@@ -1,0 +1,26 @@
+{
+  List<IEvent> events=dao.getPendingEventsForSubscription(subscription.getId());
+  assertNotNull(events);
+  printEvents(events);
+  assertEquals(events.size(),expPendingEvents);
+  if (events.size() > 0 && expPhaseChange != null) {
+    boolean foundPhase=false;
+    boolean foundChange=false;
+    for (    IEvent cur : events) {
+      if (cur instanceof IPhaseEvent) {
+        assertEquals(foundPhase,false);
+        foundPhase=true;
+        assertEquals(cur.getEffectiveDate(),expPhaseChange);
+      }
+ else       if (cur instanceof IUserEvent) {
+        IUserEvent uEvent=(IUserEvent)cur;
+        assertEquals(ApiEventType.CHANGE,uEvent.getEventType());
+        assertEquals(foundChange,false);
+        foundChange=true;
+      }
+ else {
+        assertFalse(true);
+      }
+    }
+  }
+}

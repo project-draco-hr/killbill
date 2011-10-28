@@ -1,0 +1,12 @@
+{
+  if (transitions == null) {
+    return false;
+  }
+  for (  SubscriptionTransition cur : transitions) {
+    if (cur.getTransitionTime().isBefore(clock.getUTCNow()) || cur.getEventType() == EventType.PHASE || cur.getApiEventType() != ApiEventType.CANCEL) {
+      continue;
+    }
+    return true;
+  }
+  return false;
+}

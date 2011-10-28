@@ -1,0 +1,18 @@
+{
+  List<URL> results=new ArrayList<URL>();
+  List<String> urlFragments=extractHrefs(directoryContents);
+  for (  String u : urlFragments) {
+    if (u.endsWith(XML_EXTENSION)) {
+      if (u.startsWith("/")) {
+        results.add(new URL(url.getProtocol() + ":" + u));
+      }
+ else       if (u.startsWith("http:")) {
+        results.add(new URL(u));
+      }
+ else {
+        results.add(appendToURL(url,u));
+      }
+    }
+  }
+  return results;
+}

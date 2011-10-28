@@ -1,0 +1,12 @@
+{
+  List<IEvent> events=dao.getEventsReady(apiProcessorId,sequenceId);
+  log.info(String.format("doProcessEvents : Got %d event(s)",events.size()));
+  for (  IEvent cur : events) {
+    log.info(String.format("doProcessEvents :  (clock = %s) CALLING Engine with event %s",clock.getUTCNow(),cur));
+    listener.processEventReady(cur);
+    log.info(String.format("doProcessEvents : PROCESSED event %s",cur));
+    nbProcessedEvents++;
+  }
+  dao.clearEventsReady(apiProcessorId,events);
+  log.info(String.format("doProcessEvents : clearEvents"));
+}

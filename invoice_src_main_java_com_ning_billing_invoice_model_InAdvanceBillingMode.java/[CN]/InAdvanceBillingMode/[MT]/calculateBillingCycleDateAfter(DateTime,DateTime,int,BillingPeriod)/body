@@ -1,0 +1,16 @@
+{
+  DateTime proposedDate=billingCycleDate;
+  while (proposedDate.isBefore(date)) {
+    proposedDate=proposedDate.plusMonths(billingPeriod.getNumberOfMonths());
+    if (proposedDate.dayOfMonth().get() != billingCycleDay) {
+      int lastDayOfMonth=proposedDate.dayOfMonth().getMaximumValue();
+      if (lastDayOfMonth < billingCycleDay) {
+        proposedDate=buildDate(proposedDate.getYear(),proposedDate.getMonthOfYear(),lastDayOfMonth);
+      }
+ else {
+        proposedDate=buildDate(proposedDate.getYear(),proposedDate.getMonthOfYear(),billingCycleDay);
+      }
+    }
+  }
+  return proposedDate;
+}

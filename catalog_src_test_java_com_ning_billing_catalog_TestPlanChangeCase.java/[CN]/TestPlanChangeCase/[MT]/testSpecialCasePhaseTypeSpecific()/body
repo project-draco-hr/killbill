@@ -1,0 +1,14 @@
+{
+  Product P1=createProduct("FP");
+  Product P2=createProduct("BP");
+  PriceList PL1=createPriceList("PL1");
+  PriceList PL2=createPriceList("PL2");
+  Catalog c=createCatalog(new PlanChangeRule[]{},new PlanChangeCase[]{new PlanChangeCase(P1,P2,ANNUAL,MONTHLY,EVERGREEN,EVERGREEN,PL1,PL2,IMMEDIATE)},null,P1,P2);
+  c.setPriceLists(new PriceList[]{PL1,PL2});
+  assertEquals(IMMEDIATE,c.getPlanChangePolicy(new PlanPhaseSpecifier("FP",ANNUAL,"PL1",EVERGREEN),new PlanPhaseSpecifier("BP",MONTHLY,"PL2",EVERGREEN)));
+  assertNull(c.getPlanChangePolicy(new PlanPhaseSpecifier("FP",ANNUAL,"PL1",EVERGREEN),new PlanPhaseSpecifier("BP",ANNUAL,"PL2",EVERGREEN)));
+  c=createCatalog(new PlanChangeRule[]{new PlanChangeRule(Qualifier.DEFAULT,END_OF_TERM,PhaseType.EVERGREEN)},new PlanChangeCase[]{new PlanChangeCase(P1,P2,ANNUAL,MONTHLY,EVERGREEN,EVERGREEN,null,null,IMMEDIATE)},null,P1,P2);
+  assertEquals(IMMEDIATE,c.getPlanChangePolicy(new PlanPhaseSpecifier("FP",ANNUAL,null,EVERGREEN),new PlanPhaseSpecifier("BP",MONTHLY,null,EVERGREEN)));
+  assertEquals(END_OF_TERM,c.getPlanChangePolicy(new PlanPhaseSpecifier("BP",MONTHLY,null,EVERGREEN),new PlanPhaseSpecifier("FP",ANNUAL,null,EVERGREEN)));
+  assertNull(c.getPlanChangePolicy(new PlanPhaseSpecifier("BP",MONTHLY,null,TRIAL),new PlanPhaseSpecifier("FP",ANNUAL,null,TRIAL)));
+}

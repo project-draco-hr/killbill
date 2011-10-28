@@ -1,0 +1,8 @@
+{
+  if (subscriptionId == null || now == null || activeVersion == 0) {
+    throw new EntitlementError("Missing required arguments for creating next phase event");
+  }
+  TimedPhase nextPhase=getNextTimedPhase();
+  IPhaseEvent nextPhaseEvent=(nextPhase == null) ? null : new PhaseEvent(subscriptionId,nextPhase.getPhase(),now,nextPhase.getStartPhase(),now,activeVersion);
+  return nextPhaseEvent;
+}

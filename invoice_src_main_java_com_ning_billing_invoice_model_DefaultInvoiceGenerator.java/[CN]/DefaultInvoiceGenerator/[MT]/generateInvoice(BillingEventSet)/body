@@ -1,0 +1,24 @@
+{
+  if (events == null) {
+    return new Invoice();
+  }
+  if (events.size() == 0) {
+    return new Invoice();
+  }
+  Currency targetCurrency=events.getTargetCurrency();
+  Invoice invoice=new Invoice(targetCurrency);
+  DateTime targetDate=events.getTargetDate();
+  Collections.sort(events);
+  for (int i=0; i < (events.size() - 1); i++) {
+    IBillingEvent thisEvent=events.get(i);
+    IBillingEvent nextEvent=events.get(i + 1);
+    if (thisEvent.getSubscriptionId() == nextEvent.getSubscriptionId()) {
+      processEvents(thisEvent,nextEvent,invoice,targetDate,targetCurrency);
+    }
+ else {
+      processEvent(thisEvent,invoice,targetDate,targetCurrency);
+    }
+  }
+  processEvent(events.getLast(),invoice,targetDate,targetCurrency);
+  return invoice;
+}

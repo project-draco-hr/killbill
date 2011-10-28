@@ -1,0 +1,13 @@
+{
+  if (targetDate.isBefore(startDate)) {
+    throw new InvalidDateSequenceException();
+  }
+  BigDecimal precedingProRation=calculateProRationBeforeFirstBillingPeriod(startDate,billingCycleDay,billingPeriod);
+  DateTime firstBillCycleDate=calculateBillingCycleDateOnOrAfter(startDate,billingCycleDay);
+  DateTime endBillCycleDate=calculateBillingCycleDateAfter(targetDate,firstBillCycleDate,billingCycleDay,billingPeriod);
+  BigDecimal numberOfBillingPeriods=calculateNumberOfWholeBillingPeriods(firstBillCycleDate,endBillCycleDate,billingPeriod);
+  if (targetDate.equals(endBillCycleDate)) {
+    numberOfBillingPeriods=numberOfBillingPeriods.add(BigDecimal.ONE);
+  }
+  return precedingProRation.add(numberOfBillingPeriods);
+}

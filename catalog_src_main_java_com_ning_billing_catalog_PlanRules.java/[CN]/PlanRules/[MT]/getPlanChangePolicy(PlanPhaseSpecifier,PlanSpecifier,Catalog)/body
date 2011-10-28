@@ -1,0 +1,21 @@
+{
+  if (changeCase != null) {
+    for (int i=changeCase.length - 1; i >= 0; i--) {
+      ActionPolicy policy=changeCase[i].getPlanChangePolicy(from,to,catalog);
+      if (policy != null) {
+        return policy;
+      }
+    }
+  }
+  for (int i=rules.length - 1; i >= 0; i--) {
+    int fromProductIndex=getProductIndex(catalog.getProductFromName(from.getProductName()));
+    int fromBillingPeriodIndex=getBillingPeriodIndex(from.getBillingPeriod());
+    int toProductIndex=getProductIndex(catalog.getProductFromName(to.getProductName()));
+    int toBillingPeriodIndex=getBillingPeriodIndex(to.getBillingPeriod());
+    ActionPolicy policy=rules[i].getPlanChangePolicy(fromProductIndex,fromBillingPeriodIndex,toProductIndex,toBillingPeriodIndex,from.getPhaseType());
+    if (policy != null) {
+      return policy;
+    }
+  }
+  return null;
+}

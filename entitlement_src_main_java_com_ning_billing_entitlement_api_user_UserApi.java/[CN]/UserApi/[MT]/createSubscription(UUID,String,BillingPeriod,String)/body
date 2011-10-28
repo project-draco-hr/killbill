@@ -1,0 +1,44 @@
+{
+  String realPriceList=(priceList == null) ? "standard" : priceList;
+  DateTime now=clock.getUTCNow();
+  IPlan plan=catalog.getPlan(productName,term,realPriceList);
+  if (plan == null) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BAD_CATALOG,productName,term,realPriceList);
+  }
+  IPlanPhase planPhase=(plan.getInitialPhases() != null) ? plan.getInitialPhases()[0] : plan.getFinalPhase();
+  if (planPhase == null) {
+    throw new EntitlementError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",productName,term.toString(),realPriceList));
+  }
+  ISubscriptionBundle bundle=dao.getSubscriptionBundleFromId(bundleId);
+  if (bundle == null) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_NO_BUNDLE,bundleId);
+  }
+  DateTime bundleStartDate=null;
+  ISubscription baseSubscription=dao.getBaseSubscription(bundleId);
+switch (plan.getProduct().getCategory()) {
+case BASE:
+    if (baseSubscription != null) {
+      throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BP_EXISTS,bundleId);
+    }
+  bundleStartDate=now;
+break;
+case ADD_ON:
+if (baseSubscription == null) {
+throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_NO_BP,bundleId);
+}
+bundleStartDate=baseSubscription.getStartDate();
+break;
+default :
+throw new EntitlementError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
+}
+Subscription subscription=new Subscription(bundleId,plan.getProduct().getCategory(),bundleStartDate,now);
+ApiEventCreate creationEvent=new ApiEventCreate(subscription.getId(),bundleStartDate,now,plan,realPriceList,now,now,subscription.getActiveVersion());
+EntitlementAlignment planPhaseAlignment=new EntitlementAlignment(subscription.getId(),now,bundleStartDate,plan,now,subscription.getActiveVersion());
+IPhaseEvent nextPhaseEvent=planPhaseAlignment.getNextPhaseEvent();
+List<IEvent> events=new ArrayList<IEvent>();
+events.add(creationEvent);
+if (nextPhaseEvent != null) {
+events.add(nextPhaseEvent);
+}
+return dao.createSubscription(subscription,events);
+}

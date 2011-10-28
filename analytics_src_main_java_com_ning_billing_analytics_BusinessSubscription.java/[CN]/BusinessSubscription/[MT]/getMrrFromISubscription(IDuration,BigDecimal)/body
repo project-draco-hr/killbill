@@ -1,0 +1,21 @@
+{
+  if (duration == null || duration.getUnit() == null || duration.getLength() == 0) {
+    return null;
+  }
+  if (duration.getUnit().equals(TimeUnit.UNLIMITED)) {
+    return BigDecimal.ZERO;
+  }
+ else   if (duration.getUnit().equals(TimeUnit.DAYS)) {
+    return price.multiply(DAYS_IN_MONTH).multiply(BigDecimal.valueOf(duration.getLength()));
+  }
+ else   if (duration.getUnit().equals(TimeUnit.MONTHS)) {
+    return price.divide(BigDecimal.valueOf(duration.getLength()),SCALE,BigDecimal.ROUND_HALF_UP);
+  }
+ else   if (duration.getUnit().equals(TimeUnit.YEARS)) {
+    return price.divide(BigDecimal.valueOf(duration.getLength()),SCALE,RoundingMode.HALF_UP).divide(MONTHS_IN_YEAR,SCALE,RoundingMode.HALF_UP);
+  }
+ else {
+    log.error("Unknown duration [" + duration + "], can't compute mrr");
+    return null;
+  }
+}

@@ -1,0 +1,14 @@
+{
+  log.info("Starting testSubscriptionWithAddOn");
+  try {
+    String productName="Shotgun";
+    BillingPeriod term=BillingPeriod.ANNUAL;
+    String planSetName="standard";
+    testListener.pushExpectedEvent(NextEvent.CREATE);
+    Subscription subscription=(Subscription)entitlementApi.createSubscription(bundle.getId(),productName,term,planSetName);
+    assertNotNull(subscription);
+  }
+ catch (  EntitlementUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}

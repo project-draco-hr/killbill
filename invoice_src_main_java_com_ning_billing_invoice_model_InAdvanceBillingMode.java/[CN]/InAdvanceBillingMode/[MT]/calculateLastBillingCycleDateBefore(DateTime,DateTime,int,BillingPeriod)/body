@@ -1,0 +1,23 @@
+{
+  DateTime proposedDate=previousBillCycleDate;
+  proposedDate=proposedDate.plusMonths(billingPeriod.getNumberOfMonths());
+  if (!proposedDate.isBefore(date)) {
+    return previousBillCycleDate;
+  }
+  while (proposedDate.isBefore(date)) {
+    proposedDate=proposedDate.plusMonths(billingPeriod.getNumberOfMonths());
+  }
+  proposedDate=proposedDate.plusMonths(-billingPeriod.getNumberOfMonths());
+  if (proposedDate.dayOfMonth().get() < billingCycleDay) {
+    int lastDayOfTheMonth=proposedDate.dayOfMonth().getMaximumValue();
+    if (lastDayOfTheMonth < billingCycleDay) {
+      return buildDate(proposedDate.getYear(),proposedDate.getMonthOfYear(),lastDayOfTheMonth);
+    }
+ else {
+      return buildDate(proposedDate.getYear(),proposedDate.getMonthOfYear(),billingCycleDay);
+    }
+  }
+ else {
+    return proposedDate;
+  }
+}

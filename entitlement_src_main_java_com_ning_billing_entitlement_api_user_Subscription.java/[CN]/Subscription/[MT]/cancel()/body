@@ -1,0 +1,13 @@
+{
+  SubscriptionState currentState=getState();
+  if (currentState != SubscriptionState.ACTIVE) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_CANCEL_BAD_STATE,id,currentState);
+  }
+  DateTime now=clock.getUTCNow();
+  PlanPhaseSpecifier planPhase=new PlanPhaseSpecifier(getCurrentPlan().getProduct().getName(),getCurrentPlan().getBillingPeriod(),getCurrentPriceList(),getCurrentPhase().getPhaseType());
+  ActionPolicy policy=catalog.getPlanCancelPolicy(planPhase);
+  DateTime effectiveDate=getPlanChangeEffectiveDate(policy,now);
+  IEvent cancelEvent=new ApiEventCancel(id,bundleStartDate,now,now,effectiveDate,activeVersion);
+  dao.cancelSubscription(id,cancelEvent);
+  rebuildTransitions();
+}

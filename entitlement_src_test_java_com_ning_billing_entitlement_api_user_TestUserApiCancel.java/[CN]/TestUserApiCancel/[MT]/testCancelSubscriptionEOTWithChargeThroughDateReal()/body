@@ -1,0 +1,34 @@
+{
+  log.info("Starting testCancelSubscriptionEOTWithChargeThroughDate");
+  try {
+    String prod="Shotgun";
+    BillingPeriod term=BillingPeriod.MONTHLY;
+    String planSet="standard";
+    Subscription subscription=createSubscription(prod,term,planSet);
+    IPlanPhase trialPhase=subscription.getCurrentPhase();
+    assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
+    DateTime expectedPhaseTrialChange=Clock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
+    assertTrue(testListener.isCompleted(2000));
+    trialPhase=subscription.getCurrentPhase();
+    assertEquals(trialPhase.getPhaseType(),PhaseType.EVERGREEN);
+    IDuration ctd=getDurationMonth(1);
+    DateTime newChargedThroughDate=Clock.addDuration(expectedPhaseTrialChange,ctd);
+    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
+    subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    subscription.cancel();
+    assertFalse(testListener.isCompleted(2000));
+    clock.addDeltaFromReality(ctd);
+    DateTime future=clock.getUTCNow();
+    assertTrue(testListener.isCompleted(2000));
+    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    assertNull(currentPhase);
+    checkNextPhaseChange(subscription,0,null);
+  }
+ catch (  EntitlementUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}

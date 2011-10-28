@@ -1,0 +1,20 @@
+{
+  List<TimedPhase> result=new LinkedList<EntitlementAlignment.TimedPhase>();
+  DateTime curPhaseStart=(plan.getPlanAlignment() == PlanAlignment.START_OF_SUBSCRIPTION) ? effectiveDate : bundleStart;
+  if (plan.getInitialPhases() == null) {
+    result.add(new TimedPhase(plan.getFinalPhase(),curPhaseStart));
+    return result;
+  }
+  DateTime nextPhaseStart=null;
+  for (  IPlanPhase cur : plan.getInitialPhases()) {
+    result.add(new TimedPhase(cur,curPhaseStart));
+    IDuration curPhaseDuration=cur.getDuration();
+    nextPhaseStart=Clock.addDuration(curPhaseStart,curPhaseDuration);
+    if (nextPhaseStart == null) {
+      throw new EntitlementError(String.format("Unexpected non ending UNLIMITED phase for plan %s",plan.getName()));
+    }
+    curPhaseStart=nextPhaseStart;
+  }
+  result.add(new TimedPhase(plan.getFinalPhase(),nextPhaseStart));
+  return result;
+}

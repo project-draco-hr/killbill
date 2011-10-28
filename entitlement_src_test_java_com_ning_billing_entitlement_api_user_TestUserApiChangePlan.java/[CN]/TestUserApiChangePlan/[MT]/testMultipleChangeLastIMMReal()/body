@@ -1,0 +1,35 @@
+{
+  try {
+    Subscription subscription=createSubscription("Assault-Rifle",BillingPeriod.MONTHLY,"gunclubDiscount");
+    IPlanPhase trialPhase=subscription.getCurrentPhase();
+    assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
+    assertTrue(testListener.isCompleted(2000));
+    List<IDuration> durationList=new ArrayList<IDuration>();
+    durationList.add(trialPhase.getDuration());
+    DateTime startDiscountPhase=Clock.addDuration(subscription.getStartDate(),durationList);
+    IDuration ctd=getDurationMonth(1);
+    DateTime newChargedThroughDate=Clock.addDuration(startDiscountPhase,ctd);
+    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
+    subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount");
+    assertFalse(testListener.isCompleted(2000));
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount");
+    assertFalse(testListener.isCompleted(2000));
+    IPlan currentPlan=subscription.getCurrentPlan();
+    assertNotNull(currentPlan);
+    assertEquals(currentPlan.getProduct().getName(),"Assault-Rifle");
+    assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
+    assertEquals(currentPlan.getPlanAlignment(),PlanAlignment.START_OF_BUNDLE);
+    assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.ANNUAL);
+    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    assertNotNull(currentPhase);
+    assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
+  }
+ catch (  EntitlementUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}

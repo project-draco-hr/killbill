@@ -1,0 +1,16 @@
+{
+  if (!isSubscriptionFutureCancelled()) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_UNCANCEL_BAD_STATE,id.toString());
+  }
+  DateTime now=clock.getUTCNow();
+  IEvent uncancelEvent=new ApiEventUncancel(id,bundleStartDate,now,now,now,activeVersion);
+  List<IEvent> uncancelEvents=new ArrayList<IEvent>();
+  uncancelEvents.add(uncancelEvent);
+  EntitlementAlignment planPhaseAlignment=new EntitlementAlignment(id,now,bundleStartDate,getCurrentPlan(),now,activeVersion);
+  IPhaseEvent nextPhaseEvent=planPhaseAlignment.getNextPhaseEvent();
+  if (nextPhaseEvent != null) {
+    uncancelEvents.add(nextPhaseEvent);
+  }
+  dao.uncancelSubscription(id,uncancelEvents);
+  rebuildTransitions();
+}

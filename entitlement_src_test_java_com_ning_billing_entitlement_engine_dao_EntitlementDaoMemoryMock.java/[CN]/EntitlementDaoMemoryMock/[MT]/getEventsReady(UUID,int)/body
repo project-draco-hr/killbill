@@ -1,0 +1,18 @@
+{
+synchronized (events) {
+    List<IEvent> readyList=new LinkedList<IEvent>();
+    for (    IEvent cur : events) {
+      if (cur.isAvailableForProcessing(clock.getUTCNow())) {
+        if (cur.getOwner() != null) {
+          log.warn(String.format("EventProcessor %s stealing event %s from %s",ownerId,cur,cur.getOwner()));
+        }
+        cur.setOwner(ownerId);
+        cur.setNextAvailableDate(clock.getUTCNow().plus(config.getDaoClaimTimeMs()));
+        cur.setProcessingState(IEventLyfecycleState.IN_PROCESSING);
+        readyList.add(cur);
+      }
+    }
+    Collections.sort(readyList);
+    return readyList;
+  }
+}

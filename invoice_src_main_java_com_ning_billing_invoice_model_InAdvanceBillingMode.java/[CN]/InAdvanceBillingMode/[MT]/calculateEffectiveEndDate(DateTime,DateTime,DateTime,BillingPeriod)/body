@@ -1,0 +1,23 @@
+{
+  if (targetDate.isBefore(endDate)) {
+    if (targetDate.isBefore(billCycleDate)) {
+      return billCycleDate;
+    }
+    int numberOfMonthsInPeriod=billingPeriod.getNumberOfMonths();
+    DateTime startOfPeriod=billCycleDate;
+    DateTime startOfNextPeriod=billCycleDate.plusMonths(numberOfMonthsInPeriod);
+    while (!isBetween(targetDate,startOfPeriod,startOfNextPeriod)) {
+      startOfPeriod=startOfNextPeriod;
+      startOfNextPeriod=startOfPeriod.plusMonths(numberOfMonthsInPeriod);
+    }
+    if (endDate.isBefore(startOfNextPeriod)) {
+      return endDate;
+    }
+ else {
+      return startOfNextPeriod;
+    }
+  }
+ else {
+    return endDate;
+  }
+}

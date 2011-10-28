@@ -1,0 +1,15 @@
+{
+  for (  final EventType possibleEventType : EventType.values()) {
+    if (!eventString.startsWith(possibleEventType.toString().toUpperCase())) {
+      continue;
+    }
+    final String categoryString=eventString.substring(possibleEventType.toString().length() + 1,eventString.length());
+    if (categoryString.equals(MISC)) {
+      return new BusinessSubscriptionEvent(possibleEventType,null);
+    }
+ else {
+      return new BusinessSubscriptionEvent(possibleEventType,ProductCategory.valueOf(categoryString));
+    }
+  }
+  throw new IllegalArgumentException("Unable to parse event string: " + eventString);
+}

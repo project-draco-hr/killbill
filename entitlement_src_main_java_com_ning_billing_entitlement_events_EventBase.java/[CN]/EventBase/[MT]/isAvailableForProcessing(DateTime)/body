@@ -1,0 +1,19 @@
+{
+  if (!isActive) {
+    return false;
+  }
+switch (processingState) {
+case AVAILABLE:
+    break;
+case IN_PROCESSING:
+  if (nextAvailableProcessingTime.isAfter(now)) {
+    return false;
+  }
+break;
+case PROCESSED:
+return false;
+default :
+throw new EntitlementError(String.format("Unkwnon IEvent processing state %s",processingState));
+}
+return effectiveDate.isBefore(now);
+}

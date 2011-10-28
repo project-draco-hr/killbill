@@ -1,0 +1,7 @@
+{
+  Product P1=createProduct("FP");
+  Product P2=createProduct("BP");
+  Catalog c=createCatalog(new PlanChangeRule[]{},new PlanChangeCase[]{new PlanChangeCase(P1,P2,ANNUAL,MONTHLY,null,null,null,null,IMMEDIATE)},null,P1,P2);
+  assertEquals(IMMEDIATE,c.getPlanChangePolicy(new PlanPhaseSpecifier("FP",ANNUAL,null,EVERGREEN),new PlanPhaseSpecifier("BP",MONTHLY,null,EVERGREEN)));
+  assertNull(c.getPlanChangePolicy(new PlanPhaseSpecifier("BP",MONTHLY,null,EVERGREEN),new PlanPhaseSpecifier("FP",ANNUAL,null,EVERGREEN)));
+}

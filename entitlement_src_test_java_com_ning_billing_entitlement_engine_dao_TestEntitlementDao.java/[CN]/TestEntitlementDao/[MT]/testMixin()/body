@@ -1,0 +1,21 @@
+{
+  String dbiString="jdbc:mysql://127.0.0.1:3306/killbill?createDatabaseIfNotExist=true";
+  DBI dbi=new DBI(dbiString,"root","root");
+  ISubscriptionSqlDao dao=dbi.onDemand(ISubscriptionSqlDao.class);
+  DateTime now=new DateTime();
+  final Subscription sub=new Subscription(UUID.randomUUID(),UUID.randomUUID(),ProductCategory.BASE,now,now,now,now,1);
+  String productName="Shotgun";
+  BillingPeriod term=BillingPeriod.MONTHLY;
+  String planSetName="standard";
+  IPlan plan=catalog.getPlan(productName,term,planSetName);
+  final IEvent event=new ApiEventCreate(UUID.randomUUID(),now,now,plan,planSetName,now,now,1);
+  dao.inTransaction(new Transaction<Void,ISubscriptionSqlDao>(){
+    @Override public Void inTransaction(    ISubscriptionSqlDao subscriptionDao,    TransactionStatus status) throws Exception {
+      subscriptionDao.insertSubscription(sub);
+      IEventSqlDao eventDao=subscriptionDao.become(IEventSqlDao.class);
+      eventDao.insertEvent(event);
+      return null;
+    }
+  }
+);
+}

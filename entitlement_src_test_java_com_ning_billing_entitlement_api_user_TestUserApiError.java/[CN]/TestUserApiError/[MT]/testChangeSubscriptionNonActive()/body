@@ -1,0 +1,23 @@
+{
+  try {
+    ISubscription subscription=createSubscription("Shotgun",BillingPeriod.ANNUAL,"standard");
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    subscription.cancel();
+    try {
+      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"standard");
+    }
+ catch (    EntitlementUserApiException e) {
+      assertEquals(e.getCode(),ErrorCode.ENT_CHANGE_NON_ACTIVE.getCode());
+      try {
+        log.info(e.getMessage());
+      }
+ catch (      Throwable el) {
+        assertFalse(true);
+      }
+    }
+  }
+ catch (  Exception e) {
+    e.printStackTrace();
+    Assert.assertFalse(true);
+  }
+}

@@ -1,0 +1,14 @@
+{
+  IBillingMode billingMode=getBillingMode(event.getBillingMode());
+  DateTime startDate=event.getEffectiveDate();
+  int billingCycleDay=event.getBillCycleDay();
+  BillingPeriod billingPeriod=event.getBillingPeriod();
+  try {
+    BigDecimal numberOfBillingCycles;
+    numberOfBillingCycles=billingMode.calculateNumberOfBillingCycles(startDate,targetDate,billingCycleDay,billingPeriod);
+    return numberOfBillingCycles.multiply(rate);
+  }
+ catch (  InvalidDateSequenceException e) {
+    return BigDecimal.ZERO;
+  }
+}

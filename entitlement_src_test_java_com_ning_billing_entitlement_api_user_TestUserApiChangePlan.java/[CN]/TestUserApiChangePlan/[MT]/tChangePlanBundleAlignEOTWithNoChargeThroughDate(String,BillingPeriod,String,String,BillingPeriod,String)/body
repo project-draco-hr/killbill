@@ -1,0 +1,21 @@
+{
+  log.info("Starting testChangeSubscriptionEOTWithNoChargeThroughDate");
+  try {
+    Subscription subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
+    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    clock.setDeltaFromReality(currentPhase.getDuration(),DAY_IN_MS);
+    DateTime futureNow=clock.getUTCNow();
+    DateTime nextExpectedPhaseChange=Clock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
+    assertTrue(futureNow.isAfter(nextExpectedPhaseChange));
+    assertTrue(testListener.isCompleted(3000));
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    subscription.changePlan(toProd,toTerm,toPlanSet);
+    assertTrue(testListener.isCompleted(2000));
+    currentPhase=subscription.getCurrentPhase();
+    checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.EVERGREEN);
+  }
+ catch (  EntitlementUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}

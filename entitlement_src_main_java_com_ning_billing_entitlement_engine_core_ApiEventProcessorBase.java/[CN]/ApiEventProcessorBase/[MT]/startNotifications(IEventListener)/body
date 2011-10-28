@@ -1,0 +1,67 @@
+{
+  this.listener=listener;
+  this.isProcessingEvents=true;
+  this.nbProcessedEvents=0;
+  final ApiEventProcessorBase apiEventProcessor=this;
+synchronized (this) {
+    if (executor != null) {
+      log.warn("There is already an executor thread running, return");
+      return;
+    }
+    this.executor=Executors.newSingleThreadExecutor(new ThreadFactory(){
+      @Override public Thread newThread(      Runnable r){
+        Thread th=new Thread(r);
+        th.setName(API_EVENT_THREAD_NAME);
+        th.setUncaughtExceptionHandler(new UncaughtExceptionHandler(){
+          @Override public void uncaughtException(          Thread t,          Throwable e){
+            log.error("Uncaught exception for thread " + t.getName(),e);
+          }
+        }
+);
+        return th;
+      }
+    }
+);
+  }
+  executor.execute(new Runnable(){
+    @Override public void run(){
+      log.info(String.format("ApiEventProcessor thread %s  [%d] started",API_EVENT_THREAD_NAME,Thread.currentThread().getId()));
+      try {
+        while (true) {
+synchronized (apiEventProcessor) {
+            if (!isProcessingEvents) {
+              log.info(String.format("ApiEventProcessor thread  %s  [%d] exiting...",API_EVENT_THREAD_NAME,Thread.currentThread().getId()));
+              apiEventProcessor.notify();
+              break;
+            }
+          }
+          try {
+            doProcessEvents(sequenceId.getAndIncrement());
+          }
+ catch (          OutOfMemoryError e) {
+            log.warn("",e);
+            throw e;
+          }
+catch (          Throwable e) {
+            log.error(API_EVENT_THREAD_NAME + " got an exception",e);
+          }
+          sleepALittle();
+        }
+        log.info(String.format("ApiEventProcessor thread  %s  [%d] exited...",API_EVENT_THREAD_NAME,Thread.currentThread().getId()));
+      }
+ catch (      Throwable e) {
+        log.error(API_EVENT_THREAD_NAME + " got an exception exiting...",e);
+        System.exit(1);
+      }
+    }
+    private void sleepALittle(){
+      try {
+        Thread.sleep(config.getNotificationSleepTimeMs());
+      }
+ catch (      Exception e) {
+        log.warn("Got interrupted exception when sleeeping between event notifications",e);
+      }
+    }
+  }
+);
+}

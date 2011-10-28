@@ -1,0 +1,30 @@
+{
+  String currentPriceList=getCurrentPriceList();
+  String realPriceList=(priceList == null) ? currentPriceList : priceList;
+  SubscriptionState currentState=getState();
+  if (currentState != SubscriptionState.ACTIVE) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_CHANGE_NON_ACTIVE,id,currentState);
+  }
+  if (isSubscriptionFutureCancelled()) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_CHANGE_FUTURE_CANCELLED,id);
+  }
+  DateTime now=clock.getUTCNow();
+  IPlan newPlan=catalog.getPlan(productName,term,realPriceList);
+  if (newPlan == null) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BAD_CATALOG,productName,term.toString(),realPriceList);
+  }
+  PlanPhaseSpecifier fromPlanPhase=new PlanPhaseSpecifier(getCurrentPlan().getProduct().getName(),getCurrentPlan().getBillingPeriod(),currentPriceList,getCurrentPhase().getPhaseType());
+  PlanPhaseSpecifier toPlanPhase=new PlanPhaseSpecifier(newPlan.getProduct().getName(),newPlan.getBillingPeriod(),realPriceList,null);
+  ActionPolicy policy=catalog.getPlanChangePolicy(fromPlanPhase,toPlanPhase);
+  DateTime effectiveDate=getPlanChangeEffectiveDate(policy,now);
+  IEvent changeEvent=new ApiEventChange(id,bundleStartDate,now,newPlan,realPriceList,now,effectiveDate,activeVersion);
+  EntitlementAlignment planPhaseAlignment=new EntitlementAlignment(id,now,bundleStartDate,newPlan,effectiveDate,activeVersion);
+  IPhaseEvent nextPhaseEvent=planPhaseAlignment.getNextPhaseEvent();
+  List<IEvent> changeEvents=new ArrayList<IEvent>();
+  if (nextPhaseEvent != null) {
+    changeEvents.add(nextPhaseEvent);
+  }
+  changeEvents.add(changeEvent);
+  dao.changePlan(id,changeEvents);
+  rebuildTransitions();
+}

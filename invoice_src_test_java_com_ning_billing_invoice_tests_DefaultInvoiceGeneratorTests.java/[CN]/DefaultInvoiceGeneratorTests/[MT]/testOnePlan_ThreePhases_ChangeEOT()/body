@@ -1,0 +1,15 @@
+{
+  DateTime targetDate=buildDateTime(2011,12,3);
+  BillingEventSet events=new BillingEventSet(Currency.USD,targetDate);
+  UUID subscriptionId=UUID.randomUUID();
+  IBillingEvent event1=new BillingEvent(subscriptionId,buildDateTime(2011,9,1),"World Domination","Build Space Laser",new InternationalPriceMock(FIVE),BillingPeriod.MONTHLY,1,BillingMode.IN_ADVANCE);
+  events.add(event1);
+  IBillingEvent event2=new BillingEvent(subscriptionId,buildDateTime(2011,10,1),"World Domination","Incinerate James Bond",new InternationalPriceMock(TEN),BillingPeriod.MONTHLY,1,BillingMode.IN_ADVANCE);
+  events.add(event2);
+  IBillingEvent event3=new BillingEvent(subscriptionId,buildDateTime(2011,11,1),"World Domination","Cackle Gleefully",new InternationalPriceMock(THIRTY),BillingPeriod.MONTHLY,1,BillingMode.IN_ADVANCE);
+  events.add(event3);
+  Invoice invoice=generator.generateInvoice(events);
+  assertNotNull(invoice);
+  assertEquals(invoice.getNumberOfItems(),3);
+  assertEquals(invoice.getTotalAmount(),FIVE.add(TEN).add(TWO.multiply(THIRTY)).setScale(NUMBER_OF_DECIMALS));
+}

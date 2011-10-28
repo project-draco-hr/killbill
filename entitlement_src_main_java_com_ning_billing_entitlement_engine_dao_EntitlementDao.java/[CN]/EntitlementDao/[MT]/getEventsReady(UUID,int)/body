@@ -1,0 +1,27 @@
+{
+  final Date now=clock.getUTCNow().toDate();
+  final Date nextAvailable=clock.getUTCNow().plus(config.getDaoClaimTimeMs()).toDate();
+  log.debug(String.format("EntitlementDao getEventsReady START effectiveNow =  %s",now));
+  List<IEvent> events=eventsDao.inTransaction(new Transaction<List<IEvent>,IEventSqlDao>(){
+    @Override public List<IEvent> inTransaction(    IEventSqlDao dao,    TransactionStatus status) throws Exception {
+      List<IEvent> claimedEvents=new ArrayList<IEvent>();
+      List<IEvent> input=dao.getReadyEvents(now,config.getDaoMaxReadyEvents());
+      for (      IEvent cur : input) {
+        final boolean claimed=(dao.claimEvent(ownerId.toString(),nextAvailable,cur.getId().toString(),now) == 1);
+        if (claimed) {
+          claimedEvents.add(cur);
+          dao.insertClaimedHistory(sequenceId,ownerId.toString(),hostname,now,cur.getId().toString());
+        }
+      }
+      return claimedEvents;
+    }
+  }
+);
+  for (  IEvent cur : events) {
+    log.debug(String.format("EntitlementDao %s [host %s] claimed events %s",ownerId,hostname,cur.getId()));
+    if (cur.getOwner() != null && !cur.getOwner().equals(ownerId)) {
+      log.warn(String.format("EventProcessor %s stealing event %s from %s",ownerId,cur,cur.getOwner()));
+    }
+  }
+  return events;
+}

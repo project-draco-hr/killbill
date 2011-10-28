@@ -1,0 +1,13 @@
+{
+  for (  Field cur : SubscriptionBuilder.class.getDeclaredFields()) {
+    try {
+      Object value=cur.get(this);
+      if (value == null) {
+        throw new EntitlementError(String.format("Field %s has not been set for Subscription",cur.getName()));
+      }
+    }
+ catch (    IllegalAccessException e) {
+      throw new EntitlementError(String.format("Failed to access value for field %s for Subscription",cur.getName()),e);
+    }
+  }
+}

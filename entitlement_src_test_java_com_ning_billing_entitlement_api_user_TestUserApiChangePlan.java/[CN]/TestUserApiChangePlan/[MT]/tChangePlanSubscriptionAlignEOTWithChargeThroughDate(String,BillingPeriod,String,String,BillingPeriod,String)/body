@@ -1,0 +1,48 @@
+{
+  log.info("Starting testChangePlanBundleAlignEOTWithChargeThroughDate");
+  try {
+    DateTime currentTime=clock.getUTCNow();
+    Subscription subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
+    IPlanPhase trialPhase=subscription.getCurrentPhase();
+    DateTime expectedPhaseTrialChange=Clock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    currentTime=clock.getUTCNow();
+    clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
+    currentTime=clock.getUTCNow();
+    assertTrue(testListener.isCompleted(2000));
+    IDuration ctd=getDurationMonth(1);
+    DateTime newChargedThroughDate=Clock.addDuration(expectedPhaseTrialChange,ctd);
+    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
+    subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
+    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    assertNotNull(currentPhase);
+    assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
+    currentTime=clock.getUTCNow();
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    subscription.changePlan(toProd,toTerm,toPlanSet);
+    checkChangePlan(subscription,fromProd,ProductCategory.BASE,fromTerm,PhaseType.EVERGREEN);
+    assertFalse(testListener.isCompleted(2000));
+    clock.addDeltaFromReality(ctd);
+    currentTime=clock.getUTCNow();
+    assertTrue(testListener.isCompleted(2000));
+    String currentProduct=subscription.getCurrentPlan().getProduct().getName();
+    assertNotNull(currentProduct);
+    assertEquals(currentProduct,toProd);
+    currentPhase=subscription.getCurrentPhase();
+    assertNotNull(currentPhase);
+    assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    clock.addDeltaFromReality(getDurationMonth(11));
+    currentTime=clock.getUTCNow();
+    assertFalse(testListener.isCompleted(2000));
+    DateTime nextExpectedPhaseChange=Clock.addDuration(newChargedThroughDate,currentPhase.getDuration());
+    checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
+    clock.addDeltaFromReality(getDurationMonth(1));
+    currentTime=clock.getUTCNow();
+    assertTrue(testListener.isCompleted(2000));
+  }
+ catch (  EntitlementUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}
