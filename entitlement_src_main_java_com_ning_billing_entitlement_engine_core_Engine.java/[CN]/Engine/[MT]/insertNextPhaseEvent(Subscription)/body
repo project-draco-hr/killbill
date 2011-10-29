@@ -1,7 +1,7 @@
 {
   DateTime now=clock.getUTCNow();
-  EntitlementAlignment planPhaseAlignment=new EntitlementAlignment(subscription.getId(),now,subscription.getBundleStartDate(),subscription.getCurrentPlan(),subscription.getLatestTranstion().getTransitionTime(),subscription.getActiveVersion());
-  IPhaseEvent nextPhaseEvent=planPhaseAlignment.getNextPhaseEvent();
+  TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(subscription,subscription.getCurrentPlan(),now,subscription.getCurrentPlanStart());
+  IPhaseEvent nextPhaseEvent=PhaseEvent.getNextPhaseEvent(nextTimedPhase,subscription,now);
   if (nextPhaseEvent != null) {
     dao.createNextPhaseEvent(subscription.getId(),nextPhaseEvent);
   }

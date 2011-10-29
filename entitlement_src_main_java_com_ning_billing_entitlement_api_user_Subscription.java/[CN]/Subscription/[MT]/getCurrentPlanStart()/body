@@ -1,0 +1,16 @@
+{
+  if (transitions == null) {
+    throw new EntitlementError(String.format("No transitions for subscription %s",getId()));
+  }
+  Iterator<SubscriptionTransition> it=((LinkedList<SubscriptionTransition>)transitions).descendingIterator();
+  while (it.hasNext()) {
+    SubscriptionTransition cur=it.next();
+    if (cur.getTransitionTime().isAfter(clock.getUTCNow())) {
+      continue;
+    }
+    if (cur.getEventType() == EventType.API_USER && cur.getApiEventType() == ApiEventType.CHANGE) {
+      return cur.getTransitionTime();
+    }
+  }
+  return transitions.get(0).getTransitionTime();
+}

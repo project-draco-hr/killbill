@@ -4,7 +4,8 @@
     throw new EntitlementUserApiException(ErrorCode.ENT_CANCEL_BAD_STATE,id,currentState);
   }
   DateTime now=clock.getUTCNow();
-  PlanPhaseSpecifier planPhase=new PlanPhaseSpecifier(getCurrentPlan().getProduct().getName(),getCurrentPlan().getBillingPeriod(),getCurrentPriceList(),getCurrentPhase().getPhaseType());
+  IPlan currentPlan=getCurrentPlan();
+  PlanPhaseSpecifier planPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),getCurrentPlan().getBillingPeriod(),getCurrentPriceList(),getCurrentPhase().getPhaseType());
   ActionPolicy policy=catalog.getPlanCancelPolicy(planPhase);
   DateTime effectiveDate=getPlanChangeEffectiveDate(policy,now);
   IEvent cancelEvent=new ApiEventCancel(id,bundleStartDate,now,now,effectiveDate,activeVersion);

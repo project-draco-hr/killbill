@@ -13,13 +13,15 @@
   if (newPlan == null) {
     throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BAD_CATALOG,productName,term.toString(),realPriceList);
   }
-  PlanPhaseSpecifier fromPlanPhase=new PlanPhaseSpecifier(getCurrentPlan().getProduct().getName(),getCurrentPlan().getBillingPeriod(),currentPriceList,getCurrentPhase().getPhaseType());
-  PlanPhaseSpecifier toPlanPhase=new PlanPhaseSpecifier(newPlan.getProduct().getName(),newPlan.getBillingPeriod(),realPriceList,null);
+  IPlan currentPlan=getCurrentPlan();
+  PlanPhaseSpecifier fromPlanPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),currentPlan.getBillingPeriod(),currentPriceList,getCurrentPhase().getPhaseType());
+  PlanSpecifier toPlanPhase=new PlanSpecifier(newPlan.getProduct().getName(),newPlan.getProduct().getCategory(),newPlan.getBillingPeriod(),realPriceList);
   ActionPolicy policy=catalog.getPlanChangePolicy(fromPlanPhase,toPlanPhase);
   DateTime effectiveDate=getPlanChangeEffectiveDate(policy,now);
-  IEvent changeEvent=new ApiEventChange(id,bundleStartDate,now,newPlan,realPriceList,now,effectiveDate,activeVersion);
-  EntitlementAlignment planPhaseAlignment=new EntitlementAlignment(id,now,bundleStartDate,newPlan,effectiveDate,activeVersion);
-  IPhaseEvent nextPhaseEvent=planPhaseAlignment.getNextPhaseEvent();
+  TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(this,newPlan,realPriceList,effectiveDate);
+  IEvent changeEvent=new ApiEventChange(id,bundleStartDate,now,newPlan.getName(),currentTimedPhase.getPhase().getName(),realPriceList,now,effectiveDate,activeVersion);
+  TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(this,newPlan,realPriceList,effectiveDate);
+  IPhaseEvent nextPhaseEvent=PhaseEvent.getNextPhaseEvent(nextTimedPhase,this,now);
   List<IEvent> changeEvents=new ArrayList<IEvent>();
   if (nextPhaseEvent != null) {
     changeEvents.add(nextPhaseEvent);

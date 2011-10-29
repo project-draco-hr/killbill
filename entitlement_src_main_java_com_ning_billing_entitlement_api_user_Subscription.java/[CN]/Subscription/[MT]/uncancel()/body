@@ -6,8 +6,9 @@
   IEvent uncancelEvent=new ApiEventUncancel(id,bundleStartDate,now,now,now,activeVersion);
   List<IEvent> uncancelEvents=new ArrayList<IEvent>();
   uncancelEvents.add(uncancelEvent);
-  EntitlementAlignment planPhaseAlignment=new EntitlementAlignment(id,now,bundleStartDate,getCurrentPlan(),now,activeVersion);
-  IPhaseEvent nextPhaseEvent=planPhaseAlignment.getNextPhaseEvent();
+  DateTime planStartDate=getCurrentPlanStart();
+  TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(this,getCurrentPlan(),now,planStartDate);
+  IPhaseEvent nextPhaseEvent=PhaseEvent.getNextPhaseEvent(nextTimedPhase,this,now);
   if (nextPhaseEvent != null) {
     uncancelEvents.add(nextPhaseEvent);
   }
