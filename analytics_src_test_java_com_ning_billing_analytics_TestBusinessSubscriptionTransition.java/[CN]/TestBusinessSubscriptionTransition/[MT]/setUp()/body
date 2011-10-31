@@ -4,9 +4,9 @@
   final IPlanPhase phase=new MockPhase(PhaseType.EVERGREEN,plan,MockDuration.UNLIMITED(),25.95);
   final ISubscription prevISubscription=new MockSubscription(ISubscription.SubscriptionState.ACTIVE,plan,phase);
   final ISubscription nextISubscription=new MockSubscription(ISubscription.SubscriptionState.CANCELLED,plan,phase);
-  prevSubscription=new BusinessSubscription(prevISubscription);
-  nextSubscription=new BusinessSubscription(nextISubscription);
-  event=BusinessSubscriptionEvent.subscriptionCancelled(prevISubscription);
+  prevSubscription=new BusinessSubscription(prevISubscription,USD);
+  nextSubscription=new BusinessSubscription(nextISubscription,USD);
+  event=BusinessSubscriptionEvent.subscriptionCancelled(prevISubscription.getCurrentPlan());
   requestedTimestamp=new DateTime(DateTimeZone.UTC);
   key="1234";
   transition=new BusinessSubscriptionTransition(key,requestedTimestamp,event,prevSubscription,nextSubscription);
