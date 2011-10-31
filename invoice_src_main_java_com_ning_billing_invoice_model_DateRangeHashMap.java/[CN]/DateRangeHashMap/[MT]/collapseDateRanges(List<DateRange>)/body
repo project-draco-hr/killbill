@@ -1,0 +1,23 @@
+{
+  if (dateRanges.size() < 2) {
+    return dateRanges;
+  }
+  int originalSize=dateRanges.size();
+  List<DateRange> newDateRanges=new ArrayList<DateRange>();
+  DateRange range=dateRanges.get(0);
+  for (int i=1; i < dateRanges.size(); i++) {
+    DateRange thisRange=dateRanges.get(i);
+    if (range.overlaps(thisRange)) {
+      range=range.calculateUnionWith(thisRange);
+      newDateRanges.add(range);
+    }
+ else {
+      newDateRanges.add(range);
+      range=thisRange;
+    }
+  }
+  if (originalSize > newDateRanges.size()) {
+    newDateRanges=collapseDateRanges(newDateRanges);
+  }
+  return newDateRanges;
+}

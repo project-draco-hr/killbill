@@ -1,0 +1,21 @@
+{
+  InvoiceItemList currentItems=(InvoiceItemList)currentInvoiceItems.clone();
+  InvoiceItemList existingItems=(InvoiceItemList)existingInvoiceItems.clone();
+  Collections.sort(currentItems);
+  Collections.sort(existingItems);
+  List<InvoiceItem> existingItemsToRemove=new ArrayList<InvoiceItem>();
+  for (  InvoiceItem currentItem : currentItems) {
+    for (    InvoiceItem existingItem : existingItems) {
+      if (currentItem.duplicates(existingItem)) {
+        currentItem.subtract(existingItem);
+        existingItemsToRemove.add(existingItem);
+      }
+    }
+  }
+  existingItems.removeAll(existingItemsToRemove);
+  currentItems.removeZeroDollarItems();
+  for (  InvoiceItem existingItem : existingItems) {
+    currentItems.add(existingItem.asCredit());
+  }
+  return currentItems;
+}
