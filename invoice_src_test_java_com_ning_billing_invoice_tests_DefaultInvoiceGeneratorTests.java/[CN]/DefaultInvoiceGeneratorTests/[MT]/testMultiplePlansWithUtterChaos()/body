@@ -1,0 +1,44 @@
+{
+  BillingMode billingMode=BillingMode.IN_ADVANCE;
+  BillingEventSet events=new BillingEventSet();
+  UUID subscriptionId1=UUID.randomUUID();
+  DateTime startDate1=buildDateTime(2011,1,5);
+  String planName1="World Domination";
+  IBillingEvent event;
+  BigDecimal expectedAmount;
+  InvoiceItemList invoiceItems=new InvoiceItemList();
+  event=new BillingEvent(subscriptionId1,startDate1,planName1,"Conceive diabolical plan",new InternationalPriceMock(EIGHT),BillingPeriod.MONTHLY,5,billingMode);
+  events.add(event);
+  expectedAmount=EIGHT;
+  testInvoiceGeneration(events,invoiceItems,startDate1,1,expectedAmount);
+  assertEquals(invoiceItems.size(),1);
+  testInvoiceGeneration(events,invoiceItems,buildDateTime(2011,1,6),0,ZERO);
+  assertEquals(invoiceItems.size(),1);
+  UUID subscriptionId2=UUID.randomUUID();
+  DateTime startDate2=buildDateTime(2011,3,10);
+  String planName2="Build Invoicing System";
+  event=new BillingEvent(subscriptionId2,startDate2,planName2,"Implement and test pro-ration algorithm",new InternationalPriceMock(TWENTY),BillingPeriod.MONTHLY,10,billingMode);
+  events.add(event);
+  expectedAmount=EIGHT.multiply(TWO).add(TWENTY).setScale(NUMBER_OF_DECIMALS);
+  testInvoiceGeneration(events,invoiceItems,startDate2,2,expectedAmount);
+  assertEquals(invoiceItems.size(),3);
+  DateTime phaseChangeDate=buildDateTime(2011,4,5);
+  event=new BillingEvent(subscriptionId1,phaseChangeDate,planName1,"Hire minions",new InternationalPriceMock(TWELVE),BillingPeriod.MONTHLY,5,billingMode);
+  events.add(event);
+  testInvoiceGeneration(events,invoiceItems,phaseChangeDate,1,TWELVE);
+  assertEquals(invoiceItems.size(),4);
+  DateTime billRunDate=buildDateTime(2011,4,11);
+  testInvoiceGeneration(events,invoiceItems,billRunDate,1,TWENTY);
+  assertEquals(invoiceItems.size(),5);
+  DateTime plan1CancelDate=buildDateTime(2011,4,29);
+  event=new BillingEvent(subscriptionId1,plan1CancelDate,planName1,"Defeated by James Bond",new InternationalPriceMock(ZERO),BillingPeriod.MONTHLY,5,billingMode);
+  events.add(event);
+  Invoice invoice=generator.generateInvoice(events,new InvoiceItemList(),plan1CancelDate,Currency.USD);
+  BigDecimal totalToDate=invoice.getTotalAmount();
+  BigDecimal invoicedAmount=ZERO;
+  for (  InvoiceItem item : invoiceItems) {
+    invoicedAmount=invoicedAmount.add(item.getAmount());
+  }
+  BigDecimal creditAmount=totalToDate.subtract(invoicedAmount).setScale(NUMBER_OF_DECIMALS);
+  testInvoiceGeneration(events,invoiceItems,plan1CancelDate,2,creditAmount);
+}

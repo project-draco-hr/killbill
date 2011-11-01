@@ -1,0 +1,18 @@
+{
+  InvoiceItemList items=new InvoiceItemList();
+  Collections.sort(events);
+  for (int i=0; i < (events.size() - 1); i++) {
+    IBillingEvent thisEvent=events.get(i);
+    IBillingEvent nextEvent=events.get(i + 1);
+    if (thisEvent.getSubscriptionId() == nextEvent.getSubscriptionId()) {
+      processEvents(thisEvent,nextEvent,items,targetDate,targetCurrency);
+    }
+ else {
+      processEvent(thisEvent,items,targetDate,targetCurrency);
+    }
+  }
+  if (events.size() > 0) {
+    processEvent(events.getLast(),items,targetDate,targetCurrency);
+  }
+  return items;
+}
