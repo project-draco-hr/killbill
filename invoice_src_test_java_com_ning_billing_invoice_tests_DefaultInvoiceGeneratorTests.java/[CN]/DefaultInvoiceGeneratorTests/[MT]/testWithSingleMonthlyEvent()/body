@@ -6,10 +6,10 @@
   String phaseName="Build Space Laser";
   IBillingEvent event=new BillingEvent(subscriptionId,startDate,planName,phaseName,new InternationalPriceMock(TEN),BillingPeriod.MONTHLY,1,BillingMode.IN_ADVANCE);
   events.add(event);
-  InvoiceItemList invoiceItems=new InvoiceItemList();
+  InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,10,3);
-  Invoice invoice=generator.generateInvoice(events,invoiceItems,targetDate,Currency.USD);
-  assertNotNull(invoice);
-  assertEquals(invoice.getNumberOfItems(),1);
-  assertEquals(invoice.getTotalAmount(),TWENTY);
+  InvoiceItemList invoiceItems=generator.generateInvoiceItems(events,existingInvoiceItems,targetDate,Currency.USD);
+  assertNotNull(invoiceItems);
+  assertEquals(invoiceItems.size(),1);
+  assertEquals(invoiceItems.getTotalAmount(),TWENTY);
 }

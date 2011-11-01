@@ -5,11 +5,11 @@
   events.add(event1);
   IBillingEvent event2=new BillingEvent(subscriptionId,buildDateTime(2011,10,15),"World Domination","Incinerate James Bond",new InternationalPriceMock(TEN),BillingPeriod.MONTHLY,15,BillingMode.IN_ADVANCE);
   events.add(event2);
-  InvoiceItemList invoiceItems=new InvoiceItemList();
+  InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,12,3);
-  Invoice invoice=generator.generateInvoice(events,invoiceItems,targetDate,Currency.USD);
-  assertNotNull(invoice);
-  assertEquals(invoice.getNumberOfItems(),2);
+  InvoiceItemList invoiceItems=generator.generateInvoiceItems(events,existingInvoiceItems,targetDate,Currency.USD);
+  assertNotNull(invoiceItems);
+  assertEquals(invoiceItems.size(),2);
   BigDecimal numberOfCyclesEvent1;
   numberOfCyclesEvent1=ONE.add(FOURTEEN.divide(THIRTY_ONE,NUMBER_OF_DECIMALS,ROUNDING_METHOD));
   BigDecimal numberOfCyclesEvent2=TWO;
@@ -17,5 +17,5 @@
   expectedValue=numberOfCyclesEvent1.multiply(FIVE);
   expectedValue=expectedValue.add(numberOfCyclesEvent2.multiply(TEN));
   expectedValue=expectedValue.setScale(NUMBER_OF_DECIMALS);
-  assertEquals(invoice.getTotalAmount(),expectedValue);
+  assertEquals(invoiceItems.getTotalAmount(),expectedValue);
 }

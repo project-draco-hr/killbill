@@ -7,13 +7,13 @@
   BigDecimal rate=TEN;
   IBillingEvent event=new BillingEvent(subscriptionId,startDate,planName,phaseName,new InternationalPriceMock(rate),BillingPeriod.MONTHLY,15,BillingMode.IN_ADVANCE);
   events.add(event);
-  InvoiceItemList invoiceItems=new InvoiceItemList();
+  InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,10,3);
-  Invoice invoice=generator.generateInvoice(events,invoiceItems,targetDate,Currency.USD);
-  assertNotNull(invoice);
-  assertEquals(invoice.getNumberOfItems(),1);
+  InvoiceItemList invoiceItems=generator.generateInvoiceItems(events,existingInvoiceItems,targetDate,Currency.USD);
+  assertNotNull(invoiceItems);
+  assertEquals(invoiceItems.size(),1);
   BigDecimal expectedNumberOfBillingCycles;
   expectedNumberOfBillingCycles=ONE.add(FOURTEEN.divide(THIRTY_ONE,NUMBER_OF_DECIMALS,ROUNDING_METHOD));
   BigDecimal expectedAmount=expectedNumberOfBillingCycles.multiply(rate).setScale(NUMBER_OF_DECIMALS);
-  assertEquals(invoice.getTotalAmount(),expectedAmount);
+  assertEquals(invoiceItems.getTotalAmount(),expectedAmount);
 }

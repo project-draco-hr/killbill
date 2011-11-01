@@ -7,10 +7,10 @@
   events.add(event2);
   IBillingEvent event3=new BillingEvent(subscriptionId,buildDateTime(2011,11,1),"World Domination","Cackle Gleefully",new InternationalPriceMock(THIRTY),BillingPeriod.MONTHLY,1,BillingMode.IN_ADVANCE);
   events.add(event3);
-  InvoiceItemList invoiceItems=new InvoiceItemList();
+  InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,12,3);
-  Invoice invoice=generator.generateInvoice(events,invoiceItems,targetDate,Currency.USD);
-  assertNotNull(invoice);
-  assertEquals(invoice.getNumberOfItems(),3);
-  assertEquals(invoice.getTotalAmount(),FIVE.add(TEN).add(TWO.multiply(THIRTY)).setScale(NUMBER_OF_DECIMALS));
+  InvoiceItemList invoiceItems=generator.generateInvoiceItems(events,existingInvoiceItems,targetDate,Currency.USD);
+  assertNotNull(invoiceItems);
+  assertEquals(invoiceItems.size(),3);
+  assertEquals(invoiceItems.getTotalAmount(),FIVE.add(TEN).add(TWO.multiply(THIRTY)).setScale(NUMBER_OF_DECIMALS));
 }
