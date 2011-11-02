@@ -1,9 +1,8 @@
 {
   JAXBContext context=JAXBContext.newInstance(Catalog.class);
-  InputStream resourceStream=XMLReader.class.getResourceAsStream("/CatalogSchema.xsd");
   SchemaFactory factory=SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-  Schema schema=factory.newSchema(new StreamSource(resourceStream));
   Unmarshaller um=context.createUnmarshaller();
+  Schema schema=factory.newSchema(XMLSchemaGenerator.xmlSchema());
   um.setSchema(schema);
   Object o=um.unmarshal(url);
   if (o instanceof Catalog) {
