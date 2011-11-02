@@ -6,11 +6,12 @@
   IBillingEvent event1=new BillingEvent(subscriptionId,startDate,"World Domination","Build Space Laser",new InternationalPriceMock(rate),BillingPeriod.MONTHLY,1,BillingMode.IN_ADVANCE);
   events.add(event1);
   InvoiceItemList existingInvoiceItems=new InvoiceItemList();
-  InvoiceItem invoiceItem=new InvoiceItem(subscriptionId,startDate,buildDateTime(2012,1,1),"",rate.multiply(FOUR),rate,Currency.USD);
+  InvoiceItem invoiceItem=new InvoiceItem(UUID.randomUUID(),subscriptionId,startDate,buildDateTime(2012,1,1),"",rate.multiply(FOUR),rate,Currency.USD);
   existingInvoiceItems.add(invoiceItem);
   DateTime targetDate=buildDateTime(2011,12,3);
-  InvoiceItemList invoiceItems=generator.generateInvoiceItems(events,existingInvoiceItems,targetDate,Currency.USD);
-  assertNotNull(invoiceItems);
-  assertEquals(invoiceItems.size(),0);
-  assertEquals(invoiceItems.getTotalAmount(),ZERO);
+  UUID accountId=UUID.randomUUID();
+  Invoice invoice=generator.generateInvoice(accountId,events,existingInvoiceItems,targetDate,Currency.USD);
+  assertNotNull(invoice);
+  assertEquals(invoice.getNumberOfItems(),0);
+  assertEquals(invoice.getTotalAmount(),ZERO);
 }

@@ -7,9 +7,10 @@
   events.add(event2);
   InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,12,3);
-  InvoiceItemList invoiceItems=generator.generateInvoiceItems(events,existingInvoiceItems,targetDate,Currency.USD);
-  assertNotNull(invoiceItems);
-  assertEquals(invoiceItems.size(),2);
+  UUID accountId=UUID.randomUUID();
+  Invoice invoice=generator.generateInvoice(accountId,events,existingInvoiceItems,targetDate,Currency.USD);
+  assertNotNull(invoice);
+  assertEquals(invoice.getNumberOfItems(),2);
   BigDecimal numberOfCyclesEvent1;
   numberOfCyclesEvent1=ONE.add(FOURTEEN.divide(THIRTY_ONE,NUMBER_OF_DECIMALS,ROUNDING_METHOD));
   BigDecimal numberOfCyclesEvent2=TWO;
@@ -17,5 +18,5 @@
   expectedValue=numberOfCyclesEvent1.multiply(FIVE);
   expectedValue=expectedValue.add(numberOfCyclesEvent2.multiply(TEN));
   expectedValue=expectedValue.setScale(NUMBER_OF_DECIMALS);
-  assertEquals(invoiceItems.getTotalAmount(),expectedValue);
+  assertEquals(invoice.getTotalAmount(),expectedValue);
 }
