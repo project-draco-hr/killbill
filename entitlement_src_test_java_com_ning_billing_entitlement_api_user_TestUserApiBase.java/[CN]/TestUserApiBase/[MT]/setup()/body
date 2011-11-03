@@ -1,6 +1,7 @@
 {
   loadSystemPropertiesFromClasspath("/entitlement.properties");
   final Injector g=getInjector();
+  service=g.getInstance(IEntitlementSystem.class);
   engine=g.getInstance(Engine.class);
   entitlementApi=g.getInstance(IEntitlementUserApi.class);
   catalogApi=g.getInstance(ICatalogUserApi.class);
@@ -9,6 +10,7 @@
   dao=g.getInstance(IEntitlementDao.class);
   clock=(ClockMock)g.getInstance(IClock.class);
   try {
+    service.initialize();
     init();
   }
  catch (  EntitlementUserApiException e) {
