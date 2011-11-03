@@ -9,8 +9,9 @@
   events.add(event3);
   InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,12,3);
-  InvoiceItemList invoiceItems=generator.generateInvoiceItems(events,existingInvoiceItems,targetDate,Currency.USD);
-  assertNotNull(invoiceItems);
-  assertEquals(invoiceItems.size(),3);
-  assertEquals(invoiceItems.getTotalAmount(),FIVE.add(TEN).add(TWO.multiply(THIRTY)).setScale(NUMBER_OF_DECIMALS));
+  UUID accountId=UUID.randomUUID();
+  Invoice invoice=generator.generateInvoice(accountId,events,existingInvoiceItems,targetDate,Currency.USD);
+  assertNotNull(invoice);
+  assertEquals(invoice.getNumberOfItems(),3);
+  assertEquals(invoice.getTotalAmount(),FIVE.add(TEN).add(TWO.multiply(THIRTY)).setScale(NUMBER_OF_DECIMALS));
 }

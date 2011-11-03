@@ -1,0 +1,13 @@
+{
+  if (events == null) {
+    return new Invoice(accountId,targetCurrency);
+  }
+  if (events.size() == 0) {
+    return new Invoice(accountId,targetCurrency);
+  }
+  Invoice invoice=new Invoice(accountId,targetCurrency);
+  InvoiceItemList currentItems=generateInvoiceItems(events,invoice.getInvoiceId(),targetDate,targetCurrency);
+  InvoiceItemList itemsToPost=reconcileInvoiceItems(invoice.getInvoiceId(),currentItems,existingItems);
+  invoice.add(itemsToPost);
+  return invoice;
+}

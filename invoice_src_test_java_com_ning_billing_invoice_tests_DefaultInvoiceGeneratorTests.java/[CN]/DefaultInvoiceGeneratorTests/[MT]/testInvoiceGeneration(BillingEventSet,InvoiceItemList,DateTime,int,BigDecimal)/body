@@ -1,8 +1,9 @@
 {
   Currency currency=Currency.USD;
-  InvoiceItemList invoiceItems=generator.generateInvoiceItems(events,existingInvoiceItems,targetDate,currency);
-  existingInvoiceItems.addAll(invoiceItems);
-  assertNotNull(invoiceItems);
-  assertEquals(invoiceItems.size(),expectedNumberOfItems);
-  assertEquals(invoiceItems.getTotalAmount(),expectedAmount);
+  UUID accountId=UUID.randomUUID();
+  Invoice invoice=generator.generateInvoice(accountId,events,existingInvoiceItems,targetDate,currency);
+  existingInvoiceItems.addAll(invoice.getItems());
+  assertNotNull(invoice);
+  assertEquals(invoice.getNumberOfItems(),expectedNumberOfItems);
+  assertEquals(invoice.getTotalAmount(),expectedAmount);
 }
