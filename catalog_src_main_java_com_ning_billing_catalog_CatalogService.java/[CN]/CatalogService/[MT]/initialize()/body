@@ -1,8 +1,11 @@
 {
-  try {
-    catalog=CatalogLoader.getCatalogFromProperty(config.getCatalogURI());
-  }
- catch (  Exception e) {
-    throw new ServiceException(e);
+  if (!isInitialized) {
+    try {
+      catalog=CatalogLoader.getCatalogFromProperty(config.getCatalogURI());
+      isInitialized=true;
+    }
+ catch (    Exception e) {
+      throw new ServiceException(e);
+    }
   }
 }
