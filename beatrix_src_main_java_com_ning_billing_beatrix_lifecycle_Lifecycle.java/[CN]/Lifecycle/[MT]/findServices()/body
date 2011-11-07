@@ -1,0 +1,10 @@
+{
+  List<LifecycleService> result=new LinkedList<LifecycleService>();
+  ClassFinder classFinder=new ClassFinder(Lifecycle.class.getClassLoader());
+  List<Class<? extends LifecycleService>> services=classFinder.getServices();
+  for (  Class<? extends LifecycleService> cur : services) {
+    log.info("Found service {}",cur);
+    result.add(injector.getInstance(cur));
+  }
+  return result;
+}
