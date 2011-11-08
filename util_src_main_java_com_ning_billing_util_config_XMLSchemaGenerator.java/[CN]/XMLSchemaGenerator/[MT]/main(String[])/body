@@ -1,0 +1,14 @@
+{
+  if (args.length != 2) {
+    printUsage();
+    System.exit(0);
+  }
+  Class<?> clazz=(Class<?>)args.getClass().getClassLoader().loadClass(args[1]);
+  JAXBContext context=JAXBContext.newInstance(clazz);
+  String xsdFileName="Schema.xsd";
+  if (args.length != 0) {
+    xsdFileName=args[0] + "/" + xsdFileName;
+  }
+  FileOutputStream s=new FileOutputStream(xsdFileName);
+  pojoToXSD(context,s);
+}
