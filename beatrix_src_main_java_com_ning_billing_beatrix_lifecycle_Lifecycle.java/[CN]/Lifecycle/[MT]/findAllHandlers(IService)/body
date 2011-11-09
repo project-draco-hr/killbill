@@ -1,0 +1,13 @@
+{
+  Multimap<LyfecycleLevel,LifecycleHandler> methodsInService=HashMultimap.create();
+  Class<? extends IService> clazz=service.getClass();
+  for (  Method method : clazz.getMethods()) {
+    LyfecycleHandlerType annotation=method.getAnnotation(LyfecycleHandlerType.class);
+    if (annotation != null) {
+      LyfecycleLevel level=annotation.value();
+      LifecycleHandler handler=new LifecycleHandler(service,method);
+      methodsInService.put(level,handler);
+    }
+  }
+  return methodsInService;
+}

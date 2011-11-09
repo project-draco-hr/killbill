@@ -1,10 +1,15 @@
 {
-  List<LifecycleService> result=new LinkedList<LifecycleService>();
-  ClassFinder classFinder=new ClassFinder(Lifecycle.class.getClassLoader());
-  List<Class<? extends LifecycleService>> services=classFinder.getServices();
-  for (  Class<? extends LifecycleService> cur : services) {
-    log.info("Found service {}",cur);
-    result.add(injector.getInstance(cur));
+  Set<IService> result=new TreeSet<IService>();
+  Set<Class<? extends IService>> services=serviceFinder.getServices();
+  for (  Class<? extends IService> cur : services) {
+    log.debug("Found service {}",cur);
+    try {
+      IService service=injector.getInstance(cur);
+      result.add(injector.getInstance(cur));
+    }
+ catch (    Exception e) {
+      log.warn("Failed to inject {}",cur.getName());
+    }
   }
   return result;
 }
