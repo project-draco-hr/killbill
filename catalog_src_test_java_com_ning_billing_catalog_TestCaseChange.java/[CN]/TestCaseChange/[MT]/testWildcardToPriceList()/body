@@ -1,9 +1,9 @@
 {
   MockCatalog cat=new MockCatalog();
   Product product1=cat.getProducts()[0];
-  PriceList priceList1=cat.getPriceLists()[0];
+  PriceList priceList1=cat.getPriceLists().getDefaultPricelist();
   Product product2=cat.getProducts()[2];
-  PriceList priceList2=cat.getPriceLists()[2];
+  PriceList priceList2=cat.getPriceLists().getChildPriceLists()[1];
   CaseChangeResult cr=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1,null,PhaseType.EVERGREEN,Result.FOO);
   assertion(Result.FOO,cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
   assertionNull(cr,"wrong",product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);

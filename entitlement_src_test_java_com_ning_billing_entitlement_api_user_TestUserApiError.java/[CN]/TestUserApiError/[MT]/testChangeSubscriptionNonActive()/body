@@ -1,10 +1,10 @@
 {
   try {
-    ISubscription subscription=createSubscription("Shotgun",BillingPeriod.ANNUAL,"standard");
+    ISubscription subscription=createSubscription("Shotgun",BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     subscription.cancel();
     try {
-      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"standard");
+      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
     }
  catch (    EntitlementUserApiException e) {
       assertEquals(e.getCode(),ErrorCode.ENT_CHANGE_NON_ACTIVE.getCode());
