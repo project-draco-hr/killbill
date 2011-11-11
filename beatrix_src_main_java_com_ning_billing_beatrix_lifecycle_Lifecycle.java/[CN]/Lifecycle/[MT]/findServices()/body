@@ -1,0 +1,16 @@
+{
+  Set<IService> result=new HashSet<IService>();
+  Set<Class<? extends IService>> services=serviceFinder.getServices();
+  for (  Class<? extends IService> cur : services) {
+    log.debug("Found service {}",cur.getName());
+    try {
+      IService instance=injector.getInstance(cur);
+      log.debug("got instance {}",instance.getName());
+      result.add(instance);
+    }
+ catch (    Exception e) {
+      log.warn("Failed to inject " + cur.getName(),e);
+    }
+  }
+  return result;
+}
