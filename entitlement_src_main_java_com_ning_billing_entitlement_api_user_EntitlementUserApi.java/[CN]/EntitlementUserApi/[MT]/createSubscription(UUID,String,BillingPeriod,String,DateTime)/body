@@ -1,6 +1,10 @@
 {
   String realPriceList=(priceList == null) ? IPriceListSet.DEFAULT_PRICELIST_NAME : priceList;
   DateTime now=clock.getUTCNow();
+  if (requestedDate != null && requestedDate.isAfter(now)) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
+  }
+  requestedDate=(requestedDate == null) ? now : requestedDate;
   IPlan plan=catalog.getPlan(productName,term,realPriceList);
   if (plan == null) {
     throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BAD_CATALOG,productName,term,realPriceList);
@@ -20,7 +24,7 @@ case BASE:
     if (baseSubscription != null) {
       throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BP_EXISTS,bundleId);
     }
-  bundleStartDate=now;
+  bundleStartDate=requestedDate;
 break;
 case ADD_ON:
 if (baseSubscription == null) {
@@ -31,10 +35,10 @@ break;
 default :
 throw new EntitlementError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
 }
-DateTime effectiveDate=now;
+DateTime effectiveDate=requestedDate;
 Subscription subscription=new Subscription(bundleId,plan.getProduct().getCategory(),bundleStartDate,effectiveDate);
 TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnCreate(subscription,plan,realPriceList,effectiveDate);
-ApiEventCreate creationEvent=new ApiEventCreate(subscription.getId(),bundleStartDate,now,plan.getName(),currentTimedPhase.getPhase().getName(),realPriceList,now,effectiveDate,subscription.getActiveVersion());
+ApiEventCreate creationEvent=new ApiEventCreate(subscription.getId(),bundleStartDate,now,plan.getName(),currentTimedPhase.getPhase().getName(),realPriceList,requestedDate,effectiveDate,subscription.getActiveVersion());
 TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnCreate(subscription,plan,realPriceList,effectiveDate);
 IPhaseEvent nextPhaseEvent=PhaseEvent.getNextPhaseEvent(nextTimedPhase,subscription,now);
 List<IEvent> events=new ArrayList<IEvent>();

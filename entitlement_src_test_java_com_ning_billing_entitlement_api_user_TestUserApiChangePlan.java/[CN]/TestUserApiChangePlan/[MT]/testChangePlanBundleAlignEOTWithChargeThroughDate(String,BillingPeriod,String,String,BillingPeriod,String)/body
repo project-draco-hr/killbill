@@ -15,7 +15,7 @@
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
-    subscription.changePlan(toProd,toTerm,toPlanSet);
+    subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow());
     assertFalse(testListener.isCompleted(2000));
     testListener.reset();
     currentPhase=subscription.getCurrentPhase();
