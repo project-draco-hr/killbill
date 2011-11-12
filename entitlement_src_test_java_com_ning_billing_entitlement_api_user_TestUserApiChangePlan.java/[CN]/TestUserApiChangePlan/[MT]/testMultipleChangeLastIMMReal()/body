@@ -14,10 +14,10 @@
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
     subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount");
+    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow());
     assertFalse(testListener.isCompleted(2000));
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount");
+    subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow());
     assertFalse(testListener.isCompleted(2000));
     IPlan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);

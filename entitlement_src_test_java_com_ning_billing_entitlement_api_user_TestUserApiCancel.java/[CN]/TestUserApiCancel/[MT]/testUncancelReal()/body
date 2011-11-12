@@ -19,7 +19,7 @@
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
     subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    subscription.cancel();
+    subscription.cancel(clock.getUTCNow(),false);
     assertFalse(testListener.isCompleted(2000));
     subscription.uncancel();
     clock.addDeltaFromReality(ctd);

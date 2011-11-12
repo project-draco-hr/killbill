@@ -4,6 +4,9 @@
     throw new EntitlementUserApiException(ErrorCode.ENT_CANCEL_BAD_STATE,id,currentState);
   }
   DateTime now=clock.getUTCNow();
+  if (requestedDate != null && requestedDate.isAfter(now)) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
+  }
   IPlan currentPlan=getCurrentPlan();
   PlanPhaseSpecifier planPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),getCurrentPlan().getBillingPeriod(),getCurrentPriceList(),getCurrentPhase().getPhaseType());
   ActionPolicy policy=catalog.getPlanCancelPolicy(planPhase);
