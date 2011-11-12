@@ -1,6 +1,6 @@
 {
   try {
-    ISubscription subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+    ISubscription subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,IPriceListSet.DEFAULT_PRICELIST_NAME);
     IPlanPhase trialPhase=subscription.getCurrentPhase();
     DateTime expectedPhaseTrialChange=Clock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     IDuration ctd=getDurationMonth(1);
@@ -9,7 +9,7 @@
     subscription=entitlementApi.getSubscriptionFromId(subscription.getId());
     subscription.cancel();
     try {
-      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,IPriceListSet.DEFAULT_PRICELIST_NAME);
     }
  catch (    EntitlementUserApiException e) {
       assertEquals(e.getCode(),ErrorCode.ENT_CHANGE_FUTURE_CANCELLED.getCode());
