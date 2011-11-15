@@ -5,7 +5,7 @@
     IPlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription.changePlan("Pistol",BillingPeriod.ANNUAL,"gunclubDiscount");
+    subscription.changePlan("Pistol",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow());
     testListener.isCompleted(3000);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
@@ -16,12 +16,12 @@
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
     subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    subscription.cancel();
+    subscription.cancel(clock.getUTCNow(),false);
     assertFalse(testListener.isCompleted(2000));
     testListener.reset();
     subscription.uncancel();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount");
+    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow());
     assertFalse(testListener.isCompleted(2000));
     clock.addDeltaFromReality(ctd);
     assertTrue(testListener.isCompleted(3000));

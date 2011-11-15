@@ -3,7 +3,7 @@
   try {
     String prod="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
-    String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
+    String planSet=IPriceListSet.DEFAULT_PRICELIST_NAME;
     Subscription subscription=createSubscription(prod,term,planSet);
     IPlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
@@ -15,7 +15,7 @@
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.EVERGREEN);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    subscription.cancel();
+    subscription.cancel(clock.getUTCNow(),false);
     assertTrue(testListener.isCompleted(2000));
     IPlanPhase currentPhase=subscription.getCurrentPhase();
     assertNull(currentPhase);

@@ -4,7 +4,7 @@
     DateTime init=clock.getUTCNow();
     String prod="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
-    String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
+    String planSet=IPriceListSet.DEFAULT_PRICELIST_NAME;
     Subscription subscription=createSubscription(prod,term,planSet);
     IPlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
@@ -12,7 +12,7 @@
     clock.setDeltaFromReality(moveALittleInTime,0);
     DateTime future=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    subscription.cancel();
+    subscription.cancel(clock.getUTCNow(),false);
     currentPhase=subscription.getCurrentPhase();
     testListener.isCompleted(1000);
     List<ISubscriptionTransition> allTransitions=subscription.getActiveTransitions();

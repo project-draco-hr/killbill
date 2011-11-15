@@ -4,9 +4,9 @@
     DateTime init=clock.getUTCNow();
     String productName="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
-    String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+    String planSetName=IPriceListSet.DEFAULT_PRICELIST_NAME;
     testListener.pushExpectedEvent(NextEvent.CREATE);
-    Subscription subscription=(Subscription)entitlementApi.createSubscription(bundle.getId(),productName,term,planSetName);
+    Subscription subscription=(Subscription)entitlementApi.createSubscription(bundle.getId(),productName,term,planSetName,clock.getUTCNow());
     assertNotNull(subscription);
     assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
     assertEquals(subscription.getBundleId(),bundle.getId());
