@@ -1,0 +1,14 @@
+{
+  MockCatalog cat=new MockCatalog();
+  Product product=cat.getProducts()[0];
+  PriceList priceList=cat.getPriceLists().getDefaultPricelist();
+  CaseResult cr0=new CaseResult(product,ProductCategory.BASE,BillingPeriod.MONTHLY,priceList,PhaseType.EVERGREEN,Result.FOO);
+  CaseResult cr1=new CaseResult(product,ProductCategory.BASE,BillingPeriod.MONTHLY,priceList,PhaseType.EVERGREEN,Result.BAR);
+  CaseResult cr2=new CaseResult(product,ProductCategory.BASE,BillingPeriod.MONTHLY,priceList,PhaseType.EVERGREEN,Result.TINKYWINKY);
+  CaseResult cr3=new CaseResult(product,ProductCategory.BASE,BillingPeriod.ANNUAL,priceList,PhaseType.EVERGREEN,Result.DIPSY);
+  CaseResult cr4=new CaseResult(product,ProductCategory.BASE,BillingPeriod.ANNUAL,priceList,PhaseType.EVERGREEN,Result.LALA);
+  Result r1=CasePhase.getResult(new CaseResult[]{cr0,cr1,cr2,cr3,cr4},new PlanPhaseSpecifier(product.getName(),product.getCategory(),BillingPeriod.MONTHLY,priceList.getName(),PhaseType.EVERGREEN),cat);
+  assertEquals(Result.FOO,r1);
+  Result r2=CasePhase.getResult(new CaseResult[]{cr0,cr1,cr2,cr3,cr4},new PlanPhaseSpecifier(product.getName(),product.getCategory(),BillingPeriod.ANNUAL,priceList.getName(),PhaseType.EVERGREEN),cat);
+  assertEquals(Result.DIPSY,r2);
+}
