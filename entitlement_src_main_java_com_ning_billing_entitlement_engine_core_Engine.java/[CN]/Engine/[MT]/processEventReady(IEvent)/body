@@ -1,17 +1,16 @@
 {
-  if (observers == null) {
-    return;
-  }
   Subscription subscription=(Subscription)dao.getSubscriptionFromId(event.getSubscriptionId());
   if (subscription == null) {
     log.warn("Failed to retrieve subscription for id %s",event.getSubscriptionId());
     return;
   }
-  if (event.getType() == EventType.API_USER) {
-    dispatchApiEvent((IUserEvent)event,subscription);
-  }
- else {
-    dispatchPhaseEvent((IPhaseEvent)event,subscription);
+  if (event.getType() == EventType.PHASE) {
     insertNextPhaseEvent(subscription);
+  }
+  try {
+    eventBus.post(subscription.getLatestTranstion());
+  }
+ catch (  EventBusException e) {
+    log.warn("Failed to post entitlement event " + event,e);
   }
 }
