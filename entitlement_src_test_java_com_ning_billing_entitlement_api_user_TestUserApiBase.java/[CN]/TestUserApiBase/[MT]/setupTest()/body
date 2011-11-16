@@ -5,9 +5,10 @@
   clock.resetDeltaFromReality();
   ((IEntitlementDaoMock)dao).reset();
   try {
+    busService.getEventBus().register(testListener);
     bundle=entitlementApi.createBundleForAccount(account,"myDefaultBundle");
   }
- catch (  EntitlementUserApiException e) {
+ catch (  Exception e) {
     Assert.fail(e.getMessage());
   }
   assertNotNull(bundle);
