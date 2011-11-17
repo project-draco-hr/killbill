@@ -1,0 +1,20 @@
+{
+  final String analyticsDdl=IOUtils.toString(BusinessSubscriptionTransitionDao.class.getResourceAsStream("/com/ning/billing/analytics/ddl.sql"));
+  final String accountDdl=IOUtils.toString(BusinessSubscriptionTransitionDao.class.getResourceAsStream("/com/ning/billing/account/ddl.sql"));
+  final String entitlementDdl=IOUtils.toString(BusinessSubscriptionTransitionDao.class.getResourceAsStream("/com/ning/billing/entitlement/ddl.sql"));
+  helper.startMysql();
+  helper.initDb(analyticsDdl);
+  helper.initDb(accountDdl);
+  helper.initDb(entitlementDdl);
+  final ISubscriptionBundle bundle=entitlementApi.createBundleForAccount(new MockAccount(KEY),KEY);
+  Assert.assertNotNull(bundle);
+  Assert.assertEquals(bundle.getKey(),KEY);
+  final IProduct product=new MockProduct("platinium","subscription",ProductCategory.BASE);
+  final IPlan plan=new MockPlan("platinum-monthly",product);
+  final IPlanPhase phase=new MockPhase(PhaseType.EVERGREEN,plan,MockDuration.UNLIMITED(),25.95);
+  final UUID subscriptionId=UUID.randomUUID();
+  final DateTime effectiveTransitionTime=new DateTime(DateTimeZone.UTC);
+  final DateTime requestedTransitionTime=new DateTime(DateTimeZone.UTC);
+  transition=new SubscriptionTransition(subscriptionId,bundle.getId(),IEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,ISubscription.SubscriptionState.ACTIVE,plan,phase,"something");
+  expectedTransition=new BusinessSubscriptionTransition(KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan),null,new BusinessSubscription(plan,phase,null,effectiveTransitionTime,ISubscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId()));
+}
