@@ -1,10 +1,19 @@
 {
-  String directoryContents=pullContentsFrom(url);
-  List<URL> xmlURLs=findXmlReferences(directoryContents,url);
+  List<URL> xmlURLs=null;
+  if (url.getPath().endsWith(XML_EXTENSION)) {
+    xmlURLs=new ArrayList<URL>();
+    xmlURLs.add(url);
+  }
+ else {
+    String directoryContents=pullContentsFrom(url);
+    xmlURLs=findXmlReferences(directoryContents,url);
+  }
   VersionedCatalog result=new VersionedCatalog();
   for (  URL u : xmlURLs) {
     Catalog catalog=XMLLoader.getObjectFromURL(u,Catalog.class);
     result.add(catalog);
   }
+  Date now=clock.getUTCNow().toDate();
+  result.configureEffectiveDate(now);
   return result;
 }
