@@ -11,6 +11,9 @@
   PlanChangeResult planChangeResult=null;
   try {
     IProduct destProduct=catalog.getProductFromName(productName);
+    if (destProduct == null) {
+      throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BAD_CATALOG,productName,term.toString(),"");
+    }
     IPlan currentPlan=getCurrentPlan();
     PlanPhaseSpecifier fromPlanPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),currentPlan.getBillingPeriod(),currentPriceList,getCurrentPhase().getPhaseType());
     PlanSpecifier toPlanPhase=new PlanSpecifier(productName,destProduct.getCategory(),term,priceList);
