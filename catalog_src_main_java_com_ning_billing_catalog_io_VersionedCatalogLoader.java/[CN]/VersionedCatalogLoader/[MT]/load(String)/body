@@ -1,24 +1,2 @@
 {
-  try {
-    List<URL> xmlURLs=null;
-    if (urlString.endsWith(XML_EXTENSION)) {
-      xmlURLs=new ArrayList<URL>();
-      xmlURLs.add(new URL(urlString));
-    }
- else {
-      String[] directoryContents=getResourceListing(urlString);
-      xmlURLs=findXmlReferences(directoryContents,url);
-    }
-    VersionedCatalog result=new VersionedCatalog();
-    for (    URL u : xmlURLs) {
-      Catalog catalog=XMLLoader.getObjectFromURL(u,Catalog.class);
-      result.add(catalog);
-    }
-    Date now=clock.getUTCNow().toDate();
-    result.configureEffectiveDate(now);
-    return result;
-  }
- catch (  Exception e) {
-    throw new ServiceException("Problem encountered loading catalog",e);
-  }
 }
