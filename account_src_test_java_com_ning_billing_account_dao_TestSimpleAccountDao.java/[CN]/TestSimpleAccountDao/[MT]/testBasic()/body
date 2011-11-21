@@ -1,12 +1,13 @@
 {
-  IAccount a=new Account().withKey("foo");
-  dao.createAccount(a);
-  IAccount r=dao.getAccountByKey("foo");
+  IAccount a=createTestAccount();
+  dao.saveAccount(a);
+  String key=a.getExternalKey();
+  IAccount r=dao.getAccountByKey(key);
   assertNotNull(r);
-  assertEquals(r.getKey(),a.getKey());
+  assertEquals(r.getExternalKey(),a.getExternalKey());
   r=dao.getAccountById(r.getId());
   assertNotNull(r);
-  assertEquals(r.getKey(),a.getKey());
+  assertEquals(r.getExternalKey(),a.getExternalKey());
   List<IAccount> all=dao.getAccounts();
   assertNotNull(all);
   assertTrue(all.size() >= 1);

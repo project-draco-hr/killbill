@@ -1,10 +1,12 @@
 {
-  String key="test1234";
-  IAccount account=Account.create().withKey(key);
+  Account account=createTestAccount();
   UUID id=account.getId();
+  String key=account.getExternalKey();
+  String name=account.getName();
   account.save();
   account=Account.loadAccount(id);
   assertNotNull(account);
   assertEquals(account.getId(),id);
-  assertEquals(account.getKey(),key);
+  assertEquals(account.getExternalKey(),key);
+  assertEquals(account.getName(),name);
 }

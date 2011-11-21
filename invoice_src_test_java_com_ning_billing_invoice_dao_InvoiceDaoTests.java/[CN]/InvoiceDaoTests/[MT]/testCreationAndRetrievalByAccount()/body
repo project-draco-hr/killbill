@@ -1,0 +1,16 @@
+{
+  InvoiceDao dao=InjectorMagic.getInvoiceDao();
+  UUID accountId=UUID.randomUUID();
+  IInvoice invoice=new Invoice(accountId,new Clock().getUTCNow(),Currency.USD);
+  DateTime invoiceDate=invoice.getInvoiceDate();
+  dao.createInvoice(invoice);
+  List<IInvoice> invoices=dao.getInvoicesByAccount(accountId.toString());
+  assertNotNull(invoices);
+  assertEquals(invoices.size(),1);
+  IInvoice thisInvoice=invoices.get(0);
+  assertEquals(invoice.getAccountId(),accountId);
+  assertTrue(thisInvoice.getInvoiceDate().compareTo(invoiceDate) == 0);
+  assertEquals(thisInvoice.getCurrency(),Currency.USD);
+  assertEquals(thisInvoice.getNumberOfItems(),0);
+  assertTrue(thisInvoice.getTotalAmount().compareTo(BigDecimal.ZERO) == 0);
+}
