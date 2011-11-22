@@ -10,7 +10,7 @@
   DateTime now=clock.getUTCNow();
   PlanChangeResult planChangeResult=null;
   try {
-    IProduct destProduct=catalog.getProductFromName(productName);
+    IProduct destProduct=catalog.findProduct(productName);
     if (destProduct == null) {
       throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BAD_CATALOG,productName,term.toString(),"");
     }
@@ -24,7 +24,13 @@
   }
   ActionPolicy policy=planChangeResult.getPolicy();
   IPriceList newPriceList=planChangeResult.getNewPriceList();
-  IPlan newPlan=catalog.getPlan(productName,term,newPriceList.getName());
+  IPlan newPlan=null;
+  try {
+    newPlan=catalog.findPlan(productName,term,newPriceList.getName());
+  }
+ catch (  CatalogApiException e) {
+    e.printStackTrace();
+  }
   if (newPlan == null) {
     throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BAD_CATALOG,productName,term.toString(),newPriceList.getName());
   }

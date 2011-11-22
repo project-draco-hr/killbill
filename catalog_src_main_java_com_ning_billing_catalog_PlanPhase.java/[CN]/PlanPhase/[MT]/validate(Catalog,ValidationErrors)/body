@@ -8,5 +8,8 @@
   if (recurringPrice == null && billingPeriod != BillingPeriod.NO_BILLING_PERIOD) {
     errors.add(new ValidationError(String.format("Phase %s of plan %s has no reccurring price but does have a billing period. The billing period shoudl be set to '%s'",type.toString(),plan.getName(),BillingPeriod.NO_BILLING_PERIOD),catalog.getCatalogURI(),PlanPhase.class,type.toString()));
   }
+  if (recurringPrice == null && fixedPrice == null) {
+    errors.add(new ValidationError(String.format("Phase %s of plan %s has neither a reccurring price or a fixed price.",type.toString(),plan.getName()),catalog.getCatalogURI(),PlanPhase.class,type.toString()));
+  }
   return errors;
 }

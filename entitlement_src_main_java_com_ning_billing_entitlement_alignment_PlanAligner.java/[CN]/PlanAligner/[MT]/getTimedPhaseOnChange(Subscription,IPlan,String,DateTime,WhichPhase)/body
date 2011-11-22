@@ -6,7 +6,13 @@
   PlanPhaseSpecifier fromPlanPhaseSpecifier=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),currentPlan.getBillingPeriod(),currentPriceList,currentPhase.getPhaseType());
   PlanSpecifier toPlanSpecifier=new PlanSpecifier(plan.getProduct().getName(),plan.getProduct().getCategory(),plan.getBillingPeriod(),priceList);
   DateTime planStartDate=null;
-  PlanAlignmentChange alignment=catalog.getPlanChangeAlignment(fromPlanPhaseSpecifier,toPlanSpecifier);
+  PlanAlignmentChange alignment=null;
+  try {
+    alignment=catalog.planChangeAlignment(fromPlanPhaseSpecifier,toPlanSpecifier);
+  }
+ catch (  CatalogApiException e) {
+    e.printStackTrace();
+  }
 switch (alignment) {
 case START_OF_SUBSCRIPTION:
     planStartDate=subscription.getStartDate();
