@@ -7,23 +7,20 @@
       break;
     }
     claimedEvents.addAll(tmpEvents);
-    if (oneEventOnly) {
-      break;
-    }
   }
  while (true);
   if (claimedEvents.size() == 0) {
     return false;
   }
   Collection<IEvent> claimedEventsFiltered=null;
-  if (subscriptionsIds == null) {
+  if (subscriptionsIds.length == 0) {
     claimedEventsFiltered=claimedEvents;
   }
  else {
     claimedEventsFiltered=Collections2.filter(claimedEvents,new Predicate<IEvent>(){
       @Override public boolean apply(      IEvent input){
         for (        UUID cur : subscriptionsIds) {
-          if (cur.equals(input.getId())) {
+          if (cur.equals(input.getSubscriptionId())) {
             return true;
           }
         }
@@ -31,6 +28,9 @@
       }
     }
 );
+  }
+  if (claimedEventsFiltered.size() == 0) {
+    return false;
   }
   if (oneEventOnly) {
     List<IEvent> oneEventList=new ArrayList<IEvent>(1);
