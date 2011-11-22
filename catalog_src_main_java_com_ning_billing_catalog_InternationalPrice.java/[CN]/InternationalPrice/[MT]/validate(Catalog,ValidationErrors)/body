@@ -1,11 +1,20 @@
 {
-  if (prices.length == 0)   return errors;
   Currency[] supportedCurrencies=catalog.getSupportedCurrencies();
   for (  IPrice p : prices) {
     Currency currency=p.getCurrency();
     if (!currencyIsSupported(currency,supportedCurrencies)) {
       errors.add("Unsupported currency: " + currency,catalog.getCatalogURI(),this.getClass(),"");
     }
+    try {
+      if (p.getValue().doubleValue() < 0.0) {
+        errors.add("Negative value for price in currency: " + currency,catalog.getCatalogURI(),this.getClass(),"");
+      }
+    }
+ catch (    CurrencyValueNull e) {
+    }
+  }
+  if (effectiveDateForExistingSubscriptons != null && catalog.getEffectiveDate().getTime() > effectiveDateForExistingSubscriptons.getTime()) {
+    errors.add(new ValidationError(String.format("Price effective date %s is before catalog effective date '%s'",effectiveDateForExistingSubscriptons,catalog.getEffectiveDate().getTime()),catalog.getCatalogURI(),InternationalPrice.class,""));
   }
   return errors;
 }

@@ -21,7 +21,14 @@
       billingPeriod=null;
     }
     if (currentPhase.getRecurringPrice() != null) {
-      price=currentPhase.getRecurringPrice().getPrice(USD);
+      BigDecimal tmpPrice=null;
+      try {
+        tmpPrice=currentPhase.getRecurringPrice().getPrice(USD);
+      }
+ catch (      CatalogApiException e) {
+        tmpPrice=new BigDecimal(0);
+      }
+      price=tmpPrice;
       mrr=getMrrFromISubscription(currentPhase.getDuration(),price);
     }
  else {
