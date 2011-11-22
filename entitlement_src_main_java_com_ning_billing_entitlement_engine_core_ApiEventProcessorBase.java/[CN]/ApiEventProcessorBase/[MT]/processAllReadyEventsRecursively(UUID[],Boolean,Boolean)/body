@@ -1,0 +1,45 @@
+{
+  int curSequenceId=sequenceId.getAndIncrement();
+  List<IEvent> claimedEvents=new LinkedList<IEvent>();
+  do {
+    List<IEvent> tmpEvents=dao.getEventsReady(apiProcessorId,curSequenceId);
+    if (tmpEvents.size() == 0) {
+      break;
+    }
+    claimedEvents.addAll(tmpEvents);
+    if (oneEventOnly) {
+      break;
+    }
+  }
+ while (true);
+  if (claimedEvents.size() == 0) {
+    return false;
+  }
+  Collection<IEvent> claimedEventsFiltered=null;
+  if (subscriptionsIds == null) {
+    claimedEventsFiltered=claimedEvents;
+  }
+ else {
+    claimedEventsFiltered=Collections2.filter(claimedEvents,new Predicate<IEvent>(){
+      @Override public boolean apply(      IEvent input){
+        for (        UUID cur : subscriptionsIds) {
+          if (cur.equals(input.getId())) {
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+);
+  }
+  if (oneEventOnly) {
+    List<IEvent> oneEventList=new ArrayList<IEvent>(1);
+    oneEventList.add(claimedEventsFiltered.iterator().next());
+    claimedEventsFiltered=oneEventList;
+  }
+  doProcessEventsFromList(curSequenceId,claimedEventsFiltered);
+  if (recursive && !oneEventOnly) {
+    processAllReadyEventsRecursively(subscriptionsIds,recursive,oneEventOnly);
+  }
+  return true;
+}
