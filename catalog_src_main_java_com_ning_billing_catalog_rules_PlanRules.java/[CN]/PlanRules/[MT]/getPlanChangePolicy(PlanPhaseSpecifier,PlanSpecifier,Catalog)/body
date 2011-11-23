@@ -1,17 +1,6 @@
 {
-  ActionPolicy policy=CaseChange.getResult(changeCase,from,to,catalog);
-  if (policy != null) {
-    return policy;
+  if (from.getProductName().equals(to.getProductName()) && from.getBillingPeriod() == to.getBillingPeriod() && from.getPriceListName().equals(to.getPriceListName())) {
+    return ActionPolicy.ILLEGAL;
   }
-  for (int i=rules.length - 1; i >= 0; i--) {
-    int fromProductIndex=getProductIndex(catalog.getProductFromName(from.getProductName()));
-    int fromBillingPeriodIndex=getBillingPeriodIndex(from.getBillingPeriod());
-    int toProductIndex=getProductIndex(catalog.getProductFromName(to.getProductName()));
-    int toBillingPeriodIndex=getBillingPeriodIndex(to.getBillingPeriod());
-    policy=rules[i].getPlanChangePolicy(fromProductIndex,fromBillingPeriodIndex,toProductIndex,toBillingPeriodIndex,from.getPhaseType());
-    if (policy != null) {
-      return policy;
-    }
-  }
-  return null;
+  return CaseChange.getResult(changeCase,from,to,catalog);
 }
