@@ -4,12 +4,14 @@
   this.nbProcessedEvents=0;
   if (config.isEventProcessingOff()) {
     log.warn("KILLBILL ENTITLEMENT EVENT PROCESSING IS OFF !!!");
+    listener.completedNotificationStart();
     return;
   }
   final ApiEventProcessorBase apiEventProcessor=this;
 synchronized (this) {
     if (executor != null) {
       log.warn("There is already an executor thread running, return");
+      listener.completedNotificationStart();
       return;
     }
     this.executor=Executors.newSingleThreadExecutor(new ThreadFactory(){
@@ -30,6 +32,7 @@ synchronized (this) {
   executor.execute(new Runnable(){
     @Override public void run(){
       log.info(String.format("ApiEventProcessor thread %s  [%d] started",API_EVENT_THREAD_NAME,Thread.currentThread().getId()));
+      listener.completedNotificationStart();
       try {
         while (true) {
 synchronized (apiEventProcessor) {

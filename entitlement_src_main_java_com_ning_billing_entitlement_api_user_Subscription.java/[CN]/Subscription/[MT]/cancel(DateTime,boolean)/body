@@ -4,6 +4,7 @@
     throw new EntitlementUserApiException(ErrorCode.ENT_CANCEL_BAD_STATE,id,currentState);
   }
   DateTime now=clock.getUTCNow();
+  requestedDate=(requestedDate != null) ? Clock.truncateMs(requestedDate) : null;
   if (requestedDate != null && requestedDate.isAfter(now)) {
     throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
   }
