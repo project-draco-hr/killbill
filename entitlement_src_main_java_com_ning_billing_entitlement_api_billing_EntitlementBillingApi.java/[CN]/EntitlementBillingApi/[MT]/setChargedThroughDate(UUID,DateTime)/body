@@ -3,6 +3,6 @@
   if (subscription == null) {
     new EntitlementBillingApiException(String.format("Unknwon subscription %s",subscriptionId));
   }
-  Subscription updatedSubscription=new SubscriptionBuilder().setId(subscription.getId()).setBundleId(subscription.getBundleId()).setStartDate(subscription.getStartDate()).setBundleStartDate(subscription.getBundleStartDate()).setChargedThroughDate(ctd).setPaidThroughDate(subscription.getPaidThroughDate()).setActiveVersion(subscription.getActiveVersion()).setCategory(subscription.getCategory()).build();
-  dao.updateSubscription(updatedSubscription);
+  SubscriptionBuilder builder=new SubscriptionBuilder(subscription).setChargedThroughDate(ctd).setPaidThroughDate(subscription.getPaidThroughDate());
+  dao.updateSubscription(new Subscription(builder,false));
 }
