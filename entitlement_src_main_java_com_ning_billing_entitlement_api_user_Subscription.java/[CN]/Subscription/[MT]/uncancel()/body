@@ -3,7 +3,7 @@
     throw new EntitlementUserApiException(ErrorCode.ENT_UNCANCEL_BAD_STATE,id.toString());
   }
   DateTime now=clock.getUTCNow();
-  IEvent uncancelEvent=new ApiEventUncancel(id,bundleStartDate,now,now,now,activeVersion);
+  IEvent uncancelEvent=new ApiEventUncancel(new ApiEventBuilder().setSubscriptionId(id).setActiveVersion(activeVersion).setProcessedDate(now).setRequestedDate(now).setEffectiveDate(now));
   List<IEvent> uncancelEvents=new ArrayList<IEvent>();
   uncancelEvents.add(uncancelEvent);
   DateTime planStartDate=getCurrentPlanStart();
