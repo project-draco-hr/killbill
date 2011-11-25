@@ -9,8 +9,11 @@
   await().atMost(1,MINUTES).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {
       List<PaymentInfo> processedPayments=mockPaymentProcessor.getProcessedPayments();
-      return processedPayments.size() == 1;
+      List<PaymentError> errors=mockPaymentProcessor.getErrors();
+      return processedPayments.size() == 1 || errors.size() == 1;
     }
   }
 );
+  assertFalse(mockPaymentProcessor.getProcessedPayments().isEmpty());
+  assertTrue(mockPaymentProcessor.getErrors().isEmpty());
 }
