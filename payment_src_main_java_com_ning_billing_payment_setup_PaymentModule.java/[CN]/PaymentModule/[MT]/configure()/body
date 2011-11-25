@@ -1,4 +1,6 @@
 {
   final PaymentConfig config=new ConfigurationObjectFactory(props).build(PaymentConfig.class);
-  installPaymentProviderPlugin(config);
+  bind(PaymentConfig.class).toInstance(config);
+  bind(PaymentProviderPluginRegistry.class).asEagerSingleton();
+  installPaymentProviderPlugins(config);
 }
