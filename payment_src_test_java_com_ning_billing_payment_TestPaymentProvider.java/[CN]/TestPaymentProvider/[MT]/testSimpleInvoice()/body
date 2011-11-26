@@ -9,12 +9,27 @@
   eventBus.post(invoice);
   await().atMost(1,MINUTES).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {
-      List<PaymentInfo> processedPayments=mockPaymentProcessor.getProcessedPayments();
-      List<PaymentError> errors=mockPaymentProcessor.getErrors();
+      List<PaymentInfo> processedPayments=paymentInfoReceiver.getProcessedPayments();
+      List<PaymentError> errors=paymentInfoReceiver.getErrors();
       return processedPayments.size() == 1 || errors.size() == 1;
     }
   }
 );
-  assertFalse(mockPaymentProcessor.getProcessedPayments().isEmpty());
-  assertTrue(mockPaymentProcessor.getErrors().isEmpty());
+  assertFalse(paymentInfoReceiver.getProcessedPayments().isEmpty());
+  assertTrue(paymentInfoReceiver.getErrors().isEmpty());
+  final PaymentInfo paymentInfo=paymentInfoReceiver.getProcessedPayments().get(0);
+  final PaymentInfoRequest infoRequest=new PaymentInfoRequest(account.getId(),paymentInfo.getId());
+  paymentInfoReceiver.clear();
+  eventBus.post(infoRequest);
+  await().atMost(1,MINUTES).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      List<PaymentInfo> processedPayments=paymentInfoReceiver.getProcessedPayments();
+      List<PaymentError> errors=paymentInfoReceiver.getErrors();
+      return processedPayments.size() == 1 || errors.size() == 1;
+    }
+  }
+);
+  assertFalse(paymentInfoReceiver.getProcessedPayments().isEmpty());
+  assertTrue(paymentInfoReceiver.getErrors().isEmpty());
+  assertEquals(paymentInfoReceiver.getProcessedPayments().get(0),paymentInfo);
 }

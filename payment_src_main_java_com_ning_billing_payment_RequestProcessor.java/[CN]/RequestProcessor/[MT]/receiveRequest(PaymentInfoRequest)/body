@@ -1,0 +1,7 @@
+{
+  final IAccount account=accountUserApi.getAccountFromId(request.getAccountId());
+  final String paymentProviderName=account.getFieldValue(PAYMENT_PROVIDER_KEY);
+  final PaymentProviderPlugin plugin=pluginRegistry.getPlugin(paymentProviderName);
+  Either<PaymentError,PaymentInfo> result=plugin.getPaymentInfo(request.getPaymentId());
+  eventBus.post(result.isLeft() ? result.getLeft() : result.getRight());
+}
