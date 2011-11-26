@@ -1,3 +1,19 @@
 {
-  dao.insertAccount(account);
+  final String objectId=account.getId().toString();
+  final String objectType=Account.OBJECT_TYPE;
+  dao.begin();
+  try {
+    dao.insertAccount(account);
+    List<ICustomField> newFields=account.getFields().getNewFields();
+    dao.createFields(objectId,objectType,newFields);
+    for (    ICustomField field : newFields) {
+      field.setAsSaved();
+    }
+    dao.saveFields(objectId,objectType,account.getFields().getUpdatedFields());
+    dao.commit();
+  }
+ catch (  RuntimeException ex) {
+    dao.rollback();
+    throw ex;
+  }
 }
