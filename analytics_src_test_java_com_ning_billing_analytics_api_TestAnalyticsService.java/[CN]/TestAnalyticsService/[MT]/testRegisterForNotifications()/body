@@ -1,0 +1,20 @@
+{
+  Assert.assertEquals(service.getName(),"analytics-service");
+  try {
+    bus.start();
+    service.registerForNotifications();
+  }
+ catch (  Throwable t) {
+    Assert.fail("Unable to start the bus or service! " + t);
+  }
+  bus.post(transition);
+  Thread.sleep(1000);
+  Assert.assertEquals(dao.getTransitions(KEY).size(),1);
+  Assert.assertEquals(dao.getTransitions(KEY).get(0),expectedTransition);
+  try {
+    bus.stop();
+  }
+ catch (  Throwable t) {
+    Assert.fail("Unable to stop the bus!");
+  }
+}
