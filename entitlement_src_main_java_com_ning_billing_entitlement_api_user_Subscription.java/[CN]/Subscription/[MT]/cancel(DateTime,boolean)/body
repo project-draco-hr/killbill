@@ -12,7 +12,7 @@
   PlanPhaseSpecifier planPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),getCurrentPlan().getBillingPeriod(),getCurrentPriceList(),getCurrentPhase().getPhaseType());
   ActionPolicy policy=catalog.getPlanCancelPolicy(planPhase);
   DateTime effectiveDate=getPlanChangeEffectiveDate(policy,now);
-  IEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(id).setActiveVersion(activeVersion).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
+  IEntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(id).setActiveVersion(activeVersion).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
   dao.cancelSubscription(id,cancelEvent);
   rebuildTransitions();
 }

@@ -1,0 +1,22 @@
+{
+synchronized (events) {
+    boolean foundCancel=false;
+    Iterator<IEntitlementEvent> it=events.descendingIterator();
+    while (it.hasNext()) {
+      IEntitlementEvent cur=it.next();
+      if (cur.getSubscriptionId() != subscriptionId) {
+        continue;
+      }
+      if (cur.getType() == EventType.API_USER && ((IApiEvent)cur).getEventType() == ApiEventType.CANCEL) {
+        cur.deactivate();
+        foundCancel=true;
+        break;
+      }
+    }
+    if (foundCancel) {
+      for (      IEntitlementEvent cur : uncancelEvents) {
+        insertEvent(cur);
+      }
+    }
+  }
+}

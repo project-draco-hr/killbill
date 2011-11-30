@@ -31,10 +31,10 @@
   }
   DateTime effectiveDate=getPlanChangeEffectiveDate(policy,now);
   TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(this,newPlan,newPriceList.getName(),effectiveDate);
-  IEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(id).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList.getName()).setActiveVersion(activeVersion).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
+  IEntitlementEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(id).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList.getName()).setActiveVersion(activeVersion).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
   TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(this,newPlan,newPriceList.getName(),effectiveDate);
   IPhaseEvent nextPhaseEvent=PhaseEvent.getNextPhaseEvent(nextTimedPhase,this,now);
-  List<IEvent> changeEvents=new ArrayList<IEvent>();
+  List<IEntitlementEvent> changeEvents=new ArrayList<IEntitlementEvent>();
   if (nextPhaseEvent != null && !nextPhaseEvent.getEffectiveDate().equals(changeEvent.getEffectiveDate())) {
     changeEvents.add(nextPhaseEvent);
   }

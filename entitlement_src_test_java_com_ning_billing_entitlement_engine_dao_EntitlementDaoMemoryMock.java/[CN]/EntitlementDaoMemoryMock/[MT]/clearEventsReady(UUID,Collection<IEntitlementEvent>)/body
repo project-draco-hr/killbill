@@ -1,0 +1,12 @@
+{
+synchronized (events) {
+    for (    IEntitlementEvent cur : cleared) {
+      if (cur.getOwner().equals(ownerId)) {
+        cur.setProcessingState(IEventLifecycleState.PROCESSED);
+      }
+ else {
+        log.warn(String.format("EventProcessor %s trying to clear event %s that it does not own",ownerId,cur));
+      }
+    }
+  }
+}

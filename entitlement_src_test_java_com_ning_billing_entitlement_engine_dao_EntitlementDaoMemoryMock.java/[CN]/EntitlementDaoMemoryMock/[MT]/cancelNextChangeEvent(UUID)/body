@@ -1,12 +1,12 @@
 {
 synchronized (events) {
-    Iterator<IEvent> it=events.descendingIterator();
+    Iterator<IEntitlementEvent> it=events.descendingIterator();
     while (it.hasNext()) {
-      IEvent cur=it.next();
+      IEntitlementEvent cur=it.next();
       if (cur.getSubscriptionId() != subscriptionId) {
         continue;
       }
-      if (cur.getType() == EventType.API_USER && ApiEventType.CHANGE == ((IApiEvent)cur).getEventType() && cur.getProcessingState() == IEventLyfecycleState.AVAILABLE) {
+      if (cur.getType() == EventType.API_USER && ApiEventType.CHANGE == ((IApiEvent)cur).getEventType() && cur.getProcessingState() == IEventLifecycleState.AVAILABLE) {
         cur.deactivate();
         break;
       }
