@@ -5,7 +5,14 @@
   if (requestedDate != null && requestedDate.isAfter(now)) {
     throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
   }
-  IPlan plan=catalogService.getCatalog().getPlan(productName,term,realPriceList);
+  requestedDate=(requestedDate == null) ? now : requestedDate;
+  IPlan plan=null;
+  try {
+    plan=catalogService.getCatalog().findPlan(productName,term,realPriceList);
+  }
+ catch (  CatalogApiException e) {
+    e.printStackTrace();
+  }
   if (plan == null) {
     throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BAD_CATALOG,productName,term,realPriceList);
   }

@@ -57,10 +57,30 @@ break;
 default :
 throw new EntitlementError(String.format("Unexpected Event type = %s",cur.getType()));
 }
-IPlan previousPlan=catalog.getPlanFromName(previousPlanName);
-IPlanPhase previousPhase=catalog.getPhaseFromName(previousPhaseName);
-IPlan nextPlan=catalog.getPlanFromName(nextPlanName);
-IPlanPhase nextPhase=catalog.getPhaseFromName(nextPhaseName);
+IPlan previousPlan=null;
+IPlanPhase previousPhase=null;
+IPlan nextPlan=null;
+IPlanPhase nextPhase=null;
+try {
+previousPlan=catalog.findPlan(previousPlanName);
+}
+ catch (CatalogApiException e) {
+}
+try {
+previousPhase=catalog.findPhase(previousPhaseName);
+}
+ catch (CatalogApiException e) {
+}
+try {
+nextPlan=catalog.findPlan(nextPlanName);
+}
+ catch (CatalogApiException e) {
+}
+try {
+nextPhase=catalog.findPhase(nextPhaseName);
+}
+ catch (CatalogApiException e) {
+}
 SubscriptionTransition transition=new SubscriptionTransition(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),previousState,previousPlan,previousPhase,previousPriceList,nextState,nextPlan,nextPhase,nextPriceList);
 transitions.add(transition);
 previousState=nextState;
