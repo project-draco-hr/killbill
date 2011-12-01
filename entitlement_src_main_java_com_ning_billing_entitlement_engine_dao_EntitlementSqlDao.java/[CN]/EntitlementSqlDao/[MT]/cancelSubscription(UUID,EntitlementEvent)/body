@@ -1,0 +1,11 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EventSqlDao>(){
+    @Override public Void inTransaction(    EventSqlDao dao,    TransactionStatus status) throws Exception {
+      cancelNextChangeEventFromTransaction(subscriptionId,dao);
+      cancelNextPhaseEventFromTransaction(subscriptionId,dao);
+      dao.insertEvent(cancelEvent);
+      return null;
+    }
+  }
+);
+}

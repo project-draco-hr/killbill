@@ -1,8 +1,8 @@
 {
   int curSequenceId=sequenceId.getAndIncrement();
-  List<IEntitlementEvent> claimedEvents=new LinkedList<IEntitlementEvent>();
+  List<EntitlementEvent> claimedEvents=new LinkedList<EntitlementEvent>();
   do {
-    List<IEntitlementEvent> tmpEvents=dao.getEventsReady(apiProcessorId,curSequenceId);
+    List<EntitlementEvent> tmpEvents=dao.getEventsReady(apiProcessorId,curSequenceId);
     if (tmpEvents.size() == 0) {
       break;
     }
@@ -12,13 +12,13 @@
   if (claimedEvents.size() == 0) {
     return false;
   }
-  Collection<IEntitlementEvent> claimedEventsFiltered=null;
+  Collection<EntitlementEvent> claimedEventsFiltered=null;
   if (subscriptionsIds.length == 0) {
     claimedEventsFiltered=claimedEvents;
   }
  else {
-    claimedEventsFiltered=Collections2.filter(claimedEvents,new Predicate<IEntitlementEvent>(){
-      @Override public boolean apply(      IEntitlementEvent input){
+    claimedEventsFiltered=Collections2.filter(claimedEvents,new Predicate<EntitlementEvent>(){
+      @Override public boolean apply(      EntitlementEvent input){
         for (        UUID cur : subscriptionsIds) {
           if (cur.equals(input.getSubscriptionId())) {
             return true;
@@ -33,7 +33,7 @@
     return false;
   }
   if (oneEventOnly) {
-    List<IEntitlementEvent> oneEventList=new ArrayList<IEntitlementEvent>(1);
+    List<EntitlementEvent> oneEventList=new ArrayList<EntitlementEvent>(1);
     oneEventList.add(claimedEventsFiltered.iterator().next());
     claimedEventsFiltered=oneEventList;
   }

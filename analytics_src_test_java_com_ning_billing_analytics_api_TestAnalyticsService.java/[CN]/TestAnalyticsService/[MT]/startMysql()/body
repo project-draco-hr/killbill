@@ -8,7 +8,7 @@
   helper.initDb(entitlementDdl);
   final MockAccount account=new MockAccount(UUID.randomUUID(),ACCOUNT_KEY,Currency.USD);
   final IAccount storedAccount=accountApi.createAccount(account);
-  final ISubscriptionBundle bundle=entitlementApi.createBundleForAccount(storedAccount,KEY);
+  final SubscriptionBundle bundle=entitlementApi.createBundleForAccount(storedAccount,KEY);
   Assert.assertNotNull(bundle);
   Assert.assertEquals(bundle.getKey(),KEY);
   final IProduct product=new MockProduct("platinium","subscription",ProductCategory.BASE);
@@ -18,6 +18,6 @@
   final DateTime effectiveTransitionTime=new DateTime(DateTimeZone.UTC);
   final DateTime requestedTransitionTime=new DateTime(DateTimeZone.UTC);
   final String priceList="something";
-  transition=new SubscriptionTransition(UUID.randomUUID(),subscriptionId,bundle.getId(),IEntitlementEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,ISubscription.SubscriptionState.ACTIVE,plan,phase,priceList);
-  expectedTransition=new BusinessSubscriptionTransition(KEY,ACCOUNT_KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan),null,new BusinessSubscription(priceList,plan,phase,null,effectiveTransitionTime,ISubscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId()));
+  transition=new SubscriptionTransitionData(UUID.randomUUID(),subscriptionId,bundle.getId(),EntitlementEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,Subscription.SubscriptionState.ACTIVE,plan,phase,priceList);
+  expectedTransition=new BusinessSubscriptionTransition(KEY,ACCOUNT_KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan),null,new BusinessSubscription(priceList,plan,phase,null,effectiveTransitionTime,Subscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId()));
 }

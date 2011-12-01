@@ -1,0 +1,14 @@
+{
+  subscriptionsDao.inTransaction(new Transaction<Void,SubscriptionSqlDao>(){
+    @Override public Void inTransaction(    SubscriptionSqlDao dao,    TransactionStatus status) throws Exception {
+      dao.insertSubscription(subscription);
+      EventSqlDao eventsDaoFromSameTranscation=dao.become(EventSqlDao.class);
+      for (      EntitlementEvent cur : initialEvents) {
+        eventsDaoFromSameTranscation.insertEvent(cur);
+      }
+      return null;
+    }
+  }
+);
+  return new SubscriptionData(new SubscriptionBuilder(subscription),true);
+}

@@ -5,7 +5,7 @@
     String prod="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
     String planSet=IPriceListSet.DEFAULT_PRICELIST_NAME;
-    Subscription subscription=createSubscription(prod,term,planSet);
+    SubscriptionData subscription=createSubscription(prod,term,planSet);
     IPlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
     IDuration moveALittleInTime=getDurationDay(3);
@@ -15,7 +15,7 @@
     subscription.cancel(clock.getUTCNow(),false);
     currentPhase=subscription.getCurrentPhase();
     testListener.isCompleted(1000);
-    List<ISubscriptionTransition> allTransitions=subscription.getActiveTransitions();
+    List<SubscriptionTransition> allTransitions=subscription.getActiveTransitions();
     printSubscriptionTransitions(allTransitions);
     assertNull(currentPhase);
     checkNextPhaseChange(subscription,0,null);

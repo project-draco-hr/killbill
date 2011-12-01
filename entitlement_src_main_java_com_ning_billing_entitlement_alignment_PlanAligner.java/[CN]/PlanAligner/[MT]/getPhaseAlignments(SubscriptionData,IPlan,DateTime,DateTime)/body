@@ -1,0 +1,23 @@
+{
+  if (plan == null) {
+    return Collections.emptyList();
+  }
+  List<TimedPhase> result=new LinkedList<TimedPhase>();
+  DateTime curPhaseStart=planStartDate;
+  if (plan.getInitialPhases() == null) {
+    result.add(new TimedPhase(plan.getFinalPhase(),curPhaseStart));
+    return result;
+  }
+  DateTime nextPhaseStart=null;
+  for (  IPlanPhase cur : plan.getInitialPhases()) {
+    result.add(new TimedPhase(cur,curPhaseStart));
+    IDuration curPhaseDuration=cur.getDuration();
+    nextPhaseStart=DefaultClock.addDuration(curPhaseStart,curPhaseDuration);
+    if (nextPhaseStart == null) {
+      throw new EntitlementError(String.format("Unexpected non ending UNLIMITED phase for plan %s",plan.getName()));
+    }
+    curPhaseStart=nextPhaseStart;
+  }
+  result.add(new TimedPhase(plan.getFinalPhase(),nextPhaseStart));
+  return result;
+}

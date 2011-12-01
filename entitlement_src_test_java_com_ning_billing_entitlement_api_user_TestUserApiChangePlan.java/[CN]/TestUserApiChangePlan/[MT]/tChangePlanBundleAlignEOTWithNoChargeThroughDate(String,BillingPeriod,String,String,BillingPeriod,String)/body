@@ -1,12 +1,12 @@
 {
   log.info("Starting testChangePlanBundleAlignEOTWithNoChargeThroughDateReal");
   try {
-    Subscription subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
+    SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
     IPlanPhase currentPhase=subscription.getCurrentPhase();
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(currentPhase.getDuration(),DAY_IN_MS);
     DateTime futureNow=clock.getUTCNow();
-    DateTime nextExpectedPhaseChange=Clock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
+    DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     assertTrue(futureNow.isAfter(nextExpectedPhaseChange));
     assertTrue(testListener.isCompleted(3000));
     testListener.pushExpectedEvent(NextEvent.CHANGE);

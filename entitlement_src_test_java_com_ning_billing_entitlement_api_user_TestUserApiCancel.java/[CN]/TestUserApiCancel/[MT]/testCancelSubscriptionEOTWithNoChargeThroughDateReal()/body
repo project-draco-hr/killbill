@@ -4,10 +4,10 @@
     String prod="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
     String planSet=IPriceListSet.DEFAULT_PRICELIST_NAME;
-    Subscription subscription=createSubscription(prod,term,planSet);
+    SubscriptionData subscription=createSubscription(prod,term,planSet);
     IPlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    DateTime expectedPhaseTrialChange=Clock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);

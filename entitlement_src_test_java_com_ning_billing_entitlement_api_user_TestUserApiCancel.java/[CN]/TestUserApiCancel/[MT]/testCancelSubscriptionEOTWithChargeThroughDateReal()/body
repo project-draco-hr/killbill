@@ -4,10 +4,10 @@
     String prod="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
     String planSet=IPriceListSet.DEFAULT_PRICELIST_NAME;
-    Subscription subscription=createSubscription(prod,term,planSet);
+    SubscriptionData subscription=createSubscription(prod,term,planSet);
     IPlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    DateTime expectedPhaseTrialChange=Clock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
@@ -15,9 +15,9 @@
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.EVERGREEN);
     IDuration ctd=getDurationMonth(1);
-    DateTime newChargedThroughDate=Clock.addDuration(expectedPhaseTrialChange,ctd);
+    DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
-    subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     subscription.cancel(clock.getUTCNow(),false);
     assertFalse(testListener.isCompleted(2000));

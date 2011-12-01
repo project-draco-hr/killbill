@@ -1,10 +1,10 @@
 {
   try {
-    ISubscription subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,IPriceListSet.DEFAULT_PRICELIST_NAME);
+    Subscription subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,IPriceListSet.DEFAULT_PRICELIST_NAME);
     IPlanPhase trialPhase=subscription.getCurrentPhase();
-    DateTime expectedPhaseTrialChange=Clock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     IDuration ctd=getDurationMonth(1);
-    DateTime newChargedThroughDate=Clock.addDuration(expectedPhaseTrialChange,ctd);
+    DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
     subscription=entitlementApi.getSubscriptionFromId(subscription.getId());
     subscription.cancel(clock.getUTCNow(),false);

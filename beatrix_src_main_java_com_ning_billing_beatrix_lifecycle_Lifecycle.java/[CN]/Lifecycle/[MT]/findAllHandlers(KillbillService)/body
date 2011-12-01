@@ -1,0 +1,13 @@
+{
+  Multimap<LifecycleLevel,LifecycleHandler<? extends KillbillService>> methodsInService=HashMultimap.create();
+  Class<? extends KillbillService> clazz=service.getClass();
+  for (  Method method : clazz.getMethods()) {
+    LifecycleHandlerType annotation=method.getAnnotation(LifecycleHandlerType.class);
+    if (annotation != null) {
+      LifecycleLevel level=annotation.value();
+      LifecycleHandler<? extends KillbillService> handler=new LifecycleHandler<KillbillService>(service,method);
+      methodsInService.put(level,handler);
+    }
+  }
+  return methodsInService;
+}
