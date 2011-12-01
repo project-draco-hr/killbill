@@ -1,8 +1,13 @@
 {
-  DateTime now=clock.getUTCNow();
-  TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(subscription,subscription.getCurrentPlan(),now,subscription.getCurrentPlanStart());
-  PhaseEvent nextPhaseEvent=PhaseEventData.getNextPhaseEvent(nextTimedPhase,subscription,now);
-  if (nextPhaseEvent != null) {
-    dao.createNextPhaseEvent(subscription.getId(),nextPhaseEvent);
+  try {
+    DateTime now=clock.getUTCNow();
+    TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(subscription,subscription.getCurrentPlan(),now,subscription.getCurrentPlanStart());
+    PhaseEvent nextPhaseEvent=PhaseEventData.getNextPhaseEvent(nextTimedPhase,subscription,now);
+    if (nextPhaseEvent != null) {
+      dao.createNextPhaseEvent(subscription.getId(),nextPhaseEvent);
+    }
+  }
+ catch (  CatalogApiException e) {
+    log.error(String.format("Failed to insert next phase for subscription %s",subscription.getId()),e);
   }
 }
