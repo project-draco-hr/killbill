@@ -1,0 +1,90 @@
+{
+  if (events == null) {
+    return;
+  }
+  SubscriptionState nextState=null;
+  String nextPlanName=null;
+  String nextPhaseName=null;
+  String nextPriceList=null;
+  SubscriptionState previousState=null;
+  String previousPlanName=null;
+  String previousPhaseName=null;
+  String previousPriceList=null;
+  transitions=new LinkedList<SubscriptionTransitionData>();
+  for (  final EntitlementEvent cur : events) {
+    if (!cur.isActive() || cur.getActiveVersion() < activeVersion) {
+      continue;
+    }
+    ApiEventType apiEventType=null;
+switch (cur.getType()) {
+case PHASE:
+      PhaseEvent phaseEV=(PhaseEvent)cur;
+    nextPhaseName=phaseEV.getPhase();
+  break;
+case API_USER:
+ApiEvent userEV=(ApiEvent)cur;
+apiEventType=userEV.getEventType();
+switch (apiEventType) {
+case CREATE:
+nextState=SubscriptionState.ACTIVE;
+nextPlanName=userEV.getEventPlan();
+nextPhaseName=userEV.getEventPlanPhase();
+nextPriceList=userEV.getPriceList();
+break;
+case CHANGE:
+nextPlanName=userEV.getEventPlan();
+nextPhaseName=userEV.getEventPlanPhase();
+nextPriceList=userEV.getPriceList();
+break;
+case PAUSE:
+nextState=SubscriptionState.PAUSED;
+break;
+case RESUME:
+nextState=SubscriptionState.ACTIVE;
+break;
+case CANCEL:
+nextState=SubscriptionState.CANCELLED;
+nextPlanName=null;
+nextPhaseName=null;
+break;
+case UNCANCEL:
+break;
+default :
+throw new EntitlementError(String.format("Unexpected UserEvent type = %s",userEV.getEventType().toString()));
+}
+break;
+default :
+throw new EntitlementError(String.format("Unexpected Event type = %s",cur.getType()));
+}
+IPlan previousPlan=null;
+IPlanPhase previousPhase=null;
+IPlan nextPlan=null;
+IPlanPhase nextPhase=null;
+try {
+previousPlan=catalog.findPlan(previousPlanName);
+}
+ catch (CatalogApiException e) {
+}
+try {
+previousPhase=catalog.findPhase(previousPhaseName);
+}
+ catch (CatalogApiException e) {
+}
+try {
+nextPlan=catalog.findPlan(nextPlanName);
+}
+ catch (CatalogApiException e) {
+}
+try {
+nextPhase=catalog.findPhase(nextPhaseName);
+}
+ catch (CatalogApiException e) {
+}
+SubscriptionTransitionData transition=new SubscriptionTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),previousState,previousPlan,previousPhase,previousPriceList,nextState,nextPlan,nextPhase,nextPriceList);
+transitions.add(transition);
+previousState=nextState;
+previousPlanName=nextPlanName;
+previousPhaseName=nextPhaseName;
+previousPriceList=nextPriceList;
+}
+}

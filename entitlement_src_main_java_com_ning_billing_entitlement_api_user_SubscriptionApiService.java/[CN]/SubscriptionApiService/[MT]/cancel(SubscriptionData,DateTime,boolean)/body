@@ -1,0 +1,24 @@
+{
+  SubscriptionState currentState=subscription.getState();
+  if (currentState != SubscriptionState.ACTIVE) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_CANCEL_BAD_STATE,subscription.getId(),currentState);
+  }
+  DateTime now=clock.getUTCNow();
+  requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : null;
+  if (requestedDate != null && requestedDate.isAfter(now)) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
+  }
+  IPlan currentPlan=subscription.getCurrentPlan();
+  PlanPhaseSpecifier planPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),subscription.getCurrentPlan().getBillingPeriod(),subscription.getCurrentPriceList(),subscription.getCurrentPhase().getPhaseType());
+  ActionPolicy policy=null;
+  try {
+    policy=catalogService.getCatalog().planCancelPolicy(planPhase);
+  }
+ catch (  CatalogApiException e) {
+    e.printStackTrace();
+  }
+  DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy,now);
+  EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
+  dao.cancelSubscription(subscription.getId(),cancelEvent);
+  subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getCatalog());
+}

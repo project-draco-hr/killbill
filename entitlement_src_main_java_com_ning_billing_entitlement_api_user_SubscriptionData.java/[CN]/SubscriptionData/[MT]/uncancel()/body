@@ -1,17 +1,3 @@
 {
-  if (!isSubscriptionFutureCancelled()) {
-    throw new EntitlementUserApiException(ErrorCode.ENT_UNCANCEL_BAD_STATE,id.toString());
-  }
-  DateTime now=clock.getUTCNow();
-  EntitlementEvent uncancelEvent=new ApiEventUncancel(new ApiEventBuilder().setSubscriptionId(id).setActiveVersion(activeVersion).setProcessedDate(now).setRequestedDate(now).setEffectiveDate(now));
-  List<EntitlementEvent> uncancelEvents=new ArrayList<EntitlementEvent>();
-  uncancelEvents.add(uncancelEvent);
-  DateTime planStartDate=getCurrentPlanStart();
-  TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(this,getCurrentPlan(),now,planStartDate);
-  PhaseEvent nextPhaseEvent=PhaseEventData.getNextPhaseEvent(nextTimedPhase,this,now);
-  if (nextPhaseEvent != null) {
-    uncancelEvents.add(nextPhaseEvent);
-  }
-  dao.uncancelSubscription(id,uncancelEvents);
-  rebuildTransitions();
+  apiService.uncancel(this);
 }

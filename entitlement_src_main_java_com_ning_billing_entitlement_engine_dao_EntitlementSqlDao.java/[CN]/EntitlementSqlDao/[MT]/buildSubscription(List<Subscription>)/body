@@ -1,0 +1,9 @@
+{
+  List<Subscription> result=new ArrayList<Subscription>(input.size());
+  for (  Subscription cur : input) {
+    List<EntitlementEvent> events=eventsDao.getEventsForSubscription(cur.getId().toString());
+    Subscription reloaded=apiService.createFromExisting(new SubscriptionBuilder((SubscriptionData)cur),events);
+    result.add(reloaded);
+  }
+  return result;
+}
