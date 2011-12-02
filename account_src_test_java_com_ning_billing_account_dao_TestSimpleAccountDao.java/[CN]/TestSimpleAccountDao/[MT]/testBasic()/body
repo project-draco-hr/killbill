@@ -1,14 +1,14 @@
 {
   IAccount a=createTestAccount();
-  accountDao.saveAccount(a);
+  accountDao.save(a);
   String key=a.getExternalKey();
   IAccount r=accountDao.getAccountByKey(key);
   assertNotNull(r);
   assertEquals(r.getExternalKey(),a.getExternalKey());
-  r=accountDao.getAccountById(r.getId());
+  r=accountDao.getById(r.getId().toString());
   assertNotNull(r);
   assertEquals(r.getExternalKey(),a.getExternalKey());
-  List<IAccount> all=accountDao.getAccounts();
+  List<IAccount> all=accountDao.get();
   assertNotNull(all);
   assertTrue(all.size() >= 1);
 }

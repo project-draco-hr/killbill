@@ -4,11 +4,12 @@
     final String ddl=IOUtils.toString(IAccountDaoSql.class.getResourceAsStream("/com/ning/billing/account/ddl.sql"));
     module.createDb(ddl);
     final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module);
-    injectorMagic=injector.getInstance(InjectorMagic.class);
     fieldStoreDao=injector.getInstance(IFieldStoreDao.class);
     fieldStoreDao.test();
     accountDao=injector.getInstance(IAccountDao.class);
     accountDao.test();
+    IEventBusService busService=injector.getInstance(IEventBusService.class);
+    ((EventBusService)busService).startBus();
   }
  catch (  Throwable t) {
     fail(t.toString());

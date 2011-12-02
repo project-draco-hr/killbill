@@ -1,10 +1,10 @@
 {
-  Account account=createTestAccount();
+  IAccount account=createTestAccount();
   String fieldName="testField1";
   String fieldValue="testField1_value";
   account.setFieldValue(fieldName,fieldValue);
-  account.save();
-  Account thisAccount=Account.loadAccount(account.getExternalKey());
+  accountDao.save(account);
+  IAccount thisAccount=accountDao.getAccountByKey(account.getExternalKey());
   assertNotNull(thisAccount);
   assertEquals(thisAccount.getExternalKey(),account.getExternalKey());
   assertEquals(thisAccount.getFieldValue(fieldName),fieldValue);
