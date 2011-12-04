@@ -1,0 +1,17 @@
+{
+  boolean foundIt=false;
+  Iterator<NextEvent> it=nextExpectedEvent.iterator();
+  while (it.hasNext()) {
+    NextEvent ev=it.next();
+    if (ev == expected) {
+      it.remove();
+      foundIt=true;
+      break;
+    }
+  }
+  if (!foundIt) {
+    Joiner joiner=Joiner.on(" ");
+    System.err.println("Expected event " + expected + " got "+ joiner.join(nextExpectedEvent));
+    System.exit(1);
+  }
+}
