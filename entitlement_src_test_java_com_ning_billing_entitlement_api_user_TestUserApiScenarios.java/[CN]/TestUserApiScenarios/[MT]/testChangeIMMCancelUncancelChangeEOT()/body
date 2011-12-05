@@ -2,7 +2,7 @@
   log.info("Starting testChangeIMMCancelUncancelChangeEOT");
   try {
     SubscriptionData subscription=createSubscription("Assault-Rifle",BillingPeriod.MONTHLY,"gunclubDiscount");
-    IPlanPhase trialPhase=subscription.getCurrentPhase();
+    PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Pistol",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow());
@@ -10,7 +10,7 @@
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
     assertTrue(testListener.isCompleted(2000));
-    IDuration ctd=getDurationMonth(1);
+    Duration ctd=getDurationMonth(1);
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);

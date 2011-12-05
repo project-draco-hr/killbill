@@ -3,12 +3,12 @@
   try {
     SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    IDuration moveALittleInTime=getDurationDay(3);
+    Duration moveALittleInTime=getDurationDay(3);
     clock.setDeltaFromReality(moveALittleInTime,0);
     subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow());
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.TRIAL);
     assertTrue(testListener.isCompleted(2000));
-    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    PlanPhase currentPhase=subscription.getCurrentPhase();
     DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);

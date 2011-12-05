@@ -3,7 +3,7 @@
   try {
     DateTime currentTime=clock.getUTCNow();
     SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
-    IPlanPhase trialPhase=subscription.getCurrentPhase();
+    PlanPhase trialPhase=subscription.getCurrentPhase();
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
@@ -11,11 +11,11 @@
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
     currentTime=clock.getUTCNow();
     assertTrue(testListener.isCompleted(2000));
-    IDuration ctd=getDurationMonth(1);
+    Duration ctd=getDurationMonth(1);
     DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
-    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
     currentTime=clock.getUTCNow();

@@ -12,8 +12,8 @@
     DateTime now=clock.getUTCNow();
     PlanChangeResult planChangeResult=null;
     try {
-      IProduct destProduct=catalogService.getCatalog().findProduct(productName);
-      IPlan currentPlan=subscription.getCurrentPlan();
+      Product destProduct=catalogService.getCatalog().findProduct(productName);
+      Plan currentPlan=subscription.getCurrentPlan();
       PlanPhaseSpecifier fromPlanPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),currentPlan.getBillingPeriod(),currentPriceList,subscription.getCurrentPhase().getPhaseType());
       PlanSpecifier toPlanPhase=new PlanSpecifier(productName,destProduct.getCategory(),term,priceList);
       planChangeResult=catalogService.getCatalog().planChange(fromPlanPhase,toPlanPhase);
@@ -22,8 +22,8 @@
       throw new EntitlementUserApiException(e);
     }
     ActionPolicy policy=planChangeResult.getPolicy();
-    IPriceList newPriceList=planChangeResult.getNewPriceList();
-    IPlan newPlan=catalogService.getCatalog().findPlan(productName,term,newPriceList.getName());
+    PriceList newPriceList=planChangeResult.getNewPriceList();
+    Plan newPlan=catalogService.getCatalog().findPlan(productName,term,newPriceList.getName());
     DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy,now);
     TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(subscription,newPlan,newPriceList.getName(),effectiveDate);
     EntitlementEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList.getName()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
