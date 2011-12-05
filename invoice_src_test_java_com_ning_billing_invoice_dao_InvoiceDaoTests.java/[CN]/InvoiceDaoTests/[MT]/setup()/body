@@ -1,13 +1,12 @@
 {
   try {
     InvoiceModuleMock module=new InvoiceModuleMock();
-    final String ddl=IOUtils.toString(InvoiceDao.class.getResourceAsStream("/com/ning/billing/invoice/ddl.sql"));
+    final String ddl=IOUtils.toString(InvoiceDaoWrapper.class.getResourceAsStream("/com/ning/billing/invoice/ddl.sql"));
     module.createDb(ddl);
     final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module);
-    InjectorMagic injectorMagic=injector.getInstance(InjectorMagic.class);
-    dao=injector.getInstance(InvoiceDao.class);
+    dao=injector.getInstance(InvoiceDaoWrapper.class);
     dao.test();
-    invoiceItemDao=injector.getInstance(IInvoiceItemDao.class);
+    invoiceItemDao=injector.getInstance(InvoiceItemDao.class);
     invoiceItemDao.test();
   }
  catch (  Throwable t) {

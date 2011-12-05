@@ -9,7 +9,7 @@
   UUID subscriptionId4=UUID.randomUUID();
   BigDecimal rate4=new BigDecimal("12.0");
   DateTime targetDate=new DateTime(2011,5,23,0,0,0,0);
-  IInvoice invoice1=new Invoice(accountId,targetDate,Currency.USD);
+  Invoice invoice1=new InvoiceDefault(accountId,targetDate,Currency.USD);
   dao.createInvoice(invoice1);
   UUID invoiceId1=invoice1.getId();
   DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
@@ -22,7 +22,7 @@
   invoiceItemDao.createInvoiceItem(item3);
   InvoiceItem item4=new InvoiceItem(invoiceId1,subscriptionId4,startDate,endDate,"test D",rate4,rate4,Currency.USD);
   invoiceItemDao.createInvoiceItem(item4);
-  Invoice invoice=new Invoice(accountId,targetDate,Currency.USD);
+  InvoiceDefault invoice=new InvoiceDefault(accountId,targetDate,Currency.USD);
   dao.createInvoice(invoice);
   UUID invoiceId2=invoice.getId();
   startDate=endDate;
@@ -33,12 +33,12 @@
   invoiceItemDao.createInvoiceItem(item6);
   InvoiceItem item7=new InvoiceItem(invoiceId2,subscriptionId3,startDate,endDate,"test C",rate3,rate3,Currency.USD);
   invoiceItemDao.createInvoiceItem(item7);
-  List<IInvoice> items1=dao.getInvoicesBySubscription(subscriptionId1.toString());
+  List<Invoice> items1=dao.getInvoicesBySubscription(subscriptionId1.toString());
   assertEquals(items1.size(),2);
-  List<IInvoice> items2=dao.getInvoicesBySubscription(subscriptionId2.toString());
+  List<Invoice> items2=dao.getInvoicesBySubscription(subscriptionId2.toString());
   assertEquals(items2.size(),2);
-  List<IInvoice> items3=dao.getInvoicesBySubscription(subscriptionId3.toString());
+  List<Invoice> items3=dao.getInvoicesBySubscription(subscriptionId3.toString());
   assertEquals(items3.size(),2);
-  List<IInvoice> items4=dao.getInvoicesBySubscription(subscriptionId4.toString());
+  List<Invoice> items4=dao.getInvoicesBySubscription(subscriptionId4.toString());
   assertEquals(items4.size(),1);
 }
