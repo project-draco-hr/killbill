@@ -1,7 +1,20 @@
 {
   Assert.assertEquals(service.getName(),"analytics-service");
+  final MockAccount account=new MockAccount(UUID.randomUUID(),ACCOUNT_KEY,Currency.USD);
+  final Account storedAccount=accountApi.createAccount(account);
+  final ISubscriptionBundle bundle=entitlementApi.createBundleForAccount(storedAccount,KEY);
+  Assert.assertNotNull(bundle);
+  Assert.assertEquals(bundle.getKey(),KEY);
+  final IProduct product=new MockProduct("platinum","subscription",ProductCategory.BASE);
+  final IPlan plan=new MockPlan("platinum-monthly",product);
+  final IPlanPhase phase=new MockPhase(PhaseType.EVERGREEN,plan,MockDuration.UNLIMITED(),25.95);
+  final UUID subscriptionId=UUID.randomUUID();
+  final DateTime effectiveTransitionTime=new DateTime(DateTimeZone.UTC);
+  final DateTime requestedTransitionTime=new DateTime(DateTimeZone.UTC);
+  final String priceList="something";
+  transition=new SubscriptionTransition(UUID.randomUUID(),subscriptionId,bundle.getId(),IEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,ISubscription.SubscriptionState.ACTIVE,plan,phase,priceList);
+  expectedTransition=new BusinessSubscriptionTransition(KEY,ACCOUNT_KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan),null,new BusinessSubscription(priceList,plan,phase,Currency.USD,effectiveTransitionTime,ISubscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId()));
   try {
-    bus.start();
     service.registerForNotifications();
   }
  catch (  Throwable t) {
