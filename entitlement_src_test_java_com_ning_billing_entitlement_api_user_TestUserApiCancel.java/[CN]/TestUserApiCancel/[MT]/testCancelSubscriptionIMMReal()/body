@@ -4,11 +4,11 @@
     DateTime init=clock.getUTCNow();
     String prod="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
-    String planSet=IPriceListSet.DEFAULT_PRICELIST_NAME;
+    String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
     SubscriptionData subscription=createSubscription(prod,term,planSet);
-    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
-    IDuration moveALittleInTime=getDurationDay(3);
+    Duration moveALittleInTime=getDurationDay(3);
     clock.setDeltaFromReality(moveALittleInTime,0);
     DateTime future=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.CANCEL);

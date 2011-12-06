@@ -2,7 +2,7 @@
   try {
     System.out.println("DEMO 1 START");
     SubscriptionData subscription=createSubscription("Assault-Rifle",BillingPeriod.MONTHLY,"gunclubDiscount");
-    IPlanPhase trialPhase=subscription.getCurrentPhase();
+    PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     displayState(subscription.getId(),"STEP 1. CREATED SUBSCRIPTION");
     testListener.pushExpectedEvent(NextEvent.CHANGE);
@@ -13,10 +13,10 @@
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
     assertTrue(testListener.isCompleted(3000));
     displayState(subscription.getId(),"STEP 3. MOVE TO DISCOUNT PHASE");
-    List<IDuration> durationList=new ArrayList<IDuration>();
+    List<Duration> durationList=new ArrayList<Duration>();
     durationList.add(trialPhase.getDuration());
     DateTime startDiscountPhase=DefaultClock.addDuration(subscription.getStartDate(),durationList);
-    IDuration ctd=getDurationMonth(1);
+    Duration ctd=getDurationMonth(1);
     DateTime newChargedThroughDate=DefaultClock.addDuration(startDiscountPhase,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
@@ -33,12 +33,12 @@
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     clock.addDeltaFromReality(ctd);
     assertTrue(testListener.isCompleted(2000));
-    IPlan currentPlan=subscription.getCurrentPlan();
+    Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),"Pistol");
     assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
     assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.ANNUAL);
-    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
     displayState(subscription.getId(),"STEP 6. MOVE TO EOT");

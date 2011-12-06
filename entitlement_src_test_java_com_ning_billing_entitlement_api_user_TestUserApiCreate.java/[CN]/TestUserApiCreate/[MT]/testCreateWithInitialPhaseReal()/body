@@ -4,7 +4,7 @@
     DateTime init=clock.getUTCNow();
     String productName="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
-    String planSetName=IPriceListSet.DEFAULT_PRICELIST_NAME;
+    String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
     testListener.pushExpectedEvent(NextEvent.CREATE);
     SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),productName,term,planSetName,PhaseType.EVERGREEN,clock.getUTCNow());
     assertNotNull(subscription);
@@ -13,12 +13,12 @@
     assertDateWithin(subscription.getStartDate(),init,clock.getUTCNow());
     assertDateWithin(subscription.getBundleStartDate(),init,clock.getUTCNow());
     printSubscriptionTransitions(subscription.getActiveTransitions());
-    IPlan currentPlan=subscription.getCurrentPlan();
+    Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),productName);
     assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
     assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.MONTHLY);
-    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
   }
