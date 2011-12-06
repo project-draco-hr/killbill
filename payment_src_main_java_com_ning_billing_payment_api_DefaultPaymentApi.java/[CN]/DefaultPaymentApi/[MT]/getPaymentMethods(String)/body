@@ -1,0 +1,7 @@
+{
+  final String paymentProviderName;
+  final IAccount account=accountUserApi.getAccountFromId(UUID.fromString(accountId));
+  paymentProviderName=account.getFieldValue(RequestProcessor.PAYMENT_PROVIDER_KEY);
+  final PaymentProviderPlugin plugin=pluginRegistry.getPlugin(paymentProviderName);
+  return plugin.getPaymentMethods(accountId);
+}
