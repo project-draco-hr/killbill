@@ -1,15 +1,15 @@
 {
   log.info("Starting testChangePlanBundleAlignIMM");
   try {
-    Subscription subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
+    SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    IDuration moveALittleInTime=getDurationDay(3);
+    Duration moveALittleInTime=getDurationDay(3);
     clock.setDeltaFromReality(moveALittleInTime,0);
     subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow());
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.TRIAL);
     assertTrue(testListener.isCompleted(2000));
-    IPlanPhase currentPhase=subscription.getCurrentPhase();
-    DateTime nextExpectedPhaseChange=Clock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
+    PlanPhase currentPhase=subscription.getCurrentPhase();
+    DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.addDeltaFromReality(currentPhase.getDuration());

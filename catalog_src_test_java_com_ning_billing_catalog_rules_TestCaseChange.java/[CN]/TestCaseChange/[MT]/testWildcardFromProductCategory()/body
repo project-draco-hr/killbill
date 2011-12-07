@@ -1,18 +1,18 @@
 {
   MockCatalog cat=new MockCatalog();
-  Product product1=cat.getProducts()[0];
-  PriceList priceList1=cat.getPriceListFromName(IPriceListSet.DEFAULT_PRICELIST_NAME);
-  Product product2=cat.getProducts()[2];
-  PriceList priceList2=cat.getPriceLists().getChildPriceLists()[1];
+  DefaultProduct product1=cat.getProducts()[0];
+  DefaultPriceList priceList1=cat.getPriceListFromName(PriceListSet.DEFAULT_PRICELIST_NAME);
+  DefaultProduct product2=cat.getProducts()[2];
+  DefaultPriceList priceList2=cat.getPriceLists().getChildPriceLists()[1];
   CaseChangeResult cr=new CaseChangeResult(product1,product2,null,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1,priceList2,PhaseType.EVERGREEN,Result.FOO);
   assertion(Result.FOO,cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
-  assertionNull(cr,"wrong",product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
-  assertionNull(cr,product1.getName(),"wrong",ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
+  assertionNull(cr,cat.getProducts()[1].getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
+  assertionNull(cr,product1.getName(),cat.getProducts()[1].getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
   assertion(Result.FOO,cr,product1.getName(),product2.getName(),ProductCategory.ADD_ON,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
   assertionNull(cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.ADD_ON,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
   assertionNull(cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.ANNUAL,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
   assertionNull(cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.ANNUAL,priceList1.getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
-  assertionNull(cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,"wrong",priceList2.getName(),PhaseType.EVERGREEN,cat);
-  assertionNull(cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),"wrong",PhaseType.EVERGREEN,cat);
+  assertionNull(cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,cat.getProducts()[1].getName(),priceList2.getName(),PhaseType.EVERGREEN,cat);
+  assertionNull(cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),cat.getProducts()[1].getName(),PhaseType.EVERGREEN,cat);
   assertionNull(cr,product1.getName(),product2.getName(),ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1.getName(),priceList2.getName(),PhaseType.TRIAL,cat);
 }

@@ -1,33 +1,33 @@
 {
   log.info("Starting testChangeSubscriptionEOTWithChargeThroughDate");
   try {
-    Subscription subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
-    IPlanPhase trialPhase=subscription.getCurrentPhase();
-    DateTime expectedPhaseTrialChange=Clock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
+    PlanPhase trialPhase=subscription.getCurrentPhase();
+    DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
     assertTrue(testListener.isCompleted(2000));
-    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
-    IDuration ctd=getDurationMonth(1);
-    DateTime newChargedThroughDate=Clock.addDuration(expectedPhaseTrialChange,ctd);
+    Duration ctd=getDurationMonth(1);
+    DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow());
     assertFalse(testListener.isCompleted(2000));
     testListener.reset();
     currentPhase=subscription.getCurrentPhase();
     checkChangePlan(subscription,fromProd,ProductCategory.BASE,fromTerm,PhaseType.DISCOUNT);
-    DateTime nextExpectedPhaseChange=Clock.addDuration(expectedPhaseTrialChange,currentPhase.getDuration());
+    DateTime nextExpectedPhaseChange=DefaultClock.addDuration(expectedPhaseTrialChange,currentPhase.getDuration());
     checkNextPhaseChange(subscription,2,nextExpectedPhaseChange);
-    List<IEvent> events=dao.getPendingEventsForSubscription(subscription.getId());
-    assertTrue(events.get(0) instanceof IApiEvent);
+    List<EntitlementEvent> events=dao.getPendingEventsForSubscription(subscription.getId());
+    assertTrue(events.get(0) instanceof ApiEvent);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     clock.addDeltaFromReality(ctd);
     assertTrue(testListener.isCompleted(5000));
-    subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     currentPhase=subscription.getCurrentPhase();
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.DISCOUNT);
   }

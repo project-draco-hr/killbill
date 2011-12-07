@@ -1,13 +1,13 @@
 {
-  Product foo=new Product("Foo",ProductCategory.BASE);
-  Product bar=new Product("Bar",ProductCategory.BASE);
-  Plan[] defaultPlans=new Plan[]{new MockPlan().setName("plan-foo-monthly").setProduct(foo).setFinalPhase(new MockPlanPhase().setBillCycleDuration(MONTHLY).setPhaseType(EVERGREEN)),new MockPlan().setName("plan-bar-monthly").setProduct(bar).setFinalPhase(new MockPlanPhase().setBillCycleDuration(MONTHLY).setPhaseType(EVERGREEN)),new MockPlan().setName("plan-foo-annual").setProduct(foo).setFinalPhase(new MockPlanPhase().setBillCycleDuration(ANNUAL).setPhaseType(EVERGREEN)),new MockPlan().setName("plan-bar-annual").setProduct(bar).setFinalPhase(new MockPlanPhase().setBillCycleDuration(ANNUAL).setPhaseType(EVERGREEN))};
-  Plan[] childPlans=new Plan[]{new MockPlan().setName("plan-foo").setProduct(foo).setFinalPhase(new MockPlanPhase().setBillCycleDuration(ANNUAL).setPhaseType(DISCOUNT)),new MockPlan().setName("plan-bar").setProduct(bar).setFinalPhase(new MockPlanPhase().setBillCycleDuration(ANNUAL).setPhaseType(DISCOUNT))};
+  DefaultProduct foo=new DefaultProduct("Foo",ProductCategory.BASE);
+  DefaultProduct bar=new DefaultProduct("Bar",ProductCategory.BASE);
+  DefaultPlan[] defaultPlans=new DefaultPlan[]{new MockPlan().setName("plan-foo-monthly").setProduct(foo).setFinalPhase(new MockPlanPhase().setBillCycleDuration(MONTHLY).setPhaseType(EVERGREEN)),new MockPlan().setName("plan-bar-monthly").setProduct(bar).setFinalPhase(new MockPlanPhase().setBillCycleDuration(MONTHLY).setPhaseType(EVERGREEN)),new MockPlan().setName("plan-foo-annual").setProduct(foo).setFinalPhase(new MockPlanPhase().setBillCycleDuration(ANNUAL).setPhaseType(EVERGREEN)),new MockPlan().setName("plan-bar-annual").setProduct(bar).setFinalPhase(new MockPlanPhase().setBillCycleDuration(ANNUAL).setPhaseType(EVERGREEN))};
+  DefaultPlan[] childPlans=new DefaultPlan[]{new MockPlan().setName("plan-foo").setProduct(foo).setFinalPhase(new MockPlanPhase().setBillCycleDuration(ANNUAL).setPhaseType(DISCOUNT)),new MockPlan().setName("plan-bar").setProduct(bar).setFinalPhase(new MockPlanPhase().setBillCycleDuration(ANNUAL).setPhaseType(DISCOUNT))};
   PriceListDefault defaultPriceList=new PriceListDefault(defaultPlans);
-  PriceList[] childPriceLists=new PriceList[]{new PriceList(childPlans,"child")};
-  PriceListSet set=new PriceListSet(defaultPriceList,childPriceLists);
-  Assert.assertEquals(set.getPlanListFrom(IPriceListSet.DEFAULT_PRICELIST_NAME,foo,BillingPeriod.ANNUAL).getFinalPhase().getPhaseType(),PhaseType.EVERGREEN);
-  Assert.assertEquals(set.getPlanListFrom(IPriceListSet.DEFAULT_PRICELIST_NAME,foo,BillingPeriod.MONTHLY).getFinalPhase().getPhaseType(),PhaseType.EVERGREEN);
+  DefaultPriceList[] childPriceLists=new DefaultPriceList[]{new DefaultPriceList(childPlans,"child")};
+  DefaultPriceListSet set=new DefaultPriceListSet(defaultPriceList,childPriceLists);
+  Assert.assertEquals(set.getPlanListFrom(PriceListSet.DEFAULT_PRICELIST_NAME,foo,BillingPeriod.ANNUAL).getFinalPhase().getPhaseType(),PhaseType.EVERGREEN);
+  Assert.assertEquals(set.getPlanListFrom(PriceListSet.DEFAULT_PRICELIST_NAME,foo,BillingPeriod.MONTHLY).getFinalPhase().getPhaseType(),PhaseType.EVERGREEN);
   Assert.assertEquals(set.getPlanListFrom("child",foo,BillingPeriod.ANNUAL).getFinalPhase().getPhaseType(),PhaseType.DISCOUNT);
   Assert.assertEquals(set.getPlanListFrom("child",foo,BillingPeriod.MONTHLY).getFinalPhase().getPhaseType(),PhaseType.EVERGREEN);
 }

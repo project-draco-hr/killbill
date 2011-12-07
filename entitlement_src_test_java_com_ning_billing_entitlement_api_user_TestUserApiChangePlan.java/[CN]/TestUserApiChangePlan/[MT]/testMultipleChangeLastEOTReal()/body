@@ -1,18 +1,18 @@
 {
   try {
-    Subscription subscription=createSubscription("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount");
-    IPlanPhase trialPhase=subscription.getCurrentPhase();
+    SubscriptionData subscription=createSubscription("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount");
+    PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
     assertTrue(testListener.isCompleted(2000));
-    List<IDuration> durationList=new ArrayList<IDuration>();
+    List<Duration> durationList=new ArrayList<Duration>();
     durationList.add(trialPhase.getDuration());
-    DateTime startDiscountPhase=Clock.addDuration(subscription.getStartDate(),durationList);
-    IDuration ctd=getDurationMonth(1);
-    DateTime newChargedThroughDate=Clock.addDuration(startDiscountPhase,ctd);
+    DateTime startDiscountPhase=DefaultClock.addDuration(subscription.getStartDate(),durationList);
+    Duration ctd=getDurationMonth(1);
+    DateTime newChargedThroughDate=DefaultClock.addDuration(startDiscountPhase,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
-    subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Shotgun",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow());
     assertFalse(testListener.isCompleted(2000));
@@ -21,12 +21,12 @@
     subscription.changePlan("Pistol",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow());
     assertFalse(testListener.isCompleted(2000));
     testListener.reset();
-    IPlan currentPlan=subscription.getCurrentPlan();
+    Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),"Assault-Rifle");
     assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
     assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.ANNUAL);
-    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
@@ -43,7 +43,7 @@
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.addDeltaFromReality(currentPhase.getDuration());
     assertTrue(testListener.isCompleted(3000));
-    subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),"Pistol");

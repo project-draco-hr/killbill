@@ -1,0 +1,15 @@
+{
+synchronized (events) {
+    Iterator<EntitlementEvent> it=events.descendingIterator();
+    while (it.hasNext()) {
+      EntitlementEvent cur=it.next();
+      if (cur.getSubscriptionId() != subscriptionId) {
+        continue;
+      }
+      if (cur.getType() == EventType.API_USER && ApiEventType.CHANGE == ((ApiEvent)cur).getEventType() && cur.getProcessingState() == EventLifecycleState.AVAILABLE) {
+        cur.deactivate();
+        break;
+      }
+    }
+  }
+}
