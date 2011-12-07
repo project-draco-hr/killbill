@@ -1,10 +1,10 @@
 {
   MockCatalog cat=new MockCatalog();
-  Product product=cat.getProducts()[0];
-  PriceList priceList=cat.getPriceListFromName(IPriceListSet.DEFAULT_PRICELIST_NAME);
+  DefaultProduct product=cat.getProducts()[0];
+  DefaultPriceList priceList=cat.getPriceListFromName(PriceListSet.DEFAULT_PRICELIST_NAME);
   CaseResult cr=new CaseResult(null,ProductCategory.BASE,BillingPeriod.MONTHLY,priceList,Result.FOO);
   assertion(Result.FOO,cr,product.getName(),ProductCategory.BASE,BillingPeriod.MONTHLY,priceList.getName(),cat);
-  assertion(Result.FOO,cr,"lala",ProductCategory.BASE,BillingPeriod.MONTHLY,priceList.getName(),cat);
+  assertion(Result.FOO,cr,cat.getProducts()[1].getName(),ProductCategory.BASE,BillingPeriod.MONTHLY,priceList.getName(),cat);
   assertionNull(cr,product.getName(),ProductCategory.ADD_ON,BillingPeriod.MONTHLY,priceList.getName(),cat);
   assertionNull(cr,product.getName(),ProductCategory.BASE,BillingPeriod.ANNUAL,priceList.getName(),cat);
   assertionNull(cr,product.getName(),ProductCategory.BASE,BillingPeriod.MONTHLY,"dipsy",cat);

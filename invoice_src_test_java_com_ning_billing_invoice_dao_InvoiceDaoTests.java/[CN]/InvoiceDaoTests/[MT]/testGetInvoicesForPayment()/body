@@ -5,14 +5,14 @@
   int existingInvoiceCount=invoices.size();
   UUID accountId=UUID.randomUUID();
   DateTime targetDate=new DateTime(2011,10,6,0,0,0,0);
-  Invoice invoice=new InvoiceDefault(accountId,targetDate,Currency.USD);
+  Invoice invoice=new DefaultInvoice(accountId,targetDate,Currency.USD);
   dao.createInvoice(invoice);
   UUID invoiceId=invoice.getId();
   UUID subscriptionId=UUID.randomUUID();
   DateTime endDate=targetDate.plusMonths(3);
   BigDecimal rate=new BigDecimal("9.0");
   BigDecimal amount=rate.multiply(new BigDecimal("3.0"));
-  InvoiceItem item=new InvoiceItem(invoiceId,subscriptionId,targetDate,endDate,"test",amount,rate,Currency.USD);
+  DefaultInvoiceItem item=new DefaultInvoiceItem(invoiceId,subscriptionId,targetDate,endDate,"test",amount,rate,Currency.USD);
   invoiceItemDao.createInvoiceItem(item);
   invoices=dao.getInvoicesForPayment(notionalDate.toDate(),NUMBER_OF_DAY_BETWEEN_RETRIES);
   assertEquals(invoices.size(),existingInvoiceCount + 1);

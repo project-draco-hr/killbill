@@ -5,10 +5,10 @@
     DateTime requestedDate=init.minusYears(1);
     String productName="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
-    String planSetName=IPriceListSet.DEFAULT_PRICELIST_NAME;
+    String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
     testListener.pushExpectedEvent(NextEvent.PHASE);
     testListener.pushExpectedEvent(NextEvent.CREATE);
-    Subscription subscription=(Subscription)entitlementApi.createSubscription(bundle.getId(),productName,term,planSetName,requestedDate);
+    SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),productName,term,planSetName,null,requestedDate);
     assertNotNull(subscription);
     assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
     assertEquals(subscription.getBundleId(),bundle.getId());

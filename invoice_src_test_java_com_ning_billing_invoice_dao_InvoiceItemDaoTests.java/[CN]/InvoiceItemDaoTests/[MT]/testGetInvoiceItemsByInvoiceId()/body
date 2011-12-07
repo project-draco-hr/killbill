@@ -5,9 +5,9 @@
   for (int i=0; i < 5; i++) {
     UUID subscriptionId=UUID.randomUUID();
     BigDecimal amount=rate.multiply(new BigDecimal(i + 1));
-    InvoiceItem item=new InvoiceItem(invoiceId,subscriptionId,startDate,startDate.plusMonths(1),"test",amount,amount,Currency.USD);
+    DefaultInvoiceItem item=new DefaultInvoiceItem(invoiceId,subscriptionId,startDate,startDate.plusMonths(1),"test",amount,amount,Currency.USD);
     dao.createInvoiceItem(item);
   }
-  List<IInvoiceItem> items=dao.getInvoiceItemsByInvoice(invoiceId.toString());
+  List<InvoiceItem> items=dao.getInvoiceItemsByInvoice(invoiceId.toString());
   assertEquals(items.size(),5);
 }

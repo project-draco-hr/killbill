@@ -6,9 +6,9 @@
     BillingPeriod term=BillingPeriod.ANNUAL;
     String planSetName="gunclubDiscount";
     testListener.pushExpectedEvent(NextEvent.CREATE);
-    Subscription subscription=(Subscription)entitlementApi.createSubscription(bundle.getId(),productName,term,planSetName,clock.getUTCNow());
+    SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),productName,term,planSetName,null,clock.getUTCNow());
     assertNotNull(subscription);
-    IPlanPhase currentPhase=subscription.getCurrentPhase();
+    PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
     assertTrue(testListener.isCompleted(5000));
@@ -22,7 +22,7 @@
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.addDeltaFromReality(currentPhase.getDuration());
     assertTrue(testListener.isCompleted(2000));
-    subscription=(Subscription)entitlementApi.getSubscriptionFromId(subscription.getId());
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     curTime=clock.getUTCNow();
     currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);

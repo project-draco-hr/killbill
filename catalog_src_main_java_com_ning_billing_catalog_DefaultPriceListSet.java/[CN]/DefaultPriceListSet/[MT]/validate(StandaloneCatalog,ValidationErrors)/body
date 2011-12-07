@@ -1,0 +1,10 @@
+{
+  defaultPricelist.validate(catalog,errors);
+  for (  DefaultPriceList pl : childPriceLists) {
+    if (pl.getName().equals(PriceListSet.DEFAULT_PRICELIST_NAME)) {
+      errors.add(new ValidationError("Pricelists cannot use the reserved name '" + PriceListSet.DEFAULT_PRICELIST_NAME + "'",catalog.getCatalogURI(),DefaultPriceListSet.class,pl.getName()));
+    }
+    pl.validate(catalog,errors);
+  }
+  return errors;
+}

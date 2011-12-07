@@ -1,0 +1,12 @@
+{
+  if (transitions == null) {
+    return false;
+  }
+  for (  SubscriptionTransitionData cur : transitions) {
+    if (cur.getEffectiveTransitionTime().isBefore(clock.getUTCNow()) || cur.getEventType() == EventType.PHASE || cur.getApiEventType() != ApiEventType.CANCEL) {
+      continue;
+    }
+    return true;
+  }
+  return false;
+}

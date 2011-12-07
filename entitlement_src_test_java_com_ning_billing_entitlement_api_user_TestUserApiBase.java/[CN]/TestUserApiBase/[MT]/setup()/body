@@ -1,15 +1,15 @@
 {
   loadSystemPropertiesFromClasspath("/entitlement.properties");
   final Injector g=getInjector();
-  entitlementService=g.getInstance(IEntitlementService.class);
-  catalogService=g.getInstance(ICatalogService.class);
-  busService=g.getInstance(IEventBusService.class);
-  config=g.getInstance(IEntitlementConfig.class);
-  dao=g.getInstance(IEntitlementDao.class);
-  clock=(ClockMock)g.getInstance(IClock.class);
+  entitlementService=g.getInstance(EntitlementService.class);
+  catalogService=g.getInstance(CatalogService.class);
+  busService=g.getInstance(EventBusService.class);
+  config=g.getInstance(EntitlementConfig.class);
+  dao=g.getInstance(EntitlementDao.class);
+  clock=(ClockMock)g.getInstance(Clock.class);
   try {
-    ((CatalogService)catalogService).loadCatalog();
-    ((EventBusService)busService).startBus();
+    ((DefaultCatalogService)catalogService).loadCatalog();
+    ((DefaultEventBusService)busService).startBus();
     ((Engine)entitlementService).initialize();
     init();
   }
