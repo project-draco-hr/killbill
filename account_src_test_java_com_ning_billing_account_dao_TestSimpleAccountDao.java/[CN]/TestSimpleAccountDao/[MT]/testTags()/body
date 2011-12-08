@@ -1,0 +1,19 @@
+{
+  Account account=createTestAccount();
+  TagDescription description=new DefaultTagDescription("Test Tag","For testing only",true,true,"Test System",new DateTime());
+  String addedBy="testTags()";
+  DateTime dateAdded=new DateTime();
+  account.addTag(description,addedBy,dateAdded);
+  assertEquals(account.getTagList().size(),1);
+  accountDao.save(account);
+  Account thisAccount=accountDao.getById(account.getId().toString());
+  List<Tag> tagList=thisAccount.getTagList();
+  assertEquals(tagList.size(),1);
+  Tag tag=tagList.get(0);
+  assertEquals(tag.getName(),description.getName());
+  assertEquals(tag.getGenerateInvoice(),description.getGenerateInvoice());
+  assertEquals(tag.getProcessPayment(),description.getProcessPayment());
+  assertEquals(tag.getTagDescriptionId(),description.getId());
+  assertEquals(tag.getAddedBy(),addedBy);
+  assertEquals(tag.getDateAdded(),dateAdded);
+}

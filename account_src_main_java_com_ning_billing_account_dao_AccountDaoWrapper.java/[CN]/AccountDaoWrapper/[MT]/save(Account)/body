@@ -10,7 +10,9 @@
         accountDao.save(account);
         FieldStore fieldStore=account.getFields();
         FieldStoreDao fieldStoreDao=conn.attach(FieldStoreDao.class);
-        fieldStoreDao.save(accountId,objectType,fieldStore.getFieldList());
+        fieldStoreDao.save(accountId,objectType,fieldStore.getEntityList());
+        TagStoreDao tagStoreDao=conn.attach(TagStoreDao.class);
+        tagStoreDao.save(accountId,objectType,account.getTagList());
         if (currentAccount == null) {
           AccountCreationNotification creationEvent=new AccountCreationEventDefault(account);
           eventBus.post(creationEvent);
