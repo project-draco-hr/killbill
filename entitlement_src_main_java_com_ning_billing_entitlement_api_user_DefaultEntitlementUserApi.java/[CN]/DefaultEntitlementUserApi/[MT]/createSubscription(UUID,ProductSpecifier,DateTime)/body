@@ -1,6 +1,6 @@
 {
   try {
-    String realPriceList=(priceList == null) ? PriceListSet.DEFAULT_PRICELIST_NAME : priceList;
+    String realPriceList=(spec.getPriceList() == null) ? PriceListSet.DEFAULT_PRICELIST_NAME : spec.getPriceList();
     DateTime now=clock.getUTCNow();
     requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : now;
     if (requestedDate != null && requestedDate.isAfter(now)) {
@@ -8,10 +8,10 @@
     }
     requestedDate=(requestedDate == null) ? now : requestedDate;
     DateTime effectiveDate=requestedDate;
-    Plan plan=catalogService.getCatalog().findPlan(productName,term,realPriceList);
+    Plan plan=catalogService.getCatalog().findPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList);
     PlanPhase phase=(plan.getInitialPhases() != null) ? plan.getInitialPhases()[0] : plan.getFinalPhase();
     if (phase == null) {
-      throw new EntitlementError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",productName,term.toString(),realPriceList));
+      throw new EntitlementError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",spec.getProductName(),spec.getBillingPeriod().toString(),realPriceList));
     }
     SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(bundleId);
     if (bundle == null) {
@@ -35,7 +35,7 @@ break;
 default :
 throw new EntitlementError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
 }
-SubscriptionData subscription=apiService.createBasePlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setStartDate(effectiveDate),plan,initialPhase,realPriceList,requestedDate,effectiveDate,now);
+SubscriptionData subscription=apiService.createBasePlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setStartDate(effectiveDate),plan,spec.getInitialPhaseType(),realPriceList,requestedDate,effectiveDate,now);
 return subscription;
 }
  catch (CatalogApiException e) {

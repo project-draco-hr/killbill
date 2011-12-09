@@ -1,6 +1,20 @@
 {
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),productName,term,planSet,null,clock.getUTCNow());
+  SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),new ProductSpecifier(){
+    @Override public BillingPeriod getBillingPeriod(){
+      return term;
+    }
+    @Override public PhaseType getInitialPhaseType(){
+      return null;
+    }
+    @Override public String getPriceList(){
+      return planSet;
+    }
+    @Override public String getProductName(){
+      return productName;
+    }
+  }
+,clock.getUTCNow());
   assertNotNull(subscription);
   assertTrue(testListener.isCompleted(5000));
   return subscription;
