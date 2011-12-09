@@ -1,8 +1,10 @@
 {
   Account account=createTestAccount();
   TagDescription description=new DefaultTagDescription("Test Tag","For testing only",true,true,"Test System",new DateTime());
+  TagDescriptionDao tagDescriptionDao=dbi.onDemand(TagDescriptionDao.class);
+  tagDescriptionDao.save(description);
   String addedBy="testTags()";
-  DateTime dateAdded=new DateTime();
+  DateTime dateAdded=new DefaultClock().getUTCNow();
   account.addTag(description,addedBy,dateAdded);
   assertEquals(account.getTagList().size(),1);
   accountDao.save(account);
@@ -15,5 +17,5 @@
   assertEquals(tag.getProcessPayment(),description.getProcessPayment());
   assertEquals(tag.getTagDescriptionId(),description.getId());
   assertEquals(tag.getAddedBy(),addedBy);
-  assertEquals(tag.getDateAdded(),dateAdded);
+  assertEquals(tag.getDateAdded().compareTo(dateAdded),0);
 }
