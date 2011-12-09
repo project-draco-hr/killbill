@@ -1,4 +1,5 @@
 {
+  bus.start();
   final String analyticsDdl=IOUtils.toString(BusinessSubscriptionTransitionDao.class.getResourceAsStream("/com/ning/billing/analytics/ddl.sql"));
   final String accountDdl=IOUtils.toString(BusinessSubscriptionTransitionDao.class.getResourceAsStream("/com/ning/billing/account/ddl.sql"));
   final String entitlementDdl=IOUtils.toString(BusinessSubscriptionTransitionDao.class.getResourceAsStream("/com/ning/billing/entitlement/ddl.sql"));
@@ -11,7 +12,7 @@
   final SubscriptionBundle bundle=entitlementApi.createBundleForAccount(storedAccount,KEY);
   Assert.assertNotNull(bundle);
   Assert.assertEquals(bundle.getKey(),KEY);
-  final Product product=new MockProduct("platinium","subscription",ProductCategory.BASE);
+  final Product product=new MockProduct("platinum","subscription",ProductCategory.BASE);
   final Plan plan=new MockPlan("platinum-monthly",product);
   final PlanPhase phase=new MockPhase(PhaseType.EVERGREEN,plan,MockDuration.UNLIMITED(),25.95);
   final UUID subscriptionId=UUID.randomUUID();
@@ -19,5 +20,5 @@
   final DateTime requestedTransitionTime=new DateTime(DateTimeZone.UTC);
   final String priceList="something";
   transition=new SubscriptionTransitionData(UUID.randomUUID(),subscriptionId,bundle.getId(),EntitlementEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,Subscription.SubscriptionState.ACTIVE,plan,phase,priceList);
-  expectedTransition=new BusinessSubscriptionTransition(KEY,ACCOUNT_KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan),null,new BusinessSubscription(priceList,plan,phase,null,effectiveTransitionTime,Subscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId()));
+  expectedTransition=new BusinessSubscriptionTransition(KEY,ACCOUNT_KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan),null,new BusinessSubscription(priceList,plan,phase,Currency.USD,effectiveTransitionTime,Subscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId()));
 }
