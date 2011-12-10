@@ -1,6 +1,6 @@
 {
   try {
-    String realPriceList=(spec.getPriceList() == null) ? PriceListSet.DEFAULT_PRICELIST_NAME : spec.getPriceList();
+    String realPriceList=(spec.getPriceListName() == null) ? PriceListSet.DEFAULT_PRICELIST_NAME : spec.getPriceListName();
     DateTime now=clock.getUTCNow();
     requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : now;
     if (requestedDate != null && requestedDate.isAfter(now)) {
@@ -35,7 +35,7 @@ break;
 default :
 throw new EntitlementError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
 }
-SubscriptionData subscription=apiService.createBasePlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setStartDate(effectiveDate),plan,spec.getInitialPhaseType(),realPriceList,requestedDate,effectiveDate,now);
+SubscriptionData subscription=apiService.createBasePlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setStartDate(effectiveDate),plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,now);
 return subscription;
 }
  catch (CatalogApiException e) {
