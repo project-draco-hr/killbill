@@ -28,7 +28,7 @@
     TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(subscription,newPlan,newPriceList.getName(),effectiveDate);
     EntitlementEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList.getName()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
     TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(subscription,newPlan,newPriceList.getName(),effectiveDate);
-    PhaseEvent nextPhaseEvent=PhaseEventData.getNextPhaseEvent(nextTimedPhase,subscription,now);
+    PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.getNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,now,nextTimedPhase.getStartPhase()) : null;
     List<EntitlementEvent> changeEvents=new ArrayList<EntitlementEvent>();
     if (nextPhaseEvent != null && !nextPhaseEvent.getEffectiveDate().equals(changeEvent.getEffectiveDate())) {
       changeEvents.add(nextPhaseEvent);

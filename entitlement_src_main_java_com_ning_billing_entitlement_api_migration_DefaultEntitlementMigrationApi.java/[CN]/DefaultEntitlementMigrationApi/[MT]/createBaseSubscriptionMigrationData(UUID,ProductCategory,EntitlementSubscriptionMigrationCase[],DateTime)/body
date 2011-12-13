@@ -1,0 +1,29 @@
+{
+  try {
+    final DateTime bundleStartDate=now;
+    List<EntitlementEvent> emptyEvents=Collections.emptyList();
+    SubscriptionData subscriptionData=factory.createSubscription(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(productCategory).setBundleStartDate(bundleStartDate),emptyEvents);
+    TimedMigration[] events=null;
+    Plan plan0=catalogService.getCatalog().findPlan(input[0].getPlanPhaseSpecifer().getProductName(),input[0].getPlanPhaseSpecifer().getBillingPeriod(),input[0].getPlanPhaseSpecifer().getPriceListName());
+    Plan plan1=(input.length > 1) ? catalogService.getCatalog().findPlan(input[1].getPlanPhaseSpecifer().getProductName(),input[1].getPlanPhaseSpecifer().getBillingPeriod(),input[1].getPlanPhaseSpecifer().getPriceListName()) : null;
+    if (isRegularMigratedSubscription(input)) {
+      events=migrationAligner.getEventsOnRegularMigration(subscriptionData,plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifer().getPhaseType()),input[0].getPlanPhaseSpecifer().getPriceListName(),now);
+    }
+ else     if (isRegularFutureCancelledMigratedSubscription(input)) {
+      events=migrationAligner.getEventsOnFuturePlanCancelMigration(subscriptionData,plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifer().getPhaseType()),input[0].getPlanPhaseSpecifer().getPriceListName(),now,input[0].getCancelledDate());
+    }
+ else     if (isPhaseChangeMigratedSubscription(input)) {
+      events=migrationAligner.getEventsOnFuturePhaseChangeMigration(subscriptionData,plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifer().getPhaseType()),input[0].getPlanPhaseSpecifer().getPriceListName(),now,input[1].getEffectiveDate());
+    }
+ else     if (isPlanChangeMigratedSubscription(input)) {
+      events=migrationAligner.getEventsOnFuturePlanChangeMigration(subscriptionData,plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifer().getPhaseType()),plan1,input[0].getPlanPhaseSpecifer().getPriceListName(),now,input[1].getEffectiveDate());
+    }
+ else {
+      throw new EntitlementMigrationApiException("Unknown migration type");
+    }
+    return new SubscriptionMigrationData(subscriptionData,toEvents(subscriptionData,now,events));
+  }
+ catch (  CatalogApiException e) {
+    throw new EntitlementMigrationApiException(e);
+  }
+}
