@@ -1,0 +1,17 @@
+{
+  List<EntitlementSubscriptionMigrationCase> cases=new LinkedList<EntitlementSubscriptionMigrationCase>();
+  final DateTime effectiveDate=new DateTime().minusMonths(3);
+  cases.add(new EntitlementSubscriptionMigrationCase(){
+    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
+      return new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+    }
+    @Override public DateTime getEffectiveDate(){
+      return effectiveDate;
+    }
+    @Override public DateTime getCancelledDate(){
+      return effectiveDate.plusYears(1);
+    }
+  }
+);
+  return createAccountWithSingleBasePlan(cases);
+}

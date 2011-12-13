@@ -1,0 +1,29 @@
+{
+  List<EntitlementSubscriptionMigrationCase> cases=new LinkedList<EntitlementSubscriptionMigrationCase>();
+  final DateTime effectiveDate=new DateTime().minusDays(10);
+  cases.add(new EntitlementSubscriptionMigrationCase(){
+    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
+      return new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+    }
+    @Override public DateTime getEffectiveDate(){
+      return effectiveDate;
+    }
+    @Override public DateTime getCancelledDate(){
+      return effectiveDate.plusMonths(1);
+    }
+  }
+);
+  cases.add(new EntitlementSubscriptionMigrationCase(){
+    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
+      return new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+    }
+    @Override public DateTime getEffectiveDate(){
+      return effectiveDate.plusMonths(1).plusDays(1);
+    }
+    @Override public DateTime getCancelledDate(){
+      return null;
+    }
+  }
+);
+  return createAccountWithSingleBasePlan(cases);
+}
