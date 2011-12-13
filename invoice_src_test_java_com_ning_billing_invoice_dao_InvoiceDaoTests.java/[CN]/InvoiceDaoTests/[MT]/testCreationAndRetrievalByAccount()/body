@@ -1,0 +1,15 @@
+{
+  UUID accountId=UUID.randomUUID();
+  Invoice invoice=new DefaultInvoice(accountId,new DefaultClock().getUTCNow(),Currency.USD);
+  DateTime invoiceDate=invoice.getInvoiceDate();
+  dao.createInvoice(invoice);
+  List<Invoice> invoices=dao.getInvoicesByAccount(accountId.toString());
+  assertNotNull(invoices);
+  assertEquals(invoices.size(),1);
+  Invoice thisInvoice=invoices.get(0);
+  assertEquals(invoice.getAccountId(),accountId);
+  assertTrue(thisInvoice.getInvoiceDate().compareTo(invoiceDate) == 0);
+  assertEquals(thisInvoice.getCurrency(),Currency.USD);
+  assertEquals(thisInvoice.getNumberOfItems(),0);
+  assertTrue(thisInvoice.getTotalAmount().compareTo(BigDecimal.ZERO) == 0);
+}

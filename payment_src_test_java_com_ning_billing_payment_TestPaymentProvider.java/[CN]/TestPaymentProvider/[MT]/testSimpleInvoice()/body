@@ -1,11 +1,11 @@
 {
-  final IAccount account=getTestAccount();
+  final Account account=getTestAccount();
   final UUID subscriptionUuid=UUID.randomUUID();
   final UUID invoiceUuid=UUID.randomUUID();
   final DateTime now=new DateTime();
   final InvoiceItem lineItem=new InvoiceItem(invoiceUuid,subscriptionUuid,now,now.plusMonths(1),"Test invoice",new BigDecimal("10"),new BigDecimal("1"),Currency.USD);
   final List<InvoiceItem> lineItems=Arrays.asList(lineItem);
-  final Invoice invoice=new Invoice(account.getId(),lineItems,Currency.USD);
+  final Invoice invoice=new DefaultInvoice(account.getId(),lineItems,Currency.USD);
   eventBus.post(invoice);
   await().atMost(1,MINUTES).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {

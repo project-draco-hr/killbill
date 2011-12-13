@@ -1,0 +1,36 @@
+{
+  final String accountId=account.getId().toString();
+  final String objectType=DefaultAccount.OBJECT_TYPE;
+  dbi.inTransaction(new TransactionCallback<Void>(){
+    @Override public Void inTransaction(    Handle conn,    TransactionStatus status) throws Exception {
+      try {
+        conn.begin();
+        AccountDao accountDao=conn.attach(AccountDao.class);
+        Account currentAccount=accountDao.getById(accountId);
+        accountDao.save(account);
+        FieldStore fieldStore=account.getFields();
+        FieldStoreDao fieldStoreDao=conn.attach(FieldStoreDao.class);
+        fieldStoreDao.save(accountId,objectType,fieldStore.getEntityList());
+        TagStoreDao tagStoreDao=conn.attach(TagStoreDao.class);
+        tagStoreDao.save(accountId,objectType,account.getTagList());
+        if (currentAccount == null) {
+          AccountCreationNotification creationEvent=new AccountCreationEventDefault(account);
+          eventBus.post(creationEvent);
+        }
+ else {
+          AccountChangeNotification changeEvent=new AccountChangeNotificationDefault(account.getId(),currentAccount,account);
+          if (changeEvent.hasChanges()) {
+            eventBus.post(changeEvent);
+          }
+        }
+        conn.commit();
+      }
+ catch (      Exception e) {
+        conn.rollback();
+        throw e;
+      }
+      return null;
+    }
+  }
+);
+}

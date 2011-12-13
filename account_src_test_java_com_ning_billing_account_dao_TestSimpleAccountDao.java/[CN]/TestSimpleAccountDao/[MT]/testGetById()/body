@@ -1,10 +1,14 @@
 {
-  String key="test1234";
-  IAccount account=Account.create().withKey(key);
+  Account account=createTestAccount();
   UUID id=account.getId();
-  dao.save(account);
-  account=dao.getAccountById(id);
+  String key=account.getExternalKey();
+  String name=account.getName();
+  int firstNameLength=account.getFirstNameLength();
+  accountDao.save(account);
+  account=accountDao.getById(id.toString());
   assertNotNull(account);
   assertEquals(account.getId(),id);
-  assertEquals(account.getKey(),key);
+  assertEquals(account.getExternalKey(),key);
+  assertEquals(account.getName(),name);
+  assertEquals(account.getFirstNameLength(),firstNameLength);
 }

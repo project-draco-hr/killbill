@@ -1,12 +1,11 @@
 {
-  String key="test45678";
-  IAccount account=Account.create().withKey(key);
+  Account account=createTestAccount();
   String fieldName="testField1";
   String fieldValue="testField1_value";
   account.setFieldValue(fieldName,fieldValue);
-  dao.save(account);
-  account=dao.getAccountByKey(key);
-  assertNotNull(account);
-  assertEquals(account.getKey(),key);
-  assertEquals(account.getFieldValue(fieldName),fieldValue);
+  accountDao.save(account);
+  Account thisAccount=accountDao.getAccountByKey(account.getExternalKey());
+  assertNotNull(thisAccount);
+  assertEquals(thisAccount.getExternalKey(),account.getExternalKey());
+  assertEquals(thisAccount.getFieldValue(fieldName),fieldValue);
 }
