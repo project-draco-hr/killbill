@@ -1,4 +1,9 @@
 {
-  bundlesDao.insertBundle(bundle);
-  return bundle;
+  return bundlesDao.inTransaction(new Transaction<SubscriptionBundle,BundleSqlDao>(){
+    @Override public SubscriptionBundle inTransaction(    BundleSqlDao trans,    TransactionStatus status) throws Exception {
+      trans.insertBundle(bundle);
+      return trans.getBundleFromId(bundle.getId().toString());
+    }
+  }
+);
 }
