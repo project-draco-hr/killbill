@@ -1,7 +1,5 @@
 {
-  InvoiceGenerator generator=new DefaultInvoiceGenerator();
-  final Account account=getTestAccount();
-  final UUID invoiceUuid=UUID.randomUUID();
+  final Account account=createAccount();
   final DateTime now=new DateTime();
   BillingEventSet events=new BillingEventSet();
   UUID subscriptionId=UUID.randomUUID();
@@ -9,11 +7,8 @@
   String phaseName="phase 1";
   BillingEvent event=new DefaultBillingEvent(subscriptionId,now,planName,phaseName,new InternationalPriceMock(new BigDecimal("10.00")),BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE);
   events.add(event);
-  InvoiceItemList existingInvoiceItems=new InvoiceItemList();
-  UUID accountId=UUID.randomUUID();
-  Invoice invoice=generator.generateInvoice(accountId,events,existingInvoiceItems,now,Currency.USD);
-  existingInvoiceItems.addAll(invoice.getItems());
-  eventBus.post(invoice);
+  final Invoice invoice=createInvoice(account,null,null,new DateTime(),Currency.USD);
+  eventBus.post(createNotificationFor(invoice));
   await().atMost(1,MINUTES).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {
       List<PaymentInfo> processedPayments=paymentInfoReceiver.getProcessedPayments();
