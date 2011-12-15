@@ -1,9 +1,9 @@
 {
-  return dbi.inTransaction(new TransactionCallback<Account>(){
-    @Override public Account inTransaction(    Handle conn,    TransactionStatus status) throws Exception {
-      Account account=accountDao.getById(id);
+  return accountDao.inTransaction(new Transaction<Account,AccountSqlDao>(){
+    @Override public Account inTransaction(    AccountSqlDao accountSqlDao,    TransactionStatus status) throws Exception {
+      Account account=accountSqlDao.getById(id);
       if (account != null) {
-        FieldStoreDao fieldStoreDao=conn.attach(FieldStoreDao.class);
+        FieldStoreDao fieldStoreDao=accountSqlDao.become(FieldStoreDao.class);
         List<CustomField> fields=fieldStoreDao.load(account.getId().toString(),account.getObjectName());
         account.getFields().clear();
         if (fields != null) {
@@ -11,7 +11,7 @@
             account.getFields().setValue(field.getName(),field.getValue());
           }
         }
-        TagStoreDao tagStoreDao=conn.attach(TagStoreDao.class);
+        TagStoreDao tagStoreDao=fieldStoreDao.become(TagStoreDao.class);
         List<Tag> tags=tagStoreDao.load(account.getId().toString(),account.getObjectName());
         account.clearTags();
         if (tags != null) {
