@@ -1,0 +1,35 @@
+{
+  try {
+    DateTime beforeMigration=clock.getUTCNow();
+    EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlanFutreCancelled();
+    DateTime afterMigration=clock.getUTCNow();
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    migrationApi.migrate(toBeMigrated);
+    assertTrue(testListener.isCompleted(5000));
+    List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
+    assertEquals(bundles.size(),1);
+    SubscriptionBundle bundle=bundles.get(0);
+    List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId());
+    assertEquals(subscriptions.size(),1);
+    Subscription subscription=subscriptions.get(0);
+    assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
+    assertEquals(subscription.getCurrentPriceList(),PriceListSet.DEFAULT_PRICELIST_NAME);
+    assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
+    assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-annual");
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    Duration oneYear=getDurationYear(1);
+    clock.setDeltaFromReality(oneYear,0);
+    assertTrue(testListener.isCompleted(5000));
+    assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
+    assertNotNull(subscription.getEndDate());
+    assertTrue(subscription.getEndDate().isAfterNow());
+    assertEquals(subscription.getCurrentPriceList(),PriceListSet.DEFAULT_PRICELIST_NAME);
+    assertEquals(subscription.getCurrentPhase(),null);
+    assertEquals(subscription.getState(),SubscriptionState.CANCELLED);
+    assertNull(subscription.getCurrentPlan());
+  }
+ catch (  EntitlementMigrationApiException e) {
+    Assert.fail("",e);
+  }
+}
