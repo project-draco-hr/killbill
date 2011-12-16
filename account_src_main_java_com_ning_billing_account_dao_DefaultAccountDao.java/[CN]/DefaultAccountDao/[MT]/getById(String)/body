@@ -5,10 +5,10 @@
       if (account != null) {
         FieldStoreDao fieldStoreDao=accountSqlDao.become(FieldStoreDao.class);
         List<CustomField> fields=fieldStoreDao.load(account.getId().toString(),account.getObjectName());
-        account.getFields().clear();
+        account.clearFields();
         if (fields != null) {
           for (          CustomField field : fields) {
-            account.getFields().setValue(field.getName(),field.getValue());
+            account.setFieldValue(field.getName(),field.getValue());
           }
         }
         TagStoreDao tagStoreDao=fieldStoreDao.become(TagStoreDao.class);

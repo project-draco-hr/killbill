@@ -5,9 +5,8 @@
     @Override public Void inTransaction(    AccountSqlDao accountDao,    TransactionStatus status) throws Exception {
       Account currentAccount=accountDao.getById(accountId);
       accountDao.save(account);
-      FieldStore fieldStore=account.getFields();
       FieldStoreDao fieldStoreDao=accountDao.become(FieldStoreDao.class);
-      fieldStoreDao.save(accountId,objectType,fieldStore.getEntityList());
+      fieldStoreDao.save(accountId,objectType,account.getFieldList());
       TagStoreDao tagStoreDao=fieldStoreDao.become(TagStoreDao.class);
       tagStoreDao.save(accountId,objectType,account.getTagList());
       if (currentAccount == null) {
