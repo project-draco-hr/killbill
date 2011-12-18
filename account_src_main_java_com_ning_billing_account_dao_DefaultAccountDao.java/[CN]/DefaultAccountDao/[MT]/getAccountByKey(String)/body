@@ -1,0 +1,25 @@
+{
+  return accountDao.inTransaction(new Transaction<Account,AccountSqlDao>(){
+    @Override public Account inTransaction(    AccountSqlDao accountSqlDao,    TransactionStatus status) throws Exception {
+      Account account=accountSqlDao.getAccountByKey(key);
+      if (account != null) {
+        FieldStoreDao fieldStoreDao=accountSqlDao.become(FieldStoreDao.class);
+        List<CustomField> fields=fieldStoreDao.load(account.getId().toString(),account.getObjectName());
+        account.getFields().clear();
+        if (fields != null) {
+          for (          CustomField field : fields) {
+            account.getFields().setValue(field.getName(),field.getValue());
+          }
+        }
+        TagStoreDao tagStoreDao=fieldStoreDao.become(TagStoreDao.class);
+        List<Tag> tags=tagStoreDao.load(account.getId().toString(),account.getObjectName());
+        account.clearTags();
+        if (tags != null) {
+          account.addTags(tags);
+        }
+      }
+      return account;
+    }
+  }
+);
+}
