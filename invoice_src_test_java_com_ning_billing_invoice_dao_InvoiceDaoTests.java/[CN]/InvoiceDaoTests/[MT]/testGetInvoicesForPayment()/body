@@ -16,13 +16,13 @@
   invoiceItemDao.save(item);
   invoices=invoiceDao.getInvoicesForPayment(notionalDate.toDate(),NUMBER_OF_DAY_BETWEEN_RETRIES);
   assertEquals(invoices.size(),existingInvoiceCount + 1);
-  invoiceDao.notifyFailedPayment(invoice.getId().toString(),notionalDate.toDate());
+  invoiceDao.notifyFailedPayment(invoice.getId().toString(),UUID.randomUUID().toString(),notionalDate.toDate());
   invoices=invoiceDao.getInvoicesForPayment(notionalDate.toDate(),NUMBER_OF_DAY_BETWEEN_RETRIES);
   assertEquals(invoices.size(),existingInvoiceCount);
   notionalDate=notionalDate.plusDays(NUMBER_OF_DAY_BETWEEN_RETRIES);
   invoices=invoiceDao.getInvoicesForPayment(notionalDate.toDate(),NUMBER_OF_DAY_BETWEEN_RETRIES);
   assertEquals(invoices.size(),existingInvoiceCount + 1);
-  invoiceDao.notifySuccessfulPayment(invoiceId.toString(),notionalDate.toDate(),new BigDecimal("22.0000"));
+  invoiceDao.notifySuccessfulPayment(invoiceId.toString(),new BigDecimal("22.0000"),Currency.USD.toString(),UUID.randomUUID().toString(),notionalDate.toDate());
   invoices=invoiceDao.getInvoicesForPayment(notionalDate.toDate(),NUMBER_OF_DAY_BETWEEN_RETRIES);
   assertEquals(invoices.size(),existingInvoiceCount);
   invoice=invoiceDao.getById(invoiceId.toString());
@@ -30,7 +30,7 @@
   notionalDate=notionalDate.plusDays(NUMBER_OF_DAY_BETWEEN_RETRIES);
   invoices=invoiceDao.getInvoicesForPayment(notionalDate.toDate(),NUMBER_OF_DAY_BETWEEN_RETRIES);
   assertEquals(invoices.size(),existingInvoiceCount + 1);
-  invoiceDao.notifySuccessfulPayment(invoiceId.toString(),notionalDate.toDate(),new BigDecimal("5.0000"));
+  invoiceDao.notifySuccessfulPayment(invoiceId.toString(),new BigDecimal("5.0000"),Currency.USD.toString(),UUID.randomUUID().toString(),notionalDate.toDate());
   invoices=invoiceDao.getInvoicesForPayment(notionalDate.toDate(),NUMBER_OF_DAY_BETWEEN_RETRIES);
   assertEquals(invoices.size(),existingInvoiceCount);
   invoice=invoiceDao.getById(invoiceId.toString());
