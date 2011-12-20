@@ -1,11 +1,10 @@
 {
-  final String paymentProviderName;
-  if (accountKey == null) {
-    paymentProviderName=null;
-  }
- else {
-    final Account account=accountUserApi.getAccountById(UUID.fromString(accountKey));
-    paymentProviderName=account.getFieldValue(RequestProcessor.PAYMENT_PROVIDER_KEY);
+  String paymentProviderName=null;
+  if (accountKey != null) {
+    final Account account=accountUserApi.getAccountByKey(accountKey);
+    if (account != null) {
+      paymentProviderName=account.getPaymentProviderName();
+    }
   }
   return pluginRegistry.getPlugin(paymentProviderName);
 }
