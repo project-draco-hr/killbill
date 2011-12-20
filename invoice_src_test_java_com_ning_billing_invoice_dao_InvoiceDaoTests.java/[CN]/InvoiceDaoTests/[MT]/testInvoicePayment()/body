@@ -10,8 +10,8 @@
   invoiceDao.save(invoice);
   Invoice savedInvoice=invoiceDao.getById(invoiceId.toString());
   assertNotNull(savedInvoice);
-  assertEquals(savedInvoice.getTotalAmount(),new BigDecimal("21.00"));
-  assertEquals(savedInvoice.getAmountOutstanding(),new BigDecimal("21.00"));
+  assertEquals(savedInvoice.getTotalAmount().compareTo(new BigDecimal("21.00")),0);
+  assertEquals(savedInvoice.getAmountOutstanding().compareTo(new BigDecimal("21.00")),0);
   assertEquals(savedInvoice.getAmountPaid(),BigDecimal.ZERO);
   assertEquals(savedInvoice.getItems().size(),1);
   BigDecimal paymentAmount=new BigDecimal("11.00");
@@ -19,8 +19,8 @@
   invoiceDao.notifySuccessfulPayment(invoiceId.toString(),paymentAmount,Currency.USD.toString(),paymentId,new DefaultClock().getUTCNow().plusDays(12).toDate());
   Invoice retrievedInvoice=invoiceDao.getById(invoiceId.toString());
   assertNotNull(retrievedInvoice);
-  assertEquals(retrievedInvoice.getTotalAmount(),new BigDecimal("21.00"));
-  assertEquals(retrievedInvoice.getAmountOutstanding(),new BigDecimal("10.00"));
-  assertEquals(retrievedInvoice.getAmountPaid(),new BigDecimal("11.00"));
   assertEquals(retrievedInvoice.getItems().size(),1);
+  assertEquals(retrievedInvoice.getTotalAmount().compareTo(new BigDecimal("21.00")),0);
+  assertEquals(retrievedInvoice.getAmountOutstanding().compareTo(new BigDecimal("10.00")),0);
+  assertEquals(retrievedInvoice.getAmountPaid().compareTo(new BigDecimal("11.00")),0);
 }
