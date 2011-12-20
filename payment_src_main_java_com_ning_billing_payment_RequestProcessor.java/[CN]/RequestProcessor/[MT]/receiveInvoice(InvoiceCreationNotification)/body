@@ -1,16 +1,22 @@
 {
-  final Invoice invoice=invoiceApi.getInvoice(event.getInvoiceId());
-  if (invoice == null) {
+  try {
+    final Invoice invoice=invoiceApi.getInvoice(event.getInvoiceId());
+    if (invoice == null) {
+    }
+ else     if (invoice.getAmountOutstanding().compareTo(BigDecimal.ZERO) == 0) {
+    }
+ else {
+      final Account account=accountUserApi.getAccountById(event.getAccountId());
+      if (account == null) {
+      }
+ else {
+        final String paymentProviderName=account.getPaymentProviderName();
+        final PaymentProviderPlugin plugin=pluginRegistry.getPlugin(paymentProviderName);
+        Either<PaymentError,PaymentInfo> result=plugin.processInvoice(account,invoice);
+        eventBus.post(result.isLeft() ? result.getLeft() : result.getRight());
+      }
+    }
   }
- else {
-    final Account account=accountUserApi.getAccountById(event.getAccountId());
-    if (account == null) {
-    }
- else {
-      final String paymentProviderName=account.getFieldValue(PAYMENT_PROVIDER_KEY);
-      final PaymentProviderPlugin plugin=pluginRegistry.getPlugin(paymentProviderName);
-      Either<PaymentError,PaymentInfo> result=plugin.processInvoice(account,invoice);
-      eventBus.post(result.isLeft() ? result.getLeft() : result.getRight());
-    }
+ catch (  EventBusException ex) {
   }
 }
