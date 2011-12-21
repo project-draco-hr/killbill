@@ -1,16 +1,20 @@
 {
   Assert.assertEquals(service.getName(),"analytics-service");
   try {
-    bus.start();
     service.registerForNotifications();
   }
  catch (  Throwable t) {
     Assert.fail("Unable to start the bus or service! " + t);
   }
   bus.post(transition);
+  bus.post(accountCreationNotification);
   Thread.sleep(1000);
-  Assert.assertEquals(dao.getTransitions(KEY).size(),1);
-  Assert.assertEquals(dao.getTransitions(KEY).get(0),expectedTransition);
+  Assert.assertEquals(subscriptionDao.getTransitions(KEY).size(),1);
+  Assert.assertEquals(subscriptionDao.getTransitions(KEY).get(0),expectedTransition);
+  Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getKey(),ACCOUNT_KEY);
+  Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getTags().size(),2);
+  Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTags().indexOf(TAG_ONE.getName()) != -1);
+  Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTags().indexOf(TAG_TWO.getName()) != -1);
   try {
     bus.stop();
   }

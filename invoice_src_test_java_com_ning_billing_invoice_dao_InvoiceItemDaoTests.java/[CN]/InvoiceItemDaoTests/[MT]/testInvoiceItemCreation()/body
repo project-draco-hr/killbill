@@ -1,0 +1,20 @@
+{
+  UUID invoiceId=UUID.randomUUID();
+  UUID subscriptionId=UUID.randomUUID();
+  DateTime startDate=new DateTime(2011,10,1,0,0,0,0);
+  DateTime endDate=new DateTime(2011,11,1,0,0,0,0);
+  BigDecimal rate=new BigDecimal("20.00");
+  InvoiceItem item=new DefaultInvoiceItem(invoiceId,subscriptionId,startDate,endDate,"test",rate,rate,Currency.USD);
+  invoiceItemDao.save(item);
+  InvoiceItem thisItem=invoiceItemDao.getById(item.getId().toString());
+  assertNotNull(thisItem);
+  assertEquals(thisItem.getId(),item.getId());
+  assertEquals(thisItem.getInvoiceId(),item.getInvoiceId());
+  assertEquals(thisItem.getSubscriptionId(),item.getSubscriptionId());
+  assertEquals(thisItem.getStartDate(),item.getStartDate());
+  assertEquals(thisItem.getEndDate(),item.getEndDate());
+  assertEquals(thisItem.getDescription(),item.getDescription());
+  assertEquals(thisItem.getAmount().compareTo(item.getAmount()),0);
+  assertEquals(thisItem.getRate().compareTo(item.getRate()),0);
+  assertEquals(thisItem.getCurrency(),item.getCurrency());
+}
