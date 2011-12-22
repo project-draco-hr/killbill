@@ -1,0 +1,34 @@
+{
+  return new EntitlementAccountMigration(){
+    private final UUID accountId=UUID.randomUUID();
+    @Override public EntitlementBundleMigration[] getBundles(){
+      List<EntitlementBundleMigration> bundles=new ArrayList<EntitlementBundleMigration>();
+      EntitlementBundleMigration bundle0=new EntitlementBundleMigration(){
+        @Override public EntitlementSubscriptionMigration[] getSubscriptions(){
+          EntitlementSubscriptionMigration subscription=new EntitlementSubscriptionMigration(){
+            @Override public EntitlementSubscriptionMigrationCase[] getSubscriptionCases(){
+              return cases.toArray(new EntitlementSubscriptionMigrationCase[cases.size()]);
+            }
+            @Override public ProductCategory getCategory(){
+              return ProductCategory.BASE;
+            }
+          }
+;
+          EntitlementSubscriptionMigration[] result=new EntitlementSubscriptionMigration[1];
+          result[0]=subscription;
+          return result;
+        }
+        @Override public String getBundleKey(){
+          return "12345";
+        }
+      }
+;
+      bundles.add(bundle0);
+      return bundles.toArray(new EntitlementBundleMigration[bundles.size()]);
+    }
+    @Override public UUID getAccountKey(){
+      return accountId;
+    }
+  }
+;
+}
