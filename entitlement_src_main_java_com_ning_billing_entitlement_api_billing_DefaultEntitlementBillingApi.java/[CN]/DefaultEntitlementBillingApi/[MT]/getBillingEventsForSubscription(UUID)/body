@@ -1,3 +1,16 @@
 {
-  return null;
+  List<SubscriptionBundle> bundles=dao.getSubscriptionBundleForAccount(accountId);
+  List<Subscription> subscriptions=new ArrayList<Subscription>();
+  for (  SubscriptionBundle bundle : bundles) {
+    subscriptions.addAll(dao.getSubscriptions(bundle.getId()));
+  }
+  List<SubscriptionTransition> transitions=new ArrayList<SubscriptionTransition>();
+  for (  Subscription subscription : subscriptions) {
+    transitions.addAll(subscription.getAllTransitions());
+  }
+  SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
+  for (  SubscriptionTransition transition : transitions) {
+    result.add(createBillingEvent(transition));
+  }
+  return result;
 }
