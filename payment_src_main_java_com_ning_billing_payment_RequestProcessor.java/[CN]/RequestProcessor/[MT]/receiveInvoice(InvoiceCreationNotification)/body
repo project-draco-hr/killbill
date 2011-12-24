@@ -3,17 +3,28 @@
     final Invoice invoice=invoiceApi.getInvoice(event.getInvoiceId());
     if (invoice == null) {
     }
- else     if (invoice.getAmountOutstanding().compareTo(BigDecimal.ZERO) == 0) {
-    }
  else {
-      final Account account=accountUserApi.getAccountById(event.getAccountId());
-      if (account == null) {
+      PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice);
+      if (invoice.getAmountOutstanding().compareTo(BigDecimal.ZERO) == 0) {
       }
  else {
-        final String paymentProviderName=account.getPaymentProviderName();
-        final PaymentProviderPlugin plugin=pluginRegistry.getPlugin(paymentProviderName);
-        Either<PaymentError,PaymentInfo> result=plugin.processInvoice(account,invoice);
-        eventBus.post(result.isLeft() ? result.getLeft() : result.getRight());
+        final Account account=accountUserApi.getAccountById(event.getAccountId());
+        if (account == null) {
+        }
+ else {
+          final BigDecimal paymentAmount=invoice.getAmountOutstanding();
+          final String paymentProviderName=account.getPaymentProviderName();
+          final PaymentProviderPlugin plugin=pluginRegistry.getPlugin(paymentProviderName);
+          Either<PaymentError,PaymentInfo> result=plugin.processInvoice(account,invoice);
+          if (result.isLeft()) {
+            invoiceApi.paymentFailed(invoice.getId(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate());
+          }
+ else {
+            updatePaymentAttemptWithPaymentInfoId(result.getRight().getId(),plugin);
+            invoiceApi.paymentSuccessful(invoice.getId(),paymentAmount,invoice.getCurrency(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate());
+          }
+          eventBus.post(result.isLeft() ? result.getLeft() : result.getRight());
+        }
       }
     }
   }
