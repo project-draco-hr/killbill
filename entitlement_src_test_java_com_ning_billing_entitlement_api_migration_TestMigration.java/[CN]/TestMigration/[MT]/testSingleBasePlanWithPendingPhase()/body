@@ -1,7 +1,8 @@
 {
   try {
     DateTime beforeMigration=clock.getUTCNow();
-    EntitlementAccountMigration toBeMigrated=createAccountFuturePendingPhase();
+    final DateTime trialDate=clock.getUTCNow().minusDays(10);
+    EntitlementAccountMigration toBeMigrated=createAccountFuturePendingPhase(trialDate);
     DateTime afterMigration=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated);
@@ -12,7 +13,7 @@
     List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId());
     assertEquals(subscriptions.size(),1);
     Subscription subscription=subscriptions.get(0);
-    assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
+    assertEquals(subscription.getStartDate(),trialDate);
     assertEquals(subscription.getEndDate(),null);
     assertEquals(subscription.getCurrentPriceList(),PriceListSet.DEFAULT_PRICELIST_NAME);
     assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.TRIAL);
@@ -22,7 +23,7 @@
     Duration thirtyDays=getDurationDay(30);
     clock.setDeltaFromReality(thirtyDays,0);
     assertTrue(testListener.isCompleted(5000));
-    assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
+    assertEquals(subscription.getStartDate(),trialDate);
     assertEquals(subscription.getEndDate(),null);
     assertEquals(subscription.getCurrentPriceList(),PriceListSet.DEFAULT_PRICELIST_NAME);
     assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);

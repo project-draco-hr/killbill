@@ -1,6 +1,10 @@
 {
   try {
-    requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : null;
+    DateTime now=clock.getUTCNow();
+    requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : now;
+    if (requestedDate != null && requestedDate.isAfter(now)) {
+      throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
+    }
     String currentPriceList=subscription.getCurrentPriceList();
     SubscriptionState currentState=subscription.getState();
     if (currentState != SubscriptionState.ACTIVE) {
@@ -9,7 +13,6 @@
     if (subscription.isSubscriptionFutureCancelled()) {
       throw new EntitlementUserApiException(ErrorCode.ENT_CHANGE_FUTURE_CANCELLED,subscription.getId());
     }
-    DateTime now=clock.getUTCNow();
     PlanChangeResult planChangeResult=null;
     try {
       Product destProduct=catalogService.getCatalog().findProduct(productName);
