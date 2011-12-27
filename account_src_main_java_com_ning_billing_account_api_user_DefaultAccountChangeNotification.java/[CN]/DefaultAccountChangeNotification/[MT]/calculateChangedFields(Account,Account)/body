@@ -1,35 +1,11 @@
 {
-  List<ChangedField> changedFields=new ArrayList<ChangedField>();
-  if (!newData.getExternalKey().equals(oldData.getExternalKey())) {
-    changedFields.add(new DefaultChangedField("externalKey",oldData.getExternalKey(),newData.getExternalKey()));
-  }
-  if (!newData.getEmail().equals(oldData.getEmail())) {
-    changedFields.add(new DefaultChangedField("email",oldData.getEmail(),newData.getEmail()));
-  }
-  if (!newData.getName().equals(oldData.getName())) {
-    changedFields.add(new DefaultChangedField("firstName",oldData.getName(),newData.getName()));
-  }
-  if (!newData.getPhone().equals(oldData.getPhone())) {
-    changedFields.add(new DefaultChangedField("phone",oldData.getPhone(),newData.getPhone()));
-  }
-  if (!newData.getCurrency().equals(oldData.getCurrency())) {
-    changedFields.add(new DefaultChangedField("currency",oldData.getCurrency().toString(),newData.getCurrency().toString()));
-  }
-  if (newData.getBillCycleDay() != oldData.getBillCycleDay()) {
-    changedFields.add(new DefaultChangedField("billCycleDay",Integer.toString(oldData.getBillCycleDay()),Integer.toString(newData.getBillCycleDay())));
-  }
-  String oldProviderName=oldData.getPaymentProviderName();
-  String newProviderName=newData.getPaymentProviderName();
-  if ((newProviderName == null) && (oldProviderName == null)) {
-  }
- else   if ((newProviderName == null) && (oldProviderName != null)) {
-    changedFields.add((new DefaultChangedField("paymentProviderName",oldProviderName,newProviderName)));
-  }
- else   if ((newProviderName != null) && (oldProviderName == null)) {
-    changedFields.add((new DefaultChangedField("paymentProviderName",oldProviderName,newProviderName)));
-  }
- else   if (!newProviderName.equals(oldProviderName)) {
-    changedFields.add((new DefaultChangedField("paymentProviderName",oldProviderName,newProviderName)));
-  }
-  return changedFields;
+  List<ChangedField> tmpChangedFields=new ArrayList<ChangedField>();
+  addIfValueChanged(tmpChangedFields,"externalKey",oldData.getExternalKey(),newData.getExternalKey());
+  addIfValueChanged(tmpChangedFields,"email",oldData.getEmail(),newData.getEmail());
+  addIfValueChanged(tmpChangedFields,"firstName",oldData.getName(),newData.getName());
+  addIfValueChanged(tmpChangedFields,"phone",oldData.getPhone(),newData.getPhone());
+  addIfValueChanged(tmpChangedFields,"currency",(oldData.getCurrency() != null) ? oldData.getCurrency().toString() : null,(newData.getCurrency() != null) ? newData.getCurrency().toString() : null);
+  addIfValueChanged(tmpChangedFields,"billCycleDay",Integer.toString(oldData.getBillCycleDay()),Integer.toString(newData.getBillCycleDay()));
+  addIfValueChanged(tmpChangedFields,"paymentProviderName",oldData.getPaymentProviderName(),newData.getPaymentProviderName());
+  return tmpChangedFields;
 }
