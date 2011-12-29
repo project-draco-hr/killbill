@@ -3,7 +3,11 @@
   PlanPhase currentPhase=subscription.getCurrentPhase();
   Plan currentPlan=subscription.getCurrentPlan();
   String currentPriceList=subscription.getCurrentPriceList();
-  PlanPhaseSpecifier fromPlanPhaseSpecifier=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),currentPlan.getBillingPeriod(),currentPriceList,currentPhase.getPhaseType());
+  ProductCategory currentCategory=currentPlan.getProduct().getCategory();
+  if (currentCategory != ProductCategory.BASE) {
+    throw new EntitlementError(String.format("Only implemented changePlan for BasePlan"));
+  }
+  PlanPhaseSpecifier fromPlanPhaseSpecifier=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentCategory,currentPlan.getBillingPeriod(),currentPriceList,currentPhase.getPhaseType());
   PlanSpecifier toPlanSpecifier=new PlanSpecifier(plan.getProduct().getName(),plan.getProduct().getCategory(),plan.getBillingPeriod(),priceList);
   DateTime planStartDate=null;
   PlanAlignmentChange alignment=null;
