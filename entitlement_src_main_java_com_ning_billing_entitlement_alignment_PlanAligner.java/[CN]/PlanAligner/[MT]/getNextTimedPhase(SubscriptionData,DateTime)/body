@@ -6,12 +6,10 @@
     }
 switch (lastPlanTransition.getTransitionType()) {
 case CREATE:
-      DateTime initialStartPhase=subscription.getStartDate();
-    PhaseType initialPhase=lastPlanTransition.getNextPhase().getPhaseType();
-  List<TimedPhase> timedPhases=getPhaseAlignments(subscription.getCurrentPlan(),initialPhase,initialStartPhase);
-return getTimedPhase(timedPhases,effectiveDate,WhichPhase.NEXT);
+      List<TimedPhase> timedPhases=getTimedPhaseOnCreate(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPhase().getPhaseType(),lastPlanTransition.getNextPriceList());
+    return getTimedPhase(timedPhases,effectiveDate,WhichPhase.NEXT);
 case CHANGE:
-return getTimedPhaseOnChange(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getPreviousPhase(),lastPlanTransition.getPreviousPlan(),lastPlanTransition.getPreviousPriceList(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPriceList(),effectiveDate,WhichPhase.NEXT);
+  return getTimedPhaseOnChange(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getPreviousPhase(),lastPlanTransition.getPreviousPlan(),lastPlanTransition.getPreviousPriceList(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPriceList(),effectiveDate,WhichPhase.NEXT);
 default :
 throw new EntitlementError(String.format("Unexpectd initial transition %s for current plan %s on subscription %s",lastPlanTransition.getTransitionType(),subscription.getCurrentPlan(),subscription.getId()));
 }
