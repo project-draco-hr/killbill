@@ -1,0 +1,8 @@
+{
+  final Account account=createTestAccount();
+  final Invoice invoice=createTestInvoice(account);
+  PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice);
+  invoicePaymentApi.paymentSuccessful(invoice.getId(),invoice.getAmountOutstanding(),invoice.getCurrency(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate());
+  InvoicePayment invoicePayment=invoicePaymentApi.getInvoicePayment(invoice.getId(),paymentAttempt.getPaymentAttemptId());
+  assertNotNull(invoicePayment);
+}
