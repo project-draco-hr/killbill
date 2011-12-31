@@ -5,7 +5,10 @@
     return;
   }
   if (event.getType() == EventType.PHASE) {
-    insertNextPhaseEvent(subscription);
+    onPhaseEvent(subscription);
+  }
+ else   if (event.getType() == EventType.API_USER && subscription.getCategory() == ProductCategory.BASE) {
+    onBasePlanEvent(subscription,event);
   }
   try {
     eventBus.post(subscription.getTransitionFromEvent(event));
