@@ -1,8 +1,11 @@
 {
+  if (baseSubscription.getState() == SubscriptionState.CANCELLED) {
+    return false;
+  }
   Product targetAddonProduct=targetAddOnPlan.getProduct();
   Product baseProduct=baseSubscription.getCurrentPlan().getProduct();
-  Product[] availableAddOns=baseProduct.getAvailable();
-  for (  Product curAv : availableAddOns) {
+  Product[] includedAddOns=baseProduct.getIncluded();
+  for (  Product curAv : includedAddOns) {
     if (curAv.getName().equals(targetAddonProduct.getName())) {
       return true;
     }
