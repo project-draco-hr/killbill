@@ -1,0 +1,11 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EventSqlDao>(){
+    @Override public Void inTransaction(    EventSqlDao transEventDao,    TransactionStatus status) throws Exception {
+      SubscriptionSqlDao transSubDao=transEventDao.become(SubscriptionSqlDao.class);
+      BundleSqlDao transBundleDao=transEventDao.become(BundleSqlDao.class);
+      undoMigrationFromTransaction(accountId,transEventDao,transBundleDao,transSubDao);
+      return null;
+    }
+  }
+);
+}

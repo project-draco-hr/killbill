@@ -5,7 +5,7 @@
       throw new EntitlementUserApiException(ErrorCode.ENT_CANCEL_BAD_STATE,subscription.getId(),currentState);
     }
     DateTime now=clock.getUTCNow();
-    requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : null;
+    requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : now;
     if (requestedDate != null && requestedDate.isAfter(now)) {
       throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
     }
@@ -13,7 +13,7 @@
     PlanPhaseSpecifier planPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),subscription.getCurrentPlan().getBillingPeriod(),subscription.getCurrentPriceList(),subscription.getCurrentPhase().getPhaseType());
     ActionPolicy policy=null;
     policy=catalogService.getCatalog().planCancelPolicy(planPhase);
-    DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy,now);
+    DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy,requestedDate);
     EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
     dao.cancelSubscription(subscription.getId(),cancelEvent);
     subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getCatalog());
