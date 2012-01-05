@@ -1,0 +1,39 @@
+{
+  try {
+    TimedMigration[] events=null;
+    Plan plan0=catalogService.getCatalog().findPlan(input[0].getPlanPhaseSpecifer().getProductName(),input[0].getPlanPhaseSpecifer().getBillingPeriod(),input[0].getPlanPhaseSpecifer().getPriceListName());
+    Plan plan1=(input.length > 1) ? catalogService.getCatalog().findPlan(input[1].getPlanPhaseSpecifer().getProductName(),input[1].getPlanPhaseSpecifer().getBillingPeriod(),input[1].getPlanPhaseSpecifer().getPriceListName()) : null;
+    DateTime migrationStartDate=now;
+    if (isRegularMigratedSubscription(input)) {
+      events=getEventsOnRegularMigration(plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifer().getPhaseType()),input[0].getPlanPhaseSpecifer().getPriceListName(),now);
+    }
+ else     if (isRegularFutureCancelledMigratedSubscription(input)) {
+      events=getEventsOnFuturePlanCancelMigration(plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifer().getPhaseType()),input[0].getPlanPhaseSpecifer().getPriceListName(),now,input[0].getCancelledDate());
+    }
+ else     if (isPhaseChangeMigratedSubscription(input)) {
+      PhaseType curPhaseType=input[0].getPlanPhaseSpecifer().getPhaseType();
+      Duration curPhaseDuration=null;
+      for (      PlanPhase cur : plan0.getAllPhases()) {
+        if (cur.getPhaseType() == curPhaseType) {
+          curPhaseDuration=cur.getDuration();
+          break;
+        }
+      }
+      if (curPhaseDuration == null) {
+        throw new EntitlementMigrationApiException(String.format("Failed to compute current phase duration for plan %s and phase %s",plan0.getName(),curPhaseType));
+      }
+      migrationStartDate=DefaultClock.removeDuration(input[1].getEffectiveDate(),curPhaseDuration);
+      events=getEventsOnFuturePhaseChangeMigration(plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifer().getPhaseType()),input[0].getPlanPhaseSpecifer().getPriceListName(),migrationStartDate,input[1].getEffectiveDate());
+    }
+ else     if (isPlanChangeMigratedSubscription(input)) {
+      events=getEventsOnFuturePlanChangeMigration(plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifer().getPhaseType()),plan1,getPlanPhase(plan1,input[1].getPlanPhaseSpecifer().getPhaseType()),input[0].getPlanPhaseSpecifer().getPriceListName(),now,input[1].getEffectiveDate());
+    }
+ else {
+      throw new EntitlementMigrationApiException("Unknown migration type");
+    }
+    return events;
+  }
+ catch (  CatalogApiException e) {
+    throw new EntitlementMigrationApiException(e);
+  }
+}

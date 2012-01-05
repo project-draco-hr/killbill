@@ -1,0 +1,18 @@
+{
+  if (invoice == null) {
+    return null;
+  }
+  DateTime lastPaymentDate=null;
+  BigDecimal amountPaid=new BigDecimal("0");
+  for (  InvoicePaymentInfo info : paymentInfos) {
+    if (info.invoiceId.equals(invoice.getId().toString())) {
+      if (lastPaymentDate == null || lastPaymentDate.isBefore(info.paymentDate)) {
+        lastPaymentDate=info.paymentDate;
+      }
+      if (info.amount != null) {
+        amountPaid.add(info.amount);
+      }
+    }
+  }
+  return new DefaultInvoice(invoice.getId(),invoice.getAccountId(),invoice.getInvoiceDate(),invoice.getTargetDate(),invoice.getCurrency(),lastPaymentDate,amountPaid,invoice.getItems());
+}

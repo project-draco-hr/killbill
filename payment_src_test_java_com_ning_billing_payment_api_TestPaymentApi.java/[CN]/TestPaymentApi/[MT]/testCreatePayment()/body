@@ -1,0 +1,14 @@
+{
+  final DateTime now=new DateTime();
+  final Account account=createAccount();
+  final Invoice invoice=createInvoice(account,now,Currency.USD);
+  final BigDecimal amount=new BigDecimal("10.00");
+  final UUID subscriptionId=UUID.randomUUID();
+  invoice.add(new DefaultInvoiceItem(invoice.getId(),subscriptionId,now,now.plusMonths(1),"Test",amount,new BigDecimal("1.0"),Currency.USD));
+  List<Either<PaymentError,PaymentInfo>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()));
+  assertEquals(results.size(),1);
+  assertTrue(results.get(0).isRight());
+  PaymentInfo paymentInfo=results.get(0).getRight();
+  assertNotNull(paymentInfo.getId());
+  assertEquals(paymentInfo.getAmount().doubleValue(),amount.doubleValue());
+}
