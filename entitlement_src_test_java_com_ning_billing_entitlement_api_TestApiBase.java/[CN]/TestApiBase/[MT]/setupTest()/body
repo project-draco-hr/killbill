@@ -1,0 +1,17 @@
+{
+  log.warn("\n");
+  log.warn("RESET TEST FRAMEWORK\n\n");
+  testListener.reset();
+  clock.resetDeltaFromReality();
+  ((MockEntitlementDao)dao).reset();
+  try {
+    busService.getEventBus().register(testListener);
+    UUID accountId=UUID.randomUUID();
+    bundle=entitlementApi.createBundleForAccount(accountId,"myDefaultBundle");
+  }
+ catch (  Exception e) {
+    Assert.fail(e.getMessage());
+  }
+  assertNotNull(bundle);
+  ((Engine)entitlementService).start();
+}
