@@ -1,0 +1,20 @@
+{
+  Catalog catalog=catalogService.getCatalog();
+  Plan plan=transition.getNextPlan();
+  Product product=plan.getProduct();
+  PlanPhase phase=transition.getNextPhase();
+  BillingAlignment alignment=catalog.billingAlignment(new PlanPhaseSpecifier(product.getName(),product.getCategory(),phase.getBillingPeriod(),transition.getNextPriceList(),phase.getPhaseType()));
+  int result=0;
+switch (alignment) {
+case ACCOUNT:
+    result=accountApi.getAccountById(accountId).getBillCycleDay();
+  break;
+case BUNDLE:
+result=dao.getSubscriptionBundleFromId(transition.getBundleId()).getStartDate().getDayOfMonth();
+break;
+case SUBSCRIPTION:
+result=dao.getSubscriptionFromId(transition.getSubscriptionId()).getStartDate().getDayOfMonth();
+break;
+}
+return result;
+}

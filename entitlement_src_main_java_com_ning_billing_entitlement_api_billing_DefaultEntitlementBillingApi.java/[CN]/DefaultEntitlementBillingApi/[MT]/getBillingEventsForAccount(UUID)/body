@@ -8,9 +8,10 @@
   for (  Subscription subscription : subscriptions) {
     transitions.addAll(subscription.getAllTransitions());
   }
+  Account account=accountApi.getAccountById(accountId);
   SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
   for (  SubscriptionTransition transition : transitions) {
-    result.add(createBillingEvent(transition));
+    result.add(new DefaultBillingEvent(transition,account.getBillCycleDay()));
   }
   return result;
 }
