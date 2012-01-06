@@ -1,0 +1,30 @@
+{
+  final UUID accountId=toBeMigrated.getAccountKey();
+  final DateTime now=clock.getUTCNow();
+  List<BundleMigrationData> accountBundleData=new LinkedList<BundleMigrationData>();
+  for (  final EntitlementBundleMigration curBundle : toBeMigrated.getBundles()) {
+    SubscriptionBundleData bundleData=new SubscriptionBundleData(curBundle.getBundleKey(),accountId);
+    List<SubscriptionMigrationData> bundleSubscriptionData=new LinkedList<AccountMigrationData.SubscriptionMigrationData>();
+    for (    EntitlementSubscriptionMigration curSub : curBundle.getSubscriptions()) {
+      SubscriptionMigrationData data=null;
+switch (curSub.getCategory()) {
+case BASE:
+        data=createBaseSubscriptionMigrationData(bundleData.getId(),curSub.getCategory(),curSub.getSubscriptionCases(),now);
+      break;
+case ADD_ON:
+    break;
+case STANDALONE:
+  break;
+default :
+throw new EntitlementMigrationApiException(String.format("Unkown product type ",curSub.getCategory()));
+}
+if (data != null) {
+bundleSubscriptionData.add(data);
+}
+}
+BundleMigrationData bundleMigrationData=new BundleMigrationData(bundleData,bundleSubscriptionData);
+accountBundleData.add(bundleMigrationData);
+}
+AccountMigrationData accountMigrationData=new AccountMigrationData(accountBundleData);
+return accountMigrationData;
+}

@@ -2,13 +2,13 @@
   UUID accountId=UUID.randomUUID();
   DateTime targetDate=new DateTime(2011,5,23,0,0,0,0);
   DefaultInvoice invoice=new DefaultInvoice(accountId,targetDate,Currency.USD);
-  invoiceDao.save(invoice);
+  invoiceDao.create(invoice);
   UUID invoiceId=invoice.getId();
   DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
   BigDecimal rate=new BigDecimal("20.00");
   UUID subscriptionId=UUID.randomUUID();
   DefaultInvoiceItem item=new DefaultInvoiceItem(invoiceId,subscriptionId,startDate,startDate.plusMonths(1),"test",rate,rate,Currency.USD);
-  invoiceItemDao.save(item);
+  invoiceItemDao.create(item);
   List<InvoiceItem> items=invoiceItemDao.getInvoiceItemsByAccount(accountId.toString());
   assertEquals(items.size(),1);
 }
