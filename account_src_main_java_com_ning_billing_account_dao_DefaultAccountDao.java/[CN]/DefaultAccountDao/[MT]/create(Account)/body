@@ -2,12 +2,11 @@
   final String accountId=account.getId().toString();
   final String objectType=DefaultAccount.OBJECT_TYPE;
   accountDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
-    @Override public Void inTransaction(    AccountSqlDao accountDao,    TransactionStatus status) throws Exception {
-      Account currentAccount=accountDao.getById(accountId);
-      accountDao.create(account);
-      FieldStoreDao fieldStoreDao=accountDao.become(FieldStoreDao.class);
+    @Override public Void inTransaction(    AccountSqlDao accountSqlDao,    TransactionStatus status) throws Exception {
+      accountSqlDao.create(account);
+      FieldStoreDao fieldStoreDao=accountSqlDao.become(FieldStoreDao.class);
       fieldStoreDao.save(accountId,objectType,account.getFieldList());
-      TagStoreDao tagStoreDao=fieldStoreDao.become(TagStoreDao.class);
+      TagStoreDao tagStoreDao=accountSqlDao.become(TagStoreDao.class);
       tagStoreDao.save(accountId,objectType,account.getTagList());
       AccountCreationNotification creationEvent=new DefaultAccountCreationEvent(account);
       eventBus.post(creationEvent);

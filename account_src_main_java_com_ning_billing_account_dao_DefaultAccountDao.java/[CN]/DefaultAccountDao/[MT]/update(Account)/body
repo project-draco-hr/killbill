@@ -2,10 +2,10 @@
   final String accountId=account.getId().toString();
   final String objectType=DefaultAccount.OBJECT_TYPE;
   accountDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
-    @Override public Void inTransaction(    AccountSqlDao accountDao,    TransactionStatus status) throws Exception {
-      Account currentAccount=accountDao.getById(accountId);
-      accountDao.update(account);
-      FieldStoreDao fieldStoreDao=accountDao.become(FieldStoreDao.class);
+    @Override public Void inTransaction(    AccountSqlDao accountSqlDao,    TransactionStatus status) throws Exception {
+      Account currentAccount=accountSqlDao.getById(accountId);
+      accountSqlDao.update(account);
+      FieldStoreDao fieldStoreDao=accountSqlDao.become(FieldStoreDao.class);
       fieldStoreDao.clear(accountId,objectType);
       fieldStoreDao.save(accountId,objectType,account.getFieldList());
       TagStoreDao tagStoreDao=fieldStoreDao.become(TagStoreDao.class);
