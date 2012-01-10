@@ -1,11 +1,4 @@
 {
-  final PaymentProviderPlugin plugin=getPaymentProviderPlugin(accountKey);
   final Account account=accountUserApi.getAccountByKey(accountKey);
-  List<Either<PaymentError,PaymentInfo>> processedPaymentsOrErrors=new ArrayList<Either<PaymentError,PaymentInfo>>(invoiceIds.size());
-  for (  String invoiceId : invoiceIds) {
-    Invoice invoice=invoicePaymentApi.getInvoice(UUID.fromString(invoiceId));
-    Either<PaymentError,PaymentInfo> paymentOrError=plugin.processInvoice(account,invoice);
-    processedPaymentsOrErrors.add(paymentOrError);
-  }
-  return processedPaymentsOrErrors;
+  return createPayment(account,invoiceIds);
 }

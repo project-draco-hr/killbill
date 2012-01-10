@@ -1,8 +1,10 @@
 {
   final ConfigurationObjectFactory factory=new ConfigurationObjectFactory(props);
-  final PaymentConfig config=factory.build(PaymentConfig.class);
-  bind(PaymentConfig.class).toInstance(config);
+  final PaymentConfig paymentConfig=factory.build(PaymentConfig.class);
+  bind(PaymentConfig.class).toInstance(paymentConfig);
   bind(PaymentProviderPluginRegistry.class).asEagerSingleton();
-  bind(PaymentApi.class).to(DefaultPaymentApi.class);
-  installPaymentProviderPlugins(config);
+  bind(PaymentApi.class).to(DefaultPaymentApi.class).asEagerSingleton();
+  bind(MockPaymentDao.class).asEagerSingleton();
+  bind(PaymentDao.class).to(MockPaymentDao.class);
+  installPaymentProviderPlugins(paymentConfig);
 }
