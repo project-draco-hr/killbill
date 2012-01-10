@@ -2,12 +2,12 @@
   Account account=createTestAccount();
   TagDescription description=new DefaultTagDescription("Test Tag","For testing only",true,true,"Test System",new DateTime());
   TagDescriptionDao tagDescriptionDao=dbi.onDemand(TagDescriptionDao.class);
-  tagDescriptionDao.save(description);
+  tagDescriptionDao.create(description);
   String addedBy="testTags()";
   DateTime dateAdded=new DefaultClock().getUTCNow();
   account.addTag(description,addedBy,dateAdded);
   assertEquals(account.getTagList().size(),1);
-  accountDao.save(account);
+  accountDao.create(account);
   Account thisAccount=accountDao.getById(account.getId().toString());
   List<Tag> tagList=thisAccount.getTagList();
   assertEquals(tagList.size(),1);
