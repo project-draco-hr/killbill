@@ -4,14 +4,16 @@
   for (  SubscriptionBundle bundle : bundles) {
     subscriptions.addAll(dao.getSubscriptions(bundle.getId()));
   }
-  List<SubscriptionTransition> transitions=new ArrayList<SubscriptionTransition>();
-  for (  Subscription subscription : subscriptions) {
-    transitions.addAll(subscription.getAllTransitions());
-  }
-  Account account=accountApi.getAccountById(accountId);
   SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
-  for (  SubscriptionTransition transition : transitions) {
-    result.add(new DefaultBillingEvent(transition,account.getBillCycleDay()));
+  for (  Subscription subscription : subscriptions) {
+    for (    SubscriptionTransition transition : subscription.getAllTransitions()) {
+      try {
+        result.add(new DefaultBillingEvent(transition,subscription,calculateBCD(transition,accountId)));
+      }
+ catch (      CatalogApiException e) {
+        log.error("Failing to identify catalog components while creating BillingEvent from transition: " + transition.getId().toString(),e);
+      }
+    }
   }
   return result;
 }

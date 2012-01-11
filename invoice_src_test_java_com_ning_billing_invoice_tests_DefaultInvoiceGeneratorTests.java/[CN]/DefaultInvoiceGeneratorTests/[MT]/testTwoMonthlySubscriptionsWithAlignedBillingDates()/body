@@ -1,8 +1,14 @@
 {
   BillingEventSet events=new BillingEventSet();
-  BillingEvent event1=new DefaultBillingEvent(UUID.randomUUID(),buildDateTime(2011,9,1),"World Domination","Build Space Laser",new InternationalPriceMock(ZERO),new InternationalPriceMock(FIVE),BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"Test");
+  MockCatalog catalog=new MockCatalog();
+  Plan plan1=catalog.getCurrentPlans()[0];
+  PlanPhase phase1=plan1.getAllPhases()[0];
+  Plan plan2=catalog.getCurrentPlans()[1];
+  PlanPhase phase2=plan2.getAllPhases()[0];
+  Subscription sub=new SubscriptionData(new SubscriptionBuilder().setId(UUID.randomUUID()));
+  BillingEvent event1=new DefaultBillingEvent(sub,buildDateTime(2011,9,1),plan1,phase1,new InternationalPriceMock(ZERO),new InternationalPriceMock(FIVE),BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"Test");
   events.add(event1);
-  BillingEvent event2=new DefaultBillingEvent(UUID.randomUUID(),buildDateTime(2011,10,1),"Groceries","Pick Up Milk",new InternationalPriceMock(ZERO),new InternationalPriceMock(TEN),BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"Test");
+  BillingEvent event2=new DefaultBillingEvent(sub,buildDateTime(2011,10,1),plan2,phase2,new InternationalPriceMock(ZERO),new InternationalPriceMock(TEN),BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"Test");
   events.add(event2);
   InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,10,3);

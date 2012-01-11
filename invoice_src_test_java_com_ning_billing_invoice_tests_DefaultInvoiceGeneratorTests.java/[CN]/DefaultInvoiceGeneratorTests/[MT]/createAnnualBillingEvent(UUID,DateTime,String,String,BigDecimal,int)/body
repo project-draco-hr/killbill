@@ -1,3 +1,7 @@
 {
-  return new DefaultBillingEvent(subscriptionId,startDate,planName,planPhaseName,new InternationalPriceMock(ZERO),new InternationalPriceMock(rate),BillingPeriod.ANNUAL,billCycleDay,BillingModeType.IN_ADVANCE,"Test");
+  MockCatalog catalog=new MockCatalog();
+  Plan plan=catalog.getCurrentPlans()[0];
+  PlanPhase phase=plan.getAllPhases()[0];
+  Subscription sub=new SubscriptionData(new SubscriptionBuilder().setId(UUID.randomUUID()));
+  return new DefaultBillingEvent(sub,startDate,plan,phase,new InternationalPriceMock(ZERO),new InternationalPriceMock(rate),BillingPeriod.ANNUAL,billCycleDay,BillingModeType.IN_ADVANCE,"Test");
 }

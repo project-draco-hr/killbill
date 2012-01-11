@@ -1,20 +1,26 @@
 {
-  Catalog catalog=catalogService.getCatalog();
+  Catalog catalog=catalogService.getFullCatalog();
   Plan plan=transition.getNextPlan();
   Product product=plan.getProduct();
   PlanPhase phase=transition.getNextPhase();
-  BillingAlignment alignment=catalog.billingAlignment(new PlanPhaseSpecifier(product.getName(),product.getCategory(),phase.getBillingPeriod(),transition.getNextPriceList(),phase.getPhaseType()));
+  BillingAlignment alignment=catalog.billingAlignment(new PlanPhaseSpecifier(product.getName(),product.getCategory(),phase.getBillingPeriod(),transition.getNextPriceList(),phase.getPhaseType()),transition.getRequestedTransitionTime());
   int result=0;
+  Account account=accountApi.getAccountById(accountId);
 switch (alignment) {
 case ACCOUNT:
-    result=accountApi.getAccountById(accountId).getBillCycleDay();
+    result=account.getBillCycleDay();
   break;
 case BUNDLE:
-result=dao.getSubscriptionBundleFromId(transition.getBundleId()).getStartDate().getDayOfMonth();
+SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(transition.getBundleId());
+result=bundle.getStartDate().getDayOfMonth();
 break;
 case SUBSCRIPTION:
-result=dao.getSubscriptionFromId(transition.getSubscriptionId()).getStartDate().getDayOfMonth();
+Subscription subscription=dao.getSubscriptionFromId(transition.getSubscriptionId());
+result=subscription.getStartDate().getDayOfMonth();
 break;
+}
+if (result == 0) {
+throw new CatalogApiException(ErrorCode.CAT_INVALID_BILLING_ALIGNMENT,alignment.toString());
 }
 return result;
 }

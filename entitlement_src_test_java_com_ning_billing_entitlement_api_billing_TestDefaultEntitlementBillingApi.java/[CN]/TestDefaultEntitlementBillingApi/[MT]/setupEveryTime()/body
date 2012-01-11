@@ -1,0 +1,32 @@
+{
+  bundles=new ArrayList<SubscriptionBundle>();
+  final SubscriptionBundle bundle=new SubscriptionBundleData(zeroId,"TestKey",oneId,new DateTime().minusDays(4));
+  bundles.add(bundle);
+  transitions=new ArrayList<SubscriptionTransition>();
+  subscriptions=new ArrayList<Subscription>();
+  SubscriptionBuilder builder=new SubscriptionBuilder();
+  subscriptionStartDate=new DateTime().minusDays(3);
+  builder.setStartDate(subscriptionStartDate);
+  subscription=new SubscriptionData(builder){
+    public List<SubscriptionTransition> getAllTransitions(){
+      return transitions;
+    }
+  }
+;
+  subscriptions.add(subscription);
+  dao=new BrainDeadMockEntitlementDao(){
+    public List<SubscriptionBundle> getSubscriptionBundleForAccount(    UUID accountId){
+      return bundles;
+    }
+    public List<Subscription> getSubscriptions(    UUID bundleId){
+      return subscriptions;
+    }
+    public Subscription getSubscriptionFromId(    UUID subscriptionId){
+      return subscription;
+    }
+    @Override public SubscriptionBundle getSubscriptionBundleFromId(    UUID bundleId){
+      return bundle;
+    }
+  }
+;
+}
