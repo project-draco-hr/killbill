@@ -1,9 +1,9 @@
 {
   Set<UUID> result=new LinkedHashSet<UUID>();
 synchronized (monitor) {
-    for (    InvoicePaymentInfo info : paymentInfos) {
-      Invoice invoice=invoices.get(info.invoiceId);
-      if ((invoice != null) && (((info.paymentDate == null) || !info.paymentDate.plusDays(numberOfDays).isAfter(targetDate.getTime())) && (invoice.getTotalAmount() != null) && invoice.getTotalAmount().doubleValue() >= 0) && ((info.amount == null) || info.amount.doubleValue() >= invoice.getTotalAmount().doubleValue())) {
+    for (    InvoicePayment invoicePayment : invoicePayments.values()) {
+      Invoice invoice=invoices.get(invoicePayment.getInvoiceId());
+      if ((invoice != null) && (((invoicePayment.getPaymentAttemptDate() == null) || !invoicePayment.getPaymentAttemptDate().plusDays(numberOfDays).isAfter(targetDate.getTime())) && (invoice.getTotalAmount() != null) && invoice.getTotalAmount().doubleValue() >= 0) && ((invoicePayment.getAmount() == null) || invoicePayment.getAmount().doubleValue() >= invoice.getTotalAmount().doubleValue())) {
         result.add(invoice.getId());
       }
     }

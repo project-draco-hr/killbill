@@ -4,13 +4,13 @@
   }
   DateTime lastPaymentDate=null;
   BigDecimal amountPaid=new BigDecimal("0");
-  for (  InvoicePaymentInfo info : paymentInfos) {
-    if (info.invoiceId.equals(invoice.getId().toString())) {
-      if (lastPaymentDate == null || lastPaymentDate.isBefore(info.paymentDate)) {
-        lastPaymentDate=info.paymentDate;
+  for (  InvoicePayment invoicePayment : invoicePayments.values()) {
+    if (invoicePayment.getInvoiceId().equals(invoice.getId().toString())) {
+      if (lastPaymentDate == null || lastPaymentDate.isBefore(invoicePayment.getPaymentAttemptDate())) {
+        lastPaymentDate=invoicePayment.getPaymentAttemptDate();
       }
-      if (info.amount != null) {
-        amountPaid.add(info.amount);
+      if (invoicePayment.getAmount() != null) {
+        amountPaid.add(invoicePayment.getAmount());
       }
     }
   }
