@@ -1,6 +1,11 @@
 {
   Account account=createTestAccount();
   accountDao.create(account);
-  UUID accountId=accountDao.getIdFromKey(account.getExternalKey());
-  assertEquals(accountId,account.getId());
+  try {
+    UUID accountId=accountDao.getIdFromKey(account.getExternalKey());
+    assertEquals(accountId,account.getId());
+  }
+ catch (  AccountApiException a) {
+    fail("Retrieving account failed.");
+  }
 }

@@ -1,32 +1,34 @@
 {
-  final String key=account.getExternalKey();
-  final String objectType=DefaultAccount.OBJECT_TYPE;
-  accountDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
-    @Override public Void inTransaction(    AccountSqlDao accountDao,    TransactionStatus status) throws Exception {
-      Account currentAccount=accountDao.getAccountByKey(key);
-      if (currentAccount == null) {
-        throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST,key);
+  try {
+    accountDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
+      @Override public Void inTransaction(      final AccountSqlDao accountSqlDao,      final TransactionStatus status) throws AccountApiException, EventBus.EventBusException {
+        String accountId=account.getId().toString();
+        Account currentAccount=accountSqlDao.getById(accountId);
+        if (currentAccount == null) {
+          throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
+        }
+        String currentKey=currentAccount.getExternalKey();
+        if (!currentKey.equals(account.getExternalKey())) {
+          throw new AccountApiException(ErrorCode.ACCOUNT_CANNOT_CHANGE_EXTERNAL_KEY,currentKey);
+        }
+        accountSqlDao.update(account);
+        saveTagsFromWithinTransaction(account,accountSqlDao,false);
+        saveCustomFieldsFromWithinTransaction(account,accountSqlDao,false);
+        AccountChangeNotification changeEvent=new DefaultAccountChangeNotification(account.getId(),currentAccount,account);
+        if (changeEvent.hasChanges()) {
+          eventBus.post(changeEvent);
+        }
+        return null;
       }
-      accountDao.update(account);
-      String accountId=account.getId().toString();
-      FieldStoreDao fieldStoreDao=accountDao.become(FieldStoreDao.class);
-      fieldStoreDao.clear(accountId,objectType);
-      List<CustomField> fieldList=account.getFieldList();
-      if (fieldList != null) {
-        fieldStoreDao.save(accountId,objectType,account.getFieldList());
-      }
-      TagStoreDao tagStoreDao=fieldStoreDao.become(TagStoreDao.class);
-      tagStoreDao.clear(accountId,objectType);
-      List<Tag> tagList=account.getTagList();
-      if (tagList != null) {
-        tagStoreDao.save(accountId,objectType,tagList);
-      }
-      AccountChangeNotification changeEvent=new DefaultAccountChangeNotification(account.getId(),currentAccount,account);
-      if (changeEvent.hasChanges()) {
-        eventBus.post(changeEvent);
-      }
-      return null;
+    }
+);
+  }
+ catch (  RuntimeException t) {
+    if (t.getCause() instanceof AccountApiException) {
+      throw (AccountApiException)t.getCause();
+    }
+ else {
+      throw t;
     }
   }
-);
 }

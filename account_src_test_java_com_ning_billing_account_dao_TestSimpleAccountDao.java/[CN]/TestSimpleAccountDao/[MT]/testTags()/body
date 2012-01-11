@@ -1,21 +1,18 @@
 {
   Account account=createTestAccount();
-  TagDescription description=new DefaultTagDescription("Test Tag","For testing only",true,true,"Test System",new DateTime());
-  TagDescriptionDao tagDescriptionDao=dbi.onDemand(TagDescriptionDao.class);
-  tagDescriptionDao.create(description);
+  TagDefinition definition=new DefaultTagDefinition("Test Tag","For testing only","Test System",new DateTime());
+  TagDefinitionSqlDao tagDescriptionDao=dbi.onDemand(TagDefinitionSqlDao.class);
+  tagDescriptionDao.create(definition);
   String addedBy="testTags()";
   DateTime dateAdded=new DefaultClock().getUTCNow();
-  account.addTag(description,addedBy,dateAdded);
+  account.addTag(definition,addedBy,dateAdded);
   assertEquals(account.getTagList().size(),1);
   accountDao.create(account);
   Account thisAccount=accountDao.getById(account.getId().toString());
   List<Tag> tagList=thisAccount.getTagList();
   assertEquals(tagList.size(),1);
   Tag tag=tagList.get(0);
-  assertEquals(tag.getName(),description.getName());
-  assertEquals(tag.getGenerateInvoice(),description.getGenerateInvoice());
-  assertEquals(tag.getProcessPayment(),description.getProcessPayment());
-  assertEquals(tag.getTagDescriptionId(),description.getId());
+  assertEquals(tag.getTagDefinitionName(),definition.getName());
   assertEquals(tag.getAddedBy(),addedBy);
-  assertEquals(tag.getDateAdded().compareTo(dateAdded),0);
+  assertEquals(tag.getAddedDate().compareTo(dateAdded),0);
 }
