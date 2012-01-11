@@ -1,0 +1,23 @@
+{
+  this.clock=clock;
+  this.svcName=svcName;
+  this.queueName=queueName;
+  this.handler=handler;
+  this.config=config;
+  this.hostname=Hostname.get();
+  this.dao=dbi.onDemand(NotificationSqlDao.class);
+  this.executor=Executors.newSingleThreadExecutor(new ThreadFactory(){
+    @Override public Thread newThread(    Runnable r){
+      Thread th=new Thread(r);
+      th.setName(NOTIFICATION_THREAD_PREFIX + svcName + "-"+ queueName);
+      th.setUncaughtExceptionHandler(new UncaughtExceptionHandler(){
+        @Override public void uncaughtException(        Thread t,        Throwable e){
+          log.error("Uncaught exception for thread " + t.getName(),e);
+        }
+      }
+);
+      return th;
+    }
+  }
+);
+}
