@@ -1,6 +1,6 @@
 {
   final Account account=createTestAccount();
-  accountDao.save(account);
+  accountDao.create(account);
   AccountData accountData=new AccountData(){
     @Override public String getExternalKey(){
       return account.getExternalKey();
@@ -29,7 +29,7 @@
   }
 ;
   Account updatedAccount=new DefaultAccount(account.getId(),accountData);
-  accountDao.save(updatedAccount);
+  accountDao.update(updatedAccount);
   Account savedAccount=accountDao.getAccountByKey(account.getExternalKey());
   assertNotNull(savedAccount);
   assertEquals(savedAccount.getName(),updatedAccount.getName());

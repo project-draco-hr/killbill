@@ -1,12 +1,17 @@
 {
   setupBusAndMySQL();
-  tagDao.save(TAG_ONE);
-  tagDao.save(TAG_TWO);
+  tagDao.create(TAG_ONE);
+  tagDao.create(TAG_TWO);
   final MockAccount account=new MockAccount(UUID.randomUUID(),ACCOUNT_KEY,Currency.USD);
-  final Account storedAccount=accountApi.createAccount(account);
-  storedAccount.addTag(TAG_ONE,"pierre",new DateTime(DateTimeZone.UTC));
-  storedAccount.addTag(TAG_TWO,"pierre",new DateTime(DateTimeZone.UTC));
-  accountApi.saveAccount(storedAccount);
-  createSubscriptionTransitionEvent(storedAccount);
-  createAccountCreationEvent(storedAccount);
+  try {
+    List<Tag> tags=new ArrayList<Tag>();
+    tags.add(new DefaultTag(TAG_ONE,"pierre",new DateTime(DateTimeZone.UTC)));
+    tags.add(new DefaultTag(TAG_TWO,"pierre",new DateTime(DateTimeZone.UTC)));
+    final Account storedAccount=accountApi.createAccount(account,null,tags);
+    createSubscriptionTransitionEvent(storedAccount);
+    createAccountCreationEvent(storedAccount);
+  }
+ catch (  Throwable t) {
+    fail("Initializing accounts failed.",t);
+  }
 }
