@@ -1,6 +1,7 @@
 {
-  bind(DBI.class).toProvider(DBIProvider.class).asEagerSingleton();
-  final DbiConfig config=new ConfigurationObjectFactory(System.getProperties()).build(DbiConfig.class);
-  bind(DbiConfig.class).toInstance(config);
   bind(Clock.class).to(ClockMock.class);
+  final MysqlTestingHelper helper=new MysqlTestingHelper();
+  bind(MysqlTestingHelper.class).toInstance(helper);
+  DBI dbi=helper.getDBI();
+  bind(DBI.class).toInstance(dbi);
 }
