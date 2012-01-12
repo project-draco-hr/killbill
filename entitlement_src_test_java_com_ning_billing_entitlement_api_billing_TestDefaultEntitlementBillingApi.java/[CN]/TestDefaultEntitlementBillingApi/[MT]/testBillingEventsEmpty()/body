@@ -1,0 +1,12 @@
+{
+  EntitlementDao dao=new BrainDeadMockEntitlementDao(){
+    public List<SubscriptionBundle> getSubscriptionBundleForAccount(    UUID accountId){
+      return new ArrayList<SubscriptionBundle>();
+    }
+  }
+;
+  AccountUserApi accountApi=new BrainDeadAccountUserApi();
+  DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(dao,accountApi,catalogService);
+  SortedSet<BillingEvent> events=api.getBillingEventsForAccount(new UUID(0L,0L));
+  Assert.assertEquals(events.size(),0);
+}
