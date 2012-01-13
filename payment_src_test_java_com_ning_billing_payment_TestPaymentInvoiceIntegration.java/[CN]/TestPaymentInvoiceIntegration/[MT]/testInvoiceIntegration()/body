@@ -16,7 +16,13 @@
   assertFalse(paymentInfoReceiver.getProcessedPayments().isEmpty());
   assertTrue(paymentInfoReceiver.getErrors().isEmpty());
   List<PaymentInfo> payments=paymentInfoReceiver.getProcessedPayments();
-  PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(payments.get(0).getId());
+  PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(payments.get(0).getPaymentId());
   Assert.assertNotNull(paymentAttempt);
   Invoice invoiceForPayment=invoicePaymentApi.getInvoiceForPaymentAttemptId(paymentAttempt.getPaymentAttemptId());
+  Assert.assertNotNull(invoiceForPayment);
+  Assert.assertEquals(invoiceForPayment.getId(),invoice.getId());
+  Assert.assertEquals(invoiceForPayment.getAccountId(),account.getId());
+  Assert.assertEquals(invoiceForPayment.getLastPaymentAttempt(),paymentAttempt.getPaymentAttemptDate());
+  Assert.assertEquals(invoiceForPayment.getAmountOutstanding(),new BigDecimal("0"));
+  Assert.assertEquals(invoiceForPayment.getAmountPaid(),amount);
 }

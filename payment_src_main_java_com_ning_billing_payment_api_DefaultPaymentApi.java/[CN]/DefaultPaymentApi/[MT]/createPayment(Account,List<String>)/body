@@ -5,15 +5,19 @@
     Invoice invoice=invoicePaymentApi.getInvoice(UUID.fromString(invoiceId));
     if (invoice.getAmountOutstanding().compareTo(BigDecimal.ZERO) == 0) {
     }
+ else     if (invoiceId.equals(paymentDao.getPaymentAttemptForInvoiceId(invoiceId))) {
+    }
  else {
       PaymentAttempt paymentAttempt=paymentDao.createPaymentAttempt(invoice);
       Either<PaymentError,PaymentInfo> paymentOrError=plugin.processInvoice(account,invoice);
       processedPaymentsOrErrors.add(paymentOrError);
       if (paymentOrError.isRight()) {
-        PaymentInfo info=paymentOrError.getRight();
-        paymentDao.savePaymentInfo(info);
-        paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getPaymentAttemptId(),info.getId());
-        invoicePaymentApi.paymentSuccessful(invoice.getId(),invoice.getAmountOutstanding(),invoice.getCurrency(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate());
+        PaymentInfo paymentInfo=paymentOrError.getRight();
+        paymentDao.savePaymentInfo(paymentInfo);
+        if (paymentInfo.getPaymentId() != null) {
+          paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getPaymentAttemptId(),paymentInfo.getPaymentId());
+        }
+        invoicePaymentApi.paymentSuccessful(invoice.getId(),paymentInfo.getAmount(),invoice.getCurrency(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate());
       }
  else {
         invoicePaymentApi.paymentFailed(invoice.getId(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate());
