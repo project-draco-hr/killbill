@@ -1,11 +1,12 @@
 {
   BillingEventSet events=new BillingEventSet();
-  UUID subscriptionId=UUID.randomUUID();
+  Subscription sub=new SubscriptionData(new SubscriptionBuilder().setId(UUID.randomUUID()));
   DateTime startDate=buildDateTime(2011,9,1);
-  String planName="World Domination";
-  String phaseName="Build Space Laser";
+  MockCatalog catalog=new MockCatalog();
+  Plan plan=catalog.getCurrentPlans()[0];
+  PlanPhase phase=plan.getAllPhases()[0];
   BigDecimal rate=TEN;
-  BillingEvent event=new DefaultBillingEvent(subscriptionId,startDate,planName,phaseName,new InternationalPriceMock(rate),BillingPeriod.MONTHLY,15,BillingModeType.IN_ADVANCE);
+  BillingEvent event=new DefaultBillingEvent(sub,startDate,plan,phase,new InternationalPriceMock(ZERO),new InternationalPriceMock(rate),BillingPeriod.MONTHLY,15,BillingModeType.IN_ADVANCE,"Test");
   events.add(event);
   InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,10,3);

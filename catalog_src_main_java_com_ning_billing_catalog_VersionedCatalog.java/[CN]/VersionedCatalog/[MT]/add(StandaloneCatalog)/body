@@ -1,6 +1,11 @@
 {
-  if (currentCatalog == null) {
-    currentCatalog=e;
+  if (catalogName == null) {
+    catalogName=e.getCatalogName();
+  }
+ else {
+    if (!catalogName.equals(getCatalogName())) {
+      throw new CatalogApiException(ErrorCode.CAT_CATALOG_NAME_MISMATCH,catalogName,e.getCatalogName());
+    }
   }
   versions.add(e);
   Collections.sort(versions,new Comparator<StandaloneCatalog>(){

@@ -1,0 +1,15 @@
+{
+  if (productName == null) {
+    throw new CatalogApiException(ErrorCode.CAT_NULL_PRODUCT_NAME);
+  }
+  if (priceLists == null) {
+    throw new CatalogApiException(ErrorCode.CAT_PRICE_LIST_NOT_FOUND,priceListName);
+  }
+  Product product=findCurrentProduct(productName);
+  DefaultPlan result=priceLists.getPlanListFrom(priceListName,product,period);
+  if (result == null) {
+    String periodString=(period == null) ? "NULL" : period.toString();
+    throw new CatalogApiException(ErrorCode.CAT_PLAN_NOT_FOUND,productName,periodString,priceListName);
+  }
+  return result;
+}

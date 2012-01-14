@@ -1,4 +1,7 @@
 {
+  if (priceListName == null) {
+    throw new CatalogApiException(ErrorCode.CAT_NULL_PRICE_LIST_NAME);
+  }
   if (defaultPricelist.getName().equals(priceListName)) {
     return defaultPricelist;
   }
@@ -7,5 +10,5 @@
       return pl;
     }
   }
-  return null;
+  throw new CatalogApiException(ErrorCode.CAT_PRICE_LIST_NOT_FOUND,priceListName);
 }
