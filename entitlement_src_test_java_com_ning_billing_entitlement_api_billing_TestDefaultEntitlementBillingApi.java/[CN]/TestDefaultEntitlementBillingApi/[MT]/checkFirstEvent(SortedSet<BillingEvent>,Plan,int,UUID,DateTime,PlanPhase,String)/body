@@ -1,0 +1,20 @@
+{
+  Assert.assertEquals(events.size(),1);
+  BillingEvent event=events.first();
+  if (nextPhase.getFixedPrice() != null) {
+    Assert.assertEquals(nextPhase.getFixedPrice().getPrice(Currency.USD),event.getFixedPrice().getPrice(Currency.USD));
+  }
+  if (nextPhase.getRecurringPrice() != null) {
+    Assert.assertEquals(nextPhase.getRecurringPrice().getPrice(Currency.USD),event.getRecurringPrice().getPrice(Currency.USD));
+  }
+  Assert.assertEquals(BCD,event.getBillCycleDay());
+  Assert.assertEquals(id,event.getSubscription().getId());
+  Assert.assertEquals(time,event.getEffectiveDate());
+  Assert.assertEquals(nextPhase,event.getPlanPhase());
+  Assert.assertEquals(nextPlan,event.getPlan());
+  Assert.assertEquals(nextPhase.getBillingPeriod(),event.getBillingPeriod());
+  Assert.assertEquals(BillingModeType.IN_ADVANCE,event.getBillingMode());
+  Assert.assertEquals(desc,event.getDescription());
+  Assert.assertEquals(nextPhase.getFixedPrice(),event.getFixedPrice());
+  Assert.assertEquals(nextPhase.getRecurringPrice(),event.getRecurringPrice());
+}
