@@ -1,2 +1,47 @@
 {
+  try {
+    this.stoppedNotificationThread=false;
+    this.startedNotificationThread=false;
+    subscritionEventQueue=notificationQueueService.createNotificationQueue(ENTITLEMENT_SERVICE_NAME,NOTIFICATION_QUEUE_NAME,new NotificationQueueHandler(){
+      @Override public void handleReadyNotification(      String notificationKey){
+        EntitlementEvent event=dao.getEventById(UUID.fromString(notificationKey));
+        if (event == null) {
+          log.warn("Failed to extract event for notification key {}",notificationKey);
+        }
+ else {
+          processEventReady(event);
+        }
+      }
+      @Override public void completedQueueStop(){
+synchronized (this) {
+          stoppedNotificationThread=true;
+          this.notifyAll();
+        }
+      }
+      @Override public void completedQueueStart(){
+synchronized (this) {
+          startedNotificationThread=true;
+          this.notifyAll();
+        }
+      }
+    }
+,new NotificationConfig(){
+      @Override public boolean isNotificationProcessingOff(){
+        return config.isEventProcessingOff();
+      }
+      @Override public long getNotificationSleepTimeMs(){
+        return config.getNotificationSleepTimeMs();
+      }
+      @Override public int getDaoMaxReadyEvents(){
+        return config.getDaoMaxReadyEvents();
+      }
+      @Override public long getDaoClaimTimeMs(){
+        return config.getDaoMaxReadyEvents();
+      }
+    }
+);
+  }
+ catch (  NotficationQueueAlreadyExists e) {
+    throw new RuntimeException(e);
+  }
 }

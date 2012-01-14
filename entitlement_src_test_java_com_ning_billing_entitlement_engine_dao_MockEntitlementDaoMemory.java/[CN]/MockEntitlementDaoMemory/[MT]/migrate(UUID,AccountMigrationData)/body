@@ -5,8 +5,14 @@ synchronized (events) {
       SubscriptionBundleData bundleData=curBundle.getData();
       for (      SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
         SubscriptionData subData=curSubscription.getData();
-        for (        EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
+        for (        final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
           events.add(curEvent);
+          recordFutureNotificationFromTransaction(null,curEvent.getEffectiveDate(),new NotificationKey(){
+            @Override public String toString(){
+              return curEvent.getId().toString();
+            }
+          }
+);
         }
         subscriptions.add(subData);
       }

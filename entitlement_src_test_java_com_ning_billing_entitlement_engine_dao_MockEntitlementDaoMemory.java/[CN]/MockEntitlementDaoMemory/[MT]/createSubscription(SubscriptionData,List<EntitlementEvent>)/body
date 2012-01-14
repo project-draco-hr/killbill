@@ -1,6 +1,14 @@
 {
 synchronized (events) {
     events.addAll(initalEvents);
+    for (    final EntitlementEvent cur : initalEvents) {
+      recordFutureNotificationFromTransaction(null,cur.getEffectiveDate(),new NotificationKey(){
+        @Override public String toString(){
+          return cur.getId().toString();
+        }
+      }
+);
+    }
   }
   Subscription updatedSubscription=buildSubscription(subscription);
   subscriptions.add(updatedSubscription);

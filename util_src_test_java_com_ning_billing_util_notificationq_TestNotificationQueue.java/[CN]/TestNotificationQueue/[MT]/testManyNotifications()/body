@@ -1,7 +1,7 @@
 {
   final Map<String,Boolean> expectedNotifications=new TreeMap<String,Boolean>();
   final TestStartStop testStartStop=new TestStartStop(false,false);
-  NotificationQueue queue=new NotificationQueue(dbi,clock,"test-svc","many",new NotificationQueueHandler(){
+  DefaultNotificationQueue queue=new DefaultNotificationQueue(dbi,clock,"test-svc","many",new NotificationQueueHandler(){
     @Override public void handleReadyNotification(    String notificationKey){
 synchronized (expectedNotifications) {
         expectedNotifications.put(notificationKey,Boolean.TRUE);
@@ -17,7 +17,7 @@ synchronized (expectedNotifications) {
   }
 ,getNotificationConfig(false,100,10,10000));
   executeTest(testStartStop,queue,new WithTest(){
-    @Override public void test(    final NotificationQueue readyQueue) throws InterruptedException {
+    @Override public void test(    final DefaultNotificationQueue readyQueue) throws InterruptedException {
       final DateTime now=clock.getUTCNow();
       final int MAX_NOTIFICATIONS=100;
       for (int i=0; i < MAX_NOTIFICATIONS; i++) {

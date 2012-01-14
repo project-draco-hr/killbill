@@ -2,7 +2,7 @@
 synchronized (events) {
     List<EntitlementEvent> results=new LinkedList<EntitlementEvent>();
     for (    EntitlementEvent cur : events) {
-      if (cur.isActive() && cur.getProcessingState() == EventLifecycleState.AVAILABLE && cur.getSubscriptionId().equals(subscriptionId)) {
+      if (cur.isActive() && cur.getEffectiveDate().isAfter(clock.getUTCNow()) && cur.getSubscriptionId().equals(subscriptionId)) {
         results.add(cur);
       }
     }
