@@ -1,10 +1,6 @@
 {
-  final DateTime now=new DateTime();
-  final Account account=createTestAccount();
-  final UUID subscriptionId=UUID.randomUUID();
-  final BigDecimal amount=new BigDecimal("10.00");
-  final InvoiceItem item=new DefaultInvoiceItem(null,subscriptionId,now,now.plusMonths(1),"Test",amount,new BigDecimal("1.0"),Currency.USD);
-  final Invoice invoice=createTestInvoice(account,now,Currency.USD,item);
+  final Account account=testHelper.createTestAccount();
+  final Invoice invoice=testHelper.createTestInvoice(account);
   await().atMost(1,MINUTES).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {
       List<PaymentInfo> processedPayments=paymentInfoReceiver.getProcessedPayments();
@@ -22,7 +18,7 @@
   Assert.assertNotNull(invoiceForPayment);
   Assert.assertEquals(invoiceForPayment.getId(),invoice.getId());
   Assert.assertEquals(invoiceForPayment.getAccountId(),account.getId());
-  Assert.assertEquals(invoiceForPayment.getLastPaymentAttempt(),paymentAttempt.getPaymentAttemptDate());
-  Assert.assertEquals(invoiceForPayment.getAmountOutstanding(),new BigDecimal("0"));
-  Assert.assertEquals(invoiceForPayment.getAmountPaid(),amount);
+  Assert.assertTrue(invoiceForPayment.getLastPaymentAttempt().isEqual(paymentAttempt.getPaymentAttemptDate()));
+  Assert.assertEquals(invoiceForPayment.getAmountOutstanding().floatValue(),new BigDecimal("0").floatValue());
+  Assert.assertEquals(invoiceForPayment.getAmountPaid().floatValue(),invoice.getAmountOutstanding().floatValue());
 }

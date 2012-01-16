@@ -1,3 +1,12 @@
 {
-  accounts.put(entity.getId().toString(),entity);
+  Account currentAccount=accounts.put(account.getId().toString(),account);
+  AccountChangeNotification changeEvent=new DefaultAccountChangeNotification(account.getId(),currentAccount,account);
+  if (changeEvent.hasChanges()) {
+    try {
+      eventBus.post(changeEvent);
+    }
+ catch (    EventBusException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 }

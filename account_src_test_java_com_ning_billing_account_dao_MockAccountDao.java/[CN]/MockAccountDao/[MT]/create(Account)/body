@@ -1,3 +1,9 @@
 {
-  accounts.put(entity.getId().toString(),entity);
+  accounts.put(account.getId().toString(),account);
+  try {
+    eventBus.post(new DefaultAccountCreationEvent(account));
+  }
+ catch (  EventBusException ex) {
+    throw new RuntimeException(ex);
+  }
 }
