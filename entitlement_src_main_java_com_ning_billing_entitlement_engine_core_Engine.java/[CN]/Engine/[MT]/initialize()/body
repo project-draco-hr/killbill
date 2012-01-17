@@ -1,7 +1,5 @@
 {
   try {
-    this.stoppedNotificationThread=false;
-    this.startedNotificationThread=false;
     subscritionEventQueue=notificationQueueService.createNotificationQueue(ENTITLEMENT_SERVICE_NAME,NOTIFICATION_QUEUE_NAME,new NotificationQueueHandler(){
       @Override public void handleReadyNotification(      String notificationKey){
         EntitlementEvent event=dao.getEventById(UUID.fromString(notificationKey));
@@ -10,18 +8,6 @@
         }
  else {
           processEventReady(event);
-        }
-      }
-      @Override public void completedQueueStop(){
-synchronized (this) {
-          stoppedNotificationThread=true;
-          this.notifyAll();
-        }
-      }
-      @Override public void completedQueueStart(){
-synchronized (this) {
-          startedNotificationThread=true;
-          this.notifyAll();
         }
       }
     }
