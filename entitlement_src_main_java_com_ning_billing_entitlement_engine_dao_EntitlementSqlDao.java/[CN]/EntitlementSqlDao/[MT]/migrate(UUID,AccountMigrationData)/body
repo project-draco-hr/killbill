@@ -8,8 +8,14 @@
         SubscriptionBundleData bundleData=curBundle.getData();
         for (        SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
           SubscriptionData subData=curSubscription.getData();
-          for (          EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
+          for (          final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
             transEventDao.insertEvent(curEvent);
+            recordFutureNotificationFromTransaction(transEventDao,curEvent.getEffectiveDate(),new NotificationKey(){
+              @Override public String toString(){
+                return curEvent.getId().toString();
+              }
+            }
+);
           }
           transSubDao.insertSubscription(subData);
         }

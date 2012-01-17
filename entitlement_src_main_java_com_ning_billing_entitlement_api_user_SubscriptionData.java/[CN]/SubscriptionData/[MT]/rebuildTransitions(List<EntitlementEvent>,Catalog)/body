@@ -7,10 +7,10 @@
   String nextPhaseName=null;
   String nextPriceList=null;
   SubscriptionState previousState=null;
-  String previousPlanName=null;
-  String previousPhaseName=null;
   String previousPriceList=null;
   transitions=new LinkedList<SubscriptionTransitionData>();
+  Plan previousPlan=null;
+  PlanPhase previousPhase=null;
   for (  final EntitlementEvent cur : events) {
     if (!cur.isActive() || cur.getActiveVersion() < activeVersion) {
       continue;
@@ -57,15 +57,11 @@ break;
 default :
 throw new EntitlementError(String.format("Unexpected Event type = %s",cur.getType()));
 }
-Plan previousPlan=null;
-PlanPhase previousPhase=null;
 Plan nextPlan=null;
 PlanPhase nextPhase=null;
 try {
-previousPlan=(previousPlanName != null) ? catalog.findPlan(previousPlanName) : null;
-previousPhase=(previousPhaseName != null) ? catalog.findPhase(previousPhaseName) : null;
-nextPlan=(nextPlanName != null) ? catalog.findPlan(nextPlanName) : null;
-nextPhase=(nextPhaseName != null) ? catalog.findPhase(nextPhaseName) : null;
+nextPlan=(nextPlanName != null) ? catalog.findPlan(nextPlanName,cur.getRequestedDate(),getStartDate()) : null;
+nextPhase=(nextPhaseName != null) ? catalog.findPhase(nextPhaseName,cur.getRequestedDate(),getStartDate()) : null;
 }
  catch (CatalogApiException e) {
 log.error(String.format("Failed to build transition for subscription %s",id),e);
@@ -73,8 +69,8 @@ log.error(String.format("Failed to build transition for subscription %s",id),e);
 SubscriptionTransitionData transition=new SubscriptionTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),previousState,previousPlan,previousPhase,previousPriceList,nextState,nextPlan,nextPhase,nextPriceList);
 transitions.add(transition);
 previousState=nextState;
-previousPlanName=nextPlanName;
-previousPhaseName=nextPhaseName;
+previousPlan=nextPlan;
+previousPhase=nextPhase;
 previousPriceList=nextPriceList;
 }
 }

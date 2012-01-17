@@ -1,6 +1,10 @@
 {
+  if (recursive || oneEventOnly) {
+    throw new EntitlementError("Not implemented");
+  }
   if (config.isEventProcessingOff()) {
     log.warn("Running event processing loop");
-    apiEventProcessor.processAllReadyEvents(subscriptionsIds,recursive,oneEventOnly);
+    NotificationQueue queue=getNotificationQueue();
+    queue.processReadyNotification();
   }
 }

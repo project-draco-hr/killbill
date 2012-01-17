@@ -1,5 +1,5 @@
 {
-  Currency[] supportedCurrencies=catalog.getSupportedCurrencies();
+  Currency[] supportedCurrencies=catalog.getCurrentSupportedCurrencies();
   for (  Price p : prices) {
     Currency currency=p.getCurrency();
     if (!currencyIsSupported(currency,supportedCurrencies)) {
@@ -12,9 +12,6 @@
     }
  catch (    CurrencyValueNull e) {
     }
-  }
-  if (effectiveDateForExistingSubscriptons != null && catalog.getEffectiveDate().getTime() > effectiveDateForExistingSubscriptons.getTime()) {
-    errors.add(new ValidationError(String.format("Price effective date %s is before catalog effective date '%s'",effectiveDateForExistingSubscriptons,catalog.getEffectiveDate().getTime()),catalog.getCatalogURI(),DefaultInternationalPrice.class,""));
   }
   return errors;
 }

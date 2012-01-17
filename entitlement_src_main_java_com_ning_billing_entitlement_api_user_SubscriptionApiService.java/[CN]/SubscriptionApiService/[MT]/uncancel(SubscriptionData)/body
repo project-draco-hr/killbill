@@ -6,11 +6,11 @@
   EntitlementEvent uncancelEvent=new ApiEventUncancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setRequestedDate(now).setEffectiveDate(now));
   List<EntitlementEvent> uncancelEvents=new ArrayList<EntitlementEvent>();
   uncancelEvents.add(uncancelEvent);
-  TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(subscription,now);
+  TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(subscription,now,now);
   PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.getNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,now,nextTimedPhase.getStartPhase()) : null;
   if (nextPhaseEvent != null) {
     uncancelEvents.add(nextPhaseEvent);
   }
   dao.uncancelSubscription(subscription.getId(),uncancelEvents);
-  subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getCatalog());
+  subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getFullCatalog());
 }

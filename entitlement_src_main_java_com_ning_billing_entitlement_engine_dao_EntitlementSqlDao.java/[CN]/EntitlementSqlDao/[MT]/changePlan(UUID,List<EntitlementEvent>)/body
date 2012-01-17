@@ -3,8 +3,14 @@
     @Override public Void inTransaction(    EventSqlDao dao,    TransactionStatus status) throws Exception {
       cancelNextChangeEventFromTransaction(subscriptionId,dao);
       cancelNextPhaseEventFromTransaction(subscriptionId,dao);
-      for (      EntitlementEvent cur : changeEvents) {
+      for (      final EntitlementEvent cur : changeEvents) {
         dao.insertEvent(cur);
+        recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new NotificationKey(){
+          @Override public String toString(){
+            return cur.getId().toString();
+          }
+        }
+);
       }
       return null;
     }
