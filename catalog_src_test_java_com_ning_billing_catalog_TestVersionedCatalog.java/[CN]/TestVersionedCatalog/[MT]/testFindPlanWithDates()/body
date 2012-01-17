@@ -1,0 +1,28 @@
+{
+  DateTime dt0=new DateTime("2010-01-01T00:00:00+00:00");
+  DateTime dt1=new DateTime("2011-01-01T00:01:00+00:00");
+  DateTime dt2=new DateTime("2011-02-02T00:01:00+00:00");
+  DateTime dt214=new DateTime("2011-02-14T00:01:00+00:00");
+  DateTime dt3=new DateTime("2011-03-03T00:01:00+00:00");
+  try {
+    vc.findPlan("pistol-monthly",dt0,dt0);
+    Assert.fail("Exception should have been thrown there are no plans for this date");
+  }
+ catch (  CatalogApiException e) {
+    log.error("Expected exception",e);
+  }
+  Plan newSubPlan1=vc.findPlan("pistol-monthly",dt1,dt1);
+  Plan newSubPlan2=vc.findPlan("pistol-monthly",dt2,dt2);
+  Plan newSubPlan214=vc.findPlan("pistol-monthly",dt214,dt214);
+  Plan newSubPlan3=vc.findPlan("pistol-monthly",dt3,dt3);
+  Assert.assertEquals(newSubPlan1.getAllPhases()[1].getRecurringPrice().getPrice(Currency.USD),new BigDecimal("1.0"));
+  Assert.assertEquals(newSubPlan2.getAllPhases()[1].getRecurringPrice().getPrice(Currency.USD),new BigDecimal("2.0"));
+  Assert.assertEquals(newSubPlan214.getAllPhases()[1].getRecurringPrice().getPrice(Currency.USD),new BigDecimal("2.0"));
+  Assert.assertEquals(newSubPlan3.getAllPhases()[1].getRecurringPrice().getPrice(Currency.USD),new BigDecimal("3.0"));
+  Plan exSubPlan2=vc.findPlan("pistol-monthly",dt2,dt1);
+  Plan exSubPlan214=vc.findPlan("pistol-monthly",dt214,dt1);
+  Plan exSubPlan3=vc.findPlan("pistol-monthly",dt3,dt1);
+  Assert.assertEquals(exSubPlan2.getAllPhases()[1].getRecurringPrice().getPrice(Currency.USD),new BigDecimal("1.0"));
+  Assert.assertEquals(exSubPlan214.getAllPhases()[1].getRecurringPrice().getPrice(Currency.USD),new BigDecimal("2.0"));
+  Assert.assertEquals(exSubPlan3.getAllPhases()[1].getRecurringPrice().getPrice(Currency.USD),new BigDecimal("2.0"));
+}
