@@ -1,12 +1,12 @@
 {
   List<SubscriptionBundle> bundles=dao.getSubscriptionBundleForAccount(accountId);
   List<Subscription> subscriptions=new ArrayList<Subscription>();
-  for (  SubscriptionBundle bundle : bundles) {
+  for (  final SubscriptionBundle bundle : bundles) {
     subscriptions.addAll(dao.getSubscriptions(bundle.getId()));
   }
   SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
-  for (  Subscription subscription : subscriptions) {
-    for (    SubscriptionTransition transition : subscription.getAllTransitions()) {
+  for (  final Subscription subscription : subscriptions) {
+    for (    final SubscriptionTransition transition : subscription.getAllTransitions()) {
       try {
         result.add(new DefaultBillingEvent(transition,subscription,calculateBCD(transition,accountId)));
       }

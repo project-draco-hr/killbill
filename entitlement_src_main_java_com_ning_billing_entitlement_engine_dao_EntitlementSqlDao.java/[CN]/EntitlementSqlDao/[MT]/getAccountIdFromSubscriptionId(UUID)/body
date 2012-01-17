@@ -1,0 +1,11 @@
+{
+  UUID bundleId=subscriptionsDao.getSubscriptionFromId(subscriptionId.toString()).getBundleId();
+  if (bundleId == null) {
+    throw new EntitlementBillingApiException(ErrorCode.ENT_GET_NO_BUNDLE_FOR_SUBSCRIPTION,subscriptionId.toString());
+  }
+  SubscriptionBundle bundle=bundlesDao.getBundleFromId(bundleId.toString());
+  if (bundle == null) {
+    throw new EntitlementBillingApiException(ErrorCode.ENT_GET_INVALID_BUNDLE_ID,bundleId.toString());
+  }
+  return bundle.getAccountId();
+}
