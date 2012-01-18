@@ -1,11 +1,11 @@
 {
   DateTime notionalDate=new DateTime();
   DateTime targetDate=new DateTime(2011,10,6,0,0,0,0);
-  List<UUID> invoices=invoiceDao.getInvoicesForPayment(notionalDate.toDate(),NUMBER_OF_DAY_BETWEEN_RETRIES);
+  List<UUID> invoices=invoiceDao.getInvoicesForPayment(notionalDate,NUMBER_OF_DAY_BETWEEN_RETRIES);
   int existingInvoiceCount=invoices.size();
   UUID accountId=UUID.randomUUID();
   Invoice invoice=new DefaultInvoice(accountId,targetDate,Currency.USD);
   invoiceDao.create(invoice);
-  invoices=invoiceDao.getInvoicesForPayment(notionalDate.toDate(),NUMBER_OF_DAY_BETWEEN_RETRIES);
+  invoices=invoiceDao.getInvoicesForPayment(notionalDate,NUMBER_OF_DAY_BETWEEN_RETRIES);
   assertEquals(invoices.size(),existingInvoiceCount);
 }
