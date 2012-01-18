@@ -1,15 +1,23 @@
 {
   final Injector g=Guice.createInjector(Stage.PRODUCTION,new AbstractModule(){
     protected void configure(){
-      bind(Clock.class).to(DefaultClock.class).asEagerSingleton();
-      bind(NextBillingDateNotifier.class).to(DefaultNextBillingDateNotifier.class).asEagerSingleton();
+      bind(Clock.class).to(ClockMock.class).asEagerSingleton();
       bind(Bus.class).to(MemoryEventBus.class).asEagerSingleton();
       bind(NotificationQueueService.class).to(DefaultNotificationQueueService.class).asEagerSingleton();
       final InvoiceConfig config=new ConfigurationObjectFactory(System.getProperties()).build(InvoiceConfig.class);
       bind(InvoiceConfig.class).toInstance(config);
+      final MysqlTestingHelper helper=new MysqlTestingHelper();
+      bind(MysqlTestingHelper.class).toInstance(helper);
+      DBI dbi=helper.getDBI();
+      bind(DBI.class).toInstance(dbi);
     }
   }
 );
-  notifier=g.getInstance(NextBillingDateNotifier.class);
   clock=g.getInstance(Clock.class);
+  DBI dbi=g.getInstance(DBI.class);
+  dao=dbi.onDemand(DummySqlTest.class);
+  eventBus=g.getInstance(Bus.class);
+  helper=g.getInstance(MysqlTestingHelper.class);
+  notifier=new DefaultNextBillingDateNotifier(g.getInstance(NotificationQueueService.class),eventBus,g.getInstance(InvoiceConfig.class));
+  startMysql();
 }
