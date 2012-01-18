@@ -2,7 +2,7 @@
   final UUID subscriptionId=new UUID(0L,1L);
   final DateTime now=new DateTime();
   final DateTime readyTime=now.plusMillis(2000);
-  NextBillingEventListener listener=new NextBillingEventListener();
+  final NextBillingEventListener listener=new NextBillingEventListener();
   eventBus.start();
   notifier.initialize();
   notifier.start();
@@ -15,6 +15,11 @@
   }
 );
   ((ClockMock)clock).setDeltaFromReality(3000);
-  Thread.sleep(1000);
+  await().atMost(1,MINUTES).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return listener.getEventCount() == 1;
+    }
+  }
+);
   Assert.assertEquals(listener.getEventCount(),1);
 }
