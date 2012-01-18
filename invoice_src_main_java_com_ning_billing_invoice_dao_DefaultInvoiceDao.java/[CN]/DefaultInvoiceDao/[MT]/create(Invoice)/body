@@ -4,11 +4,14 @@
       Invoice currentInvoice=invoiceDao.getById(invoice.getId().toString());
       if (currentInvoice == null) {
         invoiceDao.create(invoice);
-        List<InvoiceItem> invoiceItems=invoice.getItems();
+        List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
         InvoiceItemSqlDao invoiceItemDao=invoiceDao.become(InvoiceItemSqlDao.class);
         invoiceItemDao.create(invoiceItems);
+        List<InvoicePayment> invoicePayments=invoice.getPayments();
+        InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
+        invoicePaymentSqlDao.create(invoicePayments);
         InvoiceCreationNotification event;
-        event=new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getAmountOutstanding(),invoice.getCurrency(),invoice.getInvoiceDate());
+        event=new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate());
         eventBus.post(event);
       }
       return null;

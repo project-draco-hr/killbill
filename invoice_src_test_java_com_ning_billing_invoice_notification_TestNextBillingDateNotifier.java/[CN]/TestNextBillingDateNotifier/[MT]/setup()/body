@@ -1,0 +1,15 @@
+{
+  final Injector g=Guice.createInjector(Stage.PRODUCTION,new AbstractModule(){
+    protected void configure(){
+      bind(Clock.class).to(DefaultClock.class).asEagerSingleton();
+      bind(NextBillingDateNotifier.class).to(DefaultNextBillingDateNotifier.class).asEagerSingleton();
+      bind(Bus.class).to(MemoryEventBus.class).asEagerSingleton();
+      bind(NotificationQueueService.class).to(DefaultNotificationQueueService.class).asEagerSingleton();
+      final InvoiceConfig config=new ConfigurationObjectFactory(System.getProperties()).build(InvoiceConfig.class);
+      bind(InvoiceConfig.class).toInstance(config);
+    }
+  }
+);
+  notifier=g.getInstance(NextBillingDateNotifier.class);
+  clock=g.getInstance(Clock.class);
+}

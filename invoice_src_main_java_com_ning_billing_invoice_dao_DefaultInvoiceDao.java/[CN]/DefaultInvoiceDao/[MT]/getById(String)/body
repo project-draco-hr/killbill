@@ -5,7 +5,10 @@
       if (invoice != null) {
         InvoiceItemSqlDao invoiceItemDao=invoiceDao.become(InvoiceItemSqlDao.class);
         List<InvoiceItem> invoiceItems=invoiceItemDao.getInvoiceItemsByInvoice(invoiceId);
-        invoice.add(invoiceItems);
+        invoice.addInvoiceItems(invoiceItems);
+        InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
+        List<InvoicePayment> invoicePayments=invoicePaymentSqlDao.getPaymentsForInvoice(invoiceId);
+        invoice.addPayments(invoicePayments);
       }
       return invoice;
     }
