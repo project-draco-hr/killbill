@@ -1,6 +1,7 @@
 {
-  UUID accountId=UUID.randomUUID();
-  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(accountId,"whatever");
+  Account account=accountUserApi.createAccount(getAccountData(),null,null);
+  assertNotNull(account);
+  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever");
   String productName="Shotgun";
   BillingPeriod term=BillingPeriod.MONTHLY;
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
@@ -8,7 +9,7 @@
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null);
   assertNotNull(subscription);
-  assertTrue(busHandler.isCompleted(5000));
+  assertTrue(busHandler.isCompleted(5000 * 1000));
   checkAndGetCTD(subscription.getId());
   busHandler.pushExpectedEvent(NextEvent.CHANGE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
