@@ -26,7 +26,8 @@
   billingEvents.addAll(events);
   DateTime targetDate=new DateTime();
   Currency targetCurrency=account.getCurrency();
-  InvoiceItemList invoiceItemList=(InvoiceItemList)invoiceUserApi.getInvoiceItemsByAccount(accountId);
+  List<InvoiceItem> items=invoiceUserApi.getInvoiceItemsByAccount(accountId);
+  InvoiceItemList invoiceItemList=new InvoiceItemList(items);
   Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoiceItemList,targetDate,targetCurrency);
   if (invoice != null) {
     if (invoice.getNumberOfItems() > 0) {
