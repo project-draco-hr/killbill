@@ -1,7 +1,7 @@
 {
   SubscriptionData subscription=(SubscriptionData)dao.getSubscriptionFromId(subscriptionId);
   if (subscription == null) {
-    new EntitlementBillingApiException(String.format("Unknown subscription %s",subscriptionId));
+    throw new EntitlementBillingApiException(ErrorCode.ENT_INVALID_SUBSCRIPTION_ID,subscriptionId.toString());
   }
   SubscriptionBuilder builder=new SubscriptionBuilder(subscription).setChargedThroughDate(ctd).setPaidThroughDate(subscription.getPaidThroughDate());
   dao.updateSubscription(new SubscriptionData(builder));
