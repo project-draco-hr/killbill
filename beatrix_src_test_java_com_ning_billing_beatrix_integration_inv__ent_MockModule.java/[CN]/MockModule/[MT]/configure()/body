@@ -1,0 +1,16 @@
+{
+  loadSystemPropertiesFromClasspath("/resource.properties");
+  bind(Clock.class).to(ClockMock.class).asEagerSingleton();
+  bind(ClockMock.class).asEagerSingleton();
+  bind(Lifecycle.class).to(SubsetDefaultLifecycle.class).asEagerSingleton();
+  bind(IDBI.class).to(DBI.class).asEagerSingleton();
+  bind(DBI.class).toProvider(DBIProvider.class).asEagerSingleton();
+  final DbiConfig config=new ConfigurationObjectFactory(System.getProperties()).build(DbiConfig.class);
+  bind(DbiConfig.class).toInstance(config);
+  install(new EventBusModule());
+  install(new NotificationQueueModule());
+  install(new AccountModule());
+  install(new CatalogModule());
+  install(new EntitlementModule());
+  install(new InvoiceModule());
+}

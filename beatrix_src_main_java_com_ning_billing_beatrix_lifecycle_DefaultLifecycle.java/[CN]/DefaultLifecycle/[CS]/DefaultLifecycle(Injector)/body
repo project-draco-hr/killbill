@@ -1,0 +1,11 @@
+{
+  this.serviceFinder=new ServiceFinder(DefaultLifecycle.class.getClassLoader());
+  this.handlersByLevel=Multimaps.newSetMultimap(new ConcurrentHashMap<LifecycleLevel,Collection<LifecycleHandler<? extends KillbillService>>>(),new Supplier<Set<LifecycleHandler<? extends KillbillService>>>(){
+    @Override public Set<LifecycleHandler<? extends KillbillService>> get(){
+      return new CopyOnWriteArraySet<LifecycleHandler<? extends KillbillService>>();
+    }
+  }
+);
+  this.injector=injector;
+  init();
+}
