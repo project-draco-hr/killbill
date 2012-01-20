@@ -1,6 +1,7 @@
 {
   try {
-    BigDecimal rate=event.getRecurringPrice(targetCurrency);
+    InternationalPrice recurringPrice=event.getRecurringPrice();
+    BigDecimal rate=recurringPrice.getPrice(targetCurrency);
     BigDecimal invoiceItemAmount=calculateInvoiceItemAmount(event,targetDate,rate);
     BillingMode billingMode=getBillingMode(event.getBillingMode());
     DateTime billThroughDate=billingMode.calculateEffectiveEndDate(event.getEffectiveDate(),targetDate,event.getBillCycleDay(),event.getBillingPeriod());

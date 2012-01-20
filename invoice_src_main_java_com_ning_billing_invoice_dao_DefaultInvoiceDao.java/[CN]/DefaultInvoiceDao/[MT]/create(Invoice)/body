@@ -13,7 +13,7 @@
         invoicePaymentSqlDao.create(invoicePayments);
         InvoiceCreationNotification event;
         event=new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate());
-        eventBus.post(event);
+        eventBus.postFromTransaction(event,invoiceDao);
       }
       return null;
     }

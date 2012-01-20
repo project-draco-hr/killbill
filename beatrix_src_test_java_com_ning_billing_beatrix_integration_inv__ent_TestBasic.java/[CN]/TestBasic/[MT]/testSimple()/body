@@ -1,0 +1,45 @@
+{
+  Account account=accountUserApi.createAccount(getAccountData(),null,null);
+  assertNotNull(account);
+  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever");
+  String productName="Shotgun";
+  BillingPeriod term=BillingPeriod.MONTHLY;
+  String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  busHandler.pushExpectedEvent(NextEvent.CREATE);
+  busHandler.pushExpectedEvent(NextEvent.INVOICE);
+  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null);
+  assertNotNull(subscription);
+  assertTrue(busHandler.isCompleted(5000));
+  checkAndGetCTD(subscription.getId());
+  busHandler.pushExpectedEvent(NextEvent.CHANGE);
+  busHandler.pushExpectedEvent(NextEvent.INVOICE);
+  BillingPeriod newTerm=BillingPeriod.MONTHLY;
+  String newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  String newProductName="Assault-Rifle";
+  subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
+  assertTrue(busHandler.isCompleted(5000));
+  DateTime ctd=checkAndGetCTD(subscription.getId());
+  newTerm=BillingPeriod.MONTHLY;
+  newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  newProductName="Pistol";
+  subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
+  busHandler.pushExpectedEvent(NextEvent.CHANGE);
+  busHandler.pushExpectedEvent(NextEvent.INVOICE);
+  clock.setDeltaFromReality(ctd.getMillis() - clock.getUTCNow().getMillis());
+  assertTrue(busHandler.isCompleted(5000));
+  int maxCycles=3;
+  DateTime lastCtd=null;
+  do {
+    clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
+    busHandler.pushExpectedEvent(NextEvent.INVOICE);
+    assertTrue(busHandler.isCompleted(5000));
+    lastCtd=checkAndGetCTD(subscription.getId());
+  }
+ while (maxCycles-- > 0);
+  subscription.cancel(clock.getUTCNow(),false);
+  busHandler.pushExpectedEvent(NextEvent.CANCEL);
+  busHandler.pushExpectedEvent(NextEvent.INVOICE);
+  Interval it=new Interval(lastCtd,clock.getUTCNow());
+  clock.addDeltaFromReality(it.toDurationMillis());
+  assertTrue(busHandler.isCompleted(5000));
+}

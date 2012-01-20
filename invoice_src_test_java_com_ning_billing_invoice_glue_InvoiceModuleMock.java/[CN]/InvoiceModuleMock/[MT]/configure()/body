@@ -1,6 +1,11 @@
 {
   dbi=helper.getDBI();
   bind(IDBI.class).toInstance(dbi);
+  bind(Clock.class).to(DefaultClock.class).asEagerSingleton();
+  installNotificationQueue();
+  install(new AccountModule());
+  install(new CatalogModule());
+  install(new EntitlementModule());
   super.configure();
   install(new EventBusModule());
 }
