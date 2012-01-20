@@ -1,0 +1,7 @@
+{
+  final TestEvent event=new TestEvent(UUID.randomUUID(),"Hello World!");
+  Future<TestResponse> future=EventBusFuture.post(eventBus,event);
+  TestResponse response=future.get(1,TimeUnit.SECONDS);
+  assertEquals(response.getRequestId(),event.getId());
+  assertEquals(response.getMsg(),event.getMsg());
+}

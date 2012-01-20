@@ -4,7 +4,7 @@
   Invoice invoice=new DefaultInvoice(accountId,targetDate,Currency.USD);
   DateTime paymentAttemptDate=new DateTime(2011,6,24,12,14,36,0);
   invoiceDao.create(invoice);
-  invoiceDao.notifyFailedPayment(invoice.getId().toString(),UUID.randomUUID().toString(),paymentAttemptDate.toDate());
+  invoiceDao.notifyOfPaymentAttempt(new InvoicePayment(invoice.getId(),UUID.randomUUID(),paymentAttemptDate));
   invoice=invoiceDao.getById(invoice.getId().toString());
   assertTrue(invoice.getLastPaymentAttempt().equals(paymentAttemptDate));
 }
