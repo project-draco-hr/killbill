@@ -1,0 +1,6 @@
+{
+  SubscriptionSqlDao subscriptionSqlDao=transactionalDao.become(SubscriptionSqlDao.class);
+  SubscriptionData subscription=(SubscriptionData)subscriptionSqlDao.getSubscriptionFromId(subscriptionId.toString());
+  Date paidThroughDate=(subscription.getPaidThroughDate() == null) ? null : subscription.getPaidThroughDate().toDate();
+  subscriptionSqlDao.updateSubscription(subscriptionId.toString(),subscription.getActiveVersion(),ctd.toDate(),paidThroughDate);
+}

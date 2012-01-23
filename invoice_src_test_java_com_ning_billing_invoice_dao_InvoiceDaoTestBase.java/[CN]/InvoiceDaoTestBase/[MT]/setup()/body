@@ -1,6 +1,6 @@
 {
   try {
-    InvoiceModuleMock module=new InvoiceModuleMock();
+    module=new InvoiceModuleMock();
     final String ddl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/invoice/ddl.sql"));
     module.createDb(ddl);
     final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module);
@@ -10,6 +10,7 @@
     invoicePaymentDao=module.getIDBI().onDemand(InvoicePaymentSqlDao.class);
     BusService busService=injector.getInstance(BusService.class);
     ((DefaultEventBusService)busService).startBus();
+    assertTrue(true);
   }
  catch (  Throwable t) {
     fail(t.toString());

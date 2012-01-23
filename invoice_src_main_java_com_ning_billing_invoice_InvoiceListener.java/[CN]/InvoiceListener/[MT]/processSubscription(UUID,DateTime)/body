@@ -1,0 +1,26 @@
+{
+  log.info("Got subscription transition from InvoiceListener.");
+  if (subscriptionId == null) {
+    log.error("Failed handling entitlement change.",new InvoiceApiException(ErrorCode.INVOICE_INVALID_TRANSITION));
+    return;
+  }
+  UUID accountId=entitlementBillingApi.getAccountIdFromSubscriptionId(subscriptionId);
+  if (accountId == null) {
+    log.error("Failed handling entitlement change.",new InvoiceApiException(ErrorCode.INVOICE_NO_ACCOUNT_ID_FOR_SUBSCRIPTION_ID,subscriptionId.toString()));
+    return;
+  }
+  Account account=accountUserApi.getAccountById(accountId);
+  if (account == null) {
+    log.error("Failed handling entitlement change.",new InvoiceApiException(ErrorCode.INVOICE_ACCOUNT_ID_INVALID,accountId.toString()));
+    return;
+  }
+  SortedSet<BillingEvent> events=entitlementBillingApi.getBillingEventsForAccount(accountId);
+  BillingEventSet billingEvents=new BillingEventSet(events);
+  Currency targetCurrency=account.getCurrency();
+  List<InvoiceItem> items=invoiceDao.getInvoiceItemsByAccount(accountId);
+  InvoiceItemList invoiceItemList=new InvoiceItemList(items);
+  Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoiceItemList,targetDate,targetCurrency);
+  if (invoice != null) {
+    invoiceDao.create(invoice);
+  }
+}
