@@ -1,0 +1,11 @@
+{
+synchronized (monitor) {
+    invoices.put(invoice.getId(),invoice);
+  }
+  try {
+    eventBus.post(new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate()));
+  }
+ catch (  Bus.EventBusException ex) {
+    throw new RuntimeException(ex);
+  }
+}
