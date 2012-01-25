@@ -1,0 +1,15 @@
+{
+  String definitionName="TestTag12345";
+  tagDefinitionDao.create(definitionName,"Some test tag","test");
+  TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName);
+  assertNotNull(tagDefinition);
+  UUID objectId=UUID.randomUUID();
+  String objectType="TestType";
+  TagStore tagStore=new DefaultTagStore(objectId,objectType);
+  Tag tag=new DescriptiveTag(tagDefinition,"test",clock.getUTCNow());
+  tagStore.add(tag);
+  tagStoreSqlDao.save(objectId.toString(),objectType,tagStore.getEntityList());
+  List<Tag> tags=tagStoreSqlDao.load(objectId.toString(),objectType);
+  assertEquals(tags.size(),1);
+  tagDefinitionDao.deleteTagDefinition(definitionName);
+}

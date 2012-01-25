@@ -1,0 +1,26 @@
+{
+  UUID accountId=UUID.randomUUID();
+  TagStore tagStore=new DefaultTagStore(accountId,ACCOUNT_TYPE);
+  String definitionName="MixedTagTest";
+  TagDefinition tagDefinition=null;
+  try {
+    tagDefinition=tagDefinitionDao.create(definitionName,"Test tag for some test purpose","testUser");
+  }
+ catch (  TagDefinitionApiException e) {
+    fail("Tag definition creation failed.",e);
+  }
+  DescriptiveTag descriptiveTag=new DescriptiveTag(tagDefinition,"testUser",clock.getUTCNow());
+  tagStore.add(descriptiveTag);
+  assertEquals(tagStore.generateInvoice(),true);
+  ControlTag controlTag=new DefaultControlTag("testUser",clock.getUTCNow(),ControlTagType.AUTO_INVOICING_OFF);
+  tagStore.add(controlTag);
+  assertEquals(tagStore.generateInvoice(),false);
+  List<Tag> tagList=tagStore.getEntityList();
+  tagStoreSqlDao.save(accountId.toString(),ACCOUNT_TYPE,tagList);
+  tagStore.clear();
+  assertEquals(tagStore.getEntityList().size(),0);
+  tagList=tagStoreSqlDao.load(accountId.toString(),ACCOUNT_TYPE);
+  tagStore.add(tagList);
+  assertEquals(tagList.size(),2);
+  assertEquals(tagStore.generateInvoice(),false);
+}

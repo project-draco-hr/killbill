@@ -18,7 +18,9 @@
   Assert.assertNotNull(invoiceForPayment);
   Assert.assertEquals(invoiceForPayment.getId(),invoice.getId());
   Assert.assertEquals(invoiceForPayment.getAccountId(),account.getId());
-  Assert.assertTrue(invoiceForPayment.getLastPaymentAttempt().isEqual(paymentAttempt.getPaymentAttemptDate()));
+  DateTime invoicePaymentAttempt=invoiceForPayment.getLastPaymentAttempt();
+  DateTime correctedDate=invoicePaymentAttempt.minus(invoicePaymentAttempt.millisOfSecond().get());
+  Assert.assertTrue(correctedDate.isEqual(paymentAttempt.getPaymentAttemptDate()));
   Assert.assertEquals(invoiceForPayment.getBalance().floatValue(),new BigDecimal("0").floatValue());
-  Assert.assertEquals(invoiceForPayment.getAmountPaid().floatValue(),invoice.getBalance().floatValue());
+  Assert.assertEquals(invoiceForPayment.getAmountPaid().floatValue(),invoice.getAmountPaid().floatValue());
 }

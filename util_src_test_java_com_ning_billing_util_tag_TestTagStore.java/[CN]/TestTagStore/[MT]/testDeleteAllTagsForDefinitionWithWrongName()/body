@@ -1,0 +1,19 @@
+{
+  String definitionName="TestTag654321";
+  String wrongDefinitionName="TestTag564321";
+  try {
+    tagDefinitionDao.create(definitionName,"Some test tag","test");
+  }
+ catch (  TagDefinitionApiException e) {
+    fail("Could not create tag definition",e);
+  }
+  TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName);
+  assertNotNull(tagDefinition);
+  tagDefinitionDao.deleteAllTagsForDefinition(wrongDefinitionName);
+  try {
+    tagDefinitionDao.deleteTagDefinition(definitionName);
+  }
+ catch (  TagDefinitionApiException e) {
+    fail("Could not delete tag definition",e);
+  }
+}
