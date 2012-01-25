@@ -1,7 +1,10 @@
 {
   for (  Tag tag : entities.values()) {
-    if (!tag.getGenerateInvoice()) {
-      return false;
+    if (tag instanceof ControlTag) {
+      ControlTag controlTag=(ControlTag)tag;
+      if (controlTag.getControlTagType() == ControlTagType.AUTO_INVOICING_OFF) {
+        return false;
+      }
     }
   }
   return true;
