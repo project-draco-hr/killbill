@@ -1,13 +1,18 @@
 {
   if (events == null) {
-    return new DefaultInvoice(accountId,targetDate,targetCurrency);
+    return null;
   }
   if (events.size() == 0) {
-    return new DefaultInvoice(accountId,targetDate,targetCurrency);
+    return null;
   }
   DefaultInvoice invoice=new DefaultInvoice(accountId,targetDate,targetCurrency);
   InvoiceItemList currentItems=generateInvoiceItems(events,invoice.getId(),targetDate,targetCurrency);
   InvoiceItemList itemsToPost=reconcileInvoiceItems(invoice.getId(),currentItems,existingItems);
-  invoice.addInvoiceItems(itemsToPost);
-  return invoice;
+  if (itemsToPost.size() == 0) {
+    return null;
+  }
+ else {
+    invoice.addInvoiceItems(itemsToPost);
+    return invoice;
+  }
 }

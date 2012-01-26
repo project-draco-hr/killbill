@@ -2,9 +2,9 @@
   subscriptionsDao.inTransaction(new Transaction<Void,SubscriptionSqlDao>(){
     @Override public Void inTransaction(    SubscriptionSqlDao dao,    TransactionStatus status) throws Exception {
       dao.insertSubscription(subscription);
-      EventSqlDao eventsDaoFromSameTranscation=dao.become(EventSqlDao.class);
+      EventSqlDao eventsDaoFromSameTransaction=dao.become(EventSqlDao.class);
       for (      final EntitlementEvent cur : initialEvents) {
-        eventsDaoFromSameTranscation.insertEvent(cur);
+        eventsDaoFromSameTransaction.insertEvent(cur);
         recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new NotificationKey(){
           @Override public String toString(){
             return cur.getId().toString();
