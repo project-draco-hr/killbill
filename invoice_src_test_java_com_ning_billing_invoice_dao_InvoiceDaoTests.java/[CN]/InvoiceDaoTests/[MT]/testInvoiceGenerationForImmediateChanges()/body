@@ -1,4 +1,5 @@
 {
+  InvoiceGenerator generator=new DefaultInvoiceGenerator();
   UUID accountId=UUID.randomUUID();
   InvoiceItemList invoiceItemList=new InvoiceItemList();
   DateTime targetDate=new DateTime(2011,2,16,0,0,0,0);
@@ -8,7 +9,7 @@
   MockPlan plan1=new MockPlan(phase1);
   Subscription subscription=new MockSubscription();
   DateTime effectiveDate1=new DateTime(2011,2,1,0,0,0,0);
-  BillingEvent event1=new DefaultBillingEvent(subscription,effectiveDate1,plan1,phase1,null,recurringPrice,BillingPeriod.MONTHLY,15,BillingModeType.IN_ADVANCE,"testEvent");
+  BillingEvent event1=new DefaultBillingEvent(subscription,effectiveDate1,plan1,phase1,null,recurringPrice,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"testEvent1");
   BillingEventSet events=new BillingEventSet();
   events.add(event1);
   Invoice invoice1=generator.generateInvoice(accountId,events,invoiceItemList,targetDate,Currency.USD);
@@ -19,10 +20,15 @@
   MockPlanPhase phase2=new MockPlanPhase(recurringPrice,null,BillingPeriod.MONTHLY,PhaseType.TRIAL);
   MockPlan plan2=new MockPlan(phase2);
   DateTime effectiveDate2=new DateTime(2011,2,15,0,0,0,0);
-  BillingEvent event2=new DefaultBillingEvent(subscription,effectiveDate2,plan2,phase2,null,recurringPrice,BillingPeriod.MONTHLY,15,BillingModeType.IN_ADVANCE,"testEvent");
+  BillingEvent event2=new DefaultBillingEvent(subscription,effectiveDate2,plan2,phase2,null,recurringPrice2,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"testEvent2");
   events.add(event2);
   Invoice invoice2=generator.generateInvoice(accountId,events,invoiceItemList,targetDate,Currency.USD);
-  assertEquals(invoice1.getBalance(),FIFTEEN);
+  assertEquals(invoice2.getBalance(),FIVE);
   invoiceItemList.addAll(invoice2.getInvoiceItems());
-  fail();
+  invoiceDao.create(invoice1);
+  invoiceDao.create(invoice2);
+  Invoice savedInvoice1=invoiceDao.getById(invoice1.getId());
+  assertEquals(savedInvoice1.getTotalAmount(),ZERO);
+  Invoice savedInvoice2=invoiceDao.getById(invoice2.getId());
+  assertEquals(savedInvoice2.getTotalAmount(),FIFTEEN);
 }
