@@ -1,4 +1,7 @@
 {
+  if (existingInvoiceItems == null) {
+    return currentInvoiceItems;
+  }
   InvoiceItemList currentItems=new InvoiceItemList();
   for (  final InvoiceItem item : currentInvoiceItems) {
     currentItems.add(new DefaultInvoiceItem(item,invoiceId));
@@ -18,7 +21,7 @@
   existingItems.removeAll(existingItemsToRemove);
   existingItems.removeCancellingPairs();
   for (  final InvoiceItem existingItem : existingItems) {
-    currentItems.add(existingItem.asCredit(invoiceId));
+    currentItems.add(existingItem.asCredit(existingItem.getInvoiceId()));
   }
   return currentItems;
 }
