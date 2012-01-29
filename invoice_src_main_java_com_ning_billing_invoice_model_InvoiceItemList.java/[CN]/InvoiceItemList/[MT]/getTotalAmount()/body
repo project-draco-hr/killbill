@@ -1,7 +1,12 @@
 {
-  BigDecimal total=new BigDecimal("0");
+  BigDecimal total=BigDecimal.ZERO.setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
   for (  final InvoiceItem item : this) {
-    total=total.add(item.getAmount());
+    if (item.getRecurringAmount() != null) {
+      total=total.add(item.getRecurringAmount());
+    }
+    if (item.getFixedAmount() != null) {
+      total=total.add(item.getFixedAmount());
+    }
   }
   return total.setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
 }

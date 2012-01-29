@@ -1,16 +1,16 @@
 {
   try {
-    InternationalPrice recurringPrice=firstEvent.getRecurringPrice();
-    if (recurringPrice != null) {
-      BigDecimal rate=recurringPrice.getPrice(targetCurrency);
-      BigDecimal numberOfBillingPeriods=calculateNumberOfBillingPeriods(firstEvent,secondEvent,targetDate);
-      if (numberOfBillingPeriods.compareTo(BigDecimal.ZERO) != 0) {
-        BigDecimal invoiceItemAmount=numberOfBillingPeriods.multiply(rate);
-        BillingMode billingMode=getBillingMode(firstEvent.getBillingMode());
-        DateTime billThroughDate=billingMode.calculateEffectiveEndDate(firstEvent.getEffectiveDate(),secondEvent.getEffectiveDate(),targetDate,firstEvent.getBillCycleDay(),firstEvent.getBillingPeriod());
-        addInvoiceItem(invoiceId,items,firstEvent,billThroughDate,invoiceItemAmount,rate,targetCurrency);
-      }
+    BigDecimal recurringRate=firstEvent.getRecurringPrice() == null ? null : firstEvent.getRecurringPrice().getPrice(targetCurrency);
+    BigDecimal fixedPrice=firstEvent.getFixedPrice() == null ? null : firstEvent.getFixedPrice().getPrice(targetCurrency);
+    BigDecimal numberOfBillingPeriods;
+    BigDecimal recurringAmount=null;
+    if (recurringRate != null) {
+      numberOfBillingPeriods=calculateNumberOfBillingPeriods(firstEvent,secondEvent,targetDate);
+      recurringAmount=numberOfBillingPeriods.multiply(recurringRate);
     }
+    BillingMode billingMode=getBillingMode(firstEvent.getBillingMode());
+    DateTime billThroughDate=billingMode.calculateEffectiveEndDate(firstEvent.getEffectiveDate(),secondEvent.getEffectiveDate(),targetDate,firstEvent.getBillCycleDay(),firstEvent.getBillingPeriod());
+    addInvoiceItem(invoiceId,items,firstEvent,billThroughDate,recurringAmount,recurringRate,fixedPrice,targetCurrency);
   }
  catch (  CatalogApiException e) {
     log.error(String.format("Encountered a catalog error processing invoice %s for billing event on date %s",invoiceId.toString(),ISODateTimeFormat.basicDateTime().print(firstEvent.getEffectiveDate())),e);
