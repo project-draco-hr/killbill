@@ -4,13 +4,19 @@
       @Override public void handleReadyNotification(      String notificationKey){
         UUID subscriptionId;
         try {
-          subscriptionId=UUID.fromString(notificationKey);
+          UUID key=UUID.fromString(notificationKey);
+          Subscription subscription=entitlementDao.getSubscriptionFromId(key);
+          if (subscription == null) {
+            log.warn("Next Billing Date Notification Queue handled spurious notification (key: " + key + ")");
+          }
+ else {
+            processEvent(key);
+          }
         }
  catch (        IllegalArgumentException e) {
           log.error("The key returned from the NextBillingNotificationQueue is not a valid UUID",e);
           return;
         }
-        processEvent(subscriptionId);
       }
     }
 ,new NotificationConfig(){
@@ -29,7 +35,7 @@
     }
 );
   }
- catch (  NotficationQueueAlreadyExists e) {
+ catch (  NotificationQueueAlreadyExists e) {
     throw new RuntimeException(e);
   }
 }

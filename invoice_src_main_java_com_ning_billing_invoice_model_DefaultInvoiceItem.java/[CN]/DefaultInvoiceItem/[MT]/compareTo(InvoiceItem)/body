@@ -1,7 +1,13 @@
 {
-  int compareSubscriptions=getSubscriptionId().compareTo(invoiceItem.getSubscriptionId());
+  int compareSubscriptions=getSubscriptionId().compareTo(that.getSubscriptionId());
   if (compareSubscriptions == 0) {
-    return getStartDate().compareTo(invoiceItem.getStartDate());
+    if ((this.endDate != null) && (that.getEndDate() == null)) {
+      return -1;
+    }
+    if ((this.endDate == null) && (that.getEndDate() != null)) {
+      return 1;
+    }
+    return getStartDate().compareTo(that.getStartDate());
   }
  else {
     return compareSubscriptions;

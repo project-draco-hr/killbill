@@ -1,10 +1,16 @@
 {
   try {
-    BigDecimal rate=event.getRecurringPrice(targetCurrency);
-    BigDecimal invoiceItemAmount=calculateInvoiceItemAmount(event,targetDate,rate);
+    BigDecimal recurringRate=event.getRecurringPrice() == null ? null : event.getRecurringPrice().getPrice(targetCurrency);
+    BigDecimal fixedPrice=event.getFixedPrice() == null ? null : event.getFixedPrice().getPrice(targetCurrency);
+    BigDecimal numberOfBillingPeriods;
+    BigDecimal recurringAmount=null;
+    if (recurringRate != null) {
+      numberOfBillingPeriods=calculateNumberOfBillingPeriods(event,targetDate);
+      recurringAmount=numberOfBillingPeriods.multiply(recurringRate);
+    }
     BillingMode billingMode=getBillingMode(event.getBillingMode());
     DateTime billThroughDate=billingMode.calculateEffectiveEndDate(event.getEffectiveDate(),targetDate,event.getBillCycleDay(),event.getBillingPeriod());
-    addInvoiceItem(invoiceId,items,event,billThroughDate,invoiceItemAmount,rate,targetCurrency);
+    addInvoiceItem(invoiceId,items,event,billThroughDate,recurringAmount,recurringRate,fixedPrice,targetCurrency);
   }
  catch (  CatalogApiException e) {
     log.error(String.format("Encountered a catalog error processing invoice %s for billing event on date %s",invoiceId.toString(),ISODateTimeFormat.basicDateTime().print(event.getEffectiveDate())),e);

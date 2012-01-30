@@ -2,11 +2,11 @@
   final String ownerId=UUID.randomUUID().toString();
   String notificationKey=UUID.randomUUID().toString();
   DateTime effDt=new DateTime();
-  Notification notif=new DefaultNotification(notificationKey,effDt);
+  Notification notif=new DefaultNotification("testBasic",notificationKey,effDt);
   dao.insertNotification(notif);
   Thread.sleep(1000);
   DateTime now=new DateTime();
-  List<Notification> notifications=dao.getReadyNotifications(now.toDate(),3);
+  List<Notification> notifications=dao.getReadyNotifications(now.toDate(),3,"testBasic");
   assertNotNull(notifications);
   assertEquals(notifications.size(),1);
   Notification notification=notifications.get(0);

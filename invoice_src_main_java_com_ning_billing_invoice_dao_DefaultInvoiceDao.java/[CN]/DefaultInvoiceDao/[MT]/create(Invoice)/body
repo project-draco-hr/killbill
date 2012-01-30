@@ -7,12 +7,14 @@
         List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
         InvoiceItemSqlDao invoiceItemDao=invoiceDao.become(InvoiceItemSqlDao.class);
         invoiceItemDao.create(invoiceItems);
+        notifyOfFutureBillingEvents(invoiceSqlDao,invoiceItems);
+        setChargedThroughDates(invoiceSqlDao,invoiceItems);
         List<InvoicePayment> invoicePayments=invoice.getPayments();
         InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.create(invoicePayments);
         InvoiceCreationNotification event;
         event=new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate());
-        eventBus.post(event);
+        eventBus.postFromTransaction(event,invoiceDao);
       }
       return null;
     }

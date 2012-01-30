@@ -1,16 +1,19 @@
 {
   if (this.startDate.equals(that.getStartDate()) && this.endDate.equals(that.getEndDate())) {
     this.startDate=this.endDate;
-    this.amount=this.amount.subtract(that.getAmount());
+    this.recurringAmount=safeSubtract(this.recurringAmount,that.getRecurringAmount());
+    this.fixedAmount=safeSubtract(this.fixedAmount,that.getFixedAmount());
   }
  else {
     if (this.startDate.equals(that.getStartDate())) {
       this.startDate=that.getEndDate();
-      this.amount=this.amount.subtract(that.getAmount());
+      this.recurringAmount=safeSubtract(this.recurringAmount,that.getRecurringAmount());
+      this.fixedAmount=safeSubtract(this.fixedAmount,that.getFixedAmount());
     }
     if (this.endDate.equals(that.getEndDate())) {
       this.endDate=that.getStartDate();
-      this.amount=this.amount.subtract(that.getAmount());
+      this.recurringAmount=safeSubtract(this.recurringAmount,that.getRecurringAmount());
+      this.fixedAmount=safeSubtract(this.fixedAmount,that.getFixedAmount());
     }
   }
 }
