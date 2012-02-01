@@ -9,16 +9,16 @@
   InvoiceItemList existingItems=(InvoiceItemList)existingInvoiceItems.clone();
   Collections.sort(currentItems);
   Collections.sort(existingItems);
-  List<InvoiceItem> existingItemsToRemove=new ArrayList<InvoiceItem>();
   for (  final InvoiceItem currentItem : currentItems) {
-    for (    final InvoiceItem existingItem : existingItems) {
+    Iterator<InvoiceItem> it=existingItems.iterator();
+    while (it.hasNext()) {
+      InvoiceItem existingItem=it.next();
       if (currentItem.duplicates(existingItem)) {
         currentItem.subtract(existingItem);
-        existingItemsToRemove.add(existingItem);
+        it.remove();
       }
     }
   }
-  existingItems.removeAll(existingItemsToRemove);
   existingItems.removeCancellingPairs();
   for (  final InvoiceItem existingItem : existingItems) {
     currentItems.add(existingItem.asCredit(existingItem.getInvoiceId()));
