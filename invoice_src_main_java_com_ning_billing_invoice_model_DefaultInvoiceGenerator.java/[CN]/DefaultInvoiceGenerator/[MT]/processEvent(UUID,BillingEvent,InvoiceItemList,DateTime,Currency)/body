@@ -10,8 +10,9 @@
     }
     BillingMode billingMode=getBillingMode(event.getBillingMode());
     DateTime billThroughDate=billingMode.calculateEffectiveEndDate(event.getEffectiveDate(),targetDate,event.getBillCycleDay(),event.getBillingPeriod());
-    if (!billThroughDate.isAfter(targetDate.plusMonths(event.getBillingPeriod().getNumberOfMonths()))) {
-      addInvoiceItem(invoiceId,items,event,billThroughDate,recurringAmount,recurringRate,fixedPrice,targetCurrency);
+    if ((event.getBillingPeriod() == BillingPeriod.NO_BILLING_PERIOD) || (!billThroughDate.isAfter(targetDate.plusMonths(event.getBillingPeriod().getNumberOfMonths())))) {
+      BigDecimal effectiveFixedPrice=items.hasInvoiceItemForPhase(event.getPlanPhase().getName()) ? null : fixedPrice;
+      addInvoiceItem(invoiceId,items,event,billThroughDate,recurringAmount,recurringRate,effectiveFixedPrice,targetCurrency);
     }
   }
  catch (  CatalogApiException e) {
