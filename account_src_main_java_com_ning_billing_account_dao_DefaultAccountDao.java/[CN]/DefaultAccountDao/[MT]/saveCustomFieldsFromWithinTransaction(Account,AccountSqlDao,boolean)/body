@@ -1,12 +1,12 @@
 {
   String accountId=account.getId().toString();
   String objectType=account.getObjectName();
-  TagStoreSqlDao tagStoreDao=transactionalDao.become(TagStoreSqlDao.class);
+  FieldStoreDao fieldStoreDao=transactionalDao.become(FieldStoreDao.class);
   if (!isCreation) {
-    tagStoreDao.clear(accountId,objectType);
+    fieldStoreDao.clear(accountId,objectType);
   }
-  List<Tag> tagList=account.getTagList();
-  if (tagList != null) {
-    tagStoreDao.save(accountId,objectType,tagList);
+  List<CustomField> fieldList=account.getFieldList();
+  if (fieldList != null) {
+    fieldStoreDao.save(accountId,objectType,fieldList);
   }
 }

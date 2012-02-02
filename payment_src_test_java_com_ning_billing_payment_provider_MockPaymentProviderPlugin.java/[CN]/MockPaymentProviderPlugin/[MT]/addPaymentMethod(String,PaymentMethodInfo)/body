@@ -1,0 +1,24 @@
+{
+  if (paymentMethod != null) {
+    String paymentMethodId=RandomStringUtils.random(10);
+    PaymentMethodInfo realPaymentMethod=null;
+    if (paymentMethod instanceof PaypalPaymentMethodInfo) {
+      PaypalPaymentMethodInfo paypalPaymentMethod=(PaypalPaymentMethodInfo)paymentMethod;
+      realPaymentMethod=new PaypalPaymentMethodInfo.Builder(paypalPaymentMethod).setId(paymentMethodId).build();
+    }
+ else     if (paymentMethod instanceof CreditCardPaymentMethodInfo) {
+      CreditCardPaymentMethodInfo ccPaymentMethod=(CreditCardPaymentMethodInfo)paymentMethod;
+      realPaymentMethod=new CreditCardPaymentMethodInfo.Builder(ccPaymentMethod).setId(paymentMethodId).build();
+    }
+    if (realPaymentMethod == null) {
+      return Either.left(new PaymentError("unsupported","Payment method " + paymentMethod.getType() + " not supported by the plugin"));
+    }
+ else {
+      paymentMethods.put(paymentMethodId,paymentMethod);
+      return Either.right(paymentMethodId);
+    }
+  }
+ else {
+    return Either.left(new PaymentError("unknown","Could not create add payment method " + paymentMethod + " for "+ accountKey));
+  }
+}
