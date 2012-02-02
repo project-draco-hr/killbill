@@ -1,0 +1,21 @@
+{
+  final Handle h=dbi.open();
+  final MySqlGlobalLockerDao dao=h.attach(MySqlGlobalLockerDao.class);
+  final boolean obtained=dao.lock(lockName,timeout);
+  if (obtained) {
+    return new GlobalLock(){
+      public void release(){
+        try {
+          dao.releaseLock(lockName);
+        }
+  finally {
+          h.close();
+        }
+      }
+    }
+;
+  }
+ else {
+    return null;
+  }
+}

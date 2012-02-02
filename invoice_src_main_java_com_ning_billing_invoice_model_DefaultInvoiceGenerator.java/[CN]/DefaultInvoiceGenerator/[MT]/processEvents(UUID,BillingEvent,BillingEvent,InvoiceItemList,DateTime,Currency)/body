@@ -14,8 +14,10 @@
       BillingMode billingMode=getBillingMode(firstEvent.getBillingMode());
       billThroughDate=billingMode.calculateEffectiveEndDate(firstEvent.getEffectiveDate(),secondEvent.getEffectiveDate(),targetDate,firstEvent.getBillCycleDay(),firstEvent.getBillingPeriod());
     }
-    BigDecimal effectiveFixedPrice=items.hasInvoiceItemForPhase(firstEvent.getPlanPhase().getName()) ? null : fixedPrice;
-    addInvoiceItem(invoiceId,items,firstEvent,billThroughDate,recurringAmount,recurringRate,effectiveFixedPrice,targetCurrency);
+    if (Days.daysBetween(firstEvent.getEffectiveDate(),billThroughDate).getDays() > 0) {
+      BigDecimal effectiveFixedPrice=items.hasInvoiceItemForPhase(firstEvent.getPlanPhase().getName()) ? null : fixedPrice;
+      addInvoiceItem(invoiceId,items,firstEvent,billThroughDate,recurringAmount,recurringRate,effectiveFixedPrice,targetCurrency);
+    }
   }
  catch (  CatalogApiException e) {
     log.error(String.format("Encountered a catalog error processing invoice %s for billing event on date %s",invoiceId.toString(),ISODateTimeFormat.basicDateTime().print(firstEvent.getEffectiveDate())),e);

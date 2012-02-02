@@ -1,5 +1,5 @@
 {
-  long DELAY=5000;
+  long DELAY=5000 * 10;
   Account account=accountUserApi.createAccount(getAccountData(),null,null);
   assertNotNull(account);
   SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever");
@@ -19,7 +19,6 @@
   String newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   String newProductName="Assault-Rifle";
   subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
-  Thread.sleep(600000);
   assertTrue(busHandler.isCompleted(DELAY));
   log.info("testSimple passed second busHandler checkpoint.");
   DateTime ctd=checkAndGetCTD(subscription.getId());

@@ -7,8 +7,11 @@
     BigDecimal fixedPrice=event.getFixedPrice() == null ? null : event.getFixedPrice().getPrice(targetCurrency);
     BigDecimal numberOfBillingPeriods;
     BigDecimal recurringAmount=null;
-    DateTime billThroughDate=null;
-    if (recurringRate != null) {
+    DateTime billThroughDate;
+    if (recurringRate == null) {
+      billThroughDate=event.getPlanPhase().getDuration().addToDateTime(event.getEffectiveDate());
+    }
+ else {
       numberOfBillingPeriods=calculateNumberOfBillingPeriods(event,targetDate);
       recurringAmount=numberOfBillingPeriods.multiply(recurringRate);
       BillingMode billingMode=getBillingMode(event.getBillingMode());
