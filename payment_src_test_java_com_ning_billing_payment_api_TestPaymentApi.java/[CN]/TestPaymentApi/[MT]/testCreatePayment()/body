@@ -1,5 +1,5 @@
 {
-  final DateTime now=new DateTime();
+  final DateTime now=new DateTime(DateTimeZone.UTC);
   final Account account=testHelper.createTestAccount();
   final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
   final BigDecimal amount=new BigDecimal("10.00");
@@ -10,5 +10,14 @@
   assertTrue(results.get(0).isRight());
   PaymentInfo paymentInfo=results.get(0).getRight();
   assertNotNull(paymentInfo.getPaymentId());
-  assertEquals(paymentInfo.getAmount().doubleValue(),amount.doubleValue());
+  assertTrue(paymentInfo.getAmount().compareTo(amount) == 0);
+  assertNotNull(paymentInfo.getPaymentNumber());
+  PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(paymentInfo.getPaymentId());
+  assertNotNull(paymentAttempt);
+  assertNotNull(paymentAttempt.getPaymentAttemptId());
+  assertEquals(paymentAttempt.getInvoiceId(),invoice.getId());
+  assertTrue(paymentAttempt.getAmount().compareTo(amount) == 0);
+  assertEquals(paymentAttempt.getCurrency(),Currency.USD);
+  assertEquals(paymentAttempt.getPaymentId(),paymentInfo.getPaymentId());
+  assertEquals(paymentAttempt.getPaymentAttemptDate().withMillisOfSecond(0),now.withMillisOfSecond(0));
 }
