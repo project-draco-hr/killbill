@@ -14,6 +14,9 @@
   if (!this.getCurrency().equals(that.getCurrency())) {
     return false;
   }
+  if ((this.endDate == null) && (that.getEndDate() == null) && (this.startDate.compareTo(that.getStartDate()) == 0)) {
+    return true;
+  }
   DateRange thisDateRange=new DateRange(this.getStartDate(),this.getEndDate());
-  return thisDateRange.contains(that.getStartDate()) && thisDateRange.contains(that.getEndDate());
+  return thisDateRange.contains(that.getStartDate()) && (that.getEndDate() == null || thisDateRange.contains(that.getEndDate()));
 }
