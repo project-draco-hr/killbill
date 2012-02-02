@@ -1,0 +1,28 @@
+{
+  final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
+  List<Either<PaymentError,PaymentInfo>> processedPaymentsOrErrors=new ArrayList<Either<PaymentError,PaymentInfo>>(invoiceIds.size());
+  for (  String invoiceId : invoiceIds) {
+    Invoice invoice=invoicePaymentApi.getInvoice(UUID.fromString(invoiceId));
+    if (invoice.getAmountOutstanding().compareTo(BigDecimal.ZERO) == 0) {
+      log.info("Received invoice for payment with outstanding amount of 0 {} ",invoice);
+    }
+ else     if (invoiceId.equals(paymentDao.getPaymentAttemptForInvoiceId(invoiceId))) {
+      log.info("Duplicate invoice payment event, already received invoice {} ",invoice);
+    }
+ else {
+      PaymentAttempt paymentAttempt=paymentDao.createPaymentAttempt(invoice);
+      Either<PaymentError,PaymentInfo> paymentOrError=plugin.processInvoice(account,invoice);
+      processedPaymentsOrErrors.add(paymentOrError);
+      PaymentInfo paymentInfo=null;
+      if (paymentOrError.isRight()) {
+        paymentInfo=paymentOrError.getRight();
+        paymentDao.savePaymentInfo(paymentInfo);
+        if (paymentInfo.getPaymentId() != null) {
+          paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getPaymentAttemptId(),paymentInfo.getPaymentId());
+        }
+      }
+      invoicePaymentApi.notifyOfPaymentAttempt(new InvoicePayment(invoice.getId(),paymentInfo == null ? null : paymentInfo.getAmount(),paymentInfo == null ? null : invoice.getCurrency(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate()));
+    }
+  }
+  return processedPaymentsOrErrors;
+}
