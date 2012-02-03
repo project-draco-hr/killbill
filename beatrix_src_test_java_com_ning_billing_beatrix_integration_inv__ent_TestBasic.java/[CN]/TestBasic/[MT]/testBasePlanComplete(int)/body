@@ -1,6 +1,6 @@
 {
   long DELAY=5000 * 10;
-  Account account=accountUserApi.createAccount(getAccountData(),null,null);
+  Account account=accountUserApi.createAccount(getAccountData(billingDay),null,null);
   assertNotNull(account);
   SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever");
   String productName="Shotgun";
@@ -25,6 +25,8 @@
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   clock.setDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
+  Thread.sleep(600000);
+  assertTrue(busHandler.isCompleted(DELAY));
   newTerm=BillingPeriod.MONTHLY;
   newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   newProductName="Pistol";

@@ -1,12 +1,13 @@
 {
   int lastDayOfMonth=date.dayOfMonth().getMaximumValue();
-  DateTime proposedDate;
+  MutableDateTime tmp=date.toMutableDateTime();
   if (billingCycleDay > lastDayOfMonth) {
-    proposedDate=new DateTime(date.getYear(),date.getMonthOfYear(),lastDayOfMonth,date.getHourOfDay(),date.getMinuteOfHour(),date.getSecondOfMinute(),date.getMillisOfSecond());
+    tmp.setDayOfMonth(lastDayOfMonth);
   }
  else {
-    proposedDate=new DateTime(date.getYear(),date.getMonthOfYear(),billingCycleDay,date.getHourOfDay(),date.getMinuteOfHour(),date.getSecondOfMinute(),date.getMillisOfSecond());
+    tmp.setDayOfMonth(billingCycleDay);
   }
+  DateTime proposedDate=tmp.toDateTime();
   while (proposedDate.isBefore(date)) {
     proposedDate=proposedDate.plusMonths(1);
   }
