@@ -1,9 +1,7 @@
 {
   for (  final InvoiceItem item : invoiceItems) {
-    if (item.getRecurringRate() != null) {
-      if (item.getRecurringAmount().compareTo(BigDecimal.ZERO) > 0) {
-        notifier.insertNextBillingNotification(dao,item.getSubscriptionId(),item.getEndDate());
-      }
+    if ((item.getEndDate() != null) && (item.getRecurringAmount() == null || item.getRecurringAmount().compareTo(BigDecimal.ZERO) >= 0)) {
+      notifier.insertNextBillingNotification(dao,item.getSubscriptionId(),item.getEndDate());
     }
   }
 }
