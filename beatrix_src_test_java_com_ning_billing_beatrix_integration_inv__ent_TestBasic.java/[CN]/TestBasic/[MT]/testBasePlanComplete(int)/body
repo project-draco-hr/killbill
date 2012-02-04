@@ -1,5 +1,5 @@
 {
-  long DELAY=5000 * 10;
+  long DELAY=5000;
   Account account=accountUserApi.createAccount(getAccountData(billingDay),null,null);
   assertNotNull(account);
   SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever");
@@ -25,34 +25,39 @@
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   clock.setDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
-  Thread.sleep(600000);
   assertTrue(busHandler.isCompleted(DELAY));
   newTerm=BillingPeriod.MONTHLY;
   newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   newProductName="Pistol";
+  subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
   subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
   log.info("testSimple has passed third busHandler checkpoint (no events)");
   busHandler.pushExpectedEvent(NextEvent.CHANGE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  clock.addDeltaFromReality(ctd.getMillis() - clock.getUTCNow().getMillis());
+  clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
   assertTrue(busHandler.isCompleted(DELAY));
   log.info("testSimple passed fourth busHandler checkpoint.");
   int maxCycles=3;
   DateTime lastCtd=null;
   do {
-    clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
     busHandler.pushExpectedEvent(NextEvent.INVOICE);
+    clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
     assertTrue(busHandler.isCompleted(DELAY));
     lastCtd=checkAndGetCTD(subscription.getId());
   }
  while (maxCycles-- > 0);
+  subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
   subscription.cancel(clock.getUTCNow(),false);
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
-  Interval it=new Interval(lastCtd,clock.getUTCNow());
+  Interval it=new Interval(clock.getUTCNow(),lastCtd);
   clock.addDeltaFromReality(it.toDurationMillis());
   assertTrue(busHandler.isCompleted(DELAY));
   busHandler.reset();
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
   assertTrue(busHandler.isCompleted(DELAY));
-  lastCtd=checkAndGetCTD(subscription.getId());
+  subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
+  lastCtd=subscription.getChargedThroughDate();
+  assertNotNull(lastCtd);
+  log.info("Checking CTD: " + lastCtd.toString() + "; clock is "+ clock.getUTCNow().toString());
+  assertTrue(lastCtd.isBefore(clock.getUTCNow()));
 }
