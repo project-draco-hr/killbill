@@ -1,3 +1,10 @@
 {
-  return Either.left(new PaymentError("unknown","Not implemented"));
+  Collection<PaymentMethodInfo> filteredPaymentMethods=Collections2.filter(paymentMethods.values(),new Predicate<PaymentMethodInfo>(){
+    @Override public boolean apply(    PaymentMethodInfo input){
+      return accountKey.equals(input.getAccountId());
+    }
+  }
+);
+  List<PaymentMethodInfo> result=new ArrayList<PaymentMethodInfo>(filteredPaymentMethods);
+  return Either.right(result);
 }

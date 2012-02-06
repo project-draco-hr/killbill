@@ -4,6 +4,12 @@
       cancelNextChangeEventFromTransaction(subscriptionId,dao);
       cancelNextPhaseEventFromTransaction(subscriptionId,dao);
       dao.insertEvent(cancelEvent);
+      recordFutureNotificationFromTransaction(dao,cancelEvent.getEffectiveDate(),new NotificationKey(){
+        @Override public String toString(){
+          return cancelEvent.getId().toString();
+        }
+      }
+);
       return null;
     }
   }

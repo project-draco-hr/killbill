@@ -14,8 +14,14 @@
       }
       if (existingCancelId != null) {
         dao.unactiveEvent(existingCancelId.toString(),now);
-        for (        EntitlementEvent cur : uncancelEvents) {
+        for (        final EntitlementEvent cur : uncancelEvents) {
           dao.insertEvent(cur);
+          recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new NotificationKey(){
+            @Override public String toString(){
+              return cur.getId().toString();
+            }
+          }
+);
         }
       }
       return null;

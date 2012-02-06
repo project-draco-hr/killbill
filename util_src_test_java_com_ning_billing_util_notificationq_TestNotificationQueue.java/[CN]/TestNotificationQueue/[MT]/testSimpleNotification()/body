@@ -1,0 +1,57 @@
+{
+  final Map<String,Boolean> expectedNotifications=new TreeMap<String,Boolean>();
+  final TestStartStop testStartStop=new TestStartStop(false,false);
+  DefaultNotificationQueue queue=new DefaultNotificationQueue(dbi,clock,"test-svc","foo",new NotificationQueueHandler(){
+    @Override public void handleReadyNotification(    String notificationKey){
+synchronized (expectedNotifications) {
+        expectedNotifications.put(notificationKey,Boolean.TRUE);
+        expectedNotifications.notify();
+      }
+    }
+    @Override public void completedQueueStop(){
+      testStartStop.stopped();
+    }
+    @Override public void completedQueueStart(){
+      testStartStop.started();
+    }
+  }
+,getNotificationConfig(false,100,1,10000));
+  executeTest(testStartStop,queue,new WithTest(){
+    @Override public void test(    final DefaultNotificationQueue readyQueue) throws InterruptedException {
+      final UUID key=UUID.randomUUID();
+      final DummyObject obj=new DummyObject("foo",key);
+      final DateTime now=new DateTime();
+      final DateTime readyTime=now.plusMillis(2000);
+      final NotificationKey notificationKey=new NotificationKey(){
+        @Override public String toString(){
+          return key.toString();
+        }
+      }
+;
+      expectedNotifications.put(notificationKey.toString(),Boolean.FALSE);
+      dao.inTransaction(new Transaction<Void,DummySqlTest>(){
+        @Override public Void inTransaction(        DummySqlTest transactional,        TransactionStatus status) throws Exception {
+          transactional.insertDummy(obj);
+          readyQueue.recordFutureNotificationFromTransaction(transactional,readyTime,notificationKey);
+          return null;
+        }
+      }
+);
+      ((ClockMock)clock).setDeltaFromReality(3000);
+      int nbTry=1;
+      boolean success=false;
+      do {
+synchronized (expectedNotifications) {
+          if (expectedNotifications.get(notificationKey.toString())) {
+            success=true;
+            break;
+          }
+          expectedNotifications.wait(1000);
+        }
+      }
+ while (nbTry-- > 0);
+      assertEquals(success,true);
+    }
+  }
+);
+}

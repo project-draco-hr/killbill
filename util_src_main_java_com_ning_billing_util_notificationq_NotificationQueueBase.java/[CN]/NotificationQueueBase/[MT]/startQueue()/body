@@ -1,0 +1,49 @@
+{
+  this.isProcessingEvents=true;
+  this.nbProcessedEvents=new AtomicLong();
+  if (config.isNotificationProcessingOff()) {
+    log.warn(String.format("KILLBILL NOTIFICATION PROCESSING FOR SVC %s IS OFF !!!",getFullQName()));
+    handler.completedQueueStart();
+    return;
+  }
+  final NotificationQueueBase notificationQueue=this;
+  executor.execute(new Runnable(){
+    @Override public void run(){
+      log.info(String.format("NotificationQueue thread %s [%d] started",Thread.currentThread().getName(),Thread.currentThread().getId()));
+      handler.completedQueueStart();
+      try {
+        while (true) {
+synchronized (notificationQueue) {
+            if (!isProcessingEvents) {
+              log.info(String.format("NotificationQueue has been requested to stop, thread  %s  [%d] stopping...",Thread.currentThread().getName(),Thread.currentThread().getId()));
+              notificationQueue.notify();
+              break;
+            }
+          }
+          try {
+            doProcessEvents(sequenceId.getAndIncrement());
+          }
+ catch (          Exception e) {
+            log.error(String.format("NotificationQueue thread  %s  [%d] got an exception..",Thread.currentThread().getName(),Thread.currentThread().getId()),e);
+          }
+          sleepALittle();
+        }
+      }
+ catch (      InterruptedException e) {
+        log.warn(Thread.currentThread().getName() + " got interrupted ",e);
+      }
+catch (      Throwable e) {
+        log.error(Thread.currentThread().getName() + " got an exception exiting...",e);
+        e.printStackTrace();
+      }
+ finally {
+        handler.completedQueueStop();
+        log.info(String.format("NotificationQueue thread  %s  [%d] exited...",Thread.currentThread().getName(),Thread.currentThread().getId()));
+      }
+    }
+    private void sleepALittle() throws InterruptedException {
+      Thread.sleep(config.getNotificationSleepTimeMs());
+    }
+  }
+);
+}

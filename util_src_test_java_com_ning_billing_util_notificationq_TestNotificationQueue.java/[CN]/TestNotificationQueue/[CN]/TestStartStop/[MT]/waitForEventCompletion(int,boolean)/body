@@ -1,0 +1,12 @@
+{
+  DateTime init=new DateTime();
+synchronized (this) {
+    while (!((start ? started : stopped))) {
+      wait(timeoutMs);
+      if (init.plusMillis(timeoutMs).isAfterNow()) {
+        break;
+      }
+    }
+  }
+  return (start ? started : stopped);
+}

@@ -1,0 +1,15 @@
+{
+  final Account account=testHelper.createTestAccount();
+  paymentApi.createPaymentProviderAccount(account);
+  String accountKey=account.getExternalKey();
+  PaypalPaymentMethodInfo paymentMethod=new PaypalPaymentMethodInfo.Builder().setBaid("12345").setEmail(account.getEmail()).setDefaultMethod(true).build();
+  Either<PaymentError,String> paymentMethodIdOrError=paymentApi.addPaymentMethod(accountKey,paymentMethod);
+  assertTrue(paymentMethodIdOrError.isRight());
+  assertNotNull(paymentMethodIdOrError.getRight());
+  Either<PaymentError,PaymentMethodInfo> paymentMethodInfoOrError=paymentApi.getPaymentMethod(accountKey,paymentMethodIdOrError.getRight());
+  assertTrue(paymentMethodInfoOrError.isRight());
+  assertNotNull(paymentMethodInfoOrError.getRight());
+  Either<PaymentError,PaymentProviderAccount> accountOrError=paymentApi.getPaymentProviderAccount(accountKey);
+  assertTrue(accountOrError.isRight());
+  return accountOrError.getRight();
+}

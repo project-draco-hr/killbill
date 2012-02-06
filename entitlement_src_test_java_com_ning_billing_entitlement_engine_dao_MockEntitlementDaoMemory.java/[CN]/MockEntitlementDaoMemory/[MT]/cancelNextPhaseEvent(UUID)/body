@@ -10,7 +10,7 @@ synchronized (events) {
       if (cur.getSubscriptionId() != subscriptionId) {
         continue;
       }
-      if (cur.getType() == EventType.PHASE && cur.getProcessingState() == EventLifecycleState.AVAILABLE) {
+      if (cur.getType() == EventType.PHASE && cur.getEffectiveDate().isAfter(clock.getUTCNow())) {
         cur.deactivate();
         break;
       }
