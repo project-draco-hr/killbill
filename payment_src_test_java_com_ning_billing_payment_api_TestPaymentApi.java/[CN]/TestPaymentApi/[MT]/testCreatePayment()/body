@@ -12,6 +12,7 @@
   assertNotNull(paymentInfo.getPaymentId());
   assertTrue(paymentInfo.getAmount().compareTo(amount) == 0);
   assertNotNull(paymentInfo.getPaymentNumber());
+  assertFalse(paymentInfo.getStatus().equals("Error"));
   PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(paymentInfo.getPaymentId());
   assertNotNull(paymentAttempt);
   assertNotNull(paymentAttempt.getPaymentAttemptId());
@@ -19,5 +20,5 @@
   assertTrue(paymentAttempt.getAmount().compareTo(amount) == 0);
   assertEquals(paymentAttempt.getCurrency(),Currency.USD);
   assertEquals(paymentAttempt.getPaymentId(),paymentInfo.getPaymentId());
-  assertEquals(paymentAttempt.getPaymentAttemptDate().withMillisOfSecond(0),now.withMillisOfSecond(0));
+  assertEquals(paymentAttempt.getPaymentAttemptDate().withMillisOfSecond(0).withSecondOfMinute(0),now.withMillisOfSecond(0).withSecondOfMinute(0));
 }
