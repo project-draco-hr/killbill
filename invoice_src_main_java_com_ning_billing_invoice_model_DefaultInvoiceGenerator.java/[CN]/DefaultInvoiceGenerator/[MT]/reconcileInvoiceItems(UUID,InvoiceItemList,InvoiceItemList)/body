@@ -1,25 +1,28 @@
 {
+  if ((existingInvoiceItems == null) || (existingInvoiceItems.size() == 0)) {
+    return currentInvoiceItems;
+  }
   InvoiceItemList currentItems=new InvoiceItemList();
-  for (  InvoiceItem item : currentInvoiceItems) {
+  for (  final InvoiceItem item : currentInvoiceItems) {
     currentItems.add(new DefaultInvoiceItem(item,invoiceId));
   }
   InvoiceItemList existingItems=(InvoiceItemList)existingInvoiceItems.clone();
   Collections.sort(currentItems);
   Collections.sort(existingItems);
-  List<InvoiceItem> existingItemsToRemove=new ArrayList<InvoiceItem>();
-  for (  InvoiceItem currentItem : currentItems) {
-    for (    InvoiceItem existingItem : existingItems) {
+  for (  final InvoiceItem currentItem : currentItems) {
+    Iterator<InvoiceItem> it=existingItems.iterator();
+    while (it.hasNext()) {
+      InvoiceItem existingItem=it.next();
       if (currentItem.duplicates(existingItem)) {
         currentItem.subtract(existingItem);
-        existingItemsToRemove.add(existingItem);
+        it.remove();
       }
     }
   }
-  existingItems.removeAll(existingItemsToRemove);
   existingItems.removeCancellingPairs();
-  currentItems.removeZeroDollarItems();
-  for (  InvoiceItem existingItem : existingItems) {
-    currentItems.add(existingItem.asCredit(invoiceId));
+  for (  final InvoiceItem existingItem : existingItems) {
+    currentItems.add(existingItem.asCredit(existingItem.getInvoiceId()));
   }
+  currentItems.cleanupDuplicatedItems();
   return currentItems;
 }

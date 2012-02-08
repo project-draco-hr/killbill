@@ -1,8 +1,8 @@
 {
   Catalog catalog=catalogService.getFullCatalog();
-  Plan plan=transition.getNextPlan();
+  Plan plan=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? transition.getNextPlan() : transition.getPreviousPlan();
   Product product=plan.getProduct();
-  PlanPhase phase=transition.getNextPhase();
+  PlanPhase phase=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? transition.getNextPhase() : transition.getPreviousPhase();
   BillingAlignment alignment=catalog.billingAlignment(new PlanPhaseSpecifier(product.getName(),product.getCategory(),phase.getBillingPeriod(),transition.getNextPriceList(),phase.getPhaseType()),transition.getRequestedTransitionTime());
   int result=0;
   Account account=accountApi.getAccountById(accountId);

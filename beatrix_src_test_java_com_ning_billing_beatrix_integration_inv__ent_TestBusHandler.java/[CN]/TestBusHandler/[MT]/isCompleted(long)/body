@@ -1,0 +1,17 @@
+{
+synchronized (this) {
+    if (completed) {
+      return completed;
+    }
+    try {
+      wait(timeout);
+    }
+ catch (    Exception ignore) {
+    }
+  }
+  if (!completed) {
+    Joiner joiner=Joiner.on(" ");
+    log.error("TestBusHandler did not complete in " + timeout + " ms, remaining events are "+ joiner.join(nextExpectedEvent));
+  }
+  return completed;
+}

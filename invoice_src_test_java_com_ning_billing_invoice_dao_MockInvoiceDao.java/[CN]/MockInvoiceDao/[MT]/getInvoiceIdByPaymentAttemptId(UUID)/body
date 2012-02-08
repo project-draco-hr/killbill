@@ -1,8 +1,10 @@
 {
 synchronized (monitor) {
-    for (    InvoicePayment invoicePayment : invoicePayments.values()) {
-      if (paymentAttemptId.toString().equals(invoicePayment.getPaymentAttemptId())) {
-        return invoicePayment.getInvoiceId().toString();
+    for (    Invoice invoice : invoices.values()) {
+      for (      InvoicePayment payment : invoice.getPayments()) {
+        if (paymentAttemptId.equals(payment.getPaymentAttemptId())) {
+          return invoice.getId();
+        }
       }
     }
   }

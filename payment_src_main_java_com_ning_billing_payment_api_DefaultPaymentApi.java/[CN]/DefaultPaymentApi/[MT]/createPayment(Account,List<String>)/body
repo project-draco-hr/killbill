@@ -3,7 +3,7 @@
   List<Either<PaymentError,PaymentInfo>> processedPaymentsOrErrors=new ArrayList<Either<PaymentError,PaymentInfo>>(invoiceIds.size());
   for (  String invoiceId : invoiceIds) {
     Invoice invoice=invoicePaymentApi.getInvoice(UUID.fromString(invoiceId));
-    if (invoice.getAmountOutstanding().compareTo(BigDecimal.ZERO) == 0) {
+    if (invoice.getBalance().compareTo(BigDecimal.ZERO) == 0) {
       log.info("Received invoice for payment with outstanding amount of 0 {} ",invoice);
     }
  else     if (invoiceId.equals(paymentDao.getPaymentAttemptForInvoiceId(invoiceId))) {
@@ -33,7 +33,7 @@
           paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getPaymentAttemptId(),paymentInfo.getPaymentId());
         }
       }
-      invoicePaymentApi.notifyOfPaymentAttempt(new InvoicePayment(invoice.getId(),paymentInfo == null ? null : paymentInfo.getAmount(),paymentInfo == null ? null : invoice.getCurrency(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate()));
+      invoicePaymentApi.notifyOfPaymentAttempt(new DefaultInvoicePayment(paymentAttempt.getPaymentAttemptId(),invoice.getId(),paymentAttempt.getPaymentAttemptDate(),paymentInfo == null ? null : paymentInfo.getAmount(),paymentInfo == null ? null : invoice.getCurrency()));
     }
   }
   return processedPaymentsOrErrors;

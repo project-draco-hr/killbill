@@ -1,0 +1,11 @@
+{
+  Plan plan=new MockPlan();
+  PlanPhase planPhase=createMockMonthlyPlanPhase(ZERO);
+  BillingEventSet events=new BillingEventSet();
+  DateTime targetDate=new DateTime();
+  events.add(createBillingEvent(UUID.randomUUID(),targetDate,plan,planPhase,targetDate.getDayOfMonth()));
+  InvoiceGenerator invoiceGenerator=new DefaultInvoiceGenerator();
+  Invoice invoice=invoiceGenerator.generateInvoice(UUID.randomUUID(),events,null,targetDate,Currency.USD);
+  InvoiceItem item=invoice.getInvoiceItems().get(0);
+  assertEquals(item.getEndDate().compareTo(targetDate.plusMonths(1)),0);
+}
