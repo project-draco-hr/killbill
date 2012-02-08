@@ -1,11 +1,6 @@
 {
   TestApiBase.loadSystemPropertiesFromClasspath("/entitlement.properties");
-  final Injector g=Guice.createInjector(Stage.PRODUCTION,new CatalogModule(),new AbstractModule(){
-    protected void configure(){
-      bind(Clock.class).to(DefaultClock.class).asEagerSingleton();
-    }
-  }
-);
+  final Injector g=Guice.createInjector(Stage.PRODUCTION,new CatalogModule(),new ClockModule());
   catalogService=g.getInstance(CatalogService.class);
   clock=g.getInstance(Clock.class);
   ((DefaultCatalogService)catalogService).loadCatalog();
