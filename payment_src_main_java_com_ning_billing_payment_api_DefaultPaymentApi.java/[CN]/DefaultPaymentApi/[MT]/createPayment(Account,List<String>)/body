@@ -14,6 +14,11 @@
       Either<PaymentError,PaymentInfo> paymentOrError=plugin.processInvoice(account,invoice);
       processedPaymentsOrErrors.add(paymentOrError);
       PaymentInfo paymentInfo=null;
+      if (paymentOrError.isLeft()) {
+        String error=StringUtils.substring(paymentOrError.getLeft().getMessage() + paymentOrError.getLeft().getType(),0,100);
+        log.info("Could not process a payment for " + paymentAttempt + " error was "+ error);
+        addRetry(paymentAttempt.getPaymentAttemptId(),error);
+      }
       if (paymentOrError.isRight()) {
         paymentInfo=paymentOrError.getRight();
         paymentDao.savePaymentInfo(paymentInfo);
