@@ -1,0 +1,13 @@
+{
+  final String lockName=getLockName(service,lockKey);
+  final Handle h=dbi.open();
+  try {
+    final MySqlGlobalLockerDao dao=h.attach(MySqlGlobalLockerDao.class);
+    return dao.isFree(lockName);
+  }
+  finally {
+    if (h != null) {
+      h.close();
+    }
+  }
+}
