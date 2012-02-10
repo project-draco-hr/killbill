@@ -1,0 +1,22 @@
+{
+  int dayOfMonth=startDate.getDayOfMonth();
+  int maxDayOfMonth=startDate.dayOfMonth().getMaximumValue();
+  DateTime nextBillingDate;
+  if ((billCycleDay > maxDayOfMonth) || (dayOfMonth == billCycleDay)) {
+    nextBillingDate=startDate.plusMonths(billingPeriod.getNumberOfMonths());
+  }
+ else {
+    MutableDateTime proposedDate=startDate.toMutableDateTime();
+    if (dayOfMonth < billCycleDay) {
+      int effectiveBillCycleDay=(billCycleDay > maxDayOfMonth) ? maxDayOfMonth : billCycleDay;
+      nextBillingDate=proposedDate.dayOfMonth().set(effectiveBillCycleDay).toDateTime();
+    }
+ else {
+      proposedDate=proposedDate.monthOfYear().add(1);
+      maxDayOfMonth=proposedDate.dayOfMonth().getMaximumValue();
+      int effectiveBillCycleDay=(billCycleDay > maxDayOfMonth) ? maxDayOfMonth : billCycleDay;
+      nextBillingDate=proposedDate.dayOfMonth().set(effectiveBillCycleDay).toDateTime();
+    }
+  }
+  return nextBillingDate.isAfter(nextEndDate) ? nextEndDate : nextBillingDate;
+}

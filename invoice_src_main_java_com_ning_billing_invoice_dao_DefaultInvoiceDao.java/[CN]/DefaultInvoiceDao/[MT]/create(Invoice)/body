@@ -5,8 +5,8 @@
       if (currentInvoice == null) {
         invoiceDao.create(invoice);
         List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
-        InvoiceItemSqlDao invoiceItemDao=invoiceDao.become(InvoiceItemSqlDao.class);
-        invoiceItemDao.create(invoiceItems);
+        RecurringInvoiceItemSqlDao recurringInvoiceItemDao=invoiceDao.become(RecurringInvoiceItemSqlDao.class);
+        recurringInvoiceItemDao.create(invoiceItems);
         notifyOfFutureBillingEvents(invoiceSqlDao,invoiceItems);
         setChargedThroughDates(invoiceSqlDao,invoiceItems);
         List<InvoicePayment> invoicePayments=invoice.getPayments();

@@ -1,0 +1,12 @@
+{
+  List<InvoiceItem> items=new ArrayList<InvoiceItem>();
+  for (int i=0; i < events.size(); i++) {
+    BillingEvent thisEvent=events.get(i);
+    BillingEvent nextEvent=events.isLast(thisEvent) ? null : events.get(i + 1);
+    if (nextEvent != null) {
+      nextEvent=(thisEvent.getSubscription().getId() == nextEvent.getSubscription().getId()) ? nextEvent : null;
+    }
+    items.addAll(processEvents(invoiceId,thisEvent,nextEvent,targetDate,currency));
+  }
+  return items;
+}

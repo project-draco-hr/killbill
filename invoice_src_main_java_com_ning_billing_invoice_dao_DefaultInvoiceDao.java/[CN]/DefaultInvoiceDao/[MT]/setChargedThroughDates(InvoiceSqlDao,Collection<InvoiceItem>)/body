@@ -1,8 +1,11 @@
 {
   for (  InvoiceItem item : invoiceItems) {
-    if ((item.getEndDate() != null) && (item.getRecurringAmount() == null || item.getRecurringAmount().compareTo(BigDecimal.ZERO) >= 0)) {
-      log.info("Setting CTD for invoice item {} to {}",item.getId().toString(),item.getEndDate().toString());
-      entitlementBillingApi.setChargedThroughDateFromTransaction(dao,item.getSubscriptionId(),item.getEndDate());
+    if (item instanceof RecurringInvoiceItem) {
+      RecurringInvoiceItem recurringInvoiceItem=(RecurringInvoiceItem)item;
+      if ((recurringInvoiceItem.getEndDate() != null) && (recurringInvoiceItem.getAmount() == null || recurringInvoiceItem.getAmount().compareTo(BigDecimal.ZERO) >= 0)) {
+        log.info("Setting CTD for invoice item {} to {}",recurringInvoiceItem.getId().toString(),recurringInvoiceItem.getEndDate().toString());
+        entitlementBillingApi.setChargedThroughDateFromTransaction(dao,recurringInvoiceItem.getSubscriptionId(),recurringInvoiceItem.getEndDate());
+      }
     }
   }
 }
