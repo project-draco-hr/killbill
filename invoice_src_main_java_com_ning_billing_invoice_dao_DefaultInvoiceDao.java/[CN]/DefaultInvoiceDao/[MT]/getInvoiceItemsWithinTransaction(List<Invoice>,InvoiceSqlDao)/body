@@ -1,7 +1,5 @@
 {
-  RecurringInvoiceItemSqlDao recurringInvoiceItemDao=invoiceDao.become(RecurringInvoiceItemSqlDao.class);
   for (  final Invoice invoice : invoices) {
-    List<InvoiceItem> invoiceItems=recurringInvoiceItemDao.getInvoiceItemsByInvoice(invoice.getId().toString());
-    invoice.addInvoiceItems(invoiceItems);
+    getInvoiceItemsWithinTransaction(invoice,invoiceDao);
   }
 }

@@ -1,21 +1,32 @@
 {
   if (paymentMethod != null) {
-    String paymentMethodId=RandomStringUtils.random(10);
-    PaymentMethodInfo realPaymentMethod=null;
-    if (paymentMethod instanceof PaypalPaymentMethodInfo) {
-      PaypalPaymentMethodInfo paypalPaymentMethod=(PaypalPaymentMethodInfo)paymentMethod;
-      realPaymentMethod=new PaypalPaymentMethodInfo.Builder(paypalPaymentMethod).setId(paymentMethodId).build();
-    }
- else     if (paymentMethod instanceof CreditCardPaymentMethodInfo) {
-      CreditCardPaymentMethodInfo ccPaymentMethod=(CreditCardPaymentMethodInfo)paymentMethod;
-      realPaymentMethod=new CreditCardPaymentMethodInfo.Builder(ccPaymentMethod).setId(paymentMethodId).build();
-    }
-    if (realPaymentMethod == null) {
-      return Either.left(new PaymentError("unsupported","Payment method " + paymentMethod.getType() + " not supported by the plugin"));
+    PaymentProviderAccount account=accounts.get(accountKey);
+    if (account != null && account.getId() != null) {
+      String existingDefaultMethod=account.getDefaultPaymentMethodId();
+      String paymentMethodId=RandomStringUtils.randomAlphanumeric(10);
+      boolean shouldBeDefault=Boolean.TRUE.equals(paymentMethod.getDefaultMethod()) || existingDefaultMethod == null;
+      PaymentMethodInfo realPaymentMethod=null;
+      if (paymentMethod instanceof PaypalPaymentMethodInfo) {
+        PaypalPaymentMethodInfo paypalPaymentMethod=(PaypalPaymentMethodInfo)paymentMethod;
+        realPaymentMethod=new PaypalPaymentMethodInfo.Builder(paypalPaymentMethod).setId(paymentMethodId).setAccountId(accountKey).setDefaultMethod(shouldBeDefault).setBaid(paypalPaymentMethod.getBaid()).setEmail(paypalPaymentMethod.getEmail()).build();
+      }
+ else       if (paymentMethod instanceof CreditCardPaymentMethodInfo) {
+        CreditCardPaymentMethodInfo ccPaymentMethod=(CreditCardPaymentMethodInfo)paymentMethod;
+        realPaymentMethod=new CreditCardPaymentMethodInfo.Builder(ccPaymentMethod).setId(paymentMethodId).build();
+      }
+      if (realPaymentMethod == null) {
+        return Either.left(new PaymentError("unsupported","Payment method " + paymentMethod.getType() + " not supported by the plugin"));
+      }
+ else {
+        if (shouldBeDefault) {
+          setDefaultPaymentMethodOnAccount(account,paymentMethodId);
+        }
+        paymentMethods.put(paymentMethodId,realPaymentMethod);
+        return Either.right(paymentMethodId);
+      }
     }
  else {
-      paymentMethods.put(paymentMethodId,paymentMethod);
-      return Either.right(paymentMethodId);
+      return Either.left(new PaymentError("noaccount","Could not retrieve account for accountKey " + accountKey));
     }
   }
  else {

@@ -1,0 +1,19 @@
+{
+  final Account account=testHelper.createTestPayPalAccount();
+  paymentApi.createPaymentProviderAccount(account);
+  String accountKey=account.getExternalKey();
+  PaypalPaymentMethodInfo paymentMethod1=new PaypalPaymentMethodInfo.Builder().setDefaultMethod(false).setBaid("12345").setEmail(account.getEmail()).build();
+  Either<PaymentError,String> paymentMethodIdOrError1=paymentApi.addPaymentMethod(accountKey,paymentMethod1);
+  assertTrue(paymentMethodIdOrError1.isRight());
+  assertNotNull(paymentMethodIdOrError1.getRight());
+  PaypalPaymentMethodInfo paymentMethod2=new PaypalPaymentMethodInfo.Builder().setDefaultMethod(true).setBaid("12345").setEmail(account.getEmail()).build();
+  Either<PaymentError,String> paymentMethodIdOrError2=paymentApi.addPaymentMethod(accountKey,paymentMethod2);
+  assertTrue(paymentMethodIdOrError2.isRight());
+  assertNotNull(paymentMethodIdOrError2.getRight());
+  Either<PaymentError,List<PaymentMethodInfo>> paymentMethodsOrError=paymentApi.getPaymentMethods(accountKey);
+  assertTrue(paymentMethodsOrError.isRight());
+  Either<PaymentError,Void> errorOrVoid1=paymentApi.deletePaymentMethod(accountKey,paymentMethodIdOrError1.getRight());
+  Either<PaymentError,Void> errorOrVoid2=paymentApi.deletePaymentMethod(accountKey,paymentMethodIdOrError2.getRight());
+  assertTrue(errorOrVoid1.isRight());
+  assertTrue(errorOrVoid2.isLeft());
+}

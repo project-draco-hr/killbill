@@ -4,14 +4,17 @@
       Invoice currentInvoice=invoiceDao.getById(invoice.getId().toString());
       if (currentInvoice == null) {
         invoiceDao.create(invoice);
-        List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
+        List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         RecurringInvoiceItemSqlDao recurringInvoiceItemDao=invoiceDao.become(RecurringInvoiceItemSqlDao.class);
-        recurringInvoiceItemDao.create(invoiceItems);
-        notifyOfFutureBillingEvents(invoiceSqlDao,invoiceItems);
-        setChargedThroughDates(invoiceSqlDao,invoiceItems);
+        recurringInvoiceItemDao.batchCreateFromTransaction(recurringInvoiceItems);
+        notifyOfFutureBillingEvents(invoiceSqlDao,recurringInvoiceItems);
+        setChargedThroughDates(invoiceSqlDao,recurringInvoiceItems);
+        List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
+        FixedPriceInvoiceItemSqlDao fixedPriceInvoiceItemDao=invoiceDao.become(FixedPriceInvoiceItemSqlDao.class);
+        fixedPriceInvoiceItemDao.batchCreateFromTransaction(fixedPriceInvoiceItems);
         List<InvoicePayment> invoicePayments=invoice.getPayments();
         InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
-        invoicePaymentSqlDao.create(invoicePayments);
+        invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments);
         InvoiceCreationNotification event;
         event=new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate());
         eventBus.postFromTransaction(event,invoiceDao);

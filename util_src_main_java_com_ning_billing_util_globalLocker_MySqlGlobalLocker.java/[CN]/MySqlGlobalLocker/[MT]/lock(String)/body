@@ -4,12 +4,14 @@
   final boolean obtained=dao.lock(lockName,timeout);
   if (obtained) {
     return new GlobalLock(){
-      public void release(){
+      @Override public void release(){
         try {
           dao.releaseLock(lockName);
         }
   finally {
-          h.close();
+          if (h != null) {
+            h.close();
+          }
         }
       }
     }
