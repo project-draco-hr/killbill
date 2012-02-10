@@ -1,23 +1,18 @@
 {
   final Date now=clock.getUTCNow().toDate();
   final Date nextAvailable=clock.getUTCNow().plus(config.getDaoClaimTimeMs()).toDate();
-  log.debug(String.format("NotificationQueue %s getEventsReady START effectiveNow =  %s",getFullQName(),now));
-  List<Notification> input=dao.inTransaction(new Transaction<List<Notification>,NotificationSqlDao>(){
-    @Override public List<Notification> inTransaction(    NotificationSqlDao transactionalDao,    TransactionStatus status) throws Exception {
-      return transactionalDao.getReadyNotifications(now,config.getDaoMaxReadyEvents(),getFullQName());
-    }
-  }
-);
+  List<Notification> input=dao.getReadyNotifications(now,config.getDaoMaxReadyEvents(),getFullQName());
   List<Notification> claimedNotifications=new ArrayList<Notification>();
   for (  Notification cur : input) {
-    final boolean claimed=(dao.claimNotification(hostname,nextAvailable,cur.getId().toString(),now) == 1);
+    logDebug("about to claim notification %s,  key = %s for time %s",cur.getUUID(),cur.getNotificationKey(),cur.getEffectiveDate());
+    final boolean claimed=(dao.claimNotification(hostname,nextAvailable,cur.getId(),now) == 1);
+    logDebug("claimed notification %s, key = %s for time %s result = %s",cur.getUUID(),cur.getNotificationKey(),cur.getEffectiveDate(),Boolean.valueOf(claimed));
     if (claimed) {
       claimedNotifications.add(cur);
-      dao.insertClaimedHistory(seqId,hostname,now,cur.getId().toString());
+      dao.insertClaimedHistory(seqId,hostname,now,cur.getUUID().toString());
     }
   }
   for (  Notification cur : claimedNotifications) {
-    log.debug(String.format("NotificationQueue %s claimed events %s",getFullQName(),cur.getId()));
     if (cur.getOwner() != null && !cur.getOwner().equals(hostname)) {
       log.warn(String.format("NotificationQueue %s stealing notification %s from %s",getFullQName(),cur,cur.getOwner()));
     }
