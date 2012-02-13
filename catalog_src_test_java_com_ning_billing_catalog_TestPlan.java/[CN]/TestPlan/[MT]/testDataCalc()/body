@@ -1,0 +1,24 @@
+{
+  DefaultPlan p0=new MockPlan(){
+    public PlanPhase[] getAllPhases(){
+      return new PlanPhase[]{new MyPlanPhase(10,true),new MyPlanPhase(10,false)};
+    }
+  }
+;
+  DefaultPlan p1=new MockPlan(){
+    public PlanPhase[] getAllPhases(){
+      return new PlanPhase[]{new MyPlanPhase(10,true),new MyPlanPhase(10,true),new MyPlanPhase(10,true),new MyPlanPhase(10,true),new MyPlanPhase(10,false),new MyPlanPhase(10,true)};
+    }
+  }
+;
+  DefaultPlan p2=new MockPlan(){
+    public PlanPhase[] getAllPhases(){
+      return new PlanPhase[]{new MyPlanPhase(10,false),new MyPlanPhase(10,true)};
+    }
+  }
+;
+  DateTime requestedDate=new DateTime();
+  Assert.assertEquals(p0.dateOfFirstRecurringNonZeroCharge(requestedDate),requestedDate.plusDays(10));
+  Assert.assertEquals(p1.dateOfFirstRecurringNonZeroCharge(requestedDate),requestedDate.plusDays(40));
+  Assert.assertEquals(p2.dateOfFirstRecurringNonZeroCharge(requestedDate),requestedDate.plusDays(0));
+}
