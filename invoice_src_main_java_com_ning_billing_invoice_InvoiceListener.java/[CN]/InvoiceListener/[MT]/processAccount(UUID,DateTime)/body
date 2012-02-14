@@ -1,0 +1,15 @@
+{
+  GlobalLock lock=null;
+  try {
+    lock=locker.lockWithNumberOfTries(LockerService.INVOICE,accountId.toString(),NB_LOCK_TRY);
+    processAccountWithLock(accountId,targetDate);
+  }
+ catch (  LockFailedException e) {
+    log.error(String.format("Failed to process invoice for account %s, targetDate %s",accountId.toString(),targetDate),e);
+  }
+ finally {
+    if (lock != null) {
+      lock.release();
+    }
+  }
+}
