@@ -1,0 +1,23 @@
+{
+  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscriptionId);
+  List<InvoiceItem> invoiceItems=invoiceUserApi.getInvoiceItemsByAccount(accountId);
+  Iterator<InvoiceItem> invoiceItemIterator=invoiceItems.iterator();
+  while (invoiceItemIterator.hasNext()) {
+    InvoiceItem item=invoiceItemIterator.next();
+    for (    InvoiceItemData data : expectedResult.getItems()) {
+      if (item.getStartDate().compareTo(data.getStartDate()) == 0) {
+        if (item.getEndDate().compareTo(data.getEndDate()) == 0) {
+          if (item.getAmount().compareTo(data.getAmount()) == 0) {
+            invoiceItemIterator.remove();
+          }
+        }
+      }
+    }
+  }
+  assertEquals(invoiceItems.size(),0);
+  DateTime ctd=subscription.getChargedThroughDate();
+  assertNotNull(ctd);
+  log.info("Checking CTD: " + ctd.toString() + "; clock is "+ clock.getUTCNow().toString());
+  assertTrue(clock.getUTCNow().isBefore(ctd));
+  assertTrue(ctd.compareTo(expectedResult.getChargeThroughDate()) == 0);
+}
