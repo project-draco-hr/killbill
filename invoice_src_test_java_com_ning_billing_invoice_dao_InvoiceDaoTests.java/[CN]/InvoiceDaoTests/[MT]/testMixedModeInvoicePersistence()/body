@@ -15,7 +15,7 @@
   DateTime effectiveDate2=effectiveDate1.plusDays(30);
   BillingEvent event2=new DefaultBillingEvent(subscription,effectiveDate2,plan,phase2,null,recurringPrice,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent2",SubscriptionTransitionType.CHANGE);
   events.add(event2);
-  InvoiceGenerator generator=new DefaultInvoiceGenerator();
+  InvoiceGenerator generator=new DefaultInvoiceGenerator(clock);
   Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,effectiveDate2,Currency.USD);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
