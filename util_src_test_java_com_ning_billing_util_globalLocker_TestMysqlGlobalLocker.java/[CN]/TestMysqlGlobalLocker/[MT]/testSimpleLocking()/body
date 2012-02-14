@@ -1,0 +1,23 @@
+{
+  final String lockName=UUID.randomUUID().toString();
+  GlobalLocker locker=new MySqlGlobalLocker(dbi);
+  GlobalLock lock=locker.lockWithNumberOfTries(LockerService.INVOICE,lockName,3);
+  dbi.inTransaction(new TransactionCallback<Void>(){
+    @Override public Void inTransaction(    Handle conn,    TransactionStatus status) throws Exception {
+      conn.execute("insert into dummy (dummy_id) values ('" + UUID.randomUUID().toString() + "')");
+      return null;
+    }
+  }
+);
+  Assert.assertEquals(locker.isFree(LockerService.INVOICE,lockName),Boolean.FALSE);
+  boolean gotException=false;
+  try {
+    locker.lockWithNumberOfTries(LockerService.INVOICE,lockName,1);
+  }
+ catch (  LockFailedException e) {
+    gotException=true;
+  }
+  Assert.assertTrue(gotException);
+  lock.release();
+  Assert.assertEquals(locker.isFree(LockerService.INVOICE,lockName),Boolean.TRUE);
+}

@@ -3,14 +3,14 @@
   this.nbProcessedEvents=new AtomicLong();
   if (config.isNotificationProcessingOff()) {
     log.warn(String.format("KILLBILL NOTIFICATION PROCESSING FOR SVC %s IS OFF !!!",getFullQName()));
-    handler.completedQueueStart();
+    completedQueueStart();
     return;
   }
   final NotificationQueueBase notificationQueue=this;
   executor.execute(new Runnable(){
     @Override public void run(){
       log.info(String.format("NotificationQueue thread %s [%d] started",Thread.currentThread().getName(),Thread.currentThread().getId()));
-      handler.completedQueueStart();
+      completedQueueStart();
       try {
         while (true) {
 synchronized (notificationQueue) {
@@ -37,7 +37,7 @@ catch (      Throwable e) {
         e.printStackTrace();
       }
  finally {
-        handler.completedQueueStop();
+        completedQueueStop();
         log.info(String.format("NotificationQueue thread  %s  [%d] exited...",Thread.currentThread().getName(),Thread.currentThread().getId()));
       }
     }
@@ -46,4 +46,5 @@ catch (      Throwable e) {
     }
   }
 );
+  waitForNotificationStartCompletion();
 }

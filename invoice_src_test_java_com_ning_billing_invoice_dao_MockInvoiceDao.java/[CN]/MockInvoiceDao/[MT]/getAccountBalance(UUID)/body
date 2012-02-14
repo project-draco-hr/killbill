@@ -1,8 +1,9 @@
 {
-  List<Invoice> invoices=getInvoicesByAccount(accountId.toString());
-  BigDecimal result=BigDecimal.ZERO;
-  for (  Invoice invoice : invoices) {
-    result=result.add(invoice.getAmountOutstanding());
+  BigDecimal balance=BigDecimal.ZERO;
+  for (  Invoice invoice : get()) {
+    if (accountId.equals(invoice.getAccountId())) {
+      balance=balance.add(invoice.getBalance());
+    }
   }
-  return result;
+  return balance;
 }

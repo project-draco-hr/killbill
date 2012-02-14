@@ -1,12 +1,9 @@
 {
-  return invoiceDao.inTransaction(new Transaction<List<Invoice>,InvoiceSqlDao>(){
+  return invoiceSqlDao.inTransaction(new Transaction<List<Invoice>,InvoiceSqlDao>(){
     @Override public List<Invoice> inTransaction(    final InvoiceSqlDao invoiceDao,    final TransactionStatus status) throws Exception {
       List<Invoice> invoices=invoiceDao.get();
-      InvoiceItemSqlDao invoiceItemDao=invoiceDao.become(InvoiceItemSqlDao.class);
-      for (      Invoice invoice : invoices) {
-        List<InvoiceItem> invoiceItems=invoiceItemDao.getInvoiceItemsByInvoice(invoice.getId().toString());
-        invoice.add(invoiceItems);
-      }
+      getInvoiceItemsWithinTransaction(invoices,invoiceDao);
+      getInvoicePaymentsWithinTransaction(invoices,invoiceDao);
       return invoices;
     }
   }
