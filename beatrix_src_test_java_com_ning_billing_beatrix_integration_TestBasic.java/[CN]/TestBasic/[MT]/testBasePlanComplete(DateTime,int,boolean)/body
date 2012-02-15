@@ -1,5 +1,5 @@
 {
-  long DELAY=5000 * 10;
+  long DELAY=5000;
   Account account=accountUserApi.createAccount(getAccountData(billingDay),null,null);
   UUID accountId=account.getId();
   assertNotNull(account);
@@ -27,7 +27,7 @@
   assertTrue(busHandler.isCompleted(DELAY));
   log.info("testSimple passed second busHandler checkpoint.");
   startDate=subscription.getCurrentPhaseStart();
-  endDate=startDate.plusMonths(1);
+  endDate=startDate.plusDays(30);
   price=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
   verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
@@ -39,6 +39,14 @@
   }
   clock.setDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
+  startDate=subscription.getCurrentPhaseStart();
+  int numberOfDaysToProRate=billingDay - startDate.dayOfMonth().get();
+  DateTime firstEndDate=startDate.plusDays(numberOfDaysToProRate);
+  DateTime secondEndDate=firstEndDate.plusMonths(1);
+  BigDecimal rate=subscription.getCurrentPhase().getRecurringPrice().getPrice(Currency.USD);
+  price=rate.multiply(new BigDecimal(numberOfDaysToProRate).setScale(4)).setScale(4).divide(new BigDecimal("29.0000"),6);
+  verifyTestResult(accountId,subscription.getId(),startDate,firstEndDate,price,secondEndDate);
+  verifyTestResult(accountId,subscription.getId(),firstEndDate,secondEndDate,rate,secondEndDate);
   newTerm=BillingPeriod.MONTHLY;
   newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   newProductName="Pistol";
@@ -51,14 +59,18 @@
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
   assertTrue(busHandler.isCompleted(DELAY));
   log.info("testSimple passed fourth busHandler checkpoint.");
+  startDate=secondEndDate;
+  endDate=secondEndDate.plusMonths(1);
+  price=subscription.getCurrentPhase().getRecurringPrice().getPrice(Currency.USD);
+  verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
   int maxCycles=3;
-  startDate=endDate;
-  endDate=startDate.plusMonths(1);
   do {
     busHandler.pushExpectedEvent(NextEvent.INVOICE);
     busHandler.pushExpectedEvent(NextEvent.PAYMENT);
     clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
     assertTrue(busHandler.isCompleted(DELAY));
+    startDate=endDate;
+    endDate=startDate.plusMonths(1);
     verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
   }
  while (maxCycles-- > 0);
