@@ -1,7 +1,9 @@
 {
-  long DELAY=5000;
+  long DELAY=5000 * 10;
   Account account=accountUserApi.createAccount(getAccountData(billingDay),null,null);
+  UUID accountId=account.getId();
   assertNotNull(account);
+  clock.setDeltaFromReality(initialCreationDate.getMillis() - DateTime.now().getMillis());
   SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever");
   String productName="Shotgun";
   BillingPeriod term=BillingPeriod.MONTHLY;
@@ -12,7 +14,10 @@
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
   log.info("testSimple passed first busHandler checkpoint.");
-  checkAndGetCTD(subscription.getId());
+  DateTime startDate=subscription.getCurrentPhaseStart();
+  DateTime endDate=startDate.plusDays(30);
+  BigDecimal price=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
+  verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
   busHandler.pushExpectedEvent(NextEvent.CHANGE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   BillingPeriod newTerm=BillingPeriod.MONTHLY;
@@ -21,11 +26,14 @@
   subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
   assertTrue(busHandler.isCompleted(DELAY));
   log.info("testSimple passed second busHandler checkpoint.");
-  DateTime ctd=checkAndGetCTD(subscription.getId());
+  startDate=subscription.getCurrentPhaseStart();
+  endDate=startDate.plusMonths(1);
+  price=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
+  verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
-  if (prorationExpected) {
+  if (proRationExpected) {
     busHandler.pushExpectedEvent(NextEvent.INVOICE);
     busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   }
@@ -44,29 +52,30 @@
   assertTrue(busHandler.isCompleted(DELAY));
   log.info("testSimple passed fourth busHandler checkpoint.");
   int maxCycles=3;
-  DateTime lastCtd=null;
+  startDate=endDate;
+  endDate=startDate.plusMonths(1);
   do {
     busHandler.pushExpectedEvent(NextEvent.INVOICE);
     busHandler.pushExpectedEvent(NextEvent.PAYMENT);
     clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
     assertTrue(busHandler.isCompleted(DELAY));
-    lastCtd=checkAndGetCTD(subscription.getId());
+    verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
   }
  while (maxCycles-- > 0);
   subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
   subscription.cancel(clock.getUTCNow(),false);
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
-  Interval it=new Interval(clock.getUTCNow(),lastCtd);
+  Interval it=new Interval(clock.getUTCNow(),endDate);
   clock.addDeltaFromReality(it.toDurationMillis());
   assertTrue(busHandler.isCompleted(DELAY));
   busHandler.reset();
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
   assertTrue(busHandler.isCompleted(DELAY));
   subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
-  lastCtd=subscription.getChargedThroughDate();
+  DateTime lastCtd=subscription.getChargedThroughDate();
   assertNotNull(lastCtd);
   log.info("Checking CTD: " + lastCtd.toString() + "; clock is "+ clock.getUTCNow().toString());
   assertTrue(lastCtd.isBefore(clock.getUTCNow()));
-  Thread.sleep(3000);
+  Thread.sleep(DELAY);
   log.info("TEST PASSED !");
 }
