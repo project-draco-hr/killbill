@@ -25,6 +25,10 @@
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+  if (prorationExpected) {
+    busHandler.pushExpectedEvent(NextEvent.INVOICE);
+    busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+  }
   clock.setDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
   newTerm=BillingPeriod.MONTHLY;
@@ -63,4 +67,6 @@
   assertNotNull(lastCtd);
   log.info("Checking CTD: " + lastCtd.toString() + "; clock is "+ clock.getUTCNow().toString());
   assertTrue(lastCtd.isBefore(clock.getUTCNow()));
+  Thread.sleep(3000);
+  log.info("TEST PASSED !");
 }
