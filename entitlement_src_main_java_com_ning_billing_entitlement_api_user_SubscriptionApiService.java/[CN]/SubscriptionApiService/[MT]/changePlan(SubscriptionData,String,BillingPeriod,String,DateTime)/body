@@ -2,9 +2,7 @@
   try {
     DateTime now=clock.getUTCNow();
     requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : now;
-    if (requestedDate != null && requestedDate.isAfter(now)) {
-      throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
-    }
+    validateRequestedDateOnChangeOrCancel(subscription,now,requestedDate);
     String currentPriceList=subscription.getCurrentPriceList();
     SubscriptionState currentState=subscription.getState();
     if (currentState != SubscriptionState.ACTIVE) {
@@ -27,7 +25,7 @@
     ActionPolicy policy=planChangeResult.getPolicy();
     PriceList newPriceList=planChangeResult.getNewPriceList();
     Plan newPlan=catalogService.getFullCatalog().findPlan(productName,term,newPriceList.getName(),requestedDate);
-    DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy,now);
+    DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy,requestedDate);
     TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(subscription,newPlan,newPriceList.getName(),requestedDate,effectiveDate);
     EntitlementEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList.getName()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
     TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(subscription,newPlan,newPriceList.getName(),requestedDate,effectiveDate);

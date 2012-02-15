@@ -3,12 +3,8 @@
     @Override public Invoice inTransaction(    final InvoiceSqlDao invoiceDao,    final TransactionStatus status) throws Exception {
       Invoice invoice=invoiceDao.getById(invoiceId.toString());
       if (invoice != null) {
-        InvoiceItemSqlDao invoiceItemDao=invoiceDao.become(InvoiceItemSqlDao.class);
-        List<InvoiceItem> invoiceItems=invoiceItemDao.getInvoiceItemsByInvoice(invoiceId.toString());
-        invoice.addInvoiceItems(invoiceItems);
-        InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
-        List<InvoicePayment> invoicePayments=invoicePaymentSqlDao.getPaymentsForInvoice(invoiceId.toString());
-        invoice.addPayments(invoicePayments);
+        getInvoiceItemsWithinTransaction(invoice,invoiceDao);
+        getInvoicePaymentsWithinTransaction(invoice,invoiceDao);
       }
       return invoice;
     }

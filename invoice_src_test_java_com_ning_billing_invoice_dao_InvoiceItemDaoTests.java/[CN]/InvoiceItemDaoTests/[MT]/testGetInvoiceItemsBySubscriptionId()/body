@@ -4,9 +4,9 @@
   BigDecimal rate=new BigDecimal("20.00");
   for (int i=0; i < 3; i++) {
     UUID invoiceId=UUID.randomUUID();
-    DefaultInvoiceItem item=new DefaultInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate.plusMonths(i),startDate.plusMonths(i + 1),rate,rate,null,Currency.USD);
-    invoiceItemDao.create(item);
+    RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate.plusMonths(i),startDate.plusMonths(i + 1),rate,rate,Currency.USD);
+    recurringInvoiceItemDao.create(item);
   }
-  List<InvoiceItem> items=invoiceItemDao.getInvoiceItemsBySubscription(subscriptionId.toString());
+  List<InvoiceItem> items=recurringInvoiceItemDao.getInvoiceItemsBySubscription(subscriptionId.toString());
   assertEquals(items.size(),3);
 }

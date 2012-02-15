@@ -1,0 +1,19 @@
+{
+  List<UUID> itemsToRemove=new ArrayList<UUID>();
+  for (  InvoiceItem item1 : items) {
+    if (item1 instanceof RecurringInvoiceItem) {
+      RecurringInvoiceItem recurringInvoiceItem=(RecurringInvoiceItem)item1;
+      if (recurringInvoiceItem.reversesItem()) {
+        itemsToRemove.add(recurringInvoiceItem.getId());
+        itemsToRemove.add(recurringInvoiceItem.getReversedItemId());
+      }
+    }
+  }
+  Iterator<InvoiceItem> iterator=items.iterator();
+  while (iterator.hasNext()) {
+    InvoiceItem item=iterator.next();
+    if (itemsToRemove.contains(item.getId())) {
+      iterator.remove();
+    }
+  }
+}
