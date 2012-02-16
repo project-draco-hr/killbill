@@ -17,7 +17,8 @@
   DateTime startDate=subscription.getCurrentPhaseStart();
   DateTime endDate=startDate.plusDays(30);
   BigDecimal rate=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
-  verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate);
+  int invoiceItemCount=1;
+  verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate,invoiceItemCount);
   busHandler.pushExpectedEvent(NextEvent.CHANGE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   BillingPeriod newTerm=BillingPeriod.MONTHLY;
@@ -27,7 +28,8 @@
   assertTrue(busHandler.isCompleted(DELAY));
   startDate=subscription.getCurrentPhaseStart();
   endDate=startDate.plusDays(30);
-  verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate);
+  invoiceItemCount=2;
+  verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate,invoiceItemCount);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
@@ -45,24 +47,28 @@ switch (billingDay) {
 case 1:
     price=THIRTY.divide(THIRTY_ONE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD).multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
   chargeThroughDate=startDate.plusMonths(1).toMutableDateTime().dayOfMonth().set(billingDay).toDateTime();
-verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,price,chargeThroughDate);
+invoiceItemCount+=1;
+verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,price,chargeThroughDate,invoiceItemCount);
 break;
 case 2:
-chargeThroughDate=startDate.plusMonths(1);
 price=rate;
-verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,price,chargeThroughDate);
+chargeThroughDate=startDate.plusMonths(1);
+invoiceItemCount+=1;
+verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,price,chargeThroughDate,invoiceItemCount);
 break;
 case 3:
+price=ONE.divide(TWENTY_NINE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD).multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
 DateTime firstEndDate=startDate.plusDays(1);
 chargeThroughDate=firstEndDate.plusMonths(1);
-price=ONE.divide(TWENTY_NINE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD).multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
-verifyTestResult(accountId,subscription.getId(),startDate,firstEndDate,price,chargeThroughDate);
-verifyTestResult(accountId,subscription.getId(),firstEndDate,chargeThroughDate,rate,chargeThroughDate);
+invoiceItemCount+=2;
+verifyTestResult(accountId,subscription.getId(),startDate,firstEndDate,price,chargeThroughDate,invoiceItemCount);
+verifyTestResult(accountId,subscription.getId(),firstEndDate,chargeThroughDate,rate,chargeThroughDate,invoiceItemCount);
 break;
 case 31:
 chargeThroughDate=startDate.toMutableDateTime().dayOfMonth().set(31).toDateTime();
 price=TWENTY_NINE.divide(THIRTY_ONE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD).multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
-verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,price,chargeThroughDate);
+invoiceItemCount+=1;
+verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,price,chargeThroughDate,invoiceItemCount);
 break;
 default :
 throw new UnsupportedOperationException();
@@ -80,7 +86,8 @@ assertTrue(busHandler.isCompleted(DELAY));
 startDate=chargeThroughDate;
 endDate=chargeThroughDate.plusMonths(1);
 price=subscription.getCurrentPhase().getRecurringPrice().getPrice(Currency.USD);
-verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
+invoiceItemCount+=1;
+verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate,invoiceItemCount);
 int maxCycles=3;
 do {
 busHandler.pushExpectedEvent(NextEvent.INVOICE);
@@ -94,7 +101,8 @@ int maximumDay=endDate.dayOfMonth().getMaximumValue();
 int newDay=(maximumDay < billingDay) ? maximumDay : billingDay;
 endDate=endDate.toMutableDateTime().dayOfMonth().set(newDay).toDateTime();
 }
-verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
+invoiceItemCount+=1;
+verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate,invoiceItemCount);
 }
  while (maxCycles-- > 0);
 subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
