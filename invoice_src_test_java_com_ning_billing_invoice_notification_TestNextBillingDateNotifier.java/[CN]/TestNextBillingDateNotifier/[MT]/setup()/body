@@ -22,6 +22,7 @@
   dao=dbi.onDemand(DummySqlTest.class);
   eventBus=g.getInstance(Bus.class);
   helper=g.getInstance(MysqlTestingHelper.class);
-  notifier=new DefaultNextBillingDateNotifier(g.getInstance(NotificationQueueService.class),g.getInstance(InvoiceConfig.class),new MockEntitlementDao(),listener);
+  notificationQueueService=g.getInstance(NotificationQueueService.class);
+  notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),new MockEntitlementDao(),listener);
   startMysql();
 }
