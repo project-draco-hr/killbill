@@ -3,13 +3,13 @@
   DateTime notionalDate=new DateTime();
   UUID accountId=UUID.randomUUID();
   DateTime targetDate=new DateTime(2011,10,6,0,0,0,0);
-  Invoice invoice=new DefaultInvoice(accountId,targetDate,Currency.USD);
+  Invoice invoice=new DefaultInvoice(accountId,targetDate,Currency.USD,clock);
   UUID invoiceId=invoice.getId();
   UUID subscriptionId=UUID.randomUUID();
   DateTime endDate=targetDate.plusMonths(3);
   BigDecimal rate=new BigDecimal("9.0");
   BigDecimal amount=rate.multiply(new BigDecimal("3.0"));
-  DefaultInvoiceItem item=new DefaultInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",targetDate,endDate,amount,rate,null,Currency.USD);
+  RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",targetDate,endDate,amount,rate,Currency.USD);
   invoice.addInvoiceItem(item);
   invoiceDao.create(invoice);
   int count;

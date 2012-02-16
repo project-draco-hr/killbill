@@ -4,17 +4,17 @@
       return billCycleDate;
     }
     int numberOfMonthsInPeriod=billingPeriod.getNumberOfMonths();
-    DateTime startOfPeriod=billCycleDate;
-    DateTime startOfNextPeriod=billCycleDate.plusMonths(numberOfMonthsInPeriod);
-    while (isNotBetween(targetDate,startOfPeriod,startOfNextPeriod)) {
-      startOfPeriod=startOfNextPeriod;
-      startOfNextPeriod=startOfPeriod.plusMonths(numberOfMonthsInPeriod);
+    int numberOfPeriods=0;
+    DateTime proposedDate=billCycleDate;
+    while (!proposedDate.isAfter(targetDate)) {
+      proposedDate=billCycleDate.plusMonths(numberOfPeriods * numberOfMonthsInPeriod);
+      numberOfPeriods+=1;
     }
-    if (endDate.isBefore(startOfNextPeriod)) {
+    if (endDate.isBefore(proposedDate)) {
       return endDate;
     }
  else {
-      return startOfNextPeriod;
+      return proposedDate;
     }
   }
  else {
