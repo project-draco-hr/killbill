@@ -1,5 +1,6 @@
 {
-  long DELAY=5000;
+  long DELAY=2000;
+  log.info("Beginning test with BCD of " + billingDay);
   Account account=accountUserApi.createAccount(getAccountData(billingDay),null,null);
   UUID accountId=account.getId();
   assertNotNull(account);
@@ -13,11 +14,10 @@
   SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null);
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
-  log.info("testSimple passed first busHandler checkpoint.");
   DateTime startDate=subscription.getCurrentPhaseStart();
   DateTime endDate=startDate.plusDays(30);
-  BigDecimal price=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
-  verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
+  BigDecimal rate=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
+  verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate);
   busHandler.pushExpectedEvent(NextEvent.CHANGE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   BillingPeriod newTerm=BillingPeriod.MONTHLY;
@@ -25,11 +25,9 @@
   String newProductName="Assault-Rifle";
   subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
   assertTrue(busHandler.isCompleted(DELAY));
-  log.info("testSimple passed second busHandler checkpoint.");
   startDate=subscription.getCurrentPhaseStart();
   endDate=startDate.plusDays(30);
-  price=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
-  verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
+  verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
@@ -40,54 +38,79 @@
   clock.setDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
   startDate=subscription.getCurrentPhaseStart();
-  int numberOfDaysToProRate=billingDay - startDate.dayOfMonth().get();
-  DateTime firstEndDate=startDate.plusDays(numberOfDaysToProRate);
-  DateTime secondEndDate=firstEndDate.plusMonths(1);
-  BigDecimal rate=subscription.getCurrentPhase().getRecurringPrice().getPrice(Currency.USD);
-  price=rate.multiply(new BigDecimal(numberOfDaysToProRate).setScale(4)).setScale(4).divide(new BigDecimal("29.0000"),6);
-  verifyTestResult(accountId,subscription.getId(),startDate,firstEndDate,price,secondEndDate);
-  verifyTestResult(accountId,subscription.getId(),firstEndDate,secondEndDate,rate,secondEndDate);
-  newTerm=BillingPeriod.MONTHLY;
-  newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-  newProductName="Pistol";
-  subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
-  subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
-  log.info("testSimple has passed third busHandler checkpoint (no events)");
-  busHandler.pushExpectedEvent(NextEvent.CHANGE);
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  busHandler.pushExpectedEvent(NextEvent.PAYMENT);
-  clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
-  assertTrue(busHandler.isCompleted(DELAY));
-  log.info("testSimple passed fourth busHandler checkpoint.");
-  startDate=secondEndDate;
-  endDate=secondEndDate.plusMonths(1);
-  price=subscription.getCurrentPhase().getRecurringPrice().getPrice(Currency.USD);
-  verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
-  int maxCycles=3;
-  do {
-    busHandler.pushExpectedEvent(NextEvent.INVOICE);
-    busHandler.pushExpectedEvent(NextEvent.PAYMENT);
-    clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
-    assertTrue(busHandler.isCompleted(DELAY));
-    startDate=endDate;
-    endDate=startDate.plusMonths(1);
-    verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
-  }
+  rate=subscription.getCurrentPhase().getRecurringPrice().getPrice(Currency.USD);
+  BigDecimal price;
+  DateTime chargeThroughDate;
+switch (billingDay) {
+case 1:
+    price=THIRTY.divide(THIRTY_ONE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD).multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
+  chargeThroughDate=startDate.plusMonths(1).toMutableDateTime().dayOfMonth().set(billingDay).toDateTime();
+verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,price,chargeThroughDate);
+break;
+case 2:
+chargeThroughDate=startDate.plusMonths(1);
+price=rate;
+verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,price,chargeThroughDate);
+break;
+case 3:
+DateTime firstEndDate=startDate.plusDays(1);
+chargeThroughDate=firstEndDate.plusMonths(1);
+price=ONE.divide(TWENTY_NINE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD).multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
+verifyTestResult(accountId,subscription.getId(),startDate,firstEndDate,price,chargeThroughDate);
+verifyTestResult(accountId,subscription.getId(),firstEndDate,chargeThroughDate,rate,chargeThroughDate);
+break;
+case 31:
+chargeThroughDate=startDate.toMutableDateTime().dayOfMonth().set(31).toDateTime();
+price=TWENTY_NINE.divide(THIRTY_ONE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD).multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
+verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,price,chargeThroughDate);
+break;
+default :
+throw new UnsupportedOperationException();
+}
+newTerm=BillingPeriod.MONTHLY;
+newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+newProductName="Pistol";
+subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
+subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
+busHandler.pushExpectedEvent(NextEvent.CHANGE);
+busHandler.pushExpectedEvent(NextEvent.INVOICE);
+busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
+assertTrue(busHandler.isCompleted(DELAY));
+startDate=chargeThroughDate;
+endDate=chargeThroughDate.plusMonths(1);
+price=subscription.getCurrentPhase().getRecurringPrice().getPrice(Currency.USD);
+verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
+int maxCycles=3;
+do {
+busHandler.pushExpectedEvent(NextEvent.INVOICE);
+busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
+assertTrue(busHandler.isCompleted(DELAY));
+startDate=endDate;
+endDate=startDate.plusMonths(1);
+if (endDate.dayOfMonth().get() != billingDay) {
+int maximumDay=endDate.dayOfMonth().getMaximumValue();
+int newDay=(maximumDay < billingDay) ? maximumDay : billingDay;
+endDate=endDate.toMutableDateTime().dayOfMonth().set(newDay).toDateTime();
+}
+verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate);
+}
  while (maxCycles-- > 0);
-  subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
-  subscription.cancel(clock.getUTCNow(),false);
-  busHandler.pushExpectedEvent(NextEvent.CANCEL);
-  Interval it=new Interval(clock.getUTCNow(),endDate);
-  clock.addDeltaFromReality(it.toDurationMillis());
-  assertTrue(busHandler.isCompleted(DELAY));
-  busHandler.reset();
-  clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
-  assertTrue(busHandler.isCompleted(DELAY));
-  subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
-  DateTime lastCtd=subscription.getChargedThroughDate();
-  assertNotNull(lastCtd);
-  log.info("Checking CTD: " + lastCtd.toString() + "; clock is "+ clock.getUTCNow().toString());
-  assertTrue(lastCtd.isBefore(clock.getUTCNow()));
-  Thread.sleep(DELAY);
-  log.info("TEST PASSED !");
+subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
+subscription.cancel(clock.getUTCNow(),false);
+busHandler.pushExpectedEvent(NextEvent.CANCEL);
+Interval it=new Interval(clock.getUTCNow(),endDate);
+clock.addDeltaFromReality(it.toDurationMillis());
+assertTrue(busHandler.isCompleted(DELAY));
+busHandler.reset();
+clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
+assertTrue(busHandler.isCompleted(DELAY));
+subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
+DateTime lastCtd=subscription.getChargedThroughDate();
+assertNotNull(lastCtd);
+log.info("Checking CTD: " + lastCtd.toString() + "; clock is "+ clock.getUTCNow().toString());
+assertTrue(lastCtd.isBefore(clock.getUTCNow()));
+Thread.sleep(DELAY);
+log.info("TEST PASSED !");
 }
