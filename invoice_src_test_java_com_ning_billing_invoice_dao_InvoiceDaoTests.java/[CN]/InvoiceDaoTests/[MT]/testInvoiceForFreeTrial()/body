@@ -9,8 +9,8 @@
   BillingEventSet events=new BillingEventSet();
   events.add(event);
   DateTime targetDate=buildDateTime(2011,1,15);
-  InvoiceGenerator generator=new DefaultInvoiceGenerator();
+  InvoiceGenerator generator=new DefaultInvoiceGenerator(clock);
   Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,targetDate,Currency.USD);
-  assertEquals(invoice.getNumberOfItems(),1);
+  assertEquals(invoice.getNumberOfItems(),2);
   assertEquals(invoice.getTotalAmount().compareTo(ZERO),0);
 }

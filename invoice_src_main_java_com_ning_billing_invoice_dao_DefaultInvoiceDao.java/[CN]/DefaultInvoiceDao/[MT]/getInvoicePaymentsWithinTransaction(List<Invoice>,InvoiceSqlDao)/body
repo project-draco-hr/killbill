@@ -1,8 +1,5 @@
 {
-  InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
-  for (  final Invoice invoice : invoices) {
-    String invoiceId=invoice.getId().toString();
-    List<InvoicePayment> invoicePayments=invoicePaymentSqlDao.getPaymentsForInvoice(invoiceId);
-    invoice.addPayments(invoicePayments);
+  for (  Invoice invoice : invoices) {
+    getInvoicePaymentsWithinTransaction(invoice,invoiceDao);
   }
 }

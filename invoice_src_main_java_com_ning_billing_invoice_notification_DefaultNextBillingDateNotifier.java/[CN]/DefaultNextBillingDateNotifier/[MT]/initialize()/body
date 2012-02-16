@@ -1,8 +1,7 @@
 {
   try {
     nextBillingQueue=notificationQueueService.createNotificationQueue(DefaultInvoiceService.INVOICE_SERVICE_NAME,NEXT_BILLING_DATE_NOTIFIER_QUEUE,new NotificationQueueHandler(){
-      @Override public void handleReadyNotification(      String notificationKey){
-        UUID subscriptionId;
+      @Override public void handleReadyNotification(      String notificationKey,      DateTime eventDate){
         try {
           UUID key=UUID.fromString(notificationKey);
           Subscription subscription=entitlementDao.getSubscriptionFromId(key);
@@ -10,7 +9,7 @@
             log.warn("Next Billing Date Notification Queue handled spurious notification (key: " + key + ")");
           }
  else {
-            processEvent(key);
+            processEvent(key,eventDate);
           }
         }
  catch (        IllegalArgumentException e) {
