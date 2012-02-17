@@ -1,14 +1,7 @@
 {
-  String key=data.getExternalKey();
-  Account existingAccount=dao.getAccountByKey(key);
-  if (existingAccount == null) {
-    Account account=new DefaultAccount(data);
-    account.addFields(fields);
-    account.addTags(tags);
-    dao.create(account);
-    return account;
-  }
- else {
-    throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,key);
-  }
+  Account account=new DefaultAccount(data,clock.getUTCNow());
+  account.addFields(fields);
+  account.addTags(tags);
+  dao.create(account);
+  return account;
 }

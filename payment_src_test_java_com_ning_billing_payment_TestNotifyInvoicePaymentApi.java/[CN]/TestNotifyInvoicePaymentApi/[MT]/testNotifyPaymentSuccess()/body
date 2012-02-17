@@ -1,0 +1,8 @@
+{
+  final Account account=testHelper.createTestCreditCardAccount();
+  final Invoice invoice=testHelper.createTestInvoice(account);
+  PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice);
+  invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),invoice.getBalance(),invoice.getCurrency(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate());
+  InvoicePayment invoicePayment=invoicePaymentApi.getInvoicePayment(paymentAttempt.getPaymentAttemptId());
+  assertNotNull(invoicePayment);
+}

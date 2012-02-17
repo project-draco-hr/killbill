@@ -1,17 +1,28 @@
 {
-  final String accountId=account.getId().toString();
-  final String objectType=DefaultAccount.OBJECT_TYPE;
-  accountDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
-    @Override public Void inTransaction(    AccountSqlDao accountSqlDao,    TransactionStatus status) throws Exception {
-      accountSqlDao.create(account);
-      FieldStoreDao fieldStoreDao=accountSqlDao.become(FieldStoreDao.class);
-      fieldStoreDao.save(accountId,objectType,account.getFieldList());
-      TagStoreDao tagStoreDao=accountSqlDao.become(TagStoreDao.class);
-      tagStoreDao.save(accountId,objectType,account.getTagList());
-      AccountCreationNotification creationEvent=new DefaultAccountCreationEvent(account);
-      eventBus.post(creationEvent);
-      return null;
+  final String key=account.getExternalKey();
+  try {
+    accountSqlDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
+      @Override public Void inTransaction(      final AccountSqlDao transactionalDao,      final TransactionStatus status) throws AccountApiException, Bus.EventBusException {
+        Account currentAccount=transactionalDao.getAccountByKey(key);
+        if (currentAccount != null) {
+          throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,key);
+        }
+        transactionalDao.create(account);
+        saveTagsFromWithinTransaction(account,transactionalDao,true);
+        saveCustomFieldsFromWithinTransaction(account,transactionalDao,true);
+        AccountCreationNotification creationEvent=new DefaultAccountCreationEvent(account);
+        eventBus.post(creationEvent);
+        return null;
+      }
+    }
+);
+  }
+ catch (  RuntimeException re) {
+    if (re.getCause() instanceof AccountApiException) {
+      throw (AccountApiException)re.getCause();
+    }
+ else {
+      throw re;
     }
   }
-);
 }

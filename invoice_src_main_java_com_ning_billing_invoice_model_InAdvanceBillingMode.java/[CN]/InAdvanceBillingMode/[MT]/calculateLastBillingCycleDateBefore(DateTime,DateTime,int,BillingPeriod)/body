@@ -1,20 +1,18 @@
 {
   DateTime proposedDate=previousBillCycleDate;
-  proposedDate=proposedDate.plusMonths(billingPeriod.getNumberOfMonths());
-  if (!proposedDate.isBefore(date)) {
-    return previousBillCycleDate;
-  }
-  while (proposedDate.isBefore(date)) {
-    proposedDate=proposedDate.plusMonths(billingPeriod.getNumberOfMonths());
+  int numberOfPeriods=0;
+  while (!proposedDate.isAfter(date)) {
+    proposedDate=previousBillCycleDate.plusMonths(numberOfPeriods * billingPeriod.getNumberOfMonths());
+    numberOfPeriods+=1;
   }
   proposedDate=proposedDate.plusMonths(-billingPeriod.getNumberOfMonths());
   if (proposedDate.dayOfMonth().get() < billingCycleDay) {
     int lastDayOfTheMonth=proposedDate.dayOfMonth().getMaximumValue();
     if (lastDayOfTheMonth < billingCycleDay) {
-      return buildDate(proposedDate.getYear(),proposedDate.getMonthOfYear(),lastDayOfTheMonth);
+      return new MutableDateTime(proposedDate).dayOfMonth().set(lastDayOfTheMonth).toDateTime();
     }
  else {
-      return buildDate(proposedDate.getYear(),proposedDate.getMonthOfYear(),billingCycleDay);
+      return new MutableDateTime(proposedDate).dayOfMonth().set(billingCycleDay).toDateTime();
     }
   }
  else {

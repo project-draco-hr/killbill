@@ -1,13 +1,8 @@
 {
-  return accountDao.inTransaction(new Transaction<Account,AccountSqlDao>(){
-    @Override public Account inTransaction(    AccountSqlDao accountSqlDao,    TransactionStatus status) throws Exception {
-      Account account=accountSqlDao.getById(id);
-      if (account != null) {
-        setCustomFieldsFromWithinTransaction(account,accountSqlDao);
-        setTagsFromWithinTransaction(account,accountSqlDao);
-      }
-      return account;
-    }
+  Account account=accountSqlDao.getById(id);
+  if (account != null) {
+    setCustomFieldsFromWithinTransaction(account,accountSqlDao);
+    setTagsFromWithinTransaction(account,accountSqlDao);
   }
-);
+  return account;
 }

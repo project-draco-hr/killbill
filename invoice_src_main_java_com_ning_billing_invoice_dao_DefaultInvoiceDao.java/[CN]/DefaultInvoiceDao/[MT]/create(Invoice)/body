@@ -1,15 +1,23 @@
 {
-  invoiceDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
+  invoiceSqlDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
     @Override public Void inTransaction(    final InvoiceSqlDao invoiceDao,    final TransactionStatus status) throws Exception {
       Invoice currentInvoice=invoiceDao.getById(invoice.getId().toString());
       if (currentInvoice == null) {
         invoiceDao.create(invoice);
-        List<InvoiceItem> invoiceItems=invoice.getItems();
-        InvoiceItemSqlDao invoiceItemDao=invoiceDao.become(InvoiceItemSqlDao.class);
-        invoiceItemDao.create(invoiceItems);
+        List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
+        RecurringInvoiceItemSqlDao recurringInvoiceItemDao=invoiceDao.become(RecurringInvoiceItemSqlDao.class);
+        recurringInvoiceItemDao.batchCreateFromTransaction(recurringInvoiceItems);
+        notifyOfFutureBillingEvents(invoiceSqlDao,recurringInvoiceItems);
+        List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
+        FixedPriceInvoiceItemSqlDao fixedPriceInvoiceItemDao=invoiceDao.become(FixedPriceInvoiceItemSqlDao.class);
+        fixedPriceInvoiceItemDao.batchCreateFromTransaction(fixedPriceInvoiceItems);
+        setChargedThroughDates(invoiceSqlDao,fixedPriceInvoiceItems,recurringInvoiceItems);
+        List<InvoicePayment> invoicePayments=invoice.getPayments();
+        InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
+        invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments);
         InvoiceCreationNotification event;
-        event=new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getAmountOutstanding(),invoice.getCurrency(),invoice.getInvoiceDate());
-        eventBus.post(event);
+        event=new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate());
+        eventBus.postFromTransaction(event,invoiceDao);
       }
       return null;
     }

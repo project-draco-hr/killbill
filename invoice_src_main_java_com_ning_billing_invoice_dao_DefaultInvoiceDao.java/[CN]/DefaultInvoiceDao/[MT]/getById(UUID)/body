@@ -1,0 +1,13 @@
+{
+  return invoiceSqlDao.inTransaction(new Transaction<Invoice,InvoiceSqlDao>(){
+    @Override public Invoice inTransaction(    final InvoiceSqlDao invoiceDao,    final TransactionStatus status) throws Exception {
+      Invoice invoice=invoiceDao.getById(invoiceId.toString());
+      if (invoice != null) {
+        getInvoiceItemsWithinTransaction(invoice,invoiceDao);
+        getInvoicePaymentsWithinTransaction(invoice,invoiceDao);
+      }
+      return invoice;
+    }
+  }
+);
+}

@@ -1,0 +1,12 @@
+{
+  String accountId=account.getId().toString();
+  String objectType=account.getObjectName();
+  FieldStoreDao fieldStoreDao=transactionalDao.become(FieldStoreDao.class);
+  if (!isCreation) {
+    fieldStoreDao.clear(accountId,objectType);
+  }
+  List<CustomField> fieldList=account.getFieldList();
+  if (fieldList != null) {
+    fieldStoreDao.batchSaveFromTransaction(accountId,objectType,fieldList);
+  }
+}

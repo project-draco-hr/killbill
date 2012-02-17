@@ -1,0 +1,29 @@
+{
+  final Account account=testHelper.createTestCreditCardAccount();
+  testHelper.createTestInvoice(account);
+  await().atMost(1,MINUTES).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      List<PaymentInfo> processedPayments=paymentInfoReceiver.getProcessedPayments();
+      List<PaymentError> errors=paymentInfoReceiver.getErrors();
+      return processedPayments.size() == 1 || errors.size() == 1;
+    }
+  }
+);
+  assertFalse(paymentInfoReceiver.getProcessedPayments().isEmpty());
+  assertTrue(paymentInfoReceiver.getErrors().isEmpty());
+  final PaymentInfo paymentInfo=paymentInfoReceiver.getProcessedPayments().get(0);
+  final PaymentInfoRequest paymentInfoRequest=new PaymentInfoRequest(account.getId(),paymentInfo.getPaymentId());
+  paymentInfoReceiver.clear();
+  eventBus.post(paymentInfoRequest);
+  await().atMost(5,MINUTES).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      List<PaymentInfo> processedPayments=paymentInfoReceiver.getProcessedPayments();
+      List<PaymentError> errors=paymentInfoReceiver.getErrors();
+      return processedPayments.size() == 1 || errors.size() == 1;
+    }
+  }
+);
+  assertFalse(paymentInfoReceiver.getProcessedPayments().isEmpty());
+  assertTrue(paymentInfoReceiver.getErrors().isEmpty());
+  assertEquals(paymentInfoReceiver.getProcessedPayments().get(0),paymentInfo);
+}

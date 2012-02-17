@@ -1,0 +1,25 @@
+{
+  Plan plan1=new MockPlan();
+  BigDecimal fixedCost1=TEN;
+  BigDecimal fixedCost2=TWENTY;
+  PlanPhase phase1=createMockMonthlyPlanPhase(null,fixedCost1,PhaseType.TRIAL);
+  PlanPhase phase2=createMockMonthlyPlanPhase(null,fixedCost2,PhaseType.EVERGREEN);
+  BillingEventSet events=new BillingEventSet();
+  UUID subscriptionId=UUID.randomUUID();
+  UUID accountId=UUID.randomUUID();
+  DateTime startDate=new DateTime(2011,1,1,3,40,27,0);
+  BillingEvent event1=createBillingEvent(subscriptionId,startDate,plan1,phase1,1);
+  events.add(event1);
+  Invoice invoice1=generator.generateInvoice(accountId,events,null,startDate,Currency.USD);
+  assertNotNull(invoice1);
+  assertEquals(invoice1.getNumberOfItems(),1);
+  assertEquals(invoice1.getTotalAmount(),fixedCost1);
+  List<InvoiceItem> existingItems=invoice1.getInvoiceItems();
+  DateTime phaseChangeDate=startDate.plusMonths(1);
+  BillingEvent event2=createBillingEvent(subscriptionId,phaseChangeDate,plan1,phase2,1);
+  events.add(event2);
+  Invoice invoice2=generator.generateInvoice(accountId,events,existingItems,phaseChangeDate,Currency.USD);
+  assertNotNull(invoice2);
+  assertEquals(invoice2.getNumberOfItems(),1);
+  assertEquals(invoice2.getTotalAmount(),fixedCost2);
+}

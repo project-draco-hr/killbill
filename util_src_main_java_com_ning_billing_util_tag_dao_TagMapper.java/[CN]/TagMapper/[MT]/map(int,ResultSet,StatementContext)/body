@@ -1,0 +1,20 @@
+{
+  String name=result.getString("tag_definition_name");
+  UUID id=UUID.fromString(result.getString("id"));
+  String addedBy=result.getString("added_by");
+  DateTime addedDate=new DateTime(result.getTimestamp("added_date"));
+  Tag tag;
+  try {
+    ControlTagType controlTagType=ControlTagType.valueOf(name);
+    tag=new DefaultControlTag(id,addedBy,addedDate,controlTagType);
+  }
+ catch (  Throwable t) {
+    String description=result.getString("tag_description");
+    String createdBy=result.getString("created_by");
+    DateTime creationDate=new DateTime(result.getDate("creation_date"));
+    UUID tagDefinitionId=UUID.fromString(result.getString("tag_definition_id"));
+    TagDefinition tagDefinition=new DefaultTagDefinition(tagDefinitionId,name,description,createdBy,creationDate);
+    tag=new DescriptiveTag(id,tagDefinition,addedBy,addedDate);
+  }
+  return tag;
+}

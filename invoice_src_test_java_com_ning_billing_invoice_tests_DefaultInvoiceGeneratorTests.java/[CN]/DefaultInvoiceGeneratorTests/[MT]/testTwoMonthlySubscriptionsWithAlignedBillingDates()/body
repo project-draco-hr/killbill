@@ -1,14 +1,15 @@
 {
   BillingEventSet events=new BillingEventSet();
-  MockCatalog catalog=new MockCatalog();
-  Plan plan1=catalog.getCurrentPlans()[0];
-  PlanPhase phase1=plan1.getAllPhases()[0];
-  Plan plan2=catalog.getCurrentPlans()[1];
-  PlanPhase phase2=plan2.getAllPhases()[0];
+  Plan plan1=new MockPlan();
+  BigDecimal rate1=FIVE;
+  PlanPhase phase1=createMockMonthlyPlanPhase(rate1);
+  Plan plan2=new MockPlan();
+  BigDecimal rate2=TEN;
+  PlanPhase phase2=createMockMonthlyPlanPhase(rate2);
   Subscription sub=new SubscriptionData(new SubscriptionBuilder().setId(UUID.randomUUID()));
-  BillingEvent event1=new DefaultBillingEvent(sub,buildDateTime(2011,9,1),plan1,phase1,new InternationalPriceMock(ZERO),new InternationalPriceMock(FIVE),BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"Test");
+  BillingEvent event1=createBillingEvent(sub.getId(),buildDateTime(2011,9,1),plan1,phase1,1);
   events.add(event1);
-  BillingEvent event2=new DefaultBillingEvent(sub,buildDateTime(2011,10,1),plan2,phase2,new InternationalPriceMock(ZERO),new InternationalPriceMock(TEN),BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"Test");
+  BillingEvent event2=createBillingEvent(sub.getId(),buildDateTime(2011,10,1),plan2,phase2,1);
   events.add(event2);
   InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,10,3);
@@ -16,5 +17,5 @@
   Invoice invoice=generator.generateInvoice(accountId,events,existingInvoiceItems,targetDate,Currency.USD);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
-  assertEquals(invoice.getTotalAmount(),FIVE.multiply(TWO).add(TEN).setScale(NUMBER_OF_DECIMALS));
+  assertEquals(invoice.getTotalAmount(),rate1.add(rate2).setScale(NUMBER_OF_DECIMALS));
 }

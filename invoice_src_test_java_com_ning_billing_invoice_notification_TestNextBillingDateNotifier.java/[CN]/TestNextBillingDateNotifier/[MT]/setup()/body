@@ -1,0 +1,28 @@
+{
+  final Injector g=Guice.createInjector(Stage.PRODUCTION,new AbstractModule(){
+    protected void configure(){
+      bind(Clock.class).to(ClockMock.class).asEagerSingleton();
+      bind(Bus.class).to(InMemoryBus.class).asEagerSingleton();
+      bind(NotificationQueueService.class).to(DefaultNotificationQueueService.class).asEagerSingleton();
+      final InvoiceConfig invoiceConfig=new ConfigurationObjectFactory(System.getProperties()).build(InvoiceConfig.class);
+      bind(InvoiceConfig.class).toInstance(invoiceConfig);
+      final CatalogConfig catalogConfig=new ConfigurationObjectFactory(System.getProperties()).build(CatalogConfig.class);
+      bind(CatalogConfig.class).toInstance(catalogConfig);
+      bind(CatalogService.class).to(DefaultCatalogService.class).asEagerSingleton();
+      final MysqlTestingHelper helper=new MysqlTestingHelper();
+      bind(MysqlTestingHelper.class).toInstance(helper);
+      IDBI dbi=helper.getDBI();
+      bind(IDBI.class).toInstance(dbi);
+      bind(EntitlementDao.class).to(EntitlementSqlDao.class).asEagerSingleton();
+    }
+  }
+);
+  clock=g.getInstance(Clock.class);
+  IDBI dbi=g.getInstance(IDBI.class);
+  dao=dbi.onDemand(DummySqlTest.class);
+  eventBus=g.getInstance(Bus.class);
+  helper=g.getInstance(MysqlTestingHelper.class);
+  notificationQueueService=g.getInstance(NotificationQueueService.class);
+  notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),new MockEntitlementDao(),listener);
+  startMysql();
+}

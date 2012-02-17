@@ -1,0 +1,13 @@
+{
+  dbi=helper.getDBI();
+  bind(IDBI.class).toInstance(dbi);
+  bind(Clock.class).to(DefaultClock.class).asEagerSingleton();
+  installNotificationQueue();
+  install(new AccountModule());
+  install(new CatalogModule());
+  install(new EntitlementModule());
+  install(new GlobalLockerModule());
+  super.configure();
+  bind(InvoiceTestApi.class).to(DefaultInvoiceTestApi.class).asEagerSingleton();
+  install(new BusModule());
+}

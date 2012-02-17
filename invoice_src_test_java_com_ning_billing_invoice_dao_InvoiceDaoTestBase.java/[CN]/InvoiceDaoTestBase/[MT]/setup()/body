@@ -1,14 +1,19 @@
 {
   try {
-    InvoiceModuleMock module=new InvoiceModuleMock();
-    final String ddl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/invoice/ddl.sql"));
-    module.createDb(ddl);
+    module=new InvoiceModuleWithEmbeddedDb();
+    final String invoiceDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/invoice/ddl.sql"));
+    final String entitlementDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/entitlement/ddl.sql"));
+    module.startDb();
+    module.initDb(invoiceDdl);
+    module.initDb(entitlementDdl);
     final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module);
     invoiceDao=injector.getInstance(InvoiceDao.class);
     invoiceDao.test();
-    invoiceItemDao=module.getInvoiceItemDao();
-    EventBusService busService=injector.getInstance(EventBusService.class);
-    ((DefaultEventBusService)busService).startBus();
+    recurringInvoiceItemDao=module.getInvoiceItemSqlDao();
+    invoicePaymentDao=module.getInvoicePaymentSqlDao();
+    BusService busService=injector.getInstance(BusService.class);
+    ((DefaultBusService)busService).startBus();
+    assertTrue(true);
   }
  catch (  Throwable t) {
     fail(t.toString());

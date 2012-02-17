@@ -1,10 +1,10 @@
 {
   UUID accountId=UUID.randomUUID();
   DateTime targetDate=new DateTime(2011,10,6,0,0,0,0);
-  Invoice invoice=new DefaultInvoice(accountId,targetDate,Currency.USD);
+  Invoice invoice=new DefaultInvoice(accountId,targetDate,Currency.USD,clock);
   DateTime paymentAttemptDate=new DateTime(2011,6,24,12,14,36,0);
   invoiceDao.create(invoice);
-  invoiceDao.notifyFailedPayment(invoice.getId().toString(),UUID.randomUUID().toString(),paymentAttemptDate.toDate());
-  invoice=invoiceDao.getById(invoice.getId().toString());
-  assertTrue(invoice.getLastPaymentAttempt().equals(paymentAttemptDate));
+  invoiceDao.notifyOfPaymentAttempt(new DefaultInvoicePayment(invoice.getId(),paymentAttemptDate));
+  invoice=invoiceDao.getById(invoice.getId());
+  assertEquals(invoice.getLastPaymentAttempt().compareTo(paymentAttemptDate),0);
 }

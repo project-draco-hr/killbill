@@ -1,0 +1,15 @@
+{
+  UUID accountId=UUID.randomUUID();
+  TagStore tagStore=new DefaultTagStore(accountId,ACCOUNT_TYPE);
+  ControlTag tag=new DefaultControlTag("testUser",clock.getUTCNow(),ControlTagType.AUTO_INVOICING_OFF);
+  tagStore.add(tag);
+  assertEquals(tagStore.generateInvoice(),false);
+  List<Tag> tagList=tagStore.getEntityList();
+  saveTags(tagStoreSqlDao,ACCOUNT_TYPE,accountId.toString(),tagList);
+  tagStore.clear();
+  assertEquals(tagStore.getEntityList().size(),0);
+  tagList=tagStoreSqlDao.load(accountId.toString(),ACCOUNT_TYPE);
+  tagStore.add(tagList);
+  assertEquals(tagList.size(),1);
+  assertEquals(tagStore.generateInvoice(),false);
+}

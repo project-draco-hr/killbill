@@ -6,7 +6,7 @@
   subscriptions=new ArrayList<Subscription>();
   SubscriptionBuilder builder=new SubscriptionBuilder();
   subscriptionStartDate=new DateTime().minusDays(3);
-  builder.setStartDate(subscriptionStartDate);
+  builder.setStartDate(subscriptionStartDate).setId(oneId);
   subscription=new SubscriptionData(builder){
     public List<SubscriptionTransition> getAllTransitions(){
       return transitions;
@@ -24,9 +24,13 @@
     public Subscription getSubscriptionFromId(    UUID subscriptionId){
       return subscription;
     }
+    @Override public UUID getAccountIdFromSubscriptionId(    final UUID subscriptionId){
+      throw new UnsupportedOperationException();
+    }
     @Override public SubscriptionBundle getSubscriptionBundleFromId(    UUID bundleId){
       return bundle;
     }
   }
 ;
+  assertTrue(true);
 }
