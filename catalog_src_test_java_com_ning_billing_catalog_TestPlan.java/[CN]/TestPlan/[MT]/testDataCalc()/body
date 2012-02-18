@@ -1,24 +1,9 @@
 {
-  DefaultPlan p0=new MockPlan(){
-    public PlanPhase[] getAllPhases(){
-      return new PlanPhase[]{new MyPlanPhase(10,true),new MyPlanPhase(10,false)};
-    }
-  }
-;
-  DefaultPlan p1=new MockPlan(){
-    public PlanPhase[] getAllPhases(){
-      return new PlanPhase[]{new MyPlanPhase(10,true),new MyPlanPhase(10,true),new MyPlanPhase(10,true),new MyPlanPhase(10,true),new MyPlanPhase(10,false),new MyPlanPhase(10,true)};
-    }
-  }
-;
-  DefaultPlan p2=new MockPlan(){
-    public PlanPhase[] getAllPhases(){
-      return new PlanPhase[]{new MyPlanPhase(10,false),new MyPlanPhase(10,true)};
-    }
-  }
-;
+  DefaultPlan p0=MockPlan.createBicycleTrialEvergreen1USD();
+  DefaultPlan p1=MockPlan.createBicycleTrialEvergreen1USD(100);
+  DefaultPlan p2=MockPlan.createBicycleNoTrialEvergreen1USD();
   DateTime requestedDate=new DateTime();
-  Assert.assertEquals(p0.dateOfFirstRecurringNonZeroCharge(requestedDate),requestedDate.plusDays(10));
-  Assert.assertEquals(p1.dateOfFirstRecurringNonZeroCharge(requestedDate),requestedDate.plusDays(40));
-  Assert.assertEquals(p2.dateOfFirstRecurringNonZeroCharge(requestedDate),requestedDate.plusDays(0));
+  Assert.assertEquals(p0.dateOfFirstRecurringNonZeroCharge(requestedDate).compareTo(requestedDate.plusDays(30)),0);
+  Assert.assertEquals(p1.dateOfFirstRecurringNonZeroCharge(requestedDate).compareTo(requestedDate.plusDays(100)),0);
+  Assert.assertEquals(p2.dateOfFirstRecurringNonZeroCharge(requestedDate).compareTo(requestedDate.plusDays(0)),0);
 }
