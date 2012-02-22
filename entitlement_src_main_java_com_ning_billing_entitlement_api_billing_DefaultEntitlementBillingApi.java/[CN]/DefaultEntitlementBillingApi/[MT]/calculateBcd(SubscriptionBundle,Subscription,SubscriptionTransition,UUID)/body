@@ -4,22 +4,23 @@
   Product product=plan.getProduct();
   PlanPhase phase=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? transition.getNextPhase() : transition.getPreviousPhase();
   BillingAlignment alignment=catalog.billingAlignment(new PlanPhaseSpecifier(product.getName(),product.getCategory(),phase.getBillingPeriod(),transition.getNextPriceList(),phase.getPhaseType()),transition.getRequestedTransitionTime());
-  int result=0;
+  int result=-1;
   Account account=accountApi.getAccountById(accountId);
 switch (alignment) {
 case ACCOUNT:
     result=account.getBillCycleDay();
-  break;
+  if (result == 0) {
+    result=calculateBcdFromSubscription(subscription,plan,account);
+  }
+break;
 case BUNDLE:
-SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(transition.getBundleId());
-result=bundle.getStartDate().getDayOfMonth();
+result=bundle.getStartDate().toDateTime(account.getTimeZone()).getDayOfMonth();
 break;
 case SUBSCRIPTION:
-Subscription subscription=dao.getSubscriptionFromId(transition.getSubscriptionId());
-result=subscription.getStartDate().getDayOfMonth();
+result=subscription.getStartDate().toDateTime(account.getTimeZone()).getDayOfMonth();
 break;
 }
-if (result == 0) {
+if (result == -1) {
 throw new CatalogApiException(ErrorCode.CAT_INVALID_BILLING_ALIGNMENT,alignment.toString());
 }
 return result;
