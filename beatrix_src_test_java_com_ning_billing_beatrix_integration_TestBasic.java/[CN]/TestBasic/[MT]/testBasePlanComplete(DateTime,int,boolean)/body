@@ -1,10 +1,10 @@
 {
-  long DELAY=2000;
+  long DELAY=5000;
   log.info("Beginning test with BCD of " + billingDay);
   Account account=accountUserApi.createAccount(getAccountData(billingDay),null,null);
   UUID accountId=account.getId();
   assertNotNull(account);
-  clock.setDeltaFromReality(initialCreationDate.getMillis() - DateTime.now().getMillis());
+  clock.setDeltaFromReality(initialCreationDate.getMillis() - clock.getUTCNow().getMillis());
   SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever");
   String productName="Shotgun";
   BillingPeriod term=BillingPeriod.MONTHLY;
