@@ -21,6 +21,9 @@
     if (re.getCause() instanceof AccountApiException) {
       throw (AccountApiException)re.getCause();
     }
+ else     if (re.getCause() instanceof DataTruncation) {
+      throw new AccountApiException(ErrorCode.DATA_TRUNCATION,re.getCause().getMessage());
+    }
  else {
       throw re;
     }
