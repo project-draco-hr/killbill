@@ -4,9 +4,9 @@
     Invoice invoice=invoicePaymentApi.getInvoice(paymentAttempt.getInvoiceId());
     Account account=accountUserApi.getAccountById(paymentAttempt.getAccountId());
     if (invoice != null && account != null) {
-      if (invoice.getBalance().compareTo(BigDecimal.ZERO) == 0) {
+      if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
         log.info("Received invoice for payment with outstanding amount of 0 {} ",invoice);
-        Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0"));
+        return Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0 or less"));
       }
  else {
         return processPayment(getPaymentProviderPlugin(account),account,invoice,paymentAttempt);
