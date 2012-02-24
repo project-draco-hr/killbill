@@ -1,0 +1,30 @@
+{
+  Either<PaymentError,PaymentInfo> paymentOrError=plugin.processInvoice(account,invoice);
+  PaymentInfo paymentInfo=null;
+  if (paymentOrError.isLeft()) {
+    String error=StringUtils.substring(paymentOrError.getLeft().getMessage() + paymentOrError.getLeft().getType(),0,100);
+    log.info("Could not process a payment for " + paymentAttempt + " error was "+ error);
+    scheduleRetry(paymentAttempt,error);
+  }
+ else {
+    paymentInfo=paymentOrError.getRight();
+    paymentDao.savePaymentInfo(paymentInfo);
+    Either<PaymentError,PaymentMethodInfo> paymentMethodInfoOrError=plugin.getPaymentMethodInfo(paymentInfo.getPaymentMethodId());
+    if (paymentMethodInfoOrError.isRight()) {
+      PaymentMethodInfo paymentMethodInfo=paymentMethodInfoOrError.getRight();
+      if (paymentMethodInfo instanceof CreditCardPaymentMethodInfo) {
+        CreditCardPaymentMethodInfo ccPaymentMethod=(CreditCardPaymentMethodInfo)paymentMethodInfo;
+        paymentDao.updatePaymentInfo(ccPaymentMethod.getType(),paymentInfo.getPaymentId(),ccPaymentMethod.getCardType(),ccPaymentMethod.getCardCountry());
+      }
+ else       if (paymentMethodInfo instanceof PaypalPaymentMethodInfo) {
+        PaypalPaymentMethodInfo paypalPaymentMethodInfo=(PaypalPaymentMethodInfo)paymentMethodInfo;
+        paymentDao.updatePaymentInfo(paypalPaymentMethodInfo.getType(),paymentInfo.getPaymentId(),null,null);
+      }
+    }
+    if (paymentInfo.getPaymentId() != null) {
+      paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getPaymentAttemptId(),paymentInfo.getPaymentId());
+    }
+  }
+  invoicePaymentApi.notifyOfPaymentAttempt(new DefaultInvoicePayment(paymentAttempt.getPaymentAttemptId(),invoice.getId(),paymentAttempt.getPaymentAttemptDate(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : paymentInfo.getAmount(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : invoice.getCurrency()));
+  return paymentOrError;
+}
