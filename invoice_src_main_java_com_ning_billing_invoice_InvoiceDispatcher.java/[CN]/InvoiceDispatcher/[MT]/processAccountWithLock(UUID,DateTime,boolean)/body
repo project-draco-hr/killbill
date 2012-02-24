@@ -1,0 +1,31 @@
+{
+  Account account=accountUserApi.getAccountById(accountId);
+  if (account == null) {
+    log.error("Failed handling entitlement change.",new InvoiceApiException(ErrorCode.INVOICE_ACCOUNT_ID_INVALID,accountId.toString()));
+    return null;
+  }
+  SortedSet<BillingEvent> events=entitlementBillingApi.getBillingEventsForAccount(accountId);
+  BillingEventSet billingEvents=new BillingEventSet(events);
+  Currency targetCurrency=account.getCurrency();
+  List<InvoiceItem> items=invoiceDao.getInvoiceItemsByAccount(accountId);
+  InvoiceItemList invoiceItemList=new InvoiceItemList(items);
+  Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoiceItemList,targetDate,targetCurrency);
+  if (invoice == null) {
+    log.info("Generated null invoice.");
+    outputDebugData(events,invoiceItemList);
+  }
+ else {
+    log.info("Generated invoice {} with {} items.",invoice.getId().toString(),invoice.getNumberOfItems());
+    if (VERBOSE_OUTPUT) {
+      log.info("New items");
+      for (      InvoiceItem item : invoice.getInvoiceItems()) {
+        log.info(item.toString());
+      }
+    }
+    outputDebugData(events,invoiceItemList);
+    if (invoice.getNumberOfItems() > 0 && !dryrun) {
+      invoiceDao.create(invoice);
+    }
+  }
+  return invoice;
+}

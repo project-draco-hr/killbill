@@ -1,21 +1,20 @@
 {
-  List<SubscriptionBundle> bundles=dao.getSubscriptionBundleForAccount(accountId);
-  List<Subscription> subscriptions=new ArrayList<Subscription>();
-  for (  final SubscriptionBundle bundle : bundles) {
-    subscriptions.addAll(dao.getSubscriptions(bundle.getId()));
-  }
+  List<SubscriptionBundle> bundles=entitlementDao.getSubscriptionBundleForAccount(accountId);
   SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
-  for (  final Subscription subscription : subscriptions) {
-    for (    final SubscriptionTransition transition : subscription.getAllTransitions()) {
-      try {
-        BillingEvent event=new DefaultBillingEvent(transition,subscription,calculateBCD(transition,accountId));
-        result.add(event);
-      }
- catch (      CatalogApiException e) {
-        log.error("Failing to identify catalog components while creating BillingEvent from transition: " + transition.getId().toString(),e);
-      }
-catch (      Exception e) {
-        log.warn("Failed while getting BillingEvent",e);
+  for (  final SubscriptionBundle bundle : bundles) {
+    List<Subscription> subscriptions=entitlementDao.getSubscriptions(bundle.getId());
+    for (    final Subscription subscription : subscriptions) {
+      for (      final SubscriptionTransition transition : subscription.getAllTransitions()) {
+        try {
+          BillingEvent event=new DefaultBillingEvent(transition,subscription,calculateBcd(bundle,subscription,transition,accountId));
+          result.add(event);
+        }
+ catch (        CatalogApiException e) {
+          log.error("Failing to identify catalog components while creating BillingEvent from transition: " + transition.getId().toString(),e);
+        }
+catch (        Exception e) {
+          log.warn("Failed while getting BillingEvent",e);
+        }
       }
     }
   }
