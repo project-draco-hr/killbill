@@ -1,0 +1,17 @@
+{
+  final BusinessSubscriptionTransition transitionWithNullPrev=new BusinessSubscriptionTransition(transition.getId(),transition.getKey(),transition.getAccountKey(),transition.getRequestedTimestamp(),transition.getEvent(),null,transition.getNextSubscription());
+  businessSubscriptionTransitionDao.createTransition(transitionWithNullPrev);
+  List<BusinessSubscriptionTransition> transitions=businessSubscriptionTransitionDao.getTransitions(EVENT_KEY);
+  Assert.assertEquals(transitions.size(),1);
+  Assert.assertEquals(transitions.get(0),transitionWithNullPrev);
+  businessSubscriptionTransitionDao.createTransition(transitionWithNullPrev);
+  transitions=businessSubscriptionTransitionDao.getTransitions(EVENT_KEY);
+  Assert.assertEquals(transitions.size(),1);
+  Assert.assertEquals(transitions.get(0),transitionWithNullPrev);
+  final BusinessSubscriptionTransition secondTransitionWithNullPrev=new BusinessSubscriptionTransition(UUID.randomUUID(),transition.getKey(),transition.getAccountKey(),transition.getRequestedTimestamp(),transition.getEvent(),null,transition.getNextSubscription());
+  businessSubscriptionTransitionDao.createTransition(secondTransitionWithNullPrev);
+  transitions=businessSubscriptionTransitionDao.getTransitions(EVENT_KEY);
+  Assert.assertEquals(transitions.size(),2);
+  Assert.assertTrue(transitions.contains(transitionWithNullPrev));
+  Assert.assertTrue(transitions.contains(secondTransitionWithNullPrev));
+}
