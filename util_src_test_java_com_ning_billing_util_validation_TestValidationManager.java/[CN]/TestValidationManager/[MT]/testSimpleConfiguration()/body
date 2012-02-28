@@ -1,7 +1,7 @@
 {
   String STRING_FIELD_2="column2";
   String STRING_FIELD_2_PROPERTY="stringField2";
-  SimpleTestClass testObject=new SimpleTestClass("a",null,7.9,new DateTime());
+  SimpleTestClass testObject=new SimpleTestClass(null,null,7.9,new DateTime());
   vm.setConfiguration(testObject.getClass(),STRING_FIELD_2_PROPERTY,vm.getColumnInfo(TABLE_NAME,STRING_FIELD_2));
   assertTrue(vm.hasConfiguration(testObject.getClass()));
   assertFalse(vm.hasConfiguration(ValidationManager.class));
@@ -9,6 +9,32 @@
   assertNotNull(configuration);
   assertTrue(configuration.hasMapping(STRING_FIELD_2_PROPERTY));
   assertFalse(vm.validate(testObject));
+  testObject.setStringField2("a");
+  assertFalse(vm.validate(testObject));
+  testObject.setStringField2("abc");
+  assertFalse(vm.validate(testObject));
   testObject.setStringField2("ab");
+  assertTrue(vm.validate(testObject));
+  final String STRING_FIELD_1="column1";
+  final String STRING_FIELD_1_PROPERTY="stringField1";
+  vm.setConfiguration(testObject.getClass(),STRING_FIELD_1_PROPERTY,vm.getColumnInfo(TABLE_NAME,STRING_FIELD_1));
+  assertTrue(vm.validate(testObject));
+  testObject.setStringField1("This is a long string that exceeds the length limit for column 1.");
+  assertFalse(vm.validate(testObject));
+  testObject.setStringField1("This is a short string.");
+  assertTrue(vm.validate(testObject));
+  final String NUMERIC_FIELD="column3";
+  final String NUMERIC_FIELD_PROPERTY="numericField1";
+  vm.setConfiguration(testObject.getClass(),NUMERIC_FIELD_PROPERTY,vm.getColumnInfo(TABLE_NAME,NUMERIC_FIELD));
+  assertTrue(vm.validate(testObject));
+  testObject.setNumericField1(0.123456);
+  assertFalse(vm.validate(testObject));
+  testObject.setNumericField1(12345678901234D);
+  assertFalse(vm.validate(testObject));
+  testObject.setNumericField1(1234567890);
+  assertTrue(vm.validate(testObject));
+  testObject.setNumericField1(123456.7891);
+  assertTrue(vm.validate(testObject));
+  testObject.setNumericField1(12345678.91);
   assertTrue(vm.validate(testObject));
 }

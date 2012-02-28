@@ -15,10 +15,20 @@
       if (columnInfo == null) {
         return true;
       }
-      if (!columnInfo.getIsNullable()) {
-        if (value == null) {
-          return false;
-        }
+      if (!hasValidNullability(columnInfo,value)) {
+        return false;
+      }
+      if (!isValidLengthString(columnInfo,value)) {
+        return false;
+      }
+      if (!isValidLengthChar(columnInfo,value)) {
+        return false;
+      }
+      if (!hasValidPrecision(columnInfo,value)) {
+        return false;
+      }
+      if (!hasValidScale(columnInfo,value)) {
+        return false;
       }
     }
  catch (    NoSuchFieldException e) {
