@@ -1,0 +1,14 @@
+{
+  String STRING_FIELD_2="column2";
+  String STRING_FIELD_2_PROPERTY="stringField2";
+  SimpleTestClass testObject=new SimpleTestClass("a",null,7.9,new DateTime());
+  vm.setConfiguration(testObject.getClass(),STRING_FIELD_2_PROPERTY,vm.getColumnInfo(TABLE_NAME,STRING_FIELD_2));
+  assertTrue(vm.hasConfiguration(testObject.getClass()));
+  assertFalse(vm.hasConfiguration(ValidationManager.class));
+  ValidationConfiguration configuration=vm.getConfiguration(SimpleTestClass.class);
+  assertNotNull(configuration);
+  assertTrue(configuration.hasMapping(STRING_FIELD_2_PROPERTY));
+  assertFalse(vm.validate(testObject));
+  testObject.setStringField2("ab");
+  assertTrue(vm.validate(testObject));
+}
