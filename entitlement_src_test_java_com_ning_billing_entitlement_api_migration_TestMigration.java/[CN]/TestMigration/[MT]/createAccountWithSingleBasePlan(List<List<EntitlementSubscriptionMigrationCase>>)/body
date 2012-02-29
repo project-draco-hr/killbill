@@ -5,17 +5,20 @@
       List<EntitlementBundleMigration> bundles=new ArrayList<EntitlementBundleMigration>();
       EntitlementBundleMigration bundle0=new EntitlementBundleMigration(){
         @Override public EntitlementSubscriptionMigration[] getSubscriptions(){
-          EntitlementSubscriptionMigration subscription=new EntitlementSubscriptionMigration(){
-            @Override public EntitlementSubscriptionMigrationCase[] getSubscriptionCases(){
-              return cases.toArray(new EntitlementSubscriptionMigrationCase[cases.size()]);
+          EntitlementSubscriptionMigration[] result=new EntitlementSubscriptionMigration[cases.size()];
+          for (int i=0; i < cases.size(); i++) {
+            final List<EntitlementSubscriptionMigrationCase> curCases=cases.get(i);
+            EntitlementSubscriptionMigration subscription=new EntitlementSubscriptionMigration(){
+              @Override public EntitlementSubscriptionMigrationCase[] getSubscriptionCases(){
+                return curCases.toArray(new EntitlementSubscriptionMigrationCase[curCases.size()]);
+              }
+              @Override public ProductCategory getCategory(){
+                return ProductCategory.BASE;
+              }
             }
-            @Override public ProductCategory getCategory(){
-              return ProductCategory.BASE;
-            }
-          }
 ;
-          EntitlementSubscriptionMigration[] result=new EntitlementSubscriptionMigration[1];
-          result[0]=subscription;
+            result[i]=subscription;
+          }
           return result;
         }
         @Override public String getBundleKey(){

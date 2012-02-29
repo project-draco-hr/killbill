@@ -1,0 +1,44 @@
+{
+  List<EntitlementSubscriptionMigrationCase> cases=new LinkedList<EntitlementSubscriptionMigrationCase>();
+  cases.add(new EntitlementSubscriptionMigrationCase(){
+    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
+      return new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+    }
+    @Override public DateTime getEffectiveDate(){
+      return clock.getUTCNow().minusMonths(3);
+    }
+    @Override public DateTime getCancelledDate(){
+      return null;
+    }
+  }
+);
+  List<EntitlementSubscriptionMigrationCase> firstAddOnCases=new LinkedList<EntitlementSubscriptionMigrationCase>();
+  firstAddOnCases.add(new EntitlementSubscriptionMigrationCase(){
+    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
+      return new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.DISCOUNT);
+    }
+    @Override public DateTime getEffectiveDate(){
+      return initalAddonStart;
+    }
+    @Override public DateTime getCancelledDate(){
+      return initalAddonStart.plusMonths(1);
+    }
+  }
+);
+  firstAddOnCases.add(new EntitlementSubscriptionMigrationCase(){
+    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
+      return new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+    }
+    @Override public DateTime getEffectiveDate(){
+      return initalAddonStart.plusMonths(1);
+    }
+    @Override public DateTime getCancelledDate(){
+      return null;
+    }
+  }
+);
+  List<List<EntitlementSubscriptionMigrationCase>> input=new ArrayList<List<EntitlementSubscriptionMigrationCase>>();
+  input.add(cases);
+  input.add(firstAddOnCases);
+  return createAccountWithSingleBasePlan(input);
+}
