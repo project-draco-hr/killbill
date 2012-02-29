@@ -1,0 +1,17 @@
+{
+  final Account account=accountApi.getAccountById(accountId);
+  BusinessAccount bac=dao.getAccount(accountId.toString());
+  if (account == null) {
+    log.warn("Couldn't find account {}",accountId);
+  }
+ else   if (bac == null) {
+    bac=createBusinessAccountFromAccount(account);
+    log.info("ACCOUNT CREATION " + bac);
+    dao.createAccount(bac);
+  }
+ else {
+    updateBusinessAccountFromAccount(account,bac);
+    log.info("ACCOUNT UPDATE " + bac);
+    dao.saveAccount(bac);
+  }
+}
