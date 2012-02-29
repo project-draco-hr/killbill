@@ -32,6 +32,12 @@ if (baseSubscription == null) {
 checkAddonCreationRights(baseSubscription,plan);
 bundleStartDate=baseSubscription.getStartDate();
 break;
+case STANDALONE:
+if (baseSubscription != null) {
+throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BP_EXISTS,bundleId);
+}
+bundleStartDate=requestedDate;
+break;
 default :
 throw new EntitlementError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
 }
