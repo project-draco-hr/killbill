@@ -4,7 +4,7 @@
   final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
   final BigDecimal amount=new BigDecimal("10.00");
   final UUID subscriptionId=UUID.randomUUID();
-  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),subscriptionId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD));
+  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),subscriptionId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD,new DateTime(DateTimeZone.UTC),new DateTime(DateTimeZone.UTC)));
   mockPaymentProviderPlugin.makeNextInvoiceFail();
   List<Either<PaymentError,PaymentInfo>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()));
   assertEquals(results.size(),1);

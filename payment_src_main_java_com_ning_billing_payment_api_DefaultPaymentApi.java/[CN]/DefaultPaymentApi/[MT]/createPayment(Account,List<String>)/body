@@ -5,7 +5,7 @@
     Invoice invoice=invoicePaymentApi.getInvoice(UUID.fromString(invoiceId));
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
       log.info("Received invoice for payment with balance of 0 {} ",invoice);
-      Either<PaymentError,PaymentInfo> result=Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0 or less"));
+      Either<PaymentError,PaymentInfo> result=Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0 or less",account.getId(),UUID.fromString(invoiceId)));
       processedPaymentsOrErrors.add(result);
     }
  else {
