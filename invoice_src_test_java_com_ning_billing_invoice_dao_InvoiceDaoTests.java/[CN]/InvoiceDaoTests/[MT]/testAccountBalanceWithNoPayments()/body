@@ -7,9 +7,9 @@
   DateTime endDate=startDate.plusMonths(1);
   BigDecimal rate1=new BigDecimal("17.0");
   BigDecimal rate2=new BigDecimal("42.0");
-  RecurringInvoiceItem item1=new RecurringInvoiceItem(invoice1.getId(),UUID.randomUUID(),"test plan","test phase A",startDate,endDate,rate1,rate1,Currency.USD);
+  RecurringInvoiceItem item1=new RecurringInvoiceItem(invoice1.getId(),UUID.randomUUID(),"test plan","test phase A",startDate,endDate,rate1,rate1,Currency.USD,clock.getUTCNow(),clock.getUTCNow());
   recurringInvoiceItemDao.create(item1);
-  RecurringInvoiceItem item2=new RecurringInvoiceItem(invoice1.getId(),UUID.randomUUID(),"test plan","test phase B",startDate,endDate,rate2,rate2,Currency.USD);
+  RecurringInvoiceItem item2=new RecurringInvoiceItem(invoice1.getId(),UUID.randomUUID(),"test plan","test phase B",startDate,endDate,rate2,rate2,Currency.USD,clock.getUTCNow(),clock.getUTCNow());
   recurringInvoiceItemDao.create(item2);
   BigDecimal balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(rate1.add(rate2)),0);
