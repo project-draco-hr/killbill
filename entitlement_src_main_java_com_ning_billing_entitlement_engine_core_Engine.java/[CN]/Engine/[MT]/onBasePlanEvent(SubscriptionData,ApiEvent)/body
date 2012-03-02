@@ -1,5 +1,6 @@
 {
   DateTime now=clock.getUTCNow();
+  Product baseProduct=(baseSubscription.getState() == SubscriptionState.CANCELLED) ? null : baseSubscription.getCurrentPlan().getProduct();
   List<Subscription> subscriptions=dao.getSubscriptions(baseSubscription.getBundleId());
   Iterator<Subscription> it=subscriptions.iterator();
   while (it.hasNext()) {
@@ -8,8 +9,8 @@
       continue;
     }
     Plan addonCurrentPlan=cur.getCurrentPlan();
-    if (addonUtils.isAddonIncluded(baseSubscription,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseSubscription,addonCurrentPlan)) {
-      EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(event.getEffectiveDate()).setRequestedDate(now));
+    if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
+      EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(event.getEffectiveDate()).setRequestedDate(now).setFromDisk(true));
       dao.cancelSubscription(cur.getId(),cancelEvent);
     }
   }
