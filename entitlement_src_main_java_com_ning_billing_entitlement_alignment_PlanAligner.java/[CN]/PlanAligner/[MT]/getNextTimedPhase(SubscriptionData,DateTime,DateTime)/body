@@ -5,6 +5,7 @@
       throw new EntitlementError(String.format("Cannot specify an effectiveDate prior to last Plan Change, subscription = %s, effectiveDate = %s",subscription.getId(),effectiveDate));
     }
 switch (lastPlanTransition.getTransitionType()) {
+case MIGRATE_ENTITLEMENT:
 case CREATE:
       List<TimedPhase> timedPhases=getTimedPhaseOnCreate(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPhase().getPhaseType(),lastPlanTransition.getNextPriceList(),requestedDate);
     return getTimedPhase(timedPhases,effectiveDate,WhichPhase.NEXT);
