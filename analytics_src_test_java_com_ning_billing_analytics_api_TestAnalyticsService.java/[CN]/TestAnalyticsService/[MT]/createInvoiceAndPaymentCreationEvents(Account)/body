@@ -1,0 +1,14 @@
+{
+  final DefaultInvoice invoice=new DefaultInvoice(account.getId(),clock.getUTCNow(),ACCOUNT_CURRENCY,clock);
+  final FixedPriceInvoiceItem invoiceItem=new FixedPriceInvoiceItem(UUID.randomUUID(),invoice.getId(),UUID.randomUUID(),"somePlan","somePhase",clock.getUTCNow(),clock.getUTCNow().plusDays(1),INVOICE_AMOUNT,ACCOUNT_CURRENCY,clock.getUTCNow(),clock.getUTCNow());
+  invoice.addInvoiceItem(invoiceItem);
+  invoiceDao.create(invoice);
+  Assert.assertEquals(invoiceDao.getInvoicesByAccount(account.getId()).size(),1);
+  Assert.assertEquals(invoiceDao.getInvoicesByAccount(account.getId()).get(0).getInvoiceItems().size(),1);
+  invoiceCreationNotification=new DefaultInvoiceCreationNotification(invoice.getId(),account.getId(),INVOICE_AMOUNT,ACCOUNT_CURRENCY,clock.getUTCNow());
+  paymentInfoNotification=new PaymentInfo.Builder().setPaymentId(UUID.randomUUID().toString()).setPaymentMethod(PAYMENT_METHOD).setCardCountry(CARD_COUNTRY).build();
+  final PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice.getId(),account.getId(),BigDecimal.TEN,ACCOUNT_CURRENCY,clock.getUTCNow(),clock.getUTCNow(),paymentInfoNotification.getPaymentId(),1,clock.getUTCNow().plusDays(1));
+  paymentDao.createPaymentAttempt(paymentAttempt);
+  paymentDao.savePaymentInfo(paymentInfoNotification);
+  Assert.assertEquals(paymentDao.getPaymentInfo(Arrays.asList(invoice.getId().toString())).size(),1);
+}

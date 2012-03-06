@@ -2,14 +2,15 @@
   setupBusAndMySQL();
   tagDao.create(TAG_ONE);
   tagDao.create(TAG_TWO);
-  final MockAccount account=new MockAccount(UUID.randomUUID(),ACCOUNT_KEY,Currency.USD);
+  final MockAccount account=new MockAccount(UUID.randomUUID(),ACCOUNT_KEY,ACCOUNT_CURRENCY);
   try {
-    List<Tag> tags=new ArrayList<Tag>();
-    tags.add(new DescriptiveTag(TAG_ONE,"pierre",new DateTime(DateTimeZone.UTC)));
-    tags.add(new DescriptiveTag(TAG_TWO,"pierre",new DateTime(DateTimeZone.UTC)));
+    final List<Tag> tags=new ArrayList<Tag>();
+    tags.add(new DescriptiveTag(TAG_ONE,"pierre",clock.getUTCNow()));
+    tags.add(new DescriptiveTag(TAG_TWO,"pierre",clock.getUTCNow()));
     final Account storedAccount=accountApi.createAccount(account,null,tags);
     createSubscriptionTransitionEvent(storedAccount);
     createAccountCreationEvent(storedAccount);
+    createInvoiceAndPaymentCreationEvents(storedAccount);
   }
  catch (  Throwable t) {
     fail("Initializing accounts failed.",t);

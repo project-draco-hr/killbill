@@ -16,6 +16,7 @@
       continue;
     }
     ApiEventType apiEventType=null;
+    boolean isFromDisk=true;
 switch (cur.getType()) {
 case PHASE:
       PhaseEvent phaseEV=(PhaseEvent)cur;
@@ -24,6 +25,7 @@ case PHASE:
 case API_USER:
 ApiEvent userEV=(ApiEvent)cur;
 apiEventType=userEV.getEventType();
+isFromDisk=userEV.isFromDisk();
 switch (apiEventType) {
 case MIGRATE_ENTITLEMENT:
 case CREATE:
@@ -66,7 +68,7 @@ nextPhase=(nextPhaseName != null) ? catalog.findPhase(nextPhaseName,cur.getReque
  catch (CatalogApiException e) {
 log.error(String.format("Failed to build transition for subscription %s",id),e);
 }
-SubscriptionTransitionData transition=new SubscriptionTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),previousState,previousPlan,previousPhase,previousPriceList,nextState,nextPlan,nextPhase,nextPriceList);
+SubscriptionTransitionData transition=new SubscriptionTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),previousState,previousPlan,previousPhase,previousPriceList,nextState,nextPlan,nextPhase,nextPriceList,isFromDisk);
 transitions.add(transition);
 previousState=nextState;
 previousPlan=nextPlan;

@@ -6,6 +6,7 @@
  catch (  Throwable t) {
     Assert.fail("Unable to start the bus or service! " + t);
   }
+  Assert.assertNull(accountDao.getAccount(ACCOUNT_KEY));
   bus.post(transition);
   bus.post(accountCreationNotification);
   Thread.sleep(1000);
@@ -15,6 +16,14 @@
   Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getTags().size(),2);
   Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTags().indexOf(TAG_ONE.getName()) != -1);
   Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTags().indexOf(TAG_TWO.getName()) != -1);
+  Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
+  bus.post(invoiceCreationNotification);
+  Thread.sleep(1000);
+  Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
+  bus.post(paymentInfoNotification);
+  Thread.sleep(1000);
+  Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getPaymentMethod(),PAYMENT_METHOD);
+  Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getBillingAddressCountry(),CARD_COUNTRY);
   try {
     bus.stop();
   }

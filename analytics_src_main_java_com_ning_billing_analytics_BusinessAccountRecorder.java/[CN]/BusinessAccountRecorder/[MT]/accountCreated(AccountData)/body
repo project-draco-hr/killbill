@@ -1,10 +1,6 @@
 {
   final Account account=accountApi.getAccountByKey(data.getExternalKey());
-  final List<String> tags=new ArrayList<String>();
-  for (  final Tag tag : account.getTagList()) {
-    tags.add(tag.getTagDefinitionName());
-  }
-  final BusinessAccount bac=new BusinessAccount(account.getExternalKey(),null,tags,null,null,null,null,null,null);
+  final BusinessAccount bac=createBusinessAccountFromAccount(account);
   log.info("ACCOUNT CREATION " + bac);
   dao.createAccount(bac);
 }
