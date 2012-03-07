@@ -7,12 +7,11 @@
   SortedSet<BillingEvent> events=entitlementBillingApi.getBillingEventsForAccount(accountId);
   BillingEventSet billingEvents=new BillingEventSet(events);
   Currency targetCurrency=account.getCurrency();
-  List<InvoiceItem> items=invoiceDao.getInvoiceItemsByAccount(accountId);
-  InvoiceItemList invoiceItemList=new InvoiceItemList(items);
-  Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoiceItemList,targetDate,targetCurrency);
+  List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId);
+  Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,targetCurrency);
   if (invoice == null) {
     log.info("Generated null invoice.");
-    outputDebugData(events,invoiceItemList);
+    outputDebugData(events,invoices);
   }
  else {
     log.info("Generated invoice {} with {} items.",invoice.getId().toString(),invoice.getNumberOfItems());
@@ -22,7 +21,7 @@
         log.info(item.toString());
       }
     }
-    outputDebugData(events,invoiceItemList);
+    outputDebugData(events,invoices);
     if (invoice.getNumberOfItems() > 0 && !dryrun) {
       invoiceDao.create(invoice);
     }

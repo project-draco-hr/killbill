@@ -4,21 +4,22 @@
   }
   Collections.sort(events);
   List<InvoiceItem> existingItems=new ArrayList<InvoiceItem>();
-  if (items != null) {
-    existingItems=new ArrayList<InvoiceItem>(items);
+  if (existingInvoices != null) {
+    for (    Invoice invoice : existingInvoices) {
+      existingItems=new ArrayList<InvoiceItem>(invoice.getInvoiceItems());
+    }
     Collections.sort(existingItems);
   }
+  targetDate=adjustTargetDate(existingInvoices,targetDate);
   DefaultInvoice invoice=new DefaultInvoice(accountId,targetDate,targetCurrency,clock);
   UUID invoiceId=invoice.getId();
   List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,events,targetDate,targetCurrency);
-  if (existingItems != null) {
-    removeCancellingInvoiceItems(existingItems);
-    removeDuplicatedInvoiceItems(proposedItems,existingItems);
-    for (    InvoiceItem existingItem : existingItems) {
-      if (existingItem instanceof RecurringInvoiceItem) {
-        RecurringInvoiceItem recurringItem=(RecurringInvoiceItem)existingItem;
-        proposedItems.add(recurringItem.asCredit());
-      }
+  removeCancellingInvoiceItems(existingItems);
+  removeDuplicatedInvoiceItems(proposedItems,existingItems);
+  for (  InvoiceItem existingItem : existingItems) {
+    if (existingItem instanceof RecurringInvoiceItem) {
+      RecurringInvoiceItem recurringItem=(RecurringInvoiceItem)existingItem;
+      proposedItems.add(recurringItem.asCredit());
     }
   }
   if (proposedItems == null || proposedItems.size() == 0) {

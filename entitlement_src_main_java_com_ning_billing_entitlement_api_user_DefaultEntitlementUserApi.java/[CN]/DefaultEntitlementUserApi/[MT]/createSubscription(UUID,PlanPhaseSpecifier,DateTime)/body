@@ -7,7 +7,8 @@
       throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
     }
     DateTime effectiveDate=requestedDate;
-    Plan plan=catalogService.getFullCatalog().findPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,requestedDate);
+    Catalog catalog=catalogService.getFullCatalog();
+    Plan plan=catalog.findPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,requestedDate);
     PlanPhase phase=plan.getAllPhases()[0];
     if (phase == null) {
       throw new EntitlementError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",spec.getProductName(),spec.getBillingPeriod().toString(),realPriceList));
