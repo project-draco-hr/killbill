@@ -1,0 +1,17 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EventSqlDao>(){
+    @Override public Void inTransaction(    EventSqlDao dao,    TransactionStatus status) throws Exception {
+      for (      final EntitlementEvent cur : recreateEvents) {
+        dao.insertEvent(cur);
+        recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new NotificationKey(){
+          @Override public String toString(){
+            return cur.getId().toString();
+          }
+        }
+);
+      }
+      return null;
+    }
+  }
+);
+}

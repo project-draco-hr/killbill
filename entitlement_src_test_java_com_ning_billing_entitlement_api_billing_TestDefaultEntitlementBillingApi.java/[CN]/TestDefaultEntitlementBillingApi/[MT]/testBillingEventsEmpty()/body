@@ -1,13 +1,6 @@
 {
-  EntitlementDao dao=new BrainDeadMockEntitlementDao(){
-    @Override public List<SubscriptionBundle> getSubscriptionBundleForAccount(    UUID accountId){
-      return new ArrayList<SubscriptionBundle>();
-    }
-    @Override public UUID getAccountIdFromSubscriptionId(    final UUID subscriptionId){
-      throw new UnsupportedOperationException();
-    }
-  }
-;
+  dao=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementDao.class);
+  ((ZombieControl)dao).addResult("getSubscriptionBundleForAccount",new ArrayList<SubscriptionBundle>());
   AccountUserApi accountApi=new BrainDeadAccountUserApi();
   DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(dao,accountApi,catalogService);
   SortedSet<BillingEvent> events=api.getBillingEventsForAccount(new UUID(0L,0L));

@@ -1,6 +1,7 @@
 {
   UUID accountId=UUID.randomUUID();
-  Subscription subscription=new MockSubscription();
+  Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  ((ZombieControl)subscription).addResult("getId",UUID.randomUUID());
   Plan plan=new MockPlan("plan 1");
   MockInternationalPrice zeroPrice=new MockInternationalPrice(new DefaultPrice(ZERO,Currency.USD));
   MockInternationalPrice cheapPrice=new MockInternationalPrice(new DefaultPrice(ONE,Currency.USD));
