@@ -1,6 +1,8 @@
 {
   PaymentInfo paymentInfo=paymentApi.getPaymentInfoForPaymentAttemptId(paymentAttemptId);
-  if (paymentInfo == null || !PaymentStatus.Processed.equals(PaymentStatus.valueOf(paymentInfo.getStatus()))) {
+  if (paymentInfo != null && PaymentStatus.Processed.equals(PaymentStatus.valueOf(paymentInfo.getStatus()))) {
+  }
+ else {
     paymentApi.createPaymentForPaymentAttempt(UUID.fromString(paymentAttemptId));
   }
 }
