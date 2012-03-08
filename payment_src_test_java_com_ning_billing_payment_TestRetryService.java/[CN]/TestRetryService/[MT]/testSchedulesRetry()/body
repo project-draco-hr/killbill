@@ -15,8 +15,6 @@
   PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForInvoiceId(invoice.getId().toString());
   assertNotNull(paymentAttempt);
   assertEquals(notification.getNotificationKey(),paymentAttempt.getPaymentAttemptId().toString());
-  assertEquals(paymentAttempt.getRetryCount(),new Integer(1));
   DateTime expectedRetryDate=paymentAttempt.getPaymentAttemptDate().plusDays(paymentConfig.getPaymentRetryDays().get(0));
   assertEquals(notification.getEffectiveDate(),expectedRetryDate);
-  assertEquals(paymentAttempt.getNextRetryDate(),expectedRetryDate);
 }
