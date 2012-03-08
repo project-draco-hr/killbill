@@ -1,0 +1,11 @@
+{
+  String xml="<condition>" + "	<numberOfUnpaidInvoicesEqualsOrExceeds>1</numberOfUnpaidInvoicesEqualsOrExceeds>" + "</condition>";
+  InputStream is=new ByteArrayInputStream(xml.getBytes());
+  MockCondition c=XMLLoader.getObjectFromStreamNoValidation(is,MockCondition.class);
+  BillingState state0=new BillingState(new UUID(0L,1L),0,BigDecimal.ZERO,new DateTime(),PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{});
+  BillingState state1=new BillingState(new UUID(0L,1L),1,BigDecimal.ZERO,new DateTime(),PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{});
+  BillingState state2=new BillingState(new UUID(0L,1L),2,BigDecimal.ZERO,new DateTime(),PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{});
+  Assert.assertTrue(!c.evaluate(state0,new DateTime()));
+  Assert.assertTrue(c.evaluate(state1,new DateTime()));
+  Assert.assertTrue(c.evaluate(state2,new DateTime()));
+}
