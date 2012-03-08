@@ -3,7 +3,8 @@
   MockInternationalPrice recurringPrice=new MockInternationalPrice(price);
   MockPlanPhase phase=new MockPlanPhase(recurringPrice,null);
   MockPlan plan=new MockPlan(phase);
-  Subscription subscription=new MockSubscription();
+  Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  ((ZombieControl)subscription).addResult("getId",UUID.randomUUID());
   DateTime effectiveDate=buildDateTime(2011,1,1);
   BillingEvent event=new DefaultBillingEvent(subscription,effectiveDate,plan,phase,null,recurringPrice,BillingPeriod.MONTHLY,15,BillingModeType.IN_ADVANCE,"testEvent",SubscriptionTransitionType.CREATE);
   BillingEventSet events=new BillingEventSet();

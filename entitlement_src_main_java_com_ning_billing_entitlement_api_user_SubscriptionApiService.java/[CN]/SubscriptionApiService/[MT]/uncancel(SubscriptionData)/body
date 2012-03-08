@@ -3,11 +3,10 @@
     throw new EntitlementUserApiException(ErrorCode.ENT_UNCANCEL_BAD_STATE,subscription.getId().toString());
   }
   DateTime now=clock.getUTCNow();
-  EntitlementEvent uncancelEvent=new ApiEventUncancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setRequestedDate(now).setEffectiveDate(now));
+  EntitlementEvent uncancelEvent=new ApiEventUncancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setRequestedDate(now).setEffectiveDate(now).setFromDisk(true));
   List<EntitlementEvent> uncancelEvents=new ArrayList<EntitlementEvent>();
   uncancelEvents.add(uncancelEvent);
-  DateTime planStartDate=subscription.getCurrentPlanStart();
-  TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(subscription.getCurrentPlan(),subscription.getInitialPhaseOnCurrentPlan().getPhaseType(),now,planStartDate);
+  TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(subscription,now,now);
   PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,now,nextTimedPhase.getStartPhase()) : null;
   if (nextPhaseEvent != null) {
     uncancelEvents.add(nextPhaseEvent);
