@@ -1,16 +1,17 @@
 {
-  final DateTime now=new DateTime(DateTimeZone.UTC);
   final Account account=testHelper.createTestCreditCardAccount();
-  final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
+  final Invoice invoice=testHelper.createTestInvoice(account,clock.getUTCNow(),Currency.USD);
   final BigDecimal amount=new BigDecimal("10.00");
   final UUID subscriptionId=UUID.randomUUID();
-  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),subscriptionId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD,new DateTime(DateTimeZone.UTC)));
-  DateTime nextRetryDate=new DateTime(DateTimeZone.UTC).minusDays(1);
-  DateTime paymentAttemptDate=nextRetryDate.minusDays(paymentConfig.getPaymentRetryDays().get(0));
-  PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice).cloner().setRetryCount(1).setPaymentAttemptDate(paymentAttemptDate).build();
-  paymentDao.createPaymentAttempt(paymentAttempt);
+  final DateTime now=clock.getUTCNow();
+  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),subscriptionId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD,now));
+  int numberOfDays=paymentConfig.getPaymentRetryDays().get(0);
+  DateTime nextRetryDate=now.plusDays(numberOfDays);
+  PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice).cloner().setRetryCount(1).setPaymentAttemptDate(now).build();
+  PaymentAttempt attempt=paymentDao.createPaymentAttempt(paymentAttempt);
   retryService.scheduleRetry(paymentAttempt,nextRetryDate);
-  Thread.sleep(paymentConfig.getNotificationSleepTimeMs() * 10);
+  ((ClockMock)clock).setDeltaFromReality(Days.days(numberOfDays).toStandardSeconds().getSeconds() * 1000);
+  Thread.sleep(2000);
   List<Notification> pendingNotifications=mockNotificationQueue.getPendingEvents();
   assertEquals(pendingNotifications.size(),0);
   List<PaymentInfo> paymentInfos=paymentApi.getPaymentInfo(Arrays.asList(invoice.getId().toString()));

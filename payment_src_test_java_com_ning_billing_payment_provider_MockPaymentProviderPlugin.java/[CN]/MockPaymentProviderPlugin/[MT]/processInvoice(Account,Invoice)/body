@@ -3,7 +3,7 @@
     return Either.left(new PaymentError("unknown","test error",account.getId(),invoice.getId()));
   }
  else {
-    PaymentInfo payment=new PaymentInfo.Builder().setPaymentId(UUID.randomUUID().toString()).setAmount(invoice.getBalance()).setStatus("Processed").setBankIdentificationNumber("1234").setCreatedDate(new DateTime()).setEffectiveDate(new DateTime()).setPaymentNumber("12345").setReferenceId("12345").setType("Electronic").build();
+    PaymentInfo payment=new PaymentInfo.Builder().setPaymentId(UUID.randomUUID().toString()).setAmount(invoice.getBalance()).setStatus("Processed").setBankIdentificationNumber("1234").setCreatedDate(clock.getUTCNow()).setEffectiveDate(clock.getUTCNow()).setPaymentNumber("12345").setReferenceId("12345").setType("Electronic").build();
     payments.put(payment.getPaymentId(),payment);
     return Either.right(payment);
   }
