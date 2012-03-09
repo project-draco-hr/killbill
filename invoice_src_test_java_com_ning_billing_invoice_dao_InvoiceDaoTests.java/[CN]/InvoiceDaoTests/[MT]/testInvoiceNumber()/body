@@ -12,14 +12,14 @@
   ((ZombieControl)phase2).addResult("getName","plan-phase2");
   BillingEventSet events=new BillingEventSet();
   List<Invoice> invoices=new ArrayList<Invoice>();
-  BillingEvent event1=new DefaultBillingEvent(subscription,targetDate1,plan,phase1,null,TEN,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent1",SubscriptionTransitionType.CHANGE);
+  BillingEvent event1=new DefaultBillingEvent(subscription,targetDate1,plan,phase1,null,TEN,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent1",1L,SubscriptionTransitionType.CHANGE);
   events.add(event1);
   Invoice invoice1=generator.generateInvoice(UUID.randomUUID(),events,invoices,targetDate1,Currency.USD);
   invoices.add(invoice1);
   invoiceDao.create(invoice1);
   invoice1=invoiceDao.getById(invoice1.getId());
   assertNotNull(invoice1.getInvoiceNumber());
-  BillingEvent event2=new DefaultBillingEvent(subscription,targetDate1,plan,phase2,null,TWENTY,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent2",SubscriptionTransitionType.CHANGE);
+  BillingEvent event2=new DefaultBillingEvent(subscription,targetDate1,plan,phase2,null,TWENTY,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent2",2L,SubscriptionTransitionType.CHANGE);
   events.add(event2);
   Invoice invoice2=generator.generateInvoice(UUID.randomUUID(),events,invoices,targetDate2,Currency.USD);
   invoiceDao.create(invoice2);
