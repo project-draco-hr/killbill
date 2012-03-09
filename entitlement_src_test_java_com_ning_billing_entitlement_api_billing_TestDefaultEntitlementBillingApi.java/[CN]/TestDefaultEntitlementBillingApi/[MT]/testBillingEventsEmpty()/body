@@ -2,9 +2,9 @@
   dao=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementDao.class);
   ((ZombieControl)dao).addResult("getSubscriptionBundleForAccount",new ArrayList<SubscriptionBundle>());
   UUID accountId=UUID.randomUUID();
-  Account account=new BrainDeadAccount();
-  ((ZombieControl)account).addResult("getId",accountId);
-  AccountUserApi accountApi=new BrainDeadAccountUserApi();
+  Account account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
+  ((ZombieControl)account).addResult("getId",accountId).addResult("getCurrency",Currency.USD);
+  AccountUserApi accountApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
   ((ZombieControl)accountApi).addResult("getAccountById",account);
   DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(dao,accountApi,catalogService);
   SortedSet<BillingEvent> events=api.getBillingEventsForAccount(new UUID(0L,0L));
