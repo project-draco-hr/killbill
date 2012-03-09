@@ -31,7 +31,12 @@
   testListener.pushExpectedEvent(NextEvent.CANCEL);
   subscription.cancel(null,false);
   testListener.pushExpectedEvent(NextEvent.PHASE);
-  testListener.pushExpectedEvent(NextEvent.CREATE);
+  testListener.pushExpectedEvent(NextEvent.RE_CREATE);
+  try {
+    Thread.sleep(1000);
+  }
+ catch (  InterruptedException e) {
+  }
   if (fromUserAPi) {
     subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,null),requestedDate);
   }
