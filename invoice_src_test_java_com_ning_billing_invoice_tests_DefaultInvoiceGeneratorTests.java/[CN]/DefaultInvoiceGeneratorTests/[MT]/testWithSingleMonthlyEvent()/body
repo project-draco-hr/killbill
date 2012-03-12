@@ -7,10 +7,9 @@
   PlanPhase phase=createMockMonthlyPlanPhase(rate1);
   BillingEvent event=createBillingEvent(sub.getId(),startDate,plan,phase,1);
   events.add(event);
-  InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,10,3);
   UUID accountId=UUID.randomUUID();
-  Invoice invoice=generator.generateInvoice(accountId,events,existingInvoiceItems,targetDate,Currency.USD);
+  Invoice invoice=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
   assertEquals(invoice.getTotalAmount(),TWENTY);

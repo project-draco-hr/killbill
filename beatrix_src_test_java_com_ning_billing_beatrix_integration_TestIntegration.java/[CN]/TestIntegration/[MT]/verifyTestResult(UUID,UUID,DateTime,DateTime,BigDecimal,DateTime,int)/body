@@ -1,6 +1,10 @@
 {
   SubscriptionData subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscriptionId);
-  List<InvoiceItem> invoiceItems=invoiceUserApi.getInvoiceItemsByAccount(accountId);
+  List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId);
+  List<InvoiceItem> invoiceItems=new ArrayList<InvoiceItem>();
+  for (  Invoice invoice : invoices) {
+    invoiceItems.addAll(invoice.getInvoiceItems());
+  }
   assertEquals(invoiceItems.size(),totalInvoiceItemCount);
   boolean wasFound=false;
   for (  InvoiceItem item : invoiceItems) {

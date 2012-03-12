@@ -1,0 +1,14 @@
+{
+  UUID migrationInvoiceId=migrationApi.createMigrationInvoice(accountId,now,MIGRATION_INVOICE_AMOUNT,MIGRATION_INVOICE_CURRENCY);
+  Assert.assertNotNull(migrationInvoiceId);
+  Invoice invoice=invoiceDao.getById(migrationInvoiceId);
+  Assert.assertNotNull(invoice);
+  Assert.assertEquals(invoice.getAccountId(),accountId);
+  Assert.assertEquals(invoice.getTargetDate().compareTo(now),0);
+  Assert.assertEquals(invoice.getNumberOfItems(),1);
+  Assert.assertEquals(invoice.getInvoiceItems().get(0).getAmount().compareTo(MIGRATION_INVOICE_AMOUNT),0);
+  Assert.assertEquals(invoice.getBalance().compareTo(MIGRATION_INVOICE_AMOUNT),0);
+  Assert.assertEquals(invoice.getCurrency(),MIGRATION_INVOICE_CURRENCY);
+  Assert.assertTrue(invoice.isMigrationInvoice());
+  return migrationInvoiceId;
+}

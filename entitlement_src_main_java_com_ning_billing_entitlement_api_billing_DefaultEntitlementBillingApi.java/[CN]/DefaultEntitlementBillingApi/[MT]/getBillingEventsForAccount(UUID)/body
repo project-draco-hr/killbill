@@ -1,4 +1,6 @@
 {
+  Account account=accountApi.getAccountById(accountId);
+  Currency currency=account.getCurrency();
   List<SubscriptionBundle> bundles=entitlementDao.getSubscriptionBundleForAccount(accountId);
   SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
   for (  final SubscriptionBundle bundle : bundles) {
@@ -6,7 +8,7 @@
     for (    final Subscription subscription : subscriptions) {
       for (      final SubscriptionTransition transition : subscription.getAllTransitions()) {
         try {
-          BillingEvent event=new DefaultBillingEvent(transition,subscription,calculateBcd(bundle,subscription,transition,accountId));
+          BillingEvent event=new DefaultBillingEvent(transition,subscription,calculateBcd(bundle,subscription,transition,accountId),currency);
           result.add(event);
         }
  catch (        CatalogApiException e) {
