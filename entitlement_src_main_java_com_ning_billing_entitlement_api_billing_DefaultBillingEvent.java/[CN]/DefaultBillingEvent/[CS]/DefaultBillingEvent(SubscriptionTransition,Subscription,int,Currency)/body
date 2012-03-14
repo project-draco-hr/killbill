@@ -1,0 +1,15 @@
+{
+  this.billCycleDay=billCycleDay;
+  this.subscription=subscription;
+  effectiveDate=transition.getEffectiveTransitionTime();
+  planPhase=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? transition.getNextPhase() : transition.getPreviousPhase();
+  plan=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? transition.getNextPlan() : transition.getPreviousPlan();
+  fixedPrice=(transition.getNextPhase() == null) ? null : (transition.getNextPhase().getFixedPrice() == null) ? null : transition.getNextPhase().getFixedPrice().getPrice(currency);
+  recurringPrice=(transition.getNextPhase() == null) ? null : (transition.getNextPhase().getRecurringPrice() == null) ? null : transition.getNextPhase().getRecurringPrice().getPrice(currency);
+  this.currency=currency;
+  description=transition.getTransitionType().toString();
+  billingModeType=BillingModeType.IN_ADVANCE;
+  billingPeriod=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? transition.getNextPhase().getBillingPeriod() : transition.getPreviousPhase().getBillingPeriod();
+  type=transition.getTransitionType();
+  totalOrdering=((SubscriptionTransitionData)transition).getTotalOrdering();
+}

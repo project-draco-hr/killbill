@@ -5,7 +5,7 @@
   DateTime endDate=new DateTime(2011,11,1,0,0,0,0);
   BigDecimal rate=new BigDecimal("20.00");
   final DateTime expectedCreatedDate=clock.getUTCNow();
-  RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,endDate,rate,rate,Currency.USD,expectedCreatedDate,expectedCreatedDate);
+  RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,endDate,rate,rate,Currency.USD,expectedCreatedDate);
   recurringInvoiceItemDao.create(item);
   RecurringInvoiceItem thisItem=(RecurringInvoiceItem)recurringInvoiceItemDao.getById(item.getId().toString());
   assertNotNull(thisItem);
@@ -17,17 +17,5 @@
   assertEquals(thisItem.getAmount().compareTo(item.getRate()),0);
   assertEquals(thisItem.getRate().compareTo(item.getRate()),0);
   assertEquals(thisItem.getCurrency(),item.getCurrency());
-  assertEquals(thisItem.getCreatedDate(),item.getCreatedDate());
-  assertEquals(thisItem.getUpdatedDate(),item.getUpdatedDate());
-  assertEquals(thisItem.getUpdatedDate(),thisItem.getUpdatedDate());
-  assertEquals(thisItem.getUpdatedDate(),expectedCreatedDate);
-  final DateTime updatedDate=clock.getUTCNow().plusDays(10);
-  RecurringInvoiceItem expectedUpdatedItem=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,endDate,rate,rate,Currency.USD,expectedCreatedDate,updatedDate);
-  recurringInvoiceItemDao.update(item);
-  RecurringInvoiceItem updatedItem=(RecurringInvoiceItem)recurringInvoiceItemDao.getById(item.getId().toString());
-  assertNotNull(updatedItem);
-  assertEquals(updatedItem.getId(),item.getId());
-  assertEquals(updatedItem.getCreatedDate(),item.getCreatedDate());
-  assertEquals(updatedItem.getUpdatedDate(),expectedUpdatedItem.getUpdatedDate());
-  assertEquals(updatedItem.getUpdatedDate(),updatedDate);
+  assertEquals(thisItem.getCreatedDate().compareTo(item.getCreatedDate()),0);
 }
