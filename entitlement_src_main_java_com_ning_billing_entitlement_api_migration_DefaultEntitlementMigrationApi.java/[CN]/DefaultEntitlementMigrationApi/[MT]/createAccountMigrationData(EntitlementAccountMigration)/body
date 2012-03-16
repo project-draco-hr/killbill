@@ -35,11 +35,11 @@
     for (    EntitlementSubscriptionMigration curSub : sortedSubscriptions) {
       SubscriptionMigrationData data=null;
       if (bundleStartDate == null) {
-        data=createInitialSubscription(bundleData.getId(),curSub.getCategory(),curSub.getSubscriptionCases(),now);
+        data=createInitialSubscription(bundleData.getId(),curSub.getCategory(),curSub.getSubscriptionCases(),now,curSub.getChargedThroughDate());
         bundleStartDate=data.getInitialEvents().get(0).getEffectiveDate();
       }
  else {
-        data=createSubscriptionMigrationDataWithBundleDate(bundleData.getId(),curSub.getCategory(),curSub.getSubscriptionCases(),now,bundleStartDate);
+        data=createSubscriptionMigrationDataWithBundleDate(bundleData.getId(),curSub.getCategory(),curSub.getSubscriptionCases(),now,bundleStartDate,curSub.getChargedThroughDate());
       }
       if (data != null) {
         bundleSubscriptionData.add(data);

@@ -8,6 +8,9 @@
     if (cur.getEffectiveTransitionTime().isAfter(clock.getUTCNow())) {
       continue;
     }
+    if (cur.getTransitionType() == SubscriptionTransitionType.MIGRATE_BILLING) {
+      continue;
+    }
     if (cur.getEventType() == EventType.API_USER && (cur.getApiEventType() == ApiEventType.CHANGE || cur.getApiEventType() == ApiEventType.RE_CREATE)) {
       return cur;
     }

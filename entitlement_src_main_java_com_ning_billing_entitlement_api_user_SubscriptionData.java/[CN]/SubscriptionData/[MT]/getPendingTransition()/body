@@ -3,6 +3,9 @@
     return null;
   }
   for (  SubscriptionTransition cur : transitions) {
+    if (cur.getTransitionType() == SubscriptionTransitionType.MIGRATE_BILLING) {
+      continue;
+    }
     if (cur.getEffectiveTransitionTime().isAfter(clock.getUTCNow())) {
       return cur;
     }

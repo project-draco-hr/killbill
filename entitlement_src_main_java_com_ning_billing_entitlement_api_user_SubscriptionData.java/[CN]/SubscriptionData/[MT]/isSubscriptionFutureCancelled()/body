@@ -3,6 +3,9 @@
     return false;
   }
   for (  SubscriptionTransitionData cur : transitions) {
+    if (cur.getTransitionType() == SubscriptionTransitionType.MIGRATE_BILLING) {
+      continue;
+    }
     if (cur.getEffectiveTransitionTime().isBefore(clock.getUTCNow()) || cur.getEventType() == EventType.PHASE || cur.getApiEventType() != ApiEventType.CANCEL) {
       continue;
     }

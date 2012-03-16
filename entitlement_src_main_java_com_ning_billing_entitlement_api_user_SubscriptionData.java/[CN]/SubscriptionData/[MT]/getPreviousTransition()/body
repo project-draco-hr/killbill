@@ -4,6 +4,9 @@
   }
   SubscriptionTransitionData latestSubscription=transitions.get(0);
   for (  SubscriptionTransitionData cur : transitions) {
+    if (cur.getTransitionType() == SubscriptionTransitionType.MIGRATE_BILLING) {
+      continue;
+    }
     if (cur.getEffectiveTransitionTime().isAfter(clock.getUTCNow()) || !cur.isFromDisk()) {
       break;
     }

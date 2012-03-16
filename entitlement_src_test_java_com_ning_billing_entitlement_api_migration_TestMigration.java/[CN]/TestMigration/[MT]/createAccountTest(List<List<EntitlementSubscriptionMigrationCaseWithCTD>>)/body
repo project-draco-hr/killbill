@@ -1,0 +1,45 @@
+{
+  return new EntitlementAccountMigration(){
+    private final UUID accountId=UUID.randomUUID();
+    @Override public EntitlementBundleMigration[] getBundles(){
+      List<EntitlementBundleMigration> bundles=new ArrayList<EntitlementBundleMigration>();
+      EntitlementBundleMigration bundle0=new EntitlementBundleMigration(){
+        @Override public EntitlementSubscriptionMigration[] getSubscriptions(){
+          EntitlementSubscriptionMigration[] result=new EntitlementSubscriptionMigration[cases.size()];
+          for (int i=0; i < cases.size(); i++) {
+            final List<EntitlementSubscriptionMigrationCaseWithCTD> curCases=cases.get(i);
+            EntitlementSubscriptionMigration subscription=new EntitlementSubscriptionMigration(){
+              @Override public EntitlementSubscriptionMigrationCaseWithCTD[] getSubscriptionCases(){
+                return curCases.toArray(new EntitlementSubscriptionMigrationCaseWithCTD[curCases.size()]);
+              }
+              @Override public ProductCategory getCategory(){
+                return curCases.get(0).getPlanPhaseSpecifer().getProductCategory();
+              }
+              @Override public DateTime getChargedThroughDate(){
+                for (                EntitlementSubscriptionMigrationCaseWithCTD cur : curCases) {
+                  if (cur.getChargedThroughDate() != null) {
+                    return cur.getChargedThroughDate();
+                  }
+                }
+                return null;
+              }
+            }
+;
+            result[i]=subscription;
+          }
+          return result;
+        }
+        @Override public String getBundleKey(){
+          return "12345";
+        }
+      }
+;
+      bundles.add(bundle0);
+      return bundles.toArray(new EntitlementBundleMigration[bundles.size()]);
+    }
+    @Override public UUID getAccountKey(){
+      return accountId;
+    }
+  }
+;
+}
