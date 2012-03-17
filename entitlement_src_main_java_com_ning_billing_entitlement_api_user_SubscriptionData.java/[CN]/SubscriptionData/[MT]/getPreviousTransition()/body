@@ -2,15 +2,6 @@
   if (transitions == null) {
     return null;
   }
-  SubscriptionTransitionData latestSubscription=transitions.get(0);
-  for (  SubscriptionTransitionData cur : transitions) {
-    if (cur.getTransitionType() == SubscriptionTransitionType.MIGRATE_BILLING) {
-      continue;
-    }
-    if (cur.getEffectiveTransitionTime().isAfter(clock.getUTCNow()) || !cur.isFromDisk()) {
-      break;
-    }
-    latestSubscription=cur;
-  }
-  return latestSubscription;
+  SubscriptionTransitionDataIterator it=new SubscriptionTransitionDataIterator(clock,transitions,Order.DESC_FROM_FUTURE,Kind.ENTITLEMENT,Visibility.FROM_DISK_ONLY,TimeLimit.PAST_OR_PRESENT_ONLY);
+  return it.hasNext() ? it.next() : null;
 }

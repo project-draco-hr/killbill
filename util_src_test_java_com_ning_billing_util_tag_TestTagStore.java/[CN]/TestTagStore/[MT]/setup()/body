@@ -1,14 +1,10 @@
 {
   try {
-    module=new TagStoreModuleMock();
     final String utilDdl=IOUtils.toString(TestTagStore.class.getResourceAsStream("/com/ning/billing/util/ddl.sql"));
-    module.startDb();
-    module.initDb(utilDdl);
-    final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module,new MockClockModule());
-    dbi=injector.getInstance(IDBI.class);
-    tagStoreSqlDao=injector.getInstance(TagStoreSqlDao.class);
+    helper.startMysql();
+    helper.initDb(utilDdl);
     tagStoreSqlDao.test();
-    tagDefinitionDao=injector.getInstance(TagDefinitionDao.class);
+    cleanupTags();
     tag1=tagDefinitionDao.create("tag1","First tag","test");
     tag2=tagDefinitionDao.create("tag2","Second tag","test");
   }

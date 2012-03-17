@@ -2,14 +2,12 @@
   if (transitions == null) {
     return false;
   }
-  for (  SubscriptionTransitionData cur : transitions) {
-    if (cur.getTransitionType() == SubscriptionTransitionType.MIGRATE_BILLING) {
-      continue;
+  SubscriptionTransitionDataIterator it=new SubscriptionTransitionDataIterator(clock,transitions,Order.ASC_FROM_PAST,Kind.ENTITLEMENT,Visibility.ALL,TimeLimit.FUTURE_ONLY);
+  while (it.hasNext()) {
+    SubscriptionTransitionData cur=it.next();
+    if (cur.getTransitionType() == SubscriptionTransitionType.CANCEL) {
+      return true;
     }
-    if (cur.getEffectiveTransitionTime().isBefore(clock.getUTCNow()) || cur.getEventType() == EventType.PHASE || cur.getApiEventType() != ApiEventType.CANCEL) {
-      continue;
-    }
-    return true;
   }
   return false;
 }
