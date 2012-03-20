@@ -1,9 +1,10 @@
 {
+  CallContext migrationContext=factory.toMigrationCallContext(context,data.getCreatedDate(),data.getUpdatedDate());
   Account account=new DefaultAccount(data);
   account.setFields(fields);
   account.addTags(tags);
   try {
-    dao.create(account,context);
+    dao.create(account,migrationContext);
   }
  catch (  EntityPersistenceException e) {
     throw new AccountApiException(e,ErrorCode.ACCOUNT_CREATION_FAILED);

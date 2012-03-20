@@ -14,7 +14,13 @@
       }
  else {
         Object result=results.get(method.getName());
-        if (result != null) {
+        if (result == ZOMBIE_VOID) {
+          return (Void)null;
+        }
+ else         if (result != null) {
+          if (result instanceof Throwable) {
+            throw ((Throwable)result);
+          }
           return result;
         }
  else {

@@ -1,9 +1,11 @@
 {
   try {
     DateTime beforeMigration=clock.getUTCNow();
+    final DateTime initalBPStart=clock.getUTCNow().minusMonths(3);
     final DateTime initalAddonStart=clock.getUTCNow().minusMonths(1).plusDays(7);
-    EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlanAndAddons(initalAddonStart);
+    EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlanAndAddons(initalBPStart,initalAddonStart);
     DateTime afterMigration=clock.getUTCNow();
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated);
     assertTrue(testListener.isCompleted(5000));
@@ -18,7 +20,8 @@
     assertEquals(baseSubscription.getCurrentPriceList(),PriceListSet.DEFAULT_PRICELIST_NAME);
     assertEquals(baseSubscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
     assertEquals(baseSubscription.getState(),SubscriptionState.ACTIVE);
-    assertEquals(baseSubscription.getCurrentPlan().getName(),"assault-rifle-annual");
+    assertEquals(baseSubscription.getCurrentPlan().getName(),"shotgun-annual");
+    assertEquals(baseSubscription.getChargedThroughDate(),initalBPStart.plusYears(1));
     Subscription aoSubscription=(subscriptions.get(0).getCurrentPlan().getProduct().getCategory() == ProductCategory.ADD_ON) ? subscriptions.get(0) : subscriptions.get(1);
     assertEquals(aoSubscription.getStartDate(),initalAddonStart);
     assertEquals(aoSubscription.getEndDate(),null);
@@ -26,6 +29,7 @@
     assertEquals(aoSubscription.getCurrentPhase().getPhaseType(),PhaseType.DISCOUNT);
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(aoSubscription.getCurrentPlan().getName(),"telescopic-scope-monthly");
+    assertEquals(aoSubscription.getChargedThroughDate(),initalAddonStart.plusMonths(1));
   }
  catch (  EntitlementMigrationApiException e) {
     Assert.fail("",e);

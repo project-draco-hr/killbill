@@ -29,5 +29,6 @@
   ((ZombieControl)entitlementDao).addResult("getSubscriptionFromId",subscription);
   notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),entitlementDao,listener);
   startMysql();
-  listener=new InvoiceListenerMock(clock,dispatcher);
+  CallContextFactory factory=new CallContextFactory(clock);
+  listener=new InvoiceListenerMock(factory,dispatcher);
 }

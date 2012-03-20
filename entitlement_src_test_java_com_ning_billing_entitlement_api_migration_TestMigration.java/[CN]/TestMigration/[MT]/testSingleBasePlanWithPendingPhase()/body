@@ -19,6 +19,8 @@
     assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.TRIAL);
     assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-monthly");
+    assertEquals(subscription.getChargedThroughDate(),trialDate.plusDays(30));
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_BILLING);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     Duration thirtyDays=getDurationDay(30);
     clock.setDeltaFromReality(thirtyDays,0);

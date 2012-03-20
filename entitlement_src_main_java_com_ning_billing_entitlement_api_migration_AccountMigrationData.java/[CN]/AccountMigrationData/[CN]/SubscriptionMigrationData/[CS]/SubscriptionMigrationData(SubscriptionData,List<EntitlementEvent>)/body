@@ -1,5 +1,11 @@
 {
   super();
-  this.data=data;
+  SubscriptionBuilder builder=new SubscriptionBuilder(data);
+  for (  EntitlementEvent cur : initialEvents) {
+    if (cur instanceof ApiEventMigrateBilling) {
+      builder.setChargedThroughDate(cur.getEffectiveDate());
+    }
+  }
+  this.data=new SubscriptionData(builder);
   this.initialEvents=initialEvents;
 }

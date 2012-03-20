@@ -1,30 +1,8 @@
 {
-  List<EntitlementSubscriptionMigrationCase> cases=new LinkedList<EntitlementSubscriptionMigrationCase>();
-  cases.add(new EntitlementSubscriptionMigrationCase(){
-    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
-      return new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
-    }
-    @Override public DateTime getEffectiveDate(){
-      return trialDate;
-    }
-    @Override public DateTime getCancelledDate(){
-      return trialDate.plusDays(30);
-    }
-  }
-);
-  cases.add(new EntitlementSubscriptionMigrationCase(){
-    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
-      return new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
-    }
-    @Override public DateTime getEffectiveDate(){
-      return trialDate.plusDays(30);
-    }
-    @Override public DateTime getCancelledDate(){
-      return null;
-    }
-  }
-);
-  List<List<EntitlementSubscriptionMigrationCase>> input=new ArrayList<List<EntitlementSubscriptionMigrationCase>>();
+  List<EntitlementSubscriptionMigrationCaseWithCTD> cases=new LinkedList<EntitlementSubscriptionMigrationCaseWithCTD>();
+  cases.add(new EntitlementSubscriptionMigrationCaseWithCTD(new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL),trialDate,trialDate.plusDays(30),trialDate.plusDays(30)));
+  cases.add(new EntitlementSubscriptionMigrationCaseWithCTD(new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN),trialDate.plusDays(30),null,null));
+  List<List<EntitlementSubscriptionMigrationCaseWithCTD>> input=new ArrayList<List<EntitlementSubscriptionMigrationCaseWithCTD>>();
   input.add(cases);
-  return createAccountWithSingleBasePlan(input);
+  return createAccountTest(input);
 }
