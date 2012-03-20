@@ -1,8 +1,8 @@
 {
-  final DefaultInvoice invoice=new DefaultInvoice(account.getId(),clock.getUTCNow(),ACCOUNT_CURRENCY,clock);
-  final FixedPriceInvoiceItem invoiceItem=new FixedPriceInvoiceItem(UUID.randomUUID(),invoice.getId(),UUID.randomUUID(),"somePlan","somePhase",clock.getUTCNow(),clock.getUTCNow().plusDays(1),INVOICE_AMOUNT,ACCOUNT_CURRENCY,clock.getUTCNow());
+  final DefaultInvoice invoice=new DefaultInvoice(account.getId(),clock.getUTCNow(),clock.getUTCNow(),ACCOUNT_CURRENCY);
+  final FixedPriceInvoiceItem invoiceItem=new FixedPriceInvoiceItem(UUID.randomUUID(),invoice.getId(),UUID.randomUUID(),"somePlan","somePhase",clock.getUTCNow(),clock.getUTCNow().plusDays(1),INVOICE_AMOUNT,ACCOUNT_CURRENCY,context.getUserName(),clock.getUTCNow());
   invoice.addInvoiceItem(invoiceItem);
-  invoiceDao.create(invoice);
+  invoiceDao.create(invoice,context);
   Assert.assertEquals(invoiceDao.getInvoicesByAccount(account.getId()).size(),1);
   Assert.assertEquals(invoiceDao.getInvoicesByAccount(account.getId()).get(0).getInvoiceItems().size(),1);
   invoiceCreationNotification=new DefaultInvoiceCreationNotification(invoice.getId(),account.getId(),INVOICE_AMOUNT,ACCOUNT_CURRENCY,clock.getUTCNow());

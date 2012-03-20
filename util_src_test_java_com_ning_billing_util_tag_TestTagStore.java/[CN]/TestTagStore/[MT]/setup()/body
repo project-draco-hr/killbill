@@ -6,11 +6,14 @@
     module.initDb(utilDdl);
     final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module,new MockClockModule());
     dbi=injector.getInstance(IDBI.class);
-    tagStoreSqlDao=injector.getInstance(TagStoreSqlDao.class);
-    tagStoreSqlDao.test();
+    tagSqlDao=injector.getInstance(TagSqlDao.class);
+    tagSqlDao.test();
+    module.execute("truncate tag_definitions;");
+    Clock clock=injector.getInstance(Clock.class);
+    context=new DefaultCallContext(clock,"Inigo Montoya",CallOrigin.TEST,UserType.TEST);
     tagDefinitionDao=injector.getInstance(TagDefinitionDao.class);
-    tag1=tagDefinitionDao.create("tag1","First tag","test");
-    tag2=tagDefinitionDao.create("tag2","Second tag","test");
+    tag1=tagDefinitionDao.create("tag1","First tag",context);
+    tag2=tagDefinitionDao.create("tag2","Second tag",context);
   }
  catch (  Throwable t) {
     log.error("Failed to start tag store tests",t);

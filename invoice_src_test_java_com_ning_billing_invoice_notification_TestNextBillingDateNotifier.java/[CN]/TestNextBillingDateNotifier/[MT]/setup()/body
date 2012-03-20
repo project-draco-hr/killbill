@@ -23,9 +23,11 @@
   eventBus=g.getInstance(Bus.class);
   helper=g.getInstance(MysqlTestingHelper.class);
   notificationQueueService=g.getInstance(NotificationQueueService.class);
+  InvoiceDispatcher dispatcher=g.getInstance(InvoiceDispatcher.class);
   Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
   EntitlementDao entitlementDao=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementDao.class);
   ((ZombieControl)entitlementDao).addResult("getSubscriptionFromId",subscription);
   notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),entitlementDao,listener);
   startMysql();
+  listener=new InvoiceListenerMock(clock,dispatcher);
 }

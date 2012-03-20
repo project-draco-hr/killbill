@@ -4,22 +4,22 @@
   String definitionName="MixedTagTest";
   TagDefinition tagDefinition=null;
   try {
-    tagDefinition=tagDefinitionDao.create(definitionName,"Test tag for some test purpose","testUser");
+    tagDefinition=tagDefinitionDao.create(definitionName,"Test tag for some test purpose",context);
   }
  catch (  TagDefinitionApiException e) {
     fail("Tag definition creation failed.",e);
   }
-  DescriptiveTag descriptiveTag=new DescriptiveTag(tagDefinition,"testUser",clock.getUTCNow());
+  DescriptiveTag descriptiveTag=new DescriptiveTag(tagDefinition);
   tagStore.add(descriptiveTag);
   assertEquals(tagStore.generateInvoice(),true);
-  ControlTag controlTag=new DefaultControlTag("testUser",clock.getUTCNow(),ControlTagType.AUTO_INVOICING_OFF);
+  ControlTag controlTag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
   tagStore.add(controlTag);
   assertEquals(tagStore.generateInvoice(),false);
   List<Tag> tagList=tagStore.getEntityList();
-  saveTags(tagStoreSqlDao,ACCOUNT_TYPE,accountId.toString(),tagList);
+  saveTags(tagSqlDao,ACCOUNT_TYPE,accountId,tagList,context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  tagList=tagStoreSqlDao.load(accountId.toString(),ACCOUNT_TYPE);
+  tagList=tagSqlDao.load(accountId.toString(),ACCOUNT_TYPE);
   tagStore.add(tagList);
   assertEquals(tagList.size(),2);
   assertEquals(tagStore.generateInvoice(),false);

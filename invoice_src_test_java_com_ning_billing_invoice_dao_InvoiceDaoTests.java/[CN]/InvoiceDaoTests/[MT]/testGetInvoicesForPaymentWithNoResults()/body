@@ -4,8 +4,8 @@
   List<UUID> invoices=invoiceDao.getInvoicesForPayment(notionalDate,NUMBER_OF_DAY_BETWEEN_RETRIES);
   int existingInvoiceCount=invoices.size();
   UUID accountId=UUID.randomUUID();
-  Invoice invoice=new DefaultInvoice(accountId,targetDate,Currency.USD,clock);
-  invoiceDao.create(invoice);
+  Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,Currency.USD);
+  invoiceDao.create(invoice,context);
   invoices=invoiceDao.getInvoicesForPayment(notionalDate,NUMBER_OF_DAY_BETWEEN_RETRIES);
   assertEquals(invoices.size(),existingInvoiceCount);
 }

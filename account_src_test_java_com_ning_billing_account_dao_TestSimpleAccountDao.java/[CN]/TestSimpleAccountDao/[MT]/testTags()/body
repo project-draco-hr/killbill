@@ -1,18 +1,14 @@
 {
   Account account=createTestAccountBuilder().build();
-  TagDefinition definition=new DefaultTagDefinition("Test Tag","For testing only","Test System");
+  TagDefinition definition=new DefaultTagDefinition("Test Tag","For testing only");
   TagDefinitionSqlDao tagDescriptionDao=dbi.onDemand(TagDefinitionSqlDao.class);
-  tagDescriptionDao.create(definition);
-  String addedBy="testTags()";
-  DateTime dateAdded=new DefaultClock().getUTCNow();
-  account.addTag(definition,addedBy,dateAdded);
+  tagDescriptionDao.create(definition,context);
+  account.addTag(definition);
   assertEquals(account.getTagList().size(),1);
-  accountDao.create(account);
+  accountDao.create(account,context);
   Account thisAccount=accountDao.getById(account.getId().toString());
   List<Tag> tagList=thisAccount.getTagList();
   assertEquals(tagList.size(),1);
   Tag tag=tagList.get(0);
   assertEquals(tag.getTagDefinitionName(),definition.getName());
-  assertEquals(tag.getAddedBy(),addedBy);
-  assertEquals(tag.getAddedDate().compareTo(dateAdded),0);
 }

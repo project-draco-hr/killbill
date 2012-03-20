@@ -5,8 +5,8 @@
   for (int i=0; i < 5; i++) {
     UUID subscriptionId=UUID.randomUUID();
     BigDecimal amount=rate.multiply(new BigDecimal(i + 1));
-    RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,startDate.plusMonths(1),amount,amount,Currency.USD,clock.getUTCNow());
-    recurringInvoiceItemDao.create(item);
+    RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,startDate.plusMonths(1),amount,amount,Currency.USD);
+    recurringInvoiceItemDao.create(item,context);
   }
   List<InvoiceItem> items=recurringInvoiceItemDao.getInvoiceItemsByInvoice(invoiceId.toString());
   assertEquals(items.size(),5);

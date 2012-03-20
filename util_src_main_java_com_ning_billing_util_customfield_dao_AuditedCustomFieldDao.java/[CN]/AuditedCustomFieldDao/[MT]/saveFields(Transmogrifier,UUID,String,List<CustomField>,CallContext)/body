@@ -1,0 +1,23 @@
+{
+  CustomFieldSqlDao customFieldSqlDao=dao.become(CustomFieldSqlDao.class);
+  List<CustomField> existingFields=customFieldSqlDao.load(objectId.toString(),objectType);
+  List<CustomField> fieldsToUpdate=new ArrayList<CustomField>();
+  Iterator<CustomField> fieldIterator=fields.iterator();
+  while (fieldIterator.hasNext()) {
+    CustomField field=fieldIterator.next();
+    Iterator<CustomField> existingFieldIterator=existingFields.iterator();
+    while (existingFieldIterator.hasNext()) {
+      CustomField existingField=existingFieldIterator.next();
+      if (field.getName().equals(existingField.getName())) {
+        fieldsToUpdate.add(field);
+        fieldIterator.remove();
+        existingFieldIterator.remove();
+      }
+    }
+  }
+  customFieldSqlDao.batchInsertFromTransaction(objectId.toString(),objectType,fields,context);
+  customFieldSqlDao.batchUpdateFromTransaction(objectId.toString(),objectType,fieldsToUpdate,context);
+  customFieldSqlDao.batchDeleteFromTransaction(objectId.toString(),objectType,existingFields,context);
+  CustomFieldAuditSqlDao auditDao=dao.become(CustomFieldAuditSqlDao.class);
+  auditDao.batchDeleteFromTransaction(objectId.toString(),objectType,existingFields,context);
+}

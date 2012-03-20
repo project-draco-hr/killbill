@@ -4,9 +4,8 @@
   DateTime startDate=new DateTime(2011,10,1,0,0,0,0);
   DateTime endDate=new DateTime(2011,11,1,0,0,0,0);
   BigDecimal rate=new BigDecimal("20.00");
-  final DateTime expectedCreatedDate=clock.getUTCNow();
-  RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,endDate,rate,rate,Currency.USD,expectedCreatedDate);
-  recurringInvoiceItemDao.create(item);
+  RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,endDate,rate,rate,Currency.USD);
+  recurringInvoiceItemDao.create(item,context);
   RecurringInvoiceItem thisItem=(RecurringInvoiceItem)recurringInvoiceItemDao.getById(item.getId().toString());
   assertNotNull(thisItem);
   assertEquals(thisItem.getId(),item.getId());

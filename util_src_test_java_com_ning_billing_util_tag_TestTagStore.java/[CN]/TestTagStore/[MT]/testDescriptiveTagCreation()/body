@@ -4,19 +4,19 @@
   String definitionName="SomeTestTag";
   TagDefinition tagDefinition=null;
   try {
-    tagDefinition=tagDefinitionDao.create(definitionName,"Test tag for some test purpose","testUser");
+    tagDefinition=tagDefinitionDao.create(definitionName,"Test tag for some test purpose",context);
   }
  catch (  TagDefinitionApiException e) {
     fail("Tag definition creation failed.",e);
   }
-  DescriptiveTag tag=new DescriptiveTag(tagDefinition,"testUser",clock.getUTCNow());
+  DescriptiveTag tag=new DescriptiveTag(tagDefinition);
   tagStore.add(tag);
   assertEquals(tagStore.generateInvoice(),true);
   List<Tag> tagList=tagStore.getEntityList();
-  saveTags(tagStoreSqlDao,ACCOUNT_TYPE,accountId.toString(),tagList);
+  saveTags(tagSqlDao,ACCOUNT_TYPE,accountId,tagList,context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  tagList=tagStoreSqlDao.load(accountId.toString(),ACCOUNT_TYPE);
+  tagList=tagSqlDao.load(accountId.toString(),ACCOUNT_TYPE);
   tagStore.add(tagList);
   assertEquals(tagList.size(),1);
   assertEquals(tagStore.generateInvoice(),true);

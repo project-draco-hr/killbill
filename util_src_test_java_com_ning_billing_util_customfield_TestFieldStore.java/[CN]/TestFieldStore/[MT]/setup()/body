@@ -4,6 +4,10 @@
     helper.startMysql();
     helper.initDb(utilDdl);
     dbi=helper.getDBI();
+    FieldStoreModule module=new FieldStoreModule();
+    final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module,new MockClockModule());
+    Clock clock=injector.getInstance(Clock.class);
+    context=new DefaultCallContext(clock,"Fezzik",CallOrigin.TEST,UserType.TEST);
   }
  catch (  Throwable t) {
     log.error("Setup failed",t);

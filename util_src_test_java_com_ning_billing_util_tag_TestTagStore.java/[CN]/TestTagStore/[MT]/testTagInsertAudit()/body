@@ -1,0 +1,23 @@
+{
+  UUID accountId=UUID.randomUUID();
+  TagStore tagStore=new DefaultTagStore(accountId,ACCOUNT_TYPE);
+  Tag tag=new DescriptiveTag(tag2);
+  tagStore.add(tag);
+  TagSqlDao dao=dbi.onDemand(TagSqlDao.class);
+  saveTags(dao,ACCOUNT_TYPE,accountId,tagStore.getEntityList(),context);
+  List<Tag> savedTags=dao.load(accountId.toString(),ACCOUNT_TYPE);
+  assertEquals(savedTags.size(),1);
+  Tag savedTag=savedTags.get(0);
+  assertEquals(savedTag.getTagDefinitionName(),tag.getTagDefinitionName());
+  assertEquals(savedTag.getId(),tag.getId());
+  Handle handle=dbi.open();
+  String query=String.format("select * from audit_log where table_name = 'Tag' and record_id='%s'",tag.getId().toString());
+  List<Map<String,Object>> result=handle.select(query);
+  assertNotNull(result);
+  assertEquals(result.size(),1);
+  assertEquals(result.get(0).get("change_type"),"INSERT");
+  assertNotNull(result.get(0).get("change_date"));
+  DateTime changeDate=new DateTime(result.get(0).get("change_date"));
+  assertTrue(Seconds.secondsBetween(changeDate,context.getUTCNow()).getSeconds() < 2);
+  assertEquals(result.get(0).get("changed_by"),context.getUserName());
+}
