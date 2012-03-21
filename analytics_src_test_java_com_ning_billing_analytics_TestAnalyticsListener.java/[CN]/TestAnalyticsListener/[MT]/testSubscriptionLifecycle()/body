@@ -13,4 +13,11 @@
   listener.handleSubscriptionTransitionChange(cancelledSubscriptionTransition);
   Assert.assertEquals(dao.getTransitions(KEY).size(),2);
   Assert.assertEquals(dao.getTransitions(KEY).get(1),cancelledBST);
+  final DateTime effectiveRecreatedTransitionTime=new DateTime(DateTimeZone.UTC);
+  final DateTime requestedRecreatedTransitionTime=new DateTime(DateTimeZone.UTC);
+  final SubscriptionTransitionData recreatedSubscriptionTransition=createRecreatedSubscriptionTransition(requestedRecreatedTransitionTime,effectiveRecreatedTransitionTime,cancelledSubscriptionTransition.getNextState());
+  final BusinessSubscriptionTransition recreatedBST=createExpectedRecreatedBST(recreatedSubscriptionTransition.getId(),requestedRecreatedTransitionTime,effectiveRecreatedTransitionTime,cancelledBST.getNextSubscription());
+  listener.handleSubscriptionTransitionChange(recreatedSubscriptionTransition);
+  Assert.assertEquals(dao.getTransitions(KEY).size(),3);
+  Assert.assertEquals(dao.getTransitions(KEY).get(2),recreatedBST);
 }
