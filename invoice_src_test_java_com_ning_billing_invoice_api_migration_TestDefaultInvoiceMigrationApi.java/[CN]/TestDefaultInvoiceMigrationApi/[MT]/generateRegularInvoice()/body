@@ -16,7 +16,7 @@
   EntitlementBillingApi entitlementBillingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementBillingApi.class);
   ((ZombieControl)entitlementBillingApi).addResult("getBillingEventsForAccount",events);
   InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,entitlementBillingApi,invoiceDao,locker);
-  CallContext context=new CallContextFactory(clock).createCallContext("Migration test",CallOrigin.TEST,UserType.TEST);
+  CallContext context=new DefaultCallContextFactory(clock).createCallContext("Migration test",CallOrigin.TEST,UserType.TEST);
   Invoice invoice=dispatcher.processAccount(accountId,date_regular,true,context);
   Assert.assertNotNull(invoice);
   List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId);

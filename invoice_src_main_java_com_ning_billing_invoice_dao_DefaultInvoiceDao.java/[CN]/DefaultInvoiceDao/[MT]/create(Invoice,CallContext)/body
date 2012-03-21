@@ -6,7 +6,7 @@
         invoiceDao.create(invoice,context);
         List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         RecurringInvoiceItemSqlDao recurringInvoiceItemDao=invoiceDao.become(RecurringInvoiceItemSqlDao.class);
-        recurringInvoiceItemDao.batchCreateFromTransaction(recurringInvoiceItems);
+        recurringInvoiceItemDao.batchCreateFromTransaction(recurringInvoiceItems,context);
         notifyOfFutureBillingEvents(invoiceSqlDao,recurringInvoiceItems);
         List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         FixedPriceInvoiceItemSqlDao fixedPriceInvoiceItemDao=invoiceDao.become(FixedPriceInvoiceItemSqlDao.class);

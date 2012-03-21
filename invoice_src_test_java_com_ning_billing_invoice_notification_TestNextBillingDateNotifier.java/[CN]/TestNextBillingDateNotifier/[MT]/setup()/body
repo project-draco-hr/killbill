@@ -2,6 +2,7 @@
   final Injector g=Guice.createInjector(Stage.PRODUCTION,new AbstractModule(){
     @Override protected void configure(){
       bind(Clock.class).to(ClockMock.class).asEagerSingleton();
+      bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
       bind(Bus.class).to(InMemoryBus.class).asEagerSingleton();
       bind(NotificationQueueService.class).to(DefaultNotificationQueueService.class).asEagerSingleton();
       final InvoiceConfig invoiceConfig=new ConfigurationObjectFactory(System.getProperties()).build(InvoiceConfig.class);
@@ -14,6 +15,13 @@
       IDBI dbi=helper.getDBI();
       bind(IDBI.class).toInstance(dbi);
       bind(EntitlementDao.class).to(EntitlementSqlDao.class).asEagerSingleton();
+      bind(GlobalLocker.class).to(MySqlGlobalLocker.class).asEagerSingleton();
+      bind(InvoiceGenerator.class).to(DefaultInvoiceGenerator.class).asEagerSingleton();
+      bind(InvoiceDao.class).to(DefaultInvoiceDao.class);
+      bind(NextBillingDatePoster.class).to(DefaultNextBillingDatePoster.class).asEagerSingleton();
+      bind(AccountDao.class).to(DefaultAccountDao.class).asEagerSingleton();
+      bind(AccountUserApi.class).to(DefaultAccountUserApi.class).asEagerSingleton();
+      bind(EntitlementBillingApi.class).to(DefaultEntitlementBillingApi.class).asEagerSingleton();
     }
   }
 );
@@ -27,8 +35,8 @@
   Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
   EntitlementDao entitlementDao=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementDao.class);
   ((ZombieControl)entitlementDao).addResult("getSubscriptionFromId",subscription);
+  CallContextFactory factory=new DefaultCallContextFactory(clock);
+  listener=new InvoiceListenerMock(factory,dispatcher);
   notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),entitlementDao,listener);
   startMysql();
-  CallContextFactory factory=new CallContextFactory(clock);
-  listener=new InvoiceListenerMock(factory,dispatcher);
 }
