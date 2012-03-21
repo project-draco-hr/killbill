@@ -1,0 +1,24 @@
+{
+  BusinessSubscriptionEvent event;
+  event=BusinessSubscriptionEvent.subscriptionCreated(subscription.getCurrentPlan());
+  Assert.assertEquals(event.getEventType(),BusinessSubscriptionEvent.EventType.ADD);
+  Assert.assertEquals(event.getCategory(),product.getCategory());
+  Assert.assertEquals(event.toString(),"ADD_BASE");
+  event=BusinessSubscriptionEvent.subscriptionCancelled(subscription.getCurrentPlan());
+  Assert.assertEquals(event.getEventType(),BusinessSubscriptionEvent.EventType.CANCEL);
+  Assert.assertEquals(event.getCategory(),product.getCategory());
+  Assert.assertEquals(event.toString(),"CANCEL_BASE");
+  event=BusinessSubscriptionEvent.subscriptionChanged(subscription.getCurrentPlan());
+  Assert.assertEquals(event.getEventType(),BusinessSubscriptionEvent.EventType.CHANGE);
+  Assert.assertEquals(event.getCategory(),product.getCategory());
+  Assert.assertEquals(event.toString(),"CHANGE_BASE");
+  event=BusinessSubscriptionEvent.subscriptionPhaseChanged(subscription.getCurrentPlan(),subscription.getState());
+  Assert.assertEquals(event.getEventType(),BusinessSubscriptionEvent.EventType.SYSTEM_CHANGE);
+  Assert.assertEquals(event.getCategory(),product.getCategory());
+  Assert.assertEquals(event.toString(),"SYSTEM_CHANGE_BASE");
+  subscription=new MockSubscription(Subscription.SubscriptionState.CANCELLED,plan,phase);
+  event=BusinessSubscriptionEvent.subscriptionPhaseChanged(subscription.getCurrentPlan(),subscription.getState());
+  Assert.assertEquals(event.getEventType(),BusinessSubscriptionEvent.EventType.SYSTEM_CANCEL);
+  Assert.assertEquals(event.getCategory(),product.getCategory());
+  Assert.assertEquals(event.toString(),"SYSTEM_CANCEL_BASE");
+}
