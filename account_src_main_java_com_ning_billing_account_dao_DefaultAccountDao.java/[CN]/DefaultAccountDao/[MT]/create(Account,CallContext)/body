@@ -8,6 +8,11 @@
           throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,key);
         }
         transactionalDao.create(account,context);
+        UUID historyId=UUID.randomUUID();
+        AccountHistorySqlDao historyDao=accountSqlDao.become(AccountHistorySqlDao.class);
+        historyDao.insertAccountHistoryFromTransaction(account,historyId.toString(),ChangeType.INSERT.toString(),context);
+        AuditSqlDao auditDao=accountSqlDao.become(AuditSqlDao.class);
+        auditDao.insertAuditFromTransaction("account_history",historyId.toString(),ChangeType.INSERT.toString(),context);
         saveTagsFromWithinTransaction(account,transactionalDao,context);
         saveCustomFieldsFromWithinTransaction(account,transactionalDao,context);
         AccountCreationNotification creationEvent=new DefaultAccountCreationEvent(account);
