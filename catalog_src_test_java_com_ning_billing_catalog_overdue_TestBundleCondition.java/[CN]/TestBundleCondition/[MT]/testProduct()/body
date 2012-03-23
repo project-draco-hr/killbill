@@ -2,8 +2,8 @@
   DefaultProduct prod=MockProduct.createBicycle();
   BundleCondition c=new BundleCondition().setBasePlanProduct(prod);
   DateTime now=new DateTime();
-  BillingState accountState0=new BillingState(new UUID(0L,1L),0,BigDecimal.ZERO,now,PaymentResponse.LOST_OR_STOLEN,new Tag[]{new DefaultControlTag("Martin",now,ControlTagType.AUTO_BILLING_OFF),new DescriptiveTag(null,"Tag","Martin",now)});
-  BillingState accountState1=new BillingState(new UUID(0L,1L),1,new BigDecimal("100.00"),now.minusDays(10),PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{new DefaultControlTag("Martin",now,ControlTagType.OVERDUE_ENFORCEMENT_OFF)});
+  BillingState accountState0=new BillingState(new UUID(0L,1L),0,BigDecimal.ZERO,now,PaymentResponse.LOST_OR_STOLEN,new Tag[]{new DefaultControlTag("Martin",now,ControlTagType.AUTO_INVOICING_OFF),new DescriptiveTag(null,"Tag","Martin",now)});
+  BillingState accountState1=new BillingState(new UUID(0L,1L),1,new BigDecimal("100.00"),now.minusDays(10),PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{new DefaultControlTag("Martin",now,ControlTagType.AUTO_PAY_OFF)});
   BillingStateBundle state0=new BillingStateBundle(new UUID(0L,1L),accountState0,0,BigDecimal.ZERO,new DateTime(),PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{},MockProduct.createJet(),BillingPeriod.MONTHLY,new MockPriceList());
   BillingStateBundle state1=new BillingStateBundle(new UUID(0L,1L),accountState1,0,BigDecimal.ZERO,new DateTime(),PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{},prod,BillingPeriod.MONTHLY,new MockPriceList());
   Assert.assertTrue(!c.evaluate(state0,new DateTime()));

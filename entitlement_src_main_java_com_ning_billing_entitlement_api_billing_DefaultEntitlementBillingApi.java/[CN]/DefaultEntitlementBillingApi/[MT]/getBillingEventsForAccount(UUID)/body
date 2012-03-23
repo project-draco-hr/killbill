@@ -4,9 +4,14 @@
   for (  final SubscriptionBundle bundle : bundles) {
     List<Subscription> subscriptions=entitlementDao.getSubscriptions(bundle.getId());
     for (    final Subscription subscription : subscriptions) {
-      for (      final SubscriptionTransition transition : subscription.getAllTransitions()) {
+      for (      final SubscriptionTransition transition : ((SubscriptionData)subscription).getBillingTransitions()) {
         try {
-          BillingEvent event=new DefaultBillingEvent(transition,subscription,bcdCalculator.calculateBcd(bundle,subscription,transition,accountId));
+          Account account=accountApi.getAccountById(accountId);
+          int bcd=bcdCalculator.calculateBcd(bundle,subscription,transition,account);
+          MutableAccountData modifiedData=account.toMutableAccountData();
+          modifiedData.setBillCycleDay(bcd);
+          accountApi.updateAccount(account.getExternalKey(),modifiedData);
+          BillingEvent event=new DefaultBillingEvent(transition,subscription,bcd,account.getCurrency());
           result.add(event);
         }
  catch (        CatalogApiException e) {

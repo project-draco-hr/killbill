@@ -1,0 +1,8 @@
+{
+  Invoice migrationInvoice=invoiceDao.getById(migrationInvoiceId);
+  Invoice regularInvoice=invoiceDao.getById(regularInvoiceId);
+  BigDecimal balanceOfAllInvoices=migrationInvoice.getBalance().add(regularInvoice.getBalance());
+  BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId);
+  System.out.println("Account balance: " + accountBalance + " should equal the Balance Of All Invoices: "+ balanceOfAllInvoices);
+  Assert.assertEquals(accountBalance.compareTo(balanceOfAllInvoices),0);
+}

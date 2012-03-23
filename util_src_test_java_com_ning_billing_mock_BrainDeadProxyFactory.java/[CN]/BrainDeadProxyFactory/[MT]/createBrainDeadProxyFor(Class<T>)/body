@@ -1,6 +1,6 @@
 {
   return (T)Proxy.newProxyInstance(clazz.getClassLoader(),new Class[]{clazz,ZombieControl.class},new InvocationHandler(){
-    private Map<String,Object> results=new HashMap<String,Object>();
+    private final Map<String,Object> results=new HashMap<String,Object>();
     @Override public Object invoke(    Object proxy,    Method method,    Object[] args) throws Throwable {
       if (method.getDeclaringClass().equals(ZombieControl.class)) {
         if (method.getName().equals("addResult")) {
@@ -14,7 +14,13 @@
       }
  else {
         Object result=results.get(method.getName());
-        if (result != null) {
+        if (result == ZOMBIE_VOID) {
+          return (Void)null;
+        }
+ else         if (result != null) {
+          if (result instanceof Throwable) {
+            throw ((Throwable)result);
+          }
           return result;
         }
  else {
@@ -22,7 +28,7 @@
           throw new UnsupportedOperationException();
         }
       }
-      return (Void)null;
+      return null;
     }
   }
 );

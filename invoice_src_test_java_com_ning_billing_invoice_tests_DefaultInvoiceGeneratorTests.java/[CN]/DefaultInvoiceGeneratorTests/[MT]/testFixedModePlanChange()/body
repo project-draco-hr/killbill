@@ -14,11 +14,12 @@
   assertNotNull(invoice1);
   assertEquals(invoice1.getNumberOfItems(),1);
   assertEquals(invoice1.getTotalAmount(),fixedCost1);
-  List<InvoiceItem> existingItems=invoice1.getInvoiceItems();
+  List<Invoice> invoiceList=new ArrayList<Invoice>();
+  invoiceList.add(invoice1);
   DateTime phaseChangeDate=startDate.plusMonths(1);
   BillingEvent event2=createBillingEvent(subscriptionId,phaseChangeDate,plan1,phase2,1);
   events.add(event2);
-  Invoice invoice2=generator.generateInvoice(accountId,events,existingItems,phaseChangeDate,Currency.USD);
+  Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,phaseChangeDate,Currency.USD);
   assertNotNull(invoice2);
   assertEquals(invoice2.getNumberOfItems(),1);
   assertEquals(invoice2.getTotalAmount(),fixedCost2);

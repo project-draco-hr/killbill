@@ -1,9 +1,11 @@
 {
   try {
     module=new InvoiceModuleWithEmbeddedDb();
+    final String accountDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/account/ddl.sql"));
     final String invoiceDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/invoice/ddl.sql"));
     final String entitlementDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/entitlement/ddl.sql"));
     module.startDb();
+    module.initDb(accountDdl);
     module.initDb(invoiceDdl);
     module.initDb(entitlementDdl);
     final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module);
@@ -11,7 +13,7 @@
     invoiceDao.test();
     recurringInvoiceItemDao=module.getInvoiceItemSqlDao();
     invoicePaymentDao=module.getInvoicePaymentSqlDao();
-    BusService busService=injector.getInstance(BusService.class);
+    busService=injector.getInstance(BusService.class);
     ((DefaultBusService)busService).startBus();
     assertTrue(true);
   }

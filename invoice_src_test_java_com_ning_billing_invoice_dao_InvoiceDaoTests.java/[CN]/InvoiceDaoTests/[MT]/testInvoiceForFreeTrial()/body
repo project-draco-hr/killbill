@@ -1,15 +1,16 @@
 {
+  Currency currency=Currency.USD;
   DefaultPrice price=new DefaultPrice(BigDecimal.ZERO,Currency.USD);
   MockInternationalPrice recurringPrice=new MockInternationalPrice(price);
   MockPlanPhase phase=new MockPlanPhase(recurringPrice,null);
   MockPlan plan=new MockPlan(phase);
-  Subscription subscription=new MockSubscription();
+  Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  ((ZombieControl)subscription).addResult("getId",UUID.randomUUID());
   DateTime effectiveDate=buildDateTime(2011,1,1);
-  BillingEvent event=new DefaultBillingEvent(subscription,effectiveDate,plan,phase,null,recurringPrice,BillingPeriod.MONTHLY,15,BillingModeType.IN_ADVANCE,"testEvent",SubscriptionTransitionType.CREATE);
+  BillingEvent event=new DefaultBillingEvent(subscription,effectiveDate,plan,phase,null,recurringPrice.getPrice(currency),currency,BillingPeriod.MONTHLY,15,BillingModeType.IN_ADVANCE,"testEvent",1L,SubscriptionTransitionType.CREATE);
   BillingEventSet events=new BillingEventSet();
   events.add(event);
   DateTime targetDate=buildDateTime(2011,1,15);
-  InvoiceGenerator generator=new DefaultInvoiceGenerator(clock);
   Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,targetDate,Currency.USD);
   assertEquals(invoice.getNumberOfItems(),2);
   assertEquals(invoice.getTotalAmount().compareTo(ZERO),0);

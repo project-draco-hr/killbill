@@ -2,5 +2,21 @@
   if (input == null) {
     return null;
   }
-  return buildSubscription(Collections.singletonList(input)).get(0);
+  List<Subscription> bundleInput=new ArrayList<Subscription>();
+  Subscription baseSubscription=null;
+  if (input.getCategory() == ProductCategory.ADD_ON) {
+    baseSubscription=getBaseSubscription(input.getBundleId(),false);
+    bundleInput.add(baseSubscription);
+    bundleInput.add(input);
+  }
+ else {
+    bundleInput.add(input);
+  }
+  List<Subscription> reloadedSubscriptions=buildBundleSubscriptions(bundleInput);
+  for (  Subscription cur : reloadedSubscriptions) {
+    if (cur.getId().equals(input.getId())) {
+      return cur;
+    }
+  }
+  throw new EntitlementError(String.format("Unexpected code path in buildSubscription"));
 }

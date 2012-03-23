@@ -9,7 +9,9 @@
         return Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0 or less",paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId()));
       }
  else {
-        return processPayment(getPaymentProviderPlugin(account),account,invoice,paymentAttempt);
+        PaymentAttempt newPaymentAttempt=new PaymentAttempt.Builder(paymentAttempt).setRetryCount(paymentAttempt.getRetryCount() + 1).setPaymentAttemptId(UUID.randomUUID()).build();
+        paymentDao.createPaymentAttempt(newPaymentAttempt);
+        return processPayment(getPaymentProviderPlugin(account),account,invoice,newPaymentAttempt);
       }
     }
   }

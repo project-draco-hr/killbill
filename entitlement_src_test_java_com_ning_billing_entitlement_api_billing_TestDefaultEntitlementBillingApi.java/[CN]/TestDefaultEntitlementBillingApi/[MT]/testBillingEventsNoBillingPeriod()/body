@@ -4,21 +4,15 @@
   Plan nextPlan=catalogService.getFullCatalog().findPlan("shotgun-annual",now);
   PlanPhase nextPhase=nextPlan.getAllPhases()[0];
   String nextPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  SubscriptionTransition t=new SubscriptionTransitionData(zeroId,oneId,twoId,EventType.API_USER,ApiEventType.CREATE,then,now,null,null,null,null,SubscriptionState.ACTIVE,nextPlan,nextPhase,nextPriceList);
+  SubscriptionTransition t=new SubscriptionTransitionData(zeroId,oneId,twoId,EventType.API_USER,ApiEventType.CREATE,then,now,null,null,null,null,SubscriptionState.ACTIVE,nextPlan,nextPhase,nextPriceList,1,true);
   transitions.add(t);
-  AccountUserApi accountApi=new BrainDeadAccountUserApi(){
-    @Override public Account getAccountById(    UUID accountId){
-      return new BrainDeadAccount(){
-        @Override public int getBillCycleDay(){
-          return 32;
-        }
-      }
-;
-    }
-  }
-;
-  BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(accountApi,catalogService);
-  DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(dao,bcdCalculator);
+  AccountUserApi accountApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
+  Account account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
+  ((ZombieControl)account).addResult("getBillCycleDay",32);
+  ((ZombieControl)account).addResult("getCurrency",Currency.USD);
+  ((ZombieControl)accountApi).addResult("getAccountById",account);
+  BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService);
+  DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(dao,bcdCalculator,accountApi);
   SortedSet<BillingEvent> events=api.getBillingEventsForAccount(new UUID(0L,0L));
   checkFirstEvent(events,nextPlan,32,oneId,now,nextPhase,ApiEventType.CREATE.toString());
 }

@@ -1,16 +1,13 @@
 {
-  EntitlementDao dao=new BrainDeadMockEntitlementDao(){
-    public List<SubscriptionBundle> getSubscriptionBundleForAccount(    UUID accountId){
-      return new ArrayList<SubscriptionBundle>();
-    }
-    @Override public UUID getAccountIdFromSubscriptionId(    final UUID subscriptionId){
-      throw new UnsupportedOperationException();
-    }
-  }
-;
-  AccountUserApi accountApi=new BrainDeadAccountUserApi();
-  BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(accountApi,catalogService);
-  DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(dao,bcdCalculator);
+  dao=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementDao.class);
+  ((ZombieControl)dao).addResult("getSubscriptionBundleForAccount",new ArrayList<SubscriptionBundle>());
+  UUID accountId=UUID.randomUUID();
+  Account account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
+  ((ZombieControl)account).addResult("getId",accountId).addResult("getCurrency",Currency.USD);
+  AccountUserApi accountApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
+  ((ZombieControl)accountApi).addResult("getAccountById",account);
+  BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService);
+  DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(dao,bcdCalculator,accountApi);
   SortedSet<BillingEvent> events=api.getBillingEventsForAccount(new UUID(0L,0L));
   Assert.assertEquals(events.size(),0);
 }

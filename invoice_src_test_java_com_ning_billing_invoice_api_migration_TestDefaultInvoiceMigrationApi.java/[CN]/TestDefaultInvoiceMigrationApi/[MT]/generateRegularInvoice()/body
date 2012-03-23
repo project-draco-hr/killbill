@@ -1,0 +1,28 @@
+{
+  AccountUserApi accountUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
+  Account account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
+  ((ZombieControl)accountUserApi).addResult("getAccountById",account);
+  ((ZombieControl)account).addResult("getCurrency",Currency.USD);
+  ((ZombieControl)account).addResult("getId",accountId);
+  Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  ((ZombieControl)subscription).addResult("getId",subscriptionId);
+  SortedSet<BillingEvent> events=new TreeSet<BillingEvent>();
+  Plan plan=MockPlan.createBicycleNoTrialEvergreen1USD();
+  PlanPhase planPhase=MockPlanPhase.create1USDMonthlyEvergreen();
+  DateTime effectiveDate=new DateTime().minusDays(1);
+  Currency currency=Currency.USD;
+  BigDecimal fixedPrice=null;
+  events.add(new DefaultBillingEvent(subscription,effectiveDate,plan,planPhase,fixedPrice,BigDecimal.ONE,currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"",1L,SubscriptionTransitionType.CREATE));
+  EntitlementBillingApi entitlementBillingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementBillingApi.class);
+  ((ZombieControl)entitlementBillingApi).addResult("getBillingEventsForAccount",events);
+  InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,entitlementBillingApi,invoiceDao,locker);
+  Invoice invoice=dispatcher.processAccount(accountId,date_regular,true);
+  Assert.assertNotNull(invoice);
+  List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId);
+  Assert.assertEquals(invoices.size(),0);
+  invoice=dispatcher.processAccount(accountId,date_regular,false);
+  Assert.assertNotNull(invoice);
+  invoices=invoiceDao.getInvoicesByAccount(accountId);
+  Assert.assertEquals(invoices.size(),1);
+  return invoice.getId();
+}

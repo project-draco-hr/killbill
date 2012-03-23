@@ -1,7 +1,8 @@
 {
   try {
+    final DateTime startDate=clock.getUTCNow().minusMonths(2);
     DateTime beforeMigration=clock.getUTCNow();
-    EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlan();
+    EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlan(startDate);
     DateTime afterMigration=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated);
@@ -18,6 +19,7 @@
     assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
     assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-annual");
+    assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
   }
  catch (  EntitlementMigrationApiException e) {
     Assert.fail("",e);

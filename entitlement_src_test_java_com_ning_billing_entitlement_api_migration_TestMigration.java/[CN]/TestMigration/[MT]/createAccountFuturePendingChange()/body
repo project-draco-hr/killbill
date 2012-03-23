@@ -1,29 +1,9 @@
 {
-  List<EntitlementSubscriptionMigrationCase> cases=new LinkedList<EntitlementSubscriptionMigrationCase>();
+  List<EntitlementSubscriptionMigrationCaseWithCTD> cases=new LinkedList<EntitlementSubscriptionMigrationCaseWithCTD>();
   final DateTime effectiveDate=clock.getUTCNow().minusDays(10);
-  cases.add(new EntitlementSubscriptionMigrationCase(){
-    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
-      return new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
-    }
-    @Override public DateTime getEffectiveDate(){
-      return effectiveDate;
-    }
-    @Override public DateTime getCancelledDate(){
-      return effectiveDate.plusMonths(1);
-    }
-  }
-);
-  cases.add(new EntitlementSubscriptionMigrationCase(){
-    @Override public PlanPhaseSpecifier getPlanPhaseSpecifer(){
-      return new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
-    }
-    @Override public DateTime getEffectiveDate(){
-      return effectiveDate.plusMonths(1).plusDays(1);
-    }
-    @Override public DateTime getCancelledDate(){
-      return null;
-    }
-  }
-);
-  return createAccountWithSingleBasePlan(cases);
+  cases.add(new EntitlementSubscriptionMigrationCaseWithCTD(new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN),effectiveDate,effectiveDate.plusMonths(1),effectiveDate.plusMonths(1)));
+  cases.add(new EntitlementSubscriptionMigrationCaseWithCTD(new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN),effectiveDate.plusMonths(1).plusDays(1),null,null));
+  List<List<EntitlementSubscriptionMigrationCaseWithCTD>> input=new ArrayList<List<EntitlementSubscriptionMigrationCaseWithCTD>>();
+  input.add(cases);
+  return createAccountTest(input);
 }

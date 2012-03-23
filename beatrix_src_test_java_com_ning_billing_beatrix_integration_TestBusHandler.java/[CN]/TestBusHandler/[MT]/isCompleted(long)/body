@@ -3,11 +3,23 @@ synchronized (this) {
     if (completed) {
       return completed;
     }
-    try {
-      wait(timeout);
+    long waitTimeMs=timeout;
+    do {
+      try {
+        DateTime before=new DateTime();
+        wait(waitTimeMs);
+        if (completed) {
+          return completed;
+        }
+        DateTime after=new DateTime();
+        waitTimeMs-=after.getMillis() - before.getMillis();
+      }
+ catch (      Exception ignore) {
+        log.error("isCompleted got interrupted ",ignore);
+        return false;
+      }
     }
- catch (    Exception ignore) {
-    }
+ while (waitTimeMs > 0 && !completed);
   }
   if (!completed) {
     Joiner joiner=Joiner.on(" ");

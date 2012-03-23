@@ -6,13 +6,13 @@
     }
     DateTime now=clock.getUTCNow();
     requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : now;
-    validateRequestedDateOnChangeOrCancel(subscription,now,requestedDate);
+    validateRequestedDate(subscription,now,requestedDate);
     Plan currentPlan=subscription.getCurrentPlan();
     PlanPhaseSpecifier planPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),subscription.getCurrentPlan().getBillingPeriod(),subscription.getCurrentPriceList(),subscription.getCurrentPhase().getPhaseType());
     ActionPolicy policy=null;
     policy=catalogService.getFullCatalog().planCancelPolicy(planPhase,requestedDate);
     DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy,requestedDate);
-    EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now));
+    EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true));
     dao.cancelSubscription(subscription.getId(),cancelEvent);
     subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getFullCatalog());
   }

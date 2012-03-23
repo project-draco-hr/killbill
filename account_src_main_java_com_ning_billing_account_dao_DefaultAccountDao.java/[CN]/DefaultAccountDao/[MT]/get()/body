@@ -1,3 +1,13 @@
 {
-  return accountSqlDao.get();
+  return accountSqlDao.inTransaction(new Transaction<List<Account>,AccountSqlDao>(){
+    @Override public List<Account> inTransaction(    final AccountSqlDao accountSqlDao,    final TransactionStatus status) throws Exception {
+      List<Account> accounts=accountSqlDao.get();
+      for (      Account account : accounts) {
+        setCustomFieldsFromWithinTransaction(account,accountSqlDao);
+        setTagsFromWithinTransaction(account,accountSqlDao);
+      }
+      return accounts;
+    }
+  }
+);
 }

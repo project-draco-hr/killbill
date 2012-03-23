@@ -2,10 +2,6 @@
   if (transitions == null) {
     return null;
   }
-  for (  SubscriptionTransition cur : transitions) {
-    if (cur.getEffectiveTransitionTime().isAfter(clock.getUTCNow())) {
-      return cur;
-    }
-  }
-  return null;
+  SubscriptionTransitionDataIterator it=new SubscriptionTransitionDataIterator(clock,transitions,Order.ASC_FROM_PAST,Kind.ENTITLEMENT,Visibility.ALL,TimeLimit.FUTURE_ONLY);
+  return it.hasNext() ? it.next() : null;
 }
