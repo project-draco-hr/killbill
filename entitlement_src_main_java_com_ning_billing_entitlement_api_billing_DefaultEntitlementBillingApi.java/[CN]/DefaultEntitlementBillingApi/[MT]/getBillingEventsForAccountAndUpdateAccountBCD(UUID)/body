@@ -8,9 +8,11 @@
         try {
           Account account=accountApi.getAccountById(accountId);
           int bcd=bcdCalculator.calculateBcd(bundle,subscription,transition,account);
-          MutableAccountData modifiedData=account.toMutableAccountData();
-          modifiedData.setBillCycleDay(bcd);
-          accountApi.updateAccount(account.getExternalKey(),modifiedData);
+          if (account.getBillCycleDay() == 0) {
+            MutableAccountData modifiedData=account.toMutableAccountData();
+            modifiedData.setBillCycleDay(bcd);
+            accountApi.updateAccount(account.getExternalKey(),modifiedData);
+          }
           BillingEvent event=new DefaultBillingEvent(transition,subscription,bcd,account.getCurrency());
           result.add(event);
         }
