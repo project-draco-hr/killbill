@@ -6,15 +6,14 @@
   String fieldValue="Kitty Hawk";
   fieldStore1.setValue(fieldName,fieldValue);
   CustomFieldSqlDao customFieldSqlDao=dbi.onDemand(CustomFieldSqlDao.class);
-  AuditedCustomFieldDao auditedDao=new AuditedCustomFieldDao();
-  auditedDao.saveFields(customFieldSqlDao,id,objectType,fieldStore1.getEntityList(),context);
+  customFieldDao.saveFields(customFieldSqlDao,id,objectType,fieldStore1.getEntityList(),context);
   final FieldStore fieldStore2=DefaultFieldStore.create(id,objectType);
   fieldStore2.add(customFieldSqlDao.load(id.toString(),objectType));
   assertEquals(fieldStore2.getValue(fieldName),fieldValue);
   fieldValue="Cape Canaveral";
   fieldStore2.setValue(fieldName,fieldValue);
   assertEquals(fieldStore2.getValue(fieldName),fieldValue);
-  auditedDao.saveFields(customFieldSqlDao,id,objectType,fieldStore2.getEntityList(),context);
+  customFieldDao.saveFields(customFieldSqlDao,id,objectType,fieldStore2.getEntityList(),context);
   final FieldStore fieldStore3=DefaultFieldStore.create(id,objectType);
   assertEquals(fieldStore3.getValue(fieldName),null);
   fieldStore3.add(customFieldSqlDao.load(id.toString(),objectType));

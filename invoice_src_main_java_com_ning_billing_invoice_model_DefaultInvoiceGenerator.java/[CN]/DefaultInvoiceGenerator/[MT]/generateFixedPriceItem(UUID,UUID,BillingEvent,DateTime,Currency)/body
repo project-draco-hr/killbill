@@ -1,0 +1,16 @@
+{
+  if (thisEvent.getEffectiveDate().isAfter(targetDate)) {
+    return null;
+  }
+ else {
+    BigDecimal fixedPrice=thisEvent.getFixedPrice();
+    if (fixedPrice != null) {
+      Duration duration=thisEvent.getPlanPhase().getDuration();
+      DateTime endDate=duration.addToDateTime(thisEvent.getEffectiveDate());
+      return new FixedPriceInvoiceItem(invoiceId,accountId,thisEvent.getSubscription().getId(),thisEvent.getPlan().getName(),thisEvent.getPlanPhase().getName(),thisEvent.getEffectiveDate(),endDate,fixedPrice,currency);
+    }
+ else {
+      return null;
+    }
+  }
+}
