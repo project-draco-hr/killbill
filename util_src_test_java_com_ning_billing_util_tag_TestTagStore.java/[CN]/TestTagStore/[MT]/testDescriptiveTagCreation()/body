@@ -1,6 +1,6 @@
 {
   UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,ACCOUNT_TYPE);
+  TagStore tagStore=new DefaultTagStore(accountId,Account.ObjectType);
   String definitionName="SomeTestTag";
   TagDefinition tagDefinition=null;
   try {
@@ -12,11 +12,10 @@
   DescriptiveTag tag=new DescriptiveTag(tagDefinition);
   tagStore.add(tag);
   assertEquals(tagStore.generateInvoice(),true);
-  List<Tag> tagList=tagStore.getEntityList();
-  saveTags(tagSqlDao,ACCOUNT_TYPE,accountId,tagList,context);
+  tagDao.saveTagsFromTransaction(dao,accountId,Account.ObjectType,tagStore.getEntityList(),context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  tagList=tagSqlDao.load(accountId.toString(),ACCOUNT_TYPE);
+  List<Tag> tagList=tagDao.loadTags(accountId,Account.ObjectType);
   tagStore.add(tagList);
   assertEquals(tagList.size(),1);
   assertEquals(tagStore.generateInvoice(),true);

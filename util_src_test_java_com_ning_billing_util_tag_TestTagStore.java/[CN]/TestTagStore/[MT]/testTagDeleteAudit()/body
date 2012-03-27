@@ -1,15 +1,15 @@
 {
   UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,ACCOUNT_TYPE);
-  Tag tag=new DescriptiveTag(tag2);
+  TagStore tagStore=new DefaultTagStore(accountId,Account.ObjectType);
+  Tag tag=new DescriptiveTag(testTag);
   tagStore.add(tag);
-  TagSqlDao dao=dbi.onDemand(TagSqlDao.class);
-  saveTags(dao,ACCOUNT_TYPE,accountId,tagStore.getEntityList(),context);
-  saveTags(dao,ACCOUNT_TYPE,accountId,new ArrayList<Tag>(),context);
-  List<Tag> savedTags=dao.load(accountId.toString(),ACCOUNT_TYPE);
+  tagDao.saveTags(accountId,Account.ObjectType,tagStore.getEntityList(),context);
+  tagStore.remove(tag);
+  tagDao.saveTags(accountId,Account.ObjectType,tagStore.getEntityList(),context);
+  List<Tag> savedTags=tagDao.loadTags(accountId,Account.ObjectType);
   assertEquals(savedTags.size(),0);
   Handle handle=dbi.open();
-  String query=String.format("select * from audit_log where table_name = 'Tag' and record_id='%s' and change_type='DELETE'",tag.getId().toString());
+  String query=String.format("select * from audit_log where table_name = 'tag' and record_id='%s' and change_type='DELETE'",tag.getId().toString());
   List<Map<String,Object>> result=handle.select(query);
   assertNotNull(result);
   assertEquals(result.size(),1);

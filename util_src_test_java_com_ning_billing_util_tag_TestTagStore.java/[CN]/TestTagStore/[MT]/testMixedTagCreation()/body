@@ -1,6 +1,6 @@
 {
   UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,ACCOUNT_TYPE);
+  TagStore tagStore=new DefaultTagStore(accountId,Account.ObjectType);
   String definitionName="MixedTagTest";
   TagDefinition tagDefinition=null;
   try {
@@ -15,11 +15,10 @@
   ControlTag controlTag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
   tagStore.add(controlTag);
   assertEquals(tagStore.generateInvoice(),false);
-  List<Tag> tagList=tagStore.getEntityList();
-  saveTags(tagSqlDao,ACCOUNT_TYPE,accountId,tagList,context);
+  tagDao.saveTagsFromTransaction(dao,accountId,Account.ObjectType,tagStore.getEntityList(),context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  tagList=tagSqlDao.load(accountId.toString(),ACCOUNT_TYPE);
+  List<Tag> tagList=tagDao.loadTags(accountId,Account.ObjectType);
   tagStore.add(tagList);
   assertEquals(tagList.size(),2);
   assertEquals(tagStore.generateInvoice(),false);

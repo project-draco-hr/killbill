@@ -1,11 +1,10 @@
 {
   UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,ACCOUNT_TYPE);
-  Tag tag=new DescriptiveTag(tag2);
+  TagStore tagStore=new DefaultTagStore(accountId,Account.ObjectType);
+  Tag tag=new DescriptiveTag(testTag);
   tagStore.add(tag);
-  TagSqlDao dao=dbi.onDemand(TagSqlDao.class);
-  saveTags(dao,ACCOUNT_TYPE,accountId,tagStore.getEntityList(),context);
-  List<Tag> savedTags=dao.load(accountId.toString(),ACCOUNT_TYPE);
+  tagDao.saveTagsFromTransaction(dao,accountId,Account.ObjectType,tagStore.getEntityList(),context);
+  List<Tag> savedTags=tagDao.loadTags(accountId,Account.ObjectType);
   assertEquals(savedTags.size(),1);
   Tag savedTag=savedTags.get(0);
   assertEquals(savedTag.getTagDefinitionName(),tag.getTagDefinitionName());

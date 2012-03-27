@@ -9,12 +9,11 @@
   TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName);
   assertNotNull(tagDefinition);
   UUID objectId=UUID.randomUUID();
-  String objectType="TestType";
-  TagStore tagStore=new DefaultTagStore(objectId,objectType);
+  TagStore tagStore=new DefaultTagStore(objectId,Account.ObjectType);
   Tag tag=new DescriptiveTag(tagDefinition);
   tagStore.add(tag);
-  saveTags(tagSqlDao,objectType,objectId,tagStore.getEntityList(),context);
-  List<Tag> tags=tagSqlDao.load(objectId.toString(),objectType);
+  tagDao.saveTags(objectId,Account.ObjectType,tagStore.getEntityList(),context);
+  List<Tag> tags=tagDao.loadTags(objectId,Account.ObjectType);
   assertEquals(tags.size(),1);
   try {
     tagDefinitionDao.deleteAllTagsForDefinition(definitionName,context);

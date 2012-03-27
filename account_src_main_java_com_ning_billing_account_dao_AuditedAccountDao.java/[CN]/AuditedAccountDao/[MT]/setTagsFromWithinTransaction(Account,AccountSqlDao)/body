@@ -1,6 +1,5 @@
 {
-  TagSqlDao tagDao=transactionalDao.become(TagSqlDao.class);
-  List<Tag> tags=tagDao.load(account.getId().toString(),account.getObjectName());
+  List<Tag> tags=tagDao.loadTagsFromTransaction(transactionalDao,account.getId(),Account.ObjectType);
   account.clearTags();
   if (tags != null) {
     account.addTags(tags);
