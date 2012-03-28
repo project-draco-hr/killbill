@@ -1,0 +1,13 @@
+{
+  try {
+    if (overdueable instanceof SubscriptionBundle) {
+      return (OverdueWrapper<T>)new OverdueWrapper<SubscriptionBundle>((SubscriptionBundle)overdueable,dao,catalogService.getCurrentCatalog().currentBundleOverdueStateSet(),clock,billingStateCalcuatorBundle,overdueStateApplicatorBundle);
+    }
+ else {
+      throw new OverdueError(ErrorCode.OVERDUE_OVERDUEABLE_NOT_SUPPORTED,overdueable.getClass());
+    }
+  }
+ catch (  CatalogApiException e) {
+    throw new OverdueError(e,ErrorCode.OVERDUE_CAT_ERROR_ENCOUNTERED,overdueable.getId().toString(),overdueable.getClass().toString());
+  }
+}
