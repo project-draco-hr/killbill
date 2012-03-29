@@ -13,9 +13,9 @@
   List<Notification> pendingNotifications=mockNotificationQueue.getPendingEvents();
   assertEquals(pendingNotifications.size(),1);
   Notification notification=pendingNotifications.get(0);
-  PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForInvoiceId(invoice.getId().toString());
-  assertNotNull(paymentAttempt);
-  assertEquals(notification.getNotificationKey(),paymentAttempt.getPaymentAttemptId().toString());
-  DateTime expectedRetryDate=paymentAttempt.getPaymentAttemptDate().plusDays(paymentConfig.getPaymentRetryDays().get(0));
+  List<PaymentAttempt> paymentAttempts=paymentApi.getPaymentAttemptsForInvoiceId(invoice.getId().toString());
+  assertNotNull(paymentAttempts);
+  assertEquals(notification.getNotificationKey(),paymentAttempts.get(0).getPaymentAttemptId().toString());
+  DateTime expectedRetryDate=paymentAttempts.get(0).getPaymentAttemptDate().plusDays(paymentConfig.getPaymentRetryDays().get(0));
   assertEquals(notification.getEffectiveDate(),expectedRetryDate);
 }

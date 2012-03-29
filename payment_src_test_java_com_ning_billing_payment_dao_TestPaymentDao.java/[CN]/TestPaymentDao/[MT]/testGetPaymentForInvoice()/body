@@ -7,8 +7,8 @@
   final DateTime now=new DateTime(DateTimeZone.UTC).minusDays(1);
   PaymentAttempt originalPaymenAttempt=new PaymentAttempt(paymentAttemptId,invoiceId,accountId,invoiceAmount,Currency.USD,now,now,paymentId,0);
   PaymentAttempt attempt=paymentDao.createPaymentAttempt(originalPaymenAttempt);
-  PaymentAttempt attempt2=paymentDao.getPaymentAttemptForInvoiceId(invoiceId.toString());
-  Assert.assertEquals(attempt,attempt2);
+  List<PaymentAttempt> attemptsFromGet=paymentDao.getPaymentAttemptsForInvoiceId(invoiceId.toString());
+  Assert.assertEquals(attempt,attemptsFromGet.get(0));
   PaymentAttempt attempt3=paymentDao.getPaymentAttemptsForInvoiceIds(Arrays.asList(invoiceId.toString())).get(0);
   Assert.assertEquals(attempt,attempt3);
   PaymentAttempt attempt4=paymentDao.getPaymentAttemptById(attempt3.getPaymentAttemptId());
