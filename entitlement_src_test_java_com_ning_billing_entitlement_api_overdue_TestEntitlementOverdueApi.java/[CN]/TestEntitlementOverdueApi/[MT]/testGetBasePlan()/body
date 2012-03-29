@@ -1,0 +1,15 @@
+{
+  Plan basePlan=MockPlan.createBicycleNoTrialEvergreen1USD();
+  Plan addonPlan=MockPlan.createHornMonthlyNoTrial1USD();
+  List<Subscription> subs=new ArrayList<Subscription>();
+  Subscription s1=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  Subscription s2=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  ((ZombieControl)s1).addResult("getCurrentPlan",addonPlan);
+  ((ZombieControl)s2).addResult("getCurrentPlan",basePlan);
+  subs.add(s1);
+  subs.add(s2);
+  EntitlementDao dao=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementDao.class);
+  ((ZombieControl)dao).addResult("getSubscriptions",subs);
+  EntitlementOverdueApi api=new DefaultEntitlementOverdueApi(dao);
+  Assert.assertEquals(api.getBaseSubscription(new UUID(0L,0L)).getCurrentPlan(),s2.getCurrentPlan());
+}
