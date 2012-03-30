@@ -2,6 +2,8 @@
   super.configure();
   install(new ClockModule());
   install(new CallContextModule());
+  install(new FieldStoreModule());
+  install(new TagStoreModule());
   install(new AccountModule());
   install(new CatalogModule());
   install(new BusModule());
@@ -14,4 +16,5 @@
   bind(MysqlTestingHelper.class).toInstance(helper);
   final IDBI dbi=helper.getDBI();
   bind(IDBI.class).toInstance(dbi);
+  bind(TagDefinitionSqlDao.class).toInstance(dbi.onDemand(TagDefinitionSqlDao.class));
 }

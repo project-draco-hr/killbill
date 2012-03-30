@@ -14,13 +14,14 @@
       bind(MysqlTestingHelper.class).toInstance(helper);
       IDBI dbi=helper.getDBI();
       bind(IDBI.class).toInstance(dbi);
+      bind(TagDao.class).to(AuditedTagDao.class).asEagerSingleton();
+      bind(CustomFieldDao.class).to(AuditedCustomFieldDao.class).asEagerSingleton();
       bind(EntitlementDao.class).to(EntitlementSqlDao.class).asEagerSingleton();
       bind(GlobalLocker.class).to(MySqlGlobalLocker.class).asEagerSingleton();
       bind(InvoiceGenerator.class).to(DefaultInvoiceGenerator.class).asEagerSingleton();
       bind(InvoiceDao.class).to(DefaultInvoiceDao.class);
       bind(NextBillingDatePoster.class).to(DefaultNextBillingDatePoster.class).asEagerSingleton();
-      bind(AccountDao.class).to(AuditedAccountDao.class).asEagerSingleton();
-      bind(AccountUserApi.class).to(DefaultAccountUserApi.class).asEagerSingleton();
+      bind(AccountUserApi.class).to(MockAccountUserApi.class).asEagerSingleton();
       bind(EntitlementBillingApi.class).to(DefaultEntitlementBillingApi.class).asEagerSingleton();
     }
   }

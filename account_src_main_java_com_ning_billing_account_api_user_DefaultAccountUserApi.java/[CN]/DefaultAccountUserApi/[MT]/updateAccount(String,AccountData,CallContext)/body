@@ -3,11 +3,5 @@
   if (accountId == null) {
     throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_KEY,externalKey);
   }
-  Account account=new DefaultAccount(accountId,accountData);
-  try {
-    dao.update(account,context);
-  }
- catch (  EntityPersistenceException e) {
-    throw new AccountApiException(e,ErrorCode.ACCOUNT_UPDATE_FAILED);
-  }
+  updateAccount(accountId,accountData,context);
 }
