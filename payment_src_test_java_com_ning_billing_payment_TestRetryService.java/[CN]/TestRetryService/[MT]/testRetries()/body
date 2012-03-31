@@ -8,7 +8,7 @@
   int numberOfDays=paymentConfig.getPaymentRetryDays().get(0);
   DateTime nextRetryDate=now.plusDays(numberOfDays);
   PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice).cloner().setRetryCount(1).setPaymentAttemptDate(now).build();
-  paymentDao.createPaymentAttempt(paymentAttempt);
+  paymentDao.createPaymentAttempt(paymentAttempt,context);
   retryService.scheduleRetry(paymentAttempt,nextRetryDate);
   ((ClockMock)clock).setDeltaFromReality(Days.days(numberOfDays).toStandardSeconds().getSeconds() * 1000);
   Thread.sleep(2000);

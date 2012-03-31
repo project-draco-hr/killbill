@@ -7,7 +7,7 @@
   final DateTime endDate=startDate.plusMonths(1);
   invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,"test plan","test phase",startDate,endDate,amount,new BigDecimal("1.0"),Currency.USD));
   mockPaymentProviderPlugin.makeNextInvoiceFail();
-  List<Either<PaymentError,PaymentInfo>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()));
+  List<Either<PaymentError,PaymentInfo>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()),context);
   assertEquals(results.size(),1);
   assertTrue(results.get(0).isLeft());
   List<Notification> pendingNotifications=mockNotificationQueue.getPendingEvents();
