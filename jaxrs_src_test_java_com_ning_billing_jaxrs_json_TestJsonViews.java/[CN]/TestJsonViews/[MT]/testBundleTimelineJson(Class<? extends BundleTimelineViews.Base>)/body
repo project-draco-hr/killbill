@@ -1,0 +1,88 @@
+{
+  final boolean readTimeline=viewClass.equals(BundleTimelineViews.ReadTimeline.class);
+  try {
+    BundleTimelineJson obj=buildBundleTimelineJson(readTimeline);
+    ObjectWriter objWriter=objectMapper.writerWithView(viewClass);
+    Writer writer=new StringWriter();
+    objWriter.writeValue(writer,obj);
+    String baseJson=writer.toString();
+    log.info(baseJson);
+    BundleTimelineJson objFromJson=objectMapper.readValue(baseJson,BundleTimelineJson.class);
+    log.info(objFromJson.toString());
+    Assert.assertNotNull(objFromJson.getViewId());
+    Assert.assertNotNull(objFromJson.getBundle());
+    BundleJson bundle=objFromJson.getBundle();
+    Assert.assertNotNull(bundle.getBundleId());
+    Assert.assertNotNull(bundle.getAccountId());
+    Assert.assertNotNull(bundle.getExternalKey());
+    Assert.assertNotNull(bundle.getSubscriptions());
+    List<SubscriptionJson> subscriptions=bundle.getSubscriptions();
+    Assert.assertEquals(subscriptions.size(),1);
+    SubscriptionJson sub=subscriptions.get(0);
+    Assert.assertNotNull(sub.getBundleId());
+    Assert.assertNotNull(sub.getBillingPeriod());
+    Assert.assertNotNull(sub.getPriceList());
+    Assert.assertNotNull(sub.getProductCategory());
+    Assert.assertNotNull(sub.getProductName());
+    Assert.assertNotNull(sub.getSubscriptionId());
+    List<SubscriptionReadEventJson> events=sub.getEvents();
+    List<SubscriptionDeletedEventJson> deletedEvents=sub.getDeletedEvents();
+    List<SubscriptionNewEventJson> newEvents=sub.getNewEvents();
+    if (viewClass.equals(BundleTimelineViews.WriteTimeline.class)) {
+      Assert.assertNull(objFromJson.getPayments());
+      Assert.assertNull(objFromJson.getInvoices());
+      Assert.assertNull(objFromJson.getInvoices());
+      Assert.assertNull(events);
+      Assert.assertEquals(newEvents.size(),1);
+      for (      SubscriptionNewEventJson cur : newEvents) {
+        Assert.assertNotNull(cur.getRequestedDate());
+        Assert.assertNotNull(cur.getEventType());
+        Assert.assertNotNull(cur.getBillingPeriod());
+        Assert.assertNotNull(cur.getPhase());
+        Assert.assertNotNull(cur.getPriceList());
+        Assert.assertNotNull(cur.getProduct());
+      }
+      Assert.assertEquals(deletedEvents.size(),1);
+      for (      SubscriptionDeletedEventJson cur : deletedEvents) {
+        Assert.assertNotNull(cur.getEventId());
+        Assert.assertNotNull(cur.getEffectiveDate());
+        Assert.assertNotNull(cur.getRequestedDate());
+        Assert.assertNotNull(cur.getEventType());
+        Assert.assertNotNull(cur.getBillingPeriod());
+        Assert.assertNotNull(cur.getPhase());
+        Assert.assertNotNull(cur.getPriceList());
+        Assert.assertNotNull(cur.getProduct());
+      }
+      Assert.assertNotNull(objFromJson.getResonForChange());
+    }
+ else     if (viewClass.equals(BundleTimelineViews.ReadTimeline.class)) {
+      Assert.assertNotNull(objFromJson.getPayments());
+      Assert.assertNotNull(objFromJson.getInvoices());
+      Assert.assertNotNull(objFromJson.getInvoices());
+      Assert.assertNull(newEvents);
+      Assert.assertNull(deletedEvents);
+      Assert.assertEquals(events.size(),2);
+      for (      SubscriptionReadEventJson cur : events) {
+        Assert.assertNotNull(cur.getEventId());
+        Assert.assertNotNull(cur.getEffectiveDate());
+        Assert.assertNotNull(cur.getRequestedDate());
+        Assert.assertNotNull(cur.getEventType());
+        Assert.assertNotNull(cur.getBillingPeriod());
+        Assert.assertNotNull(cur.getPhase());
+        Assert.assertNotNull(cur.getPriceList());
+        Assert.assertNotNull(cur.getProduct());
+      }
+      Assert.assertNull(objFromJson.getResonForChange());
+    }
+ else {
+      Assert.fail("View of no interest");
+    }
+    writer=new StringWriter();
+    objWriter.writeValue(writer,objFromJson);
+    String newBaseJson=writer.toString();
+    Assert.assertEquals(newBaseJson,baseJson);
+  }
+ catch (  Exception e) {
+    Assert.fail(e.getMessage());
+  }
+}
