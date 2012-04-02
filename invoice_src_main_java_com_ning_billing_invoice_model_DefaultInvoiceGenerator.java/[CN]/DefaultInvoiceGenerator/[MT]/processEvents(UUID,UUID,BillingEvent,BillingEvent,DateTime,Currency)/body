@@ -1,0 +1,32 @@
+{
+  List<InvoiceItem> items=new ArrayList<InvoiceItem>();
+  InvoiceItem fixedPriceInvoiceItem=generateFixedPriceItem(invoiceId,accountId,thisEvent,targetDate,currency);
+  if (fixedPriceInvoiceItem != null) {
+    items.add(fixedPriceInvoiceItem);
+  }
+  BillingPeriod billingPeriod=thisEvent.getBillingPeriod();
+  if (billingPeriod != BillingPeriod.NO_BILLING_PERIOD) {
+    BillingMode billingMode=instantiateBillingMode(thisEvent.getBillingMode());
+    DateTime startDate=thisEvent.getEffectiveDate();
+    if (!startDate.isAfter(targetDate)) {
+      DateTime endDate=(nextEvent == null) ? null : nextEvent.getEffectiveDate();
+      int billCycleDay=thisEvent.getBillCycleDay();
+      List<RecurringInvoiceItemData> itemData;
+      try {
+        itemData=billingMode.calculateInvoiceItemData(startDate,endDate,targetDate,billCycleDay,billingPeriod);
+      }
+ catch (      InvalidDateSequenceException e) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_INVALID_DATE_SEQUENCE,startDate,endDate,targetDate);
+      }
+      for (      RecurringInvoiceItemData itemDatum : itemData) {
+        BigDecimal rate=thisEvent.getRecurringPrice();
+        if (rate != null) {
+          BigDecimal amount=itemDatum.getNumberOfCycles().multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_MODE);
+          RecurringInvoiceItem recurringItem=new RecurringInvoiceItem(invoiceId,accountId,thisEvent.getSubscription().getBundleId(),thisEvent.getSubscription().getId(),thisEvent.getPlan().getName(),thisEvent.getPlanPhase().getName(),itemDatum.getStartDate(),itemDatum.getEndDate(),amount,rate,currency);
+          items.add(recurringItem);
+        }
+      }
+    }
+  }
+  return items;
+}

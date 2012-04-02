@@ -1,4 +1,6 @@
 {
+  Account account=accountApi.getAccountById(accountId);
+  CallContext context=factory.createCallContext(API_USER_NAME,CallOrigin.INTERNAL,UserType.SYSTEM);
   List<SubscriptionBundle> bundles=entitlementDao.getSubscriptionBundleForAccount(accountId);
   SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
   for (  final SubscriptionBundle bundle : bundles) {
@@ -6,12 +8,11 @@
     for (    final Subscription subscription : subscriptions) {
       for (      final SubscriptionTransition transition : ((SubscriptionData)subscription).getBillingTransitions()) {
         try {
-          Account account=accountApi.getAccountById(accountId);
           int bcd=bcdCalculator.calculateBcd(bundle,subscription,transition,account);
           if (account.getBillCycleDay() == 0) {
             MutableAccountData modifiedData=account.toMutableAccountData();
             modifiedData.setBillCycleDay(bcd);
-            accountApi.updateAccount(account.getExternalKey(),modifiedData);
+            accountApi.updateAccount(account.getExternalKey(),modifiedData,context);
           }
           BillingEvent event=new DefaultBillingEvent(transition,subscription,bcd,account.getCurrency());
           result.add(event);

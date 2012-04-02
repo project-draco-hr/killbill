@@ -1,0 +1,36 @@
+{
+  final String key=account.getExternalKey();
+  try {
+    accountSqlDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
+      @Override public Void inTransaction(      final AccountSqlDao transactionalDao,      final TransactionStatus status) throws AccountApiException, Bus.EventBusException {
+        Account currentAccount=transactionalDao.getAccountByKey(key);
+        if (currentAccount != null) {
+          throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,key);
+        }
+        transactionalDao.create(account,context);
+        UUID historyId=UUID.randomUUID();
+        AccountHistorySqlDao historyDao=accountSqlDao.become(AccountHistorySqlDao.class);
+        historyDao.insertAccountHistoryFromTransaction(account,historyId.toString(),ChangeType.INSERT.toString(),context);
+        AuditSqlDao auditDao=accountSqlDao.become(AuditSqlDao.class);
+        auditDao.insertAuditFromTransaction("account_history",historyId.toString(),ChangeType.INSERT.toString(),context);
+        saveTagsFromWithinTransaction(account,transactionalDao,context);
+        saveCustomFieldsFromWithinTransaction(account,transactionalDao,context);
+        AccountCreationNotification creationEvent=new DefaultAccountCreationEvent(account);
+        eventBus.post(creationEvent);
+        return null;
+      }
+    }
+);
+  }
+ catch (  RuntimeException re) {
+    if (re.getCause() instanceof EntityPersistenceException) {
+      throw (EntityPersistenceException)re.getCause();
+    }
+ else     if (re.getCause() instanceof DataTruncation) {
+      throw new EntityPersistenceException(ErrorCode.DATA_TRUNCATION,re.getCause().getMessage());
+    }
+ else {
+      throw re;
+    }
+  }
+}

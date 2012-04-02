@@ -1,0 +1,21 @@
+{
+  TagSqlDao tagSqlDao=dao.become(TagSqlDao.class);
+  List<Tag> existingTags=tagSqlDao.load(objectId.toString(),objectType);
+  Iterator<Tag> tagIterator=tags.iterator();
+  while (tagIterator.hasNext()) {
+    Tag tag=tagIterator.next();
+    Iterator<Tag> existingTagIterator=existingTags.iterator();
+    while (existingTagIterator.hasNext()) {
+      Tag existingTag=existingTagIterator.next();
+      if (tag.getTagDefinitionName().equals(existingTag.getTagDefinitionName())) {
+        tagIterator.remove();
+        existingTagIterator.remove();
+      }
+    }
+  }
+  tagSqlDao.batchInsertFromTransaction(objectId.toString(),objectType,tags,context);
+  tagSqlDao.batchDeleteFromTransaction(objectId.toString(),objectType,existingTags,context);
+  TagAuditSqlDao auditDao=dao.become(TagAuditSqlDao.class);
+  auditDao.batchInsertFromTransaction(tags,context);
+  auditDao.batchDeleteFromTransaction(existingTags,context);
+}

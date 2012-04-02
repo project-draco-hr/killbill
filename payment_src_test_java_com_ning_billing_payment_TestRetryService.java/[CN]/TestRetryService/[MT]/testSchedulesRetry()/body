@@ -6,17 +6,17 @@
   final UUID bundleId=UUID.randomUUID();
   final DateTime startDate=clock.getUTCNow();
   final DateTime endDate=startDate.plusMonths(1);
-  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),subscriptionId,bundleId,"test plan","test phase",startDate,endDate,amount,new BigDecimal("1.0"),Currency.USD,clock.getUTCNow()));
+  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",startDate,endDate,amount,new BigDecimal("1.0"),Currency.USD));
   mockPaymentProviderPlugin.makeNextInvoiceFail();
-  List<Either<PaymentError,PaymentInfo>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()));
+  List<Either<PaymentError,PaymentInfo>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()),context);
   assertEquals(results.size(),1);
   assertTrue(results.get(0).isLeft());
   List<Notification> pendingNotifications=mockNotificationQueue.getPendingEvents();
   assertEquals(pendingNotifications.size(),1);
   Notification notification=pendingNotifications.get(0);
-  PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForInvoiceId(invoice.getId().toString());
-  assertNotNull(paymentAttempt);
-  assertEquals(notification.getNotificationKey(),paymentAttempt.getPaymentAttemptId().toString());
-  DateTime expectedRetryDate=paymentAttempt.getPaymentAttemptDate().plusDays(paymentConfig.getPaymentRetryDays().get(0));
+  List<PaymentAttempt> paymentAttempts=paymentApi.getPaymentAttemptsForInvoiceId(invoice.getId().toString());
+  assertNotNull(paymentAttempts);
+  assertEquals(notification.getNotificationKey(),paymentAttempts.get(0).getPaymentAttemptId().toString());
+  DateTime expectedRetryDate=paymentAttempts.get(0).getPaymentAttemptDate().plusDays(paymentConfig.getPaymentRetryDays().get(0));
   assertEquals(notification.getEffectiveDate(),expectedRetryDate);
 }

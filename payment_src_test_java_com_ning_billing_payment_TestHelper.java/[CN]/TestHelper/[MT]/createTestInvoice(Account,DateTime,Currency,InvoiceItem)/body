@@ -1,11 +1,11 @@
 {
-  Invoice invoice=new DefaultInvoice(UUID.randomUUID(),account.getId(),1,new DateTime(),targetDate,currency);
+  Invoice invoice=new DefaultInvoice(account.getId(),new DateTime(),targetDate,currency);
   for (  InvoiceItem item : items) {
     if (item instanceof RecurringInvoiceItem) {
       RecurringInvoiceItem recurringInvoiceItem=(RecurringInvoiceItem)item;
-      invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),recurringInvoiceItem.getSubscriptionId(),recurringInvoiceItem.getBundleId(),recurringInvoiceItem.getPlanName(),recurringInvoiceItem.getPhaseName(),recurringInvoiceItem.getStartDate(),recurringInvoiceItem.getEndDate(),recurringInvoiceItem.getAmount(),recurringInvoiceItem.getRate(),recurringInvoiceItem.getCurrency(),recurringInvoiceItem.getCreatedDate()));
+      invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),account.getId(),recurringInvoiceItem.getBundleId(),recurringInvoiceItem.getSubscriptionId(),recurringInvoiceItem.getPlanName(),recurringInvoiceItem.getPhaseName(),recurringInvoiceItem.getStartDate(),recurringInvoiceItem.getEndDate(),recurringInvoiceItem.getAmount(),recurringInvoiceItem.getRate(),recurringInvoiceItem.getCurrency()));
     }
   }
-  invoiceDao.create(invoice);
+  invoiceDao.create(invoice,context);
   return invoice;
 }

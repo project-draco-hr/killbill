@@ -1,7 +1,8 @@
 {
   retryQueue=notificationQueueService.createNotificationQueue(SERVICE_NAME,QUEUE_NAME,new NotificationQueueHandler(){
     @Override public void handleReadyNotification(    String notificationKey,    DateTime eventDateTime){
-      retry(notificationKey);
+      CallContext context=new DefaultCallContext("RetryService",CallOrigin.INTERNAL,UserType.SYSTEM,clock);
+      retry(notificationKey,context);
     }
   }
 ,config);

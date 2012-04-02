@@ -2,8 +2,7 @@
   return invoiceSqlDao.inTransaction(new Transaction<List<Invoice>,InvoiceSqlDao>(){
     @Override public List<Invoice> inTransaction(    final InvoiceSqlDao invoiceDao,    final TransactionStatus status) throws Exception {
       List<Invoice> invoices=invoiceDao.getInvoicesByAccountAfterDate(accountId.toString(),fromDate.toDate());
-      getInvoiceItemsWithinTransaction(invoices,invoiceDao);
-      getInvoicePaymentsWithinTransaction(invoices,invoiceDao);
+      populateChildren(invoices,invoiceDao);
       return invoices;
     }
   }

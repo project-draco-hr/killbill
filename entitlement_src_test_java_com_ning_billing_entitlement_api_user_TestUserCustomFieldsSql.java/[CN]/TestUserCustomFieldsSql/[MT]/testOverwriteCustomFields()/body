@@ -11,11 +11,11 @@
     SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,null),requestedDate);
     assertNotNull(subscription);
     assertEquals(subscription.getFieldValue("nonExistent"),null);
-    subscription.setFieldValue("field1","value1");
+    subscription.saveFieldValue("field1","value1",context);
     assertEquals(subscription.getFieldValue("field1"),"value1");
     List<CustomField> allFields=subscription.getFieldList();
     assertEquals(allFields.size(),1);
-    subscription.setFieldValue("field1","valueNew1");
+    subscription.saveFieldValue("field1","valueNew1",context);
     assertEquals(subscription.getFieldValue("field1"),"valueNew1");
     allFields=subscription.getFieldList();
     assertEquals(allFields.size(),1);
@@ -23,12 +23,17 @@
     assertEquals(subscription.getFieldValue("field1"),"valueNew1");
     allFields=subscription.getFieldList();
     assertEquals(allFields.size(),1);
-    subscription.setFieldValue("field1","valueSuperNew1");
+    subscription.saveFieldValue("field1","valueSuperNew1",context);
     assertEquals(subscription.getFieldValue("field1"),"valueSuperNew1");
     allFields=subscription.getFieldList();
     assertEquals(allFields.size(),1);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     assertEquals(subscription.getFieldValue("field1"),"valueSuperNew1");
+    allFields=subscription.getFieldList();
+    assertEquals(allFields.size(),1);
+    subscription.saveFieldValue("field1",null,context);
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
+    assertEquals(subscription.getFieldValue("field1"),null);
     allFields=subscription.getFieldList();
     assertEquals(allFields.size(),1);
   }
