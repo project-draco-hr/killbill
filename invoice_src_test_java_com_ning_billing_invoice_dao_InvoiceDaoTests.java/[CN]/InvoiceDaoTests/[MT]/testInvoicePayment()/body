@@ -3,9 +3,10 @@
   Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),Currency.USD,clock);
   UUID invoiceId=invoice.getId();
   UUID subscriptionId=UUID.randomUUID();
+  UUID bundleId=UUID.randomUUID();
   DateTime startDate=new DateTime(2010,1,1,0,0,0,0);
   DateTime endDate=new DateTime(2010,4,1,0,0,0,0);
-  InvoiceItem invoiceItem=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,endDate,new BigDecimal("21.00"),new BigDecimal("7.00"),Currency.USD,clock.getUTCNow());
+  InvoiceItem invoiceItem=new RecurringInvoiceItem(invoiceId,subscriptionId,bundleId,"test plan","test phase",startDate,endDate,new BigDecimal("21.00"),new BigDecimal("7.00"),Currency.USD,clock.getUTCNow());
   invoice.addInvoiceItem(invoiceItem);
   invoiceDao.create(invoice);
   Invoice savedInvoice=invoiceDao.getById(invoiceId);

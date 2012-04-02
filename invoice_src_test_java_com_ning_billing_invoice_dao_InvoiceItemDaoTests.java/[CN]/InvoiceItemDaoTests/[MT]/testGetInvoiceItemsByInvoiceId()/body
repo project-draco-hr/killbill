@@ -1,11 +1,12 @@
 {
   UUID invoiceId=UUID.randomUUID();
+  UUID bundleId=UUID.randomUUID();
   DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
   BigDecimal rate=new BigDecimal("20.00");
   for (int i=0; i < 5; i++) {
     UUID subscriptionId=UUID.randomUUID();
     BigDecimal amount=rate.multiply(new BigDecimal(i + 1));
-    RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,startDate.plusMonths(1),amount,amount,Currency.USD,clock.getUTCNow());
+    RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,subscriptionId,bundleId,"test plan","test phase",startDate,startDate.plusMonths(1),amount,amount,Currency.USD,clock.getUTCNow());
     recurringInvoiceItemDao.create(item);
   }
   List<InvoiceItem> items=recurringInvoiceItemDao.getInvoiceItemsByInvoice(invoiceId.toString());
