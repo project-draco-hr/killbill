@@ -4,20 +4,20 @@
   final BigDecimal amount=new BigDecimal("10.00");
   final UUID subscriptionId=UUID.randomUUID();
   final DateTime now=clock.getUTCNow();
-  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),subscriptionId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD,now));
+  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD));
   int numberOfDays=paymentConfig.getPaymentRetryDays().get(0);
   DateTime nextRetryDate=now.plusDays(numberOfDays);
   PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice).cloner().setRetryCount(1).setPaymentAttemptDate(now).build();
-  PaymentAttempt attempt=paymentDao.createPaymentAttempt(paymentAttempt);
+  paymentDao.createPaymentAttempt(paymentAttempt,context);
   retryService.scheduleRetry(paymentAttempt,nextRetryDate);
   ((ClockMock)clock).setDeltaFromReality(Days.days(numberOfDays).toStandardSeconds().getSeconds() * 1000);
   Thread.sleep(2000);
   List<Notification> pendingNotifications=mockNotificationQueue.getPendingEvents();
   assertEquals(pendingNotifications.size(),0);
-  List<PaymentInfo> paymentInfos=paymentApi.getPaymentInfo(Arrays.asList(invoice.getId().toString()));
-  assertEquals(paymentInfos.size(),1);
-  PaymentInfo paymentInfo=paymentInfos.get(0);
+  List<PaymentInfo> paymentInfoList=paymentApi.getPaymentInfo(Arrays.asList(invoice.getId().toString()));
+  assertEquals(paymentInfoList.size(),1);
+  PaymentInfo paymentInfo=paymentInfoList.get(0);
   assertEquals(paymentInfo.getStatus(),PaymentStatus.Processed.toString());
-  PaymentAttempt updatedAttempt=paymentApi.getPaymentAttemptForInvoiceId(invoice.getId().toString());
-  assertEquals(paymentInfo.getPaymentId(),updatedAttempt.getPaymentId());
+  List<PaymentAttempt> updatedAttempts=paymentApi.getPaymentAttemptsForInvoiceId(invoice.getId().toString());
+  assertEquals(paymentInfo.getPaymentId(),updatedAttempts.get(0).getPaymentId());
 }

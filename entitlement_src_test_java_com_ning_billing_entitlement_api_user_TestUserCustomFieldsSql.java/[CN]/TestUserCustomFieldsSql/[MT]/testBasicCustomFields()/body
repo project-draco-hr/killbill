@@ -10,7 +10,7 @@
     testListener.pushExpectedEvent(NextEvent.CREATE);
     SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,null),requestedDate);
     assertNotNull(subscription);
-    subscription.setFieldValue("field1","value1");
+    subscription.saveFieldValue("field1","value1",context);
     assertEquals(subscription.getFieldValue("field1"),"value1");
     List<CustomField> allFields=subscription.getFieldList();
     assertEquals(allFields.size(),1);
@@ -18,8 +18,8 @@
     assertEquals(subscription.getFieldValue("field1"),"value1");
     assertEquals(allFields.size(),1);
     subscription.clearFields();
-    subscription.setFieldValue("field2","value2");
-    subscription.setFieldValue("field3","value3");
+    subscription.saveFieldValue("field2","value2",context);
+    subscription.saveFieldValue("field3","value3",context);
     assertEquals(subscription.getFieldValue("field2"),"value2");
     assertEquals(subscription.getFieldValue("field3"),"value3");
     allFields=subscription.getFieldList();

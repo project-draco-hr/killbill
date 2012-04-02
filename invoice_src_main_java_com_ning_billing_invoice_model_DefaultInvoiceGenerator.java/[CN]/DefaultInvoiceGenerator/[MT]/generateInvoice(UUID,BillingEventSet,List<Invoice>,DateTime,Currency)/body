@@ -12,9 +12,9 @@
     Collections.sort(existingItems);
   }
   targetDate=adjustTargetDate(existingInvoices,targetDate);
-  DefaultInvoice invoice=new DefaultInvoice(accountId,targetDate,targetCurrency,clock);
+  DefaultInvoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,targetCurrency);
   UUID invoiceId=invoice.getId();
-  List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,events,targetDate,targetCurrency);
+  List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,targetDate,targetCurrency);
   removeCancellingInvoiceItems(existingItems);
   removeDuplicatedInvoiceItems(proposedItems,existingItems);
   for (  InvoiceItem existingItem : existingItems) {

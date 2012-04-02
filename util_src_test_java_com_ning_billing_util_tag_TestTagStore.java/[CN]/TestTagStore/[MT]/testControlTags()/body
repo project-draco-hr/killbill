@@ -1,13 +1,13 @@
 {
   UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,ACCOUNT_TYPE);
+  TagStore tagStore=new DefaultTagStore(accountId,Account.ObjectType);
   assertEquals(tagStore.generateInvoice(),true);
   assertEquals(tagStore.processPayment(),true);
-  ControlTag invoiceTag=new DefaultControlTag("testUser",clock.getUTCNow(),ControlTagType.AUTO_INVOICING_OFF);
+  ControlTag invoiceTag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
   tagStore.add(invoiceTag);
   assertEquals(tagStore.generateInvoice(),false);
   assertEquals(tagStore.processPayment(),true);
-  ControlTag paymentTag=new DefaultControlTag("testUser",clock.getUTCNow(),ControlTagType.AUTO_PAY_OFF);
+  ControlTag paymentTag=new DefaultControlTag(ControlTagType.AUTO_PAY_OFF);
   tagStore.add(paymentTag);
   assertEquals(tagStore.generateInvoice(),false);
   assertEquals(tagStore.processPayment(),false);

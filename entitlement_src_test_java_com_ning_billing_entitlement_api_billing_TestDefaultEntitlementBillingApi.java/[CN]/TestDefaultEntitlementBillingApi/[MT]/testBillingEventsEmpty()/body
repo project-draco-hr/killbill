@@ -6,7 +6,8 @@
   ((ZombieControl)account).addResult("getId",accountId).addResult("getCurrency",Currency.USD);
   AccountUserApi accountApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
   ((ZombieControl)accountApi).addResult("getAccountById",account);
-  DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(dao,accountApi,catalogService);
+  CallContextFactory factory=new DefaultCallContextFactory(clock);
+  DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(factory,dao,accountApi,catalogService);
   SortedSet<BillingEvent> events=api.getBillingEventsForAccount(new UUID(0L,0L));
   Assert.assertEquals(events.size(),0);
 }
