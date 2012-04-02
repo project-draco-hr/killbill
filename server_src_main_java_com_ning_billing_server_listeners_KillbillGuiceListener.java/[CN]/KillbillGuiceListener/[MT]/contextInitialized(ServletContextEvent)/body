@@ -1,21 +1,19 @@
 {
-  logger.info("GuiceListener : contextInitialized");
-  final String moduleFactoryClassName=event.getServletContext().getInitParameter("guiceModuleFactoryClass");
-  if (StringUtils.isEmpty(moduleFactoryClassName)) {
-    throw new IllegalStateException("Missing parameter 'guiceModuleFactoryClass' for IrsGuiceListener!");
-  }
-  try {
-    final Class<?> moduleFactoryClass=Class.forName(moduleFactoryClassName);
-    if (!GuiceModuleFactory.class.isAssignableFrom(moduleFactoryClass)) {
-      throw new IllegalStateException(String.format("%s exists but is not a guice module factory!",moduleFactoryClassName));
-    }
-    GuiceModuleFactory factory=GuiceModuleFactory.class.cast(moduleFactoryClass.newInstance());
-    logger.info("Instantiated " + moduleFactoryClassName + " as the factory for the main guice module.");
-    guiceModule=factory.createModule();
-  }
- catch (  Exception ex) {
-    throw new IllegalStateException(ex);
-  }
+  final ServerModuleBuilder builder=new ServerModuleBuilder().addConfig(KillbillServerConfig.class).addHealthCheck(KillbillHealthcheck.class).addJMXExport(KillbillHealthcheck.class).addModule(new KillbillServerModule()).addJerseyResource("com.ning.billing.jaxrs.resources");
+  guiceModule=builder.build();
   super.contextInitialized(event);
-  injectorInstance=this.injector(event);
+  logger.info("KillbillLifecycleListener : contextInitialized");
+  final Injector injector=injector(event);
+  killbillLifecycle=injector.getInstance(DefaultLifecycle.class);
+  killbillBusService=injector.getInstance(BusService.class);
+  killbilleventHandler=new KillbillEventHandler();
+  killbillLifecycle.fireStartupSequencePriorEventRegistration();
+  try {
+    killbillBusService.getBus().register(killbilleventHandler);
+  }
+ catch (  Bus.EventBusException e) {
+    logger.error("Failed to register for event notifications, this is bad exiting!",e);
+    System.exit(1);
+  }
+  killbillLifecycle.fireStartupSequencePostEventRegistration();
 }
