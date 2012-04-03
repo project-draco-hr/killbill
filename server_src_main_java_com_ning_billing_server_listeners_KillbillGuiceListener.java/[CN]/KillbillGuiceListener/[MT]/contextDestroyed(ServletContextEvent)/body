@@ -1,4 +1,5 @@
 {
+  super.contextDestroyed(sce);
   logger.info("IrsKillbillListener : contextDestroyed");
   if (killbillLifecycle == null) {
     return;
@@ -7,7 +8,7 @@
   try {
     killbillBusService.getBus().unregister(killbilleventHandler);
   }
- catch (  EventBusException e) {
+ catch (  Bus.EventBusException e) {
     logger.warn("Failed to unregister for event notifications",e);
   }
   killbillLifecycle.fireShutdownSequencePostEventUnRegistration();
