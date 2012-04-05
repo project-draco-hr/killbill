@@ -16,7 +16,7 @@
         AccountHistorySqlDao historyDao=accountSqlDao.become(AccountHistorySqlDao.class);
         historyDao.insertAccountHistoryFromTransaction(account,historyId.toString(),ChangeType.UPDATE.toString(),context);
         AuditSqlDao auditDao=accountSqlDao.become(AuditSqlDao.class);
-        auditDao.insertAuditFromTransaction("account_history",historyId.toString(),ChangeType.INSERT.toString(),context);
+        auditDao.insertAuditFromTransaction("account_history",historyId.toString(),ChangeType.INSERT,context);
         saveTagsFromWithinTransaction(account,accountSqlDao,context);
         saveCustomFieldsFromWithinTransaction(account,accountSqlDao,context);
         AccountChangeNotification changeEvent=new DefaultAccountChangeNotification(account.getId(),currentAccount,account);
