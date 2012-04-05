@@ -1,0 +1,73 @@
+{
+  Object[] classPaths;
+  final Set<Class<?>> result=new HashSet<Class<?>>();
+  ClassLoader classLoader=KillbillGuiceListener.class.getClassLoader();
+  try {
+    classPaths=((java.net.URLClassLoader)classLoader).getURLs();
+  }
+ catch (  ClassCastException cce) {
+    classPaths=System.getProperty("java.class.path","").split(File.pathSeparator);
+  }
+  Enumeration<?> files=null;
+  for (int h=0; h < classPaths.length; h++) {
+    JarFile module=null;
+    File classPath=new File((URL.class).isInstance(classPaths[h]) ? ((URL)classPaths[h]).getFile() : classPaths[h].toString());
+    if (classPath.isDirectory()) {
+      List<String> dirListing=new ArrayList<String>();
+      recursivelyListDir(dirListing,classPath,new StringBuffer());
+      files=Collections.enumeration(dirListing);
+    }
+ else     if (classPath.getName().endsWith(".jar")) {
+      String[] jarParts=classPath.getName().split("/");
+      String jarName=jarParts[jarParts.length - 1];
+      System.out.println(jarName);
+      if (jarFilter != null && jarName != null && !jarName.startsWith(jarFilter)) {
+        continue;
+      }
+      try {
+        module=new JarFile(classPath);
+        files=module.entries();
+      }
+ catch (      MalformedURLException mue) {
+        throw new ClassNotFoundException("Bad classpath. Error: " + mue.getMessage());
+      }
+catch (      IOException io) {
+        throw new ClassNotFoundException("jar file '" + classPath.getName() + "' could not be instantiate from file path. Error: "+ io.getMessage());
+      }
+    }
+    while (files != null && files.hasMoreElements()) {
+      String fileName=files.nextElement().toString();
+      if (fileName.endsWith(".class")) {
+        String className=fileName.replaceAll("/",".").substring(0,fileName.length() - 6);
+        if (packageFilter != null) {
+          if (!className.startsWith(packageFilter)) {
+            continue;
+          }
+        }
+        Class<?> theClass=null;
+        try {
+          theClass=Class.forName(className,false,classLoader);
+          Class<?>[] classInterfaces=getInterfaces(theClass);
+          for (int i=0; i < classInterfaces.length; i++) {
+            String interfaceName=classInterfaces[i].getName();
+            if (!interfaceFilter.equals(interfaceName)) {
+              continue;
+            }
+            result.add((Class<?>)theClass);
+          }
+        }
+ catch (        NoClassDefFoundError e) {
+          continue;
+        }
+      }
+    }
+    if (module != null) {
+      try {
+        module.close();
+      }
+ catch (      IOException e) {
+      }
+    }
+  }
+  return result;
+}

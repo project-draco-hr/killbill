@@ -1,0 +1,21 @@
+{
+  final String accountPathPrefix="/1.0/account";
+  AccountJson accountData=getAccountJson();
+  ObjectWriter objWriter=mapper.writer();
+  Writer writer=new StringWriter();
+  objWriter.writeValue(writer,accountData);
+  String baseJson=writer.toString();
+  try {
+    Thread.sleep(100000);
+  }
+ catch (  Exception e) {
+  }
+  httpClient.preparePost(String.format("http://%s:%d%s",config.getServerHost(),config.getServerPort(),accountPathPrefix)).addHeader(HEADER_CONTENT_TYPE,CONTENT_TYPE).setBody(baseJson).execute(new AsyncCompletionHandler<Integer>(){
+    @Override public Integer onCompleted(    Response response) throws Exception {
+      int statusCode=response.getStatusCode();
+      URI uri=response.getUri();
+      return statusCode;
+    }
+  }
+);
+}

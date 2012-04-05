@@ -1,0 +1,14 @@
+{
+  int prevLen;
+  if (dir.isDirectory()) {
+    File[] files=dir.listFiles();
+    for (int i=0; i < files.length; i++) {
+      prevLen=relativePath.length();
+      recursivelyListDir(dirListing,files[i],relativePath.append(prevLen == 0 ? "" : "/").append(files[i].getName()));
+      relativePath.delete(prevLen,relativePath.length());
+    }
+  }
+ else {
+    dirListing.add(relativePath.toString());
+  }
+}

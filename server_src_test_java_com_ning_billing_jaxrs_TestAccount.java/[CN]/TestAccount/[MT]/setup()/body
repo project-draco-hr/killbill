@@ -1,0 +1,17 @@
+{
+  loadSystemPropertiesFromClasspath("/killbill.properties");
+  httpClient=new AsyncHttpClient();
+  server=new HttpServer();
+  config=getConfig();
+  mapper=new ObjectMapper();
+  final Iterable<EventListener> eventListeners=new Iterable<EventListener>(){
+    @Override public Iterator<EventListener> iterator(){
+      ArrayList<EventListener> array=new ArrayList<EventListener>();
+      array.add(new KillbillGuiceListener());
+      return array.iterator();
+    }
+  }
+;
+  server.configure(config,eventListeners,new HashMap<FilterHolder,String>());
+  server.start();
+}
