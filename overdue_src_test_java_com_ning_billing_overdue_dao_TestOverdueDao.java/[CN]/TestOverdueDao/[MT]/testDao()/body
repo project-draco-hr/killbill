@@ -1,0 +1,15 @@
+{
+  ClockMock clock=new ClockMock();
+  SubscriptionBundle bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
+  UUID bundleId=UUID.randomUUID();
+  ((ZombieControl)bundle).addResult("getId",bundleId);
+  String overdueStateName="WayPassedItMan";
+  @SuppressWarnings("unchecked") OverdueState<SubscriptionBundle> state=BrainDeadProxyFactory.createBrainDeadProxyFor(OverdueState.class);
+  ((ZombieControl)state).addResult("getName",overdueStateName);
+  dao.setOverdueStateForBundle(bundle,state,clock);
+  clock.setDeltaFromReality(1000 * 3600 * 24);
+  String overdueStateName2="NoReallyThisCantGoOn";
+  ((ZombieControl)state).addResult("getName",overdueStateName2);
+  dao.setOverdueStateForBundle(bundle,state,clock);
+  Assert.assertEquals(accessDao.getOverdueStateNameFor(bundle),overdueStateName2);
+}
