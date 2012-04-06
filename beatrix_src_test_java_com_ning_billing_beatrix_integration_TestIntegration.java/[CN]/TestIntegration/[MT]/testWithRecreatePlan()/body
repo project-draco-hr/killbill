@@ -6,13 +6,13 @@
   UUID accountId=account.getId();
   assertNotNull(account);
   clock.setDeltaFromReality(initialDate.getMillis() - clock.getUTCNow().getMillis());
-  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever2");
+  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever2",context);
   String productName="Shotgun";
   BillingPeriod term=BillingPeriod.MONTHLY;
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null);
+  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context);
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
   DateTime startDate=subscription.getCurrentPhaseStart();
@@ -26,7 +26,7 @@
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
   subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
-  subscription.cancel(clock.getUTCNow(),false);
+  subscription.cancel(clock.getUTCNow(),false,context);
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
   endDate=subscription.getChargedThroughDate();
   Interval it=new Interval(clock.getUTCNow(),endDate);
@@ -38,6 +38,6 @@
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
-  subscription.recreate(new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),endDate);
+  subscription.recreate(new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),endDate,context);
   assertTrue(busHandler.isCompleted(DELAY));
 }

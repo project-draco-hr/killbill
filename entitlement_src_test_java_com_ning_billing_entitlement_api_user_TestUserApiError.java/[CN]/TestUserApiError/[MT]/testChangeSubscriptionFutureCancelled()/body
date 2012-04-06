@@ -9,11 +9,11 @@
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     Duration ctd=getDurationMonth(1);
     DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
-    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
+    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
     subscription=entitlementApi.getSubscriptionFromId(subscription.getId());
-    subscription.cancel(clock.getUTCNow(),false);
+    subscription.cancel(clock.getUTCNow(),false,context);
     try {
-      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow());
+      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),context);
     }
  catch (    EntitlementUserApiException e) {
       assertEquals(e.getCode(),ErrorCode.ENT_CHANGE_FUTURE_CANCELLED.getCode());
