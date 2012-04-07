@@ -1,0 +1,10 @@
+{
+  try {
+    String name=overdueApi.getOverdueStateNameFor(bundle);
+    OverdueState<SubscriptionBundle> state=catalogService.getCurrentCatalog().currentBundleOverdueStateSet().findState(name);
+    return new SubscriptionBundleData(bundle.getId(),bundle.getKey(),bundle.getAccountId(),bundle.getStartDate(),state);
+  }
+ catch (  CatalogApiException e) {
+    throw new EntitlementError(e);
+  }
+}

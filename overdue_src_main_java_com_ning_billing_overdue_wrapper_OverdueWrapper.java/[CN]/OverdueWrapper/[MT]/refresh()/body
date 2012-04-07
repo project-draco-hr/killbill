@@ -1,7 +1,8 @@
 {
+  OverdueState<T> nextOverdueState;
   BillingState<T> billingState=billingStateCalcuator.calculateBillingState(overdueable);
   String previousOverdueStateName=api.getOverdueStateNameFor(overdueable);
-  OverdueState<T> nextOverdueState=overdueStateSet.calculateOverdueState(billingState,clock.getUTCNow());
+  nextOverdueState=overdueStateSet.calculateOverdueState(billingState,clock.getUTCNow());
   if (!previousOverdueStateName.equals(nextOverdueState.getName())) {
     overdueStateApplicator.apply(overdueable,nextOverdueState,nextOverdueState,overdueStateSet.dateOfNextCheck(billingState,clock.getUTCNow()));
   }
