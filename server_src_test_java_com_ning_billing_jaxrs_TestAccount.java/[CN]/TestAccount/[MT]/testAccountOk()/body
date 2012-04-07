@@ -1,21 +1,28 @@
 {
-  final String accountPathPrefix="/1.0/account";
-  AccountJson accountData=getAccountJson();
-  ObjectWriter objWriter=mapper.writer();
-  Writer writer=new StringWriter();
-  objWriter.writeValue(writer,accountData);
-  String baseJson=writer.toString();
-  try {
-    Thread.sleep(100000);
-  }
- catch (  Exception e) {
-  }
-  httpClient.preparePost(String.format("http://%s:%d%s",config.getServerHost(),config.getServerPort(),accountPathPrefix)).addHeader(HEADER_CONTENT_TYPE,CONTENT_TYPE).setBody(baseJson).execute(new AsyncCompletionHandler<Integer>(){
-    @Override public Integer onCompleted(    Response response) throws Exception {
-      int statusCode=response.getStatusCode();
-      URI uri=response.getUri();
-      return statusCode;
-    }
-  }
-);
+  AccountJson input=getAccountJson("xoxo","shdgfhwe","xoxo@yahoo.com");
+  String baseJson=mapper.writeValueAsString(input);
+  Response response=doPost(BaseJaxrsResource.ACCOUNTS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
+  String location=response.getHeader("Location");
+  Assert.assertNotNull(location);
+  response=doGetWithUrl(location,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  AccountJson objFromJson=mapper.readValue(baseJson,AccountJson.class);
+  Assert.assertTrue(objFromJson.equalsNoId(input));
+  Map<String,String> queryParams=new HashMap<String,String>();
+  queryParams.put(BaseJaxrsResource.QUERY_EXTERNAL_KEY,"shdgfhwe");
+  response=doGet(BaseJaxrsResource.ACCOUNTS_PATH,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  objFromJson=mapper.readValue(baseJson,AccountJson.class);
+  Assert.assertTrue(objFromJson.equalsNoId(input));
+  AccountJson newInput=new AccountJson(objFromJson.getAcountId(),"zozo",4,objFromJson.getExternalKey(),"rr@google.com",18,"EUR","none","UTC","bl1","bh2","","ca","usa","415-255-2991");
+  baseJson=mapper.writeValueAsString(newInput);
+  final String uri=BaseJaxrsResource.ACCOUNTS_PATH + "/" + objFromJson.getAcountId();
+  response=doPut(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  objFromJson=mapper.readValue(baseJson,AccountJson.class);
+  Assert.assertTrue(objFromJson.equals(newInput));
 }

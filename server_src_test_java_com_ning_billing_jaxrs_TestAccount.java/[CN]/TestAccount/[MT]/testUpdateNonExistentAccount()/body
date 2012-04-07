@@ -1,0 +1,9 @@
+{
+  AccountJson input=getAccountJson("xoxo","shdgfhwe","xoxo@yahoo.com");
+  String baseJson=mapper.writeValueAsString(input);
+  final String uri=BaseJaxrsResource.ACCOUNTS_PATH + "/" + input.getAcountId();
+  Response response=doPut(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.NO_CONTENT.getStatusCode());
+  String body=response.getResponseBody();
+  Assert.assertEquals(body,"");
+}
