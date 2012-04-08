@@ -5,7 +5,7 @@
     PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription.changePlan("Pistol",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow());
+    subscription.changePlan("Pistol",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
     testListener.isCompleted(3000);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
@@ -13,15 +13,15 @@
     Duration ctd=getDurationMonth(1);
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
-    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate);
+    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    subscription.cancel(clock.getUTCNow(),false);
+    subscription.cancel(clock.getUTCNow(),false,context);
     assertFalse(testListener.isCompleted(2000));
     testListener.reset();
-    subscription.uncancel();
+    subscription.uncancel(context);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow());
+    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow(),context);
     assertFalse(testListener.isCompleted(2000));
     clock.addDeltaFromReality(ctd);
     assertTrue(testListener.isCompleted(3000));

@@ -5,7 +5,7 @@
     EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlan(startDate);
     DateTime afterMigration=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
-    migrationApi.migrate(toBeMigrated);
+    migrationApi.migrate(toBeMigrated,context);
     assertTrue(testListener.isCompleted(5000));
     List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
     assertEquals(bundles.size(),1);
