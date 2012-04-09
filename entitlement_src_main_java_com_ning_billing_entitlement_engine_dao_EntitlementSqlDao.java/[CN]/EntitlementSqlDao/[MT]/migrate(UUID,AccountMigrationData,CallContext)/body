@@ -11,7 +11,7 @@
         for (        SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
           SubscriptionData subData=curSubscription.getData();
           for (          final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
-            transEventDao.insertEvent(curEvent);
+            transEventDao.insertEvent(curEvent,context);
             eventIds.add(curEvent.getId().toString());
             recordFutureNotificationFromTransaction(transEventDao,curEvent.getEffectiveDate(),new NotificationKey(){
               @Override public String toString(){
@@ -23,7 +23,7 @@
           transSubDao.insertSubscription(subData,context);
           subscriptionIds.add(subData.getId().toString());
         }
-        transBundleDao.insertBundle(bundleData);
+        transBundleDao.insertBundle(bundleData,context);
         bundleIds.add(bundleData.getId().toString());
       }
       AuditSqlDao auditSqlDao=transBundleDao.become(AuditSqlDao.class);

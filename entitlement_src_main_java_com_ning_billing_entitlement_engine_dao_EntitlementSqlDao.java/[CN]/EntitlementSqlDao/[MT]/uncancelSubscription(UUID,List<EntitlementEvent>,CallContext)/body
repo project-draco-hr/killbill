@@ -13,11 +13,11 @@
         }
       }
       if (existingCancelId != null) {
-        dao.unactiveEvent(existingCancelId.toString(),now);
+        dao.unactiveEvent(existingCancelId.toString(),context);
         String deactivatedEventId=existingCancelId.toString();
         List<String> eventIds=new ArrayList<String>();
         for (        final EntitlementEvent cur : uncancelEvents) {
-          dao.insertEvent(cur);
+          dao.insertEvent(cur,context);
           eventIds.add(cur.getId().toString());
           recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new NotificationKey(){
             @Override public String toString(){
