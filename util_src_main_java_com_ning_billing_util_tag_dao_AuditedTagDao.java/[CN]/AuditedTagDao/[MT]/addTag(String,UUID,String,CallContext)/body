@@ -1,0 +1,12 @@
+{
+  tagSqlDao.inTransaction(new Transaction<Void,TagSqlDao>(){
+    @Override public Void inTransaction(    final TagSqlDao tagSqlDao,    final TransactionStatus status) throws Exception {
+      String tagId=UUID.randomUUID().toString();
+      tagSqlDao.addTagFromTransaction(tagId,tagName,objectId.toString(),objectType,context);
+      TagAuditSqlDao auditDao=tagSqlDao.become(TagAuditSqlDao.class);
+      auditDao.addTagFromTransaction(tagId,context);
+      return null;
+    }
+  }
+);
+}

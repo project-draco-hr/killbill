@@ -17,12 +17,12 @@
     DateTime now=clock.getUTCNow();
     Duration ctd=getDurationMonth(1);
     DateTime newChargedThroughDate=DefaultClock.addDuration(now,ctd);
-    billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate);
+    billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);
     baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
     String newBaseProduct="Pistol";
     BillingPeriod newBaseTerm=BillingPeriod.MONTHLY;
     String newBasePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-    baseSubscription.changePlan(newBaseProduct,newBaseTerm,newBasePriceList,now);
+    baseSubscription.changePlan(newBaseProduct,newBaseTerm,newBasePriceList,now,context);
     aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());

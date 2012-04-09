@@ -1,16 +1,20 @@
 {
   super.configure();
+  install(new ClockModule());
+  install(new CallContextModule());
+  install(new FieldStoreModule());
+  install(new TagStoreModule());
   install(new AccountModule());
   install(new CatalogModule());
   install(new BusModule());
   install(new EntitlementModule());
   install(new InvoiceModule());
   install(new PaymentModule());
-  install(new ClockModule());
   install(new TagStoreModule());
   install(new NotificationQueueModule());
   final MysqlTestingHelper helper=new MysqlTestingHelper();
   bind(MysqlTestingHelper.class).toInstance(helper);
   final IDBI dbi=helper.getDBI();
   bind(IDBI.class).toInstance(dbi);
+  bind(TagDefinitionSqlDao.class).toInstance(dbi.onDemand(TagDefinitionSqlDao.class));
 }

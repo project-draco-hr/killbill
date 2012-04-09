@@ -17,9 +17,9 @@
     DateTime now=clock.getUTCNow();
     Duration ctd=getDurationMonth(1);
     DateTime newChargedThroughDate=DefaultClock.addDuration(now,ctd);
-    billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate);
+    billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);
     baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
-    baseSubscription.cancel(now,false);
+    baseSubscription.cancel(now,false,context);
     aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
@@ -27,7 +27,6 @@
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     clock.addDeltaFromReality(ctd);
-    now=clock.getUTCNow();
     assertTrue(testListener.isCompleted(5000));
     aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
     assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);

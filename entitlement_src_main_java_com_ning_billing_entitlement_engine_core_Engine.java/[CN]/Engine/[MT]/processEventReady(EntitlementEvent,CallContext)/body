@@ -1,0 +1,22 @@
+{
+  if (!event.isActive()) {
+    return;
+  }
+  SubscriptionData subscription=(SubscriptionData)dao.getSubscriptionFromId(subscriptionFactory,event.getSubscriptionId());
+  if (subscription == null) {
+    log.warn("Failed to retrieve subscription for id %s",event.getSubscriptionId());
+    return;
+  }
+  if (event.getType() == EventType.PHASE) {
+    onPhaseEvent(subscription,context);
+  }
+ else   if (event.getType() == EventType.API_USER && subscription.getCategory() == ProductCategory.BASE) {
+    onBasePlanEvent(subscription,(ApiEvent)event,context);
+  }
+  try {
+    eventBus.post(subscription.getTransitionFromEvent(event));
+  }
+ catch (  EventBusException e) {
+    log.warn("Failed to post entitlement event " + event,e);
+  }
+}

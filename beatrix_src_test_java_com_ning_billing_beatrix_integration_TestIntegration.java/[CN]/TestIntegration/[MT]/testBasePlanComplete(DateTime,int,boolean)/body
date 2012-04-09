@@ -1,16 +1,16 @@
 {
   log.info("Beginning test with BCD of " + billingDay);
-  Account account=accountUserApi.createAccount(getAccountData(billingDay),null,null);
+  Account account=accountUserApi.createAccount(getAccountData(billingDay),null,null,context);
   UUID accountId=account.getId();
   assertNotNull(account);
   clock.setDeltaFromReality(initialCreationDate.getMillis() - clock.getUTCNow().getMillis());
-  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever");
+  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",context);
   String productName="Shotgun";
   BillingPeriod term=BillingPeriod.MONTHLY;
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null);
+  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context);
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
   DateTime startDate=subscription.getCurrentPhaseStart();
@@ -23,7 +23,7 @@
   BillingPeriod newTerm=BillingPeriod.MONTHLY;
   String newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   String newProductName="Assault-Rifle";
-  subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
+  subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow(),context);
   assertTrue(busHandler.isCompleted(DELAY));
   startDate=subscription.getCurrentPhaseStart();
   endDate=startDate.plusDays(30);
@@ -76,7 +76,7 @@ newTerm=BillingPeriod.MONTHLY;
 newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
 newProductName="Pistol";
 subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
-subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
+subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow(),context);
 busHandler.pushExpectedEvent(NextEvent.CHANGE);
 busHandler.pushExpectedEvent(NextEvent.INVOICE);
 busHandler.pushExpectedEvent(NextEvent.PAYMENT);
@@ -105,7 +105,7 @@ verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate,
 }
  while (maxCycles-- > 0);
 subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
-subscription.cancel(clock.getUTCNow(),false);
+subscription.cancel(clock.getUTCNow(),false,context);
 busHandler.pushExpectedEvent(NextEvent.CANCEL);
 Interval it=new Interval(clock.getUTCNow(),endDate);
 clock.addDeltaFromReality(it.toDurationMillis());

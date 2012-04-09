@@ -6,7 +6,8 @@
       log.info("could not process invoice payment: could not find a valid account for event {}",event);
     }
  else {
-      List<Either<PaymentError,PaymentInfo>> results=paymentApi.createPayment(account,Arrays.asList(event.getInvoiceId().toString()));
+      CallContext context=new DefaultCallContext("PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,clock);
+      List<Either<PaymentError,PaymentInfo>> results=paymentApi.createPayment(account,Arrays.asList(event.getInvoiceId().toString()),context);
       if (!results.isEmpty()) {
         Either<PaymentError,PaymentInfo> result=results.get(0);
         eventBus.post(result.isLeft() ? result.getLeft() : result.getRight());
