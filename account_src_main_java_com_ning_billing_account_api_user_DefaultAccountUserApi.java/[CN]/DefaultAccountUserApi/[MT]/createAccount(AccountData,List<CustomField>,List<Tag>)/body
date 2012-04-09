@@ -2,6 +2,11 @@
   Account account=new DefaultAccount(data,clock.getUTCNow());
   account.addFields(fields);
   account.addTags(tags);
-  dao.create(account);
+  try {
+    dao.create(account);
+  }
+ catch (  EntityPersistenceException e) {
+    throw new AccountApiException(e,ErrorCode.ACCOUNT_CREATION_FAILED);
+  }
   return account;
 }

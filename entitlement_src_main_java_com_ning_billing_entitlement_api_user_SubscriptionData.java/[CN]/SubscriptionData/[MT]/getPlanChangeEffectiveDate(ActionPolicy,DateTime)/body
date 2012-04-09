@@ -5,9 +5,10 @@
   if (policy != ActionPolicy.END_OF_TERM) {
     throw new EntitlementError(String.format("Unexpected policy type %s",policy.toString()));
   }
-  DateTime effectiveDate=chargedThroughDate;
-  if (chargedThroughDate == null || chargedThroughDate.isBefore(clock.getUTCNow())) {
-    effectiveDate=getCurrentPhaseStart();
+  if (chargedThroughDate == null) {
+    return requestedDate;
   }
-  return effectiveDate;
+ else {
+    return chargedThroughDate.isBefore(requestedDate) ? requestedDate : chargedThroughDate;
+  }
 }

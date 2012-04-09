@@ -1,0 +1,16 @@
+{
+  try {
+    SubscriptionData subscription=createSubscription("Shotgun",BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME);
+    try {
+      subscription.recreate(getProductSpecifier("Pistol",PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,null),clock.getUTCNow());
+      Assert.assertFalse(true);
+    }
+ catch (    EntitlementUserApiException e) {
+      assertEquals(e.getCode(),ErrorCode.ENT_RECREATE_BAD_STATE.getCode());
+    }
+  }
+ catch (  Exception e) {
+    e.printStackTrace();
+    Assert.assertFalse(true);
+  }
+}

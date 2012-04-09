@@ -1,6 +1,6 @@
 {
   final Injector g=Guice.createInjector(Stage.PRODUCTION,new AbstractModule(){
-    protected void configure(){
+    @Override protected void configure(){
       bind(Clock.class).to(ClockMock.class).asEagerSingleton();
       bind(Bus.class).to(InMemoryBus.class).asEagerSingleton();
       bind(NotificationQueueService.class).to(DefaultNotificationQueueService.class).asEagerSingleton();
@@ -23,6 +23,9 @@
   eventBus=g.getInstance(Bus.class);
   helper=g.getInstance(MysqlTestingHelper.class);
   notificationQueueService=g.getInstance(NotificationQueueService.class);
-  notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),new MockEntitlementDao(),listener);
+  Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  EntitlementDao entitlementDao=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementDao.class);
+  ((ZombieControl)entitlementDao).addResult("getSubscriptionFromId",subscription);
+  notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),entitlementDao,listener);
   startMysql();
 }

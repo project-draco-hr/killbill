@@ -1,0 +1,31 @@
+{
+  clock.setDeltaFromReality(new DateTime().getMillis() - clock.getUTCNow().getMillis());
+  Account account=accountUserApi.createAccount(getAccountData(15),null,null);
+  UUID accountId=account.getId();
+  String productName="Blowdart";
+  String planSetName="DEFAULT";
+  busHandler.pushExpectedEvent(NextEvent.CREATE);
+  busHandler.pushExpectedEvent(NextEvent.INVOICE);
+  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(accountId,"testKey");
+  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,BillingPeriod.MONTHLY,planSetName,PhaseType.TRIAL),null);
+  assertTrue(busHandler.isCompleted(DELAY));
+  List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId);
+  assertNotNull(invoices);
+  assertTrue(invoices.size() == 1);
+  busHandler.pushExpectedEvent(NextEvent.PHASE);
+  busHandler.pushExpectedEvent(NextEvent.INVOICE);
+  busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+  clock.addDeltaFromReality(6 * AT_LEAST_ONE_MONTH_MS);
+  assertTrue(busHandler.isCompleted(DELAY));
+  invoices=invoiceUserApi.getInvoicesByAccount(accountId);
+  assertNotNull(invoices);
+  assertTrue(invoices.size() == 2);
+  busHandler.pushExpectedEvent(NextEvent.PHASE);
+  busHandler.pushExpectedEvent(NextEvent.INVOICE);
+  busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+  clock.addDeltaFromReality(6 * AT_LEAST_ONE_MONTH_MS);
+  assertTrue(busHandler.isCompleted(DELAY));
+  invoices=invoiceUserApi.getInvoicesByAccount(accountId);
+  assertNotNull(invoices);
+  assertTrue(invoices.size() == 3);
+}

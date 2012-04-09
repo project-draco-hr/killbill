@@ -2,9 +2,9 @@
   if (transitions == null) {
     return null;
   }
-  SubscriptionTransition latestSubscription=null;
-  for (  SubscriptionTransition cur : transitions) {
-    if (cur.getEffectiveTransitionTime().isAfter(clock.getUTCNow())) {
+  SubscriptionTransitionData latestSubscription=transitions.get(0);
+  for (  SubscriptionTransitionData cur : transitions) {
+    if (cur.getEffectiveTransitionTime().isAfter(clock.getUTCNow()) || !cur.isFromDisk()) {
       break;
     }
     latestSubscription=cur;

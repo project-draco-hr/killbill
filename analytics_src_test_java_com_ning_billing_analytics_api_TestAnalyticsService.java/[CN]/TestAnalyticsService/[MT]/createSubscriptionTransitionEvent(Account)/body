@@ -6,9 +6,9 @@
   final Plan plan=new MockPlan("platinum-monthly",product);
   final PlanPhase phase=new MockPhase(PhaseType.EVERGREEN,plan,MockDuration.UNLIMITED(),25.95);
   final UUID subscriptionId=UUID.randomUUID();
-  final DateTime effectiveTransitionTime=new DateTime(DateTimeZone.UTC);
-  final DateTime requestedTransitionTime=new DateTime(DateTimeZone.UTC);
+  final DateTime effectiveTransitionTime=clock.getUTCNow();
+  final DateTime requestedTransitionTime=clock.getUTCNow();
   final String priceList="something";
-  transition=new SubscriptionTransitionData(UUID.randomUUID(),subscriptionId,bundle.getId(),EntitlementEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,Subscription.SubscriptionState.ACTIVE,plan,phase,priceList);
-  expectedTransition=new BusinessSubscriptionTransition(KEY,ACCOUNT_KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan),null,new BusinessSubscription(priceList,plan,phase,Currency.USD,effectiveTransitionTime,Subscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId()));
+  transition=new SubscriptionTransitionData(ID,subscriptionId,bundle.getId(),EntitlementEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,Subscription.SubscriptionState.ACTIVE,plan,phase,priceList,1L,true);
+  expectedTransition=new BusinessSubscriptionTransition(ID,KEY,ACCOUNT_KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan),null,new BusinessSubscription(priceList,plan,phase,ACCOUNT_CURRENCY,effectiveTransitionTime,Subscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId()));
 }

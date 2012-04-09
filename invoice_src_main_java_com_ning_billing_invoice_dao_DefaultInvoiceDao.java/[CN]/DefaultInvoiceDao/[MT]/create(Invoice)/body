@@ -15,12 +15,17 @@
         List<InvoicePayment> invoicePayments=invoice.getPayments();
         InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments);
-        InvoiceCreationNotification event;
-        event=new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate());
-        eventBus.postFromTransaction(event,invoiceDao);
       }
       return null;
     }
   }
 );
+  InvoiceCreationNotification event;
+  event=new DefaultInvoiceCreationNotification(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate());
+  try {
+    eventBus.post(event);
+  }
+ catch (  Bus.EventBusException e) {
+    throw new RuntimeException(e);
+  }
 }

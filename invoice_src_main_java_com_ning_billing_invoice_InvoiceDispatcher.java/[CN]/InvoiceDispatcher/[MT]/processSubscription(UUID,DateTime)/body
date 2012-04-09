@@ -8,17 +8,5 @@
     log.error("Failed handling entitlement change.",new InvoiceApiException(ErrorCode.INVOICE_NO_ACCOUNT_ID_FOR_SUBSCRIPTION_ID,subscriptionId.toString()));
     return;
   }
-  GlobalLock lock=null;
-  try {
-    lock=locker.lockWithNumberOfTries(LockerService.INVOICE,accountId.toString(),NB_LOCK_TRY);
-    processAccountWithLock(accountId,targetDate);
-  }
- catch (  LockFailedException e) {
-    log.error(String.format("Failed to process invoice for account %s, subscription %s, targetDate %s",accountId.toString(),subscriptionId.toString(),targetDate),e);
-  }
- finally {
-    if (lock != null) {
-      lock.release();
-    }
-  }
+  processAccount(accountId,targetDate,false);
 }

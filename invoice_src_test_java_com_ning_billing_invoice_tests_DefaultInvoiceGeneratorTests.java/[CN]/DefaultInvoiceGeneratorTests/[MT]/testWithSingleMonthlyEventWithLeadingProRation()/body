@@ -7,14 +7,13 @@
   PlanPhase phase=createMockMonthlyPlanPhase(rate);
   BillingEvent event=createBillingEvent(sub.getId(),startDate,plan,phase,15);
   events.add(event);
-  InvoiceItemList existingInvoiceItems=new InvoiceItemList();
   DateTime targetDate=buildDateTime(2011,10,3);
   UUID accountId=UUID.randomUUID();
-  Invoice invoice=generator.generateInvoice(accountId,events,existingInvoiceItems,targetDate,Currency.USD);
+  Invoice invoice=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
   BigDecimal expectedNumberOfBillingCycles;
-  expectedNumberOfBillingCycles=ONE.add(FOURTEEN.divide(THIRTY_ONE,NUMBER_OF_DECIMALS,ROUNDING_METHOD));
-  BigDecimal expectedAmount=expectedNumberOfBillingCycles.multiply(rate).setScale(NUMBER_OF_DECIMALS);
+  expectedNumberOfBillingCycles=ONE.add(FOURTEEN.divide(THIRTY_ONE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD));
+  BigDecimal expectedAmount=expectedNumberOfBillingCycles.multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
   assertEquals(invoice.getTotalAmount(),expectedAmount);
 }

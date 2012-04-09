@@ -1,5 +1,13 @@
 {
-  bind(IDBI.class).toProvider(DBIProvider.class).asEagerSingleton();
-  final DbiConfig config=new ConfigurationObjectFactory(System.getProperties()).build(DbiConfig.class);
-  bind(DbiConfig.class).toInstance(config);
+  final MysqlTestingHelper helper=new MysqlTestingHelper();
+  bind(MysqlTestingHelper.class).toInstance(helper);
+  if (helper.isUsingLocalInstance()) {
+    bind(IDBI.class).toProvider(DBIProvider.class).asEagerSingleton();
+    final DbiConfig config=new ConfigurationObjectFactory(System.getProperties()).build(DbiConfig.class);
+    bind(DbiConfig.class).toInstance(config);
+  }
+ else {
+    final IDBI dbi=helper.getDBI();
+    bind(IDBI.class).toInstance(dbi);
+  }
 }

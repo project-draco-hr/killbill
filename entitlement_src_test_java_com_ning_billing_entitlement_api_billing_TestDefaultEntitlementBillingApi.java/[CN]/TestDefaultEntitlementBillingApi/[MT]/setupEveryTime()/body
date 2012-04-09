@@ -1,36 +1,23 @@
 {
   bundles=new ArrayList<SubscriptionBundle>();
-  final SubscriptionBundle bundle=new SubscriptionBundleData(zeroId,"TestKey",oneId,new DateTime().minusDays(4));
+  final SubscriptionBundle bundle=new SubscriptionBundleData(zeroId,"TestKey",oneId,clock.getUTCNow().minusDays(4));
   bundles.add(bundle);
   transitions=new ArrayList<SubscriptionTransition>();
   subscriptions=new ArrayList<Subscription>();
   SubscriptionBuilder builder=new SubscriptionBuilder();
-  subscriptionStartDate=new DateTime().minusDays(3);
+  subscriptionStartDate=clock.getUTCNow().minusDays(3);
   builder.setStartDate(subscriptionStartDate).setId(oneId);
   subscription=new SubscriptionData(builder){
-    public List<SubscriptionTransition> getAllTransitions(){
+    @Override public List<SubscriptionTransition> getAllTransitions(){
       return transitions;
     }
   }
 ;
   subscriptions.add(subscription);
-  dao=new BrainDeadMockEntitlementDao(){
-    public List<SubscriptionBundle> getSubscriptionBundleForAccount(    UUID accountId){
-      return bundles;
-    }
-    public List<Subscription> getSubscriptions(    UUID bundleId){
-      return subscriptions;
-    }
-    public Subscription getSubscriptionFromId(    UUID subscriptionId){
-      return subscription;
-    }
-    @Override public UUID getAccountIdFromSubscriptionId(    final UUID subscriptionId){
-      throw new UnsupportedOperationException();
-    }
-    @Override public SubscriptionBundle getSubscriptionBundleFromId(    UUID bundleId){
-      return bundle;
-    }
-  }
-;
+  dao=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementDao.class);
+  ((ZombieControl)dao).addResult("getSubscriptionBundleForAccount",bundles);
+  ((ZombieControl)dao).addResult("getSubscriptions",subscriptions);
+  ((ZombieControl)dao).addResult("getSubscriptionFromId",subscription);
+  ((ZombieControl)dao).addResult("getSubscriptionBundleFromId",bundle);
   assertTrue(true);
 }

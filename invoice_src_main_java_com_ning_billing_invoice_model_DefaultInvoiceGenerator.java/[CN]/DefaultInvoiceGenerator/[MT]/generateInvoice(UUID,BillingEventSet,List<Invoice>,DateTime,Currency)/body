@@ -1,0 +1,33 @@
+{
+  if ((events == null) || (events.size() == 0)) {
+    return null;
+  }
+  validateTargetDate(targetDate);
+  Collections.sort(events);
+  List<InvoiceItem> existingItems=new ArrayList<InvoiceItem>();
+  if (existingInvoices != null) {
+    for (    Invoice invoice : existingInvoices) {
+      existingItems.addAll(invoice.getInvoiceItems());
+    }
+    Collections.sort(existingItems);
+  }
+  targetDate=adjustTargetDate(existingInvoices,targetDate);
+  DefaultInvoice invoice=new DefaultInvoice(accountId,targetDate,targetCurrency,clock);
+  UUID invoiceId=invoice.getId();
+  List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,events,targetDate,targetCurrency);
+  removeCancellingInvoiceItems(existingItems);
+  removeDuplicatedInvoiceItems(proposedItems,existingItems);
+  for (  InvoiceItem existingItem : existingItems) {
+    if (existingItem instanceof RecurringInvoiceItem) {
+      RecurringInvoiceItem recurringItem=(RecurringInvoiceItem)existingItem;
+      proposedItems.add(recurringItem.asCredit());
+    }
+  }
+  if (proposedItems == null || proposedItems.size() == 0) {
+    return null;
+  }
+ else {
+    invoice.addInvoiceItems(proposedItems);
+    return invoice;
+  }
+}
