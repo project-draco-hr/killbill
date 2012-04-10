@@ -1,0 +1,15 @@
+{
+  UUID uuid=UUID.fromString(bundleId);
+  SubscriptionBundle bundle=entitlementApi.getBundleFromId(uuid);
+  if (bundle == null) {
+    return Response.status(Status.NO_CONTENT).build();
+  }
+  List<Subscription> bundles=entitlementApi.getSubscriptionsForBundle(uuid);
+  Collection<SubscriptionJson> result=Collections2.transform(bundles,new Function<Subscription,SubscriptionJson>(){
+    @Override public SubscriptionJson apply(    Subscription input){
+      return new SubscriptionJson(input,null,null,null);
+    }
+  }
+);
+  return Response.status(Status.OK).entity(result).build();
+}

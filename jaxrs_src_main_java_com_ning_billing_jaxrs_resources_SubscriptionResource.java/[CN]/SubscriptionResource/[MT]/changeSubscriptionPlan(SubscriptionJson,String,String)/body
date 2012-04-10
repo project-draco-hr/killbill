@@ -1,3 +1,16 @@
 {
-  return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+  try {
+    UUID uuid=UUID.fromString(subscriptionId);
+    Subscription current=entitlementApi.getSubscriptionFromId(uuid);
+    if (current == null) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
+    current.changePlan(subscription.getProductName(),BillingPeriod.valueOf(subscription.getBillingPeriod()),subscription.getPriceList(),inputDate,context.getContext());
+    return getSubscription(subscriptionId);
+  }
+ catch (  EntitlementUserApiException e) {
+    log.info(String.format("Failed to change plan for subscription %s",subscription),e);
+    return Response.status(Status.BAD_REQUEST).build();
+  }
 }

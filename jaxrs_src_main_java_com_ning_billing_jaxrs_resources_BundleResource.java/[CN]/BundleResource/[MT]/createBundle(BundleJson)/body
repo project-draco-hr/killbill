@@ -1,3 +1,11 @@
 {
-  return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+  try {
+    UUID accountId=UUID.fromString(json.getAccountId());
+    final SubscriptionBundle bundle=entitlementApi.createBundleForAccount(accountId,json.getExternalKey(),context.getContext());
+    return uriBuilder.buildResponse(BundleResource.class,"getBundle",bundle.getId());
+  }
+ catch (  EntitlementUserApiException e) {
+    log.info(String.format("Failed to create bundle %s",json),e);
+    return Response.status(Status.BAD_REQUEST).build();
+  }
 }
