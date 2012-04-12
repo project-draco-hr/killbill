@@ -1,0 +1,14 @@
+{
+  return sqlDao.inTransaction(new Transaction<PaymentAttempt,PaymentSqlDao>(){
+    @Override public PaymentAttempt inTransaction(    PaymentSqlDao transactional,    TransactionStatus status) throws Exception {
+      final PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice);
+      transactional.insertPaymentAttempt(paymentAttempt,context);
+      UUID historyRecordId=UUID.randomUUID();
+      transactional.insertPaymentAttemptHistory(historyRecordId.toString(),paymentAttempt,context);
+      AuditSqlDao auditSqlDao=transactional.become(AuditSqlDao.class);
+      auditSqlDao.insertAuditFromTransaction("payment_attempt",historyRecordId.toString(),ChangeType.INSERT,context);
+      return paymentAttempt;
+    }
+  }
+);
+}

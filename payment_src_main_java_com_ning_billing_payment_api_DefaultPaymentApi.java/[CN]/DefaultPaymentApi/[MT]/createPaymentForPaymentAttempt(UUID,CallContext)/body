@@ -1,0 +1,19 @@
+{
+  PaymentAttempt paymentAttempt=paymentDao.getPaymentAttemptById(paymentAttemptId);
+  if (paymentAttempt != null) {
+    Invoice invoice=invoicePaymentApi.getInvoice(paymentAttempt.getInvoiceId());
+    Account account=accountUserApi.getAccountById(paymentAttempt.getAccountId());
+    if (invoice != null && account != null) {
+      if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+        log.info("Received invoice for payment with outstanding amount of 0 {} ",invoice);
+        return Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0 or less",paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId()));
+      }
+ else {
+        PaymentAttempt newPaymentAttempt=new PaymentAttempt.Builder(paymentAttempt).setRetryCount(paymentAttempt.getRetryCount() + 1).setPaymentAttemptId(UUID.randomUUID()).build();
+        paymentDao.createPaymentAttempt(newPaymentAttempt,context);
+        return processPayment(getPaymentProviderPlugin(account),account,invoice,newPaymentAttempt,context);
+      }
+    }
+  }
+  return Either.left(new PaymentError("retry_payment_error","Could not load payment attempt, invoice or account for id " + paymentAttemptId,paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId()));
+}

@@ -1,0 +1,57 @@
+{
+  try {
+    String realPriceList=(spec.getPriceListName() == null) ? PriceListSet.DEFAULT_PRICELIST_NAME : spec.getPriceListName();
+    DateTime now=clock.getUTCNow();
+    requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : now;
+    if (requestedDate.isAfter(now)) {
+      throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_REQUESTED_DATE,requestedDate.toString());
+    }
+    DateTime effectiveDate=requestedDate;
+    Catalog catalog=catalogService.getFullCatalog();
+    Plan plan=catalog.findPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,requestedDate);
+    PlanPhase phase=plan.getAllPhases()[0];
+    if (phase == null) {
+      throw new EntitlementError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",spec.getProductName(),spec.getBillingPeriod().toString(),realPriceList));
+    }
+    SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(bundleId);
+    if (bundle == null) {
+      throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_NO_BUNDLE,bundleId);
+    }
+    DateTime bundleStartDate=null;
+    SubscriptionData baseSubscription=(SubscriptionData)dao.getBaseSubscription(subscriptionFactory,bundleId);
+switch (plan.getProduct().getCategory()) {
+case BASE:
+      if (baseSubscription != null) {
+        if (baseSubscription.getState() == SubscriptionState.ACTIVE) {
+          throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BP_EXISTS,bundleId);
+        }
+ else {
+          baseSubscription.recreate(spec,requestedDate,context);
+          return baseSubscription;
+        }
+      }
+    bundleStartDate=requestedDate;
+  break;
+case ADD_ON:
+if (baseSubscription == null) {
+  throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_NO_BP,bundleId);
+}
+checkAddonCreationRights(baseSubscription,plan);
+bundleStartDate=baseSubscription.getStartDate();
+break;
+case STANDALONE:
+if (baseSubscription != null) {
+throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BP_EXISTS,bundleId);
+}
+bundleStartDate=requestedDate;
+break;
+default :
+throw new EntitlementError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
+}
+SubscriptionData subscription=apiService.createPlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setStartDate(effectiveDate),plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,now,context);
+return subscription;
+}
+ catch (CatalogApiException e) {
+throw new EntitlementUserApiException(e);
+}
+}

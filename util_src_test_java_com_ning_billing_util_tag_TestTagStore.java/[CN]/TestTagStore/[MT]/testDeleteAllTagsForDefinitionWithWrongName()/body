@@ -2,16 +2,16 @@
   String definitionName="TestTag654321";
   String wrongDefinitionName="TestTag564321";
   try {
-    tagDefinitionDao.create(definitionName,"Some test tag","test");
+    tagDefinitionDao.create(definitionName,"Some test tag",context);
   }
  catch (  TagDefinitionApiException e) {
     fail("Could not create tag definition",e);
   }
   TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName);
   assertNotNull(tagDefinition);
-  tagDefinitionDao.deleteAllTagsForDefinition(wrongDefinitionName);
+  tagDefinitionDao.deleteAllTagsForDefinition(wrongDefinitionName,context);
   try {
-    tagDefinitionDao.deleteTagDefinition(definitionName);
+    tagDefinitionDao.deleteTagDefinition(definitionName,context);
   }
  catch (  TagDefinitionApiException e) {
     fail("Could not delete tag definition",e);

@@ -1,13 +1,13 @@
 {
   UUID accountId=UUID.randomUUID();
-  Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),Currency.USD,clock);
+  Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),clock.getUTCNow(),Currency.USD);
   UUID invoiceId=invoice.getId();
   UUID subscriptionId=UUID.randomUUID();
   DateTime startDate=new DateTime(2010,1,1,0,0,0,0);
   DateTime endDate=new DateTime(2010,4,1,0,0,0,0);
-  InvoiceItem invoiceItem=new RecurringInvoiceItem(invoiceId,subscriptionId,"test plan","test phase",startDate,endDate,new BigDecimal("21.00"),new BigDecimal("7.00"),Currency.USD,clock.getUTCNow());
+  InvoiceItem invoiceItem=new RecurringInvoiceItem(invoiceId,accountId,subscriptionId,"test plan","test phase",startDate,endDate,new BigDecimal("21.00"),new BigDecimal("7.00"),Currency.USD);
   invoice.addInvoiceItem(invoiceItem);
-  invoiceDao.create(invoice);
+  invoiceDao.create(invoice,context);
   Invoice savedInvoice=invoiceDao.getById(invoiceId);
   assertNotNull(savedInvoice);
   assertEquals(savedInvoice.getTotalAmount().compareTo(new BigDecimal("21.00")),0);
@@ -16,7 +16,7 @@
   assertEquals(savedInvoice.getInvoiceItems().size(),1);
   BigDecimal paymentAmount=new BigDecimal("11.00");
   UUID paymentAttemptId=UUID.randomUUID();
-  invoiceDao.notifyOfPaymentAttempt(new DefaultInvoicePayment(paymentAttemptId,invoiceId,clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD));
+  invoiceDao.notifyOfPaymentAttempt(new DefaultInvoicePayment(paymentAttemptId,invoiceId,clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD),context);
   Invoice retrievedInvoice=invoiceDao.getById(invoiceId);
   assertNotNull(retrievedInvoice);
   assertEquals(retrievedInvoice.getInvoiceItems().size(),1);

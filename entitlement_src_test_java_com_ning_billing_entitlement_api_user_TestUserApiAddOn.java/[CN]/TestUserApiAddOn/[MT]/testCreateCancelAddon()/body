@@ -3,14 +3,14 @@
     String baseProduct="Shotgun";
     BillingPeriod baseTerm=BillingPeriod.MONTHLY;
     String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-    SubscriptionData baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+    createSubscription(baseProduct,baseTerm,basePriceList);
     String aoProduct="Telescopic-Scope";
     BillingPeriod aoTerm=BillingPeriod.MONTHLY;
     String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
     SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
     DateTime now=clock.getUTCNow();
-    aoSubscription.cancel(now,false);
+    aoSubscription.cancel(now,false,context);
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     assertTrue(testListener.isCompleted(5000));

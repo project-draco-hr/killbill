@@ -5,29 +5,17 @@
   String fieldName="TestField1";
   String fieldValue="Kitty Hawk";
   fieldStore1.setValue(fieldName,fieldValue);
-  FieldStoreDao fieldStoreDao=dbi.onDemand(FieldStoreDao.class);
-  fieldStoreDao.inTransaction(new Transaction<Void,FieldStoreDao>(){
-    @Override public Void inTransaction(    FieldStoreDao transactional,    TransactionStatus status) throws Exception {
-      transactional.batchSaveFromTransaction(id.toString(),objectType,fieldStore1.getEntityList());
-      return null;
-    }
-  }
-);
+  CustomFieldSqlDao customFieldSqlDao=dbi.onDemand(CustomFieldSqlDao.class);
+  customFieldDao.saveFields(customFieldSqlDao,id,objectType,fieldStore1.getEntityList(),context);
   final FieldStore fieldStore2=DefaultFieldStore.create(id,objectType);
-  fieldStore2.add(fieldStoreDao.load(id.toString(),objectType));
+  fieldStore2.add(customFieldSqlDao.load(id.toString(),objectType));
   assertEquals(fieldStore2.getValue(fieldName),fieldValue);
   fieldValue="Cape Canaveral";
   fieldStore2.setValue(fieldName,fieldValue);
   assertEquals(fieldStore2.getValue(fieldName),fieldValue);
-  fieldStoreDao.inTransaction(new Transaction<Void,FieldStoreDao>(){
-    @Override public Void inTransaction(    FieldStoreDao transactional,    TransactionStatus status) throws Exception {
-      transactional.batchSaveFromTransaction(id.toString(),objectType,fieldStore2.getEntityList());
-      return null;
-    }
-  }
-);
+  customFieldDao.saveFields(customFieldSqlDao,id,objectType,fieldStore2.getEntityList(),context);
   final FieldStore fieldStore3=DefaultFieldStore.create(id,objectType);
   assertEquals(fieldStore3.getValue(fieldName),null);
-  fieldStore3.add(fieldStoreDao.load(id.toString(),objectType));
+  fieldStore3.add(customFieldSqlDao.load(id.toString(),objectType));
   assertEquals(fieldStore3.getValue(fieldName),fieldValue);
 }

@@ -3,11 +3,17 @@
     return 1;
   }
   FixedPriceInvoiceItem that=(FixedPriceInvoiceItem)item;
-  int compareSubscriptions=getSubscriptionId().compareTo(that.getSubscriptionId());
-  if (compareSubscriptions == 0) {
-    return getStartDate().compareTo(that.getStartDate());
+  int compareAccounts=getAccountId().compareTo(that.getAccountId());
+  if (compareAccounts == 0) {
+    int compareSubscriptions=getSubscriptionId().compareTo(that.getSubscriptionId());
+    if (compareSubscriptions == 0) {
+      return getStartDate().compareTo(that.getStartDate());
+    }
+ else {
+      return compareSubscriptions;
+    }
   }
  else {
-    return compareSubscriptions;
+    return compareAccounts;
   }
 }
