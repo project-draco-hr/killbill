@@ -3,7 +3,7 @@
     @Override public Void inTransaction(    EventSqlDao dao,    TransactionStatus status) throws Exception {
       List<String> eventIds=new ArrayList<String>();
       for (      final EntitlementEvent cur : recreateEvents) {
-        dao.insertEvent(cur);
+        dao.insertEvent(cur,context);
         eventIds.add(cur.getId().toString());
         recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new NotificationKey(){
           @Override public String toString(){
