@@ -1,0 +1,28 @@
+{
+  if (curEvent.getUserToken() == null || !curEvent.getUserToken().equals(userToken)) {
+    return;
+  }
+  events.add(curEvent);
+switch (curEvent.getBusEventType()) {
+case ACCOUNT_CREATE:
+    onAccountCreation((AccountCreationNotification)curEvent);
+  break;
+case ACCOUNT_CHANGE:
+onAccountChange((AccountChangeNotification)curEvent);
+break;
+case SUBSCRIPTION_TRANSITION:
+onSubscriptionTransition((SubscriptionTransition)curEvent);
+break;
+case INVOICE_CREATION:
+onInvoiceCreation((InvoiceCreationNotification)curEvent);
+break;
+case PAYMENT_INFO:
+onPaymentInfo((PaymentInfo)curEvent);
+break;
+case PAYMENT_ERROR:
+onPaymentError((PaymentError)curEvent);
+break;
+default :
+throw new RuntimeException("Unexpected event type " + curEvent.getBusEventType());
+}
+}

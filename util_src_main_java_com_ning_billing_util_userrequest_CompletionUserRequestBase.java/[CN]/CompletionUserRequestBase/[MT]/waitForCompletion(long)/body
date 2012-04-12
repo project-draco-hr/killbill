@@ -1,0 +1,18 @@
+{
+  this.timeoutMilliSec=timeoutMilliSec;
+  initialTimeMilliSec=currentTimeMillis();
+synchronized (this) {
+    long remainingTimeMillisSec=getRemainingTimeMillis();
+    while (!isCompleted && remainingTimeMillisSec > 0) {
+      wait(remainingTimeMillisSec);
+      if (isCompleted) {
+        break;
+      }
+      remainingTimeMillisSec=getRemainingTimeMillis();
+    }
+    if (!isCompleted) {
+      throw new TimeoutException();
+    }
+  }
+  return events;
+}
