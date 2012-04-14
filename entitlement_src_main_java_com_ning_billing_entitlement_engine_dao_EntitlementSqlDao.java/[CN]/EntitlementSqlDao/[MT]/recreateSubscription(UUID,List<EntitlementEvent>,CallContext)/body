@@ -5,12 +5,7 @@
       for (      final EntitlementEvent cur : recreateEvents) {
         dao.insertEvent(cur);
         eventIds.add(cur.getId().toString());
-        recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new NotificationKey(){
-          @Override public String toString(){
-            return cur.getId().toString();
-          }
-        }
-);
+        recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
       }
       AuditSqlDao auditSqlDao=dao.become(AuditSqlDao.class);
       auditSqlDao.insertAuditFromTransaction(ENTITLEMENT_EVENTS_TABLE_NAME,eventIds,ChangeType.INSERT,context);

@@ -27,7 +27,7 @@
     Plan newPlan=catalogService.getFullCatalog().findPlan(productName,term,newPriceList.getName(),requestedDate,subscription.getStartDate());
     DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy,requestedDate);
     TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(subscription,newPlan,newPriceList.getName(),requestedDate,effectiveDate);
-    EntitlementEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList.getName()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true));
+    EntitlementEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList.getName()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setUserToken(context.getUserToken()).setFromDisk(true));
     TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(subscription,newPlan,newPriceList.getName(),requestedDate,effectiveDate);
     PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,now,nextTimedPhase.getStartPhase()) : null;
     List<EntitlementEvent> changeEvents=new ArrayList<EntitlementEvent>();
@@ -37,6 +37,7 @@
     changeEvents.add(changeEvent);
     dao.changePlan(subscription.getId(),changeEvents,context);
     subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getFullCatalog());
+    return (policy == ActionPolicy.IMMEDIATE);
   }
  catch (  CatalogApiException e) {
     throw new EntitlementUserApiException(e);

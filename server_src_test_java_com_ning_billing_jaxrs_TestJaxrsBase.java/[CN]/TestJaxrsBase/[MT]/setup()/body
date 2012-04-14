@@ -1,10 +1,8 @@
 {
   loadSystemPropertiesFromClasspath("/killbill.properties");
   final EventListener eventListener=new TestKillbillGuiceListener();
-  httpClient=new AsyncHttpClient();
   server=new HttpServer();
-  config=getConfig();
-  mapper=new ObjectMapper();
+  loadConfig();
   final Iterable<EventListener> eventListeners=new Iterable<EventListener>(){
     @Override public Iterator<EventListener> iterator(){
       ArrayList<EventListener> array=new ArrayList<EventListener>();
@@ -15,8 +13,5 @@
 ;
   server.configure(config,eventListeners,new HashMap<FilterHolder,String>());
   server.start();
-  Injector injector=((TestKillbillGuiceListener)eventListener).getTheInjector();
-  helper=injector.getInstance(MysqlTestingHelper.class);
-  clock=(ClockMock)injector.getInstance(Clock.class);
-  busHandler=new TestBusHandler();
+  injector=((TestKillbillGuiceListener)eventListener).getTheInjector();
 }

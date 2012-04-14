@@ -6,7 +6,7 @@
     if (invoice != null && account != null) {
       if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
         log.info("Received invoice for payment with outstanding amount of 0 {} ",invoice);
-        return Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0 or less",paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId()));
+        return Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0 or less",paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId(),context.getUserToken()));
       }
  else {
         PaymentAttempt newPaymentAttempt=new PaymentAttempt.Builder(paymentAttempt).setRetryCount(paymentAttempt.getRetryCount() + 1).setPaymentAttemptId(UUID.randomUUID()).build();
@@ -15,5 +15,5 @@
       }
     }
   }
-  return Either.left(new PaymentError("retry_payment_error","Could not load payment attempt, invoice or account for id " + paymentAttemptId,paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId()));
+  return Either.left(new PaymentError("retry_payment_error","Could not load payment attempt, invoice or account for id " + paymentAttemptId,paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId(),context.getUserToken()));
 }

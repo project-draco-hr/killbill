@@ -1,7 +1,7 @@
 {
   try {
     TimedPhase[] curAndNextPhases=planAligner.getCurrentAndNextTimedPhaseOnCreate(subscription,plan,initialPhase,realPriceList,requestedDate,effectiveDate);
-    ApiEventBuilder createBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(plan.getName()).setEventPlanPhase(curAndNextPhases[0].getPhase().getName()).setEventPriceList(realPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(processedDate).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true);
+    ApiEventBuilder createBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(plan.getName()).setEventPlanPhase(curAndNextPhases[0].getPhase().getName()).setEventPriceList(realPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(processedDate).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setUserToken(context.getUserToken()).setFromDisk(true);
     ApiEvent creationEvent=(reCreate) ? new ApiEventReCreate(createBuilder) : new ApiEventCreate(createBuilder);
     TimedPhase nextTimedPhase=curAndNextPhases[1];
     PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,processedDate,nextTimedPhase.getStartPhase()) : null;
