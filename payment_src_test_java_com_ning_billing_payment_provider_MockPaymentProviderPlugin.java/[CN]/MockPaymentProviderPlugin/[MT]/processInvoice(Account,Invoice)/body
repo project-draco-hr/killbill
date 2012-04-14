@@ -1,9 +1,9 @@
 {
   if (makeNextInvoiceFail.getAndSet(false)) {
-    return Either.left(new PaymentError("unknown","test error",account.getId(),invoice.getId(),null));
+    return Either.left((PaymentError)new DefaultPaymentError("unknown","test error",account.getId(),invoice.getId(),null));
   }
  else {
-    PaymentInfo payment=new PaymentInfo.Builder().setPaymentId(UUID.randomUUID().toString()).setAmount(invoice.getBalance()).setStatus("Processed").setBankIdentificationNumber("1234").setCreatedDate(clock.getUTCNow()).setEffectiveDate(clock.getUTCNow()).setPaymentNumber("12345").setReferenceId("12345").setType("Electronic").build();
+    PaymentInfo payment=new DefaultPaymentInfo.Builder().setPaymentId(UUID.randomUUID().toString()).setAmount(invoice.getBalance()).setStatus("Processed").setBankIdentificationNumber("1234").setCreatedDate(clock.getUTCNow()).setEffectiveDate(clock.getUTCNow()).setPaymentNumber("12345").setReferenceId("12345").setType("Electronic").build();
     payments.put(payment.getPaymentId(),payment);
     return Either.right(payment);
   }

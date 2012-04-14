@@ -5,12 +5,12 @@
     Invoice invoice=invoicePaymentApi.getInvoice(UUID.fromString(invoiceId));
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
       log.info("Received invoice for payment with balance of 0 {} ",invoice);
-      Either<PaymentError,PaymentInfo> result=Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0 or less",account.getId(),UUID.fromString(invoiceId),context.getUserToken()));
+      Either<PaymentError,PaymentInfo> result=Either.left((PaymentError)new DefaultPaymentError("invoice_balance_0","Invoice balance was 0 or less",account.getId(),UUID.fromString(invoiceId),context.getUserToken()));
       processedPaymentsOrErrors.add(result);
     }
  else     if (invoice.isMigrationInvoice()) {
       log.info("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
-      Either<PaymentError,PaymentInfo> result=Either.left(new PaymentError("migration invoice","Invoice balance was a migration invoice",account.getId(),UUID.fromString(invoiceId),context.getUserToken()));
+      Either<PaymentError,PaymentInfo> result=Either.left((PaymentError)new DefaultPaymentError("migration invoice","Invoice balance was a migration invoice",account.getId(),UUID.fromString(invoiceId),context.getUserToken()));
       processedPaymentsOrErrors.add(result);
     }
  else {
