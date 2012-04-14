@@ -5,10 +5,10 @@
   final BigDecimal amount=new BigDecimal("10.00");
   final UUID subscriptionId=UUID.randomUUID();
   invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD));
-  List<Either<PaymentError,PaymentInfo>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()),context);
+  List<Either<PaymentErrorEvent,PaymentInfoEvent>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()),context);
   assertEquals(results.size(),1);
   assertTrue(results.get(0).isRight());
-  PaymentInfo paymentInfo=results.get(0).getRight();
+  PaymentInfoEvent paymentInfo=results.get(0).getRight();
   assertNotNull(paymentInfo.getPaymentId());
   assertTrue(paymentInfo.getAmount().compareTo(amount) == 0);
   assertNotNull(paymentInfo.getPaymentNumber());
@@ -23,10 +23,10 @@
   DateTime nowTruncated=now.withMillisOfSecond(0).withSecondOfMinute(0);
   DateTime paymentAttemptDateTruncated=paymentAttempt.getPaymentAttemptDate().withMillisOfSecond(0).withSecondOfMinute(0);
   assertEquals(paymentAttemptDateTruncated.compareTo(nowTruncated),0);
-  List<PaymentInfo> paymentInfos=paymentApi.getPaymentInfo(Arrays.asList(invoice.getId().toString()));
+  List<PaymentInfoEvent> paymentInfos=paymentApi.getPaymentInfo(Arrays.asList(invoice.getId().toString()));
   assertNotNull(paymentInfos);
   assertTrue(paymentInfos.size() > 0);
-  PaymentInfo paymentInfoFromGet=paymentInfos.get(0);
+  PaymentInfoEvent paymentInfoFromGet=paymentInfos.get(0);
   assertEquals(paymentInfo.getAmount(),paymentInfoFromGet.getAmount());
   assertEquals(paymentInfo.getRefundAmount(),paymentInfoFromGet.getRefundAmount());
   assertEquals(paymentInfo.getPaymentId(),paymentInfoFromGet.getPaymentId());

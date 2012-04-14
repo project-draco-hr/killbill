@@ -15,7 +15,7 @@
         realPaymentMethod=new CreditCardPaymentMethodInfo.Builder(ccPaymentMethod).setId(paymentMethodId).build();
       }
       if (realPaymentMethod == null) {
-        return Either.left((PaymentError)new DefaultPaymentError("unsupported","Payment method " + paymentMethod.getType() + " not supported by the plugin",null,null,null));
+        return Either.left((PaymentErrorEvent)new DefaultPaymentError("unsupported","Payment method " + paymentMethod.getType() + " not supported by the plugin",null,null,null));
       }
  else {
         if (shouldBeDefault) {
@@ -26,10 +26,10 @@
       }
     }
  else {
-      return Either.left((PaymentError)new DefaultPaymentError("noaccount","Could not retrieve account for accountKey " + accountKey,null,null,null));
+      return Either.left((PaymentErrorEvent)new DefaultPaymentError("noaccount","Could not retrieve account for accountKey " + accountKey,null,null,null));
     }
   }
  else {
-    return Either.left((PaymentError)new DefaultPaymentError("unknown","Could not create add payment method " + paymentMethod + " for "+ accountKey,null,null,null));
+    return Either.left((PaymentErrorEvent)new DefaultPaymentError("unknown","Could not create add payment method " + paymentMethod + " for "+ accountKey,null,null,null));
   }
 }

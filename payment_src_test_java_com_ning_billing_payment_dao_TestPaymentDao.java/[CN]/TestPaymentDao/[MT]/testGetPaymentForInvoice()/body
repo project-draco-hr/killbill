@@ -14,9 +14,9 @@
   Assert.assertEquals(attempt,attempt3);
   PaymentAttempt attempt4=paymentDao.getPaymentAttemptById(attempt3.getPaymentAttemptId());
   Assert.assertEquals(attempt3,attempt4);
-  PaymentInfo originalPaymentInfo=new DefaultPaymentInfo.Builder().setPaymentId(paymentId).setAmount(invoiceAmount).setStatus("Processed").setBankIdentificationNumber("1234").setPaymentNumber("12345").setPaymentMethodId("12345").setReferenceId("12345").setType("Electronic").setCreatedDate(clock.getUTCNow()).setUpdatedDate(clock.getUTCNow()).setEffectiveDate(clock.getUTCNow()).build();
+  PaymentInfoEvent originalPaymentInfo=new DefaultPaymentInfo.Builder().setPaymentId(paymentId).setAmount(invoiceAmount).setStatus("Processed").setBankIdentificationNumber("1234").setPaymentNumber("12345").setPaymentMethodId("12345").setReferenceId("12345").setType("Electronic").setCreatedDate(clock.getUTCNow()).setUpdatedDate(clock.getUTCNow()).setEffectiveDate(clock.getUTCNow()).build();
   paymentDao.savePaymentInfo(originalPaymentInfo,thisContext);
-  PaymentInfo paymentInfo=paymentDao.getPaymentInfo(Arrays.asList(invoiceId.toString())).get(0);
+  PaymentInfoEvent paymentInfo=paymentDao.getPaymentInfo(Arrays.asList(invoiceId.toString())).get(0);
   Assert.assertEquals(paymentInfo,originalPaymentInfo);
   clock.setDeltaFromReality(60 * 60 * 1000);
   paymentDao.updatePaymentInfo(originalPaymentInfo.getPaymentMethod(),originalPaymentInfo.getPaymentId(),originalPaymentInfo.getCardType(),originalPaymentInfo.getCardCountry(),thisContext);

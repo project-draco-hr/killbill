@@ -3,15 +3,15 @@
   final Invoice invoice=testHelper.createTestInvoice(account);
   await().atMost(1,MINUTES).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {
-      List<PaymentInfo> processedPayments=paymentInfoReceiver.getProcessedPayments();
-      List<PaymentError> errors=paymentInfoReceiver.getErrors();
+      List<PaymentInfoEvent> processedPayments=paymentInfoReceiver.getProcessedPayments();
+      List<PaymentErrorEvent> errors=paymentInfoReceiver.getErrors();
       return processedPayments.size() == 1 || errors.size() == 1;
     }
   }
 );
   assertFalse(paymentInfoReceiver.getProcessedPayments().isEmpty());
   assertTrue(paymentInfoReceiver.getErrors().isEmpty());
-  List<PaymentInfo> payments=paymentInfoReceiver.getProcessedPayments();
+  List<PaymentInfoEvent> payments=paymentInfoReceiver.getProcessedPayments();
   PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(payments.get(0).getPaymentId());
   Assert.assertNotNull(paymentAttempt);
   Invoice invoiceForPayment=invoicePaymentApi.getInvoiceForPaymentAttemptId(paymentAttempt.getPaymentAttemptId());
