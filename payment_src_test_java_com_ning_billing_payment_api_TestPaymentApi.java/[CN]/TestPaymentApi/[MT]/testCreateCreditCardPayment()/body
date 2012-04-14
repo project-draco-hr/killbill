@@ -2,7 +2,7 @@
   final DateTime now=new DateTime(DateTimeZone.UTC);
   final Account account=testHelper.createTestCreditCardAccount();
   final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
-  final BigDecimal amount=new BigDecimal("10.00");
+  final BigDecimal amount=new BigDecimal("10.0011");
   final UUID subscriptionId=UUID.randomUUID();
   invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD));
   List<Either<PaymentErrorEvent,PaymentInfoEvent>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()),context);
@@ -10,7 +10,7 @@
   assertTrue(results.get(0).isRight());
   PaymentInfoEvent paymentInfo=results.get(0).getRight();
   assertNotNull(paymentInfo.getPaymentId());
-  assertTrue(paymentInfo.getAmount().compareTo(amount) == 0);
+  assertTrue(paymentInfo.getAmount().compareTo(amount.setScale(2,RoundingMode.HALF_EVEN)) == 0);
   assertNotNull(paymentInfo.getPaymentNumber());
   assertFalse(paymentInfo.getStatus().equals("Error"));
   PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(paymentInfo.getPaymentId());

@@ -5,7 +5,7 @@
       EventSqlDao eventsDaoFromSameTransaction=dao.become(EventSqlDao.class);
       List<String> eventIds=new ArrayList<String>();
       for (      final EntitlementEvent cur : initialEvents) {
-        eventsDaoFromSameTransaction.insertEvent(cur);
+        eventsDaoFromSameTransaction.insertEvent(cur,context);
         eventIds.add(cur.getId().toString());
         recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
       }
