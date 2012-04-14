@@ -6,10 +6,11 @@
   String overdueStateName="WayPassedItMan";
   @SuppressWarnings("unchecked") OverdueState<SubscriptionBundle> state=BrainDeadProxyFactory.createBrainDeadProxyFor(OverdueState.class);
   ((ZombieControl)state).addResult("getName",overdueStateName);
-  dao.setOverdueState(bundle,state,clock);
+  dao.setOverdueState(bundle,state,Overdueable.Type.SUBSCRIPTION_BUNDLE,clock);
   clock.setDeltaFromReality(1000 * 3600 * 24);
   String overdueStateName2="NoReallyThisCantGoOn";
   ((ZombieControl)state).addResult("getName",overdueStateName2);
-  dao.setOverdueState(bundle,state,clock);
-  Assert.assertEquals(accessDao.getOverdueStateNameFor(bundle),overdueStateName2);
+  dao.setOverdueState(bundle,state,Overdueable.Type.SUBSCRIPTION_BUNDLE,clock);
+  Assert.assertEquals(accessDao.getOverdueStateFor(bundle),overdueStateName2);
+  Assert.assertEquals(accessDao.getOverdueStateForIdAndType(bundle.getId(),Overdueable.Type.SUBSCRIPTION_BUNDLE),overdueStateName2);
 }

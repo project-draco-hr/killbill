@@ -1,3 +1,14 @@
 {
-  install(new EntitlementModule());
+  install(new EntitlementModule(){
+    @Override protected void installOverdueChecker(){
+      bind(OverdueChecker.class).toInstance(new OverdueChecker(){
+        @Override public void checkBlocked(        Subscription subscription) throws EntitlementUserApiException {
+        }
+        @Override public void checkBlocked(        SubscriptionBundle bundle) throws EntitlementUserApiException {
+        }
+      }
+);
+    }
+  }
+);
 }

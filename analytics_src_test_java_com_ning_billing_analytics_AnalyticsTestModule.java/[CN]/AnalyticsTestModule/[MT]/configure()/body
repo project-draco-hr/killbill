@@ -5,10 +5,15 @@
   install(new FieldStoreModule());
   install(new TagStoreModule());
   install(new AccountModule());
-  install(new CatalogModule());
   install(new BusModule());
-  install(new EntitlementModule());
+  install(new EntitlementModule(){
+    @Override protected void installOverdueChecker(){
+      bind(OverdueChecker.class).to(MockOverdueChecker.class).asEagerSingleton();
+    }
+  }
+);
   install(new InvoiceModule());
+  install(new MockOverdueAccessModule());
   install(new PaymentModule());
   install(new TagStoreModule());
   install(new NotificationQueueModule());

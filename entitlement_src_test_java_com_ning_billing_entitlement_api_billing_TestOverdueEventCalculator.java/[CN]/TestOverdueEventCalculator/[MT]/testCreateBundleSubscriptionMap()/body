@@ -1,0 +1,12 @@
+{
+  SortedSet<BillingEvent> events=new TreeSet<BillingEvent>();
+  events.add(createBillingEvent(subscription1));
+  events.add(createBillingEvent(subscription2));
+  events.add(createBillingEvent(subscription3));
+  events.add(createBillingEvent(subscription4));
+  Hashtable<UUID,Set<Subscription>> map=odc.createBundleSubscriptionMap(events);
+  assertNotNull(map);
+  assertEquals(map.keySet().size(),2);
+  assertEquals(map.get(bundleId1).size(),3);
+  assertEquals(map.get(bundleId2).size(),1);
+}

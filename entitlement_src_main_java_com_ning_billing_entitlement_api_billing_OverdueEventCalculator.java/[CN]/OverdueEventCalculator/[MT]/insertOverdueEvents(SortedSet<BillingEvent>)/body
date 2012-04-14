@@ -1,0 +1,23 @@
+{
+  if (billingEvents.size() <= 0) {
+    return;
+  }
+  Account account=billingEvents.first().getAccount();
+  Hashtable<UUID,Set<Subscription>> bundleMap=createBundleSubscriptionMap(billingEvents);
+  SortedSet<BillingEvent> billingEventsToAdd=new TreeSet<BillingEvent>();
+  SortedSet<BillingEvent> billingEventsToRemove=new TreeSet<BillingEvent>();
+  for (  UUID bundleId : bundleMap.keySet()) {
+    SortedSet<OverdueEvent> overdueBundleEvents=overdueApi.getOverdueHistory(bundleId,Overdueable.Type.SUBSCRIPTION_BUNDLE);
+    List<DisabledDuration> bundleDisablePairs=createDisablePairs(overdueBundleEvents);
+    for (    Subscription subscription : bundleMap.get(bundleId)) {
+      billingEventsToAdd.addAll(createNewEvents(bundleDisablePairs,billingEvents,account,subscription));
+      billingEventsToRemove.addAll(eventsToRemove(bundleDisablePairs,billingEvents,subscription));
+    }
+  }
+  for (  BillingEvent eventToAdd : billingEventsToAdd) {
+    billingEvents.add(eventToAdd);
+  }
+  for (  BillingEvent eventToRemove : billingEventsToRemove) {
+    billingEvents.remove(eventToRemove);
+  }
+}

@@ -10,7 +10,7 @@
   invoices.add(createInvoice(now,new BigDecimal("10000.00"),createInvoiceItems(new UUID[]{thatBundleId,thisBundleId})));
   Clock clock=new ClockMock();
   InvoiceUserApi invoiceApi=BrainDeadProxyFactory.createBrainDeadProxyFor(InvoiceUserApi.class);
-  EntitlementOverdueApi entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementOverdueApi.class);
+  EntitlementUserApi entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
   ((ZombieControl)invoiceApi).addResult("getUnpaidInvoicesByAccountId",invoices);
   BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,clock);
   SortedSet<Invoice> resultinvoices=calc.unpaidInvoicesForBundle(thisBundleId,new UUID(0L,0L));

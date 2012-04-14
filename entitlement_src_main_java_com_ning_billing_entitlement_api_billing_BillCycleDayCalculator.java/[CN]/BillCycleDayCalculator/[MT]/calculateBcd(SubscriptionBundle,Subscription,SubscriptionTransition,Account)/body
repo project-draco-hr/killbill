@@ -13,10 +13,11 @@ case ACCOUNT:
   }
 break;
 case BUNDLE:
-result=bundle.getStartDate().toDateTime(account.getTimeZone()).getDayOfMonth();
+Subscription baseSub=entitlementApi.getBaseSubscription(bundle.getId());
+result=calculateBcdFromSubscription(baseSub,plan,account);
 break;
 case SUBSCRIPTION:
-result=subscription.getStartDate().toDateTime(account.getTimeZone()).getDayOfMonth();
+result=calculateBcdFromSubscription(subscription,plan,account);
 break;
 }
 if (result == -1) {

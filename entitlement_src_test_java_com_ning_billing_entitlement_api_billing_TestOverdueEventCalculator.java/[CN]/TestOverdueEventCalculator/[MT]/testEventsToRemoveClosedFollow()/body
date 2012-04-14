@@ -1,0 +1,10 @@
+{
+  DateTime now=clock.getUTCNow();
+  List<DisabledDuration> disabledDuration=new ArrayList<OverdueEventCalculator.DisabledDuration>();
+  SortedSet<BillingEvent> billingEvents=new TreeSet<BillingEvent>();
+  disabledDuration.add(new DisabledDuration(now,now.plusDays(2)));
+  BillingEvent e3=createRealEvent(now.plusDays(3),subscription1);
+  billingEvents.add(e3);
+  SortedSet<BillingEvent> results=odc.eventsToRemove(disabledDuration,billingEvents,subscription1);
+  assertEquals(results.size(),0);
+}

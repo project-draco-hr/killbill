@@ -1,14 +1,4 @@
 {
-  int result=account.getBillCycleDay();
-  if (result != 0) {
-    return result;
-  }
-  result=new DateTime(account.getTimeZone()).getDayOfMonth();
-  try {
-    result=billCycleDay(subscription.getStartDate(),account.getTimeZone(),plan);
-  }
- catch (  CatalogApiException e) {
-    log.error("Unexpected catalog error encountered when updating BCD",e);
-  }
-  return result;
+  DateTime date=plan.dateOfFirstRecurringNonZeroCharge(subscription.getStartDate());
+  return date.toDateTime(account.getTimeZone()).getDayOfMonth();
 }

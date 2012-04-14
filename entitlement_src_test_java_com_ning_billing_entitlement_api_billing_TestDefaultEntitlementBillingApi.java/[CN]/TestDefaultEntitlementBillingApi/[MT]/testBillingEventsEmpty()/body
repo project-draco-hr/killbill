@@ -6,7 +6,8 @@
   ((ZombieControl)account).addResult("getId",accountId).addResult("getCurrency",Currency.USD);
   AccountUserApi accountApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
   ((ZombieControl)accountApi).addResult("getAccountById",account);
-  BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService);
+  EntitlementUserApi entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
+  BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
   CallContextFactory factory=new DefaultCallContextFactory(clock);
   DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(factory,dao,accountApi,bcdCalculator);
   SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(new UUID(0L,0L));
