@@ -13,7 +13,7 @@
   EntitlementUserApi entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
   BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
   CallContextFactory factory=new DefaultCallContextFactory(clock);
-  DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(factory,dao,accountApi,bcdCalculator);
+  DefaultEntitlementBillingApi api=new DefaultEntitlementBillingApi(factory,null,dao,accountApi,bcdCalculator);
   SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(new UUID(0L,0L));
   checkFirstEvent(events,nextPlan,subscription.getStartDate().getDayOfMonth(),oneId,now,nextPhase,ApiEventType.CREATE.toString());
 }

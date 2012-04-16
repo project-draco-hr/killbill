@@ -6,8 +6,8 @@
   String planSetName="DEFAULT";
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(accountId,"testKey");
-  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,BillingPeriod.MONTHLY,planSetName,PhaseType.TRIAL),null);
+  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(accountId,"testKey",context);
+  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,BillingPeriod.MONTHLY,planSetName,PhaseType.TRIAL),null,context);
   assertTrue(busHandler.isCompleted(DELAY));
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId);
   assertNotNull(invoices);

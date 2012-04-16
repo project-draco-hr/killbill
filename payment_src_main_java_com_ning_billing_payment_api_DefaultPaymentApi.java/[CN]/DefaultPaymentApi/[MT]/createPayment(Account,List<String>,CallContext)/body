@@ -4,9 +4,7 @@
   for (  String invoiceId : invoiceIds) {
     Invoice invoice=invoicePaymentApi.getInvoice(UUID.fromString(invoiceId));
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
-      log.info("Received invoice for payment with balance of 0 {} ",invoice);
-      Either<PaymentError,PaymentInfo> result=Either.left(new PaymentError("invoice_balance_0","Invoice balance was 0 or less",account.getId(),UUID.fromString(invoiceId)));
-      processedPaymentsOrErrors.add(result);
+      log.debug("Received invoice for payment with balance of 0 {} ",invoice);
     }
  else     if (invoice.isMigrationInvoice()) {
       log.info("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);

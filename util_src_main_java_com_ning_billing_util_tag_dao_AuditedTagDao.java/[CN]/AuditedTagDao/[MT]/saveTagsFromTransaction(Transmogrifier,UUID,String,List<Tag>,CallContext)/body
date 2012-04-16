@@ -15,7 +15,11 @@
   }
   tagSqlDao.batchInsertFromTransaction(objectId.toString(),objectType,tags,context);
   tagSqlDao.batchDeleteFromTransaction(objectId.toString(),objectType,existingTags,context);
-  TagAuditSqlDao auditDao=dao.become(TagAuditSqlDao.class);
-  auditDao.batchInsertFromTransaction(tags,context);
-  auditDao.batchDeleteFromTransaction(existingTags,context);
+  List<String> historyIdsForInsert=getIdList(tags.size());
+  tagSqlDao.batchInsertHistoryFromTransaction(objectId.toString(),objectType,historyIdsForInsert,tags,ChangeType.INSERT,context);
+  List<String> historyIdsForDelete=getIdList(existingTags.size());
+  tagSqlDao.batchInsertHistoryFromTransaction(objectId.toString(),objectType,historyIdsForDelete,existingTags,ChangeType.DELETE,context);
+  AuditSqlDao auditSqlDao=tagSqlDao.become(AuditSqlDao.class);
+  auditSqlDao.insertAuditFromTransaction("tag_history",historyIdsForInsert,ChangeType.INSERT,context);
+  auditSqlDao.insertAuditFromTransaction("tag_history",historyIdsForDelete,ChangeType.DELETE,context);
 }

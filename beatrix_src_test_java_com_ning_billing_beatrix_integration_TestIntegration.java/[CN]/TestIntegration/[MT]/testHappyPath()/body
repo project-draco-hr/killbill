@@ -1,13 +1,13 @@
 {
   Account account=accountUserApi.createAccount(getAccountData(3),null,null,context);
   assertNotNull(account);
-  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever");
+  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",context);
   String productName="Shotgun";
   BillingPeriod term=BillingPeriod.MONTHLY;
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null);
+  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context);
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
   busHandler.pushExpectedEvent(NextEvent.CHANGE);
@@ -15,7 +15,7 @@
   BillingPeriod newTerm=BillingPeriod.MONTHLY;
   String newPlanSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   String newProductName="Assault-Rifle";
-  subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow());
+  subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow(),context);
   assertTrue(busHandler.isCompleted(DELAY));
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
