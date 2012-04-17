@@ -1,0 +1,30 @@
+{
+  Account account=accountApi.getAccountById(accountId);
+  CallContext context=factory.createCallContext(API_USER_NAME,CallOrigin.INTERNAL,UserType.SYSTEM);
+  List<SubscriptionBundle> bundles=entitlementDao.getSubscriptionBundleForAccount(accountId);
+  SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
+  for (  final SubscriptionBundle bundle : bundles) {
+    List<Subscription> subscriptions=entitlementDao.getSubscriptions(subscriptionFactory,bundle.getId());
+    for (    final Subscription subscription : subscriptions) {
+      for (      final SubscriptionEventTransition transition : ((SubscriptionData)subscription).getBillingTransitions()) {
+        try {
+          int bcd=bcdCalculator.calculateBcd(bundle,subscription,transition,account);
+          if (account.getBillCycleDay() == 0) {
+            MutableAccountData modifiedData=account.toMutableAccountData();
+            modifiedData.setBillCycleDay(bcd);
+            accountApi.updateAccount(account.getExternalKey(),modifiedData,context);
+          }
+          BillingEvent event=new DefaultBillingEvent(account,transition,subscription,bcd,account.getCurrency());
+          result.add(event);
+        }
+ catch (        CatalogApiException e) {
+          log.error("Failing to identify catalog components while creating BillingEvent from transition: " + transition.getId().toString(),e);
+        }
+catch (        Exception e) {
+          log.warn("Failed while getting BillingEvent",e);
+        }
+      }
+    }
+  }
+  return result;
+}

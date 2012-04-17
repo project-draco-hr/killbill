@@ -1,0 +1,13 @@
+{
+  Hashtable<UUID,Set<Subscription>> result=new Hashtable<UUID,Set<Subscription>>();
+  for (  BillingEvent event : billingEvents) {
+    UUID bundleId=event.getSubscription().getBundleId();
+    Set<Subscription> subs=result.get(bundleId);
+    if (subs == null) {
+      subs=new TreeSet<Subscription>();
+      result.put(bundleId,subs);
+    }
+    subs.add(event.getSubscription());
+  }
+  return result;
+}

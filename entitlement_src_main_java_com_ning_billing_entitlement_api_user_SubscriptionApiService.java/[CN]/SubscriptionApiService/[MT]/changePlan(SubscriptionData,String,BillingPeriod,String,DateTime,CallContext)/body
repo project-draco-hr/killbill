@@ -3,7 +3,7 @@
     DateTime now=clock.getUTCNow();
     requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : now;
     validateRequestedDate(subscription,now,requestedDate);
-    String currentPriceList=subscription.getCurrentPriceList();
+    PriceList currentPriceList=subscription.getCurrentPriceList();
     SubscriptionState currentState=subscription.getState();
     if (currentState != SubscriptionState.ACTIVE) {
       throw new EntitlementUserApiException(ErrorCode.ENT_CHANGE_NON_ACTIVE,subscription.getId(),currentState);
@@ -15,7 +15,7 @@
     try {
       Product destProduct=catalogService.getFullCatalog().findProduct(productName,requestedDate);
       Plan currentPlan=subscription.getCurrentPlan();
-      PlanPhaseSpecifier fromPlanPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),currentPlan.getBillingPeriod(),currentPriceList,subscription.getCurrentPhase().getPhaseType());
+      PlanPhaseSpecifier fromPlanPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),currentPlan.getBillingPeriod(),currentPriceList.getName(),subscription.getCurrentPhase().getPhaseType());
       PlanSpecifier toPlanPhase=new PlanSpecifier(productName,destProduct.getCategory(),term,priceList);
       planChangeResult=catalogService.getFullCatalog().planChange(fromPlanPhase,toPlanPhase,requestedDate);
     }

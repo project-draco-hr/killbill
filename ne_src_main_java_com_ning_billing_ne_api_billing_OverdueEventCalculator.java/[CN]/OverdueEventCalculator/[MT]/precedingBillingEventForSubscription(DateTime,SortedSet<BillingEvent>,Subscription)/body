@@ -1,0 +1,19 @@
+{
+  if (datetime == null) {
+    return null;
+  }
+  SortedSet<BillingEvent> filteredBillingEvents=filter(billingEvents,subscription);
+  BillingEvent result=filteredBillingEvents.first();
+  if (datetime.isBefore(result.getEffectiveDate())) {
+    return null;
+  }
+  for (  BillingEvent event : filteredBillingEvents) {
+    if (event.getEffectiveDate().isAfter(datetime)) {
+      return result;
+    }
+ else {
+      result=event;
+    }
+  }
+  return result;
+}

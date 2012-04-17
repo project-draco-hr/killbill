@@ -5,10 +5,10 @@
   SubscriptionState nextState=null;
   String nextPlanName=null;
   String nextPhaseName=null;
-  String nextPriceList=null;
+  String nextPriceListName=null;
   UUID nextUserToken=null;
   SubscriptionState previousState=null;
-  String previousPriceList=null;
+  PriceList previousPriceList=null;
   transitions=new LinkedList<SubscriptionTransitionData>();
   Plan previousPlan=null;
   PlanPhase previousPhase=null;
@@ -40,12 +40,12 @@ previousPriceList=null;
 nextState=SubscriptionState.ACTIVE;
 nextPlanName=userEV.getEventPlan();
 nextPhaseName=userEV.getEventPlanPhase();
-nextPriceList=userEV.getPriceList();
+nextPriceListName=userEV.getPriceList();
 break;
 case CHANGE:
 nextPlanName=userEV.getEventPlan();
 nextPhaseName=userEV.getEventPlanPhase();
-nextPriceList=userEV.getPriceList();
+nextPriceListName=userEV.getPriceList();
 break;
 case CANCEL:
 nextState=SubscriptionState.CANCELLED;
@@ -63,9 +63,11 @@ throw new EntitlementError(String.format("Unexpected Event type = %s",cur.getTyp
 }
 Plan nextPlan=null;
 PlanPhase nextPhase=null;
+PriceList nextPriceList=null;
 try {
 nextPlan=(nextPlanName != null) ? catalog.findPlan(nextPlanName,cur.getRequestedDate(),getStartDate()) : null;
 nextPhase=(nextPhaseName != null) ? catalog.findPhase(nextPhaseName,cur.getRequestedDate(),getStartDate()) : null;
+nextPriceList=(nextPriceListName != null) ? catalog.findPriceList(nextPriceListName,cur.getRequestedDate()) : null;
 }
  catch (CatalogApiException e) {
 log.error(String.format("Failed to build transition for subscription %s",id),e);
