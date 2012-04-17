@@ -1,0 +1,27 @@
+{
+  UUID id=UUID.fromString(result.getString("id"));
+  String externalKey=result.getString("external_key");
+  String email=result.getString("email");
+  String name=result.getString("name");
+  int firstNameLength=result.getInt("first_name_length");
+  int billingCycleDay=result.getInt("billing_cycle_day");
+  String currencyString=result.getString("currency");
+  Currency currency=(currencyString == null) ? null : Currency.valueOf(currencyString);
+  String paymentProviderName=result.getString("payment_provider_name");
+  String timeZoneId=result.getString("time_zone");
+  DateTimeZone timeZone=(timeZoneId == null) ? null : DateTimeZone.forID(timeZoneId);
+  String locale=result.getString("locale");
+  String address1=result.getString("address1");
+  String address2=result.getString("address2");
+  String companyName=result.getString("company_name");
+  String city=result.getString("city");
+  String stateOrProvince=result.getString("state_or_province");
+  String postalCode=result.getString("postal_code");
+  String country=result.getString("country");
+  String phone=result.getString("phone");
+  String createdBy=result.getString("created_by");
+  DateTime createdDate=getDate(result,"created_date");
+  String updatedBy=result.getString("updated_by");
+  DateTime updatedDate=getDate(result,"updated_date");
+  return new AccountBuilder(id).externalKey(externalKey).email(email).name(name).firstNameLength(firstNameLength).phone(phone).currency(currency).billingCycleDay(billingCycleDay).paymentProviderName(paymentProviderName).timeZone(timeZone).locale(locale).address1(address1).address2(address2).companyName(companyName).city(city).stateOrProvince(stateOrProvince).postalCode(postalCode).country(country).createdBy(createdBy).createdDate(createdDate).updatedBy(updatedBy).updatedDate(updatedDate).build();
+}
