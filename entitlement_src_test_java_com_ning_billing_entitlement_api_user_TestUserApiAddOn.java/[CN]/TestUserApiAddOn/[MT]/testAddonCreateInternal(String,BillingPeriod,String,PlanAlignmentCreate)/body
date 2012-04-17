@@ -29,7 +29,18 @@
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.PHASE);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    someTimeLater=aoCurrentPhase.getDuration();
+    someTimeLater=new Duration(){
+      @Override public TimeUnit getUnit(){
+        return TimeUnit.DAYS;
+      }
+      @Override public int getNumber(){
+        return 32;
+      }
+      @Override public DateTime addToDateTime(      DateTime dateTime){
+        throw new NotImplementedException();
+      }
+    }
+;
     clock.addDeltaFromReality(someTimeLater);
     assertTrue(testListener.isCompleted(5000));
     aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
