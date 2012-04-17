@@ -1,7 +1,6 @@
 {
-  final Injector g=Guice.createInjector(Stage.PRODUCTION,new MockOverdueAccessModule(){
+  final Injector g=Guice.createInjector(Stage.PRODUCTION,new AbstractModule(){
     protected void configure(){
-      super.configure();
       bind(Clock.class).to(ClockMock.class).asEagerSingleton();
       bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
       bind(Bus.class).to(InMemoryBus.class).asEagerSingleton();
@@ -25,13 +24,6 @@
       bind(AccountUserApi.class).to(MockAccountUserApi.class).asEagerSingleton();
       bind(EntitlementBillingApi.class).to(DefaultEntitlementBillingApi.class).asEagerSingleton();
       bind(EntitlementUserApi.class).to(DefaultEntitlementUserApi.class).asEagerSingleton();
-      bind(OverdueChecker.class).toInstance(new OverdueChecker(){
-        @Override public void checkBlocked(        Subscription subscription){
-        }
-        @Override public void checkBlocked(        SubscriptionBundle bundle){
-        }
-      }
-);
     }
   }
 );

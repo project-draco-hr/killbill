@@ -15,9 +15,9 @@
   Thread.sleep(2000);
   List<Notification> pendingNotifications=mockNotificationQueue.getPendingEvents();
   assertEquals(pendingNotifications.size(),0);
-  List<PaymentInfo> paymentInfoList=paymentApi.getPaymentInfo(Arrays.asList(invoice.getId().toString()));
+  List<PaymentInfoEvent> paymentInfoList=paymentApi.getPaymentInfo(Arrays.asList(invoice.getId().toString()));
   assertEquals(paymentInfoList.size(),1);
-  PaymentInfo paymentInfo=paymentInfoList.get(0);
+  PaymentInfoEvent paymentInfo=paymentInfoList.get(0);
   assertEquals(paymentInfo.getStatus(),PaymentStatus.Processed.toString());
   List<PaymentAttempt> updatedAttempts=paymentApi.getPaymentAttemptsForInvoiceId(invoice.getId().toString());
   assertEquals(paymentInfo.getPaymentId(),updatedAttempts.get(0).getPaymentId());

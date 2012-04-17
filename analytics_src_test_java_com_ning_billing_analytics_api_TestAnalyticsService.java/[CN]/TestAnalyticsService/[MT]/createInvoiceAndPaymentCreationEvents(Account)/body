@@ -6,8 +6,8 @@
   List<Invoice> invoices=invoiceDao.getInvoicesByAccount(account.getId());
   Assert.assertEquals(invoices.size(),1);
   Assert.assertEquals(invoices.get(0).getInvoiceItems().size(),1);
-  invoiceCreationNotification=new DefaultInvoiceCreationNotification(invoice.getId(),account.getId(),INVOICE_AMOUNT,ACCOUNT_CURRENCY,clock.getUTCNow());
-  paymentInfoNotification=new PaymentInfo.Builder().setPaymentId(UUID.randomUUID().toString()).setPaymentMethod(PAYMENT_METHOD).setCardCountry(CARD_COUNTRY).build();
+  invoiceCreationNotification=new DefaultInvoiceCreationNotification(invoice.getId(),account.getId(),INVOICE_AMOUNT,ACCOUNT_CURRENCY,clock.getUTCNow(),null);
+  paymentInfoNotification=new DefaultPaymentInfo.Builder().setPaymentId(UUID.randomUUID().toString()).setPaymentMethod(PAYMENT_METHOD).setCardCountry(CARD_COUNTRY).build();
   final PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice.getId(),account.getId(),BigDecimal.TEN,ACCOUNT_CURRENCY,clock.getUTCNow(),clock.getUTCNow(),paymentInfoNotification.getPaymentId(),1);
   paymentDao.createPaymentAttempt(paymentAttempt,context);
   paymentDao.savePaymentInfo(paymentInfoNotification,context);

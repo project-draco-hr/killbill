@@ -1,0 +1,29 @@
+{
+  CallContext ctx=context.createContext();
+  CompletionUserRequestSubscription waiter=callCompletion ? new CompletionUserRequestSubscription(ctx.getUserToken()) : null;
+  try {
+    if (waiter != null) {
+      killbillHandler.registerCompletionUserRequestWaiter(waiter);
+    }
+    T operationValue=callback.doOperation(ctx);
+    if (waiter != null && callback.isImmOperation()) {
+      waiter.waitForCompletion(timeoutSec * 1000);
+    }
+    return callback.doResponseOk(operationValue);
+  }
+ catch (  EntitlementUserApiException e) {
+    log.info(String.format("Failed to complete operation"),e);
+    return Response.status(Status.BAD_REQUEST).build();
+  }
+catch (  InterruptedException e) {
+    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+  }
+catch (  TimeoutException e) {
+    return Response.status(Status.fromStatusCode(408)).build();
+  }
+ finally {
+    if (waiter != null) {
+      killbillHandler.unregisterCompletionUserRequestWaiter(waiter);
+    }
+  }
+}

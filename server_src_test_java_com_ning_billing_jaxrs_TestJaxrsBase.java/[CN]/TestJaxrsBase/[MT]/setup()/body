@@ -1,0 +1,17 @@
+{
+  loadSystemPropertiesFromClasspath("/killbill.properties");
+  final EventListener eventListener=new TestKillbillGuiceListener();
+  server=new HttpServer();
+  loadConfig();
+  final Iterable<EventListener> eventListeners=new Iterable<EventListener>(){
+    @Override public Iterator<EventListener> iterator(){
+      ArrayList<EventListener> array=new ArrayList<EventListener>();
+      array.add(eventListener);
+      return array.iterator();
+    }
+  }
+;
+  server.configure(config,eventListeners,new HashMap<FilterHolder,String>());
+  server.start();
+  injector=((TestKillbillGuiceListener)eventListener).getTheInjector();
+}

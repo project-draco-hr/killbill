@@ -15,7 +15,7 @@
         auditDao.insertAuditFromTransaction("account_history",historyId.toString(),ChangeType.INSERT,context);
         saveTagsFromWithinTransaction(account,transactionalDao,context);
         saveCustomFieldsFromWithinTransaction(account,transactionalDao,context);
-        AccountCreationNotification creationEvent=new DefaultAccountCreationEvent(account);
+        AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,context.getUserToken());
         eventBus.post(creationEvent);
         return null;
       }

@@ -1,0 +1,12 @@
+{
+  try {
+    if (transition.getRemainingEventsForUserOperation() > 0) {
+      return;
+    }
+    CallContext context=factory.createCallContext("Transition",CallOrigin.INTERNAL,UserType.SYSTEM,transition.getUserToken());
+    dispatcher.processSubscription(transition,context);
+  }
+ catch (  InvoiceApiException e) {
+    log.error(e.getMessage());
+  }
+}

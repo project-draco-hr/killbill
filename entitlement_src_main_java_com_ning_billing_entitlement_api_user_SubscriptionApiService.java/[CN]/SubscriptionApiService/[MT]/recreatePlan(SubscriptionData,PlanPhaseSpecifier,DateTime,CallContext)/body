@@ -1,5 +1,4 @@
 {
-  overdueChecker.checkBlocked(subscription);
   SubscriptionState currentState=subscription.getState();
   if (currentState != SubscriptionState.CANCELLED) {
     throw new EntitlementUserApiException(ErrorCode.ENT_RECREATE_BAD_STATE,subscription.getId(),currentState);
@@ -17,6 +16,7 @@
     DateTime effectiveDate=requestedDate;
     DateTime processedDate=now;
     createFromSubscription(subscription,plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,processedDate,true,context);
+    return true;
   }
  catch (  CatalogApiException e) {
     throw new EntitlementUserApiException(e);

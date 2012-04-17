@@ -1,6 +1,6 @@
 {
   final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
-  List<Either<PaymentError,PaymentInfo>> processedPaymentsOrErrors=new ArrayList<Either<PaymentError,PaymentInfo>>(invoiceIds.size());
+  List<Either<PaymentErrorEvent,PaymentInfoEvent>> processedPaymentsOrErrors=new ArrayList<Either<PaymentErrorEvent,PaymentInfoEvent>>(invoiceIds.size());
   for (  String invoiceId : invoiceIds) {
     Invoice invoice=invoicePaymentApi.getInvoice(UUID.fromString(invoiceId));
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
@@ -8,7 +8,7 @@
     }
  else     if (invoice.isMigrationInvoice()) {
       log.info("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
-      Either<PaymentError,PaymentInfo> result=Either.left(new PaymentError("migration invoice","Invoice balance was a migration invoice",account.getId(),UUID.fromString(invoiceId)));
+      Either<PaymentErrorEvent,PaymentInfoEvent> result=Either.left((PaymentErrorEvent)new DefaultPaymentError("migration invoice","Invoice balance was a migration invoice",account.getId(),UUID.fromString(invoiceId),context.getUserToken()));
       processedPaymentsOrErrors.add(result);
     }
  else {

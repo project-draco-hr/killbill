@@ -1,0 +1,20 @@
+{
+  BoundRequestBuilder builder=null;
+  if (verb.equals("GET")) {
+    builder=httpClient.prepareGet(url);
+  }
+ else   if (verb.equals("POST")) {
+    builder=httpClient.preparePost(url);
+  }
+ else   if (verb.equals("PUT")) {
+    builder=httpClient.preparePut(url);
+  }
+ else   if (verb.equals("DELETE")) {
+    builder=httpClient.prepareDelete(url);
+  }
+  builder.addHeader(HEADER_CONTENT_TYPE,CONTENT_TYPE);
+  for (  Entry<String,String> q : queryParams.entrySet()) {
+    builder.addQueryParameter(q.getKey(),q.getValue());
+  }
+  return builder;
+}

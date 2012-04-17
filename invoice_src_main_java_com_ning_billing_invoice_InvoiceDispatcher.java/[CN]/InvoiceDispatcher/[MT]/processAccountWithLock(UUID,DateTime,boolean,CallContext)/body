@@ -12,6 +12,9 @@
   if (invoice == null) {
     log.info("Generated null invoice.");
     outputDebugData(events,invoices);
+    if (!dryRun) {
+      postEmptyInvoiceEvent(accountId,context.getUserToken());
+    }
   }
  else {
     log.info("Generated invoice {} with {} items.",invoice.getId().toString(),invoice.getNumberOfItems());
@@ -22,7 +25,7 @@
       }
     }
     outputDebugData(events,invoices);
-    if (invoice.getNumberOfItems() > 0 && !dryRun) {
+    if (!dryRun) {
       invoiceDao.create(invoice,context);
     }
   }

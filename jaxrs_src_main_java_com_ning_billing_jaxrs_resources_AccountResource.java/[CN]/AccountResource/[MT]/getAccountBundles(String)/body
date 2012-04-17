@@ -1,0 +1,15 @@
+{
+  UUID uuid=UUID.fromString(accountId);
+  Account account=accountApi.getAccountById(uuid);
+  if (account == null) {
+    return Response.status(Status.NO_CONTENT).build();
+  }
+  List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(uuid);
+  Collection<BundleJson> result=Collections2.transform(bundles,new Function<SubscriptionBundle,BundleJson>(){
+    @Override public BundleJson apply(    SubscriptionBundle input){
+      return new BundleJson(input);
+    }
+  }
+);
+  return Response.status(Status.OK).entity(result).build();
+}

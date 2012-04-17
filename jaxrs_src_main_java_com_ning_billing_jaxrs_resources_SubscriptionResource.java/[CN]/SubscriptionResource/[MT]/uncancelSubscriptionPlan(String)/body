@@ -1,0 +1,15 @@
+{
+  try {
+    UUID uuid=UUID.fromString(subscriptionId);
+    Subscription current=entitlementApi.getSubscriptionFromId(uuid);
+    if (current == null) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    current.uncancel(context.createContext());
+    return Response.status(Status.OK).build();
+  }
+ catch (  EntitlementUserApiException e) {
+    log.info(String.format("Failed to uncancel plan for subscription %s",subscriptionId),e);
+    return Response.status(Status.BAD_REQUEST).build();
+  }
+}
