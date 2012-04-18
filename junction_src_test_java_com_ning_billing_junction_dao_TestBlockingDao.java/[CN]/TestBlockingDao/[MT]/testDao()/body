@@ -1,0 +1,19 @@
+{
+  ClockMock clock=new ClockMock();
+  UUID uuid=UUID.randomUUID();
+  String overdueStateName="WayPassedItMan";
+  String service="TEST";
+  boolean blockChange=true;
+  boolean blockEntitlement=false;
+  boolean blockBilling=false;
+  BlockingState state1=new BlockingState(uuid,overdueStateName,Blockable.Type.SUBSCRIPTION_BUNDLE,service,blockChange,blockEntitlement,blockBilling);
+  dao.setBlockingState(state1,clock);
+  clock.setDeltaFromReality(1000 * 3600 * 24);
+  String overdueStateName2="NoReallyThisCantGoOn";
+  BlockingState state2=new BlockingState(uuid,overdueStateName2,Blockable.Type.SUBSCRIPTION_BUNDLE,service,blockChange,blockEntitlement,blockBilling);
+  dao.setBlockingState(state2,clock);
+  SubscriptionBundle bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
+  ((ZombieControl)bundle).addResult("getId",uuid);
+  Assert.assertEquals(accessDao.getBlockingStateFor(bundle),overdueStateName2);
+  Assert.assertEquals(accessDao.getBlockingStateForIdAndType(bundle.getId(),Blockable.Type.SUBSCRIPTION_BUNDLE),overdueStateName2);
+}

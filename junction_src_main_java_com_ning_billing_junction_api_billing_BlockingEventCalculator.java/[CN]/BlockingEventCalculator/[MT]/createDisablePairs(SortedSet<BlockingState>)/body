@@ -1,0 +1,17 @@
+{
+  List<DisabledDuration> result=new ArrayList<BlockingEventCalculator.DisabledDuration>();
+  BlockingState first=null;
+  for (  BlockingState e : overdueBundleEvents) {
+    if (isDisableEvent(e) && first == null) {
+      first=e;
+    }
+ else     if (first != null && !isDisableEvent(e)) {
+      result.add(new DisabledDuration(first.getTimestamp(),e.getTimestamp()));
+      first=null;
+    }
+  }
+  if (first != null) {
+    result.add(new DisabledDuration(first.getTimestamp(),null));
+  }
+  return result;
+}
