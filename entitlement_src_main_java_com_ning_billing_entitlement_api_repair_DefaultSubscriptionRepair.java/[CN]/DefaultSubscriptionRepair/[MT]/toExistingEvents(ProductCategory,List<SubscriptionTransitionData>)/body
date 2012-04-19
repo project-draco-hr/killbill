@@ -1,0 +1,36 @@
+{
+  List<ExistingEvent> result=new LinkedList<SubscriptionRepair.ExistingEvent>();
+  for (  final SubscriptionTransitionData cur : transitions) {
+    String productName=null;
+    BillingPeriod billingPeriod=null;
+    String priceListName=null;
+    PhaseType phaseType=null;
+    if (cur.getTransitionType() != SubscriptionTransitionType.CANCEL) {
+      productName=cur.getNextPlan().getProduct().getName();
+      billingPeriod=cur.getNextPhase().getBillingPeriod();
+      priceListName=cur.getNextPriceList();
+      phaseType=cur.getNextPhase().getPhaseType();
+    }
+    final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(productName,category,billingPeriod,priceListName,phaseType);
+    result.add(new ExistingEvent(){
+      @Override public SubscriptionTransitionType getSubscriptionTransitionType(){
+        return cur.getTransitionType();
+      }
+      @Override public DateTime getRequestedDate(){
+        return cur.getRequestedTransitionTime();
+      }
+      @Override public PlanPhaseSpecifier getPlanPhaseSpecifier(){
+        return spec;
+      }
+      @Override public UUID getEventId(){
+        return cur.getId();
+      }
+      @Override public DateTime getEffectiveDate(){
+        return cur.getEffectiveTransitionTime();
+      }
+    }
+);
+  }
+  sortExistingEvent(result);
+  return result;
+}

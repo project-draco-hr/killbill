@@ -1,11 +1,14 @@
 {
-  bind(SubscriptionFactory.class).asEagerSingleton();
-  bind(SubscriptionApiService.class).asEagerSingleton();
+  bind(SubscriptionFactory.class).annotatedWith(Names.named(REPAIR_NAMED)).to(RepairSubscriptionFactory.class).asEagerSingleton();
+  bind(SubscriptionFactory.class).to(DefaultSubscriptionFactory.class).asEagerSingleton();
+  bind(SubscriptionApiService.class).annotatedWith(Names.named(REPAIR_NAMED)).to(RepairSubscriptionApiService.class).asEagerSingleton();
+  bind(SubscriptionApiService.class).to(DefaultSubscriptionApiService.class).asEagerSingleton();
   bind(EntitlementService.class).to(Engine.class).asEagerSingleton();
   bind(Engine.class).asEagerSingleton();
   bind(PlanAligner.class).asEagerSingleton();
   bind(AddonUtils.class).asEagerSingleton();
   bind(MigrationPlanAligner.class).asEagerSingleton();
+  bind(EntitlementRepairApi.class).to(DefaultEntitlementRepairApi.class).asEagerSingleton();
   bind(EntitlementUserApi.class).to(DefaultEntitlementUserApi.class).asEagerSingleton();
   bind(EntitlementBillingApi.class).to(DefaultEntitlementBillingApi.class).asEagerSingleton();
   bind(EntitlementMigrationApi.class).to(DefaultEntitlementMigrationApi.class).asEagerSingleton();

@@ -1,0 +1,18 @@
+{
+  if (category != ProductCategory.BASE) {
+    return;
+  }
+  DateTime now=clock.getUTCNow();
+  Product baseProduct=(getState() == SubscriptionState.CANCELLED) ? null : getCurrentPlan().getProduct();
+  Iterator<SubscriptionDataRepair> it=addonSubscriptions.iterator();
+  while (it.hasNext()) {
+    SubscriptionDataRepair cur=it.next();
+    if (cur.getState() == SubscriptionState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
+      continue;
+    }
+    Plan addonCurrentPlan=cur.getCurrentPlan();
+    if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
+      cur.cancel(requestedDate,false,context);
+    }
+  }
+}

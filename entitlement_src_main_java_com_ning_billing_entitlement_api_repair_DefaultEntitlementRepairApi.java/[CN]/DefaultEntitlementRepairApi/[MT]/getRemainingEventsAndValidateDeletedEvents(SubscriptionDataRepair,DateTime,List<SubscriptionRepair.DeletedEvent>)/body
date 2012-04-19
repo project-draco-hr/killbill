@@ -1,0 +1,41 @@
+{
+  if (deletedEvents == null || deletedEvents.size() == 0) {
+    return data.getEvents();
+  }
+  int nbDeleted=0;
+  LinkedList<EntitlementEvent> result=new LinkedList<EntitlementEvent>();
+  for (  EntitlementEvent cur : data.getEvents()) {
+    boolean foundDeletedEvent=false;
+    for (    SubscriptionRepair.DeletedEvent d : deletedEvents) {
+      if (cur.getId().equals(d.getEventId())) {
+        foundDeletedEvent=true;
+        nbDeleted++;
+        break;
+      }
+    }
+    if (!foundDeletedEvent && nbDeleted > 0) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_INVALID_DELETE_SET,cur.getId(),data.getId());
+    }
+    if (firstBPDeletedTime != null && !cur.getEffectiveDate().isBefore(firstBPDeletedTime) && !foundDeletedEvent) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_MISSING_AO_DELETE_EVENT,cur.getId(),data.getId());
+    }
+    if (nbDeleted == 0) {
+      result.add(cur);
+    }
+  }
+  if (nbDeleted != deletedEvents.size()) {
+    for (    SubscriptionRepair.DeletedEvent d : deletedEvents) {
+      boolean found=false;
+      for (      SubscriptionTransitionData cur : data.getAllTransitions()) {
+        if (cur.getId().equals(d.getEventId())) {
+          found=true;
+          continue;
+        }
+      }
+      if (!found) {
+        throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_NON_EXISTENT_DELETE_EVENT,d.getEventId(),data.getId());
+      }
+    }
+  }
+  return result;
+}

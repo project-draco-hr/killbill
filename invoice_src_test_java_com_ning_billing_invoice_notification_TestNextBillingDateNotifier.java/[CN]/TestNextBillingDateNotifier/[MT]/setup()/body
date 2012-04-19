@@ -16,14 +16,21 @@
       bind(IDBI.class).toInstance(dbi);
       bind(TagDao.class).to(AuditedTagDao.class).asEagerSingleton();
       bind(EntitlementDao.class).to(EntitlementSqlDao.class).asEagerSingleton();
+      bind(EntitlementDao.class).annotatedWith(Names.named(EntitlementModule.REPAIR_NAMED)).to(RepairEntitlementDao.class);
+      bind(RepairEntitlementLifecycleDao.class).annotatedWith(Names.named(EntitlementModule.REPAIR_NAMED)).to(RepairEntitlementDao.class);
+      bind(RepairEntitlementDao.class).asEagerSingleton();
       bind(CustomFieldDao.class).to(AuditedCustomFieldDao.class).asEagerSingleton();
       bind(GlobalLocker.class).to(MySqlGlobalLocker.class).asEagerSingleton();
       bind(InvoiceGenerator.class).to(DefaultInvoiceGenerator.class).asEagerSingleton();
-      bind(InvoiceDao.class).to(DefaultInvoiceDao.class);
+      bind(InvoiceDao.class).to(DefaultInvoiceDao.class).asEagerSingleton();
       bind(NextBillingDatePoster.class).to(DefaultNextBillingDatePoster.class).asEagerSingleton();
       bind(AccountUserApi.class).to(MockAccountUserApi.class).asEagerSingleton();
       bind(EntitlementBillingApi.class).to(DefaultEntitlementBillingApi.class).asEagerSingleton();
       bind(EntitlementUserApi.class).to(DefaultEntitlementUserApi.class).asEagerSingleton();
+      bind(SubscriptionApiService.class).annotatedWith(Names.named(EntitlementModule.REPAIR_NAMED)).to(RepairSubscriptionApiService.class).asEagerSingleton();
+      bind(SubscriptionApiService.class).to(DefaultSubscriptionApiService.class).asEagerSingleton();
+      bind(SubscriptionFactory.class).annotatedWith(Names.named(EntitlementModule.REPAIR_NAMED)).to(RepairSubscriptionFactory.class).asEagerSingleton();
+      bind(SubscriptionFactory.class).to(DefaultSubscriptionFactory.class).asEagerSingleton();
     }
   }
 );
