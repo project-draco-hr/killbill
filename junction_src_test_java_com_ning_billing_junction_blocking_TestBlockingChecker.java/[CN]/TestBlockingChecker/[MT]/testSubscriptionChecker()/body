@@ -1,0 +1,92 @@
+{
+  setStateAccount(false,false,false);
+  setStateBundle(false,false,false);
+  setStateSubscription(false,false,false);
+  checker.checkBlockedChange(subscription);
+  checker.checkBlockedEntitlement(subscription);
+  checker.checkBlockedBilling(subscription);
+  setStateSubscription(true,false,false);
+  checker.checkBlockedEntitlement(subscription);
+  checker.checkBlockedBilling(subscription);
+  try {
+    checker.checkBlockedChange(subscription);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateSubscription(false,true,false);
+  checker.checkBlockedChange(subscription);
+  checker.checkBlockedBilling(subscription);
+  try {
+    checker.checkBlockedEntitlement(subscription);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateSubscription(false,false,true);
+  checker.checkBlockedChange(subscription);
+  checker.checkBlockedEntitlement(subscription);
+  try {
+    checker.checkBlockedBilling(subscription);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateSubscription(false,false,false);
+  setStateBundle(true,false,false);
+  checker.checkBlockedEntitlement(subscription);
+  checker.checkBlockedBilling(subscription);
+  try {
+    checker.checkBlockedChange(subscription);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateBundle(false,true,false);
+  checker.checkBlockedChange(subscription);
+  checker.checkBlockedBilling(subscription);
+  try {
+    checker.checkBlockedEntitlement(subscription);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateBundle(false,false,true);
+  checker.checkBlockedChange(subscription);
+  checker.checkBlockedEntitlement(subscription);
+  try {
+    checker.checkBlockedBilling(subscription);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateSubscription(false,false,false);
+  setStateBundle(false,false,false);
+  setStateAccount(true,false,false);
+  checker.checkBlockedEntitlement(subscription);
+  checker.checkBlockedBilling(subscription);
+  try {
+    checker.checkBlockedChange(subscription);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateAccount(false,true,false);
+  checker.checkBlockedChange(subscription);
+  checker.checkBlockedBilling(subscription);
+  try {
+    checker.checkBlockedEntitlement(subscription);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateAccount(false,false,true);
+  checker.checkBlockedChange(subscription);
+  checker.checkBlockedEntitlement(subscription);
+  try {
+    checker.checkBlockedBilling(subscription);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+}

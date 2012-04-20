@@ -1,7 +1,9 @@
 {
-  EntitlementBillingApi entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementBillingApi.class);
+  BillingApi entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(BillingApi.class);
   ((ZombieControl)entitlementApi).addResult("setChargedThroughDateFromTransaction",BrainDeadProxyFactory.ZOMBIE_VOID);
   ((ZombieControl)entitlementApi).addResult("getBillingEventsForAccountAndUpdateAccountBCD",BrainDeadProxyFactory.ZOMBIE_VOID);
-  bind(EntitlementBillingApi.class).toInstance(entitlementApi);
-  bind(EntitlementDao.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementDao.class));
+  bind(EntitlementUserApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class));
+  ChargeThruApi cta=BrainDeadProxyFactory.createBrainDeadProxyFor(ChargeThruApi.class);
+  bind(ChargeThruApi.class).toInstance(cta);
+  ((ZombieControl)cta).addResult("setChargedThroughDateFromTransaction",BrainDeadProxyFactory.ZOMBIE_VOID);
 }
