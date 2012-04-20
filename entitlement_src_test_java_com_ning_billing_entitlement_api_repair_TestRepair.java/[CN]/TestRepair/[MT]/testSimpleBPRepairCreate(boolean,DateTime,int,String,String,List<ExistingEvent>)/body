@@ -51,4 +51,27 @@
   }
   dryRun=false;
   BundleRepair realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  subscriptionRepair=realRunBundleRepair.getSubscriptions();
+  assertEquals(subscriptionRepair.size(),1);
+  cur=subscriptionRepair.get(0);
+  assertEquals(cur.getId(),baseSubscription.getId());
+  events=cur.getExistingEvents();
+  assertEquals(expectedEvents.size(),events.size());
+  index=0;
+  for (  ExistingEvent e : expectedEvents) {
+    validateExistingEventForAssertion(e,events.get(index++));
+  }
+  SubscriptionData realRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  assertEquals(realRunBaseSubscription.getAllTransitions().size(),2);
+  assertEquals(realRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
+  assertEquals(realRunBaseSubscription.getBundleId(),bundle.getId());
+  assertEquals(realRunBaseSubscription.getStartDate(),newCreateTime);
+  currentPlan=realRunBaseSubscription.getCurrentPlan();
+  assertNotNull(currentPlan);
+  assertEquals(currentPlan.getProduct().getName(),newBaseProduct);
+  assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
+  assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.MONTHLY);
+  currentPhase=realRunBaseSubscription.getCurrentPhase();
+  assertNotNull(currentPhase);
+  assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
 }
