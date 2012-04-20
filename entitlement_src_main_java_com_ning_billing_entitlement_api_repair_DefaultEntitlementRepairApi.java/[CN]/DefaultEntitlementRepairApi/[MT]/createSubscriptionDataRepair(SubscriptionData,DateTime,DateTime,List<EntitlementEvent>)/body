@@ -1,0 +1,17 @@
+{
+  SubscriptionBuilder builder=new SubscriptionBuilder(curData);
+  builder.setActiveVersion(curData.getActiveVersion() + 1);
+  if (newBundleStartDate != null) {
+    builder.setBundleStartDate(newBundleStartDate);
+  }
+  if (newSubscriptionStartDate != null) {
+    builder.setStartDate(newSubscriptionStartDate);
+  }
+  if (initialEvents.size() > 0) {
+    for (    EntitlementEvent cur : initialEvents) {
+      cur.setActiveVersion(builder.getActiveVersion());
+    }
+  }
+  SubscriptionDataRepair result=(SubscriptionDataRepair)factory.createSubscription(builder,initialEvents);
+  return result;
+}
