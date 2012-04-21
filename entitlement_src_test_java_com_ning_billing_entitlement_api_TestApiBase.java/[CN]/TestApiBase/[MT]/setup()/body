@@ -2,18 +2,17 @@
   loadSystemPropertiesFromClasspath("/entitlement.properties");
   final Injector g=getInjector();
   entitlementService=g.getInstance(EntitlementService.class);
+  entitlementApi=g.getInstance(EntitlementUserApi.class);
+  billingApi=g.getInstance(ChargeThruApi.class);
+  migrationApi=g.getInstance(EntitlementMigrationApi.class);
   catalogService=g.getInstance(CatalogService.class);
   busService=g.getInstance(BusService.class);
   config=g.getInstance(EntitlementConfig.class);
   dao=g.getInstance(EntitlementDao.class);
   clock=(ClockMock)g.getInstance(Clock.class);
   helper=(isSqlTest(dao)) ? g.getInstance(MysqlTestingHelper.class) : null;
-  try {
-    ((DefaultCatalogService)catalogService).loadCatalog();
-    ((DefaultBusService)busService).startBus();
-    ((Engine)entitlementService).initialize();
-    init();
-  }
- catch (  Exception e) {
-  }
+  ((DefaultCatalogService)catalogService).loadCatalog();
+  ((DefaultBusService)busService).startBus();
+  ((Engine)entitlementService).initialize();
+  init();
 }
