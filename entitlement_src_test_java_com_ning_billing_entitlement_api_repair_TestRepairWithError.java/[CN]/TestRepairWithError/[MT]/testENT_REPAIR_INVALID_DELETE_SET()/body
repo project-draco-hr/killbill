@@ -1,0 +1,25 @@
+{
+  test.withException(new TestWithExceptionCallback(){
+    @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
+      Duration durationShift=getDurationDay(3);
+      clock.setDeltaFromReality(durationShift,0);
+      testListener.pushExpectedEvent(NextEvent.CHANGE);
+      DateTime changeTime=clock.getUTCNow();
+      baseSubscription.changePlan("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,changeTime,context);
+      assertTrue(testListener.isCompleted(5000));
+      testListener.pushExpectedEvent(NextEvent.PHASE);
+      durationShift=getDurationDay(40);
+      clock.addDeltaFromReality(durationShift);
+      assertTrue(testListener.isCompleted(5000));
+      BundleRepair bundleRepair=repairApi.getBundleRepair(bundle.getId());
+      sortEventsOnBundle(bundleRepair);
+      PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+      NewEvent ne=createNewEvent(SubscriptionTransitionType.CHANGE,baseSubscription.getStartDate().plusDays(10),spec);
+      DeletedEvent de=createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId());
+      SubscriptionRepair sRepair=createSubscriptionReapir(baseSubscription.getId(),Collections.singletonList(de),Collections.singletonList(ne));
+      BundleRepair bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      repairApi.repairBundle(bRepair,true,context);
+    }
+  }
+,ErrorCode.ENT_REPAIR_INVALID_DELETE_SET);
+}

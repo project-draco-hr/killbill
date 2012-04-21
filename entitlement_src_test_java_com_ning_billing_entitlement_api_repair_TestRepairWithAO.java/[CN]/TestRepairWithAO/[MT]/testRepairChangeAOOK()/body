@@ -1,0 +1,68 @@
+{
+  String baseProduct="Shotgun";
+  BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+  String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  SubscriptionData baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+  Duration someTimeLater=getDurationDay(3);
+  clock.setDeltaFromReality(someTimeLater,DAY_IN_MS);
+  SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+  clock.addDeltaFromReality(someTimeLater);
+  BundleRepair bundleRepair=repairApi.getBundleRepair(bundle.getId());
+  sortEventsOnBundle(bundleRepair);
+  SubscriptionRepair bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
+  assertEquals(bpRepair.getExistingEvents().size(),2);
+  SubscriptionRepair aoRepair=getSubscriptionRepair(aoSubscription.getId(),bundleRepair);
+  assertEquals(aoRepair.getExistingEvents().size(),2);
+  List<DeletedEvent> des=new LinkedList<SubscriptionRepair.DeletedEvent>();
+  des.add(createDeletedEvent(aoRepair.getExistingEvents().get(1).getEventId()));
+  DateTime aoChangeDate=aoSubscription.getStartDate().plusDays(1);
+  PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Laser-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
+  NewEvent ne=createNewEvent(SubscriptionTransitionType.CHANGE,aoChangeDate,spec);
+  SubscriptionRepair saoRepair=createSubscriptionReapir(aoSubscription.getId(),des,Collections.singletonList(ne));
+  BundleRepair bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
+  boolean dryRun=true;
+  BundleRepair dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  aoRepair=getSubscriptionRepair(aoSubscription.getId(),dryRunBundleRepair);
+  assertEquals(aoRepair.getExistingEvents().size(),3);
+  List<ExistingEvent> expected=new LinkedList<SubscriptionRepair.ExistingEvent>();
+  expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CREATE,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoSubscription.getStartDate()));
+  expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CHANGE,"Laser-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoChangeDate));
+  expected.add(createExistingEventForAssertion(SubscriptionTransitionType.PHASE,"Laser-Scope",PhaseType.EVERGREEN,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoSubscription.getStartDate().plusMonths(1)));
+  int index=0;
+  for (  ExistingEvent e : expected) {
+    validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
+  }
+  SubscriptionData newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+  assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
+  assertEquals(newAoSubscription.getAllTransitions().size(),2);
+  dryRun=false;
+  BundleRepair realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  aoRepair=getSubscriptionRepair(aoSubscription.getId(),realRunBundleRepair);
+  assertEquals(aoRepair.getExistingEvents().size(),3);
+  index=0;
+  for (  ExistingEvent e : expected) {
+    validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
+  }
+  newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+  assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
+  assertEquals(newAoSubscription.getAllTransitions().size(),3);
+  assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
+  assertEquals(newAoSubscription.getBundleId(),bundle.getId());
+  assertEquals(newAoSubscription.getStartDate(),aoSubscription.getStartDate());
+  Plan currentPlan=newAoSubscription.getCurrentPlan();
+  assertNotNull(currentPlan);
+  assertEquals(currentPlan.getProduct().getName(),"Laser-Scope");
+  assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.ADD_ON);
+  assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.MONTHLY);
+  PlanPhase currentPhase=newAoSubscription.getCurrentPhase();
+  assertNotNull(currentPhase);
+  assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  someTimeLater=getDurationDay(60);
+  clock.addDeltaFromReality(someTimeLater);
+  assertTrue(testListener.isCompleted(5000));
+  newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+  currentPhase=newAoSubscription.getCurrentPhase();
+  assertNotNull(currentPhase);
+  assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
+}

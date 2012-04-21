@@ -1,0 +1,21 @@
+{
+  test.withException(new TestWithExceptionCallback(){
+    @Override public void doTest() throws EntitlementRepairException {
+      testListener.pushExpectedEvent(NextEvent.PHASE);
+      Duration durationShift=getDurationDay(40);
+      clock.setDeltaFromReality(durationShift,0);
+      assertTrue(testListener.isCompleted(5000));
+      BundleRepair bundleRepair=repairApi.getBundleRepair(bundle.getId());
+      sortEventsOnBundle(bundleRepair);
+      PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+      NewEvent ne=createNewEvent(SubscriptionTransitionType.CHANGE,baseSubscription.getStartDate().plusDays(10),spec);
+      List<DeletedEvent> des=new LinkedList<SubscriptionRepair.DeletedEvent>();
+      des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(0).getEventId()));
+      des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
+      SubscriptionRepair sRepair=createSubscriptionReapir(baseSubscription.getId(),des,Collections.singletonList(ne));
+      BundleRepair bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      repairApi.repairBundle(bRepair,true,context);
+    }
+  }
+,ErrorCode.ENT_REPAIR_SUB_EMPTY);
+}
