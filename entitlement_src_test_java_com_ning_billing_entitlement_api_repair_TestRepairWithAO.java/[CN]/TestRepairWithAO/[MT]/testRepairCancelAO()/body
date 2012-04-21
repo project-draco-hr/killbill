@@ -23,6 +23,8 @@
   BundleRepair dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),dryRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
+  bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
+  assertEquals(bpRepair.getExistingEvents().size(),2);
   List<ExistingEvent> expected=new LinkedList<SubscriptionRepair.ExistingEvent>();
   expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CREATE,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoSubscription.getStartDate()));
   expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CANCEL,null,null,ProductCategory.ADD_ON,null,null,aoCancelDate));
@@ -33,6 +35,11 @@
   SubscriptionData newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
   assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newAoSubscription.getAllTransitions().size(),2);
+  assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
+  SubscriptionData newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  assertEquals(newBaseSubscription.getState(),SubscriptionState.ACTIVE);
+  assertEquals(newBaseSubscription.getAllTransitions().size(),2);
+  assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   dryRun=false;
   BundleRepair realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),realRunBundleRepair);
@@ -44,4 +51,9 @@
   newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
   assertEquals(newAoSubscription.getState(),SubscriptionState.CANCELLED);
   assertEquals(newAoSubscription.getAllTransitions().size(),2);
+  assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
+  newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  assertEquals(newBaseSubscription.getState(),SubscriptionState.ACTIVE);
+  assertEquals(newBaseSubscription.getAllTransitions().size(),2);
+  assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
 }
