@@ -1,0 +1,18 @@
+{
+  List<String> to=new ArrayList<String>();
+  to.add(account.getEmail());
+  List<AccountEmail> accountEmailList=accountUserApi.getEmails(account.getId());
+  List<String> cc=new ArrayList<String>();
+  for (  AccountEmail email : accountEmailList) {
+    cc.add(email.getEmail());
+  }
+  String htmlBody="";
+  String subject="";
+  EmailSender sender=new DefaultEmailSender(config);
+  try {
+    sender.sendSecureEmail(to,cc,subject,htmlBody);
+  }
+ catch (  IOException e) {
+    throw new EmailApiException(e,ErrorCode.EMAIL_SENDING_FAILED);
+  }
+}

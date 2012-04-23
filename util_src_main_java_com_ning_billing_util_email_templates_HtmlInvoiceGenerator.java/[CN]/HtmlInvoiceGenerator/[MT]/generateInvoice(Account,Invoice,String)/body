@@ -1,0 +1,14 @@
+{
+  InputStream templateStream=this.getClass().getResourceAsStream(templateName + ".mustache");
+  StringWriter writer=new StringWriter();
+  IOUtils.copy(templateStream,writer,"UTF-8");
+  String templateText=writer.toString();
+  Template template=Mustache.compiler().compile(templateText);
+  Map<String,Object> data=new HashMap<String,Object>();
+  data.put("text",new DefaultInvoiceTranslation(config));
+  data.put("account",account);
+  Locale locale=new Locale(account.getLocale());
+  InvoiceFormatter formattedInvoice=new DefaultInvoiceFormatter(config,invoice,locale);
+  data.put("invoice",formattedInvoice);
+  return template.execute(data);
+}

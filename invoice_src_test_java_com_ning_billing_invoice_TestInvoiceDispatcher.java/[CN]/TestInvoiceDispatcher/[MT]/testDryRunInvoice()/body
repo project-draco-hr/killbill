@@ -6,6 +6,7 @@
   ((ZombieControl)accountUserApi).addResult("getAccountById",account);
   ((ZombieControl)account).addResult("getCurrency",Currency.USD);
   ((ZombieControl)account).addResult("getId",accountId);
+  ((ZombieControl)account).addResult(("isNotifiedForInvoices"),true);
   Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
   ((ZombieControl)subscription).addResult("getId",subscriptionId);
   ((ZombieControl)subscription).addResult("getBundleId",new UUID(0L,0L));
@@ -19,7 +20,8 @@
   EntitlementBillingApi entitlementBillingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementBillingApi.class);
   ((ZombieControl)entitlementBillingApi).addResult("getBillingEventsForAccountAndUpdateAccountBCD",events);
   DateTime target=new DateTime();
-  InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,entitlementBillingApi,invoiceDao,locker,busService.getBus(),clock);
+  InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
+  InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,entitlementBillingApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock);
   Invoice invoice=dispatcher.processAccount(accountId,target,true,context);
   Assert.assertNotNull(invoice);
   List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId);

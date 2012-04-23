@@ -1,0 +1,27 @@
+{
+  HtmlEmail email;
+  try {
+    email=new HtmlEmail();
+    email.setSmtpPort(config.getSmtpPort());
+    email.setAuthentication(config.getSmtpUserName(),config.getSmtpPassword());
+    email.setHostName(config.getSmtpServerName());
+    email.setFrom(config.getSmtpUserName());
+    email.setSubject(subject);
+    email.setHtmlMsg(htmlBody);
+    if (to != null) {
+      for (      String recipient : to) {
+        email.addTo(recipient);
+      }
+    }
+    if (cc != null) {
+      for (      String recipient : cc) {
+        email.addCc(recipient);
+      }
+    }
+    email.setSSL(true);
+    email.send();
+  }
+ catch (  EmailException ee) {
+    log.warn("Failed to send e-mail",ee);
+  }
+}
