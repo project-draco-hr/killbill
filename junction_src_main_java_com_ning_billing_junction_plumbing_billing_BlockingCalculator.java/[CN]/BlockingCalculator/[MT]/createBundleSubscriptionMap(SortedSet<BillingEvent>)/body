@@ -1,0 +1,15 @@
+{
+  Hashtable<UUID,List<Subscription>> result=new Hashtable<UUID,List<Subscription>>();
+  for (  BillingEvent event : billingEvents) {
+    UUID bundleId=event.getSubscription().getBundleId();
+    List<Subscription> subs=result.get(bundleId);
+    if (subs == null) {
+      subs=new ArrayList<Subscription>();
+      result.put(bundleId,subs);
+    }
+    if (!result.contains(event.getSubscription())) {
+      subs.add(event.getSubscription());
+    }
+  }
+  return result;
+}
