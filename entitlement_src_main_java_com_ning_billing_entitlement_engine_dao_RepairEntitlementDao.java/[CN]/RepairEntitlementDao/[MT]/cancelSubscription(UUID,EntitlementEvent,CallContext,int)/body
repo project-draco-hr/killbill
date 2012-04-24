@@ -1,3 +1,14 @@
 {
+  long activeVersion=cancelEvent.getActiveVersion();
   addEvents(subscriptionId,Collections.singletonList(cancelEvent));
+  SubscriptionRepairEvent target=getRepairSubscriptionEvents(subscriptionId);
+  boolean foundCancelEvent=false;
+  for (  EntitlementEvent cur : target.getEvents()) {
+    if (cur.getId().equals(cancelEvent.getId())) {
+      foundCancelEvent=true;
+    }
+ else     if (foundCancelEvent) {
+      cur.setActiveVersion(activeVersion - 1);
+    }
+  }
 }

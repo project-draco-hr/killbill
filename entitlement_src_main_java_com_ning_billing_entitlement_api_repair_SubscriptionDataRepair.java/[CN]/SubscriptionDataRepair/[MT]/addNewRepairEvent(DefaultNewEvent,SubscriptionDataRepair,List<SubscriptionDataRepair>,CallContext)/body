@@ -10,16 +10,17 @@ case RE_CREATE:
 case CHANGE:
 changePlan(spec.getProductName(),spec.getBillingPeriod(),spec.getPriceListName(),input.getRequestedDate(),context);
 checkAddonRights(baseSubscription);
+trickleDownBPEffectForAddon(addonSubscriptions,getLastUserEventEffectiveDate(),context);
 break;
 case CANCEL:
 cancel(input.getRequestedDate(),false,context);
+trickleDownBPEffectForAddon(addonSubscriptions,getLastUserEventEffectiveDate(),context);
 break;
 case PHASE:
 break;
 default :
 throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_TYPE,input.getSubscriptionTransitionType(),id);
 }
-trickleDownBPEffectForAddon(addonSubscriptions,input.getRequestedDate(),context);
 }
  catch (EntitlementUserApiException e) {
 throw new EntitlementRepairException(e);

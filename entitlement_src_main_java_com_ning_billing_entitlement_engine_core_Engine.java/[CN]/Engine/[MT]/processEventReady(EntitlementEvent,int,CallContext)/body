@@ -7,6 +7,9 @@
     log.warn("Failed to retrieve subscription for id %s",event.getSubscriptionId());
     return;
   }
+  if (subscription.getActiveVersion() > event.getActiveVersion()) {
+    return;
+  }
   int theRealSeqId=seqId;
   if (event.getType() == EventType.PHASE) {
     onPhaseEvent(subscription,context);

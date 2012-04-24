@@ -1,6 +1,20 @@
 {
   test.withException(new TestWithExceptionCallback(){
-    @Override public void doTest() throws EntitlementRepairException {
+    @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
+      clock.setDeltaFromReality(getDurationDay(5),0);
+      SubscriptionData aoSubscription=createSubscription("Laser-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+      BundleRepair bundleRepair=repairApi.getBundleRepair(bundle.getId());
+      sortEventsOnBundle(bundleRepair);
+      DateTime newCreateTime=baseSubscription.getStartDate().plusDays(3);
+      PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Pistol",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
+      NewEvent ne=createNewEvent(SubscriptionTransitionType.CREATE,newCreateTime,spec);
+      List<DeletedEvent> des=new LinkedList<SubscriptionRepair.DeletedEvent>();
+      des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(0).getEventId()));
+      des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
+      SubscriptionRepair sRepair=createSubscriptionReapir(baseSubscription.getId(),des,Collections.singletonList(ne));
+      BundleRepair bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      boolean dryRun=true;
+      repairApi.repairBundle(bRepair,dryRun,context);
     }
   }
 ,ErrorCode.ENT_REPAIR_BP_RECREATE_MISSING_AO);

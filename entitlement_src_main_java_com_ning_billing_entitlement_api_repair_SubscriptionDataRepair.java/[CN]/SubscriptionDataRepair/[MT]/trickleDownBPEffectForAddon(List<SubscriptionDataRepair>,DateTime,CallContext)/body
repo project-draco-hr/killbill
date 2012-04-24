@@ -12,7 +12,9 @@
     }
     Plan addonCurrentPlan=cur.getCurrentPlan();
     if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
-      cur.cancel(requestedDate,false,context);
+      EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now).setUserToken(context.getUserToken()).setFromDisk(true));
+      repairDao.cancelSubscription(cur.getId(),cancelEvent,context,0);
+      cur.rebuildTransitions(repairDao.getEventsForSubscription(cur.getId()),catalogService.getFullCatalog());
     }
   }
 }
