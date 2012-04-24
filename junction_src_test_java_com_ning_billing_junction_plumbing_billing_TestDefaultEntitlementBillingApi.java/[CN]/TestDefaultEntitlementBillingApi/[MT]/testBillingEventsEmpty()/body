@@ -1,0 +1,12 @@
+{
+  UUID accountId=UUID.randomUUID();
+  Account account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
+  ((ZombieControl)account).addResult("getId",accountId).addResult("getCurrency",Currency.USD);
+  AccountUserApi accountApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
+  ((ZombieControl)accountApi).addResult("getAccountById",account);
+  BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
+  CallContextFactory factory=new DefaultCallContextFactory(clock);
+  BillingApi api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi);
+  SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(new UUID(0L,0L));
+  Assert.assertEquals(events.size(),0);
+}

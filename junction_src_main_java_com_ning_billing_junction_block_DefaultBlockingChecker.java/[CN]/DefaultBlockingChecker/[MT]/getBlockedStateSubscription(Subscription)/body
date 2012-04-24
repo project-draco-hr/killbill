@@ -1,0 +1,14 @@
+{
+  BlockingAggregator result=new BlockingAggregator();
+  if (subscription != null) {
+    BlockingState subscriptionState=dao.getBlockingStateFor(subscription);
+    if (subscriptionState != null) {
+      result.or(subscriptionState);
+    }
+    if (subscription.getBundleId() != null) {
+      SubscriptionBundle bundle=entitlementApi.getBundleFromId(subscription.getBundleId());
+      result.or(getBlockedStateBundleId(subscription.getBundleId()));
+    }
+  }
+  return result;
+}

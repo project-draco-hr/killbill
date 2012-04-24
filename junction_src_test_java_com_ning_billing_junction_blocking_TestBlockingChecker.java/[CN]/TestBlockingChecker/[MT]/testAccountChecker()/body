@@ -1,0 +1,37 @@
+{
+  setStateAccount(false,false,false);
+  setStateBundle(false,false,false);
+  setStateSubscription(false,false,false);
+  checker.checkBlockedChange(account);
+  checker.checkBlockedEntitlement(account);
+  checker.checkBlockedBilling(account);
+  setStateSubscription(false,false,false);
+  setStateBundle(false,false,false);
+  setStateAccount(true,false,false);
+  checker.checkBlockedEntitlement(account);
+  checker.checkBlockedBilling(account);
+  try {
+    checker.checkBlockedChange(account);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateAccount(false,true,false);
+  checker.checkBlockedChange(account);
+  checker.checkBlockedBilling(account);
+  try {
+    checker.checkBlockedEntitlement(account);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+  setStateAccount(false,false,true);
+  checker.checkBlockedChange(account);
+  checker.checkBlockedEntitlement(account);
+  try {
+    checker.checkBlockedBilling(account);
+    Assert.fail("The call should have been blocked!");
+  }
+ catch (  BlockingApiException e) {
+  }
+}

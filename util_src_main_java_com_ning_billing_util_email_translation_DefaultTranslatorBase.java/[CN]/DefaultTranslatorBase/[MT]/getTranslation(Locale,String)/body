@@ -1,0 +1,28 @@
+{
+  ResourceBundle bundle=null;
+  try {
+    bundle=ResourceBundle.getBundle(getBundlePath(),locale);
+  }
+ catch (  MissingResourceException mrex) {
+    log.warn(String.format(ErrorCode.MISSING_TRANSLATION_RESOURCE.toString(),getTranslationType()));
+  }
+  if ((bundle != null) && (bundle.containsKey(originalText))) {
+    return bundle.getString(originalText);
+  }
+ else {
+    try {
+      Locale defaultLocale=new Locale(config.getDefaultLocale());
+      bundle=ResourceBundle.getBundle(getBundlePath(),defaultLocale);
+      if ((bundle != null) && (bundle.containsKey(originalText))) {
+        return bundle.getString(originalText);
+      }
+ else {
+        return originalText;
+      }
+    }
+ catch (    MissingResourceException mrex) {
+      log.warn(String.format(ErrorCode.MISSING_TRANSLATION_RESOURCE.toString(),getTranslationType()));
+      return originalText;
+    }
+  }
+}

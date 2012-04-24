@@ -1,0 +1,44 @@
+{
+  final Injector g=Guice.createInjector(Stage.PRODUCTION,new OverdueModule(){
+    protected void configure(){
+      super.configure();
+      bind(Clock.class).to(ClockMock.class).asEagerSingleton();
+      bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
+      bind(Bus.class).to(InMemoryBus.class).asEagerSingleton();
+      bind(NotificationQueueService.class).to(DefaultNotificationQueueService.class).asEagerSingleton();
+      final InvoiceConfig invoiceConfig=new ConfigurationObjectFactory(System.getProperties()).build(InvoiceConfig.class);
+      bind(InvoiceConfig.class).toInstance(invoiceConfig);
+      final CatalogConfig catalogConfig=new ConfigurationObjectFactory(System.getProperties()).build(CatalogConfig.class);
+      bind(CatalogConfig.class).toInstance(catalogConfig);
+      bind(CatalogService.class).to(DefaultCatalogService.class).asEagerSingleton();
+      final MysqlTestingHelper helper=new MysqlTestingHelper();
+      bind(MysqlTestingHelper.class).toInstance(helper);
+      IDBI dbi=helper.getDBI();
+      bind(IDBI.class).toInstance(dbi);
+      bind(TagDao.class).to(AuditedTagDao.class).asEagerSingleton();
+      bind(CustomFieldDao.class).to(AuditedCustomFieldDao.class).asEagerSingleton();
+      bind(GlobalLocker.class).to(MySqlGlobalLocker.class).asEagerSingleton();
+      bind(BillingApi.class).to(DefaultBillingApi.class).asEagerSingleton();
+      bind(AccountUserApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class));
+      bind(ChargeThruApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(ChargeThruApi.class));
+      bind(EntitlementUserApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class));
+    }
+  }
+);
+  clock=g.getInstance(Clock.class);
+  IDBI dbi=g.getInstance(IDBI.class);
+  dao=dbi.onDemand(DummySqlTest.class);
+  eventBus=g.getInstance(Bus.class);
+  helper=g.getInstance(MysqlTestingHelper.class);
+  notificationQueueService=g.getInstance(NotificationQueueService.class);
+  OverdueProperties properties=g.getInstance(OverdueProperties.class);
+  Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
+  ((ZombieControl)entitlementUserApi).addResult("getSubscriptionFromId",subscription);
+  listener=new OverdueListenerMock();
+  notifier=new DefaultOverdueCheckNotifier(notificationQueueService,properties,listener);
+  startMysql();
+  eventBus.start();
+  notifier.initialize();
+  notifier.start();
+}
