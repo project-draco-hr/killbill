@@ -2,19 +2,6 @@
   if (category != ProductCategory.BASE) {
     return;
   }
-  DateTime now=clock.getUTCNow();
   Product baseProduct=(getState() == SubscriptionState.CANCELLED) ? null : getCurrentPlan().getProduct();
-  Iterator<SubscriptionDataRepair> it=addonSubscriptions.iterator();
-  while (it.hasNext()) {
-    SubscriptionDataRepair cur=it.next();
-    if (cur.getState() == SubscriptionState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
-      continue;
-    }
-    Plan addonCurrentPlan=cur.getCurrentPlan();
-    if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
-      EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now).setUserToken(context.getUserToken()).setFromDisk(true));
-      repairDao.cancelSubscription(cur.getId(),cancelEvent,context,0);
-      cur.rebuildTransitions(repairDao.getEventsForSubscription(cur.getId()),catalogService.getFullCatalog());
-    }
-  }
+  addAddonCancellationIfRequired(addOnSubscriptionInRepair,baseProduct,effectiveDate,context);
 }

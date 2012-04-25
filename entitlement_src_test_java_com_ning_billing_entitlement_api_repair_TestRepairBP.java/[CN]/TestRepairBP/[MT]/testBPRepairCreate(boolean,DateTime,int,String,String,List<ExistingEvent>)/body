@@ -56,7 +56,10 @@
   cur=subscriptionRepair.get(0);
   assertEquals(cur.getId(),baseSubscription.getId());
   events=cur.getExistingEvents();
-  assertEquals(expectedEvents.size(),events.size());
+  for (  ExistingEvent e : events) {
+    log.info(String.format("%s, %s, %s, %s",e.getSubscriptionTransitionType(),e.getEffectiveDate(),e.getPlanPhaseSpecifier().getProductName(),e.getPlanPhaseSpecifier().getPhaseType()));
+  }
+  assertEquals(events.size(),expectedEvents.size());
   index=0;
   for (  ExistingEvent e : expectedEvents) {
     validateExistingEventForAssertion(e,events.get(index++));

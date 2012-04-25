@@ -1,13 +1,18 @@
 {
-  SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(bundleId);
-  if (bundle == null) {
-    throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_BUNDLE,bundleId);
+  try {
+    SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(bundleId);
+    if (bundle == null) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_BUNDLE,bundleId);
+    }
+    final List<Subscription> subscriptions=dao.getSubscriptions(factory,bundleId);
+    if (subscriptions.size() == 0) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_NO_ACTIVE_SUBSCRIPTIONS,bundleId);
+    }
+    final String viewId=getViewId(((SubscriptionBundleData)bundle).getLastSysUpdateTime(),subscriptions);
+    final List<SubscriptionRepair> repairs=createGetSubscriptionRepairList(subscriptions,Collections.<SubscriptionRepair>emptyList());
+    return createGetBundleRepair(bundleId,viewId,repairs);
   }
-  final List<Subscription> subscriptions=dao.getSubscriptions(factory,bundleId);
-  if (subscriptions.size() == 0) {
-    throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_NO_ACTIVE_SUBSCRIPTIONS,bundleId);
+ catch (  CatalogApiException e) {
+    throw new EntitlementRepairException(e);
   }
-  final String viewId=getViewId(((SubscriptionBundleData)bundle).getLastSysUpdateTime(),subscriptions);
-  final List<SubscriptionRepair> repairs=createGetSubscriptionRepairList(subscriptions,Collections.<SubscriptionRepair>emptyList());
-  return createGetBundleRepair(bundleId,viewId,repairs);
 }

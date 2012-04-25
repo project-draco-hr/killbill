@@ -90,6 +90,7 @@ throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_SUBSCRIPTION,c
 curDataRepair.addNewRepairEvent(cur,baseSubscriptionRepair,addOnSubscriptionInRepair,context);
 }
 if (dryRun) {
+baseSubscriptionRepair.addFutureAddonCancellation(addOnSubscriptionInRepair,context);
 final List<SubscriptionRepair> repairs=createGetSubscriptionRepairList(subscriptions,convertDataRepair(inRepair));
 return createGetBundleRepair(input.getBundleId(),input.getViewId(),repairs);
 }
@@ -98,7 +99,10 @@ dao.repair(input.getBundleId(),inRepair,context);
 return getBundleRepair(input.getBundleId());
 }
 }
-  finally {
+ catch (CatalogApiException e) {
+throw new EntitlementRepairException(e);
+}
+ finally {
 repairDao.cleanup();
 }
 }
