@@ -1,0 +1,11 @@
+{
+  Map<String,Object> data=new HashMap<String,Object>();
+  DefaultInvoiceTranslator invoiceTranslator=new DefaultInvoiceTranslator(config);
+  Locale locale=new Locale(account.getLocale());
+  invoiceTranslator.setLocale(locale);
+  data.put("text",invoiceTranslator);
+  data.put("account",account);
+  InvoiceFormatter formattedInvoice=new DefaultInvoiceFormatter(config,invoice,locale);
+  data.put("invoice",formattedInvoice);
+  return templateEngine.executeTemplate(templateName,data);
+}
