@@ -3,9 +3,9 @@
     SubscriptionData subscription=createSubscription("Assault-Rifle",BillingPeriod.MONTHLY,"gunclubDiscount");
     PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
-    assertTrue(testListener.isCompleted(2000));
+    assertTrue(testListener.isApiCompleted(2000));
     List<Duration> durationList=new ArrayList<Duration>();
     durationList.add(trialPhase.getDuration());
     DateTime startDiscountPhase=DefaultClock.addDuration(subscription.getStartDate(),durationList);
@@ -13,12 +13,12 @@
     DateTime newChargedThroughDate=DefaultClock.addDuration(startDiscountPhase,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow(),context);
-    assertFalse(testListener.isCompleted(2000));
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    assertFalse(testListener.isApiCompleted(2000));
+    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
-    assertFalse(testListener.isCompleted(2000));
+    assertFalse(testListener.isApiCompleted(2000));
     Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),"Assault-Rifle");

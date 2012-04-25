@@ -5,9 +5,9 @@
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     clock.setDeltaFromReality(getDurationDay(1),DAY_IN_MS);
     testListener.reset();
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
-    assertTrue(testListener.isCompleted(3000));
+    assertTrue(testListener.isApiCompleted(3000));
     testListener.reset();
     Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
@@ -16,9 +16,9 @@
     assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.ANNUAL);
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
     clock.addDeltaFromReality(trialPhase.getDuration());
-    assertTrue(testListener.isCompleted(3000));
+    assertTrue(testListener.isApiCompleted(3000));
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.DISCOUNT);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());

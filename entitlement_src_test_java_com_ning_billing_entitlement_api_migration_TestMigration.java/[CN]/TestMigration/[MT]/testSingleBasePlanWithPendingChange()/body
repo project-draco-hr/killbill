@@ -3,9 +3,9 @@
     DateTime beforeMigration=clock.getUTCNow();
     EntitlementAccountMigration toBeMigrated=createAccountFuturePendingChange();
     DateTime afterMigration=clock.getUTCNow();
-    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated,context);
-    assertTrue(testListener.isCompleted(5000));
+    assertTrue(testListener.isApiCompleted(5000));
     List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
     assertEquals(bundles.size(),1);
     SubscriptionBundle bundle=bundles.get(0);
@@ -18,10 +18,10 @@
     assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
     assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-monthly");
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
     Duration oneMonth=getDurationMonth(1);
     clock.setDeltaFromReality(oneMonth,0);
-    assertTrue(testListener.isCompleted(5000));
+    assertTrue(testListener.isApiCompleted(5000));
     assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
     assertEquals(subscription.getEndDate(),null);
     assertEquals(subscription.getCurrentPriceList(),PriceListSet.DEFAULT_PRICELIST_NAME);

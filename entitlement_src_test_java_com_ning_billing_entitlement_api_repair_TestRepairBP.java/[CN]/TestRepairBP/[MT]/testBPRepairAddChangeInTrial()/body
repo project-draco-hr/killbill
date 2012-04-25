@@ -9,9 +9,9 @@
   expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CHANGE,newBaseProduct,PhaseType.TRIAL,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.NO_BILLING_PERIOD,changeDate));
   expected.add(createExistingEventForAssertion(SubscriptionTransitionType.PHASE,newBaseProduct,PhaseType.EVERGREEN,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,startDate.plusDays(30)));
   UUID baseSubscriptionId=testBPRepairAddChange(true,startDate,clockShift,baseProduct,newBaseProduct,expected,3);
-  testListener.pushExpectedEvent(NextEvent.PHASE);
+  testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
   clock.addDeltaFromReality(getDurationDay(32));
-  assertTrue(testListener.isCompleted(5000));
+  assertTrue(testListener.isApiCompleted(5000));
   SubscriptionData subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscriptionId);
   assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
   assertEquals(subscription.getBundleId(),bundle.getId());

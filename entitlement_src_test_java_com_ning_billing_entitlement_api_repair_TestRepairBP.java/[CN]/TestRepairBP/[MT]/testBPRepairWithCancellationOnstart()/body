@@ -39,7 +39,9 @@
   assertNotNull(currentPhase);
   assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
   dryRun=false;
+  testListener.expectRepairCompletion();
   BundleRepair realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  assertTrue(testListener.isRepairCompleted(5000));
   subscriptionRepair=realRunBundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),1);
   cur=subscriptionRepair.get(0);

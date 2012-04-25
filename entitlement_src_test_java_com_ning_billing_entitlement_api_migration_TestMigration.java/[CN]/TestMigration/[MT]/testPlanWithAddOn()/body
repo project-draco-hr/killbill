@@ -5,10 +5,10 @@
     final DateTime initalAddonStart=clock.getUTCNow().minusMonths(1).plusDays(7);
     EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlanAndAddons(initalBPStart,initalAddonStart);
     DateTime afterMigration=clock.getUTCNow();
-    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
-    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated,context);
-    assertTrue(testListener.isCompleted(5000));
+    assertTrue(testListener.isApiCompleted(5000));
     List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
     assertEquals(bundles.size(),1);
     SubscriptionBundle bundle=bundles.get(0);

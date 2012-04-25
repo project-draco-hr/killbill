@@ -1,0 +1,16 @@
+{
+synchronized (this) {
+    if (isRepairCompleted) {
+      return isRepairCompleted;
+    }
+    try {
+      wait(timeout);
+    }
+ catch (    Exception ignore) {
+    }
+  }
+  if (!isRepairCompleted) {
+    log.debug("ApiTestListener did not complete in " + timeout + " ms");
+  }
+  return isRepairCompleted;
+}

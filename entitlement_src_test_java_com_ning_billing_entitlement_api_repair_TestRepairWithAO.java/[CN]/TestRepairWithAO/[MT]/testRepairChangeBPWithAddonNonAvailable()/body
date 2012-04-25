@@ -6,11 +6,11 @@
   Duration someTimeLater=getDurationDay(3);
   clock.setDeltaFromReality(someTimeLater,DAY_IN_MS);
   SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
-  testListener.pushExpectedEvent(NextEvent.PHASE);
-  testListener.pushExpectedEvent(NextEvent.PHASE);
+  testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+  testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
   someTimeLater=getDurationDay(32);
   clock.addDeltaFromReality(someTimeLater);
-  assertTrue(testListener.isCompleted(7000));
+  assertTrue(testListener.isApiCompleted(7000));
   BundleRepair bundleRepair=repairApi.getBundleRepair(bundle.getId());
   sortEventsOnBundle(bundleRepair);
   SubscriptionRepair bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);

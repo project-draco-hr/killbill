@@ -6,14 +6,14 @@
     String productName="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
     String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-    testListener.pushExpectedEvent(NextEvent.PHASE);
-    testListener.pushExpectedEvent(NextEvent.CREATE);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.CREATE);
     SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,null),requestedDate,context);
     assertNotNull(subscription);
     assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
     assertEquals(subscription.getBundleId(),bundle.getId());
     assertEquals(subscription.getStartDate(),requestedDate);
-    assertTrue(testListener.isCompleted(5000));
+    assertTrue(testListener.isApiCompleted(5000));
   }
  catch (  EntitlementUserApiException e) {
     log.error("Unexpected exception",e);

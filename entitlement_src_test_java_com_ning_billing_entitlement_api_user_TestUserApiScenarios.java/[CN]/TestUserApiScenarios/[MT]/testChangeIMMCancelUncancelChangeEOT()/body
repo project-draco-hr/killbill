@@ -4,27 +4,27 @@
     SubscriptionData subscription=createSubscription("Assault-Rifle",BillingPeriod.MONTHLY,"gunclubDiscount");
     PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Pistol",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
-    testListener.isCompleted(3000);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.isApiCompleted(3000);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
-    assertTrue(testListener.isCompleted(2000));
+    assertTrue(testListener.isApiCompleted(2000));
     Duration ctd=getDurationMonth(1);
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
-    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    testListener.pushNextApiExpectedEvent(NextEvent.CANCEL);
     subscription.cancel(clock.getUTCNow(),false,context);
-    assertFalse(testListener.isCompleted(2000));
+    assertFalse(testListener.isApiCompleted(2000));
     testListener.reset();
     subscription.uncancel(context);
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow(),context);
-    assertFalse(testListener.isCompleted(2000));
+    assertFalse(testListener.isApiCompleted(2000));
     clock.addDeltaFromReality(ctd);
-    assertTrue(testListener.isCompleted(3000));
+    assertTrue(testListener.isApiCompleted(3000));
   }
  catch (  EntitlementUserApiException e) {
     Assert.fail(e.getMessage());

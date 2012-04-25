@@ -9,11 +9,11 @@
     String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
     SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
     testListener.reset();
-    testListener.pushExpectedEvent(NextEvent.PHASE);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
     Duration twoMonths=getDurationMonth(2);
     clock.setDeltaFromReality(twoMonths,DAY_IN_MS);
-    assertTrue(testListener.isCompleted(5000));
+    assertTrue(testListener.isApiCompleted(5000));
     DateTime now=clock.getUTCNow();
     Duration ctd=getDurationMonth(1);
     DateTime newChargedThroughDate=DefaultClock.addDuration(now,ctd);
@@ -27,10 +27,10 @@
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
     testListener.reset();
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
-    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
+    testListener.pushNextApiExpectedEvent(NextEvent.CANCEL);
     clock.addDeltaFromReality(ctd);
-    assertTrue(testListener.isCompleted(5000));
+    assertTrue(testListener.isApiCompleted(5000));
     aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
     assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);
   }
