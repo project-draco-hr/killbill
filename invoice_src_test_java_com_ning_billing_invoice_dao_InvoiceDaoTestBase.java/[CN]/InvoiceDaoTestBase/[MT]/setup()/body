@@ -1,24 +1,21 @@
 {
-  try {
-    module=new InvoiceModuleWithEmbeddedDb();
-    final String invoiceDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/invoice/ddl.sql"));
-    final String entitlementDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/entitlement/ddl.sql"));
-    module.startDb();
-    module.initDb(invoiceDdl);
-    module.initDb(entitlementDdl);
-    final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module);
-    invoiceDao=injector.getInstance(InvoiceDao.class);
-    invoiceDao.test();
-    recurringInvoiceItemDao=module.getInvoiceItemSqlDao();
-    invoicePaymentDao=module.getInvoicePaymentSqlDao();
-    clock=injector.getInstance(Clock.class);
-    context=new DefaultCallContextFactory(clock).createCallContext("Count Rogan",CallOrigin.TEST,UserType.TEST);
-    generator=new DefaultInvoiceGenerator(clock,invoiceConfig);
-    BusService busService=injector.getInstance(BusService.class);
-    ((DefaultBusService)busService).startBus();
-    assertTrue(true);
-  }
- catch (  Throwable t) {
-    fail(t.toString());
-  }
+  module=new InvoiceModuleWithEmbeddedDb();
+  final String invoiceDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/invoice/ddl.sql"));
+  final String entitlementDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/entitlement/ddl.sql"));
+  final String utilDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/util/ddl.sql"));
+  module.startDb();
+  module.initDb(invoiceDdl);
+  module.initDb(entitlementDdl);
+  module.initDb(utilDdl);
+  final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module);
+  invoiceDao=injector.getInstance(InvoiceDao.class);
+  invoiceDao.test();
+  recurringInvoiceItemDao=module.getInvoiceItemSqlDao();
+  invoicePaymentDao=module.getInvoicePaymentSqlDao();
+  clock=injector.getInstance(Clock.class);
+  context=new DefaultCallContextFactory(clock).createCallContext("Count Rogan",CallOrigin.TEST,UserType.TEST);
+  generator=new DefaultInvoiceGenerator(clock,invoiceConfig);
+  BusService busService=injector.getInstance(BusService.class);
+  ((DefaultBusService)busService).startBus();
+  assertTrue(true);
 }

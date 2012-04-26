@@ -5,14 +5,9 @@
   }
   clock.resetDeltaFromReality();
   ((MockEntitlementDao)dao).reset();
-  try {
-    busService.getBus().register(testListener);
-    UUID accountId=UUID.randomUUID();
-    bundle=entitlementApi.createBundleForAccount(accountId,"myDefaultBundle",context);
-  }
- catch (  Exception e) {
-    Assert.fail(e.getMessage());
-  }
+  busService.getBus().register(testListener);
+  UUID accountId=UUID.randomUUID();
+  bundle=entitlementApi.createBundleForAccount(accountId,"myDefaultBundle",context);
   assertNotNull(bundle);
   ((Engine)entitlementService).start();
 }

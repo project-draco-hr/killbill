@@ -4,7 +4,8 @@
   final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
   final BigDecimal amount=new BigDecimal("10.0011");
   final UUID subscriptionId=UUID.randomUUID();
-  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD));
+  final UUID bundleId=UUID.randomUUID();
+  invoice.addInvoiceItem(new RecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD));
   List<Either<PaymentErrorEvent,PaymentInfoEvent>> results=paymentApi.createPayment(account.getExternalKey(),Arrays.asList(invoice.getId().toString()),context);
   assertEquals(results.size(),1);
   assertTrue(results.get(0).isRight());
@@ -17,7 +18,7 @@
   assertNotNull(paymentAttempt);
   assertNotNull(paymentAttempt.getPaymentAttemptId());
   assertEquals(paymentAttempt.getInvoiceId(),invoice.getId());
-  assertTrue(paymentAttempt.getAmount().compareTo(amount) == 0);
+  assertTrue(paymentAttempt.getAmount().compareTo(amount.setScale(2,RoundingMode.HALF_EVEN)) == 0);
   assertEquals(paymentAttempt.getCurrency(),Currency.USD);
   assertEquals(paymentAttempt.getPaymentId(),paymentInfo.getPaymentId());
   DateTime nowTruncated=now.withMillisOfSecond(0).withSecondOfMinute(0);

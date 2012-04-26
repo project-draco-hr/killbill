@@ -29,7 +29,18 @@
     testListener.reset();
     testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
     testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
-    someTimeLater=aoCurrentPhase.getDuration();
+    someTimeLater=new Duration(){
+      @Override public TimeUnit getUnit(){
+        return TimeUnit.DAYS;
+      }
+      @Override public int getNumber(){
+        return 32;
+      }
+      @Override public DateTime addToDateTime(      DateTime dateTime){
+        throw new NotImplementedException();
+      }
+    }
+;
     clock.addDeltaFromReality(someTimeLater);
     clock.addDeltaFromReality(getDurationDay(1));
     assertTrue(testListener.isApiCompleted(5000));

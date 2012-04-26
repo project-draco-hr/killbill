@@ -1,0 +1,16 @@
+{
+  NotificationQueue checkOverdueQueue;
+  try {
+    checkOverdueQueue=notificationQueueService.getNotificationQueue(DefaultOverdueService.OVERDUE_SERVICE_NAME,DefaultOverdueCheckNotifier.OVERDUE_CHECK_NOTIFIER_QUEUE);
+    log.info("Queuing overdue check notification. id: {}, timestamp: {}",overdueable.getId().toString(),futureNotificationTime.toString());
+    checkOverdueQueue.recordFutureNotificationFromTransaction(transactionalDao,futureNotificationTime,new NotificationKey(){
+      @Override public String toString(){
+        return overdueable.getId().toString();
+      }
+    }
+);
+  }
+ catch (  NoSuchNotificationQueue e) {
+    log.error("Attempting to put items on a non-existent queue (DefaultOverdueCheck).",e);
+  }
+}
