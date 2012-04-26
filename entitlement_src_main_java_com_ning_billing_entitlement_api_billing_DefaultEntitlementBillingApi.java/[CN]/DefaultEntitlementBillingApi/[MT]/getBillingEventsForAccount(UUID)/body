@@ -5,10 +5,12 @@
   SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
   for (  final SubscriptionBundle bundle : bundles) {
     List<Subscription> subscriptions=entitlementDao.getSubscriptions(subscriptionFactory,bundle.getId());
+    DateTime bundleStartDate=bundle.getStartDate();
     for (    final Subscription subscription : subscriptions) {
+      bundleStartDate=(subscription.getCategory() == ProductCategory.BASE && bundleStartDate == null) ? subscription.getStartDate() : bundleStartDate;
       for (      final SubscriptionEventTransition transition : ((SubscriptionData)subscription).getBillingTransitions()) {
         try {
-          BillingEvent event=new DefaultBillingEvent(transition,subscription,calculateBcd(bundle,subscription,transition,accountId),currency);
+          BillingEvent event=new DefaultBillingEvent(transition,subscription,calculateBcd(bundle,subscription,transition,accountId,bundleStartDate),currency);
           result.add(event);
         }
  catch (        CatalogApiException e) {
