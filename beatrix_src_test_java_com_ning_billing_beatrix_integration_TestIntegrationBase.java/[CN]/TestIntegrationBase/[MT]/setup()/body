@@ -1,7 +1,8 @@
 {
   setupMySQL();
+  cleanupData();
   context=new DefaultCallContextFactory(clock).createCallContext("Integration Test",CallOrigin.TEST,UserType.TEST);
-  busHandler=new TestBusHandler();
+  busHandler=new TestBusHandler(this);
   lifecycle.fireStartupSequencePriorEventRegistration();
   busService.getBus().register(busHandler);
   lifecycle.fireStartupSequencePostEventRegistration();
