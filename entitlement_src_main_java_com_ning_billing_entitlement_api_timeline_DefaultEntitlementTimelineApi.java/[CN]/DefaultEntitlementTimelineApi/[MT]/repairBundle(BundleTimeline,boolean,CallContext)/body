@@ -1,0 +1,108 @@
+{
+  try {
+    SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(input.getBundleId());
+    if (bundle == null) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_BUNDLE,input.getBundleId());
+    }
+    final List<Subscription> subscriptions=dao.getSubscriptions(factory,input.getBundleId());
+    if (subscriptions.size() == 0) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_NO_ACTIVE_SUBSCRIPTIONS,input.getBundleId());
+    }
+    final String viewId=getViewId(((SubscriptionBundleData)bundle).getLastSysUpdateTime(),subscriptions);
+    if (!viewId.equals(input.getViewId())) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_VIEW_CHANGED,input.getBundleId(),input.getViewId(),viewId);
+    }
+    DateTime firstDeletedBPEventTime=null;
+    DateTime lastRemainingBPEventTime=null;
+    boolean isBasePlanRecreate=false;
+    DateTime newBundleStartDate=null;
+    SubscriptionDataRepair baseSubscriptionRepair=null;
+    List<SubscriptionDataRepair> addOnSubscriptionInRepair=new LinkedList<SubscriptionDataRepair>();
+    List<SubscriptionDataRepair> inRepair=new LinkedList<SubscriptionDataRepair>();
+    for (    Subscription cur : subscriptions) {
+      SubscriptionTimeline curRepair=findAndCreateSubscriptionRepair(cur.getId(),input.getSubscriptions());
+      if (curRepair != null) {
+        SubscriptionDataRepair curInputRepair=((SubscriptionDataRepair)cur);
+        final List<EntitlementEvent> remaining=getRemainingEventsAndValidateDeletedEvents(curInputRepair,firstDeletedBPEventTime,curRepair.getDeletedEvents());
+        final boolean isPlanRecreate=(curRepair.getNewEvents().size() > 0 && (curRepair.getNewEvents().get(0).getSubscriptionTransitionType() == SubscriptionTransitionType.CREATE || curRepair.getNewEvents().get(0).getSubscriptionTransitionType() == SubscriptionTransitionType.RE_CREATE));
+        final DateTime newSubscriptionStartDate=isPlanRecreate ? curRepair.getNewEvents().get(0).getRequestedDate() : null;
+        if (isPlanRecreate && remaining.size() != 0) {
+          throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_SUB_RECREATE_NOT_EMPTY,cur.getId(),cur.getBundleId());
+        }
+        if (!isPlanRecreate && remaining.size() == 0) {
+          throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_SUB_EMPTY,cur.getId(),cur.getBundleId());
+        }
+        if (cur.getCategory() == ProductCategory.BASE) {
+          int bpTransitionSize=((SubscriptionData)cur).getAllTransitions().size();
+          lastRemainingBPEventTime=(remaining.size() > 0) ? curInputRepair.getAllTransitions().get(remaining.size() - 1).getEffectiveTransitionTime() : null;
+          firstDeletedBPEventTime=(remaining.size() < bpTransitionSize) ? curInputRepair.getAllTransitions().get(remaining.size()).getEffectiveTransitionTime() : null;
+          isBasePlanRecreate=isPlanRecreate;
+          newBundleStartDate=newSubscriptionStartDate;
+        }
+        if (curRepair.getNewEvents().size() > 0) {
+          DateTime lastRemainingEventTime=(remaining.size() == 0) ? null : curInputRepair.getAllTransitions().get(remaining.size() - 1).getEffectiveTransitionTime();
+          validateFirstNewEvent(curInputRepair,curRepair.getNewEvents().get(0),lastRemainingBPEventTime,lastRemainingEventTime);
+        }
+        SubscriptionDataRepair curOutputRepair=createSubscriptionDataRepair(curInputRepair,newBundleStartDate,newSubscriptionStartDate,remaining);
+        repairDao.initializeRepair(curInputRepair.getId(),remaining);
+        inRepair.add(curOutputRepair);
+        if (curOutputRepair.getCategory() == ProductCategory.ADD_ON) {
+          if (isPlanRecreate && subscriptions.get(0).getStartDate().isAfter(curRepair.getNewEvents().get(0).getRequestedDate())) {
+            throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_AO_CREATE_BEFORE_BP_START,cur.getId(),cur.getBundleId());
+          }
+          addOnSubscriptionInRepair.add(curOutputRepair);
+        }
+ else         if (curOutputRepair.getCategory() == ProductCategory.BASE) {
+          baseSubscriptionRepair=curOutputRepair;
+        }
+      }
+    }
+    final RepairType repairType=getRepairType(subscriptions.get(0),(baseSubscriptionRepair != null));
+switch (repairType) {
+case BASE_REPAIR:
+      for (      Subscription cur : subscriptions) {
+        if (cur.getCategory() == ProductCategory.ADD_ON && !inRepair.contains(cur)) {
+          SubscriptionDataRepair curOutputRepair=createSubscriptionDataRepair((SubscriptionDataRepair)cur,newBundleStartDate,null,((SubscriptionDataRepair)cur).getEvents());
+          repairDao.initializeRepair(curOutputRepair.getId(),((SubscriptionDataRepair)cur).getEvents());
+          inRepair.add(curOutputRepair);
+          addOnSubscriptionInRepair.add(curOutputRepair);
+        }
+      }
+    break;
+case ADD_ON_REPAIR:
+  SubscriptionDataRepair baseSubscription=(SubscriptionDataRepair)subscriptions.get(0);
+baseSubscriptionRepair=createSubscriptionDataRepair(baseSubscription,baseSubscription.getBundleStartDate(),baseSubscription.getStartDate(),baseSubscription.getEvents());
+break;
+case STANDALONE_REPAIR:
+default :
+break;
+}
+validateBasePlanRecreate(isBasePlanRecreate,subscriptions,input.getSubscriptions());
+validateInputSubscriptionsKnown(subscriptions,input.getSubscriptions());
+Collection<NewEvent> newEvents=createOrderedNewEventInput(input.getSubscriptions());
+Iterator<NewEvent> it=newEvents.iterator();
+while (it.hasNext()) {
+DefaultNewEvent cur=(DefaultNewEvent)it.next();
+SubscriptionDataRepair curDataRepair=findSubscriptionDataRepair(cur.getSubscriptionId(),inRepair);
+if (curDataRepair == null) {
+throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_SUBSCRIPTION,cur.getSubscriptionId());
+}
+curDataRepair.addNewRepairEvent(cur,baseSubscriptionRepair,addOnSubscriptionInRepair,context);
+}
+if (dryRun) {
+baseSubscriptionRepair.addFutureAddonCancellation(addOnSubscriptionInRepair,context);
+final List<SubscriptionTimeline> repairs=createGetSubscriptionRepairList(subscriptions,convertDataRepair(inRepair));
+return createGetBundleRepair(input.getBundleId(),bundle.getKey(),input.getViewId(),repairs);
+}
+ else {
+dao.repair(bundle.getAccountId(),input.getBundleId(),inRepair,context);
+return getBundleRepair(input.getBundleId());
+}
+}
+ catch (CatalogApiException e) {
+throw new EntitlementRepairException(e);
+}
+ finally {
+repairDao.cleanup();
+}
+}

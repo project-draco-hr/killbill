@@ -1,0 +1,81 @@
+{
+  Subscription baseSubscription=createSubscription(baseProduct,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
+  if (clockShift > 0) {
+    if (!inTrial) {
+      testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+    }
+    Duration durationShift=getDurationDay(clockShift);
+    clock.setDeltaFromReality(durationShift,0);
+    if (!inTrial) {
+      assertTrue(testListener.isApiCompleted(5000));
+    }
+  }
+  BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+  sortEventsOnBundle(bundleRepair);
+  DateTime newCreateTime=baseSubscription.getStartDate().plusDays(clockShift - 1);
+  PlanPhaseSpecifier spec=new PlanPhaseSpecifier(newBaseProduct,ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
+  NewEvent ne=createNewEvent(SubscriptionTransitionType.CREATE,newCreateTime,spec);
+  List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+  des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(0).getEventId()));
+  des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
+  SubscriptionTimeline sRepair=createSubscriptionReapir(baseSubscription.getId(),des,Collections.singletonList(ne));
+  BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+  boolean dryRun=true;
+  BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  List<SubscriptionTimeline> subscriptionRepair=dryRunBundleRepair.getSubscriptions();
+  assertEquals(subscriptionRepair.size(),1);
+  SubscriptionTimeline cur=subscriptionRepair.get(0);
+  assertEquals(cur.getId(),baseSubscription.getId());
+  List<ExistingEvent> events=cur.getExistingEvents();
+  assertEquals(expectedEvents.size(),events.size());
+  int index=0;
+  for (  ExistingEvent e : expectedEvents) {
+    validateExistingEventForAssertion(e,events.get(index++));
+  }
+  SubscriptionData dryRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  assertEquals(dryRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
+  assertEquals(dryRunBaseSubscription.getBundleId(),bundle.getId());
+  assertEquals(dryRunBaseSubscription.getStartDate(),baseSubscription.getStartDate());
+  Plan currentPlan=dryRunBaseSubscription.getCurrentPlan();
+  assertNotNull(currentPlan);
+  assertEquals(currentPlan.getProduct().getName(),baseProduct);
+  assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
+  assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.MONTHLY);
+  PlanPhase currentPhase=dryRunBaseSubscription.getCurrentPhase();
+  assertNotNull(currentPhase);
+  if (inTrial) {
+    assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
+  }
+ else {
+    assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
+  }
+  dryRun=false;
+  BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  subscriptionRepair=realRunBundleRepair.getSubscriptions();
+  assertEquals(subscriptionRepair.size(),1);
+  cur=subscriptionRepair.get(0);
+  assertEquals(cur.getId(),baseSubscription.getId());
+  events=cur.getExistingEvents();
+  for (  ExistingEvent e : events) {
+    log.info(String.format("%s, %s, %s, %s",e.getSubscriptionTransitionType(),e.getEffectiveDate(),e.getPlanPhaseSpecifier().getProductName(),e.getPlanPhaseSpecifier().getPhaseType()));
+  }
+  assertEquals(events.size(),expectedEvents.size());
+  index=0;
+  for (  ExistingEvent e : expectedEvents) {
+    validateExistingEventForAssertion(e,events.get(index++));
+  }
+  SubscriptionData realRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  assertEquals(realRunBaseSubscription.getAllTransitions().size(),2);
+  assertEquals(realRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
+  assertEquals(realRunBaseSubscription.getBundleId(),bundle.getId());
+  assertEquals(realRunBaseSubscription.getStartDate(),newCreateTime);
+  currentPlan=realRunBaseSubscription.getCurrentPlan();
+  assertNotNull(currentPlan);
+  assertEquals(currentPlan.getProduct().getName(),newBaseProduct);
+  assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
+  assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.MONTHLY);
+  currentPhase=realRunBaseSubscription.getCurrentPhase();
+  assertNotNull(currentPhase);
+  assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
+  return baseSubscription.getId();
+}

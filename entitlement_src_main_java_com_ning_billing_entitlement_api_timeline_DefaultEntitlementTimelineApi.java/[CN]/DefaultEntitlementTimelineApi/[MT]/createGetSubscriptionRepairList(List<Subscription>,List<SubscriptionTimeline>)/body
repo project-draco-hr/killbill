@@ -1,0 +1,14 @@
+{
+  final List<SubscriptionTimeline> result=new LinkedList<SubscriptionTimeline>();
+  Set<UUID> repairIds=new TreeSet<UUID>();
+  for (  final SubscriptionTimeline cur : inRepair) {
+    repairIds.add(cur.getId());
+    result.add(cur);
+  }
+  for (  final Subscription cur : subscriptions) {
+    if (!repairIds.contains(cur.getId())) {
+      result.add(new DefaultSubscriptionTimeline((SubscriptionDataRepair)cur,catalogService.getFullCatalog()));
+    }
+  }
+  return result;
+}
