@@ -1,3 +1,7 @@
 {
-  return new BlockingSubscription(entitlementUserApi.getSubscriptionFromId(id),blockingApi,checker);
+  Subscription subscription=entitlementUserApi.getSubscriptionFromId(id);
+  if (subscription == null) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_SUBSCRIPTION_ID,id);
+  }
+  return new BlockingSubscription(subscription,blockingApi,checker);
 }

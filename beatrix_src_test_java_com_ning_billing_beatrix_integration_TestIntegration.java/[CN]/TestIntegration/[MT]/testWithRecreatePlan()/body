@@ -12,7 +12,7 @@
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context);
+  SubscriptionData subscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
   DateTime startDate=subscription.getCurrentPhaseStart();
@@ -25,7 +25,7 @@
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
-  subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
+  subscription=subscriptionDataFromSubscription(entitlementUserApi.getSubscriptionFromId(subscription.getId()));
   subscription.cancel(clock.getUTCNow(),false,context);
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
   endDate=subscription.getChargedThroughDate();

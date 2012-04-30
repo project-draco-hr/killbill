@@ -1,11 +1,16 @@
 {
-  if (type == Blockable.Type.SUBSCRIPTION && getBlockedStateSubscriptionId(blockableId).isBlockEntitlement()) {
-    throw new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,ACTION_ENTITLEMENT,TYPE_SUBSCRIPTION,blockableId.toString());
+  try {
+    if (type == Blockable.Type.SUBSCRIPTION && getBlockedStateSubscriptionId(blockableId).isBlockEntitlement()) {
+      throw new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,ACTION_ENTITLEMENT,TYPE_SUBSCRIPTION,blockableId.toString());
+    }
+ else     if (type == Blockable.Type.SUBSCRIPTION_BUNDLE && getBlockedStateBundleId(blockableId).isBlockEntitlement()) {
+      throw new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,ACTION_ENTITLEMENT,TYPE_BUNDLE,blockableId.toString());
+    }
+ else     if (type == Blockable.Type.ACCOUNT && getBlockedStateAccountId(blockableId).isBlockEntitlement()) {
+      throw new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,ACTION_ENTITLEMENT,TYPE_ACCOUNT,blockableId.toString());
+    }
   }
- else   if (type == Blockable.Type.SUBSCRIPTION_BUNDLE && getBlockedStateBundleId(blockableId).isBlockEntitlement()) {
-    throw new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,ACTION_ENTITLEMENT,TYPE_BUNDLE,blockableId.toString());
-  }
- else   if (type == Blockable.Type.ACCOUNT && getBlockedStateAccountId(blockableId).isBlockEntitlement()) {
-    throw new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,ACTION_ENTITLEMENT,TYPE_ACCOUNT,blockableId.toString());
+ catch (  EntitlementUserApiException e) {
+    throw new BlockingApiException(e,ErrorCode.values()[e.getCode()]);
   }
 }
