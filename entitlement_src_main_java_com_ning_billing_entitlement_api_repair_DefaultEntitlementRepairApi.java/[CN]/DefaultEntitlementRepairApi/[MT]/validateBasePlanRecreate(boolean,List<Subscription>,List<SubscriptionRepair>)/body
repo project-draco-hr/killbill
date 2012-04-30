@@ -1,0 +1,13 @@
+{
+  if (!isBasePlanRecreate) {
+    return;
+  }
+  if (subscriptions.size() != input.size()) {
+    throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_BP_RECREATE_MISSING_AO,subscriptions.get(0).getBundleId());
+  }
+  for (  SubscriptionRepair cur : input) {
+    if (cur.getNewEvents().size() != 0 && (cur.getNewEvents().get(0).getSubscriptionTransitionType() != SubscriptionTransitionType.CREATE && cur.getNewEvents().get(0).getSubscriptionTransitionType() != SubscriptionTransitionType.RE_CREATE)) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_BP_RECREATE_MISSING_AO_CREATE,subscriptions.get(0).getBundleId());
+    }
+  }
+}

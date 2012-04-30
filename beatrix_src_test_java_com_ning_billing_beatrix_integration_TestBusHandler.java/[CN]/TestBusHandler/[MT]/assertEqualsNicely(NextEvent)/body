@@ -13,7 +13,9 @@ synchronized (this) {
     if (!foundIt) {
       Joiner joiner=Joiner.on(" ");
       log.error("TestBusHandler Received event " + received + "; expected "+ joiner.join(nextExpectedEvent));
-      Assert.fail();
+      if (testFailure != null) {
+        testFailure.failed("TestBusHandler Received event " + received + "; expected "+ joiner.join(nextExpectedEvent));
+      }
     }
   }
 }

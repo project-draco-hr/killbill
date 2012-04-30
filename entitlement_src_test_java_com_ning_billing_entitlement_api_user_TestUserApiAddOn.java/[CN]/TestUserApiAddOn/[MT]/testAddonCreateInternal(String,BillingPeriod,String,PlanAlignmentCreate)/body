@@ -27,8 +27,8 @@
       assertEquals(aoPendingTranstion.getEffectiveTransitionTime(),aoSubscription.getStartDate().plusMonths(1));
     }
     testListener.reset();
-    testListener.pushExpectedEvent(NextEvent.PHASE);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
     someTimeLater=new Duration(){
       @Override public TimeUnit getUnit(){
         return TimeUnit.DAYS;
@@ -45,7 +45,8 @@
     }
 ;
     clock.addDeltaFromReality(someTimeLater);
-    assertTrue(testListener.isCompleted(5000));
+    clock.addDeltaFromReality(getDurationDay(1));
+    assertTrue(testListener.isApiCompleted(5000));
     aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
     aoCurrentPlan=aoSubscription.getCurrentPlan();
     assertNotNull(aoCurrentPlan);

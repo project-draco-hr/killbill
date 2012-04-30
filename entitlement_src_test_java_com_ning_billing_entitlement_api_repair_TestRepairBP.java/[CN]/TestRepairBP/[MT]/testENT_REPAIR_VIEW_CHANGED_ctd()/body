@@ -1,0 +1,25 @@
+{
+  TestWithException test=new TestWithException();
+  DateTime startDate=clock.getUTCNow();
+  testListener.reset();
+  clock.resetDeltaFromReality();
+  final Subscription baseSubscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
+  test.withException(new TestWithExceptionCallback(){
+    @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
+      BundleRepair bundleRepair=repairApi.getBundleRepair(bundle.getId());
+      sortEventsOnBundle(bundleRepair);
+      PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+      NewEvent ne=createNewEvent(SubscriptionTransitionType.CHANGE,baseSubscription.getStartDate().plusDays(10),spec);
+      List<DeletedEvent> des=new LinkedList<SubscriptionRepair.DeletedEvent>();
+      des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(0).getEventId()));
+      des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
+      SubscriptionRepair sRepair=createSubscriptionReapir(baseSubscription.getId(),des,Collections.singletonList(ne));
+      BundleRepair bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      DateTime newChargedThroughDate=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
+      billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);
+      entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+      repairApi.repairBundle(bRepair,true,context);
+    }
+  }
+,ErrorCode.ENT_REPAIR_VIEW_CHANGED);
+}

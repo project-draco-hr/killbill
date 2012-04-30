@@ -2,9 +2,9 @@
   try {
     final DateTime trialDate=clock.getUTCNow().minusDays(10);
     EntitlementAccountMigration toBeMigrated=createAccountFuturePendingPhase(trialDate);
-    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated,context);
-    assertTrue(testListener.isCompleted(5000));
+    assertTrue(testListener.isApiCompleted(5000));
     List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
     assertEquals(bundles.size(),1);
     SubscriptionBundle bundle=bundles.get(0);
@@ -18,11 +18,11 @@
     assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-monthly");
     assertEquals(subscription.getChargedThroughDate(),trialDate.plusDays(30));
-    testListener.pushExpectedEvent(NextEvent.MIGRATE_BILLING);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_BILLING);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
     Duration thirtyDays=getDurationDay(30);
     clock.setDeltaFromReality(thirtyDays,0);
-    assertTrue(testListener.isCompleted(5000));
+    assertTrue(testListener.isApiCompleted(5000));
     assertEquals(subscription.getStartDate(),trialDate);
     assertEquals(subscription.getEndDate(),null);
     assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);

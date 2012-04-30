@@ -9,14 +9,14 @@
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
-    assertTrue(testListener.isCompleted(2000));
+    assertTrue(testListener.isApiCompleted(2000));
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.EVERGREEN);
-    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    testListener.pushNextApiExpectedEvent(NextEvent.CANCEL);
     subscription.cancel(clock.getUTCNow(),false,context);
-    assertTrue(testListener.isCompleted(2000));
+    assertTrue(testListener.isApiCompleted(2000));
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNull(currentPhase);
     checkNextPhaseChange(subscription,0,null);

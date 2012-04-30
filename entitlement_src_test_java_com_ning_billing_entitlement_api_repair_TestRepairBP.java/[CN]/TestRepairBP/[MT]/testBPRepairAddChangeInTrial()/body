@@ -1,0 +1,28 @@
+{
+  String baseProduct="Shotgun";
+  String newBaseProduct="Assault-Rifle";
+  DateTime startDate=clock.getUTCNow();
+  int clockShift=10;
+  DateTime changeDate=startDate.plusDays(clockShift).minusDays(1);
+  LinkedList<ExistingEvent> expected=new LinkedList<SubscriptionRepair.ExistingEvent>();
+  expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CREATE,baseProduct,PhaseType.TRIAL,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.NO_BILLING_PERIOD,startDate));
+  expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CHANGE,newBaseProduct,PhaseType.TRIAL,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.NO_BILLING_PERIOD,changeDate));
+  expected.add(createExistingEventForAssertion(SubscriptionTransitionType.PHASE,newBaseProduct,PhaseType.EVERGREEN,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,startDate.plusDays(30)));
+  UUID baseSubscriptionId=testBPRepairAddChange(true,startDate,clockShift,baseProduct,newBaseProduct,expected,3);
+  testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+  clock.addDeltaFromReality(getDurationDay(32));
+  assertTrue(testListener.isApiCompleted(5000));
+  SubscriptionData subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscriptionId);
+  assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
+  assertEquals(subscription.getBundleId(),bundle.getId());
+  assertEquals(subscription.getStartDate(),startDate);
+  assertEquals(subscription.getBundleStartDate(),startDate);
+  Plan currentPlan=subscription.getCurrentPlan();
+  assertNotNull(currentPlan);
+  assertEquals(currentPlan.getProduct().getName(),newBaseProduct);
+  assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
+  assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.MONTHLY);
+  PlanPhase currentPhase=subscription.getCurrentPhase();
+  assertNotNull(currentPhase);
+  assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
+}
