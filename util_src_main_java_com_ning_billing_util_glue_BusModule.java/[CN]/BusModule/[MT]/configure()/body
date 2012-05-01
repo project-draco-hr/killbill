@@ -1,4 +1,13 @@
 {
   bind(BusService.class).to(DefaultBusService.class);
-  bind(Bus.class).to(InMemoryBus.class).asEagerSingleton();
+switch (type) {
+case MEMORY:
+    configureInMemoryEventBus();
+  break;
+case PERSISTENT:
+configurePersistentEventBus();
+break;
+default :
+new RuntimeException("Unrecognized EventBus type " + type);
+}
 }

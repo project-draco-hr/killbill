@@ -1,0 +1,31 @@
+{
+  Catalog catalog=catalogService.getFullCatalog();
+  Plan prevPlan=(transition.getPreviousPlan() != null) ? catalog.findPlan(transition.getPreviousPlan(),transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
+  Plan nextPlan=(transition.getNextPlan() != null) ? catalog.findPlan(transition.getNextPlan(),transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
+  Plan plan=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? nextPlan : prevPlan;
+  Product product=plan.getProduct();
+  PlanPhase prevPhase=(transition.getPreviousPhase() != null) ? catalog.findPhase(transition.getPreviousPhase(),transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
+  PlanPhase nextPhase=(transition.getNextPhase() != null) ? catalog.findPhase(transition.getNextPhase(),transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
+  PlanPhase phase=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? nextPhase : prevPhase;
+  BillingAlignment alignment=catalog.billingAlignment(new PlanPhaseSpecifier(product.getName(),product.getCategory(),phase.getBillingPeriod(),transition.getNextPriceList(),phase.getPhaseType()),transition.getRequestedTransitionTime());
+  int result=-1;
+switch (alignment) {
+case ACCOUNT:
+    result=account.getBillCycleDay();
+  if (result == 0) {
+    result=calculateBcdFromSubscription(subscription,plan,account);
+  }
+break;
+case BUNDLE:
+Subscription baseSub=entitlementApi.getBaseSubscription(bundle.getId());
+result=calculateBcdFromSubscription(baseSub,plan,account);
+break;
+case SUBSCRIPTION:
+result=calculateBcdFromSubscription(subscription,plan,account);
+break;
+}
+if (result == -1) {
+throw new CatalogApiException(ErrorCode.CAT_INVALID_BILLING_ALIGNMENT,alignment.toString());
+}
+return result;
+}
