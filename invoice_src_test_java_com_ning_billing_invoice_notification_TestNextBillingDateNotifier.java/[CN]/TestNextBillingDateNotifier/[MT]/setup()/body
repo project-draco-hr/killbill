@@ -25,14 +25,11 @@
       bind(InvoiceGenerator.class).to(DefaultInvoiceGenerator.class).asEagerSingleton();
       bind(InvoiceDao.class).to(DefaultInvoiceDao.class).asEagerSingleton();
       bind(NextBillingDatePoster.class).to(DefaultNextBillingDatePoster.class).asEagerSingleton();
-      bind(AccountUserApi.class).to(MockAccountUserApi.class).asEagerSingleton();
       bind(SubscriptionApiService.class).annotatedWith(Names.named(EntitlementModule.REPAIR_NAMED)).to(RepairSubscriptionApiService.class).asEagerSingleton();
       bind(SubscriptionApiService.class).to(DefaultSubscriptionApiService.class).asEagerSingleton();
       bind(SubscriptionFactory.class).annotatedWith(Names.named(EntitlementModule.REPAIR_NAMED)).to(RepairSubscriptionFactory.class).asEagerSingleton();
       bind(SubscriptionFactory.class).to(DefaultSubscriptionFactory.class).asEagerSingleton();
-      bind(BillingApi.class).to(DefaultBillingApi.class).asEagerSingleton();
-      bind(EntitlementUserApi.class).to(DefaultEntitlementUserApi.class).asEagerSingleton();
-      bind(ChargeThruApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(ChargeThruApi.class));
+      install(new MockJunctionModule());
     }
   }
 );

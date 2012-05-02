@@ -1,0 +1,30 @@
+{
+  clock=new ClockMock();
+  Injector i=Guice.createInjector(new AbstractModule(){
+    @Override protected void configure(){
+      blockingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(BlockingApi.class);
+      account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
+      subscription1=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class,Comparable.class);
+      subscription2=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class,Comparable.class);
+      subscription3=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class,Comparable.class);
+      subscription4=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class,Comparable.class);
+      ((ZombieControl)account).addResult("getId",UUID.randomUUID());
+      ((ZombieControl)subscription1).addResult("getBundleId",bundleId1);
+      ((ZombieControl)subscription2).addResult("getBundleId",bundleId1);
+      ((ZombieControl)subscription3).addResult("getBundleId",bundleId1);
+      ((ZombieControl)subscription4).addResult("getBundleId",bundleId2);
+      ((ZombieControl)subscription1).addResult("compareTo",1);
+      ((ZombieControl)subscription2).addResult("compareTo",1);
+      ((ZombieControl)subscription3).addResult("compareTo",1);
+      ((ZombieControl)subscription4).addResult("compareTo",1);
+      ((ZombieControl)subscription1).addResult("getId",UUID.randomUUID());
+      ((ZombieControl)subscription2).addResult("getId",UUID.randomUUID());
+      ((ZombieControl)subscription3).addResult("getId",UUID.randomUUID());
+      ((ZombieControl)subscription4).addResult("getId",UUID.randomUUID());
+      bind(BlockingStateDao.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(BlockingStateDao.class));
+      bind(BlockingApi.class).toInstance(blockingApi);
+    }
+  }
+);
+  odc=i.getInstance(BlockingCalculator.class);
+}

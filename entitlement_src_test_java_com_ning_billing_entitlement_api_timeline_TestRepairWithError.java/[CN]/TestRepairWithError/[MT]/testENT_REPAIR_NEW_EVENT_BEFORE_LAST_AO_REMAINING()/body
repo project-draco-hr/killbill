@@ -1,0 +1,24 @@
+{
+  test.withException(new TestWithExceptionCallback(){
+    @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
+      Duration someTimeLater=getDurationDay(3);
+      clock.setDeltaFromReality(someTimeLater,DAY_IN_MS);
+      SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+      clock.addDeltaFromReality(someTimeLater);
+      BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+      sortEventsOnBundle(bundleRepair);
+      SubscriptionTimeline bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
+      assertEquals(bpRepair.getExistingEvents().size(),2);
+      SubscriptionTimeline aoRepair=getSubscriptionRepair(aoSubscription.getId(),bundleRepair);
+      assertEquals(aoRepair.getExistingEvents().size(),2);
+      List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+      DateTime aoCancelDate=aoSubscription.getStartDate().plusDays(10);
+      NewEvent ne=createNewEvent(SubscriptionTransitionType.CANCEL,aoCancelDate,null);
+      SubscriptionTimeline saoRepair=createSubscriptionReapir(aoSubscription.getId(),des,Collections.singletonList(ne));
+      bundleRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
+      boolean dryRun=true;
+      repairApi.repairBundle(bundleRepair,dryRun,context);
+    }
+  }
+,ErrorCode.ENT_REPAIR_NEW_EVENT_BEFORE_LAST_AO_REMAINING);
+}

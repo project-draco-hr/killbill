@@ -1,12 +1,14 @@
 {
   Map<UUID,BigDecimal> invoiceBalances=new HashMap<UUID,BigDecimal>();
   updateInvoiceBalance(invoiceItems,invoiceBalances);
-  for (  Invoice invoice : invoices) {
-    updateInvoiceBalance(invoice.getInvoiceItems(),invoiceBalances);
-  }
-  for (  Invoice invoice : invoices) {
-    UUID invoiceId=invoice.getId();
-    invoiceBalances.put(invoiceId,invoiceBalances.get(invoiceId).subtract(invoice.getAmountPaid()));
+  if (invoices != null) {
+    for (    Invoice invoice : invoices) {
+      updateInvoiceBalance(invoice.getInvoiceItems(),invoiceBalances);
+    }
+    for (    Invoice invoice : invoices) {
+      UUID invoiceId=invoice.getId();
+      invoiceBalances.put(invoiceId,invoiceBalances.get(invoiceId).subtract(invoice.getAmountPaid()));
+    }
   }
   BigDecimal creditTotal=BigDecimal.ZERO;
   for (  UUID invoiceId : invoiceBalances.keySet()) {

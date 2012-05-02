@@ -1,8 +1,15 @@
 {
-  SubscriptionBundle bundle=entitlementApi.getBundleForKey(externalKey);
-  if (bundle == null) {
-    return Response.status(Status.NO_CONTENT).build();
+  try {
+    SubscriptionBundle bundle=entitlementApi.getBundleForKey(externalKey);
+    BundleJsonNoSubsciptions json=new BundleJsonNoSubsciptions(bundle);
+    return Response.status(Status.OK).entity(json).build();
   }
-  BundleJson json=new BundleJson(bundle);
-  return Response.status(Status.OK).entity(json).build();
+ catch (  EntitlementUserApiException e) {
+    if (e.getCode() == ErrorCode.ENT_GET_INVALID_BUNDLE_KEY.getCode()) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+ else {
+      throw e;
+    }
+  }
 }
