@@ -1,0 +1,15 @@
+{
+  final Date ctd=(subscription.getChargedThroughDate() != null) ? subscription.getChargedThroughDate().toDate() : null;
+  subscriptionsDao.inTransaction(new Transaction<Void,SubscriptionSqlDao>(){
+    @Override public Void inTransaction(    SubscriptionSqlDao transactionalDao,    TransactionStatus status) throws Exception {
+      transactionalDao.updateChargedThroughDate(subscription.getId().toString(),ctd,context);
+      BundleSqlDao tmpDao=transactionalDao.become(BundleSqlDao.class);
+      tmpDao.updateBundleLastSysTime(subscription.getBundleId().toString(),clock.getUTCNow().toDate());
+      AuditSqlDao auditSqlDao=transactionalDao.become(AuditSqlDao.class);
+      String subscriptionId=subscription.getId().toString();
+      auditSqlDao.insertAuditFromTransaction(SUBSCRIPTIONS_TABLE_NAME,subscriptionId,ChangeType.UPDATE,context);
+      return null;
+    }
+  }
+);
+}

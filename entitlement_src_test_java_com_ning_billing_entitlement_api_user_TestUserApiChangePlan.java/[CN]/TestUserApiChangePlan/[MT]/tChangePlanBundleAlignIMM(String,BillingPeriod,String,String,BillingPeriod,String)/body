@@ -2,20 +2,20 @@
   log.info("Starting testChangePlanBundleAlignIMM");
   try {
     SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
     Duration moveALittleInTime=getDurationDay(3);
     clock.setDeltaFromReality(moveALittleInTime,0);
     subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow(),context);
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.TRIAL);
-    assertTrue(testListener.isCompleted(2000));
+    assertTrue(testListener.isApiCompleted(2000));
     PlanPhase currentPhase=subscription.getCurrentPhase();
     DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
     clock.addDeltaFromReality(currentPhase.getDuration());
     DateTime futureNow=clock.getUTCNow();
     assertTrue(futureNow.isAfter(nextExpectedPhaseChange));
-    assertTrue(testListener.isCompleted(3000));
+    assertTrue(testListener.isApiCompleted(3000));
   }
  catch (  EntitlementUserApiException e) {
     Assert.fail(e.getMessage());

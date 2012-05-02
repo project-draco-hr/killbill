@@ -1,8 +1,12 @@
 {
-  if (activeWaiters.size() == 0) {
+  List<CompletionUserRequestNotifier> runningWaiters=new ArrayList<CompletionUserRequestNotifier>();
+synchronized (activeWaiters) {
+    runningWaiters.addAll(activeWaiters);
+  }
+  if (runningWaiters.size() == 0) {
     return;
   }
-  for (  CompletionUserRequestNotifier cur : activeWaiters) {
+  for (  CompletionUserRequestNotifier cur : runningWaiters) {
     cur.onBusEvent(event);
   }
 }

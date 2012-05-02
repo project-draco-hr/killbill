@@ -1,0 +1,33 @@
+{
+  try {
+    Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId());
+    List<PaymentInfoEvent> payments=Collections.emptyList();
+    if (invoices.size() > 0) {
+      Collection<String> tmp=Collections2.transform(invoices,new Function<Invoice,String>(){
+        @Override public String apply(        Invoice input){
+          return input.getId().toString();
+        }
+      }
+);
+      List<String> invoicesId=new ArrayList<String>();
+      invoicesId.addAll(tmp);
+      payments=paymentApi.getPaymentInfo(invoicesId);
+    }
+    List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(account.getId());
+    List<BundleTimeline> bundlesTimeline=new LinkedList<BundleTimeline>();
+    for (    SubscriptionBundle cur : bundles) {
+      bundlesTimeline.add(timelineApi.getBundleRepair(cur.getId()));
+    }
+    AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundlesTimeline);
+    return Response.status(Status.OK).entity(json).build();
+  }
+ catch (  AccountApiException e) {
+    log.warn("Failed to find account.",e);
+    return Response.status(Status.NO_CONTENT).build();
+  }
+catch (  EntitlementRepairException e) {
+    log.error(e.getMessage());
+    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+  }
+}
