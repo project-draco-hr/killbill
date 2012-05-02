@@ -8,7 +8,7 @@
     }
  else     if (invoice.isMigrationInvoice()) {
       log.info("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
-      Either<PaymentErrorEvent,PaymentInfoEvent> result=Either.left((PaymentErrorEvent)new DefaultPaymentError("migration invoice","Invoice balance was a migration invoice",account.getId(),UUID.fromString(invoiceId),context.getUserToken()));
+      Either<PaymentErrorEvent,PaymentInfoEvent> result=Either.left((PaymentErrorEvent)new DefaultPaymentErrorEvent("migration invoice","Invoice balance was a migration invoice",account.getId(),UUID.fromString(invoiceId),context.getUserToken()));
       processedPaymentsOrErrors.add(result);
     }
  else {

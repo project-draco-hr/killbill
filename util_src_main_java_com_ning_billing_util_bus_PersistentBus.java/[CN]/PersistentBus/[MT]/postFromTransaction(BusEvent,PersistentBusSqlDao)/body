@@ -1,0 +1,10 @@
+{
+  try {
+    String json=objectMapper.writeValueAsString(event);
+    BusEventEntry entry=new BusEventEntry(event.getClass().getName(),json);
+    transactional.insertBusEvent(entry);
+  }
+ catch (  Exception e) {
+    log.error("Failed to post BusEvent " + event.toString(),e);
+  }
+}

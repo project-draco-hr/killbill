@@ -1,0 +1,16 @@
+{
+  long ini=System.currentTimeMillis();
+  long remaining=timeoutMs;
+  while (gotEvents < expectedEvents && remaining > 0) {
+    try {
+      wait(1000);
+      if (gotEvents == expectedEvents) {
+        break;
+      }
+      remaining=timeoutMs - (System.currentTimeMillis() - ini);
+    }
+ catch (    InterruptedException ignore) {
+    }
+  }
+  return (gotEvents == expectedEvents);
+}

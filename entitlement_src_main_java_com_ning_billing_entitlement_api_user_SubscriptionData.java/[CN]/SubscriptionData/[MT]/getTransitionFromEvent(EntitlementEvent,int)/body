@@ -2,9 +2,10 @@
   if (transitions == null || event == null) {
     return null;
   }
-  for (  SubscriptionEventTransition cur : transitions) {
+  for (  SubscriptionTransitionData cur : transitions) {
     if (cur.getId().equals(event.getId())) {
-      return new SubscriptionTransitionData((SubscriptionTransitionData)cur,seqId);
+      SubscriptionTransitionData withSeq=new SubscriptionTransitionData((SubscriptionTransitionData)cur,seqId);
+      return new DefaultSubscriptionEvent(withSeq,startDate);
     }
   }
   return null;

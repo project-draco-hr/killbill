@@ -7,7 +7,7 @@
       if (invoice != null && account != null) {
         if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
           log.info("Received invoice for payment with outstanding amount of 0 {} ",invoice);
-          return Either.left((PaymentErrorEvent)new DefaultPaymentError("invoice_balance_0","Invoice balance was 0 or less",paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId(),context.getUserToken()));
+          return Either.left((PaymentErrorEvent)new DefaultPaymentErrorEvent("invoice_balance_0","Invoice balance was 0 or less",paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId(),context.getUserToken()));
         }
  else {
           PaymentAttempt newPaymentAttempt=new PaymentAttempt.Builder(paymentAttempt).setRetryCount(paymentAttempt.getRetryCount() + 1).setPaymentAttemptId(UUID.randomUUID()).build();
@@ -18,8 +18,8 @@
     }
  catch (    AccountApiException e) {
       log.error("Error creating payment attempt.",e);
-      return new Either.Left<PaymentErrorEvent,PaymentInfoEvent>((PaymentErrorEvent)new DefaultPaymentError("createPaymentError",e.getMessage(),null,null,context.getUserToken()));
+      return new Either.Left<PaymentErrorEvent,PaymentInfoEvent>((PaymentErrorEvent)new DefaultPaymentErrorEvent("createPaymentError",e.getMessage(),null,null,context.getUserToken()));
     }
   }
-  return Either.left((PaymentErrorEvent)new DefaultPaymentError("retry_payment_error","Could not load payment attempt, invoice or account for id " + paymentAttemptId,paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId(),context.getUserToken()));
+  return Either.left((PaymentErrorEvent)new DefaultPaymentErrorEvent("retry_payment_error","Could not load payment attempt, invoice or account for id " + paymentAttemptId,paymentAttempt.getAccountId(),paymentAttempt.getInvoiceId(),context.getUserToken()));
 }

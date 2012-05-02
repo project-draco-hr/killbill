@@ -1,0 +1,22 @@
+{
+  this.account=account;
+  this.billCycleDay=billCycleDay;
+  this.subscription=subscription;
+  effectiveDate=transition.getEffectiveTransitionTime();
+  String planPhaseName=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? transition.getNextPhase() : transition.getPreviousPhase();
+  planPhase=(planPhaseName != null) ? catalog.findPhase(planPhaseName,transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
+  String planName=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? transition.getNextPlan() : transition.getPreviousPlan();
+  plan=(planName != null) ? catalog.findPlan(planName,transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
+  String nextPhaseName=transition.getNextPhase();
+  PlanPhase nextPhase=(nextPhaseName != null) ? catalog.findPhase(nextPhaseName,transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
+  String prevPhaseName=transition.getPreviousPhase();
+  PlanPhase prevPhase=(prevPhaseName != null) ? catalog.findPhase(prevPhaseName,transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
+  fixedPrice=(nextPhase != null && nextPhase.getFixedPrice() != null) ? nextPhase.getFixedPrice().getPrice(currency) : null;
+  recurringPrice=(nextPhase != null && nextPhase.getRecurringPrice() != null) ? nextPhase.getRecurringPrice().getPrice(currency) : null;
+  this.currency=currency;
+  description=transition.getTransitionType().toString();
+  billingModeType=BillingModeType.IN_ADVANCE;
+  billingPeriod=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? nextPhase.getBillingPeriod() : prevPhase.getBillingPeriod();
+  type=transition.getTransitionType();
+  totalOrdering=transition.getTotalOrdering();
+}

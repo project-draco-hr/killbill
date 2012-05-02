@@ -13,8 +13,15 @@
       bind(CatalogService.class).to(DefaultCatalogService.class).asEagerSingleton();
       final MysqlTestingHelper helper=new MysqlTestingHelper();
       bind(MysqlTestingHelper.class).toInstance(helper);
-      IDBI dbi=helper.getDBI();
-      bind(IDBI.class).toInstance(dbi);
+      if (helper.isUsingLocalInstance()) {
+        bind(IDBI.class).toProvider(DBIProvider.class).asEagerSingleton();
+        final DbiConfig config=new ConfigurationObjectFactory(System.getProperties()).build(DbiConfig.class);
+        bind(DbiConfig.class).toInstance(config);
+      }
+ else {
+        final IDBI dbi=helper.getDBI();
+        bind(IDBI.class).toInstance(dbi);
+      }
       bind(TagDao.class).to(AuditedTagDao.class).asEagerSingleton();
       bind(EntitlementDao.class).to(EntitlementSqlDao.class).asEagerSingleton();
       bind(EntitlementDao.class).annotatedWith(Names.named(EntitlementModule.REPAIR_NAMED)).to(RepairEntitlementDao.class);

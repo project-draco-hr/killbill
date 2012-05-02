@@ -4,9 +4,13 @@
   final PlanPhase phase=new MockPhase(PhaseType.EVERGREEN,plan,MockDuration.UNLIMITED(),25.95);
   final Subscription prevISubscription=new MockSubscription(Subscription.SubscriptionState.ACTIVE,plan,phase);
   final Subscription nextISubscription=new MockSubscription(Subscription.SubscriptionState.CANCELLED,plan,phase);
-  prevSubscription=new BusinessSubscription(prevISubscription,USD);
-  nextSubscription=new BusinessSubscription(nextISubscription,USD);
-  event=BusinessSubscriptionEvent.subscriptionCancelled(prevISubscription.getCurrentPlan());
+  ((ZombieControl)catalog).addResult("findPlan",plan);
+  ((ZombieControl)catalog).addResult("findPhase",phase);
+  ((ZombieControl)catalogService).addResult("getFullCatalog",catalog);
+  DateTime now=new DateTime();
+  prevSubscription=new BusinessSubscription(prevISubscription,USD,catalog);
+  nextSubscription=new BusinessSubscription(nextISubscription,USD,catalog);
+  event=BusinessSubscriptionEvent.subscriptionCancelled(prevISubscription.getCurrentPlan().getName(),catalog,now,now);
   requestedTimestamp=new DateTime(DateTimeZone.UTC);
   id=UUID.randomUUID();
   key="1234";

@@ -1,7 +1,7 @@
 {
-  if (transitions == null) {
+  SubscriptionTransitionData data=getPendingTransitionData();
+  if (data == null) {
     return null;
   }
-  SubscriptionTransitionDataIterator it=new SubscriptionTransitionDataIterator(clock,transitions,Order.ASC_FROM_PAST,Kind.ENTITLEMENT,Visibility.ALL,TimeLimit.FUTURE_ONLY);
-  return it.hasNext() ? it.next() : null;
+  return new DefaultSubscriptionEvent(data,startDate);
 }
