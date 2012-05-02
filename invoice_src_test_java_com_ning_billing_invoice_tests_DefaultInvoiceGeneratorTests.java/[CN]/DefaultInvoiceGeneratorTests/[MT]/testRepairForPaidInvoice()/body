@@ -1,0 +1,26 @@
+{
+  DateTime april25=new DateTime(2012,4,25,0,0,0,0);
+  UUID accountId=UUID.randomUUID();
+  Subscription originalSubscription=createZombieSubscription();
+  Plan originalPlan=new MockPlan("original plan");
+  MockInternationalPrice price10=new MockInternationalPrice(new DefaultPrice(TEN,Currency.USD));
+  PlanPhase originalPlanEvergreen=new MockPlanPhase(price10,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
+  BillingEventSet events=new BillingEventSet();
+  events.add(createBillingEvent(originalSubscription.getId(),april25,originalPlan,originalPlanEvergreen,25));
+  Invoice invoice1=generator.generateInvoice(accountId,events,null,april25,Currency.USD);
+  List<Invoice> invoices=new ArrayList<Invoice>();
+  invoices.add(invoice1);
+  invoice1.addPayment(new DefaultInvoicePayment(UUID.randomUUID(),invoice1.getId(),april25,TEN,Currency.USD));
+  assertEquals(invoice1.getBalance().compareTo(ZERO),0);
+  events.clear();
+  Subscription newSubscription=createZombieSubscription();
+  Plan newPlan=new MockPlan("new plan");
+  MockInternationalPrice price5=new MockInternationalPrice(new DefaultPrice(FIVE,Currency.USD));
+  PlanPhase newPlanEvergreen=new MockPlanPhase(price5,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
+  events.add(createBillingEvent(newSubscription.getId(),april25,newPlan,newPlanEvergreen,25));
+  Invoice invoice2=generator.generateInvoice(accountId,events,invoices,april25,Currency.USD);
+  invoices.add(invoice2);
+  generator.distributeItems(invoices);
+  assertEquals(invoice1.getBalance().compareTo(ZERO),0);
+  assertEquals(invoice2.getBalance().compareTo(FIVE.negate()),0);
+}

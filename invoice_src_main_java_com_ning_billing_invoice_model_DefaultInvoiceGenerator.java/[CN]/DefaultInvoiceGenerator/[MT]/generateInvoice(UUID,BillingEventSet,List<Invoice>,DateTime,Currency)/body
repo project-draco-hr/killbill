@@ -20,9 +20,10 @@
   for (  InvoiceItem existingItem : existingItems) {
     if (existingItem instanceof RecurringInvoiceItem) {
       RecurringInvoiceItem recurringItem=(RecurringInvoiceItem)existingItem;
-      proposedItems.add(recurringItem.asCredit());
+      proposedItems.add(recurringItem.asReversingItem());
     }
   }
+  addCreditItems(accountId,proposedItems,existingInvoices,targetCurrency);
   if (proposedItems == null || proposedItems.size() == 0) {
     return null;
   }
