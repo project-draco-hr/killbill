@@ -1,0 +1,17 @@
+{
+  DateTime now=clock.getUTCNow();
+  BillingEvent event=new MockBillingEvent();
+  BillingEvent result=odc.createNewDisableEvent(now,event);
+  assertEquals(result.getBillCycleDay(),event.getBillCycleDay());
+  assertEquals(result.getEffectiveDate(),now);
+  assertEquals(result.getPlanPhase(),event.getPlanPhase());
+  assertEquals(result.getPlan(),event.getPlan());
+  assertEquals(result.getFixedPrice(),BigDecimal.ZERO);
+  assertEquals(result.getRecurringPrice(),BigDecimal.ZERO);
+  assertEquals(result.getCurrency(),event.getCurrency());
+  assertEquals(result.getDescription(),"");
+  assertEquals(result.getBillingMode(),event.getBillingMode());
+  assertEquals(result.getBillingPeriod(),event.getBillingPeriod());
+  assertEquals(result.getTransitionType(),SubscriptionTransitionType.CANCEL);
+  assertEquals(result.getTotalOrdering(),new Long(0));
+}

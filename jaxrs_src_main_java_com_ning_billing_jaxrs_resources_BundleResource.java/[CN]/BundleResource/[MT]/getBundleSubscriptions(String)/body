@@ -1,15 +1,25 @@
 {
-  UUID uuid=UUID.fromString(bundleId);
-  SubscriptionBundle bundle=entitlementApi.getBundleFromId(uuid);
-  if (bundle == null) {
-    return Response.status(Status.NO_CONTENT).build();
+  try {
+    UUID uuid=UUID.fromString(bundleId);
+    SubscriptionBundle bundle=entitlementApi.getBundleFromId(uuid);
+    if (bundle == null) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    List<Subscription> bundles=entitlementApi.getSubscriptionsForBundle(uuid);
+    Collection<SubscriptionJsonNoEvents> result=Collections2.transform(bundles,new Function<Subscription,SubscriptionJsonNoEvents>(){
+      @Override public SubscriptionJsonNoEvents apply(      Subscription input){
+        return new SubscriptionJsonNoEvents(input);
+      }
+    }
+);
+    return Response.status(Status.OK).entity(result).build();
   }
-  List<Subscription> bundles=entitlementApi.getSubscriptionsForBundle(uuid);
-  Collection<SubscriptionJsonNoEvents> result=Collections2.transform(bundles,new Function<Subscription,SubscriptionJsonNoEvents>(){
-    @Override public SubscriptionJsonNoEvents apply(    Subscription input){
-      return new SubscriptionJsonNoEvents(input);
+ catch (  EntitlementUserApiException e) {
+    if (e.getCode() == ErrorCode.ENT_GET_INVALID_BUNDLE_ID.getCode()) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+ else {
+      throw e;
     }
   }
-);
-  return Response.status(Status.OK).entity(result).build();
 }

@@ -1,9 +1,16 @@
 {
-  UUID uuid=UUID.fromString(subscriptionId);
-  Subscription subscription=entitlementApi.getSubscriptionFromId(uuid);
-  if (subscription == null) {
-    return Response.status(Status.NO_CONTENT).build();
+  try {
+    UUID uuid=UUID.fromString(subscriptionId);
+    Subscription subscription=entitlementApi.getSubscriptionFromId(uuid);
+    SubscriptionJsonNoEvents json=new SubscriptionJsonNoEvents(subscription);
+    return Response.status(Status.OK).entity(json).build();
   }
-  SubscriptionJsonNoEvents json=new SubscriptionJsonNoEvents(subscription);
-  return Response.status(Status.OK).entity(json).build();
+ catch (  EntitlementUserApiException e) {
+    if (e.getCode() == ErrorCode.ENT_INVALID_SUBSCRIPTION_ID.getCode()) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+ else {
+      throw e;
+    }
+  }
 }

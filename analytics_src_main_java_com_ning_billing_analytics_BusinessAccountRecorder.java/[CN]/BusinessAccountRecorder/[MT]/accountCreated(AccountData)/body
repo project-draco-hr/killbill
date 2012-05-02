@@ -1,6 +1,12 @@
 {
-  final Account account=accountApi.getAccountByKey(data.getExternalKey());
-  final BusinessAccount bac=createBusinessAccountFromAccount(account);
-  log.info("ACCOUNT CREATION " + bac);
-  dao.createAccount(bac);
+  Account account;
+  try {
+    account=accountApi.getAccountByKey(data.getExternalKey());
+    final BusinessAccount bac=createBusinessAccountFromAccount(account);
+    log.info("ACCOUNT CREATION " + bac);
+    dao.createAccount(bac);
+  }
+ catch (  AccountApiException e) {
+    log.warn("Error encountered creating BusinessAccount",e);
+  }
 }

@@ -2,14 +2,17 @@
   SubscriptionCallCompletionCallback<Response> callback=new SubscriptionCallCompletionCallback<Response>(){
     private boolean isImmediateOp=true;
     @Override public Response doOperation(    CallContext ctx) throws EntitlementUserApiException, InterruptedException, TimeoutException {
-      UUID uuid=UUID.fromString(subscriptionId);
-      Subscription current=entitlementApi.getSubscriptionFromId(uuid);
-      if (current == null) {
+      try {
+        UUID uuid=UUID.fromString(subscriptionId);
+        Subscription current=entitlementApi.getSubscriptionFromId(uuid);
+        DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
+        isImmediateOp=current.changePlan(subscription.getProductName(),BillingPeriod.valueOf(subscription.getBillingPeriod()),subscription.getPriceList(),inputDate,ctx);
+        return Response.status(Status.OK).build();
+      }
+ catch (      EntitlementUserApiException e) {
+        log.warn("Subscription not found: " + subscriptionId,e);
         return Response.status(Status.NO_CONTENT).build();
       }
-      DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
-      isImmediateOp=current.changePlan(subscription.getProductName(),BillingPeriod.valueOf(subscription.getBillingPeriod()),subscription.getPriceList(),inputDate,ctx);
-      return Response.status(Status.OK).build();
     }
     @Override public boolean isImmOperation(){
       return isImmediateOp;
@@ -18,7 +21,17 @@
       if (operationResponse.getStatus() != Status.OK.getStatusCode()) {
         return operationResponse;
       }
-      return getSubscription(subscriptionId);
+      try {
+        return getSubscription(subscriptionId);
+      }
+ catch (      EntitlementUserApiException e) {
+        if (e.getCode() == ErrorCode.ENT_GET_INVALID_BUNDLE_ID.getCode()) {
+          return Response.status(Status.NO_CONTENT).build();
+        }
+ else {
+          return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        }
+      }
     }
   }
 ;

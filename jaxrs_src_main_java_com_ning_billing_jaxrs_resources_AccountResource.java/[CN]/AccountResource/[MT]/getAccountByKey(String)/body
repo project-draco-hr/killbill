@@ -1,11 +1,17 @@
 {
-  Account account=null;
-  if (externalKey != null) {
-    account=accountApi.getAccountByKey(externalKey);
+  try {
+    Account account=null;
+    if (externalKey != null) {
+      account=accountApi.getAccountByKey(externalKey);
+    }
+    if (account == null) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    AccountJson json=new AccountJson(account);
+    return Response.status(Status.OK).entity(json).build();
   }
-  if (account == null) {
+ catch (  AccountApiException e) {
+    log.warn("Failed to find account.",e);
     return Response.status(Status.NO_CONTENT).build();
   }
-  AccountJson json=new AccountJson(account);
-  return Response.status(Status.OK).entity(json).build();
 }

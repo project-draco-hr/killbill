@@ -1,9 +1,13 @@
 {
   String paymentProviderName=null;
   if (accountKey != null) {
-    final Account account=accountUserApi.getAccountByKey(accountKey);
-    if (account != null) {
+    Account account;
+    try {
+      account=accountUserApi.getAccountByKey(accountKey);
       return getPaymentProviderPlugin(account);
+    }
+ catch (    AccountApiException e) {
+      log.error("Error getting payment provider plugin.",e);
     }
   }
   return pluginRegistry.getPlugin(paymentProviderName);

@@ -4,12 +4,17 @@
       @Override public void handleReadyNotification(      String notificationKey,      DateTime eventDate){
         try {
           UUID key=UUID.fromString(notificationKey);
-          Subscription subscription=entitlementUserApi.getSubscriptionFromId(key);
-          if (subscription == null) {
-            log.warn("Next Billing Date Notification Queue handled spurious notification (key: " + key + ")");
-          }
+          try {
+            Subscription subscription=entitlementUserApi.getSubscriptionFromId(key);
+            if (subscription == null) {
+              log.warn("Next Billing Date Notification Queue handled spurious notification (key: " + key + ")");
+            }
  else {
-            processEvent(key,eventDate);
+              processEvent(key,eventDate);
+            }
+          }
+ catch (          EntitlementUserApiException e) {
+            log.warn("Next Billing Date Notification Queue handled spurious notification (key: " + key + ")",e);
           }
         }
  catch (        IllegalArgumentException e) {
