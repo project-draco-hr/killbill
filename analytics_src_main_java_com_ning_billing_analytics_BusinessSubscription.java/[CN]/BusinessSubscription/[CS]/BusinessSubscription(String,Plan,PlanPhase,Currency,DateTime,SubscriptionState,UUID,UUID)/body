@@ -1,16 +1,7 @@
 {
-  Plan thePlan=null;
-  PlanPhase thePhase=null;
-  try {
-    thePlan=catalog.findPlan(currentPlan,new DateTime(),startDate);
-    thePhase=catalog.findPhase(currentPhase,new DateTime(),startDate);
-  }
- catch (  CatalogApiException e) {
-    log.error(String.format("Failed to retrieve Plan from catalog for plan %s, phase ",currentPlan,currentPhase));
-  }
   this.priceList=priceList;
-  if (currentPlan != null && thePlan.getProduct() != null) {
-    final Product product=thePlan.getProduct();
+  if (currentPlan != null && currentPlan.getProduct() != null) {
+    final Product product=currentPlan.getProduct();
     productName=product.getName();
     productCategory=product.getCategory();
     productType=product.getCatalogName();
@@ -21,29 +12,29 @@
     productType=null;
   }
   if (currentPhase != null) {
-    slug=thePhase.getName();
-    if (thePhase.getPhaseType() != null) {
-      phase=thePhase.getPhaseType().toString();
+    slug=currentPhase.getName();
+    if (currentPhase.getPhaseType() != null) {
+      phase=currentPhase.getPhaseType().toString();
     }
  else {
       phase=null;
     }
-    if (thePhase.getBillingPeriod() != null) {
-      billingPeriod=thePhase.getBillingPeriod().toString();
+    if (currentPhase.getBillingPeriod() != null) {
+      billingPeriod=currentPhase.getBillingPeriod().toString();
     }
  else {
       billingPeriod=null;
     }
-    if (thePhase.getRecurringPrice() != null) {
+    if (currentPhase.getRecurringPrice() != null) {
       BigDecimal tmpPrice=null;
       try {
-        tmpPrice=thePhase.getRecurringPrice().getPrice(USD);
+        tmpPrice=currentPhase.getRecurringPrice().getPrice(USD);
       }
  catch (      CatalogApiException e) {
         tmpPrice=new BigDecimal(0);
       }
       price=tmpPrice;
-      mrr=getMrrFromISubscription(thePhase.getDuration(),price);
+      mrr=getMrrFromISubscription(currentPhase.getDuration(),price);
     }
  else {
       price=BigDecimal.ZERO;
