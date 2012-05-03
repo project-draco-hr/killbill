@@ -2,8 +2,7 @@
   Currency currency=Currency.USD;
   DateTime targetDate1=DateTime.now().plusMonths(1);
   DateTime targetDate2=DateTime.now().plusMonths(2);
-  Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
-  ((ZombieControl)subscription).addResult("getId",UUID.randomUUID());
+  Subscription subscription=getZombieSubscription();
   Plan plan=BrainDeadProxyFactory.createBrainDeadProxyFor(Plan.class);
   ((ZombieControl)plan).addResult("getName","plan");
   PlanPhase phase1=BrainDeadProxyFactory.createBrainDeadProxyFor(PlanPhase.class);
@@ -12,14 +11,14 @@
   ((ZombieControl)phase2).addResult("getName","plan-phase2");
   BillingEventSet events=new BillingEventSet();
   List<Invoice> invoices=new ArrayList<Invoice>();
-  BillingEvent event1=new DefaultBillingEvent(null,subscription,targetDate1,plan,phase1,null,TEN,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent1",1L,SubscriptionTransitionType.CHANGE);
+  BillingEvent event1=createMockBillingEvent(null,subscription,targetDate1,plan,phase1,null,TEN,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent1",1L,SubscriptionTransitionType.CHANGE);
   events.add(event1);
   Invoice invoice1=generator.generateInvoice(UUID.randomUUID(),events,invoices,targetDate1,Currency.USD);
   invoices.add(invoice1);
   invoiceDao.create(invoice1,context);
   invoice1=invoiceDao.getById(invoice1.getId());
   assertNotNull(invoice1.getInvoiceNumber());
-  BillingEvent event2=new DefaultBillingEvent(null,subscription,targetDate1,plan,phase2,null,TWENTY,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent2",2L,SubscriptionTransitionType.CHANGE);
+  BillingEvent event2=createMockBillingEvent(null,subscription,targetDate1,plan,phase2,null,TWENTY,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent2",2L,SubscriptionTransitionType.CHANGE);
   events.add(event2);
   Invoice invoice2=generator.generateInvoice(UUID.randomUUID(),events,invoices,targetDate2,Currency.USD);
   invoiceDao.create(invoice2,context);

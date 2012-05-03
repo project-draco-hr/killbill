@@ -1,0 +1,17 @@
+{
+  if (tagStore != null) {
+    List<Tag> tags=new ArrayList<Tag>();
+    if (tagDefinitions != null) {
+      for (      TagDefinition tagDefinition : tagDefinitions) {
+        try {
+          ControlTagType controlTagType=ControlTagType.valueOf(tagDefinition.getName());
+          tags.add(new DefaultControlTag(controlTagType));
+        }
+ catch (        IllegalArgumentException ex) {
+          tags.add(new DescriptiveTag(tagDefinition));
+        }
+      }
+    }
+    this.tagStore.add(tags);
+  }
+}

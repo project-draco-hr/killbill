@@ -4,6 +4,7 @@
   ((ZombieControl)accountUserApi).addResult("getAccountById",account);
   ((ZombieControl)account).addResult("getCurrency",Currency.USD);
   ((ZombieControl)account).addResult("getId",accountId);
+  ((ZombieControl)account).addResult("isNotifiedForInvoices",true);
   Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
   ((ZombieControl)subscription).addResult("getId",subscriptionId);
   ((ZombieControl)subscription).addResult("getBundleId",new UUID(0L,0L));
@@ -13,10 +14,11 @@
   DateTime effectiveDate=new DateTime().minusDays(1);
   Currency currency=Currency.USD;
   BigDecimal fixedPrice=null;
-  events.add(new DefaultBillingEvent(account,subscription,effectiveDate,plan,planPhase,fixedPrice,BigDecimal.ONE,currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"",1L,SubscriptionTransitionType.CREATE));
+  events.add(createMockBillingEvent(account,subscription,effectiveDate,plan,planPhase,fixedPrice,BigDecimal.ONE,currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"",1L,SubscriptionTransitionType.CREATE));
   BillingApi entitlementBillingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(BillingApi.class);
   ((ZombieControl)entitlementBillingApi).addResult("getBillingEventsForAccountAndUpdateAccountBCD",events);
-  InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,entitlementBillingApi,invoiceDao,locker,busService.getBus(),clock);
+  InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
+  InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,entitlementBillingApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock);
   CallContext context=new DefaultCallContextFactory(clock).createCallContext("Migration test",CallOrigin.TEST,UserType.TEST);
   Invoice invoice=dispatcher.processAccount(accountId,date_regular,true,context);
   Assert.assertNotNull(invoice);
