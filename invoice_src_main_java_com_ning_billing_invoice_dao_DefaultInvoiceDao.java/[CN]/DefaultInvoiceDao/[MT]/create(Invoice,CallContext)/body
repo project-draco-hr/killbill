@@ -1,36 +1,35 @@
 {
+  final InvoiceCreationEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
   invoiceSqlDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
-    @Override public Void inTransaction(    final InvoiceSqlDao invoiceDao,    final TransactionStatus status) throws Exception {
-      Invoice currentInvoice=invoiceDao.getById(invoice.getId().toString());
+    @Override public Void inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      Invoice currentInvoice=transactional.getById(invoice.getId().toString());
       if (currentInvoice == null) {
-        invoiceDao.create(invoice,context);
+        transactional.create(invoice,context);
         List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
-        RecurringInvoiceItemSqlDao recurringInvoiceItemDao=invoiceDao.become(RecurringInvoiceItemSqlDao.class);
+        RecurringInvoiceItemSqlDao recurringInvoiceItemDao=transactional.become(RecurringInvoiceItemSqlDao.class);
         recurringInvoiceItemDao.batchCreateFromTransaction(recurringInvoiceItems,context);
-        notifyOfFutureBillingEvents(invoiceDao,recurringInvoiceItems);
+        notifyOfFutureBillingEvents(transactional,recurringInvoiceItems);
         List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
-        FixedPriceInvoiceItemSqlDao fixedPriceInvoiceItemDao=invoiceDao.become(FixedPriceInvoiceItemSqlDao.class);
+        FixedPriceInvoiceItemSqlDao fixedPriceInvoiceItemDao=transactional.become(FixedPriceInvoiceItemSqlDao.class);
         fixedPriceInvoiceItemDao.batchCreateFromTransaction(fixedPriceInvoiceItems,context);
-        setChargedThroughDates(invoiceDao,fixedPriceInvoiceItems,recurringInvoiceItems,context);
+        setChargedThroughDates(transactional,fixedPriceInvoiceItems,recurringInvoiceItems,context);
         List<InvoicePayment> invoicePayments=invoice.getPayments();
-        InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
+        InvoicePaymentSqlDao invoicePaymentSqlDao=transactional.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);
-        AuditSqlDao auditSqlDao=invoiceDao.become(AuditSqlDao.class);
+        AuditSqlDao auditSqlDao=transactional.become(AuditSqlDao.class);
         auditSqlDao.insertAuditFromTransaction("invoices",invoice.getId().toString(),ChangeType.INSERT,context);
         auditSqlDao.insertAuditFromTransaction("recurring_invoice_items",getIdsFromInvoiceItems(recurringInvoiceItems),ChangeType.INSERT,context);
         auditSqlDao.insertAuditFromTransaction("fixed_invoice_items",getIdsFromInvoiceItems(fixedPriceInvoiceItems),ChangeType.INSERT,context);
         auditSqlDao.insertAuditFromTransaction("invoice_payments",getIdsFromInvoicePayments(invoicePayments),ChangeType.INSERT,context);
       }
+      try {
+        eventBus.postFromTransaction(event,transactional);
+      }
+ catch (      EventBusException e) {
+        log.warn("Failed to post invoice event for invoiceId " + invoice.getId(),e);
+      }
       return null;
     }
   }
 );
-  InvoiceCreationEvent event;
-  event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
-  try {
-    eventBus.post(event);
-  }
- catch (  Bus.EventBusException e) {
-    throw new RuntimeException(e);
-  }
 }

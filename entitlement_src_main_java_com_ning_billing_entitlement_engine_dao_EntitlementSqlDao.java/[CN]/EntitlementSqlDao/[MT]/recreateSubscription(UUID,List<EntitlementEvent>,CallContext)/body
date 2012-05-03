@@ -1,13 +1,13 @@
 {
   eventsDao.inTransaction(new Transaction<Void,EventSqlDao>(){
-    @Override public Void inTransaction(    EventSqlDao dao,    TransactionStatus status) throws Exception {
+    @Override public Void inTransaction(    EventSqlDao transactional,    TransactionStatus status) throws Exception {
       List<String> eventIds=new ArrayList<String>();
       for (      final EntitlementEvent cur : recreateEvents) {
-        dao.insertEvent(cur,context);
+        transactional.insertEvent(cur,context);
         eventIds.add(cur.getId().toString());
-        recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
+        recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
       }
-      AuditSqlDao auditSqlDao=dao.become(AuditSqlDao.class);
+      AuditSqlDao auditSqlDao=transactional.become(AuditSqlDao.class);
       auditSqlDao.insertAuditFromTransaction(ENTITLEMENT_EVENTS_TABLE_NAME,eventIds,ChangeType.INSERT,context);
       return null;
     }

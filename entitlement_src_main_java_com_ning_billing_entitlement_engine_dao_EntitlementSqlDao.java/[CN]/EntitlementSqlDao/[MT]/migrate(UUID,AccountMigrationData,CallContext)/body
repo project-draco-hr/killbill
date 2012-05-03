@@ -1,8 +1,8 @@
 {
   eventsDao.inTransaction(new Transaction<Void,EventSqlDao>(){
-    @Override public Void inTransaction(    EventSqlDao transEventDao,    TransactionStatus status) throws Exception {
-      SubscriptionSqlDao transSubDao=transEventDao.become(SubscriptionSqlDao.class);
-      BundleSqlDao transBundleDao=transEventDao.become(BundleSqlDao.class);
+    @Override public Void inTransaction(    EventSqlDao transactional,    TransactionStatus status) throws Exception {
+      SubscriptionSqlDao transSubDao=transactional.become(SubscriptionSqlDao.class);
+      BundleSqlDao transBundleDao=transactional.become(BundleSqlDao.class);
       List<String> bundleIds=new ArrayList<String>();
       List<String> subscriptionIds=new ArrayList<String>();
       List<String> eventIds=new ArrayList<String>();
@@ -11,9 +11,9 @@
         for (        SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
           SubscriptionData subData=curSubscription.getData();
           for (          final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
-            transEventDao.insertEvent(curEvent,context);
+            transactional.insertEvent(curEvent,context);
             eventIds.add(curEvent.getId().toString());
-            recordFutureNotificationFromTransaction(transEventDao,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()));
+            recordFutureNotificationFromTransaction(transactional,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()));
           }
           transSubDao.insertSubscription(subData,context);
           subscriptionIds.add(subData.getId().toString());

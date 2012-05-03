@@ -1,11 +1,11 @@
 {
   eventsDao.inTransaction(new Transaction<Void,EventSqlDao>(){
-    @Override public Void inTransaction(    EventSqlDao dao,    TransactionStatus status) throws Exception {
-      cancelNextPhaseEventFromTransaction(subscriptionId,dao,context);
-      dao.insertEvent(nextPhase,context);
-      AuditSqlDao auditSqlDao=dao.become(AuditSqlDao.class);
+    @Override public Void inTransaction(    EventSqlDao transactional,    TransactionStatus status) throws Exception {
+      cancelNextPhaseEventFromTransaction(subscriptionId,transactional,context);
+      transactional.insertEvent(nextPhase,context);
+      AuditSqlDao auditSqlDao=transactional.become(AuditSqlDao.class);
       auditSqlDao.insertAuditFromTransaction(ENTITLEMENT_EVENTS_TABLE_NAME,nextPhase.getId().toString(),ChangeType.INSERT,context);
-      recordFutureNotificationFromTransaction(dao,nextPhase.getEffectiveDate(),new EntitlementNotificationKey(nextPhase.getId()));
+      recordFutureNotificationFromTransaction(transactional,nextPhase.getEffectiveDate(),new EntitlementNotificationKey(nextPhase.getId()));
       return null;
     }
   }
