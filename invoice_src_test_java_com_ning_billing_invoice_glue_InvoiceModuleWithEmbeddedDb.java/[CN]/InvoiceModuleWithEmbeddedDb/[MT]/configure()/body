@@ -8,9 +8,10 @@
   install(new TagStoreModule());
   installNotificationQueue();
   bind(AccountUserApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class));
-  bind(BillingApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(BillingApi.class));
+  BillingApi billingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(BillingApi.class);
+  ((ZombieControl)billingApi).addResult("setChargedThroughDateFromTransaction",BrainDeadProxyFactory.ZOMBIE_VOID);
+  bind(BillingApi.class).toInstance(billingApi);
   install(new CatalogModule());
-  install(new EntitlementModule());
   install(new GlobalLockerModule());
   super.configure();
   bind(InvoiceTestApi.class).to(DefaultInvoiceTestApi.class).asEagerSingleton();

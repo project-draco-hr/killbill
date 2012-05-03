@@ -1,0 +1,27 @@
+{
+  List<String> to=new ArrayList<String>();
+  to.add(account.getEmail());
+  List<AccountEmail> accountEmailList=accountUserApi.getEmails(account.getId());
+  List<String> cc=new ArrayList<String>();
+  for (  AccountEmail email : accountEmailList) {
+    cc.add(email.getEmail());
+  }
+  String htmlBody=null;
+  try {
+    htmlBody=generator.generateInvoice(account,invoice,"HtmlInvoiceTemplate");
+  }
+ catch (  IOException e) {
+    throw new InvoiceApiException(e,ErrorCode.EMAIL_SENDING_FAILED);
+  }
+  String subject="";
+  EmailSender sender=new DefaultEmailSender(config);
+  try {
+    sender.sendSecureEmail(to,cc,subject,htmlBody);
+  }
+ catch (  EmailApiException e) {
+    throw new InvoiceApiException(e,ErrorCode.EMAIL_SENDING_FAILED);
+  }
+catch (  IOException e) {
+    throw new InvoiceApiException(e,ErrorCode.EMAIL_SENDING_FAILED);
+  }
+}
