@@ -1,9 +1,9 @@
 {
   eventsDao.inTransaction(new Transaction<Void,EventSqlDao>(){
-    @Override public Void inTransaction(    EventSqlDao dao,    TransactionStatus status) throws Exception {
+    @Override public Void inTransaction(    EventSqlDao transactional,    TransactionStatus status) throws Exception {
       UUID existingCancelId=null;
       Date now=clock.getUTCNow().toDate();
-      List<EntitlementEvent> events=dao.getFutureActiveEventForSubscription(subscriptionId.toString(),now);
+      List<EntitlementEvent> events=transactional.getFutureActiveEventForSubscription(subscriptionId.toString(),now);
       for (      EntitlementEvent cur : events) {
         if (cur.getType() == EventType.API_USER && ((ApiEvent)cur).getEventType() == ApiEventType.CANCEL) {
           if (existingCancelId != null) {
@@ -13,15 +13,15 @@
         }
       }
       if (existingCancelId != null) {
-        dao.unactiveEvent(existingCancelId.toString(),context);
+        transactional.unactiveEvent(existingCancelId.toString(),context);
         String deactivatedEventId=existingCancelId.toString();
         List<String> eventIds=new ArrayList<String>();
         for (        final EntitlementEvent cur : uncancelEvents) {
-          dao.insertEvent(cur,context);
+          transactional.insertEvent(cur,context);
           eventIds.add(cur.getId().toString());
-          recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
+          recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
         }
-        AuditSqlDao auditSqlDao=dao.become(AuditSqlDao.class);
+        AuditSqlDao auditSqlDao=transactional.become(AuditSqlDao.class);
         auditSqlDao.insertAuditFromTransaction(ENTITLEMENT_EVENTS_TABLE_NAME,deactivatedEventId,ChangeType.UPDATE,context);
         auditSqlDao.insertAuditFromTransaction(ENTITLEMENT_EVENTS_TABLE_NAME,eventIds,ChangeType.INSERT,context);
       }

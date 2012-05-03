@@ -8,8 +8,9 @@
   }
   Assert.assertNull(accountDao.getAccount(ACCOUNT_KEY));
   bus.post(transition);
+  Thread.sleep(5000000);
   bus.post(accountCreationNotification);
-  Thread.sleep(1000);
+  Thread.sleep(5000);
   Assert.assertEquals(subscriptionDao.getTransitions(KEY).size(),1);
   Assert.assertEquals(subscriptionDao.getTransitions(KEY).get(0),expectedTransition);
   Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getKey(),ACCOUNT_KEY);
@@ -18,10 +19,10 @@
   Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTags().indexOf(TAG_TWO.getName()) != -1);
   Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
   bus.post(invoiceCreationNotification);
-  Thread.sleep(1000);
+  Thread.sleep(5000);
   Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
   bus.post(paymentInfoNotification);
-  Thread.sleep(1000);
+  Thread.sleep(5000);
   Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getPaymentMethod(),PAYMENT_METHOD);
   Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getBillingAddressCountry(),CARD_COUNTRY);
   try {

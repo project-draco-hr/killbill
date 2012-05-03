@@ -16,7 +16,12 @@
         saveTagsFromWithinTransaction(account,transactionalDao,context);
         saveCustomFieldsFromWithinTransaction(account,transactionalDao,context);
         AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,context.getUserToken());
-        eventBus.post(creationEvent);
+        try {
+          eventBus.postFromTransaction(creationEvent,transactionalDao);
+        }
+ catch (        EventBusException e) {
+          log.warn("Failed to post account creation event for account " + account.getId(),e);
+        }
         return null;
       }
     }
