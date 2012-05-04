@@ -15,6 +15,7 @@
   BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
   CallContextFactory factory=new DefaultCallContextFactory(clock);
   BillingApi api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi,blockCalculator,catalogService);
+  subscriptionPlan=catalogService.getFullCatalog().findPlan("PickupTrialEvergreen10USD",now);
   SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(new UUID(0L,0L));
   checkFirstEvent(events,nextPlan,subscription.getStartDate().plusDays(30).getDayOfMonth(),subId,now,nextPhase,ApiEventType.CREATE.toString());
 }
