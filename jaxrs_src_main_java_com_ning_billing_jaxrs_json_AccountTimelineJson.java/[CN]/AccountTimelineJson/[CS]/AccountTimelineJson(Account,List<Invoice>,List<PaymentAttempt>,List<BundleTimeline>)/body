@@ -9,7 +9,9 @@
     this.invoices.add(new InvoiceJson(cur.getTotalAmount(),cur.getId().toString(),cur.getInvoiceDate(),Integer.toString(cur.getInvoiceNumber()),cur.getBalance()));
   }
   this.payments=new LinkedList<PaymentJson>();
-  for (  PaymentInfoEvent cur : payments) {
-    this.payments.add(new PaymentJson(cur.getAmount(),null,cur.getPaymentNumber(),null,cur.getEffectiveDate(),cur.getStatus()));
+  for (  PaymentAttempt cur : payments) {
+    String status=cur.getPaymentId() != null ? "Success" : "Failed";
+    BigDecimal paidAmount=cur.getPaymentId() != null ? cur.getAmount() : BigDecimal.ZERO;
+    this.payments.add(new PaymentJson(cur.getAmount(),paidAmount,cur.getInvoiceId().toString(),cur.getPaymentId(),cur.getCreatedDate(),cur.getUpdatedDate(),cur.getRetryCount(),cur.getCurrency().toString(),status));
   }
 }
