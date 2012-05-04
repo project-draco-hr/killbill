@@ -1,16 +1,12 @@
 {
   final Injector g=Guice.createInjector(Stage.PRODUCTION,new AbstractModule(){
     protected void configure(){
-      bind(Clock.class).to(ClockMock.class).asEagerSingleton();
-      bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
-      bind(Bus.class).to(InMemoryBus.class).asEagerSingleton();
-      bind(NotificationQueueService.class).to(DefaultNotificationQueueService.class).asEagerSingleton();
-      bind(InvoiceNotifier.class).to(NullInvoiceNotifier.class).asEagerSingleton();
-      final InvoiceConfig invoiceConfig=new ConfigurationObjectFactory(System.getProperties()).build(InvoiceConfig.class);
-      bind(InvoiceConfig.class).toInstance(invoiceConfig);
-      final CatalogConfig catalogConfig=new ConfigurationObjectFactory(System.getProperties()).build(CatalogConfig.class);
-      bind(CatalogConfig.class).toInstance(catalogConfig);
-      bind(CatalogService.class).to(DefaultCatalogService.class).asEagerSingleton();
+      install(new MockClockModule());
+      install(new BusModule(BusType.MEMORY));
+      install(new InvoiceModuleWithMocks());
+      install(new MockJunctionModule());
+      install(new MockCatalogModule());
+      install(new NotificationQueueModule());
       final MysqlTestingHelper helper=new MysqlTestingHelper();
       bind(MysqlTestingHelper.class).toInstance(helper);
       if (helper.isUsingLocalInstance()) {
@@ -22,21 +18,6 @@
         final IDBI dbi=helper.getDBI();
         bind(IDBI.class).toInstance(dbi);
       }
-      bind(TagDao.class).to(AuditedTagDao.class).asEagerSingleton();
-      bind(EntitlementDao.class).to(EntitlementSqlDao.class).asEagerSingleton();
-      bind(EntitlementDao.class).annotatedWith(Names.named(DefaultEntitlementModule.REPAIR_NAMED)).to(RepairEntitlementDao.class);
-      bind(RepairEntitlementLifecycleDao.class).annotatedWith(Names.named(DefaultEntitlementModule.REPAIR_NAMED)).to(RepairEntitlementDao.class);
-      bind(RepairEntitlementDao.class).asEagerSingleton();
-      bind(CustomFieldDao.class).to(AuditedCustomFieldDao.class).asEagerSingleton();
-      bind(GlobalLocker.class).to(MySqlGlobalLocker.class).asEagerSingleton();
-      bind(InvoiceGenerator.class).to(DefaultInvoiceGenerator.class).asEagerSingleton();
-      bind(InvoiceDao.class).to(DefaultInvoiceDao.class).asEagerSingleton();
-      bind(NextBillingDatePoster.class).to(DefaultNextBillingDatePoster.class).asEagerSingleton();
-      bind(SubscriptionApiService.class).annotatedWith(Names.named(DefaultEntitlementModule.REPAIR_NAMED)).to(RepairSubscriptionApiService.class).asEagerSingleton();
-      bind(SubscriptionApiService.class).to(DefaultSubscriptionApiService.class).asEagerSingleton();
-      bind(SubscriptionFactory.class).annotatedWith(Names.named(DefaultEntitlementModule.REPAIR_NAMED)).to(RepairSubscriptionFactory.class).asEagerSingleton();
-      bind(SubscriptionFactory.class).to(DefaultSubscriptionFactory.class).asEagerSingleton();
-      install(new MockJunctionModule());
     }
   }
 );

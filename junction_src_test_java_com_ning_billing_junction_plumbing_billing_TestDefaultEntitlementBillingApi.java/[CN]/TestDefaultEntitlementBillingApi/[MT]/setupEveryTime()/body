@@ -1,18 +1,26 @@
 {
   bundles=new ArrayList<SubscriptionBundle>();
-  final SubscriptionBundle bundle=new SubscriptionBundleData(eventId,"TestKey",subId,clock.getUTCNow().minusDays(4),null);
+  final SubscriptionBundle bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
+  ((ZombieControl)bundle).addResult("getId",eventId);
   bundles.add(bundle);
   subscriptionTransitions=new LinkedList<SubscriptionEvent>();
   subscriptions=new LinkedList<Subscription>();
-  SubscriptionBuilder builder=new SubscriptionBuilder();
   subscriptionStartDate=clock.getUTCNow().minusDays(3);
-  builder.setStartDate(subscriptionStartDate).setId(subId).setBundleId(bunId);
-  subscription=new SubscriptionData(builder){
+  subscription=new MockSubscription(){
     @Override public List<SubscriptionEvent> getBillingTransitions(){
       return subscriptionTransitions;
     }
     @Override public Plan getCurrentPlan(){
       return subscriptionPlan;
+    }
+    @Override public UUID getId(){
+      return subId;
+    }
+    @Override public UUID getBundleId(){
+      return bunId;
+    }
+    @Override public DateTime getStartDate(){
+      return subscriptionStartDate;
     }
   }
 ;
