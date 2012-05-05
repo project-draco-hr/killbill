@@ -1,6 +1,7 @@
 {
   super.configure();
-  bind(Bus.class).to(InMemoryBus.class).asEagerSingleton();
-  bind(InvoiceTestApi.class).to(DefaultInvoiceTestApi.class).asEagerSingleton();
-  bind(NotificationQueueService.class).to(MockNotificationQueueService.class).asEagerSingleton();
+  install(new BusModule(BusType.MEMORY));
+  install(new MockNotificationQueueModule());
+  install(new MockInvoiceModule());
+  install(new TestDbiModule());
 }
