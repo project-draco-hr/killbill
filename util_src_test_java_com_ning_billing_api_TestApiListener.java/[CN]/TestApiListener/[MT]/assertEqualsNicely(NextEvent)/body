@@ -7,14 +7,20 @@ synchronized (this) {
       if (ev == received) {
         it.remove();
         foundIt=true;
+        if (!nonExpectedMode) {
+          log.info("TestApiListener found event {}. Yeah!",received);
+        }
+ else {
+          log.error("TestApiListener found non expected event {}. Boohh! ",received);
+        }
         break;
       }
     }
-    if (!foundIt) {
+    if (!foundIt && !nonExpectedMode) {
       Joiner joiner=Joiner.on(" ");
-      log.error("TestBusHandler Received event " + received + "; expecting "+ joiner.join(nextExpectedEvent));
+      log.error("TestApiListener Received event " + received + "; expecting "+ joiner.join(nextExpectedEvent));
       if (testStatus != null) {
-        testStatus.failed("TestBusHandler Received event " + received + "; expecting "+ joiner.join(nextExpectedEvent));
+        testStatus.failed("TestApiListener [ApiListenerStatus]: Received event " + received + "; expecting "+ joiner.join(nextExpectedEvent));
       }
     }
   }

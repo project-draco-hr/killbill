@@ -14,12 +14,14 @@
     DateTime newChargedThroughDate=DefaultClock.addDuration(startDiscountPhase,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
+    testListener.setNonExpectedMode();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow(),context);
-    assertFalse(testListener.isCompleted(5000));
+    assertFalse(testListener.isCompleted(3000));
+    testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
-    assertFalse(testListener.isCompleted(5000));
+    assertTrue(testListener.isCompleted(5000));
     Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),"Assault-Rifle");

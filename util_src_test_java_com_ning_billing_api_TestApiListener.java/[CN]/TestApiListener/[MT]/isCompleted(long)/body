@@ -7,7 +7,7 @@ synchronized (this) {
     do {
       try {
         DateTime before=new DateTime();
-        wait(1000);
+        wait(500);
         if (completed) {
           return completed;
         }
@@ -21,9 +21,9 @@ synchronized (this) {
     }
  while (waitTimeMs > 0 && !completed);
   }
-  if (!completed) {
+  if (!completed && !nonExpectedMode) {
     Joiner joiner=Joiner.on(" ");
-    log.error("TestBusHandler did not complete in " + timeout + " ms, remaining events are "+ joiner.join(nextExpectedEvent));
+    log.error("TestApiListener did not complete in " + timeout + " ms, remaining events are "+ joiner.join(nextExpectedEvent));
   }
   return completed;
 }
