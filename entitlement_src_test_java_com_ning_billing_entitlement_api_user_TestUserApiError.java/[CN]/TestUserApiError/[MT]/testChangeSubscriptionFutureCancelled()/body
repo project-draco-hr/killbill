@@ -1,11 +1,12 @@
 {
+  log.info("Starting testChangeSubscriptionFutureCancelled");
   try {
     Subscription subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
     PlanPhase trialPhase=subscription.getCurrentPhase();
     PlanPhase currentPhase=subscription.getCurrentPhase();
-    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(currentPhase.getDuration(),DAY_IN_MS);
-    assertTrue(testListener.isApiCompleted(3000));
+    assertTrue(testListener.isCompleted(5000));
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     Duration ctd=getDurationMonth(1);
     DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
@@ -24,6 +25,7 @@
         assertFalse(true);
       }
     }
+    assertListenerStatus();
   }
  catch (  Exception e) {
     e.printStackTrace();

@@ -1,19 +1,20 @@
 {
-  log.info("Starting testChangePlanBundleAlignEOTWithNoChargeThroughDateReal");
+  log.info("Starting testChangePlanBundleAlignEOTWithNoChargeThroughDate");
   try {
     SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
     PlanPhase currentPhase=subscription.getCurrentPhase();
-    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(currentPhase.getDuration(),DAY_IN_MS);
     DateTime futureNow=clock.getUTCNow();
     DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     assertTrue(futureNow.isAfter(nextExpectedPhaseChange));
-    assertTrue(testListener.isApiCompleted(3000));
-    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
+    assertTrue(testListener.isCompleted(5000));
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow(),context);
-    assertTrue(testListener.isApiCompleted(2000));
+    assertTrue(testListener.isCompleted(5000));
     currentPhase=subscription.getCurrentPhase();
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.EVERGREEN);
+    assertListenerStatus();
   }
  catch (  EntitlementUserApiException e) {
     Assert.fail(e.getMessage());

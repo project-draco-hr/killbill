@@ -1,4 +1,5 @@
 {
+  log.info("Starting testENT_REPAIR_VIEW_CHANGED_ctd");
   TestWithException test=new TestWithException();
   DateTime startDate=clock.getUTCNow();
   testListener.reset();
@@ -19,6 +20,7 @@
       billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);
       entitlementApi.getSubscriptionFromId(baseSubscription.getId());
       repairApi.repairBundle(bRepair,true,context);
+      assertListenerStatus();
     }
   }
 ,ErrorCode.ENT_REPAIR_VIEW_CHANGED);

@@ -1,4 +1,5 @@
 {
+  log.info("Starting testRepairCancelBP_EOT_WithAddons");
   String baseProduct="Shotgun";
   BillingPeriod baseTerm=BillingPeriod.MONTHLY;
   String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
@@ -6,11 +7,11 @@
   Duration someTimeLater=getDurationDay(3);
   clock.setDeltaFromReality(someTimeLater,DAY_IN_MS);
   SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
-  testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
-  testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
   someTimeLater=getDurationDay(40);
   clock.addDeltaFromReality(someTimeLater);
-  assertTrue(testListener.isApiCompleted(7000));
+  assertTrue(testListener.isCompleted(7000));
   DateTime newChargedThroughDate=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
   billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);
   baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
@@ -55,7 +56,9 @@
   assertEquals(newBaseSubscription.getAllTransitions().size(),2);
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   dryRun=false;
+  testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
   BundleTimeline realRunBundleRepair=repairApi.repairBundle(bundleRepair,dryRun,context);
+  assertTrue(testListener.isCompleted(5000));
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),realRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),3);
   bpRepair=getSubscriptionRepair(baseSubscription.getId(),realRunBundleRepair);
@@ -76,11 +79,11 @@
   assertEquals(newBaseSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newBaseSubscription.getAllTransitions().size(),3);
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
-  testListener.pushNextApiExpectedEvent(NextEvent.CANCEL);
-  testListener.pushNextApiExpectedEvent(NextEvent.CANCEL);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
   someTimeLater=getDurationDay(32);
   clock.addDeltaFromReality(someTimeLater);
-  assertTrue(testListener.isApiCompleted(7000));
+  assertTrue(testListener.isCompleted(7000));
   newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
   assertEquals(newAoSubscription.getState(),SubscriptionState.CANCELLED);
   assertEquals(newAoSubscription.getAllTransitions().size(),3);

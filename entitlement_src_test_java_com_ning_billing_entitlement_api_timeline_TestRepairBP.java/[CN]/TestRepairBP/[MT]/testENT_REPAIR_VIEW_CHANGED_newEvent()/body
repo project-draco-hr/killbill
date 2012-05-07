@@ -1,4 +1,5 @@
 {
+  log.info("Starting testENT_REPAIR_VIEW_CHANGED_newEvent");
   TestWithException test=new TestWithException();
   DateTime startDate=clock.getUTCNow();
   testListener.reset();
@@ -15,11 +16,12 @@
       des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
       SubscriptionTimeline sRepair=createSubscriptionReapir(baseSubscription.getId(),des,Collections.singletonList(ne));
       BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
-      testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
+      testListener.pushExpectedEvent(NextEvent.CHANGE);
       DateTime changeTime=clock.getUTCNow();
       baseSubscription.changePlan("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,changeTime,context);
-      assertTrue(testListener.isApiCompleted(5000));
+      assertTrue(testListener.isCompleted(5000));
       repairApi.repairBundle(bRepair,true,context);
+      assertListenerStatus();
     }
   }
 ,ErrorCode.ENT_REPAIR_VIEW_CHANGED);

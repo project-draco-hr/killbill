@@ -4,9 +4,9 @@
     DateTime beforeMigration=clock.getUTCNow();
     EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlanFutreCancelled(startDate);
     DateTime afterMigration=clock.getUTCNow();
-    testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated,context);
-    assertTrue(testListener.isApiCompleted(5000));
+    assertTrue(testListener.isCompleted(5000));
     List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
     assertEquals(bundles.size(),1);
     SubscriptionBundle bundle=bundles.get(0);
@@ -19,11 +19,11 @@
     assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-annual");
     assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
-    testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_BILLING);
-    testListener.pushNextApiExpectedEvent(NextEvent.CANCEL);
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_BILLING);
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
     Duration oneYear=getDurationYear(1);
     clock.setDeltaFromReality(oneYear,0);
-    assertTrue(testListener.isApiCompleted(5000));
+    assertTrue(testListener.isCompleted(5000));
     assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
     assertNotNull(subscription.getEndDate());
     assertTrue(subscription.getEndDate().isAfterNow());
@@ -31,6 +31,7 @@
     assertEquals(subscription.getCurrentPhase(),null);
     assertEquals(subscription.getState(),SubscriptionState.CANCELLED);
     assertNull(subscription.getCurrentPlan());
+    assertListenerStatus();
   }
  catch (  EntitlementMigrationApiException e) {
     Assert.fail("",e);

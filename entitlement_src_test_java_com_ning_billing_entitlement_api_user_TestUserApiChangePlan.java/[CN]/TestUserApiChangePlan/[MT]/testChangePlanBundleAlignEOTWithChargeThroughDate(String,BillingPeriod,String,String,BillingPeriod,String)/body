@@ -1,22 +1,21 @@
 {
-  log.info("Starting testChangeSubscriptionEOTWithChargeThroughDate");
   try {
     SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
     PlanPhase trialPhase=subscription.getCurrentPhase();
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
-    assertTrue(testListener.isApiCompleted(2000));
+    assertTrue(testListener.isCompleted(5000));
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
     Duration ctd=getDurationMonth(1);
     DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
-    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow(),context);
-    assertFalse(testListener.isApiCompleted(2000));
+    assertFalse(testListener.isCompleted(5000));
     testListener.reset();
     currentPhase=subscription.getCurrentPhase();
     checkChangePlan(subscription,fromProd,ProductCategory.BASE,fromTerm,PhaseType.DISCOUNT);
@@ -24,12 +23,13 @@
     checkNextPhaseChange(subscription,2,nextExpectedPhaseChange);
     List<EntitlementEvent> events=dao.getPendingEventsForSubscription(subscription.getId());
     assertTrue(events.get(0) instanceof ApiEvent);
-    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
     clock.addDeltaFromReality(ctd);
-    assertTrue(testListener.isApiCompleted(5000));
+    assertTrue(testListener.isCompleted(5000));
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     currentPhase=subscription.getCurrentPhase();
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.DISCOUNT);
+    assertListenerStatus();
   }
  catch (  EntitlementUserApiException e) {
     Assert.fail(e.getMessage());

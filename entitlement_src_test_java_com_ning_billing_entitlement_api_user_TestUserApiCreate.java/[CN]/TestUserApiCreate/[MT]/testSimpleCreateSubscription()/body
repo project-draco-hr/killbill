@@ -5,7 +5,7 @@
     String productName="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
     String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-    testListener.pushNextApiExpectedEvent(NextEvent.CREATE);
+    testListener.pushExpectedEvent(NextEvent.CREATE);
     SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),context);
     assertNotNull(subscription);
     assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
@@ -20,7 +20,7 @@
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
-    assertTrue(testListener.isApiCompleted(5000));
+    assertTrue(testListener.isCompleted(5000));
     List<EntitlementEvent> events=dao.getPendingEventsForSubscription(subscription.getId());
     assertNotNull(events);
     printEvents(events);
@@ -29,11 +29,12 @@
     DateTime nextPhaseChange=((PhaseEvent)events.get(0)).getEffectiveDate();
     DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     assertEquals(nextPhaseChange,nextExpectedPhaseChange);
-    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
     clock.setDeltaFromReality(currentPhase.getDuration(),DAY_IN_MS);
     DateTime futureNow=clock.getUTCNow();
     assertTrue(futureNow.isAfter(nextPhaseChange));
-    assertTrue(testListener.isApiCompleted(5000));
+    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
   }
  catch (  EntitlementUserApiException e) {
     Assert.fail(e.getMessage());

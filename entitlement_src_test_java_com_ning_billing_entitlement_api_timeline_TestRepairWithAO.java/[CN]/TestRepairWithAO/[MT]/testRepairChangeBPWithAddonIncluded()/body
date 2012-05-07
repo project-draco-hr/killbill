@@ -1,4 +1,5 @@
 {
+  log.info("Starting testRepairChangeBPWithAddonIncluded");
   String baseProduct="Shotgun";
   BillingPeriod baseTerm=BillingPeriod.MONTHLY;
   String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
@@ -66,7 +67,9 @@
   assertEquals(newBaseSubscription.getAllTransitions().size(),2);
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   dryRun=false;
+  testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
   BundleTimeline realRunBundleRepair=repairApi.repairBundle(bundleRepair,dryRun,context);
+  assertTrue(testListener.isCompleted(5000));
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),realRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
   bpRepair=getSubscriptionRepair(baseSubscription.getId(),realRunBundleRepair);

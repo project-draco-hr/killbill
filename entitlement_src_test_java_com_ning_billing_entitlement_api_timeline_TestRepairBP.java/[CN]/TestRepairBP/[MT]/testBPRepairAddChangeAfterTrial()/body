@@ -1,4 +1,5 @@
 {
+  log.info("Starting testBPRepairAddChangeAfterTrial");
   String baseProduct="Shotgun";
   String newBaseProduct="Assault-Rifle";
   DateTime startDate=clock.getUTCNow();
@@ -9,4 +10,5 @@
   expected.add(createExistingEventForAssertion(SubscriptionTransitionType.PHASE,baseProduct,PhaseType.EVERGREEN,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,startDate.plusDays(30)));
   expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CHANGE,newBaseProduct,PhaseType.EVERGREEN,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,changeDate));
   testBPRepairAddChange(false,startDate,clockShift,baseProduct,newBaseProduct,expected,3);
+  assertListenerStatus();
 }

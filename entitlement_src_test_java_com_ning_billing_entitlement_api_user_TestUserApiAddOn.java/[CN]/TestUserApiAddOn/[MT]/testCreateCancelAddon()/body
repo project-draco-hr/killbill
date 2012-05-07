@@ -1,4 +1,5 @@
 {
+  log.info("Starting testCreateCancelAddon");
   try {
     String baseProduct="Shotgun";
     BillingPeriod baseTerm=BillingPeriod.MONTHLY;
@@ -12,9 +13,10 @@
     DateTime now=clock.getUTCNow();
     aoSubscription.cancel(now,false,context);
     testListener.reset();
-    testListener.pushNextApiExpectedEvent(NextEvent.CANCEL);
-    assertTrue(testListener.isApiCompleted(5000));
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    assertTrue(testListener.isCompleted(5000));
     assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);
+    assertListenerStatus();
   }
  catch (  Exception e) {
     Assert.fail(e.getMessage());
