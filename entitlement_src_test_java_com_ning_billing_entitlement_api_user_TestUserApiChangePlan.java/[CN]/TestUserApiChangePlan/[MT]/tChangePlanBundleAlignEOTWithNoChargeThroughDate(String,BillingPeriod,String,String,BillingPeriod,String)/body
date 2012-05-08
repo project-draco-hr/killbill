@@ -4,7 +4,8 @@
     SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
     PlanPhase currentPhase=subscription.getCurrentPhase();
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    clock.setDeltaFromReality(currentPhase.getDuration(),DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
     DateTime futureNow=clock.getUTCNow();
     DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     assertTrue(futureNow.isAfter(nextExpectedPhaseChange));

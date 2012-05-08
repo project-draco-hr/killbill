@@ -5,8 +5,8 @@
     if (!inTrial) {
       testListener.pushExpectedEvent(NextEvent.PHASE);
     }
-    Duration durationShift=getDurationDay(clockShift);
-    clock.setDeltaFromReality(durationShift,0);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(clockShift));
+    clock.addDeltaFromReality(it.toDurationMillis());
     if (!inTrial) {
       assertTrue(testListener.isCompleted(5000));
     }

@@ -3,7 +3,8 @@
   DateTime startDate=clock.getUTCNow();
   Subscription baseSubscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
   testListener.pushExpectedEvent(NextEvent.PHASE);
-  clock.setDeltaFromReality(getDurationDay(35),0);
+  Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(35));
+  clock.addDeltaFromReality(it.toDurationMillis());
   assertTrue(testListener.isCompleted(5000));
   DateTime newChargedThroughDate=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
   billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);

@@ -12,13 +12,15 @@
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
     assertTrue(testListener.isCompleted(5000));
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    clock.setDeltaFromReality(currentPhase.getDuration(),DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
     currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
-    assertTrue(testListener.isCompleted(5000));
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    clock.addDeltaFromReality(currentPhase.getDuration());
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusYears(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     currentPhase=subscription.getCurrentPhase();

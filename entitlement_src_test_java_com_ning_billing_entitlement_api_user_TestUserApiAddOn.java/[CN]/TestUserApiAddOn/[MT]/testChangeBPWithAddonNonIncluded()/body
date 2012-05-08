@@ -12,8 +12,8 @@
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.PHASE);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    Duration twoMonths=getDurationMonth(2);
-    clock.setDeltaFromReality(twoMonths,DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(2));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     DateTime now=clock.getUTCNow();
     Duration ctd=getDurationMonth(1);

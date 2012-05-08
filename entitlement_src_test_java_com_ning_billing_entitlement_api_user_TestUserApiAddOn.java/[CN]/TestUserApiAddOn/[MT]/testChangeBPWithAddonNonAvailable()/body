@@ -12,8 +12,8 @@
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.PHASE);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    Duration twoMonths=getDurationMonth(2);
-    clock.setDeltaFromReality(twoMonths,DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(2));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     DateTime now=clock.getUTCNow();
     Duration ctd=getDurationMonth(1);
@@ -30,7 +30,8 @@
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    clock.addDeltaFromReality(ctd);
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
     assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);

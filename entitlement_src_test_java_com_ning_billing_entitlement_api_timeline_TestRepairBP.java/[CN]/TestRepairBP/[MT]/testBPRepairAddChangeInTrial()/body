@@ -11,7 +11,8 @@
   expected.add(createExistingEventForAssertion(SubscriptionTransitionType.PHASE,newBaseProduct,PhaseType.EVERGREEN,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,startDate.plusDays(30)));
   UUID baseSubscriptionId=testBPRepairAddChange(true,startDate,clockShift,baseProduct,newBaseProduct,expected,3);
   testListener.pushExpectedEvent(NextEvent.PHASE);
-  clock.addDeltaFromReality(getDurationDay(32));
+  Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(32));
+  clock.addDeltaFromReality(it.toDurationMillis());
   assertTrue(testListener.isCompleted(5000));
   SubscriptionData subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscriptionId);
   assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);

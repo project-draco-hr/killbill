@@ -5,7 +5,8 @@
     PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     List<Duration> durationList=new ArrayList<Duration>();
     durationList.add(trialPhase.getDuration());

@@ -7,7 +7,8 @@
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     currentTime=clock.getUTCNow();
-    clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
     currentTime=clock.getUTCNow();
     assertTrue(testListener.isCompleted(5000));
     Duration ctd=getDurationMonth(1);
@@ -25,7 +26,8 @@
     assertFalse(testListener.isCompleted(3000));
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    clock.addDeltaFromReality(ctd);
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
     currentTime=clock.getUTCNow();
     assertTrue(testListener.isCompleted(5000));
     String currentProduct=subscription.getCurrentPlan().getProduct().getName();
@@ -36,14 +38,16 @@
     assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
     testListener.setNonExpectedMode();
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    clock.addDeltaFromReality(getDurationMonth(11));
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(11));
+    clock.addDeltaFromReality(it.toDurationMillis());
     currentTime=clock.getUTCNow();
     assertFalse(testListener.isCompleted(3000));
     testListener.reset();
     DateTime nextExpectedPhaseChange=DefaultClock.addDuration(newChargedThroughDate,currentPhase.getDuration());
     checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    clock.addDeltaFromReality(getDurationMonth(1));
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
     currentTime=clock.getUTCNow();
     assertTrue(testListener.isCompleted(5000));
     assertListenerStatus();

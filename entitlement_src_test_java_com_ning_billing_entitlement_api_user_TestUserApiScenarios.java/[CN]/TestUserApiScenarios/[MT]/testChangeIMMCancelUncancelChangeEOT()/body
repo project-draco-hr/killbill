@@ -8,7 +8,8 @@
     subscription.changePlan("Pistol",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
     testListener.isCompleted(5000);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     Duration ctd=getDurationMonth(1);
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
@@ -27,7 +28,8 @@
     assertFalse(testListener.isCompleted(5000));
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    clock.addDeltaFromReality(ctd);
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     assertListenerStatus();
   }

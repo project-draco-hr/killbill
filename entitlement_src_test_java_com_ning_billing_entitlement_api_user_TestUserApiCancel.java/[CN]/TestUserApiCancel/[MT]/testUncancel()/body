@@ -10,7 +10,8 @@
     DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    clock.setDeltaFromReality(trialPhase.getDuration(),DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
@@ -21,7 +22,8 @@
     subscription.cancel(clock.getUTCNow(),false,context);
     subscription.uncancel(context);
     testListener.pushExpectedEvent(NextEvent.UNCANCEL);
-    clock.addDeltaFromReality(ctd);
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     Plan currentPlan=subscription.getCurrentPlan();
     assertEquals(currentPlan.getProduct().getName(),prod);

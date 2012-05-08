@@ -3,8 +3,8 @@
   test.withException(new TestWithExceptionCallback(){
     @Override public void doTest() throws EntitlementRepairException {
       testListener.pushExpectedEvent(NextEvent.PHASE);
-      Duration durationShift=getDurationDay(40);
-      clock.setDeltaFromReality(durationShift,0);
+      Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(40));
+      clock.addDeltaFromReality(it.toDurationMillis());
       assertTrue(testListener.isCompleted(5000));
       BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
       sortEventsOnBundle(bundleRepair);

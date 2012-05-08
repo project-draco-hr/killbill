@@ -3,8 +3,8 @@
   String baseProduct="Shotgun";
   DateTime startDate=clock.getUTCNow();
   Subscription baseSubscription=createSubscription(baseProduct,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
-  Duration durationShift=getDurationDay(10);
-  clock.setDeltaFromReality(durationShift,0);
+  Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(10));
+  clock.addDeltaFromReality(it.toDurationMillis());
   BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
   sortEventsOnBundle(bundleRepair);
   List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();

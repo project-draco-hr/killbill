@@ -4,7 +4,8 @@
     SubscriptionData subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
     PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    clock.setDeltaFromReality(getDurationDay(1),DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(2));
+    clock.addDeltaFromReality(it.toDurationMillis());
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
@@ -18,7 +19,8 @@
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    clock.addDeltaFromReality(trialPhase.getDuration());
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.DISCOUNT);
