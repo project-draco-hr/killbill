@@ -21,8 +21,7 @@
     assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
     testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_BILLING);
     testListener.pushNextApiExpectedEvent(NextEvent.CANCEL);
-    Duration oneYear=getDurationYear(1);
-    clock.setDeltaFromReality(oneYear,0);
+    clock.addYears(1);
     assertTrue(testListener.isApiCompleted(5000));
     assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
     assertNotNull(subscription.getEndDate());
