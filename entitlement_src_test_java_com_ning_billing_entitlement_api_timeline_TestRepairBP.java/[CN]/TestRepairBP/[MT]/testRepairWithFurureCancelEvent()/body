@@ -1,9 +1,11 @@
 {
+  log.info("Starting testRepairWithFurureCancelEvent");
   DateTime startDate=clock.getUTCNow();
   Subscription baseSubscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
-  testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
-  clock.setDeltaFromReality(getDurationDay(35),0);
-  assertTrue(testListener.isApiCompleted(5000));
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(35));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  assertTrue(testListener.isCompleted(5000));
   DateTime newChargedThroughDate=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
   billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);
   baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
@@ -24,7 +26,9 @@
   SubscriptionTimeline sRepair=createSubscriptionReapir(baseSubscription.getId(),des,Collections.singletonList(ne));
   BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
   boolean dryRun=false;
+  testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
   repairApi.repairBundle(bRepair,dryRun,context);
+  assertTrue(testListener.isCompleted(5000));
   baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
   assertEquals(((SubscriptionData)baseSubscription).getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
   assertEquals(baseSubscription.getBundleId(),bundle.getId());
@@ -37,4 +41,5 @@
   PlanPhase currentPhase=baseSubscription.getCurrentPhase();
   assertNotNull(currentPhase);
   assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
+  assertListenerStatus();
 }

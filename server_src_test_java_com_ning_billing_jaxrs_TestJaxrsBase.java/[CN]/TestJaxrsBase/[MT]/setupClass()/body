@@ -2,7 +2,10 @@
   loadConfig();
   httpClient=new AsyncHttpClient();
   mapper=new ObjectMapper();
-  busHandler=new TestBusHandler(null);
+  mapper.registerModule(new JodaModule());
+  mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+  mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy());
+  busHandler=new TestApiListener(null);
   this.helper=listener.getMysqlTestingHelper();
   this.clock=(ClockMock)listener.getClock();
 }

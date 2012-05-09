@@ -1,7 +1,9 @@
 {
+  log.info("Starting testENT_REPAIR_BP_RECREATE_MISSING_AO");
   test.withException(new TestWithExceptionCallback(){
     @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
-      clock.setDeltaFromReality(getDurationDay(5),0);
+      Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
+      clock.addDeltaFromReality(it.toDurationMillis());
       SubscriptionData aoSubscription=createSubscription("Laser-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
       BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
       sortEventsOnBundle(bundleRepair);

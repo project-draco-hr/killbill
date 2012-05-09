@@ -1,4 +1,5 @@
 {
+  log.info("Starting testAddonCreateWithSubscriptionAlign");
   try {
     String aoProduct="Laser-Scope";
     BillingPeriod aoTerm=BillingPeriod.MONTHLY;
@@ -7,6 +8,7 @@
     PlanAlignmentCreate alignement=catalog.planCreateAlignment(planSpecifier,clock.getUTCNow());
     assertEquals(alignement,PlanAlignmentCreate.START_OF_SUBSCRIPTION);
     testAddonCreateInternal(aoProduct,aoTerm,aoPriceList,alignement);
+    assertListenerStatus();
   }
  catch (  CatalogApiException e) {
     Assert.fail(e.getMessage());

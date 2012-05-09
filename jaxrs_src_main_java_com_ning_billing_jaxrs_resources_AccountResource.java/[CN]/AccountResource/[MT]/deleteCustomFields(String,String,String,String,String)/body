@@ -1,0 +1,15 @@
+{
+  try {
+    Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    return Response.status(Status.OK).build();
+  }
+ catch (  AccountApiException e) {
+    return Response.status(Status.NO_CONTENT).build();
+  }
+catch (  IllegalArgumentException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+catch (  NullPointerException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+}

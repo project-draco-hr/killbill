@@ -1,0 +1,23 @@
+{
+  DateTime result=input;
+  for (  Duration cur : deltaFromRealityDuration) {
+switch (cur.getUnit()) {
+case DAYS:
+      result=result.plusDays(cur.getNumber());
+    break;
+case MONTHS:
+  result=result.plusMonths(cur.getNumber());
+break;
+case YEARS:
+result=result.plusYears(cur.getNumber());
+break;
+case UNLIMITED:
+default :
+throw new RuntimeException("ClockMock is adjusting an unlimited time period");
+}
+}
+if (deltaFromRealityDurationEpsilon != 0) {
+result=result.plus(deltaFromRealityDurationEpsilon);
+}
+return result;
+}

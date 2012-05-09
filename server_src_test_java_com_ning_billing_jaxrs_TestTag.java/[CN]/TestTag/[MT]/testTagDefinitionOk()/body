@@ -1,0 +1,14 @@
+{
+  TagDefinitionJson input=new TagDefinitionJson("blue","realxing color");
+  String baseJson=mapper.writeValueAsString(input);
+  Response response=doPost(BaseJaxrsResource.TAG_DEFINITIONS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
+  String location=response.getHeader("Location");
+  assertNotNull(location);
+  response=doGetWithUrl(location,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  TagDefinitionJson objFromJson=mapper.readValue(baseJson,TagDefinitionJson.class);
+  assertNotNull(objFromJson);
+  assertEquals(objFromJson,input);
+}
