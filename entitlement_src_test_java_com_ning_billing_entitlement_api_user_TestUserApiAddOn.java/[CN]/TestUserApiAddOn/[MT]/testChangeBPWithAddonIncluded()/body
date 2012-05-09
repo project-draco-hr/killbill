@@ -1,5 +1,5 @@
 {
-  log.info("Starting testChangeBPWithAddonNonIncluded");
+  log.info("Starting testChangeBPWithAddonIncluded");
   try {
     String baseProduct="Shotgun";
     BillingPeriod baseTerm=BillingPeriod.MONTHLY;
@@ -23,6 +23,14 @@
     String newBaseProduct="Assault-Rifle";
     BillingPeriod newBaseTerm=BillingPeriod.MONTHLY;
     String newBasePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    List<SubscriptionStatusDryRun> aoStatus=entitlementApi.getDryRunChangePlanStatus(baseSubscription.getId(),newBaseProduct,now);
+    assertEquals(aoStatus.size(),1);
+    assertEquals(aoStatus.get(0).getId(),aoSubscription.getId());
+    assertEquals(aoStatus.get(0).getProductName(),aoProduct);
+    assertEquals(aoStatus.get(0).getBillingPeriod(),aoTerm);
+    assertEquals(aoStatus.get(0).getPhaseType(),aoSubscription.getCurrentPhase().getPhaseType());
+    assertEquals(aoStatus.get(0).getPriceList(),aoSubscription.getCurrentPriceList().getName());
+    assertEquals(aoStatus.get(0).getReason(),DryRunChangeReason.AO_INCLUDED_IN_NEW_PLAN);
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
