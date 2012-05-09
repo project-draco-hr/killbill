@@ -10,7 +10,8 @@
       log.info("Generated null invoice.");
       outputDebugData(events,invoices);
       if (!dryRun) {
-        postEmptyInvoiceEvent(accountId,context.getUserToken());
+        BusEvent event=new DefaultEmptyInvoiceEvent(accountId,clock.getUTCNow(),context.getUserToken());
+        postEvent(event,accountId);
       }
     }
  else {
@@ -24,6 +25,11 @@
       outputDebugData(events,invoices);
       if (!dryRun) {
         invoiceDao.create(invoice,context);
+        List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
+        List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
+        setChargedThroughDates(fixedPriceInvoiceItems,recurringInvoiceItems,context);
+        final InvoiceCreationEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
+        postEvent(event,accountId);
       }
     }
     if (account.isNotifiedForInvoices()) {

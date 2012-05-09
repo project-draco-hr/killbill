@@ -1,5 +1,4 @@
 {
-  final InvoiceCreationEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
   invoiceSqlDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
     @Override public Void inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
       Invoice currentInvoice=transactional.getById(invoice.getId().toString());
@@ -12,7 +11,6 @@
         List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         FixedPriceInvoiceItemSqlDao fixedPriceInvoiceItemDao=transactional.become(FixedPriceInvoiceItemSqlDao.class);
         fixedPriceInvoiceItemDao.batchCreateFromTransaction(fixedPriceInvoiceItems,context);
-        setChargedThroughDates(transactional,fixedPriceInvoiceItems,recurringInvoiceItems,context);
         List<InvoicePayment> invoicePayments=invoice.getPayments();
         InvoicePaymentSqlDao invoicePaymentSqlDao=transactional.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);
@@ -21,12 +19,6 @@
         auditSqlDao.insertAuditFromTransaction("recurring_invoice_items",getIdsFromInvoiceItems(recurringInvoiceItems),ChangeType.INSERT,context);
         auditSqlDao.insertAuditFromTransaction("fixed_invoice_items",getIdsFromInvoiceItems(fixedPriceInvoiceItems),ChangeType.INSERT,context);
         auditSqlDao.insertAuditFromTransaction("invoice_payments",getIdsFromInvoicePayments(invoicePayments),ChangeType.INSERT,context);
-      }
-      try {
-        eventBus.postFromTransaction(event,transactional);
-      }
- catch (      EventBusException e) {
-        log.warn("Failed to post invoice event for invoiceId " + invoice.getId(),e);
       }
       return null;
     }
