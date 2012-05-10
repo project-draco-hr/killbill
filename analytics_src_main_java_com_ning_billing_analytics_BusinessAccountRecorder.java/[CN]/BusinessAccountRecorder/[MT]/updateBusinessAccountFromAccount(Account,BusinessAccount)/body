@@ -1,39 +1,44 @@
 {
-  DateTime lastInvoiceDate=null;
-  BigDecimal totalInvoiceBalance=BigDecimal.ZERO;
-  String lastPaymentStatus=null;
-  String paymentMethod=null;
-  String creditCardType=null;
-  String billingAddressCountry=null;
-  final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId());
-  if (invoices != null && invoices.size() > 0) {
-    final List<String> invoiceIds=new ArrayList<String>();
-    for (    final Invoice invoice : invoices) {
-      invoiceIds.add(invoice.getId().toString());
-      totalInvoiceBalance=totalInvoiceBalance.add(invoice.getBalance());
-      if (lastInvoiceDate == null || invoice.getInvoiceDate().isAfter(lastInvoiceDate)) {
-        lastInvoiceDate=invoice.getInvoiceDate();
+  try {
+    DateTime lastInvoiceDate=null;
+    BigDecimal totalInvoiceBalance=BigDecimal.ZERO;
+    String lastPaymentStatus=null;
+    String paymentMethod=null;
+    String creditCardType=null;
+    String billingAddressCountry=null;
+    final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId());
+    if (invoices != null && invoices.size() > 0) {
+      final List<String> invoiceIds=new ArrayList<String>();
+      for (      final Invoice invoice : invoices) {
+        invoiceIds.add(invoice.getId().toString());
+        totalInvoiceBalance=totalInvoiceBalance.add(invoice.getBalance());
+        if (lastInvoiceDate == null || invoice.getInvoiceDate().isAfter(lastInvoiceDate)) {
+          lastInvoiceDate=invoice.getInvoiceDate();
+        }
       }
-    }
-    DateTime lastPaymentDate=null;
-    final List<PaymentInfoEvent> payments=paymentApi.getPaymentInfo(invoiceIds);
-    if (payments != null) {
-      for (      final PaymentInfoEvent payment : payments) {
-        if (lastPaymentDate == null || payment.getCreatedDate().isAfter(lastPaymentDate)) {
-          lastPaymentDate=payment.getCreatedDate();
-          lastPaymentStatus=payment.getStatus();
-          paymentMethod=payment.getPaymentMethod();
-          creditCardType=payment.getCardType();
-          billingAddressCountry=payment.getCardCountry();
+      DateTime lastPaymentDate=null;
+      final List<PaymentInfoEvent> payments=paymentApi.getPaymentInfo(invoiceIds);
+      if (payments != null) {
+        for (        final PaymentInfoEvent payment : payments) {
+          if (lastPaymentDate == null || payment.getCreatedDate().isAfter(lastPaymentDate)) {
+            lastPaymentDate=payment.getCreatedDate();
+            lastPaymentStatus=payment.getStatus();
+            paymentMethod=payment.getPaymentMethod();
+            creditCardType=payment.getCardType();
+            billingAddressCountry=payment.getCardCountry();
+          }
         }
       }
     }
+    bac.setLastPaymentStatus(lastPaymentStatus);
+    bac.setPaymentMethod(paymentMethod);
+    bac.setCreditCardType(creditCardType);
+    bac.setBillingAddressCountry(billingAddressCountry);
+    bac.setLastInvoiceDate(lastInvoiceDate);
+    bac.setTotalInvoiceBalance(totalInvoiceBalance);
+    bac.setBalance(invoiceUserApi.getAccountBalance(account.getId()));
   }
-  bac.setLastPaymentStatus(lastPaymentStatus);
-  bac.setPaymentMethod(paymentMethod);
-  bac.setCreditCardType(creditCardType);
-  bac.setBillingAddressCountry(billingAddressCountry);
-  bac.setLastInvoiceDate(lastInvoiceDate);
-  bac.setTotalInvoiceBalance(totalInvoiceBalance);
-  bac.setBalance(invoiceUserApi.getAccountBalance(account.getId()));
+ catch (  PaymentApiException e) {
+    log.error("Failed to update Business account",e);
+  }
 }

@@ -1,4 +1,12 @@
 {
   final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
-  return plugin.processRefund(account);
+  List<Either<PaymentErrorEvent,PaymentInfoEvent>> result=plugin.processRefund(account);
+  List<PaymentInfoEvent> info=new LinkedList<PaymentInfoEvent>();
+  for (  Either<PaymentErrorEvent,PaymentInfoEvent> cur : result) {
+    if (cur.isLeft()) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_REFUND,account.getId(),cur.getLeft().getMessage());
+    }
+    info.add(cur.getRight());
+  }
+  return info;
 }

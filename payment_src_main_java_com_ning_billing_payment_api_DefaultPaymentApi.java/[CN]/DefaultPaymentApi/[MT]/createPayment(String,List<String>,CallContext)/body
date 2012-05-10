@@ -4,9 +4,6 @@
     return createPayment(account,invoiceIds,context);
   }
  catch (  AccountApiException e) {
-    log.error("Error getting payment provider plugin.",e);
-    List<Either<PaymentErrorEvent,PaymentInfoEvent>> result=new ArrayList<Either<PaymentErrorEvent,PaymentInfoEvent>>();
-    result.add(new Either.Left<PaymentErrorEvent,PaymentInfoEvent>((PaymentErrorEvent)new DefaultPaymentErrorEvent("createPaymentError",e.getMessage(),null,null,context.getUserToken())));
-    return result;
+    throw new PaymentApiException(e);
   }
 }

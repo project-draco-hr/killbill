@@ -16,5 +16,13 @@
       processedPaymentsOrErrors.add(processPayment(plugin,account,invoice,paymentAttempt,context));
     }
   }
-  return processedPaymentsOrErrors;
+  List<Either<PaymentErrorEvent,PaymentInfoEvent>> result=processedPaymentsOrErrors;
+  List<PaymentInfoEvent> info=new LinkedList<PaymentInfoEvent>();
+  for (  Either<PaymentErrorEvent,PaymentInfoEvent> cur : result) {
+    if (cur.isLeft()) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),cur.getLeft().getMessage());
+    }
+    info.add(cur.getRight());
+  }
+  return info;
 }
