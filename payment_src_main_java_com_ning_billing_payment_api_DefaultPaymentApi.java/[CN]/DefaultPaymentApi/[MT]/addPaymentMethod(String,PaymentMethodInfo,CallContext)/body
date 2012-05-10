@@ -1,4 +1,8 @@
 {
   final PaymentProviderPlugin plugin=getPaymentProviderPlugin(accountKey);
-  return plugin.addPaymentMethod(accountKey,paymentMethod);
+  Either<PaymentErrorEvent,String> result=plugin.addPaymentMethod(accountKey,paymentMethod);
+  if (result.isLeft()) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_ADD_PAYMENT_METHOD,accountKey,result.getLeft().getMessage());
+  }
+  return result.getRight();
 }

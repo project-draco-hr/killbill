@@ -15,10 +15,9 @@
   Currency currency=Currency.USD;
   BigDecimal fixedPrice=null;
   events.add(createMockBillingEvent(account,subscription,effectiveDate,plan,planPhase,fixedPrice,BigDecimal.ONE,currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"",1L,SubscriptionTransitionType.CREATE));
-  BillingApi entitlementBillingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(BillingApi.class);
-  ((ZombieControl)entitlementBillingApi).addResult("getBillingEventsForAccountAndUpdateAccountBCD",events);
+  ((ZombieControl)billingApi).addResult("getBillingEventsForAccountAndUpdateAccountBCD",events);
   InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
-  InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,entitlementBillingApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock);
+  InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,billingApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock);
   CallContext context=new DefaultCallContextFactory(clock).createCallContext("Migration test",CallOrigin.TEST,UserType.TEST);
   Invoice invoice=dispatcher.processAccount(accountId,date_regular,true,context);
   Assert.assertNotNull(invoice);
