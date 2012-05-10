@@ -1,0 +1,33 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
+    @Override public Void inTransaction(    EntitlementEventSqlDao dao,    TransactionStatus status) throws Exception {
+      EntitlementEvent cancelledEvent=null;
+      Date now=clock.getUTCNow().toDate();
+      List<EntitlementEvent> events=dao.getFutureActiveEventForSubscription(subscriptionId.toString(),now);
+      for (      EntitlementEvent cur : events) {
+        if (cur.getType() == EventType.API_USER && ((ApiEvent)cur).getEventType() == ApiEventType.CANCEL) {
+          if (cancelledEvent != null) {
+            throw new EntitlementError(String.format("Found multiple cancel active events for subscriptions %s",subscriptionId.toString()));
+          }
+          cancelledEvent=cur;
+        }
+      }
+      if (cancelledEvent != null) {
+        List<EntityAudit> eventAudits=new ArrayList<EntityAudit>();
+        String cancelledEventId=cancelledEvent.getId().toString();
+        dao.unactiveEvent(cancelledEventId,context);
+        Long cancelledRecordId=dao.getRecordId(TableName.ENTITLEMENT_EVENTS,cancelledEventId);
+        eventAudits.add(new EntityAudit(cancelledRecordId,ChangeType.UPDATE));
+        for (        final EntitlementEvent cur : uncancelEvents) {
+          dao.insertEvent(cur,context);
+          Long recordId=dao.getRecordId(TableName.ENTITLEMENT_EVENTS,cur.getId().toString());
+          eventAudits.add(new EntityAudit(recordId,ChangeType.INSERT));
+          recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
+        }
+        dao.insertAuditFromTransaction(TableName.ENTITLEMENT_EVENTS,eventAudits,context);
+      }
+      return null;
+    }
+  }
+);
+}

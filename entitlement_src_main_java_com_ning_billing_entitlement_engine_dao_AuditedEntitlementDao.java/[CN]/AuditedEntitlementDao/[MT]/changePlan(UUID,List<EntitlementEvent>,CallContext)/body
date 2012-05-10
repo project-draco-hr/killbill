@@ -1,0 +1,18 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
+    @Override public Void inTransaction(    EntitlementEventSqlDao dao,    TransactionStatus status) throws Exception {
+      cancelNextChangeEventFromTransaction(subscriptionId,dao,context);
+      cancelNextPhaseEventFromTransaction(subscriptionId,dao,context);
+      List<EntityAudit> eventAudits=new ArrayList<EntityAudit>();
+      for (      final EntitlementEvent cur : changeEvents) {
+        dao.insertEvent(cur,context);
+        Long recordId=dao.getRecordId(TableName.ENTITLEMENT_EVENTS,cur.getId().toString());
+        eventAudits.add(new EntityAudit(recordId,ChangeType.INSERT));
+        recordFutureNotificationFromTransaction(dao,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
+      }
+      dao.insertAuditFromTransaction(TableName.ENTITLEMENT_EVENTS,eventAudits,context);
+      return null;
+    }
+  }
+);
+}

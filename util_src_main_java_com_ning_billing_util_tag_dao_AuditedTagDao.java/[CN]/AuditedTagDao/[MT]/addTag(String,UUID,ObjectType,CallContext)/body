@@ -1,0 +1,23 @@
+{
+  tagSqlDao.inTransaction(new Transaction<Void,TagSqlDao>(){
+    @Override public Void inTransaction(    final TagSqlDao tagSqlDao,    final TransactionStatus status) throws Exception {
+      String tagId=UUID.randomUUID().toString();
+      tagSqlDao.addTagFromTransaction(tagId,tagName,objectId.toString(),objectType,context);
+      Tag tag=tagSqlDao.findTag(tagName,objectId.toString(),objectType);
+      List<Tag> tagList=new ArrayList<Tag>();
+      tagList.add(tag);
+      List<Mapper<UUID,Long>> recordIds=tagSqlDao.getRecordIds(objectId.toString(),objectType);
+      Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
+      List<EntityHistory<Tag>> entityHistories=new ArrayList<EntityHistory<Tag>>();
+      entityHistories.addAll(convertToHistory(tagList,recordIdMap,ChangeType.INSERT));
+      Long maxHistoryRecordId=tagSqlDao.getMaxHistoryRecordId();
+      tagSqlDao.addHistoryFromTransaction(objectId.toString(),objectType,entityHistories,context);
+      List<Mapper<Long,Long>> historyRecordIds=tagSqlDao.getHistoryRecordIds(maxHistoryRecordId);
+      Map<Long,Long> historyRecordIdMap=convertToAuditMap(historyRecordIds);
+      List<EntityAudit> entityAudits=convertToAudits(entityHistories,historyRecordIdMap);
+      tagSqlDao.insertAuditFromTransaction(getTableName(),entityAudits,context);
+      return null;
+    }
+  }
+);
+}

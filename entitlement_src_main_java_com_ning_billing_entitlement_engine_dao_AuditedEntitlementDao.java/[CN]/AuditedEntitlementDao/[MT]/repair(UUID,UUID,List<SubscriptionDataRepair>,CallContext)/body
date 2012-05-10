@@ -1,0 +1,28 @@
+{
+  subscriptionsDao.inTransaction(new Transaction<Void,SubscriptionSqlDao>(){
+    @Override public Void inTransaction(    SubscriptionSqlDao transactional,    TransactionStatus status) throws Exception {
+      EntitlementEventSqlDao transEventDao=transactional.become(EntitlementEventSqlDao.class);
+      for (      final SubscriptionDataRepair cur : inRepair) {
+        transactional.updateForRepair(cur.getId().toString(),cur.getActiveVersion(),cur.getStartDate().toDate(),cur.getBundleStartDate().toDate(),context);
+        for (        EntitlementEvent event : cur.getInitialEvents()) {
+          transEventDao.updateVersion(event.getId().toString(),event.getActiveVersion(),context);
+        }
+        for (        EntitlementEvent event : cur.getNewEvents()) {
+          transEventDao.insertEvent(event,context);
+          if (event.getEffectiveDate().isAfter(clock.getUTCNow())) {
+            recordFutureNotificationFromTransaction(transactional,event.getEffectiveDate(),new EntitlementNotificationKey(event.getId()));
+          }
+        }
+      }
+      try {
+        RepairEntitlementEvent busEvent=new DefaultRepairEntitlementEvent(context.getUserToken(),accountId,bundleId,clock.getUTCNow());
+        eventBus.postFromTransaction(busEvent,transactional);
+      }
+ catch (      EventBusException e) {
+        log.warn("Failed to post repair entitlement event for bundle " + bundleId);
+      }
+      return null;
+    }
+  }
+);
+}

@@ -1,0 +1,20 @@
+{
+  final Date ctd=(subscription.getChargedThroughDate() != null) ? subscription.getChargedThroughDate().toDate() : null;
+  subscriptionsDao.inTransaction(new Transaction<Void,SubscriptionSqlDao>(){
+    @Override public Void inTransaction(    SubscriptionSqlDao transactionalDao,    TransactionStatus status) throws Exception {
+      String subscriptionId=subscription.getId().toString();
+      transactionalDao.updateChargedThroughDate(subscriptionId,ctd,context);
+      Long subscriptionRecordId=transactionalDao.getRecordId(TableName.SUBSCRIPTIONS,subscriptionId);
+      EntityAudit subscriptionAudit=new EntityAudit(subscriptionRecordId,ChangeType.UPDATE);
+      transactionalDao.insertAuditFromTransaction(TableName.SUBSCRIPTIONS,subscriptionAudit,context);
+      BundleSqlDao bundleSqlDao=transactionalDao.become(BundleSqlDao.class);
+      String bundleId=subscription.getBundleId().toString();
+      bundleSqlDao.updateBundleLastSysTime(bundleId,clock.getUTCNow().toDate());
+      Long recordId=bundleSqlDao.getRecordId(TableName.ENTITLEMENT_EVENTS,bundleId);
+      EntityAudit bundleAudit=new EntityAudit(recordId,ChangeType.UPDATE);
+      bundleSqlDao.insertAuditFromTransaction(TableName.SUBSCRIPTIONS,bundleAudit,context);
+      return null;
+    }
+  }
+);
+}

@@ -8,8 +8,9 @@
     DateTime chargedThroughDate=subscription.getChargedThroughDate();
     if (chargedThroughDate == null || chargedThroughDate.isBefore(ctd)) {
       subscriptionSqlDao.updateChargedThroughDate(subscriptionId.toString(),ctd.toDate(),context);
-      AuditSqlDao auditSqlDao=transactionalDao.become(AuditSqlDao.class);
-      auditSqlDao.insertAuditFromTransaction(SUBSCRIPTION_TABLE_NAME,subscriptionId.toString(),ChangeType.UPDATE,context);
+      Long recordId=subscriptionSqlDao.getRecordId(TableName.SUBSCRIPTIONS,subscriptionId.toString());
+      EntityAudit audit=new EntityAudit(recordId,ChangeType.UPDATE);
+      subscriptionSqlDao.insertAuditFromTransaction(TableName.SUBSCRIPTIONS,audit,context);
     }
   }
 }

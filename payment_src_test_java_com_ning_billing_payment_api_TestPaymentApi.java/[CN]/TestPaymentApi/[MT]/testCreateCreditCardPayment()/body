@@ -16,7 +16,7 @@
   assertFalse(paymentInfo.getStatus().equals("Error"));
   PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(paymentInfo.getPaymentId());
   assertNotNull(paymentAttempt);
-  assertNotNull(paymentAttempt.getPaymentAttemptId());
+  assertNotNull(paymentAttempt.getId());
   assertEquals(paymentAttempt.getInvoiceId(),invoice.getId());
   assertTrue(paymentAttempt.getAmount().compareTo(amount.setScale(2,RoundingMode.HALF_EVEN)) == 0);
   assertEquals(paymentAttempt.getCurrency(),Currency.USD);
@@ -24,7 +24,7 @@
   DateTime nowTruncated=now.withMillisOfSecond(0).withSecondOfMinute(0);
   DateTime paymentAttemptDateTruncated=paymentAttempt.getPaymentAttemptDate().withMillisOfSecond(0).withSecondOfMinute(0);
   assertEquals(paymentAttemptDateTruncated.compareTo(nowTruncated),0);
-  List<PaymentInfoEvent> paymentInfos=paymentApi.getPaymentInfo(Arrays.asList(invoice.getId().toString()));
+  List<PaymentInfoEvent> paymentInfos=paymentApi.getPaymentInfoList(Arrays.asList(invoice.getId().toString()));
   assertNotNull(paymentInfos);
   assertTrue(paymentInfos.size() > 0);
   PaymentInfoEvent paymentInfoFromGet=paymentInfos.get(0);

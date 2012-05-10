@@ -1,0 +1,35 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
+    @Override public Void inTransaction(    EntitlementEventSqlDao transEventDao,    TransactionStatus status) throws Exception {
+      SubscriptionSqlDao transSubDao=transEventDao.become(SubscriptionSqlDao.class);
+      BundleSqlDao transBundleDao=transEventDao.become(BundleSqlDao.class);
+      List<EntityAudit> bundleAudits=new ArrayList<EntityAudit>();
+      List<EntityAudit> subscriptionAudits=new ArrayList<EntityAudit>();
+      List<EntityAudit> eventAudits=new ArrayList<EntityAudit>();
+      Long recordId;
+      for (      BundleMigrationData curBundle : accountData.getData()) {
+        SubscriptionBundleData bundleData=curBundle.getData();
+        for (        SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
+          SubscriptionData subData=curSubscription.getData();
+          for (          final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
+            transEventDao.insertEvent(curEvent,context);
+            recordId=transEventDao.getRecordId(TableName.ENTITLEMENT_EVENTS,curEvent.getId().toString());
+            eventAudits.add(new EntityAudit(recordId,ChangeType.INSERT));
+            recordFutureNotificationFromTransaction(transEventDao,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()));
+          }
+          transSubDao.insertSubscription(subData,context);
+          recordId=transSubDao.getRecordId(TableName.SUBSCRIPTIONS,subData.getId().toString());
+          subscriptionAudits.add(new EntityAudit(recordId,ChangeType.INSERT));
+        }
+        transBundleDao.insertBundle(bundleData,context);
+        recordId=transBundleDao.getRecordId(TableName.BUNDLES,bundleData.getId().toString());
+        bundleAudits.add(new EntityAudit(recordId,ChangeType.INSERT));
+      }
+      transSubDao.insertAuditFromTransaction(TableName.SUBSCRIPTIONS,subscriptionAudits,context);
+      transBundleDao.insertAuditFromTransaction(TableName.BUNDLES,bundleAudits,context);
+      transEventDao.insertAuditFromTransaction(TableName.ENTITLEMENT_EVENTS,eventAudits,context);
+      return null;
+    }
+  }
+);
+}

@@ -1,7 +1,7 @@
 {
   invoiceSqlDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
     @Override public Void inTransaction(    final InvoiceSqlDao invoiceDao,    final TransactionStatus status) throws Exception {
-      Invoice currentInvoice=invoiceDao.getById(invoice.getId().toString());
+      Invoice currentInvoice=invoiceDao.getById(invoice.getId());
       if (currentInvoice == null) {
         invoiceDao.create(invoice,context);
         List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
@@ -14,12 +14,6 @@
         setChargedThroughDates(invoiceDao,fixedPriceInvoiceItems,recurringInvoiceItems,context);
         List<InvoicePayment> invoicePayments=invoice.getPayments();
         InvoicePaymentSqlDao invoicePaymentSqlDao=invoiceDao.become(InvoicePaymentSqlDao.class);
-        invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);
-        AuditSqlDao auditSqlDao=invoiceDao.become(AuditSqlDao.class);
-        auditSqlDao.insertAuditFromTransaction("invoices",invoice.getId().toString(),ChangeType.INSERT,context);
-        auditSqlDao.insertAuditFromTransaction("recurring_invoice_items",getIdsFromInvoiceItems(recurringInvoiceItems),ChangeType.INSERT,context);
-        auditSqlDao.insertAuditFromTransaction("fixed_invoice_items",getIdsFromInvoiceItems(fixedPriceInvoiceItems),ChangeType.INSERT,context);
-        auditSqlDao.insertAuditFromTransaction("invoice_payments",getIdsFromInvoicePayments(invoicePayments),ChangeType.INSERT,context);
       }
       return null;
     }

@@ -27,9 +27,9 @@
       log.info(paymentMethodInfoOrError.getLeft().getMessage());
     }
     if (paymentInfo.getPaymentId() != null) {
-      paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getPaymentAttemptId(),paymentInfo.getPaymentId(),context);
+      paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getId(),paymentInfo.getPaymentId(),context);
     }
   }
-  invoicePaymentApi.notifyOfPaymentAttempt(new DefaultInvoicePayment(paymentAttempt.getPaymentAttemptId(),invoice.getId(),paymentAttempt.getPaymentAttemptDate(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : paymentInfo.getAmount(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : invoice.getCurrency()),context);
+  invoicePaymentApi.notifyOfPaymentAttempt(new DefaultInvoicePayment(paymentAttempt.getId(),invoice.getId(),paymentAttempt.getPaymentAttemptDate(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : paymentInfo.getAmount(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : invoice.getCurrency()),context);
   return paymentOrError;
 }

@@ -1,19 +1,22 @@
 {
   try {
-    module=new AccountModuleWithEmbeddedDb();
     final String accountDdl=IOUtils.toString(AccountSqlDao.class.getResourceAsStream("/com/ning/billing/account/ddl.sql"));
     final String utilDdl=IOUtils.toString(AccountSqlDao.class.getResourceAsStream("/com/ning/billing/util/ddl.sql"));
-    module.startDb();
-    module.initDb(accountDdl);
-    module.initDb(utilDdl);
-    final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module);
-    dbi=injector.getInstance(IDBI.class);
-    accountDao=injector.getInstance(AccountDao.class);
-    accountDao.test();
-    Clock clock=injector.getInstance(Clock.class);
-    context=new DefaultCallContextFactory(clock).createCallContext("Account Dao Tests",CallOrigin.TEST,UserType.TEST);
-    BusService busService=injector.getInstance(BusService.class);
+    helper.startMysql();
+    helper.initDb(accountDdl);
+    helper.initDb(utilDdl);
+    dbi=helper.getDBI();
+    Bus bus=new InMemoryBus();
+    BusService busService=new DefaultBusService(bus);
     ((DefaultBusService)busService).startBus();
+    TagDao tagDao=new AuditedTagDao(dbi);
+    CustomFieldDao customFieldDao=new AuditedCustomFieldDao(dbi);
+    accountDao=new AuditedAccountDao(dbi,bus,tagDao,customFieldDao);
+    accountDao.test();
+    accountEmailDao=new AuditedAccountEmailDao(dbi);
+    accountEmailDao.test();
+    Clock clock=new ClockMock();
+    context=new DefaultCallContextFactory(clock).createCallContext("Account Dao Tests",CallOrigin.TEST,UserType.TEST);
   }
  catch (  Throwable t) {
     fail(t.toString());

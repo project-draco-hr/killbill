@@ -1,0 +1,33 @@
+{
+  UpdatableEntityCollectionSqlDao<T> dao=transmogrifyDao(transactionalDao);
+  List<T> existingEntities=dao.load(objectId.toString(),objectType);
+  List<T> entitiesToUpdate=new ArrayList<T>();
+  Iterator<T> entityIterator=entities.iterator();
+  while (entityIterator.hasNext()) {
+    T entity=entityIterator.next();
+    Iterator<T> existingEntityIterator=existingEntities.iterator();
+    while (existingEntityIterator.hasNext()) {
+      T existingEntity=existingEntityIterator.next();
+      if (entity.equals(existingEntity)) {
+        entitiesToUpdate.add(entity);
+        entityIterator.remove();
+        existingEntityIterator.remove();
+      }
+    }
+  }
+  dao.insertFromTransaction(objectId.toString(),objectType,entities,context);
+  dao.updateFromTransaction(objectId.toString(),objectType,entitiesToUpdate,context);
+  List<Mapper<UUID,Long>> recordIds=dao.getRecordIds(objectId.toString(),objectType);
+  Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
+  dao.deleteFromTransaction(objectId.toString(),objectType,existingEntities,context);
+  List<EntityHistory<T>> entityHistories=new ArrayList<EntityHistory<T>>();
+  entityHistories.addAll(convertToHistory(entities,recordIdMap,ChangeType.INSERT));
+  entityHistories.addAll(convertToHistory(entitiesToUpdate,recordIdMap,ChangeType.UPDATE));
+  entityHistories.addAll(convertToHistory(existingEntities,recordIdMap,ChangeType.DELETE));
+  Long maxHistoryRecordId=dao.getMaxHistoryRecordId();
+  dao.addHistoryFromTransaction(objectId.toString(),objectType,entityHistories,context);
+  List<Mapper<Long,Long>> historyRecordIds=dao.getHistoryRecordIds(maxHistoryRecordId);
+  Map<Long,Long> historyRecordIdMap=convertToAuditMap(historyRecordIds);
+  List<EntityAudit> entityAudits=convertToAudits(entityHistories,historyRecordIdMap);
+  dao.insertAuditFromTransaction(getTableName(),entityAudits,context);
+}

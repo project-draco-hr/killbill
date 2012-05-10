@@ -1,12 +1,14 @@
 {
-  sqlDao.inTransaction(new Transaction<Void,PaymentSqlDao>(){
-    @Override public Void inTransaction(    PaymentSqlDao transactional,    TransactionStatus status) throws Exception {
+  paymentAttemptSqlDao.inTransaction(new Transaction<Void,PaymentAttemptSqlDao>(){
+    @Override public Void inTransaction(    PaymentAttemptSqlDao transactional,    TransactionStatus status) throws Exception {
       transactional.updatePaymentAttemptWithPaymentId(paymentAttemptId.toString(),paymentId,context);
       PaymentAttempt paymentAttempt=transactional.getPaymentAttemptById(paymentAttemptId.toString());
-      UUID historyRecordId=UUID.randomUUID();
-      transactional.insertPaymentAttemptHistory(historyRecordId.toString(),paymentAttempt,context);
-      AuditSqlDao auditSqlDao=transactional.become(AuditSqlDao.class);
-      auditSqlDao.insertAuditFromTransaction("payment_attempt",historyRecordId.toString(),ChangeType.UPDATE,context);
+      Long recordId=transactional.getRecordId(paymentAttemptId.toString());
+      EntityHistory<PaymentAttempt> history=new EntityHistory<PaymentAttempt>(paymentAttemptId,recordId,paymentAttempt,ChangeType.UPDATE);
+      transactional.addHistoryFromTransaction(history,context);
+      Long historyRecordId=transactional.getHistoryRecordId(recordId);
+      EntityAudit audit=new EntityAudit(historyRecordId,ChangeType.UPDATE);
+      transactional.insertAuditFromTransaction(TableName.PAYMENT_ATTEMPTS,audit,context);
       return null;
     }
   }
