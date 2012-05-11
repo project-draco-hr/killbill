@@ -3,14 +3,14 @@
   clock.setDeltaFromReality(initialDate.getMillis() - clock.getUTCNow().getMillis());
   AccountJson accountJson=createAccount("poney","shdddqgfhwe","poney@yahoo.com");
   assertNotNull(accountJson);
-  BundleJsonNoSubsciptions bundleJson=createBundle(accountJson.getAcountId(),"996599");
+  BundleJsonNoSubsciptions bundleJson=createBundle(accountJson.getAccountId(),"996599");
   assertNotNull(bundleJson);
   SubscriptionJsonNoEvents subscriptionJson=createSubscription(bundleJson.getBundleId(),"Shotgun",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),true);
   assertNotNull(subscriptionJson);
   Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(3).plusDays(1));
   clock.addDeltaFromReality(it.toDurationMillis());
   crappyWaitForLackOfProperSynchonization();
-  final String uri=BaseJaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAcountId()+ "/"+ BaseJaxrsResource.TIMELINE;
+  final String uri=BaseJaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ BaseJaxrsResource.TIMELINE;
   Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   String baseJson=response.getResponseBody();
