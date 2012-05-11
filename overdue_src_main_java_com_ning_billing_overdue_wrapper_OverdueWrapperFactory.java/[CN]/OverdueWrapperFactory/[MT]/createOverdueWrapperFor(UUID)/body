@@ -1,0 +1,19 @@
+{
+  BlockingState state=api.getBlockingStateFor(id);
+  try {
+switch (state.getType()) {
+case SUBSCRIPTION_BUNDLE:
+{
+        SubscriptionBundle bundle=entitlementApi.getBundleFromId(id);
+        return (OverdueWrapper<T>)new OverdueWrapper<SubscriptionBundle>(bundle,api,overdueConfig.getBundleStateSet(),clock,billingStateCalcuatorBundle,overdueStateApplicatorBundle);
+      }
+default :
+{
+      throw new OverdueError(ErrorCode.OVERDUE_TYPE_NOT_SUPPORTED,id,state.getType());
+    }
+}
+}
+ catch (EntitlementUserApiException e) {
+throw new OverdueError(e);
+}
+}

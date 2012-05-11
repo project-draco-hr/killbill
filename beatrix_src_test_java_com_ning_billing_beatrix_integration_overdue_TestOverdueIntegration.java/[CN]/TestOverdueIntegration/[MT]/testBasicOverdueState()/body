@@ -1,0 +1,11 @@
+{
+  clock.setTime(new DateTime(2012,5,1,0,3,42,0));
+  paymentPlugin.makeNextInvoiceFail();
+  SubscriptionData baseSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
+  assertNotNull(baseSubscription);
+  clock.addWeeks(2);
+  BlockingState state=blockingApi.getBlockingStateFor(bundle);
+  Assert.assertEquals(state.getStateName(),BlockingApi.CLEAR_STATE_NAME);
+  clock.addWeeks(4);
+  clock.addWeeks(4);
+}
