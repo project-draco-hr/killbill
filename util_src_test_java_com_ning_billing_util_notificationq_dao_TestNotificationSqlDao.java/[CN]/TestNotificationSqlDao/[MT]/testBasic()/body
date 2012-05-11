@@ -13,7 +13,7 @@
   assertEquals(notification.getNotificationKey(),notificationKey);
   validateDate(notification.getEffectiveDate(),effDt);
   assertEquals(notification.getOwner(),null);
-  assertEquals(notification.getProcessingState(),NotificationLifecycleState.AVAILABLE);
+  assertEquals(notification.getProcessingState(),PersistentQueueEntryLifecycleState.AVAILABLE);
   assertEquals(notification.getNextAvailableDate(),null);
   DateTime nextAvailable=now.plusMinutes(5);
   int res=dao.claimNotification(ownerId,nextAvailable.toDate(),notification.getId(),now.toDate());
@@ -23,12 +23,12 @@
   assertEquals(notification.getNotificationKey(),notificationKey);
   validateDate(notification.getEffectiveDate(),effDt);
   assertEquals(notification.getOwner().toString(),ownerId);
-  assertEquals(notification.getProcessingState(),NotificationLifecycleState.IN_PROCESSING);
+  assertEquals(notification.getProcessingState(),PersistentQueueEntryLifecycleState.IN_PROCESSING);
   validateDate(notification.getNextAvailableDate(),nextAvailable);
   dao.clearNotification(notification.getId(),ownerId);
   notification=fetchNotification(notification.getUUID().toString());
   assertEquals(notification.getNotificationKey(),notificationKey);
   validateDate(notification.getEffectiveDate(),effDt);
-  assertEquals(notification.getProcessingState(),NotificationLifecycleState.PROCESSED);
+  assertEquals(notification.getProcessingState(),PersistentQueueEntryLifecycleState.PROCESSED);
   validateDate(notification.getNextAvailableDate(),nextAvailable);
 }
