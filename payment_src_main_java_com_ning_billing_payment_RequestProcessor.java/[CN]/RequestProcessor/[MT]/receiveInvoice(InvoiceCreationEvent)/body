@@ -7,7 +7,6 @@
       CallContext context=new DefaultCallContext("PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,clock);
       List<PaymentInfoEvent> results=paymentApi.createPayment(account,Arrays.asList(event.getInvoiceId().toString()),context);
       PaymentInfoEvent infoEvent=(!results.isEmpty()) ? results.get(0) : null;
-      postPaymentEvent(infoEvent,account.getId());
       return;
     }
  else {
@@ -22,5 +21,4 @@ catch (  PaymentApiException e) {
     log.info("Failed to process invoice payment for account: " + event.getAccountId());
     errorEvent=new DefaultPaymentErrorEvent(null,e.getMessage(),event.getAccountId(),event.getInvoiceId(),event.getUserToken());
   }
-  postPaymentEvent(errorEvent,event.getAccountId());
 }

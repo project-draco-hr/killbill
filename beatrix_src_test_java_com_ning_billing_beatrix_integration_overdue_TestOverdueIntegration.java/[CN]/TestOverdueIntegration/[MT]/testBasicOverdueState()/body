@@ -32,9 +32,11 @@
   paymentPlugin.makeAllInvoicesFail(false);
   Collection<Invoice> invoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCNow());
   List<String> invoiceIds=new ArrayList<String>();
-  List<PaymentAttempt> paymentAttempts=new ArrayList<PaymentAttempt>();
   for (  Invoice invoice : invoices) {
     invoiceIds.add(invoice.getId().toString());
+    if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+      busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+    }
   }
   paymentApi.createPayment(account,invoiceIds,new DefaultCallContext("test",null,null,clock));
   assertTrue(busHandler.isCompleted(DELAY));
