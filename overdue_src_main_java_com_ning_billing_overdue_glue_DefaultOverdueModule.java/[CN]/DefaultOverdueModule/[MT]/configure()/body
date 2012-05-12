@@ -1,0 +1,10 @@
+{
+  installOverdueUserApi();
+  installOverdueService();
+  installOverdueWrapperFactory();
+  final OverdueProperties config=new ConfigurationObjectFactory(System.getProperties()).build(OverdueProperties.class);
+  bind(OverdueProperties.class).toInstance(config);
+  bind(ExtendedOverdueService.class).to(DefaultOverdueService.class).asEagerSingleton();
+  bind(OverdueCheckNotifier.class).to(DefaultOverdueCheckNotifier.class).asEagerSingleton();
+  bind(OverdueCheckPoster.class).to(DefaultOverdueCheckPoster.class).asEagerSingleton();
+}
