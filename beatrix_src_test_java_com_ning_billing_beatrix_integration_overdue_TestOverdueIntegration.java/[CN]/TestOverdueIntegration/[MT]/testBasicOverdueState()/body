@@ -1,11 +1,43 @@
 {
   clock.setTime(new DateTime(2012,5,1,0,3,42,0));
-  paymentPlugin.makeNextInvoiceFail();
+  paymentPlugin.makeAllInvoicesFail(true);
+  busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE);
   SubscriptionData baseSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
   assertNotNull(baseSubscription);
-  clock.addWeeks(2);
-  BlockingState state=blockingApi.getBlockingStateFor(bundle);
-  Assert.assertEquals(state.getStateName(),BlockingApi.CLEAR_STATE_NAME);
-  clock.addWeeks(4);
-  clock.addWeeks(4);
+  assertTrue(busHandler.isCompleted(DELAY));
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
+  clock.addDays(30);
+  assertTrue(busHandler.isCompleted(DELAY));
+  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  clock.addDays(15);
+  assertTrue(busHandler.isCompleted(DELAY));
+  overdueApi.refreshOverdueStateFor(bundle);
+  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
+  clock.addDays(20);
+  assertTrue(busHandler.isCompleted(DELAY));
+  checkODState("OD1");
+  clock.addDays(2);
+  assertTrue(busHandler.isCompleted(DELAY));
+  overdueApi.refreshOverdueStateFor(bundle);
+  checkODState("OD1");
+  clock.addDays(8);
+  assertTrue(busHandler.isCompleted(DELAY));
+  overdueApi.refreshOverdueStateFor(bundle);
+  checkODState("OD2");
+  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
+  clock.addDays(10);
+  assertTrue(busHandler.isCompleted(DELAY));
+  checkODState("OD3");
+  paymentPlugin.makeAllInvoicesFail(false);
+  Collection<Invoice> invoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCNow());
+  List<String> invoiceIds=new ArrayList<String>();
+  List<PaymentAttempt> paymentAttempts=new ArrayList<PaymentAttempt>();
+  for (  Invoice invoice : invoices) {
+    invoiceIds.add(invoice.getId().toString());
+  }
+  paymentApi.createPayment(account,invoiceIds,new DefaultCallContext("test",null,null,clock));
+  assertTrue(busHandler.isCompleted(DELAY));
+  overdueApi.refreshOverdueStateFor(bundle);
+  checkODState(BlockingApi.CLEAR_STATE_NAME);
 }

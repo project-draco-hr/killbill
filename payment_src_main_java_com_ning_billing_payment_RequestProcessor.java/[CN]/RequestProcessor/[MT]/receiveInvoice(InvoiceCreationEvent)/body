@@ -11,16 +11,16 @@
       return;
     }
  else {
-      errorEvent=new DefaultPaymentErrorEvent(null,"Failed to retrieve account",event.getAccountId(),null,null);
+      errorEvent=new DefaultPaymentErrorEvent(null,"Failed to retrieve account",event.getAccountId(),event.getInvoiceId(),event.getUserToken());
     }
   }
  catch (  AccountApiException e) {
     log.error("Failed to process invoice payment",e);
-    errorEvent=new DefaultPaymentErrorEvent(null,e.getMessage(),event.getAccountId(),null,null);
+    errorEvent=new DefaultPaymentErrorEvent(null,e.getMessage(),event.getAccountId(),event.getInvoiceId(),event.getUserToken());
   }
 catch (  PaymentApiException e) {
-    log.error("Failed to process invoice payment",e);
-    errorEvent=new DefaultPaymentErrorEvent(null,e.getMessage(),event.getAccountId(),null,null);
+    log.info("Failed to process invoice payment for account: " + event.getAccountId());
+    errorEvent=new DefaultPaymentErrorEvent(null,e.getMessage(),event.getAccountId(),event.getInvoiceId(),event.getUserToken());
   }
   postPaymentEvent(errorEvent,event.getAccountId());
 }

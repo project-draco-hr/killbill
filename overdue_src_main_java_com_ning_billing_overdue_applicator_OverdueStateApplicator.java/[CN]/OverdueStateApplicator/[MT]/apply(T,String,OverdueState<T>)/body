@@ -1,0 +1,20 @@
+{
+  if (previousOverdueStateName.equals(nextOverdueState.getName())) {
+    return;
+  }
+  storeNewState(overdueable,nextOverdueState);
+  try {
+    Period reevaluationInterval=nextOverdueState.getReevaluationInterval();
+    if (!nextOverdueState.isClearState()) {
+      createFutureNotification(overdueable,clock.getUTCNow().plus(reevaluationInterval));
+    }
+  }
+ catch (  OverdueApiException e) {
+    if (e.getCode() != ErrorCode.OVERDUE_NO_REEVALUATION_INTERVAL.getCode()) {
+      new OverdueError(e);
+    }
+  }
+  if (nextOverdueState.isClearState()) {
+    clear(overdueable);
+  }
+}

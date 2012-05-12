@@ -1,5 +1,5 @@
 {
-  if (makeNextInvoiceFail.getAndSet(false)) {
+  if (makeNextInvoiceFail.getAndSet(false) || makeAllInvoicesFail.get()) {
     return Either.left((PaymentErrorEvent)new DefaultPaymentErrorEvent("unknown","test error",account.getId(),invoice.getId(),null));
   }
  else {
