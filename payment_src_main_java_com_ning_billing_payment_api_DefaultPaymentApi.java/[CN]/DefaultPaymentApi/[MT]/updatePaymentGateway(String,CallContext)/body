@@ -1,4 +1,8 @@
 {
   final PaymentProviderPlugin plugin=getPaymentProviderPlugin(accountKey);
-  return plugin.updatePaymentGateway(accountKey);
+  Either<PaymentErrorEvent,Void> result=plugin.updatePaymentGateway(accountKey);
+  if (result.isLeft()) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_UPD_GATEWAY_FAILED,accountKey,result.getLeft().getMessage());
+  }
+  return;
 }

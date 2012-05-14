@@ -1,0 +1,29 @@
+{
+  Subscription subscription=dao.getSubscriptionFromId(subscriptionFactory,subscriptionId);
+  if (subscription == null) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_SUBSCRIPTION_ID,subscriptionId);
+  }
+  if (subscription.getCategory() != ProductCategory.BASE) {
+    throw new EntitlementUserApiException(ErrorCode.ENT_CHANGE_DRY_RUN_NOT_BP);
+  }
+  List<SubscriptionStatusDryRun> result=new LinkedList<SubscriptionStatusDryRun>();
+  List<Subscription> bundleSubscriptions=dao.getSubscriptions(subscriptionFactory,subscription.getBundleId());
+  for (  Subscription cur : bundleSubscriptions) {
+    if (cur.getId().equals(subscriptionId)) {
+      continue;
+    }
+    DryRunChangeReason reason=null;
+    if (addonUtils.isAddonIncludedFromProdName(baseProductName,requestedDate,cur.getCurrentPlan())) {
+      reason=DryRunChangeReason.AO_INCLUDED_IN_NEW_PLAN;
+    }
+ else     if (addonUtils.isAddonAvailableFromProdName(baseProductName,requestedDate,cur.getCurrentPlan())) {
+      reason=DryRunChangeReason.AO_AVAILABLE_IN_NEW_PLAN;
+    }
+ else {
+      reason=DryRunChangeReason.AO_NOT_AVAILABLE_IN_NEW_PLAN;
+    }
+    SubscriptionStatusDryRun status=new DefaultSubscriptionStatusDryRun(cur.getId(),cur.getCurrentPlan().getProduct().getName(),cur.getCurrentPhase().getPhaseType(),cur.getCurrentPlan().getBillingPeriod(),cur.getCurrentPriceList().getName(),reason);
+    result.add(status);
+  }
+  return result;
+}

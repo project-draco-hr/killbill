@@ -1,4 +1,5 @@
 {
+  log.info("Starting testWithRecreatePlan");
   DateTime initialDate=new DateTime(2012,2,1,0,3,42,0);
   int billingDay=2;
   log.info("Beginning test with BCD of " + billingDay);
@@ -35,9 +36,10 @@
   productName="Assault-Rifle";
   term=BillingPeriod.MONTHLY;
   planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-  busHandler.pushExpectedEvent(NextEvent.CREATE);
+  busHandler.pushExpectedEvent(NextEvent.RE_CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   subscription.recreate(new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),endDate,context);
   assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
 }

@@ -1,14 +1,15 @@
 {
   try {
+    log.info("Starting testPlanWithAddOn");
     DateTime beforeMigration=clock.getUTCNow();
     final DateTime initalBPStart=clock.getUTCNow().minusMonths(3);
     final DateTime initalAddonStart=clock.getUTCNow().minusMonths(1).plusDays(7);
     EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlanAndAddons(initalBPStart,initalAddonStart);
     DateTime afterMigration=clock.getUTCNow();
-    testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
-    testListener.pushNextApiExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated,context);
-    assertTrue(testListener.isApiCompleted(5000));
+    assertTrue(testListener.isCompleted(5000));
     List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
     assertEquals(bundles.size(),1);
     SubscriptionBundle bundle=bundles.get(0);
@@ -30,6 +31,7 @@
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(aoSubscription.getCurrentPlan().getName(),"telescopic-scope-monthly");
     assertEquals(aoSubscription.getChargedThroughDate(),initalAddonStart.plusMonths(1));
+    assertListenerStatus();
   }
  catch (  EntitlementMigrationApiException e) {
     Assert.fail("",e);

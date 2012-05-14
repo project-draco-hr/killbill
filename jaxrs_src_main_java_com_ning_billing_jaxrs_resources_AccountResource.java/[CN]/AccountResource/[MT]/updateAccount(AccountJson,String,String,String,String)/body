@@ -1,0 +1,20 @@
+{
+  try {
+    AccountData data=json.toAccountData();
+    UUID uuid=UUID.fromString(accountId);
+    accountApi.updateAccount(uuid,data,context.createContext(createdBy,reason,comment));
+    return getAccount(accountId);
+  }
+ catch (  AccountApiException e) {
+    if (e.getCode() == ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID.getCode()) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+ else {
+      log.info(String.format("Failed to update account %s with %s",accountId,json),e);
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+  }
+catch (  IllegalArgumentException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+}

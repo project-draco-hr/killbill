@@ -1,13 +1,13 @@
 {
-  log.info("Starting testCreateWithRequestedDate");
+  log.info("Starting testOverwriteCustomFields");
   try {
     DateTime init=clock.getUTCNow();
     DateTime requestedDate=init.minusYears(1);
     String productName="Shotgun";
     BillingPeriod term=BillingPeriod.MONTHLY;
     String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
-    testListener.pushNextApiExpectedEvent(NextEvent.CREATE);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.CREATE);
     SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,null),requestedDate,context);
     assertNotNull(subscription);
     assertEquals(subscription.getFieldValue("nonExistent"),null);

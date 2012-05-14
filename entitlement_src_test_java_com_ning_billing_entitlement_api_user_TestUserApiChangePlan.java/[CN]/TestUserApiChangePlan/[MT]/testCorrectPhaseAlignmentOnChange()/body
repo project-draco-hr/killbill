@@ -1,13 +1,15 @@
 {
+  log.info("Starting testCorrectPhaseAlignmentOnChange");
   try {
     SubscriptionData subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
     PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    clock.setDeltaFromReality(getDurationDay(1),DAY_IN_MS);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(2));
+    clock.addDeltaFromReality(it.toDurationMillis());
     testListener.reset();
-    testListener.pushNextApiExpectedEvent(NextEvent.CHANGE);
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
-    assertTrue(testListener.isApiCompleted(3000));
+    assertTrue(testListener.isCompleted(5000));
     testListener.reset();
     Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
@@ -16,9 +18,10 @@
     assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.ANNUAL);
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
-    clock.addDeltaFromReality(trialPhase.getDuration());
-    assertTrue(testListener.isApiCompleted(3000));
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.DISCOUNT);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
@@ -26,6 +29,7 @@
     SubscriptionEvent nextPhase=subscription.getPendingTransition();
     DateTime nextPhaseEffectiveDate=nextPhase.getEffectiveTransitionTime();
     assertEquals(nextPhaseEffectiveDate,expectedNextPhaseDate);
+    assertListenerStatus();
   }
  catch (  EntitlementUserApiException e) {
     Assert.fail(e.getMessage());

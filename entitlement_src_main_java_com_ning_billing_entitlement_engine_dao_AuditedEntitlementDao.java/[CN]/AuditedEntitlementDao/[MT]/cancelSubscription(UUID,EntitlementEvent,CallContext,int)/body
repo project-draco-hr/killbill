@@ -1,15 +1,15 @@
 {
   eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
-    @Override public Void inTransaction(    EntitlementEventSqlDao dao,    TransactionStatus status) throws Exception {
-      cancelNextCancelEventFromTransaction(subscriptionId,dao,context);
-      cancelNextChangeEventFromTransaction(subscriptionId,dao,context);
-      cancelNextPhaseEventFromTransaction(subscriptionId,dao,context);
-      dao.insertEvent(cancelEvent,context);
+    @Override public Void inTransaction(    EntitlementEventSqlDao transactional,    TransactionStatus status) throws Exception {
+      cancelNextCancelEventFromTransaction(subscriptionId,transactional,context);
+      cancelNextChangeEventFromTransaction(subscriptionId,transactional,context);
+      cancelNextPhaseEventFromTransaction(subscriptionId,transactional,context);
+      transactional.insertEvent(cancelEvent,context);
       String cancelEventId=cancelEvent.getId().toString();
-      Long recordId=dao.getRecordId(TableName.ENTITLEMENT_EVENTS,cancelEventId);
-      EntityAudit audit=new EntityAudit(recordId,ChangeType.INSERT);
-      dao.insertAuditFromTransaction(TableName.ENTITLEMENT_EVENTS,audit,context);
-      recordFutureNotificationFromTransaction(dao,cancelEvent.getEffectiveDate(),new EntitlementNotificationKey(cancelEvent.getId(),seqId));
+      Long recordId=transactional.getRecordId(cancelEventId);
+      EntityAudit audit=new EntityAudit(TableName.ENTITLEMENT_EVENTS,recordId,ChangeType.INSERT);
+      transactional.insertAuditFromTransaction(audit,context);
+      recordFutureNotificationFromTransaction(transactional,cancelEvent.getEffectiveDate(),new EntitlementNotificationKey(cancelEvent.getId(),seqId));
       return null;
     }
   }

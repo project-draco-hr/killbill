@@ -1,0 +1,24 @@
+{
+  try {
+    Preconditions.checkNotNull(accountId,"% needs to be specified",QUERY_ACCOUNT_ID);
+    Preconditions.checkNotNull(targetDate,"% needs to be specified",QUERY_TARGET_DATE);
+    DateTime inputDate=(targetDate != null) ? DATE_TIME_FORMATTER.parseDateTime(targetDate) : null;
+    accountApi.getAccountById(UUID.fromString(accountId));
+    Invoice generatedInvoice=invoiceApi.triggerInvoiceGeneration(UUID.fromString(accountId),inputDate,dryRun.booleanValue(),context.createContext(createdBy,reason,comment));
+    if (dryRun) {
+      return Response.status(Status.OK).entity(new InvoiceJson(generatedInvoice)).build();
+    }
+ else {
+      return uriBuilder.buildResponse(InvoiceResource.class,"getInvoice",generatedInvoice.getId());
+    }
+  }
+ catch (  AccountApiException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+catch (  InvoiceApiException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+catch (  NullPointerException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+}

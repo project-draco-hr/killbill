@@ -1,12 +1,14 @@
 {
+  log.info("Starting testRepairRecreateAO");
   String baseProduct="Shotgun";
   BillingPeriod baseTerm=BillingPeriod.MONTHLY;
   String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
   SubscriptionData baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
-  Duration someTimeLater=getDurationDay(3);
-  clock.setDeltaFromReality(someTimeLater,DAY_IN_MS);
+  Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
+  clock.addDeltaFromReality(it.toDurationMillis());
   SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
-  clock.addDeltaFromReality(someTimeLater);
+  it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
+  clock.addDeltaFromReality(it.toDurationMillis());
   BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
   sortEventsOnBundle(bundleRepair);
   SubscriptionTimeline bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
@@ -38,7 +40,9 @@
   assertEquals(newAoSubscription.getStartDate(),aoSubscription.getStartDate());
   assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   dryRun=false;
+  testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
   BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  assertTrue(testListener.isCompleted(5000));
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),realRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
   index=0;

@@ -5,10 +5,10 @@
       PaymentAttempt savedPaymentAttempt=transactional.getPaymentAttemptById(paymentAttempt.getId().toString());
       Long recordId=transactional.getRecordId(paymentAttempt.getId().toString());
       EntityHistory<PaymentAttempt> history=new EntityHistory<PaymentAttempt>(paymentAttempt.getId(),recordId,paymentAttempt,ChangeType.INSERT);
-      transactional.addHistoryFromTransaction(history,context);
+      transactional.insertHistoryFromTransaction(history,context);
       Long historyRecordId=transactional.getHistoryRecordId(recordId);
-      EntityAudit audit=new EntityAudit(historyRecordId,ChangeType.INSERT);
-      transactional.insertAuditFromTransaction(TableName.PAYMENT_ATTEMPTS,audit,context);
+      EntityAudit audit=new EntityAudit(TableName.PAYMENT_ATTEMPTS,historyRecordId,ChangeType.INSERT);
+      transactional.insertAuditFromTransaction(audit,context);
       return savedPaymentAttempt;
     }
   }

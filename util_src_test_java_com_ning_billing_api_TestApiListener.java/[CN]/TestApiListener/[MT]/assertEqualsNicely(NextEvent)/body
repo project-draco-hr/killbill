@@ -1,0 +1,27 @@
+{
+synchronized (this) {
+    boolean foundIt=false;
+    Iterator<NextEvent> it=nextExpectedEvent.iterator();
+    while (it.hasNext()) {
+      NextEvent ev=it.next();
+      if (ev == received) {
+        it.remove();
+        foundIt=true;
+        if (!nonExpectedMode) {
+          log.info("TestApiListener found event {}. Yeah!",received);
+        }
+ else {
+          log.error("TestApiListener found non expected event {}. Boohh! ",received);
+        }
+        break;
+      }
+    }
+    if (!foundIt && !nonExpectedMode) {
+      Joiner joiner=Joiner.on(" ");
+      log.error("TestApiListener Received event " + received + "; expecting "+ joiner.join(nextExpectedEvent));
+      if (testStatus != null) {
+        testStatus.failed("TestApiListener [ApiListenerStatus]: Received event " + received + "; expecting "+ joiner.join(nextExpectedEvent));
+      }
+    }
+  }
+}

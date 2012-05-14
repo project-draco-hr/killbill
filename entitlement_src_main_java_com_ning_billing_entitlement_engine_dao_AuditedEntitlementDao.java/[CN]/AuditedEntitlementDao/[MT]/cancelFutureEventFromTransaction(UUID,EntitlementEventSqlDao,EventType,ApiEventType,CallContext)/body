@@ -13,8 +13,8 @@
   if (futureEvent != null) {
     String eventId=futureEvent.getId().toString();
     dao.unactiveEvent(eventId,context);
-    Long recordId=dao.getRecordId(TableName.ENTITLEMENT_EVENTS,eventId);
-    EntityAudit audit=new EntityAudit(recordId,ChangeType.UPDATE);
-    dao.insertAuditFromTransaction(TableName.ENTITLEMENT_EVENTS,audit,context);
+    Long recordId=dao.getRecordId(eventId);
+    EntityAudit audit=new EntityAudit(TableName.ENTITLEMENT_EVENTS,recordId,ChangeType.UPDATE);
+    dao.insertAuditFromTransaction(audit,context);
   }
 }

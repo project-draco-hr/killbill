@@ -1,8 +1,7 @@
 {
+  log.info("Starting testENT_REPAIR_VIEW_CHANGED_ctd");
   TestWithException test=new TestWithException();
   DateTime startDate=clock.getUTCNow();
-  testListener.reset();
-  clock.resetDeltaFromReality();
   final Subscription baseSubscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
   test.withException(new TestWithExceptionCallback(){
     @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
@@ -19,6 +18,7 @@
       billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);
       entitlementApi.getSubscriptionFromId(baseSubscription.getId());
       repairApi.repairBundle(bRepair,true,context);
+      assertListenerStatus();
     }
   }
 ,ErrorCode.ENT_REPAIR_VIEW_CHANGED);

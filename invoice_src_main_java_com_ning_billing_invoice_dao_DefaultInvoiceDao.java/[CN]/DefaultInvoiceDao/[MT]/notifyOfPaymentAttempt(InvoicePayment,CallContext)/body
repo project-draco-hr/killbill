@@ -3,9 +3,9 @@
     @Override public Void inTransaction(    InvoicePaymentSqlDao transactional,    TransactionStatus status) throws Exception {
       transactional.notifyOfPaymentAttempt(invoicePayment,context);
       String invoicePaymentId=invoicePayment.getId().toString();
-      Long recordId=transactional.getRecordId(TableName.INVOICE_PAYMENTS,invoicePaymentId);
-      EntityAudit audit=new EntityAudit(recordId,ChangeType.INSERT);
-      transactional.insertAuditFromTransaction(TableName.INVOICE_PAYMENTS,audit,context);
+      Long recordId=transactional.getRecordId(invoicePaymentId);
+      EntityAudit audit=new EntityAudit(TableName.INVOICE_PAYMENTS,recordId,ChangeType.INSERT);
+      transactional.insertAuditFromTransaction(audit,context);
       return null;
     }
   }

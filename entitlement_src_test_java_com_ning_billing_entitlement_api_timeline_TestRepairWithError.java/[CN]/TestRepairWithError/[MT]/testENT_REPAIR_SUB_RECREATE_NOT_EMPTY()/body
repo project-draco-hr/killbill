@@ -1,10 +1,11 @@
 {
+  log.info("Starting testENT_REPAIR_SUB_RECREATE_NOT_EMPTY");
   test.withException(new TestWithExceptionCallback(){
     @Override public void doTest() throws EntitlementRepairException {
-      testListener.pushNextApiExpectedEvent(NextEvent.PHASE);
-      Duration durationShift=getDurationDay(40);
-      clock.setDeltaFromReality(durationShift,0);
-      assertTrue(testListener.isApiCompleted(5000));
+      testListener.pushExpectedEvent(NextEvent.PHASE);
+      Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(40));
+      clock.addDeltaFromReality(it.toDurationMillis());
+      assertTrue(testListener.isCompleted(5000));
       BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
       sortEventsOnBundle(bundleRepair);
       PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);

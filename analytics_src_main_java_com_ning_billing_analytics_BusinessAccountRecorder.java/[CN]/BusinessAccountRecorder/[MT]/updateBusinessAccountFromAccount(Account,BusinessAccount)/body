@@ -15,17 +15,21 @@
         lastInvoiceDate=invoice.getInvoiceDate();
       }
     }
-    final PaymentInfoEvent payment=paymentApi.getLastPaymentInfo(invoiceIds);
-    lastPaymentStatus=payment.getStatus();
-    paymentMethod=payment.getPaymentMethod();
-    creditCardType=payment.getCardType();
-    billingAddressCountry=payment.getCardCountry();
+    try {
+      final PaymentInfoEvent payment=paymentApi.getLastPaymentInfo(invoiceIds);
+      lastPaymentStatus=payment.getStatus();
+      paymentMethod=payment.getPaymentMethod();
+      creditCardType=payment.getCardType();
+      billingAddressCountry=payment.getCardCountry();
+      bac.setLastPaymentStatus(lastPaymentStatus);
+      bac.setPaymentMethod(paymentMethod);
+      bac.setCreditCardType(creditCardType);
+      bac.setBillingAddressCountry(billingAddressCountry);
+      bac.setLastInvoiceDate(lastInvoiceDate);
+      bac.setTotalInvoiceBalance(totalInvoiceBalance);
+      bac.setBalance(invoiceUserApi.getAccountBalance(account.getId()));
+    }
+ catch (    PaymentApiException ex) {
+    }
   }
-  bac.setLastPaymentStatus(lastPaymentStatus);
-  bac.setPaymentMethod(paymentMethod);
-  bac.setCreditCardType(creditCardType);
-  bac.setBillingAddressCountry(billingAddressCountry);
-  bac.setLastInvoiceDate(lastInvoiceDate);
-  bac.setTotalInvoiceBalance(totalInvoiceBalance);
-  bac.setBalance(invoiceUserApi.getAccountBalance(account.getId()));
 }

@@ -31,7 +31,7 @@ case BASE:
 case ADD_ON:
 Plan targetAddOnPlan=reloaded.getCurrentPlan();
 String baseProductName=(futureBaseEvent instanceof ApiEventChange) ? ((ApiEventChange)futureBaseEvent).getEventPlan() : null;
-boolean createCancelEvent=(futureBaseEvent != null) && ((futureBaseEvent instanceof ApiEventCancel) || ((!addonUtils.isAddonAvailable(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan)) || (addonUtils.isAddonIncluded(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan))));
+boolean createCancelEvent=(futureBaseEvent != null) && ((futureBaseEvent instanceof ApiEventCancel) || ((!addonUtils.isAddonAvailableFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan)) || (addonUtils.isAddonIncludedFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan))));
 if (createCancelEvent) {
 DateTime now=clock.getUTCNow();
 EntitlementEvent addOnCancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(reloaded.getId()).setActiveVersion(((SubscriptionData)reloaded).getActiveVersion()).setProcessedDate(now).setEffectiveDate(futureBaseEvent.getEffectiveDate()).setRequestedDate(now).setFromDisk(false));
