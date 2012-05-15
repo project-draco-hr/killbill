@@ -1,0 +1,19 @@
+{
+  log.info("Starting testENT_REPAIR_NEW_EVENT_BEFORE_LAST_BP_REMAINING");
+  test.withException(new TestWithExceptionCallback(){
+    @Override public void doTest() throws EntitlementRepairException {
+      testListener.pushExpectedEvent(NextEvent.PHASE);
+      Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(40));
+      clock.addDeltaFromReality(it.toDurationMillis());
+      assertTrue(testListener.isCompleted(5000));
+      BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+      sortEventsOnBundle(bundleRepair);
+      PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+      NewEvent ne=createNewEvent(SubscriptionTransitionType.CHANGE,baseSubscription.getStartDate().plusDays(10),spec);
+      SubscriptionTimeline sRepair=createSubscriptionReapir(baseSubscription.getId(),Collections.<DeletedEvent>emptyList(),Collections.singletonList(ne));
+      BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      repairApi.repairBundle(bRepair,true,context);
+    }
+  }
+,ErrorCode.ENT_REPAIR_NEW_EVENT_BEFORE_LAST_BP_REMAINING);
+}

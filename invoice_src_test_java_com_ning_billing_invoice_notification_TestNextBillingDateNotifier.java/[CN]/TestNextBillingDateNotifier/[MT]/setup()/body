@@ -1,29 +1,23 @@
 {
   final Injector g=Guice.createInjector(Stage.PRODUCTION,new AbstractModule(){
-    @Override protected void configure(){
-      bind(Clock.class).to(ClockMock.class).asEagerSingleton();
-      bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
-      bind(Bus.class).to(InMemoryBus.class).asEagerSingleton();
-      bind(NotificationQueueService.class).to(DefaultNotificationQueueService.class).asEagerSingleton();
-      final InvoiceConfig invoiceConfig=new ConfigurationObjectFactory(System.getProperties()).build(InvoiceConfig.class);
-      bind(InvoiceConfig.class).toInstance(invoiceConfig);
-      final CatalogConfig catalogConfig=new ConfigurationObjectFactory(System.getProperties()).build(CatalogConfig.class);
-      bind(CatalogConfig.class).toInstance(catalogConfig);
-      bind(CatalogService.class).to(DefaultCatalogService.class).asEagerSingleton();
+    protected void configure(){
+      install(new MockClockModule());
+      install(new BusModule(BusType.MEMORY));
+      install(new InvoiceModuleWithMocks());
+      install(new MockJunctionModule());
+      install(new MockCatalogModule());
+      install(new NotificationQueueModule());
       final MysqlTestingHelper helper=new MysqlTestingHelper();
       bind(MysqlTestingHelper.class).toInstance(helper);
-      IDBI dbi=helper.getDBI();
-      bind(IDBI.class).toInstance(dbi);
-      bind(TagDao.class).to(AuditedTagDao.class).asEagerSingleton();
-      bind(EntitlementDao.class).to(EntitlementSqlDao.class).asEagerSingleton();
-      bind(CustomFieldDao.class).to(AuditedCustomFieldDao.class).asEagerSingleton();
-      bind(GlobalLocker.class).to(MySqlGlobalLocker.class).asEagerSingleton();
-      bind(InvoiceGenerator.class).to(DefaultInvoiceGenerator.class).asEagerSingleton();
-      bind(InvoiceDao.class).to(DefaultInvoiceDao.class);
-      bind(NextBillingDatePoster.class).to(DefaultNextBillingDatePoster.class).asEagerSingleton();
-      bind(AccountUserApi.class).to(MockAccountUserApi.class).asEagerSingleton();
-      bind(EntitlementBillingApi.class).to(DefaultEntitlementBillingApi.class).asEagerSingleton();
-      bind(EntitlementUserApi.class).to(DefaultEntitlementUserApi.class).asEagerSingleton();
+      if (helper.isUsingLocalInstance()) {
+        bind(IDBI.class).toProvider(DBIProvider.class).asEagerSingleton();
+        final DbiConfig config=new ConfigurationObjectFactory(System.getProperties()).build(DbiConfig.class);
+        bind(DbiConfig.class).toInstance(config);
+      }
+ else {
+        final IDBI dbi=helper.getDBI();
+        bind(IDBI.class).toInstance(dbi);
+      }
     }
   }
 );

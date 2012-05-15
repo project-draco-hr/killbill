@@ -8,15 +8,21 @@
           throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,key);
         }
         transactionalDao.create(account,context);
-        UUID historyId=UUID.randomUUID();
-        AccountHistorySqlDao historyDao=accountSqlDao.become(AccountHistorySqlDao.class);
-        historyDao.insertAccountHistoryFromTransaction(account,historyId.toString(),ChangeType.INSERT.toString(),context);
-        AuditSqlDao auditDao=accountSqlDao.become(AuditSqlDao.class);
-        auditDao.insertAuditFromTransaction("account_history",historyId.toString(),ChangeType.INSERT,context);
+        Long recordId=accountSqlDao.getRecordId(account.getId().toString());
+        EntityHistory<Account> history=new EntityHistory<Account>(account.getId(),recordId,account,ChangeType.INSERT);
+        accountSqlDao.insertHistoryFromTransaction(history,context);
+        Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId);
+        EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
+        accountSqlDao.insertAuditFromTransaction(audit,context);
         saveTagsFromWithinTransaction(account,transactionalDao,context);
         saveCustomFieldsFromWithinTransaction(account,transactionalDao,context);
-        AccountCreationNotification creationEvent=new DefaultAccountCreationEvent(account);
-        eventBus.post(creationEvent);
+        AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,context.getUserToken());
+        try {
+          eventBus.postFromTransaction(creationEvent,transactionalDao);
+        }
+ catch (        EventBusException e) {
+          log.warn("Failed to post account creation event for account " + account.getId(),e);
+        }
         return null;
       }
     }

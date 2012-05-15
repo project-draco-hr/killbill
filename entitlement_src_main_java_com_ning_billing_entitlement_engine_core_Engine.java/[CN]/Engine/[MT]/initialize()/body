@@ -1,29 +1,24 @@
 {
   try {
     subscriptionEventQueue=notificationQueueService.createNotificationQueue(ENTITLEMENT_SERVICE_NAME,NOTIFICATION_QUEUE_NAME,new NotificationQueueHandler(){
-      @Override public void handleReadyNotification(      String notificationKey,      DateTime eventDateTime){
-        EntitlementEvent event=dao.getEventById(UUID.fromString(notificationKey));
+      @Override public void handleReadyNotification(      final String inputKey,      final DateTime eventDateTime){
+        EntitlementNotificationKey key=new EntitlementNotificationKey(inputKey);
+        final EntitlementEvent event=dao.getEventById(key.getEventId());
         if (event == null) {
-          log.warn("Failed to extract event for notification key {}",notificationKey);
+          log.warn("Failed to extract event for notification key {}",inputKey);
+          return;
         }
- else {
-          final CallContext context=factory.createCallContext("SubscriptionEventQueue",CallOrigin.INTERNAL,UserType.SYSTEM);
-          processEventReady(event,context);
-        }
+        final UUID userToken=(event.getType() == EventType.API_USER) ? ((ApiEvent)event).getUserToken() : null;
+        final CallContext context=factory.createCallContext("SubscriptionEventQueue",CallOrigin.INTERNAL,UserType.SYSTEM,userToken);
+        processEventReady(event,key.getSeqId(),context);
       }
     }
 ,new NotificationConfig(){
+      @Override public long getSleepTimeMs(){
+        return config.getSleepTimeMs();
+      }
       @Override public boolean isNotificationProcessingOff(){
-        return config.isEventProcessingOff();
-      }
-      @Override public long getNotificationSleepTimeMs(){
-        return config.getNotificationSleepTimeMs();
-      }
-      @Override public int getDaoMaxReadyEvents(){
-        return config.getDaoMaxReadyEvents();
-      }
-      @Override public long getDaoClaimTimeMs(){
-        return config.getDaoClaimTimeMs();
+        return config.isNotificationProcessingOff();
       }
     }
 );

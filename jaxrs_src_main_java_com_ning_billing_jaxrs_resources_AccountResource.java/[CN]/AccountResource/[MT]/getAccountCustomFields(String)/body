@@ -1,0 +1,14 @@
+{
+  try {
+    Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    List<CustomField> fields=account.getFieldList();
+    List<CustomFieldJson> result=new LinkedList<CustomFieldJson>();
+    for (    CustomField cur : fields) {
+      result.add(new CustomFieldJson(cur));
+    }
+    return Response.status(Status.OK).entity(result).build();
+  }
+ catch (  AccountApiException e) {
+    return Response.status(Status.NO_CONTENT).build();
+  }
+}

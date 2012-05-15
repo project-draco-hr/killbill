@@ -1,0 +1,34 @@
+{
+  if (item == null) {
+    return -1;
+  }
+  if (!(item instanceof MockRecurringInvoiceItem)) {
+    return -1;
+  }
+  MockRecurringInvoiceItem that=(MockRecurringInvoiceItem)item;
+  int compareAccounts=getAccountId().compareTo(that.getAccountId());
+  if (compareAccounts == 0 && bundleId != null) {
+    int compareBundles=getBundleId().compareTo(that.getBundleId());
+    if (compareBundles == 0 && subscriptionId != null) {
+      int compareSubscriptions=getSubscriptionId().compareTo(that.getSubscriptionId());
+      if (compareSubscriptions == 0) {
+        int compareStartDates=getStartDate().compareTo(that.getStartDate());
+        if (compareStartDates == 0) {
+          return getEndDate().compareTo(that.getEndDate());
+        }
+ else {
+          return compareStartDates;
+        }
+      }
+ else {
+        return compareSubscriptions;
+      }
+    }
+ else {
+      return compareBundles;
+    }
+  }
+ else {
+    return compareAccounts;
+  }
+}

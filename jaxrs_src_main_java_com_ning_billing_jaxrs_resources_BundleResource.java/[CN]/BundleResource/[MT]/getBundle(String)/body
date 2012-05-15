@@ -1,0 +1,15 @@
+{
+  try {
+    SubscriptionBundle bundle=entitlementApi.getBundleFromId(UUID.fromString(bundleId));
+    BundleJsonNoSubsciptions json=new BundleJsonNoSubsciptions(bundle);
+    return Response.status(Status.OK).entity(json).build();
+  }
+ catch (  EntitlementUserApiException e) {
+    if (e.getCode() == ErrorCode.ENT_GET_INVALID_BUNDLE_ID.getCode()) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+ else {
+      throw e;
+    }
+  }
+}

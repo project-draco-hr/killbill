@@ -9,17 +9,17 @@
   TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName);
   assertNotNull(tagDefinition);
   UUID objectId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(objectId,Account.ObjectType);
+  TagStore tagStore=new DefaultTagStore(objectId,ObjectType.ACCOUNT);
   Tag tag=new DescriptiveTag(tagDefinition);
   tagStore.add(tag);
-  tagDao.saveTags(objectId,Account.ObjectType,tagStore.getEntityList(),context);
-  List<Tag> tags=tagDao.loadTags(objectId,Account.ObjectType);
+  tagDao.saveEntitiesFromTransaction(dao,objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  List<Tag> tags=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
   assertEquals(tags.size(),1);
   try {
     tagDefinitionDao.deleteAllTagsForDefinition(definitionName,context);
   }
  catch (  TagDefinitionApiException e) {
-    fail("Could not delete tags for tag definition",e);
+    fail("Could not delete tagStore for tag definition",e);
   }
   try {
     tagDefinitionDao.deleteTagDefinition(definitionName,context);

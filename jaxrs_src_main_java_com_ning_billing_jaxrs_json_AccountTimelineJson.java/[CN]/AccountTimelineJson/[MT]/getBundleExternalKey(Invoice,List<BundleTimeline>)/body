@@ -1,0 +1,21 @@
+{
+  Set<UUID> b=new HashSet<UUID>();
+  for (  final InvoiceItem cur : invoice.getInvoiceItems()) {
+    b.add(cur.getBundleId());
+  }
+  boolean first=true;
+  StringBuilder tmp=new StringBuilder();
+  for (  final UUID cur : b) {
+    for (    final BundleTimeline bt : bundles) {
+      if (bt.getBundleId().equals(cur)) {
+        if (!first) {
+          tmp.append(",");
+        }
+        tmp.append(bt.getExternalKey());
+        first=false;
+        break;
+      }
+    }
+  }
+  return tmp.toString();
+}

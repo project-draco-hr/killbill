@@ -1,0 +1,11 @@
+{
+  if (category != ProductCategory.BASE) {
+    return;
+  }
+  SubscriptionTransitionData pendingTransition=getPendingTransitionData();
+  if (pendingTransition == null) {
+    return;
+  }
+  Product baseProduct=(pendingTransition.getTransitionType() == SubscriptionTransitionType.CANCEL) ? null : pendingTransition.getNextPlan().getProduct();
+  addAddonCancellationIfRequired(addOnSubscriptionInRepair,baseProduct,pendingTransition.getEffectiveTransitionTime(),context);
+}

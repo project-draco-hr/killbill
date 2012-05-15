@@ -1,0 +1,15 @@
+{
+  String uri=BaseJaxrsResource.SUBSCRIPTIONS_PATH + "/" + UUID.randomUUID().toString();
+  SubscriptionJsonNoEvents subscriptionJson=new SubscriptionJsonNoEvents(null,UUID.randomUUID().toString(),null,"Pistol",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  String baseJson=mapper.writeValueAsString(subscriptionJson);
+  Response response=doPut(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.NO_CONTENT.getStatusCode());
+  String body=response.getResponseBody();
+  Assert.assertEquals(body,"");
+  response=doDelete(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.NO_CONTENT.getStatusCode());
+  body=response.getResponseBody();
+  Assert.assertEquals(body,"");
+  response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.NO_CONTENT.getStatusCode());
+}

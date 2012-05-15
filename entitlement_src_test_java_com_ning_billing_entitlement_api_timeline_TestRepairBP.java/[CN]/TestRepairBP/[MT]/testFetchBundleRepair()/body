@@ -1,0 +1,51 @@
+{
+  log.info("Starting testFetchBundleRepair");
+  String baseProduct="Shotgun";
+  BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+  String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+  String aoProduct="Telescopic-Scope";
+  BillingPeriod aoTerm=BillingPeriod.MONTHLY;
+  String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
+  BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+  List<SubscriptionTimeline> subscriptionRepair=bundleRepair.getSubscriptions();
+  assertEquals(subscriptionRepair.size(),2);
+  for (  SubscriptionTimeline cur : subscriptionRepair) {
+    assertNull(cur.getDeletedEvents());
+    assertNull(cur.getNewEvents());
+    List<ExistingEvent> events=cur.getExistingEvents();
+    assertEquals(events.size(),2);
+    sortExistingEvent(events);
+    assertEquals(events.get(0).getSubscriptionTransitionType(),SubscriptionTransitionType.CREATE);
+    assertEquals(events.get(1).getSubscriptionTransitionType(),SubscriptionTransitionType.PHASE);
+    final boolean isBP=cur.getId().equals(baseSubscription.getId());
+    if (isBP) {
+      assertEquals(cur.getId(),baseSubscription.getId());
+      assertEquals(events.get(0).getPlanPhaseSpecifier().getProductName(),baseProduct);
+      assertEquals(events.get(0).getPlanPhaseSpecifier().getPhaseType(),PhaseType.TRIAL);
+      assertEquals(events.get(0).getPlanPhaseSpecifier().getProductCategory(),ProductCategory.BASE);
+      assertEquals(events.get(0).getPlanPhaseSpecifier().getPriceListName(),basePriceList);
+      assertEquals(events.get(0).getPlanPhaseSpecifier().getBillingPeriod(),BillingPeriod.NO_BILLING_PERIOD);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getProductName(),baseProduct);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getPhaseType(),PhaseType.EVERGREEN);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getProductCategory(),ProductCategory.BASE);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getPriceListName(),basePriceList);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getBillingPeriod(),baseTerm);
+    }
+ else {
+      assertEquals(cur.getId(),aoSubscription.getId());
+      assertEquals(events.get(0).getPlanPhaseSpecifier().getProductName(),aoProduct);
+      assertEquals(events.get(0).getPlanPhaseSpecifier().getPhaseType(),PhaseType.DISCOUNT);
+      assertEquals(events.get(0).getPlanPhaseSpecifier().getProductCategory(),ProductCategory.ADD_ON);
+      assertEquals(events.get(0).getPlanPhaseSpecifier().getPriceListName(),aoPriceList);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getBillingPeriod(),aoTerm);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getProductName(),aoProduct);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getPhaseType(),PhaseType.EVERGREEN);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getProductCategory(),ProductCategory.ADD_ON);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getPriceListName(),aoPriceList);
+      assertEquals(events.get(1).getPlanPhaseSpecifier().getBillingPeriod(),aoTerm);
+    }
+  }
+  assertListenerStatus();
+}

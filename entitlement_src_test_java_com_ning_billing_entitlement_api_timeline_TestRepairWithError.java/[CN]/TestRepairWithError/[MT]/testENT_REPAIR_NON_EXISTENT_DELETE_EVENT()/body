@@ -1,0 +1,16 @@
+{
+  log.info("Starting testENT_REPAIR_NON_EXISTENT_DELETE_EVENT");
+  test.withException(new TestWithExceptionCallback(){
+    @Override public void doTest() throws EntitlementRepairException {
+      BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+      sortEventsOnBundle(bundleRepair);
+      PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+      NewEvent ne=createNewEvent(SubscriptionTransitionType.CHANGE,baseSubscription.getStartDate().plusDays(10),spec);
+      DeletedEvent de=createDeletedEvent(UUID.randomUUID());
+      SubscriptionTimeline sRepair=createSubscriptionReapir(baseSubscription.getId(),Collections.singletonList(de),Collections.singletonList(ne));
+      BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      repairApi.repairBundle(bRepair,true,context);
+    }
+  }
+,ErrorCode.ENT_REPAIR_NON_EXISTENT_DELETE_EVENT);
+}

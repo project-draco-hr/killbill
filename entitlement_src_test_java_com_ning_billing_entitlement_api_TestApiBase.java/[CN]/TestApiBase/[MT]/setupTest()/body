@@ -1,18 +1,16 @@
 {
   log.warn("RESET TEST FRAMEWORK\n\n");
+  cleanupDao();
   if (testListener != null) {
     testListener.reset();
+    resetTestListenerStatus();
   }
   clock.resetDeltaFromReality();
-  ((MockEntitlementDao)dao).reset();
-  try {
-    busService.getBus().register(testListener);
-    UUID accountId=UUID.randomUUID();
-    bundle=entitlementApi.createBundleForAccount(accountId,"myDefaultBundle",context);
-  }
- catch (  Exception e) {
-    Assert.fail(e.getMessage());
-  }
-  assertNotNull(bundle);
+  busService.getBus().start();
+  busService.getBus().register(testListener);
   ((Engine)entitlementService).start();
+  clock.setDeltaFromReality(testStartDate.getMillis() - clock.getUTCNow().getMillis());
+  UUID accountId=UUID.randomUUID();
+  bundle=entitlementApi.createBundleForAccount(accountId,"myDefaultBundle",context);
+  assertNotNull(bundle);
 }

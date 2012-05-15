@@ -1,0 +1,22 @@
+{
+  try {
+    Preconditions.checkNotNull(tagList,"Query % list cannot be null",QUERY_TAGS);
+    Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    List<TagDefinition> input=tagHelper.getTagDifinitionFromTagList(tagList);
+    account.addTagsFromDefinitions(input);
+    Response response=uriBuilder.buildResponse(AccountResource.class,"getAccountTags",account.getId());
+    return response;
+  }
+ catch (  AccountApiException e) {
+    return Response.status(Status.NO_CONTENT).build();
+  }
+catch (  IllegalArgumentException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+catch (  NullPointerException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+catch (  TagDefinitionApiException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+}

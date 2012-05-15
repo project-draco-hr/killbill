@@ -3,11 +3,11 @@
   if (paymentMethodInfo != null) {
     if (Boolean.FALSE.equals(paymentMethodInfo.getDefaultMethod()) || paymentMethodInfo.getDefaultMethod() == null) {
       if (paymentMethods.remove(paymentMethodId) == null) {
-        return Either.left(new PaymentError("unknown","Did not get any result back",null,null));
+        return Either.left((PaymentErrorEvent)new DefaultPaymentErrorEvent("unknown","Did not get any result back",null,null,null));
       }
     }
  else {
-      return Either.left(new PaymentError("error","Cannot delete default payment method",null,null));
+      return Either.left((PaymentErrorEvent)new DefaultPaymentErrorEvent("error","Cannot delete default payment method",null,null,null));
     }
   }
   return Either.right(null);

@@ -1,11 +1,5 @@
 {
-  this.clock=clock;
-  this.svcName=svcName;
-  this.queueName=queueName;
-  this.handler=handler;
-  this.config=config;
-  this.hostname=Hostname.get();
-  this.executor=Executors.newSingleThreadExecutor(new ThreadFactory(){
+  super(svcName,Executors.newFixedThreadPool(1,new ThreadFactory(){
     @Override public Thread newThread(    Runnable r){
       Thread th=new Thread(r);
       th.setName(NOTIFICATION_THREAD_PREFIX + svcName + "-"+ queueName);
@@ -18,5 +12,12 @@
       return th;
     }
   }
-);
+),NB_THREADS,config);
+  this.clock=clock;
+  this.svcName=svcName;
+  this.queueName=queueName;
+  this.handler=handler;
+  this.config=config;
+  this.hostname=Hostname.get();
+  this.nbProcessedEvents=new AtomicLong();
 }

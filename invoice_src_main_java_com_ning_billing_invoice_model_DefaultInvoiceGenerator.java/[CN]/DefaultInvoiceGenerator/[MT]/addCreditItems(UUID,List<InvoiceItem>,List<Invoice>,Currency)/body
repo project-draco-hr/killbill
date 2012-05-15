@@ -1,0 +1,23 @@
+{
+  Map<UUID,BigDecimal> invoiceBalances=new HashMap<UUID,BigDecimal>();
+  updateInvoiceBalance(invoiceItems,invoiceBalances);
+  if (invoices != null) {
+    for (    Invoice invoice : invoices) {
+      updateInvoiceBalance(invoice.getInvoiceItems(),invoiceBalances);
+    }
+    for (    Invoice invoice : invoices) {
+      UUID invoiceId=invoice.getId();
+      invoiceBalances.put(invoiceId,invoiceBalances.get(invoiceId).subtract(invoice.getAmountPaid()));
+    }
+  }
+  BigDecimal creditTotal=BigDecimal.ZERO;
+  for (  UUID invoiceId : invoiceBalances.keySet()) {
+    BigDecimal balance=invoiceBalances.get(invoiceId);
+    if (balance.compareTo(BigDecimal.ZERO) < 0) {
+      creditTotal=creditTotal.add(balance.negate());
+      invoiceItems.add(new CreditInvoiceItem(invoiceId,accountId,clock.getUTCNow(),balance,currency));
+    }
+  }
+  if (creditTotal.compareTo(BigDecimal.ZERO) != 0) {
+  }
+}

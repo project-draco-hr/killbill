@@ -2,10 +2,10 @@
   if (transitions == null) {
     return Collections.emptyList();
   }
-  List<SubscriptionTransition> result=new ArrayList<SubscriptionTransition>();
+  List<SubscriptionEvent> result=new ArrayList<SubscriptionEvent>();
   SubscriptionTransitionDataIterator it=new SubscriptionTransitionDataIterator(clock,transitions,Order.ASC_FROM_PAST,Kind.BILLING,Visibility.ALL,TimeLimit.ALL);
   while (it.hasNext()) {
-    result.add(it.next());
+    result.add(new DefaultSubscriptionEvent(it.next(),startDate));
   }
   return result;
 }

@@ -1,0 +1,14 @@
+{
+  Account a=createTestAccount(5);
+  accountDao.create(a,context);
+  String key=a.getExternalKey();
+  Account r=accountDao.getAccountByKey(key);
+  assertNotNull(r);
+  assertEquals(r.getExternalKey(),a.getExternalKey());
+  r=accountDao.getById(r.getId());
+  assertNotNull(r);
+  assertEquals(r.getExternalKey(),a.getExternalKey());
+  List<Account> all=accountDao.get();
+  assertNotNull(all);
+  assertTrue(all.size() >= 1);
+}

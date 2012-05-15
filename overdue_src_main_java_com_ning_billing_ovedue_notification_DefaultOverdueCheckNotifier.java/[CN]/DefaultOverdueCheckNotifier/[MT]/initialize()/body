@@ -1,0 +1,28 @@
+{
+  try {
+    overdueQueue=notificationQueueService.createNotificationQueue(DefaultOverdueService.OVERDUE_SERVICE_NAME,OVERDUE_CHECK_NOTIFIER_QUEUE,new NotificationQueueHandler(){
+      @Override public void handleReadyNotification(      String notificationKey,      DateTime eventDate){
+        try {
+          UUID key=UUID.fromString(notificationKey);
+          processEvent(key,eventDate);
+        }
+ catch (        IllegalArgumentException e) {
+          log.error("The key returned from the NextBillingNotificationQueue is not a valid UUID",e);
+          return;
+        }
+      }
+    }
+,new NotificationConfig(){
+      @Override public boolean isNotificationProcessingOff(){
+        return config.isNotificationProcessingOff();
+      }
+      @Override public long getSleepTimeMs(){
+        return config.getSleepTimeMs();
+      }
+    }
+);
+  }
+ catch (  NotificationQueueAlreadyExists e) {
+    throw new RuntimeException(e);
+  }
+}

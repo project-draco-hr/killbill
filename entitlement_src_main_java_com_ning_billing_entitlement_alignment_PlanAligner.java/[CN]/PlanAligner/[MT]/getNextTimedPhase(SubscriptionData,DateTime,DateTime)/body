@@ -1,16 +1,17 @@
 {
   try {
-    SubscriptionTransition lastPlanTransition=subscription.getInitialTransitionForCurrentPlan();
+    SubscriptionTransitionData lastPlanTransition=subscription.getInitialTransitionForCurrentPlan();
     if (effectiveDate.isBefore(lastPlanTransition.getEffectiveTransitionTime())) {
       throw new EntitlementError(String.format("Cannot specify an effectiveDate prior to last Plan Change, subscription = %s, effectiveDate = %s",subscription.getId(),effectiveDate));
     }
 switch (lastPlanTransition.getTransitionType()) {
 case MIGRATE_ENTITLEMENT:
 case CREATE:
-      List<TimedPhase> timedPhases=getTimedPhaseOnCreate(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPhase().getPhaseType(),lastPlanTransition.getNextPriceList(),requestedDate);
+case RE_CREATE:
+      List<TimedPhase> timedPhases=getTimedPhaseOnCreate(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPhase().getPhaseType(),lastPlanTransition.getNextPriceList().getName(),requestedDate);
     return getTimedPhase(timedPhases,effectiveDate,WhichPhase.NEXT);
 case CHANGE:
-  return getTimedPhaseOnChange(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getPreviousPhase(),lastPlanTransition.getPreviousPlan(),lastPlanTransition.getPreviousPriceList(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPriceList(),requestedDate,effectiveDate,WhichPhase.NEXT);
+  return getTimedPhaseOnChange(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getPreviousPhase(),lastPlanTransition.getPreviousPlan(),lastPlanTransition.getPreviousPriceList().getName(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPriceList().getName(),requestedDate,effectiveDate,WhichPhase.NEXT);
 default :
 throw new EntitlementError(String.format("Unexpectd initial transition %s for current plan %s on subscription %s",lastPlanTransition.getTransitionType(),subscription.getCurrentPlan(),subscription.getId()));
 }

@@ -1,0 +1,16 @@
+{
+  try {
+    final PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(paymentInfo.getId());
+    if (paymentAttempt == null) {
+      return;
+    }
+    final Account account=accountApi.getAccountById(paymentAttempt.getAccountId());
+    accountUpdated(account.getId());
+  }
+ catch (  AccountApiException e) {
+    log.warn("Error encountered creating BusinessAccount",e);
+  }
+catch (  PaymentApiException e) {
+    log.warn("Error encountered creating BusinessAccount",e);
+  }
+}

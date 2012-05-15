@@ -1,4 +1,5 @@
 {
+  log.info("Starting testWithRecreatePlan");
   DateTime initialDate=new DateTime(2012,2,1,0,3,42,0);
   int billingDay=2;
   log.info("Beginning test with BCD of " + billingDay);
@@ -12,7 +13,7 @@
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  SubscriptionData subscription=(SubscriptionData)entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context);
+  SubscriptionData subscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
   DateTime startDate=subscription.getCurrentPhaseStart();
@@ -25,7 +26,7 @@
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
-  subscription=(SubscriptionData)entitlementUserApi.getSubscriptionFromId(subscription.getId());
+  subscription=subscriptionDataFromSubscription(entitlementUserApi.getSubscriptionFromId(subscription.getId()));
   subscription.cancel(clock.getUTCNow(),false,context);
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
   endDate=subscription.getChargedThroughDate();
@@ -35,9 +36,10 @@
   productName="Assault-Rifle";
   term=BillingPeriod.MONTHLY;
   planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-  busHandler.pushExpectedEvent(NextEvent.CREATE);
+  busHandler.pushExpectedEvent(NextEvent.RE_CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   subscription.recreate(new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),endDate,context);
   assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
 }

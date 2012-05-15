@@ -1,0 +1,14 @@
+{
+  Account account=createTestAccount(1);
+  TagDefinition definition=new DefaultTagDefinition("Test Tag","For testing only",false);
+  TagDefinitionSqlDao tagDescriptionDao=dbi.onDemand(TagDefinitionSqlDao.class);
+  tagDescriptionDao.create(definition,context);
+  account.addTag(definition);
+  assertEquals(account.getTagList().size(),1);
+  accountDao.create(account,context);
+  Account thisAccount=accountDao.getById(account.getId());
+  List<Tag> tagList=thisAccount.getTagList();
+  assertEquals(tagList.size(),1);
+  Tag tag=tagList.get(0);
+  assertEquals(tag.getTagDefinitionName(),definition.getName());
+}

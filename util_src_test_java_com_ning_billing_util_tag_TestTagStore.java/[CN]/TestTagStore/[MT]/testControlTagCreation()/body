@@ -1,14 +1,14 @@
 {
   UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,Account.ObjectType);
+  TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
   ControlTag tag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
   tagStore.add(tag);
   assertEquals(tagStore.generateInvoice(),false);
   List<Tag> tagList=tagStore.getEntityList();
-  tagDao.saveTagsFromTransaction(dao,accountId,Account.ObjectType,tagList,context);
+  tagDao.saveEntitiesFromTransaction(dao,accountId,ObjectType.ACCOUNT,tagList,context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  tagList=tagDao.loadTags(accountId,Account.ObjectType);
+  tagList=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   tagStore.add(tagList);
   assertEquals(tagList.size(),1);
   assertEquals(tagStore.generateInvoice(),false);

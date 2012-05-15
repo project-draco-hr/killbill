@@ -1,9 +1,9 @@
 {
   try {
     accountSqlDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
-      @Override public Void inTransaction(      final AccountSqlDao accountSqlDao,      final TransactionStatus status) throws EntityPersistenceException, Bus.EventBusException {
+      @Override public Void inTransaction(      final AccountSqlDao transactional,      final TransactionStatus status) throws EntityPersistenceException, Bus.EventBusException {
         String accountId=account.getId().toString();
-        Account currentAccount=accountSqlDao.getById(accountId);
+        Account currentAccount=transactional.getById(accountId);
         if (currentAccount == null) {
           throw new EntityPersistenceException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
         }
@@ -11,17 +11,23 @@
         if (!currentKey.equals(account.getExternalKey())) {
           throw new EntityPersistenceException(ErrorCode.ACCOUNT_CANNOT_CHANGE_EXTERNAL_KEY,currentKey);
         }
-        accountSqlDao.update(account,context);
-        UUID historyId=UUID.randomUUID();
-        AccountHistorySqlDao historyDao=accountSqlDao.become(AccountHistorySqlDao.class);
-        historyDao.insertAccountHistoryFromTransaction(account,historyId.toString(),ChangeType.UPDATE.toString(),context);
-        AuditSqlDao auditDao=accountSqlDao.become(AuditSqlDao.class);
-        auditDao.insertAuditFromTransaction("account_history",historyId.toString(),ChangeType.INSERT,context);
-        saveTagsFromWithinTransaction(account,accountSqlDao,context);
-        saveCustomFieldsFromWithinTransaction(account,accountSqlDao,context);
-        AccountChangeNotification changeEvent=new DefaultAccountChangeNotification(account.getId(),currentAccount,account);
+        transactional.update(account,context);
+        Long recordId=accountSqlDao.getRecordId(account.getId().toString());
+        EntityHistory<Account> history=new EntityHistory<Account>(account.getId(),recordId,account,ChangeType.INSERT);
+        accountSqlDao.insertHistoryFromTransaction(history,context);
+        Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId);
+        EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
+        accountSqlDao.insertAuditFromTransaction(audit,context);
+        saveTagsFromWithinTransaction(account,transactional,context);
+        saveCustomFieldsFromWithinTransaction(account,transactional,context);
+        AccountChangeEvent changeEvent=new DefaultAccountChangeEvent(account.getId(),context.getUserToken(),currentAccount,account);
         if (changeEvent.hasChanges()) {
-          eventBus.post(changeEvent);
+          try {
+            eventBus.postFromTransaction(changeEvent,transactional);
+          }
+ catch (          EventBusException e) {
+            log.warn("Failed to post account change event for account " + account.getId(),e);
+          }
         }
         return null;
       }

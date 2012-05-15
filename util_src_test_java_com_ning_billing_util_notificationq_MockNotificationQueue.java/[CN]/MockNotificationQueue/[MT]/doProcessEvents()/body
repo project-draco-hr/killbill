@@ -1,0 +1,31 @@
+{
+  int result=0;
+  List<Notification> processedNotifications=new ArrayList<Notification>();
+  List<Notification> oldNotifications=new ArrayList<Notification>();
+  List<Notification> readyNotifications=new ArrayList<Notification>();
+synchronized (notifications) {
+    Iterator<Notification> it=notifications.iterator();
+    while (it.hasNext()) {
+      Notification cur=it.next();
+      if (cur.isAvailableForProcessing(clock.getUTCNow())) {
+        readyNotifications.add(cur);
+      }
+    }
+  }
+  result=readyNotifications.size();
+  for (  Notification cur : readyNotifications) {
+    handler.handleReadyNotification(cur.getNotificationKey(),cur.getEffectiveDate());
+    DefaultNotification processedNotification=new DefaultNotification(-1L,cur.getId(),hostname,hostname,"MockQueue",clock.getUTCNow().plus(CLAIM_TIME_MS),PersistentQueueEntryLifecycleState.PROCESSED,cur.getNotificationKey(),cur.getEffectiveDate());
+    oldNotifications.add(cur);
+    processedNotifications.add(processedNotification);
+  }
+synchronized (notifications) {
+    if (oldNotifications.size() > 0) {
+      notifications.removeAll(oldNotifications);
+    }
+    if (processedNotifications.size() > 0) {
+      notifications.addAll(processedNotifications);
+    }
+  }
+  return result;
+}

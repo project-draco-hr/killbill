@@ -1,11 +1,13 @@
 {
-  install(new InvoiceModule(){
-    @Override protected void installNotifier(){
+  install(new DefaultInvoiceModule(){
+    @Override protected void installNotifiers(){
       bind(NextBillingDateNotifier.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(NextBillingDateNotifier.class));
       NextBillingDatePoster poster=BrainDeadProxyFactory.createBrainDeadProxyFor(NextBillingDatePoster.class);
       ((ZombieControl)poster).addResult("insertNextBillingNotification",BrainDeadProxyFactory.ZOMBIE_VOID);
       bind(NextBillingDatePoster.class).toInstance(poster);
+      bind(InvoiceNotifier.class).to(NullInvoiceNotifier.class).asEagerSingleton();
     }
   }
 );
+  install(new TemplateModule());
 }

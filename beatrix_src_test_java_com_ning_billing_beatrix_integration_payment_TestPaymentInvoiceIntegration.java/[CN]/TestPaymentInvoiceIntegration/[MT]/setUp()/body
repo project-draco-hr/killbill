@@ -1,0 +1,13 @@
+{
+  Injector injector=Guice.createInjector(new PaymentTestModuleWithEmbeddedDb(),new InvoiceModuleWithMocks(),new CallContextModule(),new MockClockModule(),new MockJunctionModule(),new AbstractModule(){
+    @Override protected void configure(){
+      bind(IDBI.class).toInstance(dbi);
+    }
+  }
+);
+  injector.injectMembers(this);
+  paymentInfoReceiver=new MockPaymentInfoReceiver();
+  eventBus.start();
+  eventBus.register(invoiceProcessor);
+  eventBus.register(paymentInfoReceiver);
+}

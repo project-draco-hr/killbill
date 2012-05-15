@@ -1,0 +1,51 @@
+{
+  log.info("Starting testChangeBPWithAddonNonAvailable");
+  try {
+    String baseProduct="Shotgun";
+    BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+    String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    SubscriptionData baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+    String aoProduct="Telescopic-Scope";
+    BillingPeriod aoTerm=BillingPeriod.MONTHLY;
+    String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
+    testListener.reset();
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(2));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
+    DateTime now=clock.getUTCNow();
+    Duration ctd=getDurationMonth(1);
+    DateTime newChargedThroughDate=DefaultClock.addDuration(now,ctd);
+    billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);
+    baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+    String newBaseProduct="Pistol";
+    BillingPeriod newBaseTerm=BillingPeriod.MONTHLY;
+    String newBasePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    List<SubscriptionStatusDryRun> aoStatus=entitlementApi.getDryRunChangePlanStatus(baseSubscription.getId(),newBaseProduct,now);
+    assertEquals(aoStatus.size(),1);
+    assertEquals(aoStatus.get(0).getId(),aoSubscription.getId());
+    assertEquals(aoStatus.get(0).getProductName(),aoProduct);
+    assertEquals(aoStatus.get(0).getBillingPeriod(),aoTerm);
+    assertEquals(aoStatus.get(0).getPhaseType(),aoSubscription.getCurrentPhase().getPhaseType());
+    assertEquals(aoStatus.get(0).getPriceList(),aoSubscription.getCurrentPriceList().getName());
+    assertEquals(aoStatus.get(0).getReason(),DryRunChangeReason.AO_NOT_AVAILABLE_IN_NEW_PLAN);
+    baseSubscription.changePlan(newBaseProduct,newBaseTerm,newBasePriceList,now,context);
+    aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertTrue(aoSubscription.isSubscriptionFutureCancelled());
+    testListener.reset();
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
+    aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+    assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);
+    assertListenerStatus();
+  }
+ catch (  Exception e) {
+    Assert.fail(e.getMessage());
+  }
+}

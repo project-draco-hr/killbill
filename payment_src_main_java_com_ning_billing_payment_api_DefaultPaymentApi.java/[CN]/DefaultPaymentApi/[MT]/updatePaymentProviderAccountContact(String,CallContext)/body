@@ -1,5 +1,14 @@
 {
-  Account account=accountUserApi.getAccountByKey(externalKey);
-  final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
-  return plugin.updatePaymentProviderAccountExistingContact(account);
+  try {
+    Account account=accountUserApi.getAccountByKey(externalKey);
+    final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
+    Either<PaymentErrorEvent,Void> result=plugin.updatePaymentProviderAccountExistingContact(account);
+    if (result.isLeft()) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_UPD_PAYMENT_PROVIDER_ACCOUNT,account.getId(),result.getLeft().getMessage());
+    }
+    return;
+  }
+ catch (  AccountApiException e) {
+    throw new PaymentApiException(e);
+  }
 }

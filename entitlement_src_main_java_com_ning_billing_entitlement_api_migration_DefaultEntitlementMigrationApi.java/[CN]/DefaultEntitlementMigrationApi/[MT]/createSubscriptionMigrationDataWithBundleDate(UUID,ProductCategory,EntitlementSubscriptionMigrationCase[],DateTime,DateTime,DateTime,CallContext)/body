@@ -1,0 +1,7 @@
+{
+  TimedMigration[] events=migrationAligner.getEventsMigration(input,now);
+  DateTime migrationStartDate=events[0].getEventTime();
+  List<EntitlementEvent> emptyEvents=Collections.emptyList();
+  SubscriptionData subscriptionData=factory.createSubscription(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(productCategory).setBundleStartDate(bundleStartDate).setStartDate(migrationStartDate),emptyEvents);
+  return new SubscriptionMigrationData(subscriptionData,toEvents(subscriptionData,now,ctd,events,context));
+}

@@ -1,0 +1,27 @@
+{
+  int remaining=0;
+  try {
+synchronized (this) {
+      isProcessingEvents=false;
+      long ini=System.currentTimeMillis();
+      long remainingWaitTimeMs=waitTimeoutMs;
+      while (curActiveThreads > 0 && remainingWaitTimeMs > 0) {
+        wait(1000);
+        remainingWaitTimeMs=waitTimeoutMs - (System.currentTimeMillis() - ini);
+      }
+      remaining=curActiveThreads;
+    }
+  }
+ catch (  InterruptedException ignore) {
+    log.info(String.format("%s: Stop sequence has been interrupted, remaining active threads = %d",svcName,curActiveThreads));
+  }
+ finally {
+    if (remaining > 0) {
+      log.error(String.format("%s: Stop sequence completed with %d active remaing threads",svcName,curActiveThreads));
+    }
+ else {
+      log.info(String.format("%s: Stop sequence completed with %d active remaing threads",svcName,curActiveThreads));
+    }
+    curActiveThreads=0;
+  }
+}

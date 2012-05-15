@@ -1,0 +1,22 @@
+{
+  account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
+  ((ZombieControl)account).addResult("getId",UUID.randomUUID());
+  bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
+  ((ZombieControl)bundle).addResult("getAccountId",account.getId());
+  ((ZombieControl)bundle).addResult("getId",UUID.randomUUID());
+  ((ZombieControl)bundle).addResult("getKey","key");
+  subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  ((ZombieControl)subscription).addResult("getId",UUID.randomUUID());
+  ((ZombieControl)subscription).addResult("getBundleId",bundle.getId());
+  Injector i=Guice.createInjector(new AbstractModule(){
+    @Override protected void configure(){
+      bind(BlockingChecker.class).to(DefaultBlockingChecker.class).asEagerSingleton();
+      bind(BlockingStateDao.class).toInstance(dao);
+      EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
+      bind(EntitlementUserApi.class).toInstance(entitlementUserApi);
+      ((ZombieControl)entitlementUserApi).addResult("getBundleFromId",bundle);
+    }
+  }
+);
+  checker=i.getInstance(BlockingChecker.class);
+}

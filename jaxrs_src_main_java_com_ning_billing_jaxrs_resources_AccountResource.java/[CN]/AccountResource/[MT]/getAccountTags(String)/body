@@ -1,0 +1,16 @@
+{
+  try {
+    Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    List<Tag> tags=account.getTagList();
+    Collection<String> tagNameList=(tags.size() == 0) ? Collections.<String>emptyList() : Collections2.transform(tags,new Function<Tag,String>(){
+      @Override public String apply(      Tag input){
+        return input.getTagDefinitionName();
+      }
+    }
+);
+    return Response.status(Status.OK).entity(tagNameList).build();
+  }
+ catch (  AccountApiException e) {
+    return Response.status(Status.NO_CONTENT).build();
+  }
+}

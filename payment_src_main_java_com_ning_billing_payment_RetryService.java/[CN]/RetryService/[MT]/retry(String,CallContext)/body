@@ -1,10 +1,12 @@
 {
-  PaymentInfo paymentInfo=paymentApi.getPaymentInfoForPaymentAttemptId(paymentAttemptId);
-  if (paymentInfo != null && PaymentStatus.Processed.equals(PaymentStatus.valueOf(paymentInfo.getStatus()))) {
-    System.out.println("Found processed payment");
-  }
- else {
-    System.out.println("Creating payment for payment attempt " + paymentAttemptId);
+  try {
+    PaymentInfoEvent paymentInfo=paymentApi.getPaymentInfoForPaymentAttemptId(paymentAttemptId);
+    if (paymentInfo != null && PaymentStatus.Processed.equals(PaymentStatus.valueOf(paymentInfo.getStatus()))) {
+      return;
+    }
     paymentApi.createPaymentForPaymentAttempt(UUID.fromString(paymentAttemptId),context);
+  }
+ catch (  PaymentApiException e) {
+    log.error(String.format("Failed to retry payment for %s"),e);
   }
 }

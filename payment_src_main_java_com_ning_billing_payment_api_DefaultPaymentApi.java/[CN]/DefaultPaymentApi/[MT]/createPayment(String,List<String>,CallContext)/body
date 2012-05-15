@@ -1,4 +1,9 @@
 {
-  final Account account=accountUserApi.getAccountByKey(accountKey);
-  return createPayment(account,invoiceIds,context);
+  try {
+    final Account account=accountUserApi.getAccountByKey(accountKey);
+    return createPayment(account,invoiceIds,context);
+  }
+ catch (  AccountApiException e) {
+    throw new PaymentApiException(e);
+  }
 }

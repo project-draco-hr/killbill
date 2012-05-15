@@ -1,0 +1,22 @@
+{
+  if (addContextHeader) {
+    builder.addHeader(BaseJaxrsResource.HDR_CREATED_BY,createdBy);
+    builder.addHeader(BaseJaxrsResource.HDR_REASON,reason);
+    builder.addHeader(BaseJaxrsResource.HDR_COMMENT,comment);
+  }
+  Response response=null;
+  try {
+    ListenableFuture<Response> futureStatus=builder.execute(new AsyncCompletionHandler<Response>(){
+      @Override public Response onCompleted(      Response response) throws Exception {
+        return response;
+      }
+    }
+);
+    response=futureStatus.get(timeoutSec,TimeUnit.SECONDS);
+  }
+ catch (  Exception e) {
+    Assert.fail(e.getMessage());
+  }
+  Assert.assertNotNull(response);
+  return response;
+}

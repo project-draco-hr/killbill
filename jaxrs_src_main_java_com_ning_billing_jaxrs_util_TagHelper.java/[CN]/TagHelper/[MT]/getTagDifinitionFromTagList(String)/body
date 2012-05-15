@@ -1,0 +1,12 @@
+{
+  List<TagDefinition> result=new LinkedList<TagDefinition>();
+  String[] tagParts=tagList.split(",\\s*");
+  for (  String cur : tagParts) {
+    TagDefinition curDef=tagUserApi.getTagDefinition(cur);
+    if (curDef == null) {
+      throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_DOES_NOT_EXIST,cur);
+    }
+    result.add(curDef);
+  }
+  return result;
+}

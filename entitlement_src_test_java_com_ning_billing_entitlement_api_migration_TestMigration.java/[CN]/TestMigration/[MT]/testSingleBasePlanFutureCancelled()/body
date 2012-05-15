@@ -1,5 +1,6 @@
 {
   try {
+    log.info("Starting testSingleBasePlanFutureCancelled");
     final DateTime startDate=clock.getUTCNow().minusMonths(1);
     DateTime beforeMigration=clock.getUTCNow();
     EntitlementAccountMigration toBeMigrated=createAccountWithRegularBasePlanFutreCancelled(startDate);
@@ -14,23 +15,24 @@
     assertEquals(subscriptions.size(),1);
     Subscription subscription=subscriptions.get(0);
     assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
-    assertEquals(subscription.getCurrentPriceList(),PriceListSet.DEFAULT_PRICELIST_NAME);
+    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
     assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
     assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-annual");
     assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
     testListener.pushExpectedEvent(NextEvent.MIGRATE_BILLING);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    Duration oneYear=getDurationYear(1);
-    clock.setDeltaFromReality(oneYear,0);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusYears(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
     assertNotNull(subscription.getEndDate());
     assertTrue(subscription.getEndDate().isAfterNow());
-    assertEquals(subscription.getCurrentPriceList(),PriceListSet.DEFAULT_PRICELIST_NAME);
+    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
     assertEquals(subscription.getCurrentPhase(),null);
     assertEquals(subscription.getState(),SubscriptionState.CANCELLED);
     assertNull(subscription.getCurrentPlan());
+    assertListenerStatus();
   }
  catch (  EntitlementMigrationApiException e) {
     Assert.fail("",e);

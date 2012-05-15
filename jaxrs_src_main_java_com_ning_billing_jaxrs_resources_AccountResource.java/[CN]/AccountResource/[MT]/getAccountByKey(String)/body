@@ -1,0 +1,16 @@
+{
+  try {
+    Account account=null;
+    if (externalKey != null) {
+      account=accountApi.getAccountByKey(externalKey);
+    }
+    if (account == null) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    AccountJson json=new AccountJson(account);
+    return Response.status(Status.OK).entity(json).build();
+  }
+ catch (  AccountApiException e) {
+    return Response.status(Status.NO_CONTENT).build();
+  }
+}

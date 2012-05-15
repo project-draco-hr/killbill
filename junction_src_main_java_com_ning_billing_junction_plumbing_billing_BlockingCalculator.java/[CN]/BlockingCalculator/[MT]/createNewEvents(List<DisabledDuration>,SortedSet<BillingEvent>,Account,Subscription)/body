@@ -1,0 +1,17 @@
+{
+  SortedSet<BillingEvent> result=new TreeSet<BillingEvent>();
+  for (  DisabledDuration duration : disabledDuration) {
+    BillingEvent precedingInitialEvent=precedingBillingEventForSubscription(duration.getStart(),billingEvents,subscription);
+    BillingEvent precedingFinalEvent=precedingBillingEventForSubscription(duration.getEnd(),billingEvents,subscription);
+    if (precedingInitialEvent != null) {
+      result.add(createNewDisableEvent(duration.getStart(),precedingInitialEvent));
+      if (duration.getEnd() != null) {
+        result.add(createNewReenableEvent(duration.getEnd(),precedingFinalEvent));
+      }
+    }
+ else     if (precedingFinalEvent != null) {
+      result.add(createNewReenableEvent(duration.getEnd(),precedingFinalEvent));
+    }
+  }
+  return result;
+}

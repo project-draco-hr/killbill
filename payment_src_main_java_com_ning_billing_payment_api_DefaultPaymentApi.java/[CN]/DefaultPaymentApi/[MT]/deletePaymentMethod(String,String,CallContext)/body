@@ -1,4 +1,8 @@
 {
   final PaymentProviderPlugin plugin=getPaymentProviderPlugin(accountKey);
-  return plugin.deletePaymentMethod(accountKey,paymentMethodId);
+  Either<PaymentErrorEvent,Void> result=plugin.deletePaymentMethod(accountKey,paymentMethodId);
+  if (result.isLeft()) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_DEL_PAYMENT_METHOD,accountKey,result.getLeft().getMessage());
+  }
+  return;
 }

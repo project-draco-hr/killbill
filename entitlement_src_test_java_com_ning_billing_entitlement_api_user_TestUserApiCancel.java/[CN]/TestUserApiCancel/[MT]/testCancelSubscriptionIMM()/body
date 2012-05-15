@@ -8,15 +8,16 @@
     SubscriptionData subscription=createSubscription(prod,term,planSet);
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
-    Duration moveALittleInTime=getDurationDay(3);
-    clock.setDeltaFromReality(moveALittleInTime,0);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
+    clock.addDeltaFromReality(it.toDurationMillis());
     DateTime future=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     subscription.cancel(clock.getUTCNow(),false,context);
     currentPhase=subscription.getCurrentPhase();
-    testListener.isCompleted(1000);
+    testListener.isCompleted(3000);
     assertNull(currentPhase);
     checkNextPhaseChange(subscription,0,null);
+    assertListenerStatus();
   }
  catch (  EntitlementUserApiException e) {
     Assert.fail(e.getMessage());

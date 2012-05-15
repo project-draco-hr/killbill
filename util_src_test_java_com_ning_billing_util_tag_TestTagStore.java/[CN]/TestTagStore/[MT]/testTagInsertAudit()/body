@@ -1,10 +1,10 @@
 {
   UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,Account.ObjectType);
+  TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
   Tag tag=new DescriptiveTag(testTag);
   tagStore.add(tag);
-  tagDao.saveTagsFromTransaction(dao,accountId,Account.ObjectType,tagStore.getEntityList(),context);
-  List<Tag> savedTags=tagDao.loadTags(accountId,Account.ObjectType);
+  tagDao.saveEntitiesFromTransaction(dao,accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  List<Tag> savedTags=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   assertEquals(savedTags.size(),1);
   Tag savedTag=savedTags.get(0);
   assertEquals(savedTag.getTagDefinitionName(),tag.getTagDefinitionName());
@@ -12,6 +12,7 @@
   Handle handle=dbi.open();
   String query=String.format("select * from audit_log a inner join tag_history th on a.record_id = th.history_record_id where a.table_name = 'tag_history' and th.id='%s' and a.change_type='INSERT'",tag.getId().toString());
   List<Map<String,Object>> result=handle.select(query);
+  handle.close();
   assertNotNull(result);
   assertEquals(result.size(),1);
   assertEquals(result.get(0).get("change_type"),"INSERT");
