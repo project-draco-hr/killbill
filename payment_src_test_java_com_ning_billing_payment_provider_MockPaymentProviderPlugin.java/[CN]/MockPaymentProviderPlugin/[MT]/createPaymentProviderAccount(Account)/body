@@ -2,9 +2,9 @@
   if (account != null) {
     String id=String.valueOf(RandomStringUtils.randomAlphanumeric(10));
     accounts.put(account.getExternalKey(),new PaymentProviderAccount.Builder().setAccountKey(account.getExternalKey()).setId(id).build());
-    return Either.right(id);
+    return id;
   }
  else {
-    return Either.left((PaymentErrorEvent)new DefaultPaymentErrorEvent("unknown","Did not get account to create payment provider account",null,null,null));
+    throw new PaymentPluginApiException("","Did not get account to create payment provider account");
   }
 }

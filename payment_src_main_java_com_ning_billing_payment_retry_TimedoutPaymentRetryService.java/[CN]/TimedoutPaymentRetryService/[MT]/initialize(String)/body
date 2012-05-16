@@ -1,0 +1,9 @@
+{
+  retryQueue=notificationQueueService.createNotificationQueue(svcName,QUEUE_NAME,new NotificationQueueHandler(){
+    @Override public void handleReadyNotification(    String notificationKey,    DateTime eventDateTime){
+      CallContext context=new DefaultCallContext("TimedoutRetryService",CallOrigin.INTERNAL,UserType.SYSTEM,clock);
+      retry(notificationKey,context);
+    }
+  }
+,config);
+}

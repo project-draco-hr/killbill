@@ -1,10 +1,7 @@
 {
   if (makeNextInvoiceFail.getAndSet(false)) {
-    return Either.left((PaymentErrorEvent)new DefaultPaymentErrorEvent("unknown","test error",account.getId(),invoice.getId(),null));
+    throw new PaymentPluginApiException("","test error");
   }
- else {
-    PaymentInfoEvent payment=new DefaultPaymentInfoEvent.Builder().setPaymentId(UUID.randomUUID().toString()).setAmount(invoice.getBalance()).setStatus("Processed").setBankIdentificationNumber("1234").setCreatedDate(clock.getUTCNow()).setEffectiveDate(clock.getUTCNow()).setPaymentNumber("12345").setReferenceId("12345").setType("Electronic").build();
-    payments.put(payment.getPaymentId(),payment);
-    return Either.right(payment);
-  }
+  PaymentInfoEvent payment=new DefaultPaymentInfoEvent.Builder().setPaymentId(UUID.randomUUID().toString()).setAmount(invoice.getBalance()).setStatus("Processed").setBankIdentificationNumber("1234").setCreatedDate(clock.getUTCNow()).setEffectiveDate(clock.getUTCNow()).setPaymentNumber("12345").setReferenceId("12345").setType("Electronic").build();
+  return null;
 }

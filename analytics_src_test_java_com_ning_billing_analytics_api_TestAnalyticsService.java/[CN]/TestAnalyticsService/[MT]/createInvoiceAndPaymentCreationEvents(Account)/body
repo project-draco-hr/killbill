@@ -8,8 +8,8 @@
   Assert.assertEquals(invoices.get(0).getInvoiceItems().size(),1);
   invoiceCreationNotification=new DefaultInvoiceCreationEvent(invoice.getId(),account.getId(),INVOICE_AMOUNT,ACCOUNT_CURRENCY,clock.getUTCNow(),null);
   paymentInfoNotification=new DefaultPaymentInfoEvent.Builder().setPaymentId(UUID.randomUUID().toString()).setPaymentMethod(PAYMENT_METHOD).setCardCountry(CARD_COUNTRY).build();
-  final PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice.getId(),account.getId(),BigDecimal.TEN,ACCOUNT_CURRENCY,clock.getUTCNow(),clock.getUTCNow(),paymentInfoNotification.getPaymentId(),1);
-  paymentDao.createPaymentAttempt(paymentAttempt,context);
+  final PaymentAttempt paymentAttempt=new PaymentAttempt(UUID.randomUUID(),invoice.getId(),account.getId(),BigDecimal.TEN,ACCOUNT_CURRENCY,clock.getUTCNow(),clock.getUTCNow(),paymentInfoNotification.getPaymentId(),1,PaymentAttemptStatus.COMPLETED_SUCCESS);
+  paymentDao.createPaymentAttempt(paymentAttempt,PaymentAttemptStatus.COMPLETED_SUCCESS,context);
   paymentDao.savePaymentInfo(paymentInfoNotification,context);
   Assert.assertEquals(paymentDao.getPaymentInfo(Arrays.asList(invoice.getId().toString())).size(),1);
 }

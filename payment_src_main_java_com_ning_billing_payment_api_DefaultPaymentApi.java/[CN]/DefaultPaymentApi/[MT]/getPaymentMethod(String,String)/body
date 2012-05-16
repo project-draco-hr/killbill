@@ -1,8 +1,9 @@
 {
-  final PaymentProviderPlugin plugin=getPaymentProviderPlugin(accountKey);
-  Either<PaymentErrorEvent,PaymentMethodInfo> result=plugin.getPaymentMethodInfo(paymentMethodId);
-  if (result.isLeft()) {
-    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,accountKey,paymentMethodId);
+  try {
+    final PaymentProviderPlugin plugin=getPaymentProviderPlugin(accountKey);
+    return plugin.getPaymentMethodInfo(paymentMethodId);
   }
-  return result.getRight();
+ catch (  PaymentPluginApiException e) {
+    throw new PaymentApiException(e,ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,accountKey,paymentMethodId);
+  }
 }

@@ -1,0 +1,16 @@
+{
+  GlobalLock lock=null;
+  try {
+    lock=locker.lockWithNumberOfTries(LockerService.PAYMENT,accountExternalKey,NB_LOCK_TRY);
+    return callback.doOperation();
+  }
+ catch (  LockFailedException e) {
+    log.error(String.format("Failed to lock account %s",accountExternalKey),e);
+    return null;
+  }
+ finally {
+    if (lock != null) {
+      lock.release();
+    }
+  }
+}

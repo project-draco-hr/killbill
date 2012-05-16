@@ -1,0 +1,31 @@
+{
+  return new WithAccountLock<PaymentInfoEvent>().processAccountWithLock(locker,accountKey,new WithAccountLockCallback<PaymentInfoEvent>(){
+    @Override public PaymentInfoEvent doOperation() throws PaymentApiException {
+      PaymentAttempt paymentAttempt=paymentDao.getPaymentAttemptById(paymentAttemptId);
+      try {
+        Invoice invoice=paymentAttempt != null ? invoicePaymentApi.getInvoice(paymentAttempt.getInvoiceId()) : null;
+        Account account=paymentAttempt != null ? accountUserApi.getAccountById(paymentAttempt.getAccountId()) : null;
+        if (invoice == null || account == null) {
+          throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT_FOR_ATTEMPT_BAD,paymentAttemptId);
+        }
+        if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+          log.info("Received invoice for payment with outstanding amount of 0 {} ",invoice);
+          throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT_FOR_ATTEMPT_WITH_NON_POSITIVE_INV,account.getId());
+        }
+        try {
+          PaymentAttempt newPaymentAttempt=new PaymentAttempt.Builder(paymentAttempt).setRetryCount(paymentAttempt.getRetryCount() + 1).setPaymentAttemptId(UUID.randomUUID()).build();
+          paymentDao.createPaymentAttempt(newPaymentAttempt,PaymentAttemptStatus.IN_PROCESSING,context);
+          PaymentInfoEvent result=processPaymentWithAccountLocked(getPaymentProviderPlugin(account),account,invoice,newPaymentAttempt,context);
+          return result;
+        }
+ catch (        PaymentPluginApiException e) {
+          throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT_FOR_ATTEMPT,account.getId(),paymentAttemptId,e.getMessage());
+        }
+      }
+ catch (      AccountApiException e) {
+        throw new PaymentApiException(e);
+      }
+    }
+  }
+);
+}

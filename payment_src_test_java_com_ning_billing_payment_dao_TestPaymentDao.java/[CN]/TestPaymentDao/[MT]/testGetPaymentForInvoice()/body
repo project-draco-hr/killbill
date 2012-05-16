@@ -6,8 +6,8 @@
   final BigDecimal invoiceAmount=BigDecimal.TEN;
   ClockMock clock=new ClockMock();
   CallContext thisContext=new DefaultCallContext("Payment Tests",CallOrigin.TEST,UserType.TEST,clock);
-  PaymentAttempt originalPaymentAttempt=new PaymentAttempt(paymentAttemptId,invoiceId,accountId,invoiceAmount,Currency.USD,clock.getUTCNow(),clock.getUTCNow(),paymentId,0);
-  PaymentAttempt attempt=paymentDao.createPaymentAttempt(originalPaymentAttempt,thisContext);
+  PaymentAttempt originalPaymentAttempt=new PaymentAttempt(paymentAttemptId,invoiceId,accountId,invoiceAmount,Currency.USD,clock.getUTCNow(),clock.getUTCNow(),paymentId,0,PaymentAttemptStatus.IN_PROCESSING);
+  PaymentAttempt attempt=paymentDao.createPaymentAttempt(originalPaymentAttempt,PaymentAttemptStatus.IN_PROCESSING,thisContext);
   List<PaymentAttempt> attemptsFromGet=paymentDao.getPaymentAttemptsForInvoiceId(invoiceId.toString());
   Assert.assertEquals(attempt,attemptsFromGet.get(0));
   PaymentAttempt attempt3=paymentDao.getPaymentAttemptsForInvoiceIds(Arrays.asList(invoiceId.toString())).get(0);

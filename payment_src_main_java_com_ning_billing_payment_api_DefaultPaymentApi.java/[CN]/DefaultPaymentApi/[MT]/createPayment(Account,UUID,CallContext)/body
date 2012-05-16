@@ -1,0 +1,24 @@
+{
+  return new WithAccountLock<PaymentInfoEvent>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<PaymentInfoEvent>(){
+    @Override public PaymentInfoEvent doOperation() throws PaymentApiException {
+      try {
+        final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
+        Invoice invoice=invoicePaymentApi.getInvoice(invoiceId);
+        if (invoice.isMigrationInvoice()) {
+          log.error("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
+          return null;
+        }
+        PaymentInfoEvent result=null;
+        if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+          PaymentAttempt paymentAttempt=paymentDao.createPaymentAttempt(invoice,null,context);
+          result=processPaymentWithAccountLocked(plugin,account,invoice,paymentAttempt,context);
+        }
+        return result;
+      }
+ catch (      PaymentPluginApiException e) {
+        throw new PaymentApiException(e,ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),e.getMessage());
+      }
+    }
+  }
+);
+}

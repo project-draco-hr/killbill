@@ -1,4 +1,51 @@
 {
-  PaymentInfoEvent payment=new DefaultPaymentInfoEvent.Builder().setPaymentId(UUID.randomUUID().toString()).setAmount(invoice.getBalance()).setStatus("Processed").setCreatedDate(new DateTime(DateTimeZone.UTC)).setEffectiveDate(new DateTime(DateTimeZone.UTC)).setType("Electronic").build();
-  return Either.right(payment);
+  PaymentInfoPlugin payment=new PaymentInfoPlugin(){
+    @Override public DateTime getUpdatedDate(){
+      return new DateTime(DateTimeZone.UTC);
+    }
+    @Override public String getType(){
+      return "Electronic";
+    }
+    @Override public String getStatus(){
+      return "Processed";
+    }
+    @Override public BigDecimal getRefundAmount(){
+      return null;
+    }
+    @Override public String getReferenceId(){
+      return null;
+    }
+    @Override public String getPaymentNumber(){
+      return null;
+    }
+    @Override public String getPaymentMethodId(){
+      return null;
+    }
+    @Override public String getPaymentMethod(){
+      return null;
+    }
+    @Override public String getPaymentId(){
+      return UUID.randomUUID().toString();
+    }
+    @Override public DateTime getEffectiveDate(){
+      return null;
+    }
+    @Override public DateTime getCreatedDate(){
+      return new DateTime(DateTimeZone.UTC);
+    }
+    @Override public String getCardType(){
+      return null;
+    }
+    @Override public String getCardCountry(){
+      return null;
+    }
+    @Override public String getBankIdentificationNumber(){
+      return null;
+    }
+    @Override public BigDecimal getAmount(){
+      return invoice.getBalance();
+    }
+  }
+;
+  return payment;
 }
