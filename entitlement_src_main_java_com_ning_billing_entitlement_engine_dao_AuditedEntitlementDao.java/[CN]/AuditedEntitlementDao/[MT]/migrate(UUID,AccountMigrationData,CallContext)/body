@@ -1,0 +1,31 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
+    @Override public Void inTransaction(    EntitlementEventSqlDao transactional,    TransactionStatus status) throws Exception {
+      SubscriptionSqlDao transSubDao=transactional.become(SubscriptionSqlDao.class);
+      BundleSqlDao transBundleDao=transactional.become(BundleSqlDao.class);
+      List<EntityAudit> audits=new ArrayList<EntityAudit>();
+      Long recordId;
+      for (      BundleMigrationData curBundle : accountData.getData()) {
+        SubscriptionBundleData bundleData=curBundle.getData();
+        for (        SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
+          SubscriptionData subData=curSubscription.getData();
+          for (          final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
+            transactional.insertEvent(curEvent,context);
+            recordId=transactional.getRecordId(curEvent.getId().toString());
+            audits.add(new EntityAudit(TableName.ENTITLEMENT_EVENTS,recordId,ChangeType.INSERT));
+            recordFutureNotificationFromTransaction(transactional,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()));
+          }
+          transSubDao.insertSubscription(subData,context);
+          recordId=transSubDao.getRecordId(subData.getId().toString());
+          audits.add(new EntityAudit(TableName.SUBSCRIPTIONS,recordId,ChangeType.INSERT));
+        }
+        transBundleDao.insertBundle(bundleData,context);
+        recordId=transBundleDao.getRecordId(bundleData.getId().toString());
+        audits.add(new EntityAudit(TableName.BUNDLES,recordId,ChangeType.INSERT));
+      }
+      transSubDao.insertAuditFromTransaction(audits,context);
+      return null;
+    }
+  }
+);
+}

@@ -1,11 +1,13 @@
 {
-  sqlDao.inTransaction(new Transaction<Void,PaymentSqlDao>(){
+  paymentSqlDao.inTransaction(new Transaction<Void,PaymentSqlDao>(){
     @Override public Void inTransaction(    PaymentSqlDao transactional,    TransactionStatus status) throws Exception {
       transactional.insertPaymentInfo(info,context);
-      UUID historyRecordId=UUID.randomUUID();
-      transactional.insertPaymentInfoHistory(historyRecordId.toString(),info,context);
-      AuditSqlDao auditSqlDao=transactional.become(AuditSqlDao.class);
-      auditSqlDao.insertAuditFromTransaction("payment",historyRecordId.toString(),ChangeType.INSERT,context);
+      Long recordId=transactional.getRecordId(info.getId().toString());
+      EntityHistory<PaymentInfoEvent> history=new EntityHistory<PaymentInfoEvent>(info.getId(),recordId,info,ChangeType.INSERT);
+      transactional.insertHistoryFromTransaction(history,context);
+      Long historyRecordId=transactional.getHistoryRecordId(recordId);
+      EntityAudit audit=new EntityAudit(TableName.PAYMENTS,historyRecordId,ChangeType.INSERT);
+      transactional.insertAuditFromTransaction(audit,context);
       return null;
     }
   }

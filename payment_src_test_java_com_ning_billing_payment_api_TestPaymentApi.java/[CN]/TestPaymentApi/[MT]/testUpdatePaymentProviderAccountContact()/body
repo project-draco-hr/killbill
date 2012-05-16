@@ -1,8 +1,15 @@
 {
   final Account account=testHelper.createTestPayPalAccount();
   paymentApi.createPaymentProviderAccount(account,context);
-  String newName="Tester " + RandomStringUtils.randomAlphanumeric(10);
-  String newNumber="888-888-" + RandomStringUtils.randomNumeric(4);
-  final Account accountToUpdate=new MockAccountBuilder(account.getId()).name(newName).firstNameLength(newName.length()).externalKey(account.getExternalKey()).phone(newNumber).email(account.getEmail()).currency(account.getCurrency()).billingCycleDay(account.getBillCycleDay()).build();
-  paymentApi.updatePaymentProviderAccountContact(accountToUpdate.getExternalKey(),context);
+  Account updatedAccount=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
+  ZombieControl zombieAccount=(ZombieControl)updatedAccount;
+  zombieAccount.addResult("getId",account.getId());
+  zombieAccount.addResult("getName","Tester " + RandomStringUtils.randomAlphanumeric(10));
+  zombieAccount.addResult("getFirstNameLength",6);
+  zombieAccount.addResult("getExternalKey",account.getExternalKey());
+  zombieAccount.addResult("getPhone","888-888-" + RandomStringUtils.randomNumeric(4));
+  zombieAccount.addResult("getEmail",account.getEmail());
+  zombieAccount.addResult("getCurrency",account.getCurrency());
+  zombieAccount.addResult("getBillCycleDay",account.getBillCycleDay());
+  paymentApi.updatePaymentProviderAccountContact(updatedAccount.getExternalKey(),context);
 }

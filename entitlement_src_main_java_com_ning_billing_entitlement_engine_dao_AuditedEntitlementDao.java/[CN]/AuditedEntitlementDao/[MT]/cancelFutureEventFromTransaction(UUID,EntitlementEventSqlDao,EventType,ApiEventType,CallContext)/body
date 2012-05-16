@@ -1,0 +1,20 @@
+{
+  EntitlementEvent futureEvent=null;
+  Date now=clock.getUTCNow().toDate();
+  List<EntitlementEvent> events=dao.getFutureActiveEventForSubscription(subscriptionId.toString(),now);
+  for (  EntitlementEvent cur : events) {
+    if (cur.getType() == type && (apiType == null || apiType == ((ApiEvent)cur).getEventType())) {
+      if (futureEvent != null) {
+        throw new EntitlementError(String.format("Found multiple future events for type %s for subscriptions %s",type,subscriptionId.toString()));
+      }
+      futureEvent=cur;
+    }
+  }
+  if (futureEvent != null) {
+    String eventId=futureEvent.getId().toString();
+    dao.unactiveEvent(eventId,context);
+    Long recordId=dao.getRecordId(eventId);
+    EntityAudit audit=new EntityAudit(TableName.ENTITLEMENT_EVENTS,recordId,ChangeType.UPDATE);
+    dao.insertAuditFromTransaction(audit,context);
+  }
+}

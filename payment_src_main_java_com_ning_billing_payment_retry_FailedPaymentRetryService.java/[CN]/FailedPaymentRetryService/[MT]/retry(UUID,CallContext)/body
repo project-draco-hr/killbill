@@ -1,0 +1,12 @@
+{
+  try {
+    PaymentInfoEvent paymentInfo=paymentApi.getPaymentInfoForPaymentAttemptId(paymentAttemptId);
+    if (paymentInfo != null && PaymentStatus.Processed.equals(PaymentStatus.valueOf(paymentInfo.getStatus()))) {
+      return;
+    }
+    paymentApi.createPaymentForPaymentAttempt(null,paymentAttemptId,context);
+  }
+ catch (  PaymentApiException e) {
+    log.error(String.format("Failed to retry payment for %s"),e);
+  }
+}

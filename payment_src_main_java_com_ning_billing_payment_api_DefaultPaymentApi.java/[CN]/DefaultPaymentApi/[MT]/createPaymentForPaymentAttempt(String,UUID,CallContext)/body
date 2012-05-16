@@ -13,7 +13,7 @@
           throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT_FOR_ATTEMPT_WITH_NON_POSITIVE_INV,account.getId());
         }
         try {
-          PaymentAttempt newPaymentAttempt=new PaymentAttempt.Builder(paymentAttempt).setRetryCount(paymentAttempt.getRetryCount() + 1).setPaymentAttemptId(UUID.randomUUID()).build();
+          PaymentAttempt newPaymentAttempt=new DefaultPaymentAttempt.Builder(paymentAttempt).setRetryCount(paymentAttempt.getRetryCount() + 1).setPaymentAttemptId(UUID.randomUUID()).build();
           paymentDao.createPaymentAttempt(newPaymentAttempt,PaymentAttemptStatus.IN_PROCESSING,context);
           PaymentInfoEvent result=processPaymentWithAccountLocked(getPaymentProviderPlugin(account),account,invoice,newPaymentAttempt,context);
           return result;

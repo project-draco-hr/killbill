@@ -12,10 +12,12 @@
           throw new EntityPersistenceException(ErrorCode.ACCOUNT_CANNOT_CHANGE_EXTERNAL_KEY,currentKey);
         }
         transactional.update(account,context);
-        UUID historyId=UUID.randomUUID();
-        accountSqlDao.insertAccountHistoryFromTransaction(account,historyId.toString(),ChangeType.UPDATE,context);
-        AuditSqlDao auditDao=accountSqlDao.become(AuditSqlDao.class);
-        auditDao.insertAuditFromTransaction("account_history",historyId.toString(),ChangeType.INSERT,context);
+        Long recordId=accountSqlDao.getRecordId(account.getId().toString());
+        EntityHistory<Account> history=new EntityHistory<Account>(account.getId(),recordId,account,ChangeType.INSERT);
+        accountSqlDao.insertHistoryFromTransaction(history,context);
+        Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId);
+        EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
+        accountSqlDao.insertAuditFromTransaction(audit,context);
         saveTagsFromWithinTransaction(account,transactional,context);
         saveCustomFieldsFromWithinTransaction(account,transactional,context);
         AccountChangeEvent changeEvent=new DefaultAccountChangeEvent(account.getId(),context.getUserToken(),currentAccount,account);

@@ -4,11 +4,8 @@
     helper.startMysql();
     helper.initDb(utilDdl);
     dbi=helper.getDBI();
-    customFieldDao=new AuditedCustomFieldDao();
-    FieldStoreModule module=new FieldStoreModule();
-    final Injector injector=Guice.createInjector(Stage.DEVELOPMENT,module,new MockClockModule());
-    Clock clock=injector.getInstance(Clock.class);
-    context=new DefaultCallContextFactory(clock).createCallContext("Fezzik",CallOrigin.TEST,UserType.TEST);
+    customFieldDao=new AuditedCustomFieldDao(dbi);
+    context=new DefaultCallContextFactory(new ClockMock()).createCallContext("Fezzik",CallOrigin.TEST,UserType.TEST);
   }
  catch (  Throwable t) {
     log.error("Setup failed",t);

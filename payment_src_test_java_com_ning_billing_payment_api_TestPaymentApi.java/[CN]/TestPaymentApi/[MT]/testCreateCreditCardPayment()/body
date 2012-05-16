@@ -8,17 +8,17 @@
   final UUID bundleId=UUID.randomUUID();
   invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD));
   PaymentInfoEvent paymentInfo=paymentApi.createPayment(account.getExternalKey(),invoice.getId(),context);
-  assertNotNull(paymentInfo.getPaymentId());
+  assertNotNull(paymentInfo.getId());
   assertTrue(paymentInfo.getAmount().compareTo(amount.setScale(2,RoundingMode.HALF_EVEN)) == 0);
   assertNotNull(paymentInfo.getPaymentNumber());
   assertFalse(paymentInfo.getStatus().equals("Error"));
-  PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(paymentInfo.getPaymentId());
+  PaymentAttempt paymentAttempt=paymentApi.getPaymentAttemptForPaymentId(paymentInfo.getId());
   assertNotNull(paymentAttempt);
-  assertNotNull(paymentAttempt.getPaymentAttemptId());
+  assertNotNull(paymentAttempt.getId());
   assertEquals(paymentAttempt.getInvoiceId(),invoice.getId());
   assertTrue(paymentAttempt.getAmount().compareTo(amount.setScale(2,RoundingMode.HALF_EVEN)) == 0);
   assertEquals(paymentAttempt.getCurrency(),Currency.USD);
-  assertEquals(paymentAttempt.getPaymentId(),paymentInfo.getPaymentId());
+  assertEquals(paymentAttempt.getPaymentId(),paymentInfo.getId());
   DateTime nowTruncated=now.withMillisOfSecond(0).withSecondOfMinute(0);
   DateTime paymentAttemptDateTruncated=paymentAttempt.getPaymentAttemptDate().withMillisOfSecond(0).withSecondOfMinute(0);
   assertEquals(paymentAttemptDateTruncated.compareTo(nowTruncated),0);
@@ -28,13 +28,13 @@
   PaymentInfoEvent paymentInfoFromGet=paymentInfos.get(0);
   assertEquals(paymentInfo.getAmount(),paymentInfoFromGet.getAmount());
   assertEquals(paymentInfo.getRefundAmount(),paymentInfoFromGet.getRefundAmount());
-  assertEquals(paymentInfo.getPaymentId(),paymentInfoFromGet.getPaymentId());
+  assertEquals(paymentInfo.getId(),paymentInfoFromGet.getId());
   assertEquals(paymentInfo.getPaymentNumber(),paymentInfoFromGet.getPaymentNumber());
   assertEquals(paymentInfo.getStatus(),paymentInfoFromGet.getStatus());
   assertEquals(paymentInfo.getBankIdentificationNumber(),paymentInfoFromGet.getBankIdentificationNumber());
   assertEquals(paymentInfo.getReferenceId(),paymentInfoFromGet.getReferenceId());
   assertEquals(paymentInfo.getPaymentMethodId(),paymentInfoFromGet.getPaymentMethodId());
   assertEquals(paymentInfo.getEffectiveDate(),paymentInfoFromGet.getEffectiveDate());
-  List<PaymentAttempt> paymentAttemptsFromGet=paymentApi.getPaymentAttemptsForInvoiceId(invoice.getId().toString());
+  List<PaymentAttempt> paymentAttemptsFromGet=paymentApi.getPaymentAttemptsForInvoiceId(invoice.getId());
   assertEquals(paymentAttempt,paymentAttemptsFromGet.get(0));
 }

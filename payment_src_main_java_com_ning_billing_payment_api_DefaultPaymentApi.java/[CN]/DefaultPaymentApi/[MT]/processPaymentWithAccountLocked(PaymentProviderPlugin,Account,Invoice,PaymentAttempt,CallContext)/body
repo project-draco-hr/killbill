@@ -21,8 +21,8 @@
     paymentDao.updatePaymentInfo(paypalPaymentMethodInfo.getType(),paymentInfo.getPaymentId(),null,null,context);
   }
   if (paymentInfo.getPaymentId() != null) {
-    paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getPaymentAttemptId(),paymentInfo.getPaymentId(),context);
+    paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getId(),paymentInfo.getPaymentId(),context);
   }
-  invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : paymentInfo.getAmount(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : invoice.getCurrency(),paymentAttempt.getPaymentAttemptId(),paymentAttempt.getPaymentAttemptDate(),context);
+  invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : paymentInfo.getAmount(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : invoice.getCurrency(),paymentAttempt.getId(),paymentAttempt.getPaymentAttemptDate(),context);
   return paymentInfo;
 }
