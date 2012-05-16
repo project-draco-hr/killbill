@@ -14,14 +14,14 @@
   PaymentMethodInfo paymentMethodInfo=plugin.getPaymentMethodInfo(paymentMethodId);
   if (paymentMethodInfo instanceof CreditCardPaymentMethodInfo) {
     CreditCardPaymentMethodInfo ccPaymentMethod=(CreditCardPaymentMethodInfo)paymentMethodInfo;
-    paymentDao.updatePaymentInfo(ccPaymentMethod.getType(),paymentInfo.getPaymentId(),ccPaymentMethod.getCardType(),ccPaymentMethod.getCardCountry(),context);
+    paymentDao.updatePaymentInfo(ccPaymentMethod.getType(),paymentInfo.getId(),ccPaymentMethod.getCardType(),ccPaymentMethod.getCardCountry(),context);
   }
  else   if (paymentMethodInfo instanceof PaypalPaymentMethodInfo) {
     PaypalPaymentMethodInfo paypalPaymentMethodInfo=(PaypalPaymentMethodInfo)paymentMethodInfo;
-    paymentDao.updatePaymentInfo(paypalPaymentMethodInfo.getType(),paymentInfo.getPaymentId(),null,null,context);
+    paymentDao.updatePaymentInfo(paypalPaymentMethodInfo.getType(),paymentInfo.getId(),null,null,context);
   }
-  if (paymentInfo.getPaymentId() != null) {
-    paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getId(),paymentInfo.getPaymentId(),context);
+  if (paymentInfo.getId() != null) {
+    paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getId(),paymentInfo.getId(),context);
   }
   invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : paymentInfo.getAmount(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : invoice.getCurrency(),paymentAttempt.getId(),paymentAttempt.getPaymentAttemptDate(),context);
   return paymentInfo;

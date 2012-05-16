@@ -2,6 +2,6 @@
   if (makeNextInvoiceFail.getAndSet(false)) {
     throw new PaymentPluginApiException("","test error");
   }
-  PaymentInfoEvent payment=new DefaultPaymentInfoEvent.Builder().setId(UUID.randomUUID()).setAmount(invoice.getBalance()).setStatus("Processed").setBankIdentificationNumber("1234").setCreatedDate(clock.getUTCNow()).setEffectiveDate(clock.getUTCNow()).setPaymentNumber("12345").setReferenceId("12345").setType("Electronic").build();
-  return null;
+  PaymentInfoEvent payment=new DefaultPaymentInfoEvent.Builder().setId(UUID.randomUUID()).setAmount(invoice.getBalance()).setStatus("Processed").setBankIdentificationNumber("1234").setCreatedDate(clock.getUTCNow()).setEffectiveDate(clock.getUTCNow()).setPaymentNumber("12345").setReferenceId("12345").setType("Electronic").setPaymentMethodId("123-456-678-89").build();
+  return new MockPaymentInfoPlugin(payment);
 }
