@@ -1,11 +1,14 @@
 {
-  Account account=createTestAccount(1);
   String fieldName="testField1";
   String fieldValue="testField1_value";
-  account.setFieldValue(fieldName,fieldValue);
-  accountDao.create(account,context);
-  Account thisAccount=accountDao.getAccountByKey(account.getExternalKey());
-  assertNotNull(thisAccount);
-  assertEquals(thisAccount.getExternalKey(),account.getExternalKey());
-  assertEquals(thisAccount.getFieldValue(fieldName),fieldValue);
+  UUID accountId=UUID.randomUUID();
+  List<CustomField> customFields=new ArrayList<CustomField>();
+  customFields.add(new StringCustomField(fieldName,fieldValue));
+  CustomFieldDao customFieldDao=new AuditedCustomFieldDao(dbi);
+  customFieldDao.saveEntities(accountId,ObjectType.ACCOUNT,customFields,context);
+  Map<String,CustomField> customFieldMap=customFieldDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  assertEquals(customFieldMap.size(),1);
+  CustomField customField=customFieldMap.get(fieldName);
+  assertEquals(customField.getName(),fieldName);
+  assertEquals(customField.getValue(),fieldValue);
 }

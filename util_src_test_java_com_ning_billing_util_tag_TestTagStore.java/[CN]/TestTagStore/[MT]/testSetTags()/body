@@ -1,0 +1,16 @@
+{
+  UUID objectId=UUID.randomUUID();
+  ObjectType objectType=ObjectType.INVOICE;
+  List<Tag> tags=new ArrayList<Tag>();
+  tags.add(new DescriptiveTag("test 1"));
+  tags.add(new DescriptiveTag("test 2"));
+  tags.add(new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF));
+  tagDao.saveEntities(objectId,objectType,tags,context);
+  Map<String,Tag> savedTags=tagDao.loadEntities(objectId,objectType);
+  assertEquals(savedTags.size(),3);
+  tags.remove(1);
+  assertEquals(tags.size(),2);
+  tagDao.saveEntities(objectId,objectType,tags,context);
+  savedTags=tagDao.loadEntities(objectId,objectType);
+  assertEquals(savedTags.size(),2);
+}

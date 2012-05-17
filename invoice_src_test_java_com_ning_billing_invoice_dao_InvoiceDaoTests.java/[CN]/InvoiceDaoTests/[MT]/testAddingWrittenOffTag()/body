@@ -11,7 +11,9 @@
   events.add(event1);
   Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,targetDate1,Currency.USD);
   invoiceDao.create(invoice,context);
-  invoiceDao.addControlTag(ControlTagType.WRITTEN_OFF,invoice.getId(),context);
-  Invoice savedInvoice=invoiceDao.getById(invoice.getId());
-  assertTrue(savedInvoice.hasTag(ControlTagType.WRITTEN_OFF));
+  invoiceDao.setWrittenOff(invoice.getId(),context);
+  TagDao tagDao=new AuditedTagDao(dbi);
+  Map<String,Tag> tags=tagDao.loadEntities(invoice.getId(),ObjectType.INVOICE);
+  assertEquals(tags.size(),1);
+  assertTrue(tags.containsKey(ControlTagType.WRITTEN_OFF.toString()));
 }

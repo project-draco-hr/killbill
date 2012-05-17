@@ -9,17 +9,25 @@
     while (existingEntityIterator.hasNext()) {
       T existingEntity=existingEntityIterator.next();
       if (entity.equals(existingEntity)) {
-        entitiesToUpdate.add(entity);
         entityIterator.remove();
         existingEntityIterator.remove();
+        if (entity.hashCode() != existingEntity.hashCode()) {
+          entitiesToUpdate.add(entity);
+        }
       }
     }
   }
-  dao.insertFromTransaction(objectId.toString(),objectType,entities,context);
-  dao.updateFromTransaction(objectId.toString(),objectType,entitiesToUpdate,context);
+  if (entities.size() != 0) {
+    dao.insertFromTransaction(objectId.toString(),objectType,entities,context);
+  }
+  if (entitiesToUpdate.size() != 0) {
+    dao.updateFromTransaction(objectId.toString(),objectType,entitiesToUpdate,context);
+  }
   List<Mapper<UUID,Long>> recordIds=dao.getRecordIds(objectId.toString(),objectType);
   Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
-  dao.deleteFromTransaction(objectId.toString(),objectType,existingEntities,context);
+  if (existingEntities.size() != 0) {
+    dao.deleteFromTransaction(objectId.toString(),objectType,existingEntities,context);
+  }
   List<EntityHistory<T>> entityHistories=new ArrayList<EntityHistory<T>>();
   entityHistories.addAll(convertToHistory(entities,recordIdMap,ChangeType.INSERT));
   entityHistories.addAll(convertToHistory(entitiesToUpdate,recordIdMap,ChangeType.UPDATE));

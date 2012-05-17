@@ -12,10 +12,7 @@
   Thread.sleep(5000);
   Assert.assertEquals(subscriptionDao.getTransitions(KEY).size(),1);
   Assert.assertEquals(subscriptionDao.getTransitions(KEY).get(0),expectedTransition);
-  Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getKey(),ACCOUNT_KEY);
-  Assert.assertEquals(accountDao.getAccount(ACCOUNT_KEY).getTags().size(),2);
-  Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTags().indexOf(TAG_ONE.getName()) != -1);
-  Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTags().indexOf(TAG_TWO.getName()) != -1);
+  TagDao tagDao=new AuditedTagDao(helper.getDBI());
   Assert.assertTrue(accountDao.getAccount(ACCOUNT_KEY).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
   bus.post(invoiceCreationNotification);
   Thread.sleep(5000);

@@ -3,10 +3,10 @@
   TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
   Tag tag=new DescriptiveTag(testTag);
   tagStore.add(tag);
-  tagDao.saveEntitiesFromTransaction(dao,accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
   tagStore.remove(tag);
-  tagDao.saveEntitiesFromTransaction(dao,accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
-  List<Tag> savedTags=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  Map<String,Tag> savedTags=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   assertEquals(savedTags.size(),0);
   Handle handle=dbi.open();
   String query=String.format("select * from audit_log a inner join tag_history th on a.record_id = th.history_record_id where a.table_name = 'tag_history' and th.id='%s' and a.change_type='DELETE'",tag.getId().toString());

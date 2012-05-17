@@ -7,8 +7,8 @@
   TagStore tagStore=new DefaultTagStore(objectId,ObjectType.ACCOUNT);
   Tag tag=new DescriptiveTag(tagDefinition);
   tagStore.add(tag);
-  tagDao.saveEntitiesFromTransaction(dao,objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
-  List<Tag> tags=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
-  assertEquals(tags.size(),1);
+  tagDao.saveEntities(objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  Map<String,Tag> tagMap=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
+  assertEquals(tagMap.size(),1);
   tagDefinitionDao.deleteTagDefinition(definitionName,context);
 }
