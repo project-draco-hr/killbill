@@ -1,15 +1,13 @@
 {
-  try {
-    OverdueState<T> nextOverdueState;
-    BillingState<T> billingState=billingStateCalcuator.calculateBillingState(overdueable);
-    String previousOverdueStateName=api.getBlockingStateFor(overdueable).getStateName();
-    nextOverdueState=overdueStateSet.calculateOverdueState(billingState,clock.getUTCNow());
-    if (nextOverdueState != null && !previousOverdueStateName.equals(nextOverdueState.getName())) {
-      overdueStateApplicator.apply(overdueable,previousOverdueStateName,nextOverdueState);
-    }
-    return nextOverdueState;
+  if (overdueStateSet == null) {
+    return null;
   }
- catch (  EntitlementUserApiException e) {
-    throw new OverdueError(e);
+  OverdueState<T> nextOverdueState;
+  BillingState<T> billingState=billingState();
+  String previousOverdueStateName=api.getBlockingStateFor(overdueable).getStateName();
+  nextOverdueState=overdueStateSet.calculateOverdueState(billingState,clock.getUTCNow());
+  if (nextOverdueState != null && !previousOverdueStateName.equals(nextOverdueState.getName())) {
+    overdueStateApplicator.apply(overdueable,previousOverdueStateName,nextOverdueState);
   }
+  return nextOverdueState;
 }

@@ -1,15 +1,26 @@
 {
-  SortedSet<Invoice> unpaidInvoices=unpaidInvoicesForBundle(bundle.getId(),bundle.getAccountId());
-  Subscription basePlan=entitlementApi.getBaseSubscription(bundle.getId());
-  UUID id=bundle.getId();
-  int numberOfUnpaidInvoices=unpaidInvoices.size();
-  BigDecimal unpaidInvoiceBalance=sumBalance(unpaidInvoices);
-  DateTime dateOfEarliestUnpaidInvoice=earliest(unpaidInvoices);
-  PaymentResponse responseForLastFailedPayment=PaymentResponse.INSUFFICIENT_FUNDS;
-  Tag[] tags=new Tag[]{};
-  Product basePlanProduct=basePlan.getCurrentPlan().getProduct();
-  BillingPeriod basePlanBillingPeriod=basePlan.getCurrentPlan().getBillingPeriod();
-  PriceList basePlanPriceList=basePlan.getCurrentPriceList();
-  PhaseType basePlanPhaseType=basePlan.getCurrentPhase().getPhaseType();
-  return new BillingStateBundle(id,numberOfUnpaidInvoices,unpaidInvoiceBalance,dateOfEarliestUnpaidInvoice,responseForLastFailedPayment,tags,basePlanProduct,basePlanBillingPeriod,basePlanPriceList,basePlanPhaseType);
+  try {
+    SortedSet<Invoice> unpaidInvoices=unpaidInvoicesForBundle(bundle.getId(),bundle.getAccountId());
+    Subscription basePlan=entitlementApi.getBaseSubscription(bundle.getId());
+    UUID id=bundle.getId();
+    int numberOfUnpaidInvoices=unpaidInvoices.size();
+    BigDecimal unpaidInvoiceBalance=sumBalance(unpaidInvoices);
+    DateTime dateOfEarliestUnpaidInvoice=null;
+    UUID idOfEarliestUnpaidInvoice=null;
+    Invoice invoice=earliest(unpaidInvoices);
+    if (invoice != null) {
+      dateOfEarliestUnpaidInvoice=invoice.getInvoiceDate();
+      idOfEarliestUnpaidInvoice=invoice.getId();
+    }
+    PaymentResponse responseForLastFailedPayment=PaymentResponse.INSUFFICIENT_FUNDS;
+    Tag[] tags=new Tag[]{};
+    Product basePlanProduct=basePlan.getCurrentPlan().getProduct();
+    BillingPeriod basePlanBillingPeriod=basePlan.getCurrentPlan().getBillingPeriod();
+    PriceList basePlanPriceList=basePlan.getCurrentPriceList();
+    PhaseType basePlanPhaseType=basePlan.getCurrentPhase().getPhaseType();
+    return new BillingStateBundle(id,numberOfUnpaidInvoices,unpaidInvoiceBalance,dateOfEarliestUnpaidInvoice,idOfEarliestUnpaidInvoice,responseForLastFailedPayment,tags,basePlanProduct,basePlanBillingPeriod,basePlanPriceList,basePlanPhaseType);
+  }
+ catch (  EntitlementUserApiException e) {
+    throw new OverdueError(e);
+  }
 }

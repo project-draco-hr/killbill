@@ -1,4 +1,7 @@
 {
+  if (makeAllInvoicesFail) {
+    return Either.left((PaymentErrorEvent)new DefaultPaymentErrorEvent("unknown","test error",account.getId(),invoice.getId(),null));
+  }
   PaymentInfoEvent payment=new DefaultPaymentInfoEvent.Builder().setPaymentId(UUID.randomUUID().toString()).setAmount(invoice.getBalance()).setStatus("Processed").setCreatedDate(new DateTime(DateTimeZone.UTC)).setEffectiveDate(new DateTime(DateTimeZone.UTC)).setType("Electronic").build();
   return Either.right(payment);
 }
