@@ -4,11 +4,11 @@
   TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName);
   assertNotNull(tagDefinition);
   UUID objectId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(objectId,Account.ObjectType);
+  TagStore tagStore=new DefaultTagStore(objectId,ObjectType.ACCOUNT);
   Tag tag=new DescriptiveTag(tagDefinition);
   tagStore.add(tag);
-  tagDao.saveTags(objectId,Account.ObjectType,tagStore.getEntityList(),context);
-  List<Tag> tags=tagDao.loadTags(objectId,Account.ObjectType);
+  tagDao.saveEntitiesFromTransaction(dao,objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  List<Tag> tags=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
   assertEquals(tags.size(),1);
   tagDefinitionDao.deleteTagDefinition(definitionName,context);
 }

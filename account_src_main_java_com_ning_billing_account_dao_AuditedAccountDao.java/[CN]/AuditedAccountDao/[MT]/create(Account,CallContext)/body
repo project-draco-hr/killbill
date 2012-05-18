@@ -8,10 +8,12 @@
           throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,key);
         }
         transactionalDao.create(account,context);
-        UUID historyId=UUID.randomUUID();
-        accountSqlDao.insertAccountHistoryFromTransaction(account,historyId.toString(),ChangeType.INSERT,context);
-        AuditSqlDao auditDao=accountSqlDao.become(AuditSqlDao.class);
-        auditDao.insertAuditFromTransaction("account_history",historyId.toString(),ChangeType.INSERT,context);
+        Long recordId=accountSqlDao.getRecordId(account.getId().toString());
+        EntityHistory<Account> history=new EntityHistory<Account>(account.getId(),recordId,account,ChangeType.INSERT);
+        accountSqlDao.insertHistoryFromTransaction(history,context);
+        Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId);
+        EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
+        accountSqlDao.insertAuditFromTransaction(audit,context);
         saveTagsFromWithinTransaction(account,transactionalDao,context);
         saveCustomFieldsFromWithinTransaction(account,transactionalDao,context);
         AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,context.getUserToken());

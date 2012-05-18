@@ -4,14 +4,14 @@
   for (  BundleTimeline cur : bundles) {
     this.bundles.add(new BundleJsonWithSubscriptions(account.getId(),cur));
   }
-  this.invoices=new LinkedList<InvoiceJson>();
+  this.invoices=new LinkedList<InvoiceJsonWithBundleKeys>();
   for (  Invoice cur : invoices) {
-    this.invoices.add(new InvoiceJson(cur.getTotalAmount(),cur.getId().toString(),cur.getInvoiceDate(),Integer.toString(cur.getInvoiceNumber()),cur.getBalance()));
+    this.invoices.add(new InvoiceJsonWithBundleKeys(cur.getTotalAmount(),cur.getId().toString(),cur.getInvoiceDate(),cur.getTargetDate(),Integer.toString(cur.getInvoiceNumber()),cur.getBalance(),getBundleExternalKey(cur,bundles)));
   }
-  this.payments=new LinkedList<PaymentJson>();
+  this.payments=new LinkedList<PaymentJsonWithBundleKeys>();
   for (  PaymentAttempt cur : payments) {
     String status=cur.getPaymentId() != null ? "Success" : "Failed";
     BigDecimal paidAmount=cur.getPaymentId() != null ? cur.getAmount() : BigDecimal.ZERO;
-    this.payments.add(new PaymentJson(cur.getAmount(),paidAmount,cur.getInvoiceId().toString(),cur.getPaymentId(),cur.getCreatedDate(),cur.getUpdatedDate(),cur.getRetryCount(),cur.getCurrency().toString(),status));
+    this.payments.add(new PaymentJsonWithBundleKeys(cur.getAmount(),paidAmount,cur.getInvoiceId(),cur.getPaymentId(),cur.getCreatedDate(),cur.getUpdatedDate(),cur.getRetryCount(),cur.getCurrency().toString(),status,getBundleExternalKey(cur.getInvoiceId(),invoices,bundles)));
   }
 }

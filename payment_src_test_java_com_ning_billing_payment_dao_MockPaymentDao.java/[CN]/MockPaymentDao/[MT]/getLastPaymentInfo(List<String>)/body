@@ -1,0 +1,10 @@
+{
+  List<PaymentInfoEvent> payments=getPaymentInfoList(invoiceIds);
+  PaymentInfoEvent lastPayment=null;
+  for (  PaymentInfoEvent payment : payments) {
+    if ((lastPayment == null) || (payment.getEffectiveDate().isAfter(lastPayment.getEffectiveDate()))) {
+      lastPayment=payment;
+    }
+  }
+  return lastPayment;
+}

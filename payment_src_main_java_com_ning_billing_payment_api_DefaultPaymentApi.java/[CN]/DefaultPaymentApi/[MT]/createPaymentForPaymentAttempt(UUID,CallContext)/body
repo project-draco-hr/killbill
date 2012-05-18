@@ -10,7 +10,7 @@
           throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT_FOR_ATTEMPT_WITH_NON_POSITIVE_INV,account.getId());
         }
  else {
-          PaymentAttempt newPaymentAttempt=new PaymentAttempt.Builder(paymentAttempt).setRetryCount(paymentAttempt.getRetryCount() + 1).setPaymentAttemptId(UUID.randomUUID()).build();
+          PaymentAttempt newPaymentAttempt=new DefaultPaymentAttempt.Builder(paymentAttempt).setRetryCount(paymentAttempt.getRetryCount() + 1).setPaymentAttemptId(UUID.randomUUID()).build();
           paymentDao.createPaymentAttempt(newPaymentAttempt,context);
           Either<PaymentErrorEvent,PaymentInfoEvent> result=processPayment(getPaymentProviderPlugin(account),account,invoice,newPaymentAttempt,context);
           if (result.isLeft()) {

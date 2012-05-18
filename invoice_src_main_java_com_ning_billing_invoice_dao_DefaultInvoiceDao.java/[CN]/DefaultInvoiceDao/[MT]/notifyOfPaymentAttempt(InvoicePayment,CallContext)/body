@@ -2,9 +2,10 @@
   invoicePaymentSqlDao.inTransaction(new Transaction<Void,InvoicePaymentSqlDao>(){
     @Override public Void inTransaction(    InvoicePaymentSqlDao transactional,    TransactionStatus status) throws Exception {
       transactional.notifyOfPaymentAttempt(invoicePayment,context);
-      AuditSqlDao auditSqlDao=transactional.become(AuditSqlDao.class);
       String invoicePaymentId=invoicePayment.getId().toString();
-      auditSqlDao.insertAuditFromTransaction("invoice_payments",invoicePaymentId,ChangeType.INSERT,context);
+      Long recordId=transactional.getRecordId(invoicePaymentId);
+      EntityAudit audit=new EntityAudit(TableName.INVOICE_PAYMENTS,recordId,ChangeType.INSERT);
+      transactional.insertAuditFromTransaction(audit,context);
       return null;
     }
   }

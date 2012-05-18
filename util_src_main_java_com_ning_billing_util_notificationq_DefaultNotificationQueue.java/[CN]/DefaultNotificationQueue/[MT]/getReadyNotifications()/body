@@ -1,15 +1,15 @@
 {
   final Date now=clock.getUTCNow().toDate();
-  final Date nextAvailable=clock.getUTCNow().plus(config.getDaoClaimTimeMs()).toDate();
-  List<Notification> input=dao.getReadyNotifications(now,hostname,config.getDaoMaxReadyEvents(),getFullQName());
+  final Date nextAvailable=clock.getUTCNow().plus(CLAIM_TIME_MS).toDate();
+  List<Notification> input=dao.getReadyNotifications(now,hostname,CLAIM_TIME_MS,getFullQName());
   List<Notification> claimedNotifications=new ArrayList<Notification>();
   for (  Notification cur : input) {
-    logDebug("about to claim notification %s,  key = %s for time %s",cur.getUUID(),cur.getNotificationKey(),cur.getEffectiveDate());
-    final boolean claimed=(dao.claimNotification(hostname,nextAvailable,cur.getId(),now) == 1);
-    logDebug("claimed notification %s, key = %s for time %s result = %s",cur.getUUID(),cur.getNotificationKey(),cur.getEffectiveDate(),Boolean.valueOf(claimed));
+    logDebug("about to claim notification %s,  key = %s for time %s",cur.getId(),cur.getNotificationKey(),cur.getEffectiveDate());
+    final boolean claimed=(dao.claimNotification(hostname,nextAvailable,cur.getId().toString(),now) == 1);
+    logDebug("claimed notification %s, key = %s for time %s result = %s",cur.getId(),cur.getNotificationKey(),cur.getEffectiveDate(),Boolean.valueOf(claimed));
     if (claimed) {
       claimedNotifications.add(cur);
-      dao.insertClaimedHistory(hostname,now,cur.getUUID().toString());
+      dao.insertClaimedHistory(hostname,now,cur.getId().toString());
     }
   }
   for (  Notification cur : claimedNotifications) {
