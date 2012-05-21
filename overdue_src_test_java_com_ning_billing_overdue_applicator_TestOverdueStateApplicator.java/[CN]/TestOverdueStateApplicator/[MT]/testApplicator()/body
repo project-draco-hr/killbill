@@ -1,0 +1,32 @@
+{
+  InputStream is=new ByteArrayInputStream(configXml.getBytes());
+  config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
+  service.registerForBus();
+  service.initialize();
+  overdueWrapperFactory.setOverdueConfig(config);
+  SubscriptionBundle bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
+  ((ZombieControl)bundle).addResult("getId",UUID.randomUUID());
+  OverdueState<SubscriptionBundle> state;
+  BlockingState result;
+  state=config.getBundleStateSet().findState("OD1");
+  applicator.apply(bundle,BlockingApi.CLEAR_STATE_NAME,state);
+  result=((ApplicatorBlockingApi)blockingApi).getBlockingState();
+  Assert.assertEquals(result.getStateName(),state.getName());
+  Assert.assertEquals(result.isBlockChange(),state.blockChanges());
+  Assert.assertEquals(result.isBlockEntitlement(),state.disableEntitlementAndChangesBlocked());
+  Assert.assertEquals(result.isBlockBilling(),state.disableEntitlementAndChangesBlocked());
+  state=config.getBundleStateSet().findState("OD2");
+  applicator.apply(bundle,BlockingApi.CLEAR_STATE_NAME,state);
+  result=((ApplicatorBlockingApi)blockingApi).getBlockingState();
+  Assert.assertEquals(result.getStateName(),state.getName());
+  Assert.assertEquals(result.isBlockChange(),state.blockChanges());
+  Assert.assertEquals(result.isBlockEntitlement(),state.disableEntitlementAndChangesBlocked());
+  Assert.assertEquals(result.isBlockBilling(),state.disableEntitlementAndChangesBlocked());
+  state=config.getBundleStateSet().findState("OD3");
+  applicator.apply(bundle,BlockingApi.CLEAR_STATE_NAME,state);
+  result=((ApplicatorBlockingApi)blockingApi).getBlockingState();
+  Assert.assertEquals(result.getStateName(),state.getName());
+  Assert.assertEquals(result.isBlockChange(),state.blockChanges());
+  Assert.assertEquals(result.isBlockEntitlement(),state.disableEntitlementAndChangesBlocked());
+  Assert.assertEquals(result.isBlockBilling(),state.disableEntitlementAndChangesBlocked());
+}
