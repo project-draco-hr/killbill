@@ -2,10 +2,11 @@
   String xml="<condition>" + "	<timeSinceEarliestUnpaidInvoiceEqualsOrExceeds><unit>DAYS</unit><number>10</number></timeSinceEarliestUnpaidInvoiceEqualsOrExceeds>" + "</condition>";
   InputStream is=new ByteArrayInputStream(xml.getBytes());
   MockCondition c=XMLLoader.getObjectFromStreamNoValidation(is,MockCondition.class);
+  UUID unpaidInvoiceId=UUID.randomUUID();
   DateTime now=new DateTime();
-  BillingState<Blockable> state0=new BillingState<Blockable>(new UUID(0L,1L),0,BigDecimal.ZERO,now,PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{});
-  BillingState<Blockable> state1=new BillingState<Blockable>(new UUID(0L,1L),1,new BigDecimal("100.00"),now.minusDays(10),PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{});
-  BillingState<Blockable> state2=new BillingState<Blockable>(new UUID(0L,1L),1,new BigDecimal("200.00"),now.minusDays(20),PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{});
+  BillingState<Blockable> state0=new BillingState<Blockable>(new UUID(0L,1L),0,BigDecimal.ZERO,null,unpaidInvoiceId,PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{});
+  BillingState<Blockable> state1=new BillingState<Blockable>(new UUID(0L,1L),1,new BigDecimal("100.00"),now.minusDays(10),unpaidInvoiceId,PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{});
+  BillingState<Blockable> state2=new BillingState<Blockable>(new UUID(0L,1L),1,new BigDecimal("200.00"),now.minusDays(20),unpaidInvoiceId,PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{});
   Assert.assertTrue(!c.evaluate(state0,now));
   Assert.assertTrue(c.evaluate(state1,now));
   Assert.assertTrue(c.evaluate(state2,now));

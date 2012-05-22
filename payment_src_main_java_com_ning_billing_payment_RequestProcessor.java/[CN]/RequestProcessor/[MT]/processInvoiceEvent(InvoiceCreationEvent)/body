@@ -1,25 +1,19 @@
 {
   log.info("Received invoice creation notification for account {} and invoice {}",event.getAccountId(),event.getInvoiceId());
-  PaymentErrorEvent errorEvent=null;
+  Account account=null;
   try {
-    final Account account=accountUserApi.getAccountById(event.getAccountId());
-    if (account != null) {
-      CallContext context=new DefaultCallContext("PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,clock);
-      PaymentInfoEvent result=paymentApi.createPayment(account,event.getInvoiceId(),context);
-      postPaymentEvent(result,account.getId());
+    account=accountUserApi.getAccountById(event.getAccountId());
+    if (account == null) {
+      log.error("Failed to process invoice, account {} does not exist!",event.getAccountId());
       return;
     }
- else {
-      errorEvent=new DefaultPaymentErrorEvent(null,"Failed to retrieve account",event.getAccountId(),null,null);
-    }
+    CallContext context=new DefaultCallContext("PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken(),clock);
+    paymentApi.createPayment(account,event.getInvoiceId(),context);
   }
  catch (  AccountApiException e) {
     log.error("Failed to process invoice payment",e);
-    errorEvent=new DefaultPaymentErrorEvent(null,e.getMessage(),event.getAccountId(),null,null);
   }
 catch (  PaymentApiException e) {
     log.error("Failed to process invoice payment",e);
-    errorEvent=new DefaultPaymentErrorEvent(null,e.getMessage(),event.getAccountId(),null,null);
   }
-  postPaymentEvent(errorEvent,event.getAccountId());
 }

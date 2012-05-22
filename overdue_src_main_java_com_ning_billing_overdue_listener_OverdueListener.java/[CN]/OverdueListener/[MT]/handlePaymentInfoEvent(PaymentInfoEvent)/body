@@ -1,2 +1,12 @@
 {
+  log.info(String.format("Received PaymentInfo event %s",event.toString()));
+  try {
+    UUID paymentId=event.getId();
+    PaymentAttempt attempt=paymentApi.getPaymentAttemptForPaymentId(paymentId);
+    UUID accountId=attempt.getAccountId();
+    dispatcher.processOverdueForAccount(accountId);
+  }
+ catch (  PaymentApiException e) {
+    log.error("Payment exception encountered when trying process Overdue against payement: " + event.getId(),e);
+  }
 }

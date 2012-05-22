@@ -1,9 +1,6 @@
 {
-  try {
-    Account account=accountUserApi.getAccountById(accountId);
-    processOverdue(account);
-  }
- catch (  AccountApiException e) {
-    log.error("Error processing Overdue for Account with id: " + accountId.toString(),e);
+  List<SubscriptionBundle> bundles=entitlementUserApi.getBundlesForAccount(accountId);
+  for (  SubscriptionBundle bundle : bundles) {
+    processOverdue(bundle);
   }
 }
