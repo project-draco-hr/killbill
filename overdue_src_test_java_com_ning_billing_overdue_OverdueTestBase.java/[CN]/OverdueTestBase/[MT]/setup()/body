@@ -1,6 +1,13 @@
 {
   setupMySQL();
   service.registerForBus();
-  service.initialize();
+  try {
+    service.initialize();
+  }
+ catch (  RuntimeException e) {
+    if (!(e.getCause() instanceof NotificationQueueAlreadyExists)) {
+      throw e;
+    }
+  }
   service.start();
 }
