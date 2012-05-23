@@ -7,6 +7,9 @@
       log.error("Failed to process invoice, account {} does not exist!",event.getAccountId());
       return;
     }
+    if (isAccountAutoPayOff(account.getId())) {
+      return;
+    }
     CallContext context=new DefaultCallContext("PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken(),clock);
     paymentApi.createPayment(account,event.getInvoiceId(),context);
   }

@@ -1,0 +1,20 @@
+{
+  try {
+    List<Invoice> invoices=invoiceApi.getInvoicesByAccount(UUID.fromString(accountId));
+    List<UUID> invoicesId=new ArrayList<UUID>(Collections2.transform(invoices,new Function<Invoice,UUID>(){
+      @Override public UUID apply(      Invoice input){
+        return input.getId();
+      }
+    }
+));
+    List<PaymentInfoEvent> payments=paymentApi.getPaymentInfo(invoicesId);
+    List<PaymentJsonSimple> result=new ArrayList<PaymentJsonSimple>(payments.size());
+    for (    PaymentInfoEvent cur : payments) {
+      result.add(new PaymentJsonSimple(cur));
+    }
+    return Response.status(Status.OK).entity(result).build();
+  }
+ catch (  PaymentApiException e) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+}
