@@ -2,8 +2,8 @@
   try {
     Preconditions.checkNotNull(tagList,"Query % list cannot be null",QUERY_TAGS);
     Account account=accountApi.getAccountById(UUID.fromString(accountId));
-    List<TagDefinition> input=tagHelper.getTagDifinitionFromTagList(tagList);
-    account.addTagsFromDefinitions(input);
+    List<TagDefinition> input=tagHelper.getTagDefinitionFromTagList(tagList);
+    tagUserApi.addTags(account.getId(),ObjectType.ACCOUNT,input,context.createContext(createdBy,reason,comment));
     Response response=uriBuilder.buildResponse(AccountResource.class,"getAccountTags",account.getId());
     return response;
   }

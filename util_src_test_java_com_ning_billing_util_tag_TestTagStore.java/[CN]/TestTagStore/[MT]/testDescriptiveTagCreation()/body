@@ -12,11 +12,10 @@
   DescriptiveTag tag=new DescriptiveTag(tagDefinition);
   tagStore.add(tag);
   assertEquals(tagStore.generateInvoice(),true);
-  tagDao.saveEntitiesFromTransaction(dao,accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  List<Tag> tagList=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
-  tagStore.add(tagList);
-  assertEquals(tagList.size(),1);
-  assertEquals(tagStore.generateInvoice(),true);
+  Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  assertEquals(tagMap.size(),1);
+  assertEquals(tagMap.containsKey(ControlTagType.AUTO_INVOICING_OFF.toString()),false);
 }

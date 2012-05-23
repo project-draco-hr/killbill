@@ -1,0 +1,17 @@
+{
+  InputStream is=new ByteArrayInputStream(configXml.getBytes());
+  config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
+  overdueWrapperFactory.setOverdueConfig(config);
+  SubscriptionBundle bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
+  ((ZombieControl)bundle).addResult("getId",UUID.randomUUID());
+  OverdueState<SubscriptionBundle> state;
+  state=config.getBundleStateSet().findState("OD1");
+  applicator.apply(bundle,BlockingApi.CLEAR_STATE_NAME,state);
+  checkStateApplied(state);
+  state=config.getBundleStateSet().findState("OD2");
+  applicator.apply(bundle,BlockingApi.CLEAR_STATE_NAME,state);
+  checkStateApplied(state);
+  state=config.getBundleStateSet().findState("OD3");
+  applicator.apply(bundle,BlockingApi.CLEAR_STATE_NAME,state);
+  checkStateApplied(state);
+}

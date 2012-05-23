@@ -1,20 +1,8 @@
 {
   try {
     Account account=accountApi.getAccountById(UUID.fromString(accountId));
-    String inputTagList=tagList;
-    if (inputTagList == null) {
-      List<Tag> existingTags=account.getTagList();
-      StringBuilder tmp=new StringBuilder();
-      for (      Tag cur : existingTags) {
-        tmp.append(cur.getTagDefinitionName());
-        tmp.append(",");
-      }
-      inputTagList=tmp.toString();
-    }
-    List<TagDefinition> input=tagHelper.getTagDifinitionFromTagList(tagList);
-    for (    TagDefinition cur : input) {
-      account.removeTag(cur);
-    }
+    List<TagDefinition> input=tagHelper.getTagDefinitionFromTagList(tagList);
+    tagUserApi.removeTags(account.getId(),ObjectType.ACCOUNT,input,context.createContext(createdBy,reason,comment));
     return Response.status(Status.OK).build();
   }
  catch (  AccountApiException e) {

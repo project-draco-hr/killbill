@@ -3,10 +3,10 @@
   TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
   Tag tag=new DescriptiveTag(testTag);
   tagStore.add(tag);
-  tagDao.saveEntitiesFromTransaction(dao,accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
-  List<Tag> savedTags=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  Map<String,Tag> savedTags=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   assertEquals(savedTags.size(),1);
-  Tag savedTag=savedTags.get(0);
+  Tag savedTag=savedTags.get(tag.getTagDefinitionName());
   assertEquals(savedTag.getTagDefinitionName(),tag.getTagDefinitionName());
   assertEquals(savedTag.getId(),tag.getId());
   Handle handle=dbi.open();
