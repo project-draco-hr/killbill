@@ -15,11 +15,10 @@
   ControlTag controlTag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
   tagStore.add(controlTag);
   assertEquals(tagStore.generateInvoice(),false);
-  tagDao.saveEntitiesFromTransaction(dao,accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  List<Tag> tagList=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
-  tagStore.add(tagList);
-  assertEquals(tagList.size(),2);
-  assertEquals(tagStore.generateInvoice(),false);
+  Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  assertEquals(tagMap.size(),2);
+  assertEquals(tagMap.containsKey(ControlTagType.AUTO_INVOICING_OFF.toString()),true);
 }

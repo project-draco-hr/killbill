@@ -14,8 +14,6 @@
         Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId);
         EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
         accountSqlDao.insertAuditFromTransaction(audit,context);
-        saveTagsFromWithinTransaction(account,transactionalDao,context);
-        saveCustomFieldsFromWithinTransaction(account,transactionalDao,context);
         AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,context.getUserToken());
         try {
           eventBus.postFromTransaction(creationEvent,transactionalDao);

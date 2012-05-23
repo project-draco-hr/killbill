@@ -5,11 +5,10 @@
   tagStore.add(tag);
   assertEquals(tagStore.generateInvoice(),false);
   List<Tag> tagList=tagStore.getEntityList();
-  tagDao.saveEntitiesFromTransaction(dao,accountId,ObjectType.ACCOUNT,tagList,context);
+  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagList,context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  tagList=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
-  tagStore.add(tagList);
-  assertEquals(tagList.size(),1);
-  assertEquals(tagStore.generateInvoice(),false);
+  Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  assertEquals(tagMap.size(),1);
+  assertEquals(tagMap.containsKey(ControlTagType.AUTO_INVOICING_OFF.toString()),true);
 }

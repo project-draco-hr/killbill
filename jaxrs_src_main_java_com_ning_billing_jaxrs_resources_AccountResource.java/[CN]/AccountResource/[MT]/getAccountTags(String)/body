@@ -1,8 +1,8 @@
 {
   try {
     Account account=accountApi.getAccountById(UUID.fromString(accountId));
-    List<Tag> tags=account.getTagList();
-    Collection<String> tagNameList=(tags.size() == 0) ? Collections.<String>emptyList() : Collections2.transform(tags,new Function<Tag,String>(){
+    Map<String,Tag> tags=tagUserApi.getTags(account.getId(),ObjectType.ACCOUNT);
+    Collection<String> tagNameList=(tags.size() == 0) ? Collections.<String>emptyList() : Collections2.transform(tags.values(),new Function<Tag,String>(){
       @Override public String apply(      Tag input){
         return input.getTagDefinitionName();
       }
