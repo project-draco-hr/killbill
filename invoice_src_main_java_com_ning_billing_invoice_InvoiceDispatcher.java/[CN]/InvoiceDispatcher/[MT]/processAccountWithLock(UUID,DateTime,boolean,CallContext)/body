@@ -1,14 +1,16 @@
 {
   try {
     Account account=accountUserApi.getAccountById(accountId);
-    SortedSet<BillingEvent> events=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId);
-    BillingEventSet billingEvents=new BillingEventSet(events);
+    BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId);
+    if (billingEvents.isAccountAutoInvoiceOff()) {
+      return null;
+    }
     Currency targetCurrency=account.getCurrency();
     List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId);
     Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,targetCurrency);
     if (invoice == null) {
       log.info("Generated null invoice.");
-      outputDebugData(events,invoices);
+      outputDebugData(billingEvents,invoices);
       if (!dryRun) {
         BusEvent event=new DefaultEmptyInvoiceEvent(accountId,clock.getUTCNow(),context.getUserToken());
         postEvent(event,accountId);
@@ -22,7 +24,7 @@
           log.info(item.toString());
         }
       }
-      outputDebugData(events,invoices);
+      outputDebugData(billingEvents,invoices);
       if (!dryRun) {
         invoiceDao.create(invoice,context);
         List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);

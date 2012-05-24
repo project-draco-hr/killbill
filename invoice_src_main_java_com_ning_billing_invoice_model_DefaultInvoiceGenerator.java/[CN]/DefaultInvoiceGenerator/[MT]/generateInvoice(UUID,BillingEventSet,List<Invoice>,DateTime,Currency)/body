@@ -3,11 +3,14 @@
     return null;
   }
   validateTargetDate(targetDate);
-  Collections.sort(events);
   List<InvoiceItem> existingItems=new ArrayList<InvoiceItem>();
   if (existingInvoices != null) {
     for (    Invoice invoice : existingInvoices) {
-      existingItems.addAll(invoice.getInvoiceItems());
+      for (      InvoiceItem item : invoice.getInvoiceItems()) {
+        if (!events.getSubscriptionAndBundleIdsWithAutoInvoiceOff().contains(item.getBundleId())) {
+          existingItems.add(item);
+        }
+      }
     }
     Collections.sort(existingItems);
   }
