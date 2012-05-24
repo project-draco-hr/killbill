@@ -2,22 +2,22 @@
   PaymentInfoEvent paymentInfo=null;
   BusEvent event=null;
   try {
-    paymentInfo=new DefaultPaymentInfoEvent(plugin.processInvoice(account,invoice),account.getId(),invoice.getId());
-    paymentDao.savePaymentInfo(paymentInfo,context);
-    final String paymentMethodId=paymentInfo.getPaymentMethodId();
+    PaymentInfoPlugin paymentPluginInfo=plugin.processInvoice(account,invoice);
+    final String paymentMethodId=paymentPluginInfo.getPaymentMethodId();
     log.debug("Fetching payment method info for payment method id " + ((paymentMethodId == null) ? "null" : paymentMethodId));
     PaymentMethodInfo paymentMethodInfo=plugin.getPaymentMethodInfo(paymentMethodId);
     if (paymentMethodInfo instanceof CreditCardPaymentMethodInfo) {
       CreditCardPaymentMethodInfo ccPaymentMethod=(CreditCardPaymentMethodInfo)paymentMethodInfo;
-      paymentDao.updatePaymentInfo(ccPaymentMethod.getType(),paymentInfo.getId(),ccPaymentMethod.getCardType(),ccPaymentMethod.getCardCountry(),context);
+      paymentInfo=new DefaultPaymentInfoEvent(paymentPluginInfo,ccPaymentMethod,account.getId(),invoice.getId());
     }
  else     if (paymentMethodInfo instanceof PaypalPaymentMethodInfo) {
       PaypalPaymentMethodInfo paypalPaymentMethodInfo=(PaypalPaymentMethodInfo)paymentMethodInfo;
-      paymentDao.updatePaymentInfo(paypalPaymentMethodInfo.getType(),paymentInfo.getId(),null,null,context);
+      paymentInfo=new DefaultPaymentInfoEvent(paymentPluginInfo,paypalPaymentMethodInfo,account.getId(),invoice.getId());
     }
-    if (paymentInfo.getId() != null) {
-      paymentDao.updatePaymentAttemptWithPaymentId(paymentAttempt.getId(),paymentInfo.getId(),context);
+ else {
+      paymentInfo=new DefaultPaymentInfoEvent(paymentPluginInfo,account.getId(),invoice.getId());
     }
+    paymentDao.insertPaymentInfoWithPaymentAttemptUpdate(paymentInfo,paymentAttempt.getId(),context);
     invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : paymentInfo.getAmount(),paymentInfo == null || paymentInfo.getStatus().equalsIgnoreCase("Error") ? null : invoice.getCurrency(),paymentAttempt.getId(),paymentAttempt.getPaymentAttemptDate(),context);
     event=paymentInfo;
     return paymentInfo;
