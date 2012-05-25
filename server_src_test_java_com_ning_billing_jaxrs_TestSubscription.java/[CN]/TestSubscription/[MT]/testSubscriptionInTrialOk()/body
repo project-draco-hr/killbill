@@ -8,7 +8,7 @@
   SubscriptionJsonNoEvents subscriptionJson=createSubscription(bundleJson.getBundleId(),productName,ProductCategory.BASE.toString(),term.toString(),true);
   Assert.assertNotNull(subscriptionJson.getChargedThroughDate());
   Assert.assertEquals(subscriptionJson.getChargedThroughDate(),subscriptionJson.getStartDate().plusDays(30));
-  String uri=BaseJaxrsResource.SUBSCRIPTIONS_PATH + "/" + subscriptionJson.getSubscriptionId().toString();
+  String uri=JaxrsResource.SUBSCRIPTIONS_PATH + "/" + subscriptionJson.getSubscriptionId().toString();
   Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   String baseJson=response.getResponseBody();
@@ -26,10 +26,10 @@
   Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(3).plusDays(1));
   clock.addDeltaFromReality(it.toDurationMillis());
   crappyWaitForLackOfProperSynchonization();
-  uri=BaseJaxrsResource.SUBSCRIPTIONS_PATH + "/" + subscriptionJson.getSubscriptionId().toString();
+  uri=JaxrsResource.SUBSCRIPTIONS_PATH + "/" + subscriptionJson.getSubscriptionId().toString();
   response=doDelete(uri,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  uri=BaseJaxrsResource.SUBSCRIPTIONS_PATH + "/" + subscriptionJson.getSubscriptionId().toString()+ "/uncancel";
+  uri=JaxrsResource.SUBSCRIPTIONS_PATH + "/" + subscriptionJson.getSubscriptionId().toString()+ "/uncancel";
   response=doPut(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
 }

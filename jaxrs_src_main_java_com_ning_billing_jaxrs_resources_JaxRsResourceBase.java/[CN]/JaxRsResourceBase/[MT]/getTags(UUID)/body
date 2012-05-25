@@ -1,0 +1,10 @@
+{
+  Map<String,Tag> tags=tagUserApi.getTags(id,getObjectType());
+  Collection<String> tagNameList=(tags.size() == 0) ? Collections.<String>emptyList() : Collections2.transform(tags.values(),new Function<Tag,String>(){
+    @Override public String apply(    Tag input){
+      return input.getTagDefinitionName();
+    }
+  }
+);
+  return Response.status(Response.Status.OK).entity(tagNameList).build();
+}
