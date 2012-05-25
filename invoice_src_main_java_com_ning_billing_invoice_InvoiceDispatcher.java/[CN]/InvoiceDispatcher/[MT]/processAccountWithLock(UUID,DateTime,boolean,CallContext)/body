@@ -2,11 +2,11 @@
   try {
     Account account=accountUserApi.getAccountById(accountId);
     BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId);
+    List<Invoice> invoices=new ArrayList<Invoice>();
     if (billingEvents.isAccountAutoInvoiceOff()) {
-      return null;
+      invoices=invoiceDao.getInvoicesByAccount(accountId);
     }
     Currency targetCurrency=account.getCurrency();
-    List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId);
     Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,targetCurrency);
     if (invoice == null) {
       log.info("Generated null invoice.");
