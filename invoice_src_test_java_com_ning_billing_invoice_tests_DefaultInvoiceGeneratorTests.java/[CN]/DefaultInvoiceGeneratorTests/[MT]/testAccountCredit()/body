@@ -1,0 +1,15 @@
+{
+  BillingEventSet billingEventSet=new BillingEventSet();
+  DateTime startDate=new DateTime(2012,3,1,0,0,0,0);
+  UUID accountId=UUID.randomUUID();
+  UUID subscriptionId=UUID.randomUUID();
+  Plan plan=new MockPlan("original plan");
+  MockInternationalPrice price10=new MockInternationalPrice(new DefaultPrice(TEN,Currency.USD));
+  PlanPhase planPhase=new MockPlanPhase(price10,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
+  BillingEvent creation=createBillingEvent(subscriptionId,startDate,plan,planPhase,1);
+  billingEventSet.add(creation);
+  Invoice invoice=generator.generateInvoice(accountId,billingEventSet,null,startDate,Currency.USD);
+  assertNotNull(invoice);
+  assertEquals(invoice.getNumberOfItems(),1);
+  assertEquals(invoice.getTotalAmount().compareTo(TEN),0);
+}
