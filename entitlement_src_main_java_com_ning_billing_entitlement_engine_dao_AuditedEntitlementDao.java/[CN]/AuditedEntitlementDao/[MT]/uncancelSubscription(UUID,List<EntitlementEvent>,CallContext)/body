@@ -17,11 +17,11 @@
         String cancelledEventId=cancelledEvent.getId().toString();
         transactional.unactiveEvent(cancelledEventId,context);
         Long cancelledRecordId=transactional.getRecordId(cancelledEventId);
-        eventAudits.add(new EntityAudit(TableName.ENTITLEMENT_EVENTS,cancelledRecordId,ChangeType.UPDATE));
+        eventAudits.add(new EntityAudit(TableName.SUBSCRIPTION_EVENTS,cancelledRecordId,ChangeType.UPDATE));
         for (        final EntitlementEvent cur : uncancelEvents) {
           transactional.insertEvent(cur,context);
           Long recordId=transactional.getRecordId(cur.getId().toString());
-          eventAudits.add(new EntityAudit(TableName.ENTITLEMENT_EVENTS,recordId,ChangeType.INSERT));
+          eventAudits.add(new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.INSERT));
           recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
         }
         transactional.insertAuditFromTransaction(eventAudits,context);
