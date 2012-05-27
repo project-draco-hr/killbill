@@ -1,5 +1,5 @@
 {
-  if ((events == null) || (events.size() == 0)) {
+  if ((events == null) || (events.size() == 0) || events.isAccountAutoInvoiceOff()) {
     return null;
   }
   validateTargetDate(targetDate);
@@ -7,7 +7,7 @@
   if (existingInvoices != null) {
     for (    Invoice invoice : existingInvoices) {
       for (      InvoiceItem item : invoice.getInvoiceItems()) {
-        if (!events.getSubscriptionAndBundleIdsWithAutoInvoiceOff().contains(item.getBundleId())) {
+        if (item.getSubscriptionId() == null || !events.getSubscriptionIdsWithAutoInvoiceOff().contains(item.getSubscriptionId())) {
           existingItems.add(item);
         }
       }

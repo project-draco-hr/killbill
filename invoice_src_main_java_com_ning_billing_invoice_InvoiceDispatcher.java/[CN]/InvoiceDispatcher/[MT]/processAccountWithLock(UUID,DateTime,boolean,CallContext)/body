@@ -3,7 +3,7 @@
     Account account=accountUserApi.getAccountById(accountId);
     BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId);
     List<Invoice> invoices=new ArrayList<Invoice>();
-    if (billingEvents.isAccountAutoInvoiceOff()) {
+    if (!billingEvents.isAccountAutoInvoiceOff()) {
       invoices=invoiceDao.getInvoicesByAccount(accountId);
     }
     Currency targetCurrency=account.getCurrency();
