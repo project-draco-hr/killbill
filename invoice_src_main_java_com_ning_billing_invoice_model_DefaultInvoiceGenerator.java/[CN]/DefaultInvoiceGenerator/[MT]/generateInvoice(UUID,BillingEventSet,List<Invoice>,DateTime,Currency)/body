@@ -12,7 +12,7 @@
     Collections.sort(existingItems);
   }
   targetDate=adjustTargetDate(existingInvoices,targetDate);
-  DefaultInvoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,targetCurrency);
+  Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,targetCurrency);
   UUID invoiceId=invoice.getId();
   List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,targetDate,targetCurrency);
   removeCancellingInvoiceItems(existingItems);
@@ -23,7 +23,10 @@
       proposedItems.add(recurringItem.asReversingItem());
     }
   }
-  useExistingCredits(existingItems,proposedItems);
+  BigDecimal creditAmount=calculateCreditAmountToUse(existingItems,proposedItems);
+  if (creditAmount.compareTo(BigDecimal.ZERO) > 0) {
+    proposedItems.add(new CreditInvoiceItem(invoiceId,accountId,clock.getUTCNow(),creditAmount.negate(),targetCurrency));
+  }
   if (proposedItems == null || proposedItems.size() == 0) {
     return null;
   }

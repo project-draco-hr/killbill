@@ -1,0 +1,25 @@
+{
+  BigDecimal totalUnusedCreditAmount=BigDecimal.ZERO;
+  for (  InvoiceItem item : existingItems) {
+    if (item instanceof CreditInvoiceItem) {
+      totalUnusedCreditAmount=totalUnusedCreditAmount.add(item.getAmount());
+    }
+  }
+  BigDecimal totalAmountOwed=BigDecimal.ZERO;
+  for (  InvoiceItem item : proposedItems) {
+    if (!(item instanceof CreditInvoiceItem)) {
+      totalAmountOwed=totalAmountOwed.add(item.getAmount());
+    }
+  }
+  if (totalUnusedCreditAmount.compareTo(BigDecimal.ZERO) == 0) {
+    return BigDecimal.ZERO;
+  }
+ else {
+    if (totalAmountOwed.compareTo(totalUnusedCreditAmount) > 0) {
+      return totalUnusedCreditAmount;
+    }
+ else {
+      return totalAmountOwed;
+    }
+  }
+}
