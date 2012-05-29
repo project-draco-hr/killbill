@@ -1,13 +1,16 @@
 {
-  if ((events == null) || (events.size() == 0)) {
+  if ((events == null) || (events.size() == 0) || events.isAccountAutoInvoiceOff()) {
     return null;
   }
   validateTargetDate(targetDate);
-  Collections.sort(events);
   List<InvoiceItem> existingItems=new ArrayList<InvoiceItem>();
   if (existingInvoices != null) {
     for (    Invoice invoice : existingInvoices) {
-      existingItems.addAll(invoice.getInvoiceItems());
+      for (      InvoiceItem item : invoice.getInvoiceItems()) {
+        if (item.getSubscriptionId() == null || !events.getSubscriptionIdsWithAutoInvoiceOff().contains(item.getSubscriptionId())) {
+          existingItems.add(item);
+        }
+      }
     }
     Collections.sort(existingItems);
   }

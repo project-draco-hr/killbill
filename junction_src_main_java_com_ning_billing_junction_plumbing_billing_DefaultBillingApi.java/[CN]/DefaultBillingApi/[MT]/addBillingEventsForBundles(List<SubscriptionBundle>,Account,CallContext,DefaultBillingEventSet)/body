@@ -1,0 +1,14 @@
+{
+  for (  final SubscriptionBundle bundle : bundles) {
+    List<Subscription> subscriptions=entitlementUserApi.getSubscriptionsForBundle(bundle.getId());
+    Map<String,Tag> bundleTags=tagApi.getTags(bundle.getId(),ObjectType.BUNDLE);
+    if (bundleTags.get(ControlTagType.AUTO_INVOICING_OFF.name()) != null) {
+      for (      final Subscription subscription : subscriptions) {
+        result.getSubscriptionIdsWithAutoInvoiceOff().add(subscription.getId());
+      }
+    }
+ else {
+      addBillingEventsForSubscription(subscriptions,bundle,account,context,result);
+    }
+  }
+}
