@@ -1,8 +1,10 @@
 {
   BigDecimal total=BigDecimal.ZERO.setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
   for (  final InvoiceItem item : this) {
-    if (item.getAmount() != null) {
-      total=total.add(item.getAmount());
+    if (item instanceof CreditInvoiceItem) {
+      if (item.getAmount() != null) {
+        total=total.add(item.getAmount());
+      }
     }
   }
   return total.setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);

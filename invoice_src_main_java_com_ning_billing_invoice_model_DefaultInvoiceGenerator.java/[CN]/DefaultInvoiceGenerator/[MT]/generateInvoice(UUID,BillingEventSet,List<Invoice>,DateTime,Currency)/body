@@ -20,16 +20,9 @@
   List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,targetDate,targetCurrency);
   removeCancellingInvoiceItems(existingItems);
   removeDuplicatedInvoiceItems(proposedItems,existingItems);
-  for (  InvoiceItem existingItem : existingItems) {
-    if (existingItem instanceof RecurringInvoiceItem) {
-      RecurringInvoiceItem recurringItem=(RecurringInvoiceItem)existingItem;
-      proposedItems.add(recurringItem.asReversingItem());
-    }
-  }
-  BigDecimal creditAmount=calculateCreditAmountToUse(existingItems,proposedItems);
-  if (creditAmount.compareTo(BigDecimal.ZERO) > 0) {
-    proposedItems.add(new CreditInvoiceItem(invoiceId,accountId,clock.getUTCNow(),creditAmount.negate(),targetCurrency));
-  }
+  addReversingItems(existingItems,proposedItems);
+  generateCreditsForPastRepairedInvoices(accountId,existingInvoices,proposedItems,targetCurrency);
+  consumeExistingCredit(invoiceId,accountId,existingItems,proposedItems,targetCurrency);
   if (proposedItems == null || proposedItems.size() == 0) {
     return null;
   }

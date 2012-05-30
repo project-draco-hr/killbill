@@ -9,7 +9,11 @@
     while (itemIterator.hasNext()) {
       InvoiceItem item=itemIterator.next();
       if (!item.getInvoiceId().equals(invoiceId)) {
-        invoiceMap.get(item.getInvoiceId()).addInvoiceItem(item);
+        Invoice thisInvoice=invoiceMap.get(item.getInvoiceId());
+        if (thisInvoice == null) {
+          throw new NullPointerException();
+        }
+        thisInvoice.addInvoiceItem(item);
         itemIterator.remove();
       }
     }
