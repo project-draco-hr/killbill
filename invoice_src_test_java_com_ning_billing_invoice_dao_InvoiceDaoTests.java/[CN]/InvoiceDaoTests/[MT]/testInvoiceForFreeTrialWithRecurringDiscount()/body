@@ -17,7 +17,7 @@
   Invoice invoice1=generator.generateInvoice(accountId,events,null,effectiveDate1,Currency.USD);
   assertNotNull(invoice1);
   assertEquals(invoice1.getNumberOfItems(),1);
-  assertEquals(invoice1.getTotalAmount().compareTo(ZERO),0);
+  assertEquals(invoice1.getBalance().compareTo(ZERO),0);
   List<Invoice> invoiceList=new ArrayList<Invoice>();
   invoiceList.add(invoice1);
   DateTime effectiveDate2=effectiveDate1.plusDays(30);
@@ -26,11 +26,11 @@
   Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,effectiveDate2,Currency.USD);
   assertNotNull(invoice2);
   assertEquals(invoice2.getNumberOfItems(),1);
-  assertEquals(invoice2.getTotalAmount().compareTo(cheapAmount),0);
+  assertEquals(invoice2.getBalance().compareTo(cheapAmount),0);
   invoiceList.add(invoice2);
   DateTime effectiveDate3=effectiveDate2.plusMonths(1);
   Invoice invoice3=generator.generateInvoice(accountId,events,invoiceList,effectiveDate3,Currency.USD);
   assertNotNull(invoice3);
   assertEquals(invoice3.getNumberOfItems(),1);
-  assertEquals(invoice3.getTotalAmount().compareTo(cheapAmount),0);
+  assertEquals(invoice3.getBalance().compareTo(cheapAmount),0);
 }

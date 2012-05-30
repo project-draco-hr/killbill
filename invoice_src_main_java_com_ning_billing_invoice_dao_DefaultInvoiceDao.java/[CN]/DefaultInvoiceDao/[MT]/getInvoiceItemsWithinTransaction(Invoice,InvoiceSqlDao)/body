@@ -1,8 +1,12 @@
 {
+  String invoiceId=invoice.getId().toString();
   RecurringInvoiceItemSqlDao recurringInvoiceItemDao=invoiceDao.become(RecurringInvoiceItemSqlDao.class);
-  List<InvoiceItem> recurringInvoiceItems=recurringInvoiceItemDao.getInvoiceItemsByInvoice(invoice.getId().toString());
+  List<InvoiceItem> recurringInvoiceItems=recurringInvoiceItemDao.getInvoiceItemsByInvoice(invoiceId);
   invoice.addInvoiceItems(recurringInvoiceItems);
   FixedPriceInvoiceItemSqlDao fixedPriceInvoiceItemDao=invoiceDao.become(FixedPriceInvoiceItemSqlDao.class);
-  List<InvoiceItem> fixedPriceInvoiceItems=fixedPriceInvoiceItemDao.getInvoiceItemsByInvoice(invoice.getId().toString());
+  List<InvoiceItem> fixedPriceInvoiceItems=fixedPriceInvoiceItemDao.getInvoiceItemsByInvoice(invoiceId);
   invoice.addInvoiceItems(fixedPriceInvoiceItems);
+  CreditInvoiceItemSqlDao creditInvoiceItemSqlDao=invoiceDao.become(CreditInvoiceItemSqlDao.class);
+  List<InvoiceItem> creditInvoiceItems=creditInvoiceItemSqlDao.getInvoiceItemsByInvoice(invoiceId);
+  invoice.addInvoiceItems(creditInvoiceItems);
 }

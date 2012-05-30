@@ -15,17 +15,14 @@
     Collections.sort(existingItems);
   }
   targetDate=adjustTargetDate(existingInvoices,targetDate);
-  DefaultInvoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,targetCurrency);
+  Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,targetCurrency);
   UUID invoiceId=invoice.getId();
   List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,targetDate,targetCurrency);
   removeCancellingInvoiceItems(existingItems);
   removeDuplicatedInvoiceItems(proposedItems,existingItems);
-  for (  InvoiceItem existingItem : existingItems) {
-    if (existingItem instanceof RecurringInvoiceItem) {
-      RecurringInvoiceItem recurringItem=(RecurringInvoiceItem)existingItem;
-      proposedItems.add(recurringItem.asReversingItem());
-    }
-  }
+  addReversingItems(existingItems,proposedItems);
+  generateCreditsForPastRepairedInvoices(accountId,existingInvoices,proposedItems,targetCurrency);
+  consumeExistingCredit(invoiceId,accountId,existingItems,proposedItems,targetCurrency);
   if (proposedItems == null || proposedItems.size() == 0) {
     return null;
   }
