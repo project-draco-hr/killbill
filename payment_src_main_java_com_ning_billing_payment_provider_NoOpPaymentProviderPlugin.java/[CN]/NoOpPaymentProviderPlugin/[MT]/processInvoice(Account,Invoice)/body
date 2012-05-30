@@ -1,4 +1,7 @@
 {
+  if (makeAllInvoicesFail) {
+    throw new PaymentPluginApiException("","test error");
+  }
   PaymentInfoPlugin payment=new PaymentInfoPlugin(){
     @Override public DateTime getUpdatedDate(){
       return new DateTime(DateTimeZone.UTC);
@@ -40,7 +43,7 @@
       return null;
     }
     @Override public String getExternalPaymentId(){
-      return null;
+      return "NoOpPayment";
     }
     @Override public BigDecimal getAmount(){
       return invoice.getBalance();
