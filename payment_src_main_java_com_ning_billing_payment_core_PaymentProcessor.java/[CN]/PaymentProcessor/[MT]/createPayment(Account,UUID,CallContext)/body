@@ -1,0 +1,17 @@
+{
+  final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
+  return new WithAccountLock<Payment>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
+    @Override public Payment doOperation() throws PaymentApiException {
+      final Invoice invoice=invoicePaymentApi.getInvoice(invoiceId);
+      if (invoice.isMigrationInvoice()) {
+        log.error("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
+        return null;
+      }
+      if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+        return null;
+      }
+      return processNewPaymentWithAccountLocked(plugin,account,invoice,context);
+    }
+  }
+);
+}

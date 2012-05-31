@@ -1,0 +1,17 @@
+{
+  this.account=new AccountJsonSimple(account.getId().toString(),account.getExternalKey());
+  this.bundles=new LinkedList<BundleJsonWithSubscriptions>();
+  for (  BundleTimeline cur : bundles) {
+    this.bundles.add(new BundleJsonWithSubscriptions(account.getId(),cur));
+  }
+  this.invoices=new LinkedList<InvoiceJsonWithBundleKeys>();
+  for (  Invoice cur : invoices) {
+    this.invoices.add(new InvoiceJsonWithBundleKeys(cur.getTotalAmount(),cur.getId().toString(),cur.getInvoiceDate(),cur.getTargetDate(),Integer.toString(cur.getInvoiceNumber()),cur.getBalance(),getBundleExternalKey(cur,bundles)));
+  }
+  this.payments=new LinkedList<PaymentJsonWithBundleKeys>();
+  for (  Payment cur : payments) {
+    String status=cur.getPaymentStatus().toString();
+    BigDecimal paidAmount=cur.getPaymentStatus() == PaymentStatus.SUCCESS ? cur.getAmount() : BigDecimal.ZERO;
+    this.payments.add(new PaymentJsonWithBundleKeys(cur.getAmount(),paidAmount,account.getId().toString(),cur.getInvoiceId().toString(),cur.getId().toString(),cur.getEffectiveDate(),cur.getEffectiveDate(),cur.getAttempts().size(),cur.getCurrency().toString(),status,getBundleExternalKey(cur.getInvoiceId(),invoices,bundles)));
+  }
+}

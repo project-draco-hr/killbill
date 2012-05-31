@@ -1,0 +1,15 @@
+{
+  new WithAccountLock<Void>().processAccountWithLock(locker,accountKey,new WithAccountLockCallback<Void>(){
+    @Override public Void doOperation() throws PaymentApiException {
+      try {
+        final PaymentProviderPlugin plugin=getPaymentProviderPlugin(accountKey);
+        plugin.deletePaymentMethod(accountKey,paymentMethodId);
+        return null;
+      }
+ catch (      PaymentPluginApiException e) {
+        throw new PaymentApiException(e,ErrorCode.PAYMENT_DEL_PAYMENT_METHOD,accountKey,e.getMessage());
+      }
+    }
+  }
+);
+}

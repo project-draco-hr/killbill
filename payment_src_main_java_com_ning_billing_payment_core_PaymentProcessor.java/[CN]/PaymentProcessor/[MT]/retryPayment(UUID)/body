@@ -1,0 +1,32 @@
+{
+  try {
+    final PaymentModelDao payment=paymentDao.getPayment(paymentId);
+    if (payment == null) {
+      log.error("Invalid retry for non existnt paymentId {}",paymentId);
+      return;
+    }
+    final Account account=accountUserApi.getAccountById(payment.getAccountId());
+    final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
+    final CallContext context=factory.createCallContext("PaymentRetry",CallOrigin.INTERNAL,UserType.SYSTEM);
+    new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
+      @Override public Void doOperation() throws PaymentApiException {
+        final Invoice invoice=invoicePaymentApi.getInvoice(payment.getInvoiceId());
+        if (invoice.isMigrationInvoice()) {
+          return null;
+        }
+        if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+          return null;
+        }
+        processRetryPaymentWithAccountLocked(plugin,account,invoice,payment,context);
+        return null;
+      }
+    }
+);
+  }
+ catch (  AccountApiException e) {
+    log.error(String.format("Failed to retry payment for paymentId %s",paymentId),e);
+  }
+catch (  PaymentApiException e) {
+    log.error(String.format("Failed to retry payment for paymentId %s",paymentId),e);
+  }
+}

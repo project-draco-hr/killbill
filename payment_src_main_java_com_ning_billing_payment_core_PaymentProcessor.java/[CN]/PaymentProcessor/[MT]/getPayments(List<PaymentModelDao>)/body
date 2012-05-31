@@ -1,0 +1,9 @@
+{
+  List<Payment> result=new LinkedList<Payment>();
+  for (  PaymentModelDao cur : payments) {
+    List<PaymentAttemptModelDao> attempts=paymentDao.getAttemptsForPayment(cur.getId());
+    Payment entry=new DefaultPayment(cur,attempts);
+    result.add(entry);
+  }
+  return result;
+}

@@ -8,17 +8,4 @@
   invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",now,now.plusMonths(1),amount,new BigDecimal("1.0"),Currency.USD));
   int numberOfDays=paymentConfig.getPaymentRetryDays().get(0);
   DateTime nextRetryDate=now.plusDays(numberOfDays);
-  PaymentAttempt paymentAttempt=new DefaultPaymentAttempt(UUID.randomUUID(),invoice,PaymentAttemptStatus.COMPLETED_FAILED).cloner().setRetryCount(1).setPaymentAttemptDate(now).build();
-  paymentDao.createPaymentAttempt(paymentAttempt,PaymentAttemptStatus.COMPLETED_FAILED,context);
-  retryService.scheduleRetry(paymentAttempt,nextRetryDate);
-  ((ClockMock)clock).setDeltaFromReality(Days.days(numberOfDays).toStandardSeconds().getSeconds() * 1000);
-  Thread.sleep(2000);
-  List<Notification> pendingNotifications=mockNotificationQueue.getPendingEvents();
-  assertEquals(pendingNotifications.size(),0);
-  List<PaymentInfoEvent> paymentInfoList=paymentApi.getPaymentInfo(Arrays.asList(invoice.getId()));
-  assertEquals(paymentInfoList.size(),1);
-  PaymentInfoEvent paymentInfo=paymentInfoList.get(0);
-  assertEquals(paymentInfo.getStatus(),PaymentStatus.Processed.toString());
-  List<PaymentAttempt> updatedAttempts=paymentApi.getPaymentAttemptsForInvoiceId(invoice.getId());
-  assertEquals(paymentInfo.getId(),updatedAttempts.get(0).getPaymentId());
 }

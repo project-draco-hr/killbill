@@ -2,12 +2,7 @@
   try {
     Account account=accountApi.getAccountById(UUID.fromString(accountId));
     List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId());
-    List<PaymentAttempt> payments=new LinkedList<PaymentAttempt>();
-    if (invoices.size() > 0) {
-      for (      Invoice cur : invoices) {
-        payments.addAll(paymentApi.getPaymentAttemptsForInvoiceId(cur.getId()));
-      }
-    }
+    List<Payment> payments=paymentApi.getAccountPayments(UUID.fromString(accountId));
     List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(account.getId());
     List<BundleTimeline> bundlesTimeline=new LinkedList<BundleTimeline>();
     for (    SubscriptionBundle cur : bundles) {

@@ -1,0 +1,6 @@
+{
+  PaymentModelDao payment=new PaymentModelDao(account.getId(),invoice.getId(),invoice.getTotalAmount(),invoice.getCurrency(),invoice.getTargetDate());
+  PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),payment.getId());
+  PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,attempt,context);
+  return processPaymentWithAccountLocked(plugin,account,invoice,savedPayment,attempt,context);
+}
