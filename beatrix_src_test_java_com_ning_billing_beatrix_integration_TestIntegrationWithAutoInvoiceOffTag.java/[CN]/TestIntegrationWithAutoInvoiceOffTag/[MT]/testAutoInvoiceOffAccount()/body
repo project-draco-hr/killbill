@@ -1,0 +1,19 @@
+{
+  clock.setTime(new DateTime(2012,5,1,0,3,42,0));
+  addTag(account.getId(),ObjectType.ACCOUNT);
+  busHandler.pushExpectedEvents(NextEvent.CREATE);
+  SubscriptionData baseSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
+  assertNotNull(baseSubscription);
+  assertTrue(busHandler.isCompleted(DELAY));
+  Collection<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId());
+  assertEquals(invoices.size(),0);
+  clock.addDays(10);
+  assertTrue(busHandler.isCompleted(DELAY));
+  invoices=invoiceApi.getInvoicesByAccount(account.getId());
+  assertEquals(invoices.size(),0);
+  busHandler.pushExpectedEvents(NextEvent.PHASE);
+  clock.addDays(30);
+  assertTrue(busHandler.isCompleted(DELAY));
+  invoices=invoiceApi.getInvoicesByAccount(account.getId());
+  assertEquals(invoices.size(),0);
+}
