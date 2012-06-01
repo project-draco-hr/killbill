@@ -1,0 +1,8 @@
+{
+  if (makeNextInvoiceFail.getAndSet(false) || makeAllInvoicesFail.get()) {
+    throw new PaymentPluginApiException("","test error");
+  }
+  PaymentInfoPlugin result=new MockPaymentInfoPlugin(amount,clock.getUTCNow(),clock.getUTCNow(),PaymentPluginStatus.PROCESSED,null);
+  payments.put(paymentId,result);
+  return result;
+}

@@ -5,7 +5,7 @@
   Currency currency=Currency.USD;
   DateTime effectiveDate=clock.getUTCNow();
   PaymentModelDao payment=new PaymentModelDao(accountId,invoiceId,amount,currency,effectiveDate);
-  PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId());
+  PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),clock.getUTCNow());
   PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,attempt,context);
   assertEquals(savedPayment.getId(),payment.getId());
   assertEquals(savedPayment.getAccountId(),accountId);
