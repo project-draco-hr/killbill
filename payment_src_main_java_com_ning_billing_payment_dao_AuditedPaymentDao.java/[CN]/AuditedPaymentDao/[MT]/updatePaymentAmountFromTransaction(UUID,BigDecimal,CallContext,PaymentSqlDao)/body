@@ -1,0 +1,10 @@
+{
+  transactional.updatePaymentAmount(paymentId.toString(),amount,context);
+  PaymentModelDao savedPayment=transactional.getPayment(paymentId.toString());
+  Long recordId=transactional.getRecordId(savedPayment.getId().toString());
+  EntityHistory<PaymentModelDao> history=new EntityHistory<PaymentModelDao>(savedPayment.getId(),recordId,savedPayment,ChangeType.UPDATE);
+  transactional.insertHistoryFromTransaction(history,context);
+  Long historyRecordId=transactional.getHistoryRecordId(recordId);
+  EntityAudit audit=new EntityAudit(TableName.PAYMENTS,historyRecordId,ChangeType.UPDATE);
+  transactional.insertAuditFromTransaction(audit,context);
+}

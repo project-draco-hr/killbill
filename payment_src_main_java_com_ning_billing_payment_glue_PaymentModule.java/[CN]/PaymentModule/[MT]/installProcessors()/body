@@ -1,4 +1,13 @@
 {
+  final ExecutorService pluginExecutorService=Executors.newFixedThreadPool(PLUGIN_NB_THREADS,new ThreadFactory(){
+    @Override public Thread newThread(    Runnable r){
+      Thread th=new Thread(r);
+      th.setName(PLUGIN_THREAD_PREFIX + th.getId());
+      return th;
+    }
+  }
+);
+  bind(ExecutorService.class).annotatedWith(Names.named(PLUGIN_EXECUTOR)).toInstance(pluginExecutorService);
   bind(AccountProcessor.class).asEagerSingleton();
   bind(PaymentProcessor.class).asEagerSingleton();
   bind(RefundProcessor.class).asEagerSingleton();

@@ -1,0 +1,66 @@
+{
+  final Account account=testHelper.createTestCreditCardAccount();
+  final Invoice invoice=testHelper.createTestInvoice(account,clock.getUTCNow(),Currency.USD);
+  final BigDecimal amount=new BigDecimal("10.00");
+  final UUID subscriptionId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final DateTime startDate=clock.getUTCNow();
+  final DateTime endDate=startDate.plusMonths(1);
+  invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",startDate,endDate,amount,new BigDecimal("1.0"),Currency.USD));
+  mockPaymentProviderPlugin.makeNextPaymentFail();
+  boolean failed=false;
+  try {
+    paymentProcessor.createPayment(account.getExternalKey(),invoice.getId(),amount,context,false);
+  }
+ catch (  PaymentApiException e) {
+    failed=true;
+  }
+  assertTrue(failed);
+  for (int curFailure=0; curFailure < maxTries; curFailure++) {
+    if (curFailure < maxTries - 1) {
+      mockPaymentProviderPlugin.makeNextPaymentFail();
+    }
+    if (curFailure < paymentConfig.getPaymentRetryDays().size()) {
+      int nbDays=paymentConfig.getPaymentRetryDays().get(curFailure);
+      clock.addDays(nbDays + 1);
+      try {
+        await().atMost(3,SECONDS).until(new Callable<Boolean>(){
+          @Override public Boolean call() throws Exception {
+            Payment payment=getPaymentForInvoice(invoice.getId());
+            return payment.getPaymentStatus() == PaymentStatus.SUCCESS;
+          }
+        }
+);
+      }
+ catch (      TimeoutException e) {
+        if (curFailure == maxTries - 1) {
+          fail("Failed to find succesful payment for attempt " + (curFailure + 1) + "/"+ maxTries);
+        }
+      }
+    }
+  }
+  Payment payment=getPaymentForInvoice(invoice.getId());
+  List<PaymentAttempt> attempts=payment.getAttempts();
+  int expectedAttempts=maxTries < paymentConfig.getPaymentRetryDays().size() ? maxTries + 1 : paymentConfig.getPaymentRetryDays().size() + 1;
+  assertEquals(attempts.size(),expectedAttempts);
+  Collections.sort(attempts,new Comparator<PaymentAttempt>(){
+    @Override public int compare(    PaymentAttempt o1,    PaymentAttempt o2){
+      return o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
+    }
+  }
+);
+  for (int i=0; i < attempts.size(); i++) {
+    PaymentAttempt cur=attempts.get(i);
+    if (i < attempts.size() - 1) {
+      assertEquals(cur.getPaymentStatus(),PaymentStatus.ERROR);
+    }
+ else     if (maxTries <= paymentConfig.getPaymentRetryDays().size()) {
+      assertEquals(cur.getPaymentStatus(),PaymentStatus.SUCCESS);
+      assertEquals(payment.getPaymentStatus(),PaymentStatus.SUCCESS);
+    }
+ else {
+      assertEquals(cur.getPaymentStatus(),PaymentStatus.ERROR);
+      assertEquals(payment.getPaymentStatus(),PaymentStatus.ABORTED);
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  BusEvent event=null;
+  List<PaymentAttemptModelDao> allAttempts=null;
+  PaymentAttemptModelDao lastAttempt=null;
+  PaymentModelDao payment=null;
+  try {
+    PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(account.getExternalKey(),paymentInput.getId(),attemptInput.getRequestedAmount());
+    PaymentStatus paymentStatus=paymentPluginInfo.getStatus() == PaymentPluginStatus.ERROR ? PaymentStatus.ERROR : PaymentStatus.SUCCESS;
+    paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,paymentPluginInfo.getError(),attemptInput.getId(),context);
+    allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId());
+    lastAttempt=allAttempts.get(allAttempts.size() - 1);
+    payment=paymentDao.getPayment(paymentInput.getId());
+    invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),paymentStatus == PaymentStatus.SUCCESS ? payment.getAmount() : null,paymentStatus == PaymentStatus.SUCCESS ? payment.getCurrency() : null,lastAttempt.getId(),lastAttempt.getEffectiveDate(),context);
+    event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,context.getUserToken(),payment.getEffectiveDate());
+  }
+ catch (  PaymentPluginApiException e) {
+    final PaymentStatus errorStatus=isInstantPayment ? PaymentStatus.ABORTED : PaymentStatus.ERROR;
+    paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),errorStatus,e.getMessage(),attemptInput.getId(),context);
+    allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId());
+    lastAttempt=allAttempts.get(allAttempts.size() - 1);
+    log.info(String.format("Could not process payment for account %s, invoice %s, error = %s",account.getId(),invoice.getId(),e.getMessage()));
+    if (!isInstantPayment) {
+      scheduleRetry(paymentInput.getId(),lastAttempt.getEffectiveDate(),allAttempts.size(),context);
+    }
+    event=new DefaultPaymentErrorEvent(account.getId(),invoice.getId(),paymentInput.getId(),e.getErrorMessage(),context.getUserToken());
+    throw new PaymentApiException(e,ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),e.getMessage());
+  }
+ finally {
+    postPaymentEvent(event,account.getId());
+  }
+  return new DefaultPayment(payment,allAttempts);
+}

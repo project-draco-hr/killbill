@@ -1,0 +1,34 @@
+{
+  ((ZombieControl)invoicePaymentApi).addResult("notifyOfPaymentAttempt",BrainDeadProxyFactory.ZOMBIE_VOID);
+  final DateTime now=new DateTime(DateTimeZone.UTC);
+  final Account account=testHelper.createTestCreditCardAccount();
+  final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
+  final UUID subscriptionId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",now,now.plusMonths(1),invoiceAmount,new BigDecimal("1.0"),Currency.USD));
+  try {
+    Payment paymentInfo=paymentApi.createPayment(account.getExternalKey(),invoice.getId(),requestedAmount,context);
+    if (expectedAmount == null) {
+      fail("Expected to fail because requested amount > invoice amount");
+    }
+    assertNotNull(paymentInfo.getId());
+    assertTrue(paymentInfo.getAmount().compareTo(expectedAmount.setScale(2,RoundingMode.HALF_EVEN)) == 0);
+    assertNotNull(paymentInfo.getPaymentNumber());
+    assertEquals(paymentInfo.getPaymentStatus(),PaymentStatus.SUCCESS);
+    assertEquals(paymentInfo.getAttempts().size(),1);
+    assertEquals(paymentInfo.getInvoiceId(),invoice.getId());
+    assertEquals(paymentInfo.getCurrency(),Currency.USD);
+    PaymentAttempt paymentAttempt=paymentInfo.getAttempts().get(0);
+    assertNotNull(paymentAttempt);
+    assertNotNull(paymentAttempt.getId());
+  }
+ catch (  PaymentApiException e) {
+    if (expectedAmount != null) {
+      fail("Failed to create payment",e);
+    }
+ else {
+      log.info(e.getMessage());
+      assertEquals(e.getCode(),ErrorCode.PAYMENT_AMOUNT_DENIED.getCode());
+    }
+  }
+}

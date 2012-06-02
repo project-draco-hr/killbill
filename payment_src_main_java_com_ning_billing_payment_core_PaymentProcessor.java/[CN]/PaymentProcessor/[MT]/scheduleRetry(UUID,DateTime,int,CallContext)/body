@@ -1,0 +1,23 @@
+{
+  final List<Integer> retryDays=config.getPaymentRetryDays();
+  int retryCount=numberAttempts - 1;
+  if (retryCount < retryDays.size()) {
+    int retryInDays=0;
+    DateTime nextRetryDate=clock.getUTCNow();
+    try {
+      retryInDays=retryDays.get(retryCount);
+      nextRetryDate=nextRetryDate.plusDays(retryInDays);
+      retryService.scheduleRetry(paymentId,nextRetryDate);
+    }
+ catch (    NumberFormatException ex) {
+      log.error("Could not get retry day for retry count {}",retryCount);
+    }
+  }
+ else   if (retryCount == retryDays.size()) {
+    log.info("Last payment retry failed for {} ",paymentId);
+    paymentDao.updateStatusForPayment(paymentId,PaymentStatus.ABORTED,context);
+  }
+ else {
+    log.error("Cannot update payment retry information because retry count is invalid {} ",retryCount);
+  }
+}

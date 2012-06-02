@@ -1,8 +1,9 @@
 {
-  eventBus.start();
+  retryService.initialize(DefaultPaymentService.SERVICE_NAME);
   retryService.start();
+  eventBus.start();
   mockPaymentProviderPlugin=(MockPaymentProviderPlugin)registry.getPlugin(null);
-  mockNotificationQueue=(MockNotificationQueue)notificationQueueService.getNotificationQueue("payment-service",FailedPaymentRetryService.QUEUE_NAME);
+  mockPaymentProviderPlugin.clear();
   context=new DefaultCallContext("RetryServiceTests",CallOrigin.INTERNAL,UserType.TEST,clock);
   ((ZombieControl)invoicePaymentApi).addResult("notifyOfPaymentAttempt",BrainDeadProxyFactory.ZOMBIE_VOID);
 }
