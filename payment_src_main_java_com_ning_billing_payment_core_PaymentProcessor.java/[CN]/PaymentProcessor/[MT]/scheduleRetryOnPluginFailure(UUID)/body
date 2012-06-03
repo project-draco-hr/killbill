@@ -1,0 +1,6 @@
+{
+  List<PaymentAttemptModelDao> allAttempts=paymentDao.getAttemptsForPayment(paymentId);
+  final int retryAttempt=getNumberAttemptsInState(paymentId,allAttempts,PaymentStatus.UNKNOWN);
+  final boolean isScheduledForRetry=pluginFailureRetryService.scheduleRetry(paymentId,retryAttempt);
+  return isScheduledForRetry ? PaymentStatus.PLUGIN_FAILURE : PaymentStatus.PLUGIN_FAILURE_ABORTED;
+}

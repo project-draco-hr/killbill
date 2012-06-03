@@ -1,0 +1,24 @@
+{
+  try {
+    NotificationQueue retryQueue=notificationQueueService.getNotificationQueue(DefaultPaymentService.SERVICE_NAME,getQueueName());
+    NotificationKey key=new NotificationKey(){
+      @Override public String toString(){
+        return paymentId.toString();
+      }
+    }
+;
+    if (retryQueue != null) {
+      if (transactionalDao == null) {
+        retryQueue.recordFutureNotification(timeOfRetry,key);
+      }
+ else {
+        retryQueue.recordFutureNotificationFromTransaction(transactionalDao,timeOfRetry,key);
+      }
+    }
+  }
+ catch (  NoSuchNotificationQueue e) {
+    log.error(String.format("Failed to retrieve notification queue %s:%s",DefaultPaymentService.SERVICE_NAME,getQueueName()));
+    return false;
+  }
+  return true;
+}

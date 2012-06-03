@@ -1,17 +1,3 @@
 {
-  try {
-    NotificationQueue retryQueue=notificationQueueService.getNotificationQueue(DefaultPaymentService.SERVICE_NAME,getQueueName());
-    NotificationKey key=new NotificationKey(){
-      @Override public String toString(){
-        return paymentId.toString();
-      }
-    }
-;
-    if (retryQueue != null) {
-      retryQueue.recordFutureNotification(timeOfRetry,key);
-    }
-  }
- catch (  NoSuchNotificationQueue e) {
-    log.error(String.format("Failed to retrieve notification queue %s:%s",DefaultPaymentService.SERVICE_NAME,getQueueName()));
-  }
+  return scheduleRetryInternal(paymentId,timeOfRetry,null);
 }

@@ -1,0 +1,10 @@
+{
+  if (retryAttempt > config.getPaymentFailureRetryMaxAttempts()) {
+    return null;
+  }
+  int nbSec=config.getPaymentFailureRetryStart();
+  while (--retryAttempt > 0) {
+    nbSec=nbSec * config.getPaymentFailureRetryMultiplier();
+  }
+  return clock.getUTCNow().plusSeconds(nbSec);
+}

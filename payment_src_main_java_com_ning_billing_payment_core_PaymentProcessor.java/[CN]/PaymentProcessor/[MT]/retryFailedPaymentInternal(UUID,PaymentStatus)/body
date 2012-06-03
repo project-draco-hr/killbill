@@ -1,0 +1,47 @@
+{
+  try {
+    PaymentModelDao payment=paymentDao.getPayment(paymentId);
+    if (payment == null) {
+      log.error("Invalid retry for non existnt paymentId {}",paymentId);
+      return;
+    }
+    final Account account=accountUserApi.getAccountById(payment.getAccountId());
+    final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
+    final CallContext context=factory.createCallContext("PaymentRetry",CallOrigin.INTERNAL,UserType.SYSTEM);
+    voidPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Void>(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
+      @Override public Void doOperation() throws PaymentApiException {
+        PaymentModelDao payment=paymentDao.getPayment(paymentId);
+        boolean foundExpectedState=false;
+        for (        PaymentStatus cur : expectedPaymentStates) {
+          if (payment.getPaymentStatus() == cur) {
+            foundExpectedState=true;
+            break;
+          }
+        }
+        if (!foundExpectedState) {
+          log.info("Aborted retry for payment {} because it is {} state",paymentId,payment.getPaymentStatus());
+          return null;
+        }
+        final Invoice invoice=invoicePaymentApi.getInvoice(payment.getInvoiceId());
+        if (invoice.isMigrationInvoice()) {
+          return null;
+        }
+        if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+          log.info("Aborted retry for payment {} because invoice has been paid",paymentId);
+          return null;
+        }
+        processRetryPaymentWithAccountLocked(plugin,account,invoice,payment,invoice.getBalance(),context);
+        return null;
+      }
+    }
+));
+  }
+ catch (  AccountApiException e) {
+    log.error(String.format("Failed to retry payment for paymentId %s",paymentId),e);
+  }
+catch (  PaymentApiException e) {
+    log.info(String.format("Failed to retry payment for paymentId %s",paymentId));
+  }
+catch (  TimeoutException e) {
+  }
+}
