@@ -6,7 +6,7 @@
       return;
     }
     final Account account=accountUserApi.getAccountById(payment.getAccountId());
-    final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
+    final PaymentPluginApi plugin=getPaymentProviderPlugin(account);
     final CallContext context=factory.createCallContext("PaymentRetry",CallOrigin.INTERNAL,UserType.SYSTEM);
     voidPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Void>(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
       @Override public Void doOperation() throws PaymentApiException {
@@ -43,5 +43,6 @@ catch (  PaymentApiException e) {
     log.info(String.format("Failed to retry payment for paymentId %s",paymentId));
   }
 catch (  TimeoutException e) {
+    log.warn(String.format("Retry for payment %s timedout",paymentId));
   }
 }

@@ -1,5 +1,5 @@
 {
-  final PaymentProviderPlugin plugin=getPaymentProviderPlugin(account);
+  final PaymentPluginApi plugin=getPaymentProviderPlugin(account);
   try {
     return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
       @Override public Payment doOperation() throws PaymentApiException {
@@ -19,6 +19,7 @@
       throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,account.getId(),invoiceId);
     }
  else {
+      log.warn(String.format("Payment from Account %s, Invoice %s timedout",account.getId(),invoiceId));
       return null;
     }
   }

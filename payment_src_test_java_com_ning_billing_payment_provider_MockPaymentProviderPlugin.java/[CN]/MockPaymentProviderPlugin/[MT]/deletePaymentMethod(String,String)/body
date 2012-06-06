@@ -1,14 +1,15 @@
 {
-  PaymentMethodInfo paymentMethodInfo=paymentMethods.get(paymentMethodId);
-  if (paymentMethodInfo != null) {
-    if (Boolean.FALSE.equals(paymentMethodInfo.getDefaultMethod()) || paymentMethodInfo.getDefaultMethod() == null) {
-      if (paymentMethods.remove(paymentMethodId) == null) {
-        throw new PaymentPluginApiException("","Did not get any result back");
+  PaymentMethodPlugin toBeDeleted=null;
+  List<PaymentMethodPlugin> pms=paymentMethods.get(accountKey);
+  if (pms != null) {
+    for (    PaymentMethodPlugin cur : pms) {
+      if (cur.getExternalPaymentMethodId().equals(paymentMethodId)) {
+        toBeDeleted=cur;
+        break;
       }
     }
- else {
-      throw new PaymentPluginApiException("","Cannot delete default payment method");
-    }
   }
-  return;
+  if (toBeDeleted != null) {
+    pms.remove(toBeDeleted);
+  }
 }
