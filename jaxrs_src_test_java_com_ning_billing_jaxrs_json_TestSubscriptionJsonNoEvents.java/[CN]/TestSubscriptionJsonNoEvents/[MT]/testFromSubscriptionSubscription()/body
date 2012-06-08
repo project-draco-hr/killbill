@@ -1,0 +1,29 @@
+{
+  final Product product=Mockito.mock(Product.class);
+  Mockito.when(product.getName()).thenReturn(UUID.randomUUID().toString());
+  Mockito.when(product.getCategory()).thenReturn(ProductCategory.STANDALONE);
+  final InternationalPrice price=Mockito.mock(InternationalPrice.class);
+  final PlanPhase planPhase=Mockito.mock(PlanPhase.class);
+  Mockito.when(planPhase.getRecurringPrice()).thenReturn(price);
+  final Plan plan=Mockito.mock(Plan.class);
+  Mockito.when(plan.getProduct()).thenReturn(product);
+  Mockito.when(plan.getName()).thenReturn(UUID.randomUUID().toString());
+  Mockito.when(plan.getBillingPeriod()).thenReturn(BillingPeriod.QUARTERLY);
+  Mockito.when(plan.getFinalPhase()).thenReturn(planPhase);
+  final PriceList priceList=Mockito.mock(PriceList.class);
+  final Subscription subscription=Mockito.mock(Subscription.class);
+  Mockito.when(subscription.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(subscription.getBundleId()).thenReturn(UUID.randomUUID());
+  Mockito.when(subscription.getStartDate()).thenReturn(new DateTime(DateTimeZone.UTC));
+  Mockito.when(subscription.getCurrentPlan()).thenReturn(plan);
+  Mockito.when(subscription.getCurrentPriceList()).thenReturn(priceList);
+  Mockito.when(subscription.getChargedThroughDate()).thenReturn(new DateTime(DateTimeZone.UTC));
+  final SubscriptionJsonNoEvents subscriptionJsonNoEvents=new SubscriptionJsonNoEvents(subscription);
+  Assert.assertEquals(subscriptionJsonNoEvents.getSubscriptionId(),subscription.getId().toString());
+  Assert.assertEquals(subscriptionJsonNoEvents.getStartDate(),subscription.getStartDate());
+  Assert.assertEquals(subscriptionJsonNoEvents.getBundleId(),subscription.getBundleId().toString());
+  Assert.assertEquals(subscriptionJsonNoEvents.getProductName(),subscription.getCurrentPlan().getProduct().getName());
+  Assert.assertEquals(subscriptionJsonNoEvents.getProductCategory(),subscription.getCurrentPlan().getProduct().getCategory().toString());
+  Assert.assertEquals(subscriptionJsonNoEvents.getBillingPeriod(),subscription.getCurrentPlan().getBillingPeriod().toString());
+  Assert.assertEquals(subscriptionJsonNoEvents.getChargedThroughDate(),subscription.getChargedThroughDate());
+}
