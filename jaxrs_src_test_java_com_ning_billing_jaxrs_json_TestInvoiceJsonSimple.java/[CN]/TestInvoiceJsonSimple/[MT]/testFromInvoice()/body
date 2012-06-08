@@ -1,0 +1,20 @@
+{
+  final Invoice invoice=Mockito.mock(Invoice.class);
+  Mockito.when(invoice.getAmountCharged()).thenReturn(BigDecimal.TEN);
+  Mockito.when(invoice.getAmountCredited()).thenReturn(BigDecimal.ONE);
+  Mockito.when(invoice.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(invoice.getInvoiceDate()).thenReturn(new DateTime(DateTimeZone.UTC));
+  Mockito.when(invoice.getTargetDate()).thenReturn(new DateTime(DateTimeZone.UTC));
+  Mockito.when(invoice.getInvoiceNumber()).thenReturn(Integer.MAX_VALUE);
+  Mockito.when(invoice.getBalance()).thenReturn(BigDecimal.ZERO);
+  Mockito.when(invoice.getAccountId()).thenReturn(UUID.randomUUID());
+  final InvoiceJsonSimple invoiceJsonSimple=new InvoiceJsonSimple(invoice);
+  Assert.assertEquals(invoiceJsonSimple.getAmount(),invoice.getAmountCharged());
+  Assert.assertEquals(invoiceJsonSimple.getCredit(),invoice.getAmountCredited());
+  Assert.assertEquals(invoiceJsonSimple.getInvoiceId(),invoice.getId().toString());
+  Assert.assertEquals(invoiceJsonSimple.getInvoiceDate(),invoice.getInvoiceDate());
+  Assert.assertEquals(invoiceJsonSimple.getTargetDate(),invoice.getTargetDate());
+  Assert.assertEquals(invoiceJsonSimple.getInvoiceNumber(),String.valueOf(invoice.getInvoiceNumber()));
+  Assert.assertEquals(invoiceJsonSimple.getBalance(),invoice.getBalance());
+  Assert.assertEquals(invoiceJsonSimple.getAccountId(),invoice.getAccountId().toString());
+}

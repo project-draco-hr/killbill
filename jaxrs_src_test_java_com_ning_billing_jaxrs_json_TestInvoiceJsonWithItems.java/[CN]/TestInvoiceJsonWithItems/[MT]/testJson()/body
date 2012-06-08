@@ -1,0 +1,26 @@
+{
+  final BigDecimal amount=BigDecimal.TEN;
+  final BigDecimal credit=BigDecimal.ONE;
+  final String invoiceId=UUID.randomUUID().toString();
+  final DateTime invoiceDate=new DateTime(DateTimeZone.UTC);
+  final DateTime targetDate=new DateTime(DateTimeZone.UTC);
+  final String invoiceNumber=UUID.randomUUID().toString();
+  final BigDecimal balance=BigDecimal.ZERO;
+  final String accountId=UUID.randomUUID().toString();
+  final InvoiceItemJsonSimple invoiceItemJsonSimple=createInvoiceItemJson();
+  final InvoiceJsonWithItems invoiceJsonWithItems=new InvoiceJsonWithItems(amount,credit,invoiceId,invoiceDate,targetDate,invoiceNumber,balance,accountId,ImmutableList.<InvoiceItemJsonSimple>of(invoiceItemJsonSimple));
+  Assert.assertEquals(invoiceJsonWithItems.getAmount(),amount);
+  Assert.assertEquals(invoiceJsonWithItems.getCredit(),credit);
+  Assert.assertEquals(invoiceJsonWithItems.getInvoiceId(),invoiceId);
+  Assert.assertEquals(invoiceJsonWithItems.getInvoiceDate(),invoiceDate);
+  Assert.assertEquals(invoiceJsonWithItems.getTargetDate(),targetDate);
+  Assert.assertEquals(invoiceJsonWithItems.getInvoiceNumber(),invoiceNumber);
+  Assert.assertEquals(invoiceJsonWithItems.getBalance(),balance);
+  Assert.assertEquals(invoiceJsonWithItems.getAccountId(),accountId);
+  Assert.assertEquals(invoiceJsonWithItems.getItems().size(),1);
+  Assert.assertEquals(invoiceJsonWithItems.getItems().get(0),invoiceItemJsonSimple);
+  final String asJson=mapper.writeValueAsString(invoiceJsonWithItems);
+  Assert.assertEquals(asJson,"{\"amount\":" + invoiceJsonWithItems.getAmount().toString() + ","+ "\"credit\":"+ invoiceJsonWithItems.getCredit().toString()+ ","+ "\"invoiceId\":\""+ invoiceJsonWithItems.getInvoiceId()+ "\","+ "\"invoiceDate\":\""+ invoiceJsonWithItems.getInvoiceDate().toDateTimeISO().toString()+ "\","+ "\"targetDate\":\""+ invoiceJsonWithItems.getTargetDate().toDateTimeISO().toString()+ "\","+ "\"invoiceNumber\":\""+ invoiceJsonWithItems.getInvoiceNumber()+ "\","+ "\"balance\":"+ invoiceJsonWithItems.getBalance().toString()+ ","+ "\"accountId\":\""+ invoiceJsonWithItems.getAccountId()+ "\","+ "\"items\":[{\"invoiceId\":\""+ invoiceItemJsonSimple.getInvoiceId().toString()+ "\","+ "\"accountId\":\""+ invoiceItemJsonSimple.getAccountId().toString()+ "\","+ "\"bundleId\":\""+ invoiceItemJsonSimple.getBundleId().toString()+ "\","+ "\"subscriptionId\":\""+ invoiceItemJsonSimple.getSubscriptionId().toString()+ "\","+ "\"planName\":\""+ invoiceItemJsonSimple.getPlanName()+ "\","+ "\"phaseName\":\""+ invoiceItemJsonSimple.getPhaseName()+ "\","+ "\"description\":\""+ invoiceItemJsonSimple.getDescription()+ "\","+ "\"startDate\":\""+ invoiceItemJsonSimple.getStartDate().toDateTimeISO().toString()+ "\","+ "\"endDate\":\""+ invoiceItemJsonSimple.getEndDate().toDateTimeISO().toString()+ "\","+ "\"amount\":"+ invoiceItemJsonSimple.getAmount().toString()+ ","+ "\"currency\":\""+ invoiceItemJsonSimple.getCurrency().toString()+ "\"}]}");
+  final InvoiceJsonWithItems fromJson=mapper.readValue(asJson,InvoiceJsonWithItems.class);
+  Assert.assertEquals(fromJson,invoiceJsonWithItems);
+}

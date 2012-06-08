@@ -1,0 +1,9 @@
+{
+  final String subscriptionId=UUID.randomUUID().toString();
+  final SubscriptionJsonSimple subscriptionJsonSimple=new SubscriptionJsonSimple(subscriptionId);
+  Assert.assertEquals(subscriptionJsonSimple.getSubscriptionId(),subscriptionId);
+  final String asJson=mapper.writeValueAsString(subscriptionJsonSimple);
+  Assert.assertEquals(asJson,"{\"subscriptionId\":\"" + subscriptionJsonSimple.getSubscriptionId() + "\"}");
+  final SubscriptionJsonSimple fromJson=mapper.readValue(asJson,SubscriptionJsonSimple.class);
+  Assert.assertEquals(fromJson,subscriptionJsonSimple);
+}

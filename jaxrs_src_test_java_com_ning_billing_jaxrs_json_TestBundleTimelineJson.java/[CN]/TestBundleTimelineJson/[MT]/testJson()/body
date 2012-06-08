@@ -1,0 +1,16 @@
+{
+  final String viewId=UUID.randomUUID().toString();
+  final String reason=UUID.randomUUID().toString();
+  final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=createBundleWithSubscriptions();
+  final InvoiceJsonSimple invoiceJsonSimple=createInvoice();
+  final PaymentJsonSimple paymentJsonSimple=createPayment(UUID.fromString(invoiceJsonSimple.getAccountId()),UUID.fromString(invoiceJsonSimple.getInvoiceId()));
+  final BundleTimelineJson bundleTimelineJson=new BundleTimelineJson(viewId,bundleJsonWithSubscriptions,ImmutableList.<PaymentJsonSimple>of(paymentJsonSimple),ImmutableList.<InvoiceJsonSimple>of(invoiceJsonSimple),reason);
+  final String asJson=mapper.writeValueAsString(bundleTimelineJson);
+  final SubscriptionJsonWithEvents subscription=bundleTimelineJson.getBundle().getSubscriptions().get(0);
+  final SubscriptionJsonWithEvents.SubscriptionReadEventJson event=subscription.getEvents().get(0);
+  final PaymentJsonSimple payment=bundleTimelineJson.getPayments().get(0);
+  final InvoiceJsonSimple invoice=bundleTimelineJson.getInvoices().get(0);
+  Assert.assertEquals(asJson,"{\"viewId\":\"" + bundleTimelineJson.getViewId() + "\","+ "\"bundle\":{\"bundleId\":\""+ bundleTimelineJson.getBundle().getBundleId()+ "\","+ "\"externalKey\":\""+ bundleTimelineJson.getBundle().getExternalKey()+ "\","+ "\"subscriptions\":"+ "[{\"events\":[{\"eventId\":\""+ event.getEventId()+ "\","+ "\"billingPeriod\":\""+ event.getBillingPeriod()+ "\","+ "\"product\":\""+ event.getProduct()+ "\","+ "\"priceList\":\""+ event.getPriceList()+ "\","+ "\"eventType\":\""+ event.getEventType()+ "\","+ "\"phase\":\""+ event.getPhase()+ "\","+ "\"requestedDate\":null,"+ "\"effectiveDate\":\""+ event.getEffectiveDate().toDateTimeISO().toString()+ "\"}],"+ "\"subscriptionId\":\""+ subscription.getSubscriptionId()+ "\","+ "\"deletedEvents\":null,"+ "\"newEvents\":null}]},"+ "\"payments\":[{\"amount\":"+ payment.getAmount()+ ","+ "\"paidAmount\":"+ payment.getPaidAmount()+ ","+ "\"invoiceId\":\""+ payment.getInvoiceId()+ "\","+ "\"paymentId\":\""+ payment.getPaymentId()+ "\","+ "\"requestedDate\":\""+ payment.getRequestedDate().toDateTimeISO().toString()+ "\","+ "\"effectiveDate\":\""+ payment.getEffectiveDate().toDateTimeISO().toString()+ "\","+ "\"retryCount\":"+ payment.getRetryCount()+ ","+ "\"currency\":\""+ payment.getCurrency()+ "\","+ "\"status\":\""+ payment.getStatus()+ "\","+ "\"accountId\":\""+ payment.getAccountId()+ "\"}],"+ "\"invoices\":[{\"amount\":"+ invoice.getAmount()+ ","+ "\"credit\":"+ invoice.getCredit()+ ","+ "\"invoiceId\":\""+ invoice.getInvoiceId()+ "\","+ "\"invoiceDate\":\""+ invoice.getInvoiceDate().toDateTimeISO().toString()+ "\","+ "\"targetDate\":\""+ invoice.getTargetDate()+ "\","+ "\"invoiceNumber\":\""+ invoice.getInvoiceNumber()+ "\","+ "\"balance\":"+ invoice.getBalance()+ ","+ "\"accountId\":\""+ invoice.getAccountId()+ "\"}],"+ "\"reasonForChange\":\""+ reason+ "\"}");
+  final BundleTimelineJson fromJson=mapper.readValue(asJson,BundleTimelineJson.class);
+  Assert.assertEquals(fromJson,bundleTimelineJson);
+}

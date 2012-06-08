@@ -1,37 +1,29 @@
 {
   UpdatableEntityCollectionSqlDao<T> dao=transmogrifyDao(transactionalDao);
   List<T> existingEntities=dao.load(objectId.toString(),objectType);
-  List<T> entitiesToUpdate=new ArrayList<T>();
-  Iterator<T> entityIterator=entities.iterator();
-  while (entityIterator.hasNext()) {
-    T entity=entityIterator.next();
-    Iterator<T> existingEntityIterator=existingEntities.iterator();
-    while (existingEntityIterator.hasNext()) {
-      T existingEntity=existingEntityIterator.next();
-      if (entity.equals(existingEntity)) {
-        entityIterator.remove();
-        existingEntityIterator.remove();
-        if (entity.hashCode() != existingEntity.hashCode()) {
-          entitiesToUpdate.add(entity);
-        }
-      }
-    }
+  Set<UUID> currentObjIds=new HashSet<UUID>(Collections2.transform(existingEntities,entityIdExtractor));
+  Set<UUID> updatedObjIds=new HashSet<UUID>(Collections2.transform(entities,entityIdExtractor));
+  Set<UUID> idsOfObjsToRemove=Sets.difference(currentObjIds,updatedObjIds);
+  Set<UUID> idsOfObjsToAdd=Sets.difference(updatedObjIds,currentObjIds);
+  Set<UUID> idsOfObjsToUpdate=Sets.intersection(currentObjIds,updatedObjIds);
+  Collection<T> objsToRemove=Collections2.filter(existingEntities,new IdInSetPredicate<T>(idsOfObjsToRemove));
+  Collection<T> objsToAdd=Collections2.filter(entities,new IdInSetPredicate<T>(idsOfObjsToAdd));
+  Collection<T> objsToUpdate=Collections2.filter(existingEntities,new IdInSetPredicate<T>(idsOfObjsToUpdate));
+  if (objsToAdd.size() != 0) {
+    dao.insertFromTransaction(objectId.toString(),objectType,objsToAdd,context);
   }
-  if (entities.size() != 0) {
-    dao.insertFromTransaction(objectId.toString(),objectType,entities,context);
-  }
-  if (entitiesToUpdate.size() != 0) {
-    dao.updateFromTransaction(objectId.toString(),objectType,entitiesToUpdate,context);
+  if (objsToUpdate.size() != 0) {
+    dao.updateFromTransaction(objectId.toString(),objectType,objsToUpdate,context);
   }
   List<Mapper<UUID,Long>> recordIds=dao.getRecordIds(objectId.toString(),objectType);
   Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
-  if (existingEntities.size() != 0) {
-    dao.deleteFromTransaction(objectId.toString(),objectType,existingEntities,context);
+  if (objsToRemove.size() != 0) {
+    dao.deleteFromTransaction(objectId.toString(),objectType,objsToRemove,context);
   }
   List<EntityHistory<T>> entityHistories=new ArrayList<EntityHistory<T>>();
-  entityHistories.addAll(convertToHistory(entities,recordIdMap,ChangeType.INSERT));
-  entityHistories.addAll(convertToHistory(entitiesToUpdate,recordIdMap,ChangeType.UPDATE));
-  entityHistories.addAll(convertToHistory(existingEntities,recordIdMap,ChangeType.DELETE));
+  entityHistories.addAll(convertToHistory(objsToAdd,recordIdMap,ChangeType.INSERT));
+  entityHistories.addAll(convertToHistory(objsToUpdate,recordIdMap,ChangeType.UPDATE));
+  entityHistories.addAll(convertToHistory(objsToRemove,recordIdMap,ChangeType.DELETE));
   Long maxHistoryRecordId=dao.getMaxHistoryRecordId();
   dao.addHistoryFromTransaction(objectId.toString(),objectType,entityHistories,context);
   List<Mapper<Long,Long>> historyRecordIds=dao.getHistoryRecordIds(maxHistoryRecordId);
