@@ -6,10 +6,10 @@
     thePhase=(currentPhase != null) ? catalog.findPhase(currentPhase,new DateTime(),startDate) : null;
   }
  catch (  CatalogApiException e) {
-    log.error(String.format("Failed to retrieve Plan from catalog for plan %s, phase ",currentPlan,currentPhase));
+    log.error("Failed to retrieve Plan from catalog for plan {}, phase {}",currentPlan,currentPhase);
   }
   this.priceList=priceList;
-  if (currentPlan != null && thePlan.getProduct() != null) {
+  if (currentPlan != null && thePlan != null && thePlan.getProduct() != null) {
     final Product product=thePlan.getProduct();
     productName=product.getName();
     productCategory=product.getCategory();
@@ -20,7 +20,7 @@
     productCategory=null;
     productType=null;
   }
-  if (currentPhase != null) {
+  if (currentPhase != null && thePhase != null) {
     slug=thePhase.getName();
     if (thePhase.getPhaseType() != null) {
       phase=thePhase.getPhaseType().toString();
@@ -35,7 +35,7 @@
       billingPeriod=null;
     }
     if (thePhase.getRecurringPrice() != null) {
-      BigDecimal tmpPrice=null;
+      BigDecimal tmpPrice;
       try {
         tmpPrice=thePhase.getRecurringPrice().getPrice(USD);
       }
