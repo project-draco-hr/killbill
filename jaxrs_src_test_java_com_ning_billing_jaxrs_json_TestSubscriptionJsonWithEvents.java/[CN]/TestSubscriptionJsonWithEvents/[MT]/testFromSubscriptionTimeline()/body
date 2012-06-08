@@ -1,0 +1,21 @@
+{
+  final SubscriptionTimeline.ExistingEvent event=Mockito.mock(SubscriptionTimeline.ExistingEvent.class);
+  final DateTime effectiveDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
+  final UUID eventId=UUID.randomUUID();
+  final PlanPhaseSpecifier planPhaseSpecifier=new PlanPhaseSpecifier(UUID.randomUUID().toString(),ProductCategory.BASE,BillingPeriod.NO_BILLING_PERIOD,UUID.randomUUID().toString(),PhaseType.EVERGREEN);
+  Mockito.when(event.getEffectiveDate()).thenReturn(effectiveDate);
+  Mockito.when(event.getEventId()).thenReturn(eventId);
+  Mockito.when(event.getSubscriptionTransitionType()).thenReturn(SubscriptionTransitionType.CREATE);
+  Mockito.when(event.getPlanPhaseSpecifier()).thenReturn(planPhaseSpecifier);
+  final SubscriptionTimeline subscriptionTimeline=Mockito.mock(SubscriptionTimeline.class);
+  Mockito.when(subscriptionTimeline.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(subscriptionTimeline.getExistingEvents()).thenReturn(ImmutableList.<SubscriptionTimeline.ExistingEvent>of(event));
+  final UUID bundleId=UUID.randomUUID();
+  final SubscriptionJsonWithEvents subscriptionJsonWithEvents=new SubscriptionJsonWithEvents(bundleId,subscriptionTimeline);
+  Assert.assertEquals(subscriptionJsonWithEvents.getSubscriptionId(),subscriptionTimeline.getId().toString());
+  Assert.assertNull(subscriptionJsonWithEvents.getNewEvents());
+  Assert.assertNull(subscriptionJsonWithEvents.getDeletedEvents());
+  Assert.assertEquals(subscriptionJsonWithEvents.getEvents().size(),1);
+  Assert.assertEquals(subscriptionJsonWithEvents.getEvents().get(0).getEffectiveDate(),event.getEffectiveDate());
+  Assert.assertEquals(subscriptionJsonWithEvents.getEvents().get(0).getEventId(),event.getEventId().toString());
+}
