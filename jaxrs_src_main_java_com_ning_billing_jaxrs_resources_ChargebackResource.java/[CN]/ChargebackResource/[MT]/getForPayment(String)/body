@@ -1,0 +1,29 @@
+{
+  try {
+    Payment payment=paymentApi.getPayment(UUID.fromString(paymentId));
+    Collection<PaymentAttempt> attempts=Collections2.filter(payment.getAttempts(),new Predicate<PaymentAttempt>(){
+      @Override public boolean apply(      PaymentAttempt input){
+        return input.getPaymentStatus() == PaymentStatus.SUCCESS;
+      }
+    }
+);
+    if (attempts.size() == 0) {
+      final String error=String.format("Failed to locate succesful payment attempts for paymentId %s",paymentId);
+      return Response.status(Response.Status.NO_CONTENT).entity(error).build();
+    }
+    UUID paymentAttemptId=attempts.iterator().next().getId();
+    List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentAttemptId(paymentAttemptId);
+    List<ChargebackJson> chargebacksJson=convertToJson(chargebacks);
+    String accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(UUID.fromString(paymentId)).toString();
+    ChargebackCollectionJson json=new ChargebackCollectionJson(accountId,chargebacksJson);
+    return Response.status(Response.Status.OK).entity(json).build();
+  }
+ catch (  PaymentApiException e) {
+    final String error=String.format("Failed to locate payment attempt for payment id %s",paymentId);
+    return Response.status(Response.Status.NO_CONTENT).entity(error).build();
+  }
+catch (  InvoiceApiException e) {
+    final String error=String.format("Failed to locate account for payment id %s",paymentId);
+    return Response.status(Response.Status.NO_CONTENT).entity(error).build();
+  }
+}

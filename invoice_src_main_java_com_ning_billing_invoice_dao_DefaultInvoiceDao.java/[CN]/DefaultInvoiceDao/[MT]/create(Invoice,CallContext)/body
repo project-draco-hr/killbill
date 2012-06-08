@@ -19,6 +19,11 @@
         fixedPriceInvoiceItemDao.batchCreateFromTransaction(fixedPriceInvoiceItems,context);
         recordIdList=fixedPriceInvoiceItemDao.getRecordIds(invoice.getId().toString());
         audits.addAll(createAudits(TableName.FIXED_INVOICE_ITEMS,recordIdList));
+        List<InvoiceItem> creditInvoiceItems=invoice.getInvoiceItems(CreditInvoiceItem.class);
+        CreditInvoiceItemSqlDao creditInvoiceItemSqlDao=transactional.become(CreditInvoiceItemSqlDao.class);
+        creditInvoiceItemSqlDao.batchCreateFromTransaction(creditInvoiceItems,context);
+        recordIdList=creditInvoiceItemSqlDao.getRecordIds(invoice.getId().toString());
+        audits.addAll(createAudits(TableName.CREDIT_INVOICE_ITEMS,recordIdList));
         List<InvoicePayment> invoicePayments=invoice.getPayments();
         InvoicePaymentSqlDao invoicePaymentSqlDao=transactional.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);

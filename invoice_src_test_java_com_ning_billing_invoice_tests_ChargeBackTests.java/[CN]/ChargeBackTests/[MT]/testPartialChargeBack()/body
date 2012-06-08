@@ -1,0 +1,7 @@
+{
+  Invoice invoice=createAndPersistInvoice(THIRTY);
+  InvoicePayment payment=createAndPersistPayment(invoice.getId(),THIRTY);
+  invoicePaymentApi.processChargeback(payment.getId(),FIFTEEN,context);
+  BigDecimal amount=invoicePaymentApi.getRemainingAmountPaid(payment.getId());
+  assertTrue(amount.compareTo(FIFTEEN) == 0);
+}

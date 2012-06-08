@@ -11,7 +11,6 @@
   checkODState(BlockingApi.CLEAR_STATE_NAME);
   clock.addDays(15);
   assertTrue(busHandler.isCompleted(DELAY));
-  overdueApi.refreshOverdueStateFor(bundle);
   checkODState(BlockingApi.CLEAR_STATE_NAME);
   busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
   clock.addDays(20);
@@ -19,11 +18,9 @@
   checkODState("OD1");
   clock.addDays(2);
   assertTrue(busHandler.isCompleted(DELAY));
-  overdueApi.refreshOverdueStateFor(bundle);
   checkODState("OD1");
   clock.addDays(8);
   assertTrue(busHandler.isCompleted(DELAY));
-  overdueApi.refreshOverdueStateFor(bundle);
   checkODState("OD2");
   busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
   clock.addDays(10);
@@ -40,6 +37,5 @@
       assertTrue(busHandler.isCompleted(DELAY));
     }
   }
-  overdueApi.refreshOverdueStateFor(bundle);
   checkODState(BlockingApi.CLEAR_STATE_NAME);
 }

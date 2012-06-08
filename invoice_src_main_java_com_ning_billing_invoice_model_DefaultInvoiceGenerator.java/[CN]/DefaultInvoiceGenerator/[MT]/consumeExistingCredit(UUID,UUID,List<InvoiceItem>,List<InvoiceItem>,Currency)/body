@@ -1,0 +1,29 @@
+{
+  BigDecimal totalUnusedCreditAmount=BigDecimal.ZERO;
+  BigDecimal totalAmountOwed=BigDecimal.ZERO;
+  for (  InvoiceItem item : existingItems) {
+    if (item instanceof CreditInvoiceItem) {
+      totalUnusedCreditAmount=totalUnusedCreditAmount.add(item.getAmount());
+    }
+  }
+  for (  InvoiceItem item : proposedItems) {
+    if (item instanceof CreditInvoiceItem) {
+      totalUnusedCreditAmount=totalUnusedCreditAmount.add(item.getAmount());
+    }
+ else {
+      totalAmountOwed=totalAmountOwed.add(item.getAmount());
+    }
+  }
+  BigDecimal creditAmount=BigDecimal.ZERO;
+  if (totalUnusedCreditAmount.compareTo(BigDecimal.ZERO) > 0) {
+    if (totalAmountOwed.abs().compareTo(totalUnusedCreditAmount.abs()) > 0) {
+      creditAmount=totalUnusedCreditAmount.negate();
+    }
+ else {
+      creditAmount=totalAmountOwed;
+    }
+  }
+  if (creditAmount.compareTo(BigDecimal.ZERO) < 0) {
+    proposedItems.add(new CreditInvoiceItem(invoiceId,accountId,clock.getUTCNow(),creditAmount,targetCurrency));
+  }
+}

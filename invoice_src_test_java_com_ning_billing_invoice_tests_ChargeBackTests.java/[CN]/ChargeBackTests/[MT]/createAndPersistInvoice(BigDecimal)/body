@@ -1,0 +1,17 @@
+{
+  Invoice invoice=BrainDeadProxyFactory.createBrainDeadProxyFor(Invoice.class);
+  UUID invoiceId=UUID.randomUUID();
+  UUID accountId=UUID.randomUUID();
+  ZombieControl zombie=(ZombieControl)invoice;
+  zombie.addResult("getId",invoiceId);
+  zombie.addResult("getAccountId",accountId);
+  zombie.addResult("getInvoiceDate",clock.getUTCNow());
+  zombie.addResult("getTargetDate",clock.getUTCNow());
+  zombie.addResult("getCurrency",CURRENCY);
+  zombie.addResult("isMigrationInvoice",false);
+  List<InvoiceItem> items=new ArrayList<InvoiceItem>();
+  items.add(createInvoiceItem(invoiceId,accountId,amount));
+  zombie.addResult("getInvoiceItems",items);
+  invoiceSqlDao.create(invoice,context);
+  return invoice;
+}

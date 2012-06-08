@@ -10,7 +10,7 @@
   Subscription subscription=getZombieSubscription();
   DateTime effectiveDate1=new DateTime(2011,2,1,0,0,0,0);
   BillingEvent event1=createMockBillingEvent(null,subscription,effectiveDate1,plan1,phase1,null,recurringPrice.getPrice(currency),currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"testEvent1",1L,SubscriptionTransitionType.CREATE);
-  BillingEventSet events=new BillingEventSet();
+  BillingEventSet events=new MockBillingEventSet();
   events.add(event1);
   Invoice invoice1=generator.generateInvoice(accountId,events,invoiceList,targetDate,Currency.USD);
   assertEquals(invoice1.getBalance(),TEN);
@@ -28,7 +28,7 @@
   invoiceDao.create(invoice1,context);
   invoiceDao.create(invoice2,context);
   Invoice savedInvoice1=invoiceDao.getById(invoice1.getId());
-  assertEquals(savedInvoice1.getTotalAmount(),ZERO);
+  assertEquals(savedInvoice1.getBalance(),ZERO);
   Invoice savedInvoice2=invoiceDao.getById(invoice2.getId());
-  assertEquals(savedInvoice2.getTotalAmount(),FIFTEEN);
+  assertEquals(savedInvoice2.getBalance(),FIFTEEN);
 }

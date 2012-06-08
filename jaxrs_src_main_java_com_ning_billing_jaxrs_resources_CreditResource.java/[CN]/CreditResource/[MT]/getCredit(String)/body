@@ -1,0 +1,12 @@
+{
+  try {
+    InvoiceItem credit=invoiceUserApi.getCreditById(UUID.fromString(creditId));
+    CreditJson creditJson=new CreditJson(credit);
+    return Response.status(Response.Status.OK).entity(creditJson).build();
+  }
+ catch (  InvoiceApiException e) {
+    final String error=String.format("Failed to locate credit for id %s",creditId);
+    log.info(error,e);
+    return Response.status(Response.Status.NO_CONTENT).build();
+  }
+}

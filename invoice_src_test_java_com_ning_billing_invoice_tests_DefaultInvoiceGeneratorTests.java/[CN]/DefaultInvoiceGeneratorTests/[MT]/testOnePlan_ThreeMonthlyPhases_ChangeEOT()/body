@@ -1,5 +1,5 @@
 {
-  BillingEventSet events=new BillingEventSet();
+  BillingEventSet events=new MockBillingEventSet();
   Plan plan1=new MockPlan();
   BigDecimal rate1=FIVE;
   PlanPhase phase1=createMockMonthlyPlanPhase(rate1);
@@ -19,5 +19,5 @@
   Invoice invoice=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),4);
-  assertEquals(invoice.getTotalAmount(),rate1.add(rate2).add(TWO.multiply(rate3)).setScale(NUMBER_OF_DECIMALS));
+  assertEquals(invoice.getBalance(),rate1.add(rate2).add(TWO.multiply(rate3)).setScale(NUMBER_OF_DECIMALS));
 }
