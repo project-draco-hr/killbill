@@ -12,11 +12,13 @@
     }
   }
   DateTime previousEffectiveTransitionTime=null;
-  final List<BusinessSubscriptionTransition> transitions=dao.getTransitions(transitionKey);
-  if (transitions != null && transitions.size() > 0) {
-    final BusinessSubscriptionTransition lastTransition=transitions.get(transitions.size() - 1);
-    if (lastTransition != null && lastTransition.getNextSubscription() != null) {
-      previousEffectiveTransitionTime=lastTransition.getNextSubscription().getStartDate();
+  if (event.getEventType() != BusinessSubscriptionEvent.EventType.ADD) {
+    final List<BusinessSubscriptionTransition> transitions=dao.getTransitions(transitionKey);
+    if (transitions != null && transitions.size() > 0) {
+      final BusinessSubscriptionTransition lastTransition=transitions.get(transitions.size() - 1);
+      if (lastTransition != null && lastTransition.getNextSubscription() != null) {
+        previousEffectiveTransitionTime=lastTransition.getNextSubscription().getStartDate();
+      }
     }
   }
   final BusinessSubscription prevSubscription;
