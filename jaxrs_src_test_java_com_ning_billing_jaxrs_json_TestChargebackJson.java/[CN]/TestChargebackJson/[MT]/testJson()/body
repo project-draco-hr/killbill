@@ -1,0 +1,17 @@
+{
+  final DateTime requestedDate=new DateTime(DateTimeZone.UTC);
+  final DateTime effectiveDate=new DateTime(DateTimeZone.UTC);
+  final BigDecimal chargebackAmount=BigDecimal.TEN;
+  final String paymentId=UUID.randomUUID().toString();
+  final String reason=UUID.randomUUID().toString();
+  final ChargebackJson chargebackJson=new ChargebackJson(requestedDate,effectiveDate,chargebackAmount,paymentId,reason);
+  Assert.assertEquals(chargebackJson.getRequestedDate(),requestedDate);
+  Assert.assertEquals(chargebackJson.getEffectiveDate(),effectiveDate);
+  Assert.assertEquals(chargebackJson.getChargebackAmount(),chargebackAmount);
+  Assert.assertEquals(chargebackJson.getPaymentId(),paymentId);
+  Assert.assertEquals(chargebackJson.getReason(),reason);
+  final String asJson=mapper.writeValueAsString(chargebackJson);
+  Assert.assertEquals(asJson,"{\"requestedDate\":\"" + chargebackJson.getRequestedDate() + "\","+ "\"effectiveDate\":\""+ chargebackJson.getEffectiveDate()+ "\","+ "\"chargebackAmount\":"+ chargebackJson.getChargebackAmount()+ ","+ "\"paymentId\":\""+ chargebackJson.getPaymentId()+ "\","+ "\"reason\":\""+ chargebackJson.getReason()+ "\"}");
+  final ChargebackJson fromJson=mapper.readValue(asJson,ChargebackJson.class);
+  Assert.assertEquals(fromJson,chargebackJson);
+}
