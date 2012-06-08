@@ -1,0 +1,35 @@
+{
+  final Invoice invoice=Mockito.mock(Invoice.class);
+  Mockito.when(invoice.getAmountCharged()).thenReturn(BigDecimal.TEN);
+  Mockito.when(invoice.getAmountCredited()).thenReturn(BigDecimal.ONE);
+  Mockito.when(invoice.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(invoice.getInvoiceDate()).thenReturn(new DateTime(DateTimeZone.UTC));
+  Mockito.when(invoice.getTargetDate()).thenReturn(new DateTime(DateTimeZone.UTC));
+  Mockito.when(invoice.getInvoiceNumber()).thenReturn(Integer.MAX_VALUE);
+  Mockito.when(invoice.getBalance()).thenReturn(BigDecimal.ZERO);
+  Mockito.when(invoice.getAccountId()).thenReturn(UUID.randomUUID());
+  final InvoiceItem invoiceItem=createInvoiceItem();
+  Mockito.when(invoice.getInvoiceItems()).thenReturn(ImmutableList.<InvoiceItem>of(invoiceItem));
+  final InvoiceJsonWithItems invoiceJsonWithItems=new InvoiceJsonWithItems(invoice);
+  Assert.assertEquals(invoiceJsonWithItems.getAmount(),invoice.getAmountCharged());
+  Assert.assertEquals(invoiceJsonWithItems.getCredit(),invoice.getAmountCredited());
+  Assert.assertEquals(invoiceJsonWithItems.getInvoiceId(),invoice.getId().toString());
+  Assert.assertEquals(invoiceJsonWithItems.getInvoiceDate(),invoice.getInvoiceDate());
+  Assert.assertEquals(invoiceJsonWithItems.getTargetDate(),invoice.getTargetDate());
+  Assert.assertEquals(invoiceJsonWithItems.getInvoiceNumber(),String.valueOf(invoice.getInvoiceNumber()));
+  Assert.assertEquals(invoiceJsonWithItems.getBalance(),invoice.getBalance());
+  Assert.assertEquals(invoiceJsonWithItems.getAccountId(),invoice.getAccountId().toString());
+  Assert.assertEquals(invoiceJsonWithItems.getItems().size(),1);
+  final InvoiceItemJsonSimple invoiceItemJsonSimple=invoiceJsonWithItems.getItems().get(0);
+  Assert.assertEquals(invoiceItemJsonSimple.getInvoiceId(),invoiceItem.getInvoiceId());
+  Assert.assertEquals(invoiceItemJsonSimple.getAccountId(),invoiceItem.getAccountId());
+  Assert.assertEquals(invoiceItemJsonSimple.getBundleId(),invoiceItem.getBundleId());
+  Assert.assertEquals(invoiceItemJsonSimple.getSubscriptionId(),invoiceItem.getSubscriptionId());
+  Assert.assertEquals(invoiceItemJsonSimple.getPlanName(),invoiceItem.getPlanName());
+  Assert.assertEquals(invoiceItemJsonSimple.getPhaseName(),invoiceItem.getPhaseName());
+  Assert.assertEquals(invoiceItemJsonSimple.getDescription(),invoiceItem.getDescription());
+  Assert.assertEquals(invoiceItemJsonSimple.getStartDate(),invoiceItem.getStartDate());
+  Assert.assertEquals(invoiceItemJsonSimple.getEndDate(),invoiceItem.getEndDate());
+  Assert.assertEquals(invoiceItemJsonSimple.getAmount(),invoiceItem.getAmount());
+  Assert.assertEquals(invoiceItemJsonSimple.getCurrency(),invoiceItem.getCurrency());
+}
