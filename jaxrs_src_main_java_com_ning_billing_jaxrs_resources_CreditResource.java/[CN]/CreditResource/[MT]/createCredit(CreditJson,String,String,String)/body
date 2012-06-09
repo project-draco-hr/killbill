@@ -1,0 +1,24 @@
+{
+  final UUID accountId=json.getAccountId();
+  if (accountId == null) {
+    return Response.status(Response.Status.BAD_REQUEST).entity("AccountId cannot be null").build();
+  }
+  try {
+    final Account account=accountUserApi.getAccountById(accountId);
+    final InvoiceItem credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),json.getEffectiveDate(),account.getCurrency(),context.createContext(createdBy,reason,comment));
+    return uriBuilder.buildResponse(CreditResource.class,"getCredit",credit.getId());
+  }
+ catch (  InvoiceApiException e) {
+    final String error=String.format("Failed to create credit %s",json);
+    log.info(error,e);
+    return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+  }
+catch (  IllegalArgumentException e) {
+    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+catch (  AccountApiException e) {
+    final String error=String.format("Failed to create credit %s",json);
+    log.info(error,e);
+    return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+  }
+}

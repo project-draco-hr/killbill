@@ -15,7 +15,7 @@
     List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentAttemptId(paymentAttemptId);
     List<ChargebackJson> chargebacksJson=convertToJson(chargebacks);
     String accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(UUID.fromString(paymentId)).toString();
-    ChargebackCollectionJson json=new ChargebackCollectionJson(accountId,chargebacksJson);
+    final ChargebackCollectionJson json=new ChargebackCollectionJson(accountId,chargebacksJson);
     return Response.status(Response.Status.OK).entity(json).build();
   }
  catch (  PaymentApiException e) {

@@ -1,0 +1,11 @@
+{
+  final String bundleId=UUID.randomUUID().toString();
+  final String externalKey=UUID.randomUUID().toString();
+  final BundleJsonSimple bundleJsonSimple=new BundleJsonSimple(bundleId,externalKey);
+  Assert.assertEquals(bundleJsonSimple.getBundleId(),bundleId);
+  Assert.assertEquals(bundleJsonSimple.getExternalKey(),externalKey);
+  final String asJson=mapper.writeValueAsString(bundleJsonSimple);
+  Assert.assertEquals(asJson,"{\"bundleId\":\"" + bundleJsonSimple.getBundleId() + "\","+ "\"externalKey\":\""+ bundleJsonSimple.getExternalKey()+ "\"}");
+  final BundleJsonSimple fromJson=mapper.readValue(asJson,BundleJsonSimple.class);
+  Assert.assertEquals(fromJson,bundleJsonSimple);
+}

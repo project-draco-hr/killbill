@@ -3,7 +3,7 @@
   final FixedPriceInvoiceItem invoiceItem=new FixedPriceInvoiceItem(UUID.randomUUID(),invoice.getId(),account.getId(),UUID.randomUUID(),UUID.randomUUID(),"somePlan","somePhase",clock.getUTCNow(),clock.getUTCNow().plusDays(1),INVOICE_AMOUNT,ACCOUNT_CURRENCY);
   invoice.addInvoiceItem(invoiceItem);
   invoiceDao.create(invoice,context);
-  List<Invoice> invoices=invoiceDao.getInvoicesByAccount(account.getId());
+  final List<Invoice> invoices=invoiceDao.getInvoicesByAccount(account.getId());
   Assert.assertEquals(invoices.size(),1);
   Assert.assertEquals(invoices.get(0).getInvoiceItems().size(),1);
   invoiceCreationNotification=new DefaultInvoiceCreationEvent(invoice.getId(),account.getId(),INVOICE_AMOUNT,ACCOUNT_CURRENCY,clock.getUTCNow(),null);

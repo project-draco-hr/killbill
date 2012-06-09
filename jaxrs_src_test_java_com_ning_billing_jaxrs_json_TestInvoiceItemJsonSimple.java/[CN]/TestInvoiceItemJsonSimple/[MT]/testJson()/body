@@ -1,0 +1,29 @@
+{
+  final UUID invoiceId=UUID.randomUUID();
+  final UUID accountId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final UUID subscriptionId=UUID.randomUUID();
+  final String planName=UUID.randomUUID().toString();
+  final String phaseName=UUID.randomUUID().toString();
+  final String description=UUID.randomUUID().toString();
+  final DateTime startDate=new DateTime(DateTimeZone.UTC);
+  final DateTime endDate=new DateTime(DateTimeZone.UTC);
+  final BigDecimal amount=BigDecimal.TEN;
+  final Currency currency=Currency.MXN;
+  final InvoiceItemJsonSimple invoiceItemJsonSimple=new InvoiceItemJsonSimple(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,description,startDate,endDate,amount,currency);
+  Assert.assertEquals(invoiceItemJsonSimple.getInvoiceId(),invoiceId);
+  Assert.assertEquals(invoiceItemJsonSimple.getAccountId(),accountId);
+  Assert.assertEquals(invoiceItemJsonSimple.getBundleId(),bundleId);
+  Assert.assertEquals(invoiceItemJsonSimple.getSubscriptionId(),subscriptionId);
+  Assert.assertEquals(invoiceItemJsonSimple.getPlanName(),planName);
+  Assert.assertEquals(invoiceItemJsonSimple.getPhaseName(),phaseName);
+  Assert.assertEquals(invoiceItemJsonSimple.getDescription(),description);
+  Assert.assertEquals(invoiceItemJsonSimple.getStartDate(),startDate);
+  Assert.assertEquals(invoiceItemJsonSimple.getEndDate(),endDate);
+  Assert.assertEquals(invoiceItemJsonSimple.getAmount(),amount);
+  Assert.assertEquals(invoiceItemJsonSimple.getCurrency(),currency);
+  final String asJson=mapper.writeValueAsString(invoiceItemJsonSimple);
+  Assert.assertEquals(asJson,"{\"invoiceId\":\"" + invoiceItemJsonSimple.getInvoiceId().toString() + "\","+ "\"accountId\":\""+ invoiceItemJsonSimple.getAccountId().toString()+ "\","+ "\"bundleId\":\""+ invoiceItemJsonSimple.getBundleId().toString()+ "\","+ "\"subscriptionId\":\""+ invoiceItemJsonSimple.getSubscriptionId().toString()+ "\","+ "\"planName\":\""+ invoiceItemJsonSimple.getPlanName()+ "\","+ "\"phaseName\":\""+ invoiceItemJsonSimple.getPhaseName()+ "\","+ "\"description\":\""+ invoiceItemJsonSimple.getDescription()+ "\","+ "\"startDate\":\""+ invoiceItemJsonSimple.getStartDate().toDateTimeISO().toString()+ "\","+ "\"endDate\":\""+ invoiceItemJsonSimple.getEndDate().toDateTimeISO().toString()+ "\","+ "\"amount\":"+ invoiceItemJsonSimple.getAmount().toString()+ ","+ "\"currency\":\""+ invoiceItemJsonSimple.getCurrency().toString()+ "\"}");
+  final InvoiceItemJsonSimple fromJson=mapper.readValue(asJson,InvoiceItemJsonSimple.class);
+  Assert.assertEquals(fromJson,invoiceItemJsonSimple);
+}

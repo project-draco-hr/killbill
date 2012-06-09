@@ -1,0 +1,23 @@
+{
+  final Product product=Mockito.mock(Product.class);
+  Mockito.when(product.getName()).thenReturn(UUID.randomUUID().toString());
+  final InternationalPrice price=Mockito.mock(InternationalPrice.class);
+  final PlanPhase planPhase=Mockito.mock(PlanPhase.class);
+  Mockito.when(planPhase.getRecurringPrice()).thenReturn(price);
+  final Plan plan=Mockito.mock(Plan.class);
+  Mockito.when(plan.getProduct()).thenReturn(product);
+  Mockito.when(plan.getName()).thenReturn(UUID.randomUUID().toString());
+  Mockito.when(plan.getBillingPeriod()).thenReturn(BillingPeriod.QUARTERLY);
+  Mockito.when(plan.getFinalPhase()).thenReturn(planPhase);
+  final PriceList priceList=Mockito.mock(PriceList.class);
+  Mockito.when(priceList.getName()).thenReturn(UUID.randomUUID().toString());
+  final Listing listing=Mockito.mock(Listing.class);
+  Mockito.when(listing.getPlan()).thenReturn(plan);
+  Mockito.when(listing.getPriceList()).thenReturn(priceList);
+  final PlanDetailJason planDetailJason=new PlanDetailJason(listing);
+  Assert.assertEquals(planDetailJason.getProductName(),plan.getProduct().getName());
+  Assert.assertEquals(planDetailJason.getPlanName(),plan.getName());
+  Assert.assertEquals(planDetailJason.getBillingPeriod(),plan.getBillingPeriod());
+  Assert.assertEquals(planDetailJason.getPriceListName(),priceList.getName());
+  Assert.assertEquals(planDetailJason.getFinalPhasePrice(),plan.getFinalPhase().getRecurringPrice());
+}

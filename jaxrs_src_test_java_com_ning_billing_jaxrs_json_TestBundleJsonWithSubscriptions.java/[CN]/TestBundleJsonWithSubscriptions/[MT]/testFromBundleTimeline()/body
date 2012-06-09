@@ -1,0 +1,29 @@
+{
+  final SubscriptionTimeline.ExistingEvent event=Mockito.mock(SubscriptionTimeline.ExistingEvent.class);
+  final DateTime effectiveDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
+  final UUID eventId=UUID.randomUUID();
+  final PlanPhaseSpecifier planPhaseSpecifier=new PlanPhaseSpecifier(UUID.randomUUID().toString(),ProductCategory.BASE,BillingPeriod.NO_BILLING_PERIOD,UUID.randomUUID().toString(),PhaseType.EVERGREEN);
+  Mockito.when(event.getEffectiveDate()).thenReturn(effectiveDate);
+  Mockito.when(event.getEventId()).thenReturn(eventId);
+  Mockito.when(event.getSubscriptionTransitionType()).thenReturn(SubscriptionTransitionType.CREATE);
+  Mockito.when(event.getPlanPhaseSpecifier()).thenReturn(planPhaseSpecifier);
+  final SubscriptionTimeline subscriptionTimeline=Mockito.mock(SubscriptionTimeline.class);
+  Mockito.when(subscriptionTimeline.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(subscriptionTimeline.getExistingEvents()).thenReturn(ImmutableList.<SubscriptionTimeline.ExistingEvent>of(event));
+  final BundleTimeline bundleTimeline=Mockito.mock(BundleTimeline.class);
+  final UUID bundleId=UUID.randomUUID();
+  final String externalKey=UUID.randomUUID().toString();
+  Mockito.when(bundleTimeline.getBundleId()).thenReturn(bundleId);
+  Mockito.when(bundleTimeline.getExternalKey()).thenReturn(externalKey);
+  Mockito.when(bundleTimeline.getSubscriptions()).thenReturn(ImmutableList.<SubscriptionTimeline>of(subscriptionTimeline));
+  final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=new BundleJsonWithSubscriptions(null,bundleTimeline);
+  Assert.assertEquals(bundleJsonWithSubscriptions.getBundleId(),bundleId.toString());
+  Assert.assertEquals(bundleJsonWithSubscriptions.getExternalKey(),externalKey);
+  Assert.assertEquals(bundleJsonWithSubscriptions.getSubscriptions().size(),1);
+  final SubscriptionJsonWithEvents events=bundleJsonWithSubscriptions.getSubscriptions().get(0);
+  Assert.assertNull(events.getDeletedEvents());
+  Assert.assertNull(events.getNewEvents());
+  Assert.assertEquals(events.getEvents().size(),1);
+  Assert.assertEquals(events.getEvents().get(0).getEffectiveDate(),DefaultClock.toUTCDateTime(effectiveDate));
+  Assert.assertEquals(events.getEvents().get(0).getEventId(),eventId.toString());
+}
