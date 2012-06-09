@@ -1,5 +1,5 @@
 {
-  UUID paymentAttemptId=null;
+  final UUID paymentAttemptId;
   try {
     paymentAttemptId=paymentApi.getPaymentAttemptIdFromPaymentId(UUID.fromString(paymentId));
   }
@@ -8,11 +8,11 @@
     log.info(error,e);
     return Response.status(Response.Status.NO_CONTENT).build();
   }
-  List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentAttemptId(paymentAttemptId);
-  List<ChargebackJson> chargebacksJson=convertToJson(chargebacks);
+  final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentAttemptId(paymentAttemptId);
+  final List<ChargebackJson> chargebacksJson=convertToJson(chargebacks);
   try {
-    String accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(UUID.fromString(paymentId)).toString();
-    ChargebackCollectionJson json=new ChargebackCollectionJson(accountId,chargebacksJson);
+    final String accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(UUID.fromString(paymentId)).toString();
+    final ChargebackCollectionJson json=new ChargebackCollectionJson(accountId,chargebacksJson);
     return Response.status(Response.Status.OK).entity(json).build();
   }
  catch (  InvoiceApiException e) {

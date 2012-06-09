@@ -1,8 +1,8 @@
 {
   try {
-    Account account=accountUserApi.getAccountById(UUID.fromString(accountId));
-    InvoiceItem credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),json.getEffectiveDate(),account.getCurrency(),context.createContext(createdBy,reason,comment));
-    return uriBuilder.buildResponse(ChargebackResource.class,"getCredit",credit.getId());
+    final Account account=accountUserApi.getAccountById(UUID.fromString(accountId));
+    final InvoiceItem credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),json.getEffectiveDate(),account.getCurrency(),context.createContext(createdBy,reason,comment));
+    return uriBuilder.buildResponse(CreditResource.class,"getCredit",credit.getId());
   }
  catch (  InvoiceApiException e) {
     final String error=String.format("Failed to create credit %s",json);
