@@ -1,0 +1,21 @@
+{
+  try {
+    PaymentMethod data=json.toPaymentMethod();
+    Account account=accountApi.getAccountById(data.getAccountId());
+    paymentApi.addPaymentMethod(data.getPluginName(),account,isDefault,data.getPluginDetail(),context.createContext(createdBy,reason,comment));
+    return uriBuilder.buildResponse(AccountResource.class,"getPaymentMethods",account.getId());
+  }
+ catch (  AccountApiException e) {
+    final String error=String.format("Failed to create account %s",json);
+    log.info(error,e);
+    return Response.status(Status.BAD_REQUEST).entity(error).build();
+  }
+catch (  PaymentApiException e) {
+    final String error=String.format("Failed to create payment Method  %s",json);
+    log.info(error,e);
+    return Response.status(Status.BAD_REQUEST).entity(error).build();
+  }
+catch (  IllegalArgumentException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+}

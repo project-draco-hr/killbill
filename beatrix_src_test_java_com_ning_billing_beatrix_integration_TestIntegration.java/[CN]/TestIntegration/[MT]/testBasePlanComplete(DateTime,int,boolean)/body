@@ -1,9 +1,7 @@
 {
   log.info("Beginning test with BCD of " + billingDay);
-  AccountData accountData=getAccountData(billingDay);
-  Account account=accountUserApi.createAccount(accountData,null,null,context);
+  Account account=createAccountWithPaymentMethod(getAccountData(billingDay));
   UUID accountId=account.getId();
-  assertNotNull(account);
   clock.setDeltaFromReality(initialCreationDate.getMillis() - clock.getUTCNow().getMillis());
   SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",context);
   String productName="Shotgun";
