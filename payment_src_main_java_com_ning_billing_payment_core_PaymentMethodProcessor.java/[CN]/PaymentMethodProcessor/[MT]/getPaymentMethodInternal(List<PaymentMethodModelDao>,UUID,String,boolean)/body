@@ -3,11 +3,11 @@
   PaymentPluginApi pluginApi=null;
   try {
     List<PaymentMethodPlugin> pluginDetails=null;
-    if (withPluginDetail) {
-      pluginApi=getPaymentProviderPlugin(accountKey);
-      pluginDetails=pluginApi.getPaymentMethodDetails(accountKey);
-    }
     for (    PaymentMethodModelDao cur : paymentMethodModels) {
+      if (withPluginDetail) {
+        pluginApi=pluginRegistry.getPlugin(cur.getPluginName());
+        pluginDetails=pluginApi.getPaymentMethodDetails(accountKey);
+      }
       PaymentMethod pm=new DefaultPaymentMethod(cur,getPaymentMethodDetail(pluginDetails,cur.getExternalId()));
       result.add(pm);
     }
