@@ -1,5 +1,7 @@
 {
-  final CreditJson input=new CreditJson(BigDecimal.TEN,UUID.randomUUID(),UUID.randomUUID().toString(),new DateTime(DateTimeZone.UTC),new DateTime(DateTimeZone.UTC),UUID.randomUUID().toString());
+  final DateTime requestedDate=DefaultClock.truncateMs(new DateTime(DateTimeZone.UTC));
+  final DateTime effectiveDate=DefaultClock.truncateMs(new DateTime(DateTimeZone.UTC));
+  final CreditJson input=new CreditJson(BigDecimal.TEN,UUID.randomUUID(),UUID.randomUUID().toString(),requestedDate,effectiveDate,UUID.randomUUID().toString(),UUID.fromString(accountJson.getAccountId()));
   final String jsonInput=mapper.writeValueAsString(input);
   Response response=doPost(JaxrsResource.CREDITS_PATH,jsonInput,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.CREATED.getStatusCode(),response.getResponseBody());
@@ -8,6 +10,7 @@
   response=doGetWithUrl(location,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
   final CreditJson objFromJson=mapper.readValue(response.getResponseBody(),CreditJson.class);
-  assertNotNull(objFromJson);
-  assertEquals(objFromJson,input);
+  assertEquals(objFromJson.getAccountId(),input.getAccountId());
+  assertEquals(objFromJson.getCreditAmount().compareTo(input.getCreditAmount()),0);
+  assertEquals(objFromJson.getEffectiveDate().compareTo(input.getEffectiveDate()),0);
 }
