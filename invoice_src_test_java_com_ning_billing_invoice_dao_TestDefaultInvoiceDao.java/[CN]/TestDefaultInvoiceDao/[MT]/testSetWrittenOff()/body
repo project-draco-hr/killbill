@@ -1,0 +1,10 @@
+{
+  final UUID invoiceId=UUID.randomUUID();
+  final Map<String,Tag> beforeTags=tagUserApi.getTags(invoiceId,ObjectType.INVOICE);
+  Assert.assertEquals(beforeTags.keySet().size(),0);
+  dao.setWrittenOff(invoiceId,Mockito.mock(CallContext.class));
+  final Map<String,Tag> afterTags=tagUserApi.getTags(invoiceId,ObjectType.INVOICE);
+  Assert.assertEquals(afterTags.keySet().size(),1);
+  final String name=ControlTagType.WRITTEN_OFF.toTagDefinition().getName();
+  Assert.assertEquals(afterTags.get(name).getTagDefinitionName(),name);
+}

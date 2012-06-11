@@ -1,31 +1,31 @@
 {
   invoiceSqlDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
     @Override public Void inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
-      Invoice currentInvoice=transactional.getById(invoice.getId().toString());
+      final Invoice currentInvoice=transactional.getById(invoice.getId().toString());
       if (currentInvoice == null) {
-        List<EntityAudit> audits=new ArrayList<EntityAudit>();
+        final List<EntityAudit> audits=new ArrayList<EntityAudit>();
         transactional.create(invoice,context);
-        Long recordId=transactional.getRecordId(invoice.getId().toString());
+        final Long recordId=transactional.getRecordId(invoice.getId().toString());
         audits.add(new EntityAudit(TableName.INVOICES,recordId,ChangeType.INSERT));
         List<Long> recordIdList;
-        List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
-        RecurringInvoiceItemSqlDao recurringInvoiceItemDao=transactional.become(RecurringInvoiceItemSqlDao.class);
+        final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
+        final RecurringInvoiceItemSqlDao recurringInvoiceItemDao=transactional.become(RecurringInvoiceItemSqlDao.class);
         recurringInvoiceItemDao.batchCreateFromTransaction(recurringInvoiceItems,context);
         recordIdList=recurringInvoiceItemDao.getRecordIds(invoice.getId().toString());
         audits.addAll(createAudits(TableName.RECURRING_INVOICE_ITEMS,recordIdList));
         notifyOfFutureBillingEvents(transactional,recurringInvoiceItems);
-        List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
-        FixedPriceInvoiceItemSqlDao fixedPriceInvoiceItemDao=transactional.become(FixedPriceInvoiceItemSqlDao.class);
+        final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
+        final FixedPriceInvoiceItemSqlDao fixedPriceInvoiceItemDao=transactional.become(FixedPriceInvoiceItemSqlDao.class);
         fixedPriceInvoiceItemDao.batchCreateFromTransaction(fixedPriceInvoiceItems,context);
         recordIdList=fixedPriceInvoiceItemDao.getRecordIds(invoice.getId().toString());
         audits.addAll(createAudits(TableName.FIXED_INVOICE_ITEMS,recordIdList));
-        List<InvoiceItem> creditInvoiceItems=invoice.getInvoiceItems(CreditInvoiceItem.class);
-        CreditInvoiceItemSqlDao creditInvoiceItemSqlDao=transactional.become(CreditInvoiceItemSqlDao.class);
+        final List<InvoiceItem> creditInvoiceItems=invoice.getInvoiceItems(CreditInvoiceItem.class);
+        final CreditInvoiceItemSqlDao creditInvoiceItemSqlDao=transactional.become(CreditInvoiceItemSqlDao.class);
         creditInvoiceItemSqlDao.batchCreateFromTransaction(creditInvoiceItems,context);
         recordIdList=creditInvoiceItemSqlDao.getRecordIds(invoice.getId().toString());
         audits.addAll(createAudits(TableName.CREDIT_INVOICE_ITEMS,recordIdList));
-        List<InvoicePayment> invoicePayments=invoice.getPayments();
-        InvoicePaymentSqlDao invoicePaymentSqlDao=transactional.become(InvoicePaymentSqlDao.class);
+        final List<InvoicePayment> invoicePayments=invoice.getPayments();
+        final InvoicePaymentSqlDao invoicePaymentSqlDao=transactional.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);
         recordIdList=invoicePaymentSqlDao.getRecordIds(invoice.getId().toString());
         audits.addAll(createAudits(TableName.INVOICE_PAYMENTS,recordIdList));

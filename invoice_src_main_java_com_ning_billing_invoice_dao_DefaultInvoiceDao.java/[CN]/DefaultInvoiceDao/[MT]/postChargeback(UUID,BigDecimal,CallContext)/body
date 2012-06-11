@@ -1,5 +1,5 @@
 {
-  InvoicePayment payment=invoicePaymentSqlDao.getById(invoicePaymentId.toString());
+  final InvoicePayment payment=invoicePaymentSqlDao.getById(invoicePaymentId.toString());
   if (payment == null) {
     throw new InvoiceApiException(ErrorCode.INVOICE_PAYMENT_NOT_FOUND,invoicePaymentId.toString());
   }
@@ -7,7 +7,7 @@
     if (amount.compareTo(BigDecimal.ZERO) < 0) {
       throw new InvoiceApiException(ErrorCode.CHARGE_BACK_AMOUNT_IS_NEGATIVE);
     }
-    InvoicePayment chargeBack=payment.asChargeBack(amount,context.getCreatedDate());
+    final InvoicePayment chargeBack=payment.asChargeBack(amount,context.getCreatedDate());
     invoicePaymentSqlDao.create(chargeBack,context);
   }
 }
