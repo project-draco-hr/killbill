@@ -2,12 +2,6 @@
   final Account account=new DefaultAccount(data);
   try {
     accountDao.create(account,context);
-    if (tagDefinitions != null) {
-      tagDao.insertTags(account.getId(),ObjectType.ACCOUNT,tagDefinitions,context);
-    }
-    if (fields != null) {
-      customFieldDao.saveEntities(account.getId(),ObjectType.ACCOUNT,fields,context);
-    }
   }
  catch (  EntityPersistenceException e) {
     throw new AccountApiException(e,ErrorCode.ACCOUNT_CREATION_FAILED);

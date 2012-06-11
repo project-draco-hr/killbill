@@ -20,10 +20,7 @@
   final boolean isMigrated=true;
   final boolean isNotifiedForInvoices=false;
   final AccountData data=new DefaultAccount(id,externalKey,email,name,firstNameLength,currency,billCycleDay,paymentMethodId,timeZone,locale,address1,address2,companyName,city,stateOrProvince,country,postalCode,phone,isMigrated,isNotifiedForInvoices);
-  final String tagName=UUID.randomUUID().toString();
-  final String tagDescription=UUID.randomUUID().toString();
-  final TagDefinition tagDefinition=new DefaultTagDefinition(tagName,tagDescription,true);
-  accountUserApi.createAccount(data,null,ImmutableList.<TagDefinition>of(tagDefinition),callContext);
+  accountUserApi.createAccount(data,callContext);
   final Account account=accountDao.getAccountByKey(externalKey);
   Assert.assertEquals(account.getExternalKey(),externalKey);
   Assert.assertEquals(account.getEmail(),email);
@@ -44,7 +41,4 @@
   Assert.assertEquals(account.getPhone(),phone);
   Assert.assertEquals(account.isMigrated(),isMigrated);
   Assert.assertEquals(account.isNotifiedForInvoices(),isNotifiedForInvoices);
-  final Map<String,Tag> tags=tagDao.loadEntities(account.getId(),ObjectType.ACCOUNT);
-  Assert.assertEquals(tags.keySet().size(),1);
-  Assert.assertEquals(tags.get(tagName).getTagDefinitionName(),tagName);
 }
