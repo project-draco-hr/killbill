@@ -1,0 +1,19 @@
+{
+  try {
+    Account account=accountApi.getAccountById(UUID.fromString(payment.getAccountId()));
+    paymentApi.createPayment(account,UUID.fromString(payment.getInvoiceId()),null,context.createContext(createdBy,reason,comment));
+    Response response=uriBuilder.buildResponse(InvoiceResource.class,"getPayments",payment.getInvoiceId());
+    return response;
+  }
+ catch (  PaymentApiException e) {
+    final String error=String.format("Failed to create payment %s",e.getMessage());
+    return Response.status(Status.BAD_REQUEST).entity(error).build();
+  }
+catch (  AccountApiException e) {
+    final String error=String.format("Failed to create payment, can't find account %s",payment.getAccountId());
+    return Response.status(Status.BAD_REQUEST).entity(error).build();
+  }
+catch (  IllegalArgumentException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+}

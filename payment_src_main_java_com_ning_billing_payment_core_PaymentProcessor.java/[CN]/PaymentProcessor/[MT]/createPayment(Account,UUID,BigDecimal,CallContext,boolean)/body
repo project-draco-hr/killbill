@@ -1,0 +1,26 @@
+{
+  final PaymentPluginApi plugin=getPaymentProviderPlugin(account);
+  try {
+    return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
+      @Override public Payment doOperation() throws PaymentApiException {
+        final Invoice invoice=invoicePaymentApi.getInvoice(invoiceId);
+        if (invoice.isMigrationInvoice()) {
+          log.error("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
+          return null;
+        }
+        BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
+        return processNewPaymentWithAccountLocked(plugin,account,invoice,requestedAmount,isInstantPayment,context);
+      }
+    }
+));
+  }
+ catch (  TimeoutException e) {
+    if (isInstantPayment) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,account.getId(),invoiceId);
+    }
+ else {
+      log.warn(String.format("Payment from Account %s, Invoice %s timedout",account.getId(),invoiceId));
+      return null;
+    }
+  }
+}

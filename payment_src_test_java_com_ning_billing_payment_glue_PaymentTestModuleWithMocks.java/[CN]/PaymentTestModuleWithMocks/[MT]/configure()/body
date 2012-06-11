@@ -1,0 +1,10 @@
+{
+  loadSystemPropertiesFromClasspath("/payment.properties");
+  super.configure();
+  install(new BusModule(BusType.MEMORY));
+  install(new MockNotificationQueueModule());
+  install(new MockInvoiceModule());
+  install(new TestDbiModule());
+  install(new TagStoreModule());
+  bind(GlobalLocker.class).to(MockGlobalLocker.class).asEagerSingleton();
+}

@@ -1,0 +1,11 @@
+{
+  return paymentAttemptSqlDao.inTransaction(new Transaction<PaymentAttemptModelDao,PaymentAttemptSqlDao>(){
+    @Override public PaymentAttemptModelDao inTransaction(    PaymentAttemptSqlDao transactional,    TransactionStatus status) throws Exception {
+      PaymentAttemptModelDao savedAttempt=insertPaymentAttemptFromTransaction(attempt,context,transactional);
+      PaymentSqlDao transPaymentSqlDao=transactional.become(PaymentSqlDao.class);
+      updatePaymentAmountFromTransaction(paymentId,savedAttempt.getRequestedAmount(),context,transPaymentSqlDao);
+      return savedAttempt;
+    }
+  }
+);
+}

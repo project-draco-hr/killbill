@@ -1,0 +1,19 @@
+{
+  AccountJson input=createAccount(name,key,email);
+  final String uri=JaxrsResource.ACCOUNTS_PATH + "/" + input.getAccountId()+ "/"+ JaxrsResource.PAYMENT_METHODS;
+  PaymentMethodJson paymentMethodJson=getPaymentJson(input.getAccountId());
+  String baseJson=mapper.writeValueAsString(paymentMethodJson);
+  Map<String,String> queryParams=new HashMap<String,String>();
+  queryParams.put(JaxrsResource.QUERY_PAYMENT_METHOD_IS_DEFAULT,"true");
+  Response response=doPost(uri,baseJson,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
+  queryParams=new HashMap<String,String>();
+  queryParams.put(JaxrsResource.QUERY_EXTERNAL_KEY,input.getExternalKey());
+  response=doGet(JaxrsResource.ACCOUNTS_PATH,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  AccountJson objFromJson=mapper.readValue(baseJson,AccountJson.class);
+  Assert.assertNotNull(objFromJson);
+  Assert.assertNotNull(objFromJson.getPaymentMethodId());
+  return objFromJson;
+}

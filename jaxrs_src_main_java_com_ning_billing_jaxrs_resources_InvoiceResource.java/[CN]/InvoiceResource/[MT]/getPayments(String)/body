@@ -1,0 +1,13 @@
+{
+  try {
+    List<Payment> payments=paymentApi.getInvoicePayments(UUID.fromString(invoiceId));
+    List<PaymentJsonSimple> result=new ArrayList<PaymentJsonSimple>(payments.size());
+    for (    Payment cur : payments) {
+      result.add(new PaymentJsonSimple(cur));
+    }
+    return Response.status(Status.OK).entity(result).build();
+  }
+ catch (  PaymentApiException e) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+}

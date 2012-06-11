@@ -1,0 +1,19 @@
+{
+  List<PaymentMethod> result=new ArrayList<PaymentMethod>(paymentMethodModels.size());
+  PaymentPluginApi pluginApi=null;
+  try {
+    List<PaymentMethodPlugin> pluginDetails=null;
+    for (    PaymentMethodModelDao cur : paymentMethodModels) {
+      if (withPluginDetail) {
+        pluginApi=pluginRegistry.getPlugin(cur.getPluginName());
+        pluginDetails=pluginApi.getPaymentMethodDetails(accountKey);
+      }
+      PaymentMethod pm=new DefaultPaymentMethod(cur,getPaymentMethodDetail(pluginDetails,cur.getExternalId()));
+      result.add(pm);
+    }
+  }
+ catch (  PaymentPluginApiException e) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_GET_PAYMENT_METHODS,accountId,e.getErrorMessage());
+  }
+  return result;
+}

@@ -1,0 +1,16 @@
+{
+  if (allAttempts == null || allAttempts.size() == 0) {
+    return 0;
+  }
+  return Collections2.filter(allAttempts,new Predicate<PaymentAttemptModelDao>(){
+    @Override public boolean apply(    PaymentAttemptModelDao input){
+      for (      PaymentStatus cur : statuses) {
+        if (input.getPaymentStatus() == cur) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+).size();
+}

@@ -1,0 +1,10 @@
+{
+  PaymentPluginApi pluginApi=null;
+  try {
+    pluginApi=pluginRegistry.getPlugin(pluginName);
+    return pluginApi.createPaymentProviderAccount(account);
+  }
+ catch (  PaymentPluginApiException e) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_ACCOUNT_INIT,account.getId(),pluginApi != null ? pluginApi.getName() : null,e.getErrorMessage());
+  }
+}

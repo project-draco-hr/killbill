@@ -1,0 +1,49 @@
+{
+  BusEvent event=null;
+  List<PaymentAttemptModelDao> allAttempts=null;
+  PaymentAttemptModelDao lastAttempt=null;
+  PaymentModelDao payment=null;
+  PaymentStatus paymentStatus=PaymentStatus.UNKNOWN;
+  try {
+    PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(account.getExternalKey(),paymentInput.getId(),attemptInput.getRequestedAmount());
+switch (paymentPluginInfo.getStatus()) {
+case PROCESSED:
+      paymentStatus=PaymentStatus.SUCCESS;
+    paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,null,attemptInput.getId(),context);
+  allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId());
+lastAttempt=allAttempts.get(allAttempts.size() - 1);
+payment=paymentDao.getPayment(paymentInput.getId());
+invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),paymentStatus == PaymentStatus.SUCCESS ? payment.getAmount() : null,paymentStatus == PaymentStatus.SUCCESS ? payment.getCurrency() : null,lastAttempt.getId(),lastAttempt.getEffectiveDate(),context);
+event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,context.getUserToken(),payment.getEffectiveDate());
+break;
+case ERROR:
+if (!isInstantPayment) {
+allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId());
+final int retryAttempt=getNumberAttemptsInState(paymentInput.getId(),allAttempts,PaymentStatus.UNKNOWN,PaymentStatus.PAYMENT_FAILURE);
+final boolean isScheduledForRetry=failedPaymentRetryService.scheduleRetry(paymentInput.getId(),retryAttempt);
+paymentStatus=isScheduledForRetry ? PaymentStatus.PAYMENT_FAILURE : PaymentStatus.PAYMENT_FAILURE_ABORTED;
+}
+ else {
+paymentStatus=PaymentStatus.PAYMENT_FAILURE_ABORTED;
+}
+paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,paymentPluginInfo.getGatewayError(),attemptInput.getId(),context);
+log.info(String.format("Could not process payment for account %s, invoice %s, error = %s",account.getId(),invoice.getId(),paymentPluginInfo.getGatewayError()));
+event=new DefaultPaymentErrorEvent(account.getId(),invoice.getId(),paymentInput.getId(),paymentPluginInfo.getGatewayError(),context.getUserToken());
+throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),paymentPluginInfo.getGatewayError());
+default :
+String formatError=String.format("Plugin return status %s for payment %s",paymentPluginInfo.getStatus(),paymentInput.getId());
+throw new PaymentPluginApiException("",formatError);
+}
+}
+ catch (PaymentPluginApiException e) {
+paymentStatus=isInstantPayment ? PaymentStatus.PAYMENT_FAILURE_ABORTED : scheduleRetryOnPluginFailure(paymentInput.getId());
+paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,e.getMessage(),attemptInput.getId(),context);
+throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),e.getMessage());
+}
+ finally {
+if (event != null) {
+postPaymentEvent(event,account.getId());
+}
+}
+return new DefaultPayment(payment,allAttempts);
+}

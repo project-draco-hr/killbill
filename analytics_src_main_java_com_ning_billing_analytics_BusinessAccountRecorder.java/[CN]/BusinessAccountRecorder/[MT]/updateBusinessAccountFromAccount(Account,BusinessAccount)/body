@@ -17,25 +17,18 @@
         }
       }
       DateTime lastPaymentDate=null;
-      final List<PaymentInfoEvent> payments=paymentApi.getPaymentInfo(invoiceIds);
+      List<Payment> payments=paymentApi.getAccountPayments(account.getId());
       if (payments != null) {
-        for (        final PaymentInfoEvent payment : payments) {
-          if (lastPaymentDate == null || payment.getCreatedDate().isAfter(lastPaymentDate)) {
-            lastPaymentDate=payment.getCreatedDate();
-            lastPaymentStatus=payment.getStatus();
-            paymentMethod=payment.getPaymentMethod();
-            creditCardType=payment.getCardType();
-            billingAddressCountry=payment.getCardCountry();
+        for (        Payment cur : payments) {
+          if (lastPaymentDate == null || cur.getEffectiveDate().isAfter(lastPaymentDate)) {
+            lastPaymentDate=cur.getEffectiveDate();
+            lastPaymentStatus=cur.getPaymentStatus().toString();
+            paymentMethod=null;
+            creditCardType=null;
+            billingAddressCountry=null;
           }
         }
       }
-    }
-    final PaymentInfoEvent payment=paymentApi.getLastPaymentInfo(invoiceIds);
-    if (payment != null) {
-      lastPaymentStatus=payment.getStatus();
-      paymentMethod=payment.getPaymentMethod();
-      creditCardType=payment.getCardType();
-      billingAddressCountry=payment.getCardCountry();
     }
     bac.setLastPaymentStatus(lastPaymentStatus);
     bac.setPaymentMethod(paymentMethod);

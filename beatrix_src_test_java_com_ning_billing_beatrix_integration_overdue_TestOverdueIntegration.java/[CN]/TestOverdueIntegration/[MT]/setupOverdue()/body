@@ -2,8 +2,24 @@
   InputStream is=new ByteArrayInputStream(configXml.getBytes());
   config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
   overdueWrapperFactory.setOverdueConfig(config);
-  account=accountUserApi.createAccount(getAccountData(25),null,null,context);
+  account=createAccountWithPaymentMethod(getAccountData(25));
   assertNotNull(account);
+  PaymentMethodPlugin info=new PaymentMethodPlugin(){
+    @Override public boolean isDefaultPaymentMethod(){
+      return false;
+    }
+    @Override public String getValueString(    String key){
+      return null;
+    }
+    @Override public List<PaymentMethodKVInfo> getProperties(){
+      return null;
+    }
+    @Override public String getExternalPaymentMethodId(){
+      return UUID.randomUUID().toString();
+    }
+  }
+;
+  paymentApi.addPaymentMethod(BeatrixModule.PLUGIN_NAME,account,true,info,context);
   bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",context);
   productName="Shotgun";
   term=BillingPeriod.MONTHLY;

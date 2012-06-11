@@ -1,0 +1,13 @@
+{
+  try {
+    Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    List<PaymentMethod> methods=paymentApi.getPaymentMethods(account,withPluginInfo);
+    return Response.status(Status.OK).entity(methods).build();
+  }
+ catch (  PaymentApiException e) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+catch (  AccountApiException e) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+}
