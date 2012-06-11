@@ -6,8 +6,7 @@
       if (tag == null) {
         throw new InvoiceApiException(ErrorCode.TAG_DOES_NOT_EXIST,tagName);
       }
-      List<Tag> tagList=new ArrayList<Tag>();
-      tagList.add(tag);
+      List<Tag> tagList=Arrays.asList(tag);
       List<Mapper<UUID,Long>> recordIds=tagSqlDao.getRecordIds(objectId.toString(),objectType);
       Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
       tagSqlDao.deleteFromTransaction(objectId.toString(),objectType,tagList,context);
