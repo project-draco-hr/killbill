@@ -1,8 +1,8 @@
 {
-  DateTime createdDate=data.getCreatedDate() == null ? context.getCreatedDate() : data.getCreatedDate();
-  DateTime updatedDate=data.getUpdatedDate() == null ? context.getUpdatedDate() : data.getUpdatedDate();
-  CallContext migrationContext=factory.toMigrationCallContext(context,createdDate,updatedDate);
-  Account account=new DefaultAccount(data);
+  final DateTime createdDate=data.getCreatedDate() == null ? context.getCreatedDate() : data.getCreatedDate();
+  final DateTime updatedDate=data.getUpdatedDate() == null ? context.getUpdatedDate() : data.getUpdatedDate();
+  final CallContext migrationContext=factory.toMigrationCallContext(context,createdDate,updatedDate);
+  final Account account=new DefaultAccount(data);
   try {
     accountDao.create(account,migrationContext);
     tagDao.insertTags(account.getId(),ObjectType.ACCOUNT,tagDefinitions,context);
