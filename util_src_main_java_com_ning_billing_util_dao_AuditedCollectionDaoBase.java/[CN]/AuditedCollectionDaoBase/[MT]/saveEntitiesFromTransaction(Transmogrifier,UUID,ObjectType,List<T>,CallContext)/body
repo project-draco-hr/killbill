@@ -1,14 +1,33 @@
 {
   UpdatableEntityCollectionSqlDao<T> dao=transmogrifyDao(transactionalDao);
-  List<T> existingEntities=dao.load(objectId.toString(),objectType);
-  Set<UUID> currentObjIds=new HashSet<UUID>(Collections2.transform(existingEntities,entityIdExtractor));
-  Set<UUID> updatedObjIds=new HashSet<UUID>(Collections2.transform(entities,entityIdExtractor));
-  Set<UUID> idsOfObjsToRemove=Sets.difference(currentObjIds,updatedObjIds);
-  Set<UUID> idsOfObjsToAdd=Sets.difference(updatedObjIds,currentObjIds);
-  Set<UUID> idsOfObjsToUpdate=Sets.intersection(currentObjIds,updatedObjIds);
-  Collection<T> objsToRemove=Collections2.filter(existingEntities,new IdInSetPredicate<T>(idsOfObjsToRemove));
-  Collection<T> objsToAdd=Collections2.filter(entities,new IdInSetPredicate<T>(idsOfObjsToAdd));
-  Collection<T> objsToUpdate=Collections2.filter(existingEntities,new IdInSetPredicate<T>(idsOfObjsToUpdate));
+  List<T> currentEntities=dao.load(objectId.toString(),objectType);
+  Map<V,T> currentObjs=new HashMap<V,T>(currentEntities.size());
+  Map<V,T> updatedObjs=new HashMap<V,T>(newEntities.size());
+  for (  T currentObj : currentEntities) {
+    currentObjs.put(getEquivalenceObjectFor(currentObj),currentObj);
+  }
+  for (  T updatedObj : newEntities) {
+    updatedObjs.put(getEquivalenceObjectFor(updatedObj),updatedObj);
+  }
+  Set<V> equivToRemove=Sets.difference(currentObjs.keySet(),updatedObjs.keySet());
+  Set<V> equivToAdd=Sets.difference(updatedObjs.keySet(),currentObjs.keySet());
+  Set<V> equivToCheckForUpdate=Sets.intersection(updatedObjs.keySet(),currentObjs.keySet());
+  List<T> objsToAdd=new ArrayList<T>(equivToAdd.size());
+  List<T> objsToRemove=new ArrayList<T>(equivToRemove.size());
+  List<T> objsToUpdate=new ArrayList<T>(equivToCheckForUpdate.size());
+  for (  V equiv : equivToAdd) {
+    objsToAdd.add(updatedObjs.get(equiv));
+  }
+  for (  V equiv : equivToRemove) {
+    objsToRemove.add(currentObjs.get(equiv));
+  }
+  for (  V equiv : equivToCheckForUpdate) {
+    T currentObj=currentObjs.get(equiv);
+    T updatedObj=updatedObjs.get(equiv);
+    if (!currentObj.equals(updatedObj)) {
+      objsToUpdate.add(updatedObj);
+    }
+  }
   if (objsToAdd.size() != 0) {
     dao.insertFromTransaction(objectId.toString(),objectType,objsToAdd,context);
   }
