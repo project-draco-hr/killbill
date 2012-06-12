@@ -1,21 +1,21 @@
 {
   tagSqlDao.inTransaction(new Transaction<Void,TagSqlDao>(){
     @Override public Void inTransaction(    final TagSqlDao tagSqlDao,    final TransactionStatus status) throws Exception {
-      String tagId=UUID.randomUUID().toString();
-      String tagName=tagDefinition.getName();
+      final String tagId=UUID.randomUUID().toString();
+      final String tagName=tagDefinition.getName();
       tagSqlDao.addTagFromTransaction(tagId,tagName,objectId.toString(),objectType,context);
-      Tag tag=tagSqlDao.findTag(tagName,objectId.toString(),objectType);
-      List<Tag> tagList=new ArrayList<Tag>();
+      final Tag tag=tagSqlDao.findTag(tagName,objectId.toString(),objectType);
+      final List<Tag> tagList=new ArrayList<Tag>();
       tagList.add(tag);
-      List<Mapper<UUID,Long>> recordIds=tagSqlDao.getRecordIds(objectId.toString(),objectType);
-      Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
-      List<EntityHistory<Tag>> entityHistories=new ArrayList<EntityHistory<Tag>>();
+      final List<Mapper<UUID,Long>> recordIds=tagSqlDao.getRecordIds(objectId.toString(),objectType);
+      final Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
+      final List<EntityHistory<Tag>> entityHistories=new ArrayList<EntityHistory<Tag>>();
       entityHistories.addAll(convertToHistory(tagList,recordIdMap,ChangeType.INSERT));
-      Long maxHistoryRecordId=tagSqlDao.getMaxHistoryRecordId();
+      final Long maxHistoryRecordId=tagSqlDao.getMaxHistoryRecordId();
       tagSqlDao.addHistoryFromTransaction(objectId.toString(),objectType,entityHistories,context);
-      List<Mapper<Long,Long>> historyRecordIds=tagSqlDao.getHistoryRecordIds(maxHistoryRecordId);
-      Map<Long,Long> historyRecordIdMap=convertToAuditMap(historyRecordIds);
-      List<EntityAudit> entityAudits=convertToAudits(entityHistories,historyRecordIdMap);
+      final List<Mapper<Long,Long>> historyRecordIds=tagSqlDao.getHistoryRecordIds(maxHistoryRecordId);
+      final Map<Long,Long> historyRecordIdMap=convertToAuditMap(historyRecordIds);
+      final List<EntityAudit> entityAudits=convertToAudits(entityHistories,historyRecordIdMap);
       tagSqlDao.insertAuditFromTransaction(entityAudits,context);
       return null;
     }
