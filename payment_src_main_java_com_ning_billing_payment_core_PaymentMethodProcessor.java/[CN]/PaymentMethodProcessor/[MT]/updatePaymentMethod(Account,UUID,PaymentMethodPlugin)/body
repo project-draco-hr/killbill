@@ -1,13 +1,20 @@
 {
-  PaymentMethodModelDao paymentMethodModel=paymentDao.getPaymentMethod(paymentMethodId);
-  if (paymentMethodModel == null) {
-    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,account.getId(),paymentMethodId);
+  new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
+    @Override public Void doOperation() throws PaymentApiException {
+      PaymentMethodModelDao paymentMethodModel=paymentDao.getPaymentMethod(paymentMethodId);
+      if (paymentMethodModel == null) {
+        throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,account.getId(),paymentMethodId);
+      }
+      try {
+        PaymentMethodPlugin inputWithId=new DefaultPaymentMethodPlugin(paymentMethodProps,paymentMethodModel.getExternalId());
+        PaymentPluginApi pluginApi=getPluginApi(paymentMethodId,account.getId());
+        pluginApi.updatePaymentMethod(account.getExternalKey(),inputWithId);
+        return null;
+      }
+ catch (      PaymentPluginApiException e) {
+        throw new PaymentApiException(ErrorCode.PAYMENT_UPD_PAYMENT_METHOD,account.getId(),e.getErrorMessage());
+      }
+    }
   }
-  try {
-    PaymentPluginApi pluginApi=getPluginApi(paymentMethodId,account.getId());
-    pluginApi.updatePaymentMethod(account.getExternalKey(),paymentMethodModel.getExternalId(),paymentMethodProps);
-  }
- catch (  PaymentPluginApiException e) {
-    throw new PaymentApiException(ErrorCode.PAYMENT_UPD_PAYMENT_METHOD,account.getId(),e.getErrorMessage());
-  }
+);
 }
