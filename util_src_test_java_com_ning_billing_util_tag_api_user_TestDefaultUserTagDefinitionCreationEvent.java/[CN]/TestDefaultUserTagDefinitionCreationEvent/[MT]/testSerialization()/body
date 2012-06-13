@@ -1,0 +1,13 @@
+{
+  final ObjectMapper objectMapper=new ObjectMapper();
+  final UUID tagDefinitionId=UUID.randomUUID();
+  final String tagDefinitionName=UUID.randomUUID().toString();
+  final String tagDefinitionDescription=UUID.randomUUID().toString();
+  final boolean controlTag=true;
+  final TagDefinition tagDefinition=new DefaultTagDefinition(tagDefinitionId,tagDefinitionName,tagDefinitionDescription,controlTag);
+  final UUID userToken=UUID.randomUUID();
+  final DefaultUserTagDefinitionCreationEvent event=new DefaultUserTagDefinitionCreationEvent(tagDefinitionId,tagDefinition,userToken);
+  final String json=objectMapper.writeValueAsString(event);
+  final DefaultUserTagDefinitionCreationEvent fromJson=objectMapper.readValue(json,DefaultUserTagDefinitionCreationEvent.class);
+  Assert.assertEquals(fromJson,event);
+}
