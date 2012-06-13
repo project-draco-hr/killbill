@@ -1,14 +1,14 @@
 {
   try {
-    Account account=accountApi.getAccountById(UUID.fromString(accountId));
-    List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId());
-    List<Payment> payments=paymentApi.getAccountPayments(UUID.fromString(accountId));
-    List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(account.getId());
-    List<BundleTimeline> bundlesTimeline=new LinkedList<BundleTimeline>();
-    for (    SubscriptionBundle cur : bundles) {
+    final Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId());
+    final List<Payment> payments=paymentApi.getAccountPayments(UUID.fromString(accountId));
+    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(account.getId());
+    final List<BundleTimeline> bundlesTimeline=new LinkedList<BundleTimeline>();
+    for (    final SubscriptionBundle cur : bundles) {
       bundlesTimeline.add(timelineApi.getBundleRepair(cur.getId()));
     }
-    AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundlesTimeline);
+    final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundlesTimeline);
     return Response.status(Status.OK).entity(json).build();
   }
  catch (  AccountApiException e) {
