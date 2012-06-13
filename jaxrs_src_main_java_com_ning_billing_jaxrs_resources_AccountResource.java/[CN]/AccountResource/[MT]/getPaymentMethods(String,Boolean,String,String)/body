@@ -1,8 +1,14 @@
 {
   try {
-    Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    final Account account=accountApi.getAccountById(UUID.fromString(accountId));
     List<PaymentMethod> methods=paymentApi.getPaymentMethods(account,withPluginInfo);
-    return Response.status(Status.OK).entity(methods).build();
+    List<PaymentMethodJson> json=new ArrayList<PaymentMethodJson>(Collections2.transform(methods,new Function<PaymentMethod,PaymentMethodJson>(){
+      @Override public PaymentMethodJson apply(      PaymentMethod input){
+        return PaymentMethodJson.toPaymentMethodJson(account,input);
+      }
+    }
+));
+    return Response.status(Status.OK).entity(json).build();
   }
  catch (  PaymentApiException e) {
     return Response.status(Status.NOT_FOUND).build();

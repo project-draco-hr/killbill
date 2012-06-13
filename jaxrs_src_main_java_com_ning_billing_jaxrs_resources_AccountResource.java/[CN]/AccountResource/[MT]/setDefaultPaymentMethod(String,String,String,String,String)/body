@@ -1,0 +1,16 @@
+{
+  try {
+    final Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    paymentApi.setDefaultPaymentMethod(account,UUID.fromString(paymentMethodId),context.createContext(createdBy,reason,comment));
+    return Response.status(Status.OK).build();
+  }
+ catch (  AccountApiException e) {
+    return Response.status(Status.BAD_REQUEST).build();
+  }
+catch (  PaymentApiException e) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+catch (  IllegalArgumentException e) {
+    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+}
