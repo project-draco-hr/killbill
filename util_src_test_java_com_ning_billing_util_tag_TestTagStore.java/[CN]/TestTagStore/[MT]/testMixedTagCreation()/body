@@ -1,7 +1,7 @@
 {
-  UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
-  String definitionName="MixedTagTest";
+  final UUID accountId=UUID.randomUUID();
+  final TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
+  final String definitionName="MixedTagTest";
   TagDefinition tagDefinition=null;
   try {
     tagDefinition=tagDefinitionDao.create(definitionName,"Test tag for some test purpose",context);
@@ -9,16 +9,16 @@
  catch (  TagDefinitionApiException e) {
     fail("Tag definition creation failed.",e);
   }
-  DescriptiveTag descriptiveTag=new DescriptiveTag(tagDefinition);
+  final DescriptiveTag descriptiveTag=new DescriptiveTag(tagDefinition);
   tagStore.add(descriptiveTag);
   assertEquals(tagStore.generateInvoice(),true);
-  ControlTag controlTag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
+  final ControlTag controlTag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
   tagStore.add(controlTag);
   assertEquals(tagStore.generateInvoice(),false);
   tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  final Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   assertEquals(tagMap.size(),2);
   assertEquals(tagMap.containsKey(ControlTagType.AUTO_INVOICING_OFF.toString()),true);
 }
