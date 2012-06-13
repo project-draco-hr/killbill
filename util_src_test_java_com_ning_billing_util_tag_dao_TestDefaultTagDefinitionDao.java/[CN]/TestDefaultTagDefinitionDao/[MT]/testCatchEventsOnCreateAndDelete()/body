@@ -1,0 +1,29 @@
+{
+  final String definitionName=UUID.randomUUID().toString().substring(0,5);
+  final String description=UUID.randomUUID().toString().substring(0,5);
+  Assert.assertEquals(eventsListener.getEvents().size(),0);
+  Assert.assertEquals(eventsListener.getTagDefinitionEvents().size(),0);
+  final TagDefinition createdTagDefinition=tagDefinitionDao.create(definitionName,description,context);
+  Assert.assertEquals(createdTagDefinition.getName(),definitionName);
+  Assert.assertEquals(createdTagDefinition.getDescription(),description);
+  final TagDefinition foundTagDefinition=tagDefinitionDao.getByName(definitionName);
+  Assert.assertEquals(foundTagDefinition,createdTagDefinition);
+  Assert.assertEquals(eventsListener.getEvents().size(),1);
+  Assert.assertEquals(eventsListener.getTagDefinitionEvents().size(),1);
+  final TagDefinitionEvent tagDefinitionFirstEventReceived=eventsListener.getTagDefinitionEvents().get(0);
+  Assert.assertEquals(eventsListener.getEvents().get(0),tagDefinitionFirstEventReceived);
+  Assert.assertEquals(tagDefinitionFirstEventReceived.getTagDefinitionId(),createdTagDefinition.getId());
+  Assert.assertEquals(tagDefinitionFirstEventReceived.getTagDefinition(),createdTagDefinition);
+  Assert.assertEquals(tagDefinitionFirstEventReceived.getBusEventType(),BusEvent.BusEventType.USER_TAGDEFINITION_CREATION);
+  Assert.assertEquals(tagDefinitionFirstEventReceived.getUserToken(),context.getUserToken());
+  tagDefinitionDao.deleteTagDefinition(definitionName,context);
+  Assert.assertNull(tagDefinitionDao.getByName(definitionName));
+  Assert.assertEquals(eventsListener.getEvents().size(),2);
+  Assert.assertEquals(eventsListener.getTagDefinitionEvents().size(),2);
+  final TagDefinitionEvent tagDefinitionSecondEventReceived=eventsListener.getTagDefinitionEvents().get(1);
+  Assert.assertEquals(eventsListener.getEvents().get(1),tagDefinitionSecondEventReceived);
+  Assert.assertEquals(tagDefinitionSecondEventReceived.getTagDefinitionId(),createdTagDefinition.getId());
+  Assert.assertEquals(tagDefinitionSecondEventReceived.getTagDefinition(),createdTagDefinition);
+  Assert.assertEquals(tagDefinitionSecondEventReceived.getBusEventType(),BusEvent.BusEventType.USER_TAGDEFINITION_DELETION);
+  Assert.assertEquals(tagDefinitionSecondEventReceived.getUserToken(),context.getUserToken());
+}

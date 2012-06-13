@@ -1,0 +1,37 @@
+{
+  final String definitionName=UUID.randomUUID().toString().substring(0,5);
+  final String description=UUID.randomUUID().toString().substring(0,5);
+  final UUID objectId=UUID.randomUUID();
+  final ObjectType objectType=ObjectType.RECURRING_INVOICE_ITEM;
+  Assert.assertEquals(eventsListener.getEvents().size(),0);
+  Assert.assertEquals(eventsListener.getTagEvents().size(),0);
+  final TagDefinition createdTagDefinition=tagDefinitionDao.create(definitionName,description,context);
+  Assert.assertEquals(createdTagDefinition.getName(),definitionName);
+  Assert.assertEquals(createdTagDefinition.getDescription(),description);
+  tagDao.insertTag(objectId,objectType,createdTagDefinition,context);
+  final Map<String,Tag> foundTags=tagDao.loadEntities(objectId,objectType);
+  Assert.assertEquals(foundTags.keySet().size(),1);
+  Assert.assertEquals(foundTags.get(definitionName).getTagDefinitionName(),definitionName);
+  Assert.assertEquals(eventsListener.getEvents().size(),2);
+  Assert.assertEquals(eventsListener.getTagEvents().size(),1);
+  final TagEvent tagFirstEventReceived=eventsListener.getTagEvents().get(0);
+  Assert.assertEquals(eventsListener.getEvents().get(1),tagFirstEventReceived);
+  Assert.assertEquals(tagFirstEventReceived.getObjectId(),objectId);
+  Assert.assertEquals(tagFirstEventReceived.getObjectType(),objectType);
+  Assert.assertEquals(tagFirstEventReceived.getTagDefinition().getName(),createdTagDefinition.getName());
+  Assert.assertEquals(tagFirstEventReceived.getTagDefinition().getDescription(),createdTagDefinition.getDescription());
+  Assert.assertEquals(tagFirstEventReceived.getBusEventType(),BusEvent.BusEventType.USER_TAG_CREATION);
+  Assert.assertEquals(tagFirstEventReceived.getUserToken(),context.getUserToken());
+  tagDao.deleteTag(objectId,objectType,createdTagDefinition,context);
+  Assert.assertEquals(tagDao.loadEntities(objectId,objectType).keySet().size(),0);
+  Assert.assertEquals(eventsListener.getEvents().size(),3);
+  Assert.assertEquals(eventsListener.getTagEvents().size(),2);
+  final TagEvent tagSecondEventReceived=eventsListener.getTagEvents().get(1);
+  Assert.assertEquals(eventsListener.getEvents().get(2),tagSecondEventReceived);
+  Assert.assertEquals(tagSecondEventReceived.getObjectId(),objectId);
+  Assert.assertEquals(tagSecondEventReceived.getObjectType(),objectType);
+  Assert.assertEquals(tagSecondEventReceived.getTagDefinition().getName(),createdTagDefinition.getName());
+  Assert.assertEquals(tagSecondEventReceived.getTagDefinition().getDescription(),createdTagDefinition.getDescription());
+  Assert.assertEquals(tagSecondEventReceived.getBusEventType(),BusEvent.BusEventType.USER_TAG_DELETION);
+  Assert.assertEquals(tagSecondEventReceived.getUserToken(),context.getUserToken());
+}
