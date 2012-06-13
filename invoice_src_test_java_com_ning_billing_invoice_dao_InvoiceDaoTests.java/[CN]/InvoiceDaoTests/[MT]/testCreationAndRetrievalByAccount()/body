@@ -1,12 +1,12 @@
 {
-  UUID accountId=UUID.randomUUID();
-  Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),clock.getUTCNow(),Currency.USD);
-  DateTime invoiceDate=invoice.getInvoiceDate();
+  final UUID accountId=UUID.randomUUID();
+  final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),clock.getUTCNow(),Currency.USD);
+  final DateTime invoiceDate=invoice.getInvoiceDate();
   invoiceDao.create(invoice,context);
-  List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId);
+  final List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId);
   assertNotNull(invoices);
   assertEquals(invoices.size(),1);
-  Invoice thisInvoice=invoices.get(0);
+  final Invoice thisInvoice=invoices.get(0);
   assertEquals(invoice.getAccountId(),accountId);
   assertTrue(thisInvoice.getInvoiceDate().compareTo(invoiceDate) == 0);
   assertEquals(thisInvoice.getCurrency(),Currency.USD);

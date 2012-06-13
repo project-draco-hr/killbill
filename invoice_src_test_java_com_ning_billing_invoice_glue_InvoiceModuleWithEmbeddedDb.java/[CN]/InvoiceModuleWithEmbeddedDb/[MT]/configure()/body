@@ -8,7 +8,7 @@
   install(new TagStoreModule());
   installNotificationQueue();
   bind(AccountUserApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class));
-  BillingApi billingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(BillingApi.class);
+  final BillingApi billingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(BillingApi.class);
   ((ZombieControl)billingApi).addResult("setChargedThroughDateFromTransaction",BrainDeadProxyFactory.ZOMBIE_VOID);
   bind(BillingApi.class).toInstance(billingApi);
   install(new CatalogModule());

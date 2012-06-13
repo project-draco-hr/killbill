@@ -1,13 +1,13 @@
 {
-  MysqlTestingHelper helper=new MysqlTestingHelper();
-  IDBI dbi=helper.getDBI();
+  final MysqlTestingHelper helper=new MysqlTestingHelper();
+  final IDBI dbi=helper.getDBI();
   invoiceSqlDao=dbi.onDemand(InvoiceSqlDao.class);
   invoiceSqlDao.test();
-  NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
+  final NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
   final TagDefinitionDao tagDefinitionDao=new MockTagDefinitionDao();
   final TagDao tagDao=new MockTagDao();
   final TagUserApi tagUserApi=new DefaultTagUserApi(tagDefinitionDao,tagDao);
-  InvoiceDao invoiceDao=new DefaultInvoiceDao(dbi,nextBillingDatePoster,tagUserApi);
+  final InvoiceDao invoiceDao=new DefaultInvoiceDao(dbi,nextBillingDatePoster,tagUserApi);
   invoicePaymentApi=new DefaultInvoicePaymentApi(invoiceDao);
   context=new TestCallContext("Charge back tests");
 }

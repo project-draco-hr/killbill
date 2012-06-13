@@ -1,18 +1,18 @@
 {
-  BillingEventSet events=new MockBillingEventSet();
-  Subscription sub=createZombieSubscription();
-  DateTime startDate=buildDateTime(2011,9,1);
-  Plan plan1=new MockPlan();
-  BigDecimal rate=FIVE;
-  PlanPhase phase1=createMockMonthlyPlanPhase(rate);
-  BillingEvent event1=createBillingEvent(sub.getId(),startDate,plan1,phase1,1);
+  final BillingEventSet events=new MockBillingEventSet();
+  final Subscription sub=createZombieSubscription();
+  final DateTime startDate=buildDateTime(2011,9,1);
+  final Plan plan1=new MockPlan();
+  final BigDecimal rate=FIVE;
+  final PlanPhase phase1=createMockMonthlyPlanPhase(rate);
+  final BillingEvent event1=createBillingEvent(sub.getId(),startDate,plan1,phase1,1);
   events.add(event1);
   DateTime targetDate=buildDateTime(2011,12,1);
-  UUID accountId=UUID.randomUUID();
-  Invoice invoice1=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
-  List<Invoice> existingInvoices=new ArrayList<Invoice>();
+  final UUID accountId=UUID.randomUUID();
+  final Invoice invoice1=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
+  final List<Invoice> existingInvoices=new ArrayList<Invoice>();
   existingInvoices.add(invoice1);
   targetDate=buildDateTime(2011,12,3);
-  Invoice invoice2=generator.generateInvoice(accountId,events,existingInvoices,targetDate,Currency.USD);
+  final Invoice invoice2=generator.generateInvoice(accountId,events,existingInvoices,targetDate,Currency.USD);
   assertNull(invoice2);
 }

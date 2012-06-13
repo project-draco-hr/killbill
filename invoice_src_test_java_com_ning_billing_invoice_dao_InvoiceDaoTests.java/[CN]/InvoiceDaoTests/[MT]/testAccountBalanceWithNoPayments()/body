@@ -1,17 +1,17 @@
 {
-  UUID accountId=UUID.randomUUID();
-  UUID bundleId=UUID.randomUUID();
-  DateTime targetDate1=new DateTime(2011,10,6,0,0,0,0);
-  Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate1,Currency.USD);
+  final UUID accountId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final DateTime targetDate1=new DateTime(2011,10,6,0,0,0,0);
+  final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate1,Currency.USD);
   invoiceDao.create(invoice1,context);
-  DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
-  DateTime endDate=startDate.plusMonths(1);
-  BigDecimal rate1=new BigDecimal("17.0");
-  BigDecimal rate2=new BigDecimal("42.0");
-  RecurringInvoiceItem item1=new RecurringInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase A",startDate,endDate,rate1,rate1,Currency.USD);
+  final DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
+  final DateTime endDate=startDate.plusMonths(1);
+  final BigDecimal rate1=new BigDecimal("17.0");
+  final BigDecimal rate2=new BigDecimal("42.0");
+  final RecurringInvoiceItem item1=new RecurringInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase A",startDate,endDate,rate1,rate1,Currency.USD);
   recurringInvoiceItemDao.create(item1,context);
-  RecurringInvoiceItem item2=new RecurringInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase B",startDate,endDate,rate2,rate2,Currency.USD);
+  final RecurringInvoiceItem item2=new RecurringInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase B",startDate,endDate,rate2,rate2,Currency.USD);
   recurringInvoiceItemDao.create(item2,context);
-  BigDecimal balance=invoiceDao.getAccountBalance(accountId);
+  final BigDecimal balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(rate1.add(rate2)),0);
 }
