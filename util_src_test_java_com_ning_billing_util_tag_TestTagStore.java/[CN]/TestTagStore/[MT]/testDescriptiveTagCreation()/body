@@ -1,7 +1,7 @@
 {
-  UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
-  String definitionName="SomeTestTag";
+  final UUID accountId=UUID.randomUUID();
+  final TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
+  final String definitionName="SomeTestTag";
   TagDefinition tagDefinition=null;
   try {
     tagDefinition=tagDefinitionDao.create(definitionName,"Test tag for some test purpose",context);
@@ -9,13 +9,13 @@
  catch (  TagDefinitionApiException e) {
     fail("Tag definition creation failed.",e);
   }
-  DescriptiveTag tag=new DescriptiveTag(tagDefinition);
+  final DescriptiveTag tag=new DescriptiveTag(tagDefinition);
   tagStore.add(tag);
   assertEquals(tagStore.generateInvoice(),true);
   tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  final Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   assertEquals(tagMap.size(),1);
   assertEquals(tagMap.containsKey(ControlTagType.AUTO_INVOICING_OFF.toString()),false);
 }
