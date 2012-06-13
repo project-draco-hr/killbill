@@ -1,7 +1,7 @@
 {
   final Account account=createTestAccount(1);
   accountDao.create(account,context);
-  AccountData accountData=new AccountData(){
+  final AccountData accountData=new AccountData(){
     @Override public String getExternalKey(){
       return account.getExternalKey();
     }
@@ -61,9 +61,9 @@
     }
   }
 ;
-  Account updatedAccount=new DefaultAccount(account.getId(),accountData);
+  final Account updatedAccount=new DefaultAccount(account.getId(),accountData);
   accountDao.update(updatedAccount,context);
-  Account savedAccount=accountDao.getAccountByKey(account.getExternalKey());
+  final Account savedAccount=accountDao.getAccountByKey(account.getExternalKey());
   assertNotNull(savedAccount);
   assertEquals(savedAccount.getName(),updatedAccount.getName());
   assertEquals(savedAccount.getEmail(),updatedAccount.getEmail());

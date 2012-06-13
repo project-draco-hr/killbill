@@ -1,0 +1,11 @@
+{
+  final String accountId=UUID.randomUUID().toString();
+  final String email=UUID.randomUUID().toString();
+  final AccountEmailJson accountEmailJson=new AccountEmailJson(accountId,email);
+  Assert.assertEquals(accountEmailJson.getAccountId(),accountId);
+  Assert.assertEquals(accountEmailJson.getEmail(),email);
+  final String asJson=mapper.writeValueAsString(accountEmailJson);
+  Assert.assertEquals(asJson,"{\"accountId\":\"" + accountId + "\","+ "\"email\":\""+ email+ "\"}");
+  final AccountEmailJson fromJson=mapper.readValue(asJson,AccountEmailJson.class);
+  Assert.assertEquals(fromJson,accountEmailJson);
+}
