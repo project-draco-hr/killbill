@@ -8,7 +8,10 @@
   if (billingPeriod != BillingPeriod.NO_BILLING_PERIOD) {
     BillingMode billingMode=instantiateBillingMode(thisEvent.getBillingMode());
     DateTime startDate=thisEvent.getEffectiveDate();
-    if (!startDate.isAfter(targetDate)) {
+    DateTime tzAdjustedStartDate=startDate.toDateTime(thisEvent.getTimeZone());
+    DateTime roundedStartDate=new DateTime(tzAdjustedStartDate.getYear(),tzAdjustedStartDate.getMonthOfYear(),tzAdjustedStartDate.getDayOfMonth(),0,0);
+    log.info(String.format("start = %s, rounded = %s, target = %s, in = %s",startDate,roundedStartDate,targetDate,(!roundedStartDate.isAfter(targetDate)) ? "in" : "out"));
+    if (!roundedStartDate.isAfter(targetDate)) {
       DateTime endDate=(nextEvent == null) ? null : nextEvent.getEffectiveDate();
       int billCycleDay=thisEvent.getBillCycleDay();
       List<RecurringInvoiceItemData> itemData;
