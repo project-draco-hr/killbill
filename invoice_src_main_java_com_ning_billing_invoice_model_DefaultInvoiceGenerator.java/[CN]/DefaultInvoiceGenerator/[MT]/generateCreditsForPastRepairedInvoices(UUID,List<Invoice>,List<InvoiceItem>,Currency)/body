@@ -1,12 +1,12 @@
 {
-  Map<UUID,BigDecimal> amountOwedByInvoice=new HashMap<UUID,BigDecimal>();
+  final Map<UUID,BigDecimal> amountOwedByInvoice=new HashMap<UUID,BigDecimal>();
   if (existingInvoices != null) {
-    for (    Invoice invoice : existingInvoices) {
+    for (    final Invoice invoice : existingInvoices) {
       amountOwedByInvoice.put(invoice.getId(),invoice.getBalance());
     }
   }
-  for (  InvoiceItem item : proposedItems) {
-    UUID invoiceId=item.getInvoiceId();
+  for (  final InvoiceItem item : proposedItems) {
+    final UUID invoiceId=item.getInvoiceId();
     if (amountOwedByInvoice.containsKey(invoiceId)) {
       amountOwedByInvoice.put(invoiceId,amountOwedByInvoice.get(invoiceId).add(item.getAmount()));
     }
@@ -14,8 +14,8 @@
       amountOwedByInvoice.put(invoiceId,item.getAmount());
     }
   }
-  for (  UUID invoiceId : amountOwedByInvoice.keySet()) {
-    BigDecimal invoiceBalance=amountOwedByInvoice.get(invoiceId);
+  for (  final UUID invoiceId : amountOwedByInvoice.keySet()) {
+    final BigDecimal invoiceBalance=amountOwedByInvoice.get(invoiceId);
     if (invoiceBalance.compareTo(BigDecimal.ZERO) < 0) {
       proposedItems.add(new CreditInvoiceItem(invoiceId,accountId,clock.getUTCNow(),invoiceBalance.negate(),currency));
     }

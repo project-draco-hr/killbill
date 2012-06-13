@@ -1,18 +1,18 @@
 {
   try {
-    Account account=accountUserApi.getAccountById(accountId);
-    BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId);
+    final Account account=accountUserApi.getAccountById(accountId);
+    final BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId);
     List<Invoice> invoices=new ArrayList<Invoice>();
     if (!billingEvents.isAccountAutoInvoiceOff()) {
       invoices=invoiceDao.getInvoicesByAccount(accountId);
     }
-    Currency targetCurrency=account.getCurrency();
-    Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,targetCurrency);
+    final Currency targetCurrency=account.getCurrency();
+    final Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,targetCurrency);
     if (invoice == null) {
       log.info("Generated null invoice.");
       outputDebugData(billingEvents,invoices);
       if (!dryRun) {
-        BusEvent event=new DefaultEmptyInvoiceEvent(accountId,clock.getUTCNow(),context.getUserToken());
+        final BusEvent event=new DefaultEmptyInvoiceEvent(accountId,clock.getUTCNow(),context.getUserToken());
         postEvent(event,accountId);
       }
     }
@@ -20,15 +20,15 @@
       log.info("Generated invoice {} with {} items.",invoice.getId().toString(),invoice.getNumberOfItems());
       if (VERBOSE_OUTPUT) {
         log.info("New items");
-        for (        InvoiceItem item : invoice.getInvoiceItems()) {
+        for (        final InvoiceItem item : invoice.getInvoiceItems()) {
           log.info(item.toString());
         }
       }
       outputDebugData(billingEvents,invoices);
       if (!dryRun) {
         invoiceDao.create(invoice,context);
-        List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
-        List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
+        final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
+        final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         setChargedThroughDates(fixedPriceInvoiceItems,recurringInvoiceItems,context);
         final InvoiceCreationEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
         postEvent(event,accountId);

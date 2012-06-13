@@ -1,15 +1,15 @@
 {
-  UUID accountId=UUID.randomUUID();
-  UUID bundleId=UUID.randomUUID();
-  DateTime targetDate=new DateTime(2011,5,23,0,0,0,0);
-  DefaultInvoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,Currency.USD);
+  final UUID accountId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final DateTime targetDate=new DateTime(2011,5,23,0,0,0,0);
+  final DefaultInvoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,Currency.USD);
   invoiceDao.create(invoice,context);
-  UUID invoiceId=invoice.getId();
-  DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
-  BigDecimal rate=new BigDecimal("20.00");
-  UUID subscriptionId=UUID.randomUUID();
-  RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate,startDate.plusMonths(1),rate,rate,Currency.USD);
+  final UUID invoiceId=invoice.getId();
+  final DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
+  final BigDecimal rate=new BigDecimal("20.00");
+  final UUID subscriptionId=UUID.randomUUID();
+  final RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate,startDate.plusMonths(1),rate,rate,Currency.USD);
   recurringInvoiceItemDao.create(item,context);
-  List<InvoiceItem> items=recurringInvoiceItemDao.getInvoiceItemsByAccount(accountId.toString());
+  final List<InvoiceItem> items=recurringInvoiceItemDao.getInvoiceItemsByAccount(accountId.toString());
   assertEquals(items.size(),1);
 }

@@ -6,9 +6,9 @@
   mysqlTestingHelper.startMysql();
   mysqlTestingHelper.initDb(invoiceDdl);
   mysqlTestingHelper.initDb(utilDdl);
-  NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
+  final NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
   final TagDefinitionDao tagDefinitionDao=new MockTagDefinitionDao();
-  final TagDao tagDao=new AuditedTagDao(dbi);
+  final TagDao tagDao=new AuditedTagDao(dbi,tagEventBuilder,bus);
   final TagUserApi tagUserApi=new DefaultTagUserApi(tagDefinitionDao,tagDao);
   invoiceDao=new DefaultInvoiceDao(dbi,nextBillingDatePoster,tagUserApi);
   invoiceDao.test();
@@ -19,5 +19,7 @@
   clock=new ClockMock();
   context=new TestCallContext("Invoice Dao Tests");
   generator=new DefaultInvoiceGenerator(clock,invoiceConfig);
+  bus=new InMemoryBus();
+  bus.start();
   assertTrue(true);
 }

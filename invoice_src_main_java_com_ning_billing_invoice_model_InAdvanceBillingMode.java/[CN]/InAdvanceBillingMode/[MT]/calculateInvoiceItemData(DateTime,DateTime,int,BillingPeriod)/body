@@ -1,24 +1,24 @@
 {
-  List<RecurringInvoiceItemData> results=new ArrayList<RecurringInvoiceItemData>();
+  final List<RecurringInvoiceItemData> results=new ArrayList<RecurringInvoiceItemData>();
   if (targetDate.isBefore(startDate)) {
     throw new InvalidDateSequenceException();
   }
-  DateTime firstBillingCycleDate=calculateBillingCycleDateOnOrAfter(startDate,billingCycleDay);
+  final DateTime firstBillingCycleDate=calculateBillingCycleDateOnOrAfter(startDate,billingCycleDay);
   if (firstBillingCycleDate.isAfter(startDate)) {
-    BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,firstBillingCycleDate,billingPeriod);
+    final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,firstBillingCycleDate,billingPeriod);
     if (leadingProRationPeriods != null && leadingProRationPeriods.compareTo(BigDecimal.ZERO) > 0) {
       results.add(new RecurringInvoiceItemData(startDate,firstBillingCycleDate,leadingProRationPeriods));
     }
   }
-  DateTime effectiveEndDate=calculateEffectiveEndDate(firstBillingCycleDate,targetDate,billingPeriod);
-  DateTime lastBillingCycleDate=calculateLastBillingCycleDateBefore(effectiveEndDate,firstBillingCycleDate,billingCycleDay,billingPeriod);
-  int numberOfWholeBillingPeriods=calculateNumberOfWholeBillingPeriods(firstBillingCycleDate,lastBillingCycleDate,billingPeriod);
-  int numberOfMonthsPerBillingPeriod=billingPeriod.getNumberOfMonths();
+  final DateTime effectiveEndDate=calculateEffectiveEndDate(firstBillingCycleDate,targetDate,billingPeriod);
+  final DateTime lastBillingCycleDate=calculateLastBillingCycleDateBefore(effectiveEndDate,firstBillingCycleDate,billingCycleDay,billingPeriod);
+  final int numberOfWholeBillingPeriods=calculateNumberOfWholeBillingPeriods(firstBillingCycleDate,lastBillingCycleDate,billingPeriod);
+  final int numberOfMonthsPerBillingPeriod=billingPeriod.getNumberOfMonths();
   for (int i=0; i < numberOfWholeBillingPeriods; i++) {
     results.add(new RecurringInvoiceItemData(firstBillingCycleDate.plusMonths(i * numberOfMonthsPerBillingPeriod),firstBillingCycleDate.plusMonths((i + 1) * numberOfMonthsPerBillingPeriod),BigDecimal.ONE));
   }
   if (effectiveEndDate.isAfter(lastBillingCycleDate)) {
-    BigDecimal trailingProRationPeriods=calculateProRationAfterLastBillingCycleDate(effectiveEndDate,lastBillingCycleDate,billingPeriod);
+    final BigDecimal trailingProRationPeriods=calculateProRationAfterLastBillingCycleDate(effectiveEndDate,lastBillingCycleDate,billingPeriod);
     if (trailingProRationPeriods.compareTo(BigDecimal.ZERO) > 0) {
       results.add(new RecurringInvoiceItemData(lastBillingCycleDate,effectiveEndDate,trailingProRationPeriods));
     }

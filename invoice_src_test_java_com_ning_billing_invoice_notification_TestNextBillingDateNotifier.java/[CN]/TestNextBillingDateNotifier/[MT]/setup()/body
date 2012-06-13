@@ -22,16 +22,16 @@
   }
 );
   clock=g.getInstance(Clock.class);
-  IDBI dbi=g.getInstance(IDBI.class);
+  final IDBI dbi=g.getInstance(IDBI.class);
   dao=dbi.onDemand(DummySqlTest.class);
   eventBus=g.getInstance(Bus.class);
   helper=g.getInstance(MysqlTestingHelper.class);
   notificationQueueService=g.getInstance(NotificationQueueService.class);
-  InvoiceDispatcher dispatcher=g.getInstance(InvoiceDispatcher.class);
-  Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
-  EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
+  final InvoiceDispatcher dispatcher=g.getInstance(InvoiceDispatcher.class);
+  final Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  final EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
   ((ZombieControl)entitlementUserApi).addResult("getSubscriptionFromId",subscription);
-  CallContextFactory factory=new DefaultCallContextFactory(clock);
+  final CallContextFactory factory=new DefaultCallContextFactory(clock);
   listener=new InvoiceListenerMock(factory,dispatcher);
   notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),entitlementUserApi,listener);
   startMysql();

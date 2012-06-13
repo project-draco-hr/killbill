@@ -1,10 +1,10 @@
 {
   nextBillingQueue=notificationQueueService.createNotificationQueue(DefaultInvoiceService.INVOICE_SERVICE_NAME,NEXT_BILLING_DATE_NOTIFIER_QUEUE,new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    String notificationKey,    DateTime eventDate){
+    @Override public void handleReadyNotification(    final String notificationKey,    final DateTime eventDate){
       try {
-        UUID key=UUID.fromString(notificationKey);
+        final UUID key=UUID.fromString(notificationKey);
         try {
-          Subscription subscription=entitlementUserApi.getSubscriptionFromId(key);
+          final Subscription subscription=entitlementUserApi.getSubscriptionFromId(key);
           if (subscription == null) {
             log.warn("Next Billing Date Notification Queue handled spurious notification (key: " + key + ")");
           }
@@ -18,7 +18,6 @@
       }
  catch (      IllegalArgumentException e) {
         log.error("The key returned from the NextBillingNotificationQueue is not a valid UUID",e);
-        return;
       }
     }
   }

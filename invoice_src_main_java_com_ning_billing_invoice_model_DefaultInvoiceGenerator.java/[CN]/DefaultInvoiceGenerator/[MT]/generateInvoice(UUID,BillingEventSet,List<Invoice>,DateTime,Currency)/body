@@ -3,10 +3,10 @@
     return null;
   }
   validateTargetDate(targetDate);
-  List<InvoiceItem> existingItems=new ArrayList<InvoiceItem>();
+  final List<InvoiceItem> existingItems=new ArrayList<InvoiceItem>();
   if (existingInvoices != null) {
-    for (    Invoice invoice : existingInvoices) {
-      for (      InvoiceItem item : invoice.getInvoiceItems()) {
+    for (    final Invoice invoice : existingInvoices) {
+      for (      final InvoiceItem item : invoice.getInvoiceItems()) {
         if (item.getSubscriptionId() == null || !events.getSubscriptionIdsWithAutoInvoiceOff().contains(item.getSubscriptionId())) {
           existingItems.add(item);
         }
@@ -15,9 +15,9 @@
     Collections.sort(existingItems);
   }
   targetDate=adjustTargetDate(existingInvoices,targetDate);
-  Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,targetCurrency);
-  UUID invoiceId=invoice.getId();
-  List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,targetDate,targetCurrency);
+  final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,targetCurrency);
+  final UUID invoiceId=invoice.getId();
+  final List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,targetDate,targetCurrency);
   removeCancellingInvoiceItems(existingItems);
   removeDuplicatedInvoiceItems(proposedItems,existingItems);
   addReversingItems(existingItems,proposedItems);

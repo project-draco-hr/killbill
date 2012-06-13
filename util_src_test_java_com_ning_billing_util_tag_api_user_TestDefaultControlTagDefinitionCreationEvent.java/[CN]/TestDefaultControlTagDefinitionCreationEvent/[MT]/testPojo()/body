@@ -1,0 +1,20 @@
+{
+  final UUID tagDefinitionId=UUID.randomUUID();
+  final String tagDefinitionName=UUID.randomUUID().toString();
+  final String tagDefinitionDescription=UUID.randomUUID().toString();
+  final boolean controlTag=true;
+  final TagDefinition tagDefinition=new DefaultTagDefinition(tagDefinitionId,tagDefinitionName,tagDefinitionDescription,controlTag);
+  final UUID userToken=UUID.randomUUID();
+  final DefaultControlTagDefinitionCreationEvent event=new DefaultControlTagDefinitionCreationEvent(tagDefinitionId,tagDefinition,userToken);
+  Assert.assertEquals(event.getBusEventType(),BusEvent.BusEventType.CONTROL_TAGDEFINITION_CREATION);
+  Assert.assertEquals(event.getTagDefinitionId(),tagDefinitionId);
+  Assert.assertEquals(event.getTagDefinition(),tagDefinition);
+  Assert.assertEquals(event.getTagDefinition().getId(),tagDefinitionId);
+  Assert.assertEquals(event.getTagDefinition().getName(),tagDefinitionName);
+  Assert.assertEquals(event.getTagDefinition().getDescription(),tagDefinitionDescription);
+  Assert.assertEquals(event.getUserToken(),userToken);
+  Assert.assertEquals(event,event);
+  Assert.assertEquals(event,new DefaultControlTagDefinitionCreationEvent(tagDefinitionId,tagDefinition,userToken));
+  Assert.assertTrue(event.equals(event));
+  Assert.assertTrue(event.equals(new DefaultControlTagDefinitionCreationEvent(tagDefinitionId,tagDefinition,userToken)));
+}

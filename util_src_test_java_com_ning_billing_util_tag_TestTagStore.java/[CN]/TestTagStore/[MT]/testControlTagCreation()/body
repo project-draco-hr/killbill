@@ -1,14 +1,14 @@
 {
-  UUID accountId=UUID.randomUUID();
-  TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
-  ControlTag tag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
+  final UUID accountId=UUID.randomUUID();
+  final TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
+  final ControlTag tag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
   tagStore.add(tag);
   assertEquals(tagStore.generateInvoice(),false);
-  List<Tag> tagList=tagStore.getEntityList();
+  final List<Tag> tagList=tagStore.getEntityList();
   tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagList,context);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  final Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   assertEquals(tagMap.size(),1);
   assertEquals(tagMap.containsKey(ControlTagType.AUTO_INVOICING_OFF.toString()),true);
 }

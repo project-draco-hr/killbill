@@ -1,0 +1,14 @@
+{
+  final UUID tagDefinitionId=UUID.randomUUID();
+  final String tagDefinitionName=UUID.randomUUID().toString();
+  final String tagDefinitionDescription=UUID.randomUUID().toString();
+  final boolean controlTag=true;
+  final TagDefinition tagDefinition=new DefaultTagDefinition(tagDefinitionId,tagDefinitionName,tagDefinitionDescription,controlTag);
+  final UUID userToken=UUID.randomUUID();
+  final TagEventBuilder tagEventBuilder=new TagEventBuilder();
+  final TagDefinitionEvent event=tagEventBuilder.newUserTagDefinitionDeletionEvent(tagDefinitionId,tagDefinition,userToken);
+  Assert.assertTrue(event instanceof UserTagDefinitionDeletionEvent);
+  Assert.assertEquals(event,new DefaultUserTagDefinitionDeletionEvent(tagDefinitionId,tagDefinition,userToken));
+  Assert.assertTrue(event.equals(new DefaultUserTagDefinitionDeletionEvent(tagDefinitionId,tagDefinition,userToken)));
+  verifyTagDefinitionEvent(tagDefinitionId,tagDefinitionName,tagDefinitionDescription,tagDefinition,userToken,event);
+}
