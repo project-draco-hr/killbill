@@ -1,10 +1,26 @@
 {
-  if (dao.tagDefinitionUsageCount(definitionName) > 0) {
-    throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_IN_USE,definitionName);
+  try {
+    tagDefinitionSqlDao.inTransaction(new Transaction<Void,TagDefinitionSqlDao>(){
+      @Override public Void inTransaction(      final TagDefinitionSqlDao transactional,      final TransactionStatus status) throws Exception {
+        final TagDefinition existingDefinition=tagDefinitionSqlDao.getByName(definitionName);
+        if (existingDefinition == null) {
+          throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_DOES_NOT_EXIST,definitionName);
+        }
+        if (tagDefinitionSqlDao.tagDefinitionUsageCount(definitionName) > 0) {
+          throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_IN_USE,definitionName);
+        }
+        tagDefinitionSqlDao.deleteTagDefinition(definitionName,context);
+        return null;
+      }
+    }
+);
   }
-  final TagDefinition existingDefinition=dao.getByName(definitionName);
-  if (existingDefinition == null) {
-    throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_DOES_NOT_EXIST,definitionName);
+ catch (  TransactionFailedException exception) {
+    if (exception.getCause() instanceof TagDefinitionApiException) {
+      throw (TagDefinitionApiException)exception.getCause();
+    }
+ else {
+      throw exception;
+    }
   }
-  dao.deleteTagDefinition(definitionName,context);
 }

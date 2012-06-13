@@ -15,12 +15,9 @@
   tagDao.saveEntities(objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
   final Map<String,Tag> tagMap=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
   assertEquals(tagMap.size(),1);
-  try {
-    tagDefinitionDao.deleteAllTagsForDefinition(definitionName,context);
-  }
- catch (  TagDefinitionApiException e) {
-    fail("Could not delete tagStore for tag definition",e);
-  }
+  tagDao.deleteTag(objectId,ObjectType.ACCOUNT,tagDefinition,context);
+  final Map<String,Tag> tagMapAfterDeletion=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
+  assertEquals(tagMapAfterDeletion.size(),0);
   try {
     tagDefinitionDao.deleteTagDefinition(definitionName,context);
   }
