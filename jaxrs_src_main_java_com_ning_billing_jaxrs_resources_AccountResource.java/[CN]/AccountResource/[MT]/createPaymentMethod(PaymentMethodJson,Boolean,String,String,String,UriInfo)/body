@@ -1,9 +1,9 @@
 {
   try {
-    final PaymentMethod data=json.toPaymentMethod();
-    final Account account=accountApi.getAccountById(data.getAccountId());
-    paymentApi.addPaymentMethod(data.getPluginName(),account,isDefault,data.getPluginDetail(),context.createContext(createdBy,reason,comment));
-    return uriBuilder.buildResponse(AccountResource.class,"getPaymentMethods",account.getId());
+    PaymentMethod data=json.toPaymentMethod();
+    Account account=accountApi.getAccountById(data.getAccountId());
+    UUID paymentMethodId=paymentApi.addPaymentMethod(data.getPluginName(),account,isDefault,data.getPluginDetail(),context.createContext(createdBy,reason,comment));
+    return uriBuilder.buildResponse(PaymentMethodResource.class,"getPaymentMethod",paymentMethodId,uriInfo.getBaseUri().toString());
   }
  catch (  AccountApiException e) {
     final String error=String.format("Failed to create account %s",json);

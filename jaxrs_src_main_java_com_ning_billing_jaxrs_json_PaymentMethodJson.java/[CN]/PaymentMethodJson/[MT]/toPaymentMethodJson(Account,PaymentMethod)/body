@@ -1,0 +1,17 @@
+{
+  final boolean isDefault=account.getPaymentMethodId() != null && account.getPaymentMethodId().equals(in.getId());
+  PaymentMethodPluginDetailJson detail=null;
+  if (in.getPluginDetail() != null) {
+    List<PaymentMethodProperties> properties=null;
+    if (in.getPluginDetail().getProperties() != null) {
+      properties=new ArrayList<PaymentMethodJson.PaymentMethodProperties>(Collections2.transform(in.getPluginDetail().getProperties(),new Function<PaymentMethodKVInfo,PaymentMethodProperties>(){
+        @Override public PaymentMethodProperties apply(        PaymentMethodKVInfo input){
+          return new PaymentMethodProperties(input.getKey(),input.getValue().toString(),input.getIsUpdatable());
+        }
+      }
+));
+      detail=new PaymentMethodPluginDetailJson(in.getPluginDetail().getExternalPaymentMethodId(),properties);
+    }
+  }
+  return new PaymentMethodJson(in.getId().toString(),account.getId().toString(),isDefault,in.getPluginName(),detail);
+}

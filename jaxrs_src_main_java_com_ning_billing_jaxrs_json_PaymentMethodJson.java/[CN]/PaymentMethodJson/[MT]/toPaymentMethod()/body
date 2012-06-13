@@ -1,16 +1,16 @@
 {
   return new PaymentMethod(){
     @Override public Boolean isActive(){
-      return isActive;
+      return true;
     }
     @Override public String getPluginName(){
       return pluginName;
     }
     @Override public UUID getId(){
-      return UUID.fromString(paymentMethodId);
+      return paymentMethodId != null ? UUID.fromString(paymentMethodId) : null;
     }
     @Override public UUID getAccountId(){
-      return UUID.fromString(accountId);
+      return accountId != null ? UUID.fromString(accountId) : null;
     }
     @Override public PaymentMethodPlugin getPluginDetail(){
       return new PaymentMethodPlugin(){
@@ -24,9 +24,12 @@
           return pluginInfo.getExternalPaymentId();
         }
         @Override public List<PaymentMethodKVInfo> getProperties(){
-          List<PaymentMethodKVInfo> result=new LinkedList<PaymentMethodPlugin.PaymentMethodKVInfo>();
-          for (          PaymentMethodProperties cur : pluginInfo.getProperties()) {
-            result.add(new PaymentMethodKVInfo(cur.getKey(),cur.getValue(),cur.isUpdatable));
+          if (pluginInfo.getProperties() != null) {
+            List<PaymentMethodKVInfo> result=new LinkedList<PaymentMethodPlugin.PaymentMethodKVInfo>();
+            for (            PaymentMethodProperties cur : pluginInfo.getProperties()) {
+              result.add(new PaymentMethodKVInfo(cur.getKey(),cur.getValue(),cur.isUpdatable));
+            }
+            return result;
           }
           return null;
         }
