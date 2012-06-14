@@ -2,9 +2,9 @@
   try {
     Preconditions.checkNotNull(accountId,"% query parameter must be specified",QUERY_ACCOUNT_ID);
     accountApi.getAccountById(UUID.fromString(accountId));
-    List<Invoice> invoices=invoiceApi.getInvoicesByAccount(UUID.fromString(accountId));
-    List<InvoiceJsonSimple> result=new LinkedList<InvoiceJsonSimple>();
-    for (    Invoice cur : invoices) {
+    final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(UUID.fromString(accountId));
+    final List<InvoiceJsonSimple> result=new LinkedList<InvoiceJsonSimple>();
+    for (    final Invoice cur : invoices) {
       result.add(new InvoiceJsonSimple(cur));
     }
     return Response.status(Status.OK).entity(result).build();
