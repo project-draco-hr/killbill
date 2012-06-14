@@ -1,14 +1,14 @@
 {
-  AccountJson input=getAccountJson(name,key,email);
+  final AccountJson input=getAccountJson(name,key,email);
   String baseJson=mapper.writeValueAsString(input);
   Response response=doPost(JaxrsResource.ACCOUNTS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  String location=response.getHeader("Location");
+  final String location=response.getHeader("Location");
   Assert.assertNotNull(location);
   response=doGetWithUrl(location,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   baseJson=response.getResponseBody();
-  AccountJson objFromJson=mapper.readValue(baseJson,AccountJson.class);
+  final AccountJson objFromJson=mapper.readValue(baseJson,AccountJson.class);
   Assert.assertNotNull(objFromJson);
   return objFromJson;
 }
