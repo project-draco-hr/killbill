@@ -1,10 +1,10 @@
 {
-  Catalog catalog=catalogService.getFullCatalog();
-  ProductCategory currentCategory=currentPlan.getProduct().getCategory();
-  PlanPhaseSpecifier fromPlanPhaseSpecifier=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentCategory,currentPlan.getBillingPeriod(),currentPriceList,currentPhase.getPhaseType());
-  PlanSpecifier toPlanSpecifier=new PlanSpecifier(nextPlan.getProduct().getName(),nextPlan.getProduct().getCategory(),nextPlan.getBillingPeriod(),priceList);
+  final Catalog catalog=catalogService.getFullCatalog();
+  final ProductCategory currentCategory=currentPlan.getProduct().getCategory();
+  final PlanPhaseSpecifier fromPlanPhaseSpecifier=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentCategory,currentPlan.getBillingPeriod(),currentPriceList,currentPhase.getPhaseType());
+  final PlanSpecifier toPlanSpecifier=new PlanSpecifier(nextPlan.getProduct().getName(),nextPlan.getProduct().getCategory(),nextPlan.getBillingPeriod(),priceList);
   DateTime planStartDate=null;
-  PlanAlignmentChange alignment=catalog.planChangeAlignment(fromPlanPhaseSpecifier,toPlanSpecifier,requestedDate);
+  final PlanAlignmentChange alignment=catalog.planChangeAlignment(fromPlanPhaseSpecifier,toPlanSpecifier,requestedDate);
 switch (alignment) {
 case START_OF_SUBSCRIPTION:
     planStartDate=subscriptionStartDate;
@@ -20,6 +20,6 @@ throw new EntitlementError(String.format("Not implemented yet %s",alignment));
 default :
 throw new EntitlementError(String.format("Unknwon PlanAlignmentChange %s",alignment));
 }
-List<TimedPhase> timedPhases=getPhaseAlignments(nextPlan,null,planStartDate);
+final List<TimedPhase> timedPhases=getPhaseAlignments(nextPlan,null,planStartDate);
 return getTimedPhase(timedPhases,effectiveDate,which);
 }

@@ -1,10 +1,10 @@
 {
-  Class<?>[] clazzes=Arrays.copyOf(others,others.length + 2);
+  final Class<?>[] clazzes=Arrays.copyOf(others,others.length + 2);
   clazzes[others.length]=ZombieControl.class;
   clazzes[others.length + 1]=clazz;
   return (T)Proxy.newProxyInstance(clazz.getClassLoader(),clazzes,new InvocationHandler(){
     private final Map<String,Object> results=new HashMap<String,Object>();
-    @Override public Object invoke(    Object proxy,    Method method,    Object[] args) throws Throwable {
+    @Override public Object invoke(    final Object proxy,    final Method method,    final Object[] args) throws Throwable {
       if (method.getDeclaringClass().equals(ZombieControl.class)) {
         if (method.getName().equals("addResult")) {
           results.put((String)args[0],args[1]);
@@ -16,7 +16,7 @@
         }
       }
  else {
-        Object result=results.get(method.getName());
+        final Object result=results.get(method.getName());
         if (result == ZOMBIE_VOID) {
           return (Void)null;
         }

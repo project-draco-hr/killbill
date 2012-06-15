@@ -3,18 +3,18 @@
   try {
     accountSqlDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
       @Override public Void inTransaction(      final AccountSqlDao transactionalDao,      final TransactionStatus status) throws AccountApiException, Bus.EventBusException {
-        Account currentAccount=transactionalDao.getAccountByKey(key);
+        final Account currentAccount=transactionalDao.getAccountByKey(key);
         if (currentAccount != null) {
           throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,key);
         }
         transactionalDao.create(account,context);
-        Long recordId=accountSqlDao.getRecordId(account.getId().toString());
-        EntityHistory<Account> history=new EntityHistory<Account>(account.getId(),recordId,account,ChangeType.INSERT);
+        final Long recordId=accountSqlDao.getRecordId(account.getId().toString());
+        final EntityHistory<Account> history=new EntityHistory<Account>(account.getId(),recordId,account,ChangeType.INSERT);
         accountSqlDao.insertHistoryFromTransaction(history,context);
-        Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId);
-        EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
+        final Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId);
+        final EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
         accountSqlDao.insertAuditFromTransaction(audit,context);
-        AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,context.getUserToken());
+        final AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,context.getUserToken());
         try {
           eventBus.postFromTransaction(creationEvent,transactionalDao);
         }

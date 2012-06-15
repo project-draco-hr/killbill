@@ -1,12 +1,12 @@
 {
-  List<Listing> availAddons=new ArrayList<Listing>();
+  final List<Listing> availAddons=new ArrayList<Listing>();
   try {
-    Product product=findCurrentProduct(baseProductName);
+    final Product product=findCurrentProduct(baseProductName);
     if (product != null) {
-      for (      Product availAddon : product.getAvailable()) {
-        for (        Plan plan : getCurrentPlans()) {
+      for (      final Product availAddon : product.getAvailable()) {
+        for (        final Plan plan : getCurrentPlans()) {
           if (plan.getProduct().equals(availAddon)) {
-            for (            PriceList priceList : getPriceLists().getAllPriceLists()) {
+            for (            final PriceList priceList : getPriceLists().getAllPriceLists()) {
               if (priceList.findPlan(availAddon,plan.getBillingPeriod()) != null && priceList.findPlan(product,plan.getBillingPeriod()).equals(plan)) {
                 availAddons.add(new DefaultListing(plan,priceList));
               }

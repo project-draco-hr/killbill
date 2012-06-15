@@ -6,11 +6,11 @@
       try {
         pluginApi=pluginRegistry.getPlugin(pluginName);
         pm=new DefaultPaymentMethod(account.getId(),pluginName,paymentMethodProps);
-        String externalId=pluginApi.addPaymentMethod(account.getExternalKey(),paymentMethodProps,setDefault);
-        PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getAccountId(),pm.getPluginName(),pm.isActive(),externalId);
+        final String externalId=pluginApi.addPaymentMethod(account.getExternalKey(),paymentMethodProps,setDefault);
+        final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getAccountId(),pm.getPluginName(),pm.isActive(),externalId);
         paymentDao.insertPaymentMethod(pmModel,context);
         if (setDefault) {
-          MutableAccountData updateAccountData=new DefaultMutableAccountData(account);
+          final MutableAccountData updateAccountData=new DefaultMutableAccountData(account);
           updateAccountData.setPaymentMethodId(pm.getId());
           accountUserApi.updateAccount(account.getId(),updateAccountData,context);
         }

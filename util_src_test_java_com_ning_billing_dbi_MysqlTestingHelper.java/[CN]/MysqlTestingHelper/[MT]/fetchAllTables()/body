@@ -1,9 +1,9 @@
 {
   if (allTables == null) {
     final String dbiString="jdbc:mysql://localhost:" + port + "/information_schema";
-    IDBI cleanupDbi=new DBI(dbiString,USERNAME,PASSWORD);
+    final IDBI cleanupDbi=new DBI(dbiString,USERNAME,PASSWORD);
     final List<String> tables=cleanupDbi.withHandle(new HandleCallback<List<String>>(){
-      @Override public List<String> withHandle(      Handle h) throws Exception {
+      @Override public List<String> withHandle(      final Handle h) throws Exception {
         return h.createQuery("select table_name from tables where table_schema = :table_schema and table_type = 'BASE TABLE';").bind("table_schema",DB_NAME).map(new StringMapper()).list();
       }
     }

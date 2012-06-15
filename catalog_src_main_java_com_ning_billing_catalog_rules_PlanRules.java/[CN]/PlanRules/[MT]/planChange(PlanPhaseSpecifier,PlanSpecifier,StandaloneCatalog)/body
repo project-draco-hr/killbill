@@ -1,5 +1,5 @@
 {
-  DefaultPriceList toPriceList;
+  final DefaultPriceList toPriceList;
   if (to.getPriceListName() == null) {
     toPriceList=findPriceList(from.toPlanSpecifier(),catalog);
     to=new PlanSpecifier(to.getProductName(),to.getProductCategory(),to.getBillingPeriod(),toPriceList.getName());
@@ -7,10 +7,10 @@
  else {
     toPriceList=catalog.findCurrentPriceList(to.getPriceListName());
   }
-  ActionPolicy policy=getPlanChangePolicy(from,to,catalog);
+  final ActionPolicy policy=getPlanChangePolicy(from,to,catalog);
   if (policy == ActionPolicy.ILLEGAL) {
     throw new IllegalPlanChange(from,to);
   }
-  PlanAlignmentChange alignment=getPlanChangeAlignment(from,to,catalog);
+  final PlanAlignmentChange alignment=getPlanChangeAlignment(from,to,catalog);
   return new PlanChangeResult(toPriceList,policy,alignment);
 }

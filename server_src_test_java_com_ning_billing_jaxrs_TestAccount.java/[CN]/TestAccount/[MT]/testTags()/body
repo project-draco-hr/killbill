@@ -1,14 +1,14 @@
 {
-  TagDefinitionJson input=new TagDefinitionJson("yoyo","nothing more to say");
-  String baseJson=mapper.writeValueAsString(input);
+  final TagDefinitionJson input=new TagDefinitionJson("yoyo","nothing more to say");
+  final String baseJson=mapper.writeValueAsString(input);
   Response response=doPost(JaxrsResource.TAG_DEFINITIONS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  Map<String,String> queryParams=new HashMap<String,String>();
+  final Map<String,String> queryParams=new HashMap<String,String>();
   queryParams.put(JaxrsResource.QUERY_TAGS,input.getName());
-  String uri=JaxrsResource.ACCOUNTS_PATH + "/" + JaxrsResource.TAGS+ "/"+ UUID.randomUUID().toString();
+  final String uri=JaxrsResource.ACCOUNTS_PATH + "/" + JaxrsResource.TAGS+ "/"+ UUID.randomUUID().toString();
   response=doPost(uri,null,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  String url=getUrlFromUri(uri);
+  final String url=getUrlFromUri(uri);
   response=doGetWithUrl(url,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
 }

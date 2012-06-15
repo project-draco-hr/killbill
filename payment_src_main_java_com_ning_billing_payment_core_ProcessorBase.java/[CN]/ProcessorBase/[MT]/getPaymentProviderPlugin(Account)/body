@@ -1,11 +1,11 @@
 {
   String paymentProviderName=null;
   if (account != null) {
-    UUID paymentMethodId=account.getPaymentMethodId();
+    final UUID paymentMethodId=account.getPaymentMethodId();
     if (paymentMethodId == null) {
       throw new PaymentApiException(ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD,account.getId());
     }
-    PaymentMethodModelDao methodDao=paymentDao.getPaymentMethod(paymentMethodId);
+    final PaymentMethodModelDao methodDao=paymentDao.getPaymentMethod(paymentMethodId);
     if (methodDao == null) {
       log.error("Account {} has a non existent default payment method {}!!!",account.getId(),paymentMethodId);
       throw new PaymentApiException(ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD,account.getId());

@@ -1,10 +1,10 @@
 {
   log.info("Killbill lifecycle firing stage {}",level);
-  Set<LifecycleHandler<? extends KillbillService>> handlers=handlersByLevel.get(level);
-  for (  LifecycleHandler<? extends KillbillService> cur : handlers) {
+  final Set<LifecycleHandler<? extends KillbillService>> handlers=handlersByLevel.get(level);
+  for (  final LifecycleHandler<? extends KillbillService> cur : handlers) {
     try {
-      Method method=cur.getMethod();
-      KillbillService target=cur.getTarget();
+      final Method method=cur.getMethod();
+      final KillbillService target=cur.getTarget();
       log.info("Killbill lifecycle calling handler {} for service {}",cur.getMethod().getName(),target.getName());
       method.invoke(target);
     }

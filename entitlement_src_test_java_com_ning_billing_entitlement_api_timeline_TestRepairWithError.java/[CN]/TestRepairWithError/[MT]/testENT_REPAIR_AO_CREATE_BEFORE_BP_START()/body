@@ -4,24 +4,24 @@
     @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
       Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
       clock.addDeltaFromReality(it.toDurationMillis());
-      SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+      final SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
       it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
       clock.addDeltaFromReality(it.toDurationMillis());
-      BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+      final BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
       sortEventsOnBundle(bundleRepair);
-      SubscriptionTimeline bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
+      final SubscriptionTimeline bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
       assertEquals(bpRepair.getExistingEvents().size(),2);
-      SubscriptionTimeline aoRepair=getSubscriptionRepair(aoSubscription.getId(),bundleRepair);
+      final SubscriptionTimeline aoRepair=getSubscriptionRepair(aoSubscription.getId(),bundleRepair);
       assertEquals(aoRepair.getExistingEvents().size(),2);
-      List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+      final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
       des.add(createDeletedEvent(aoRepair.getExistingEvents().get(0).getEventId()));
       des.add(createDeletedEvent(aoRepair.getExistingEvents().get(1).getEventId()));
-      DateTime aoRecreateDate=aoSubscription.getStartDate().minusDays(5);
-      PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.DISCOUNT);
-      NewEvent ne=createNewEvent(SubscriptionTransitionType.CREATE,aoRecreateDate,spec);
-      SubscriptionTimeline saoRepair=createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
-      BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
-      boolean dryRun=true;
+      final DateTime aoRecreateDate=aoSubscription.getStartDate().minusDays(5);
+      final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.DISCOUNT);
+      final NewEvent ne=createNewEvent(SubscriptionTransitionType.CREATE,aoRecreateDate,spec);
+      final SubscriptionTimeline saoRepair=createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
+      final BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
+      final boolean dryRun=true;
       repairApi.repairBundle(bRepair,dryRun,context);
     }
   }

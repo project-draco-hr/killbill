@@ -1,9 +1,9 @@
 {
-  SubscriptionCallCompletionCallback<Subscription> callback=new SubscriptionCallCompletionCallback<Subscription>(){
+  final SubscriptionCallCompletionCallback<Subscription> callback=new SubscriptionCallCompletionCallback<Subscription>(){
     @Override public Subscription doOperation(    final CallContext ctx) throws EntitlementUserApiException, InterruptedException, TimeoutException {
-      DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
-      UUID uuid=UUID.fromString(subscription.getBundleId());
-      PlanPhaseSpecifier spec=new PlanPhaseSpecifier(subscription.getProductName(),ProductCategory.valueOf(subscription.getProductCategory()),BillingPeriod.valueOf(subscription.getBillingPeriod()),subscription.getPriceList(),null);
+      final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
+      final UUID uuid=UUID.fromString(subscription.getBundleId());
+      final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(subscription.getProductName(),ProductCategory.valueOf(subscription.getProductCategory()),BillingPeriod.valueOf(subscription.getBillingPeriod()),subscription.getPriceList(),null);
       return entitlementApi.createSubscription(uuid,spec,inputDate,ctx);
     }
     @Override public boolean isImmOperation(){
@@ -14,6 +14,6 @@
     }
   }
 ;
-  SubscriptionCallCompletion<Subscription> callCompletionCreation=new SubscriptionCallCompletion<Subscription>();
+  final SubscriptionCallCompletion<Subscription> callCompletionCreation=new SubscriptionCallCompletion<Subscription>();
   return callCompletionCreation.withSynchronization(callback,timeoutSec,callCompletion,createdBy,reason,comment);
 }

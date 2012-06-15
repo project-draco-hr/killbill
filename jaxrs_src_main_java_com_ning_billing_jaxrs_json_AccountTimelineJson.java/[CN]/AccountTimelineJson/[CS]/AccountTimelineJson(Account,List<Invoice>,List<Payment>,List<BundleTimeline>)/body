@@ -9,9 +9,9 @@
     this.invoices.add(new InvoiceJsonWithBundleKeys(cur.getAmountPaid(),cur.getAmountCredited(),cur.getId().toString(),cur.getInvoiceDate(),cur.getTargetDate(),Integer.toString(cur.getInvoiceNumber()),cur.getBalance(),cur.getAccountId().toString(),getBundleExternalKey(cur,bundles)));
   }
   this.payments=new LinkedList<PaymentJsonWithBundleKeys>();
-  for (  Payment cur : payments) {
-    String status=cur.getPaymentStatus().toString();
-    BigDecimal paidAmount=cur.getPaymentStatus() == PaymentStatus.SUCCESS ? cur.getAmount() : BigDecimal.ZERO;
+  for (  final Payment cur : payments) {
+    final String status=cur.getPaymentStatus().toString();
+    final BigDecimal paidAmount=cur.getPaymentStatus() == PaymentStatus.SUCCESS ? cur.getAmount() : BigDecimal.ZERO;
     this.payments.add(new PaymentJsonWithBundleKeys(cur.getAmount(),paidAmount,account.getId().toString(),cur.getInvoiceId().toString(),cur.getId().toString(),cur.getEffectiveDate(),cur.getEffectiveDate(),cur.getAttempts().size(),cur.getCurrency().toString(),status,getBundleExternalKey(cur.getInvoiceId(),invoices,bundles)));
   }
 }

@@ -8,11 +8,11 @@
   subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
   ((ZombieControl)subscription).addResult("getId",UUID.randomUUID());
   ((ZombieControl)subscription).addResult("getBundleId",bundle.getId());
-  Injector i=Guice.createInjector(new AbstractModule(){
+  final Injector i=Guice.createInjector(new AbstractModule(){
     @Override protected void configure(){
       bind(BlockingChecker.class).to(DefaultBlockingChecker.class).asEagerSingleton();
       bind(BlockingStateDao.class).toInstance(dao);
-      EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
+      final EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
       bind(EntitlementUserApi.class).toInstance(entitlementUserApi);
       ((ZombieControl)entitlementUserApi).addResult("getBundleFromId",bundle);
     }

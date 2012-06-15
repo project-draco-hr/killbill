@@ -2,16 +2,16 @@
   try {
     log.info("Starting testSingleBasePlanWithPendingPhase");
     final DateTime trialDate=clock.getUTCNow().minusDays(10);
-    EntitlementAccountMigration toBeMigrated=createAccountFuturePendingPhase(trialDate);
+    final EntitlementAccountMigration toBeMigrated=createAccountFuturePendingPhase(trialDate);
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated,context);
     assertTrue(testListener.isCompleted(5000));
-    List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
+    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
     assertEquals(bundles.size(),1);
-    SubscriptionBundle bundle=bundles.get(0);
-    List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId());
+    final SubscriptionBundle bundle=bundles.get(0);
+    final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId());
     assertEquals(subscriptions.size(),1);
-    Subscription subscription=subscriptions.get(0);
+    final Subscription subscription=subscriptions.get(0);
     assertEquals(subscription.getStartDate(),trialDate);
     assertEquals(subscription.getEndDate(),null);
     assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
@@ -21,7 +21,7 @@
     assertEquals(subscription.getChargedThroughDate(),trialDate.plusDays(30));
     testListener.pushExpectedEvent(NextEvent.MIGRATE_BILLING);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
+    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     assertEquals(subscription.getStartDate(),trialDate);

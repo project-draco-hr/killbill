@@ -1,17 +1,17 @@
 {
-  ValidationConfiguration configuration=getConfiguration(o.getClass());
+  final ValidationConfiguration configuration=getConfiguration(o.getClass());
   if (configuration == null) {
     return true;
   }
-  Class clazz=o.getClass();
-  for (  String propertyName : configuration.keySet()) {
+  final Class clazz=o.getClass();
+  for (  final String propertyName : configuration.keySet()) {
     try {
-      Field field=clazz.getDeclaredField(propertyName);
+      final Field field=clazz.getDeclaredField(propertyName);
       if (!field.isAccessible()) {
         field.setAccessible(true);
       }
-      Object value=field.get(o);
-      ColumnInfo columnInfo=configuration.get(propertyName);
+      final Object value=field.get(o);
+      final ColumnInfo columnInfo=configuration.get(propertyName);
       if (columnInfo == null) {
         return true;
       }

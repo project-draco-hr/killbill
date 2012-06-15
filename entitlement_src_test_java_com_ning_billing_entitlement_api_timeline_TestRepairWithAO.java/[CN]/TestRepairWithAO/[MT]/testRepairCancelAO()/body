@@ -1,37 +1,37 @@
 {
   log.info("Starting testRepairCancelAO");
-  String baseProduct="Shotgun";
-  BillingPeriod baseTerm=BillingPeriod.MONTHLY;
-  String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  SubscriptionData baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+  final String baseProduct="Shotgun";
+  final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+  final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final SubscriptionData baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
   Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
   clock.addDeltaFromReality(it.toDurationMillis());
-  SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+  final SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
   it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
   clock.addDeltaFromReality(it.toDurationMillis());
-  BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+  final BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
   sortEventsOnBundle(bundleRepair);
   SubscriptionTimeline bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
   assertEquals(bpRepair.getExistingEvents().size(),2);
   SubscriptionTimeline aoRepair=getSubscriptionRepair(aoSubscription.getId(),bundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
-  List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+  final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
   des.add(createDeletedEvent(aoRepair.getExistingEvents().get(1).getEventId()));
-  DateTime aoCancelDate=aoSubscription.getStartDate().plusDays(1);
-  NewEvent ne=createNewEvent(SubscriptionTransitionType.CANCEL,aoCancelDate,null);
-  SubscriptionTimeline saoRepair=createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
-  BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
+  final DateTime aoCancelDate=aoSubscription.getStartDate().plusDays(1);
+  final NewEvent ne=createNewEvent(SubscriptionTransitionType.CANCEL,aoCancelDate,null);
+  final SubscriptionTimeline saoRepair=createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
+  final BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
   boolean dryRun=true;
-  BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),dryRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
   bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
   assertEquals(bpRepair.getExistingEvents().size(),2);
-  List<ExistingEvent> expected=new LinkedList<SubscriptionTimeline.ExistingEvent>();
+  final List<ExistingEvent> expected=new LinkedList<SubscriptionTimeline.ExistingEvent>();
   expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CREATE,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoSubscription.getStartDate()));
   expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CANCEL,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoCancelDate));
   int index=0;
-  for (  ExistingEvent e : expected) {
+  for (  final ExistingEvent e : expected) {
     validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
   }
   SubscriptionData newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
@@ -44,12 +44,12 @@
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   dryRun=false;
   testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
-  BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  final BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
   assertTrue(testListener.isCompleted(5000));
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),realRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
   index=0;
-  for (  ExistingEvent e : expected) {
+  for (  final ExistingEvent e : expected) {
     validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
   }
   newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());

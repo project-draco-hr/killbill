@@ -1,13 +1,13 @@
 {
-  SubscriptionData subscription=subscriptionDataFromSubscription(entitlementUserApi.getSubscriptionFromId(subscriptionId));
-  List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId);
-  List<InvoiceItem> invoiceItems=new ArrayList<InvoiceItem>();
-  for (  Invoice invoice : invoices) {
+  final SubscriptionData subscription=subscriptionDataFromSubscription(entitlementUserApi.getSubscriptionFromId(subscriptionId));
+  final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId);
+  final List<InvoiceItem> invoiceItems=new ArrayList<InvoiceItem>();
+  for (  final Invoice invoice : invoices) {
     invoiceItems.addAll(invoice.getInvoiceItems());
   }
   assertEquals(invoiceItems.size(),totalInvoiceItemCount);
   boolean wasFound=false;
-  for (  InvoiceItem item : invoiceItems) {
+  for (  final InvoiceItem item : invoiceItems) {
     if (item.getStartDate().compareTo(startDate) == 0) {
       if (item.getEndDate().compareTo(endDate) == 0) {
         if (item.getAmount().compareTo(amount) == 0) {
@@ -20,7 +20,7 @@
   if (!wasFound) {
     fail();
   }
-  DateTime ctd=subscription.getChargedThroughDate();
+  final DateTime ctd=subscription.getChargedThroughDate();
   assertNotNull(ctd);
   log.info("Checking CTD: " + ctd.toString() + "; clock is "+ clock.getUTCNow().toString());
   assertTrue(clock.getUTCNow().isBefore(ctd));

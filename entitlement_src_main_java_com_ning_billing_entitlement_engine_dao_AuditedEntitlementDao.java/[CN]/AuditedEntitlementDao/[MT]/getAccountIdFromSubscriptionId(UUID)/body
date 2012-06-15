@@ -1,15 +1,15 @@
 {
-  Subscription subscription=subscriptionsDao.getSubscriptionFromId(subscriptionId.toString());
+  final Subscription subscription=subscriptionsDao.getSubscriptionFromId(subscriptionId.toString());
   if (subscription == null) {
     log.error(String.format(ErrorCode.ENT_INVALID_SUBSCRIPTION_ID.getFormat(),subscriptionId.toString()));
     return null;
   }
-  UUID bundleId=subscription.getBundleId();
+  final UUID bundleId=subscription.getBundleId();
   if (bundleId == null) {
     log.error(String.format(ErrorCode.ENT_GET_NO_BUNDLE_FOR_SUBSCRIPTION.getFormat(),subscriptionId.toString()));
     return null;
   }
-  SubscriptionBundle bundle=bundlesDao.getBundleFromId(bundleId.toString());
+  final SubscriptionBundle bundle=bundlesDao.getBundleFromId(bundleId.toString());
   if (bundle == null) {
     log.error(String.format(ErrorCode.ENT_GET_INVALID_BUNDLE_ID.getFormat(),bundleId.toString()));
     return null;
