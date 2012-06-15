@@ -2,10 +2,10 @@
   final UUID id=UUID.randomUUID();
   final ObjectType objectType=ObjectType.ACCOUNT;
   final FieldStore fieldStore1=new DefaultFieldStore(id,objectType);
-  String fieldName="TestField1";
+  final String fieldName="TestField1";
   String fieldValue="Kitty Hawk";
   fieldStore1.setValue(fieldName,fieldValue);
-  CustomFieldSqlDao customFieldSqlDao=dbi.onDemand(CustomFieldSqlDao.class);
+  final CustomFieldSqlDao customFieldSqlDao=dbi.onDemand(CustomFieldSqlDao.class);
   customFieldDao.saveEntitiesFromTransaction(customFieldSqlDao,id,objectType,fieldStore1.getEntityList(),context);
   final FieldStore fieldStore2=DefaultFieldStore.create(id,objectType);
   fieldStore2.add(customFieldSqlDao.load(id.toString(),objectType));

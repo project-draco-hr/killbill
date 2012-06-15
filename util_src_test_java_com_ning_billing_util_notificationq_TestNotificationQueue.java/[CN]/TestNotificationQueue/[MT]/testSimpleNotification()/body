@@ -1,7 +1,7 @@
 {
   final Map<String,Boolean> expectedNotifications=new TreeMap<String,Boolean>();
   final DefaultNotificationQueue queue=new DefaultNotificationQueue(dbi,clock,"test-svc","foo",new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    String notificationKey,    DateTime eventDateTime){
+    @Override public void handleReadyNotification(    final String notificationKey,    final DateTime eventDateTime){
 synchronized (expectedNotifications) {
         log.info("Handler received key: " + notificationKey);
         expectedNotifications.put(notificationKey,Boolean.TRUE);
@@ -23,7 +23,7 @@ synchronized (expectedNotifications) {
 ;
   expectedNotifications.put(notificationKey.toString(),Boolean.FALSE);
   dao.inTransaction(new Transaction<Void,DummySqlTest>(){
-    @Override public Void inTransaction(    DummySqlTest transactional,    TransactionStatus status) throws Exception {
+    @Override public Void inTransaction(    final DummySqlTest transactional,    final TransactionStatus status) throws Exception {
       transactional.insertDummy(obj);
       queue.recordFutureNotificationFromTransaction(transactional,readyTime,notificationKey);
       log.info("Posted key: " + notificationKey);

@@ -1,14 +1,14 @@
 {
   eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
-    @Override public Void inTransaction(    EntitlementEventSqlDao transactional,    TransactionStatus status) throws Exception {
-      SubscriptionSqlDao transSubDao=transactional.become(SubscriptionSqlDao.class);
-      BundleSqlDao transBundleDao=transactional.become(BundleSqlDao.class);
-      List<EntityAudit> audits=new ArrayList<EntityAudit>();
+    @Override public Void inTransaction(    final EntitlementEventSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final SubscriptionSqlDao transSubDao=transactional.become(SubscriptionSqlDao.class);
+      final BundleSqlDao transBundleDao=transactional.become(BundleSqlDao.class);
+      final List<EntityAudit> audits=new ArrayList<EntityAudit>();
       Long recordId;
-      for (      BundleMigrationData curBundle : accountData.getData()) {
-        SubscriptionBundleData bundleData=curBundle.getData();
-        for (        SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
-          SubscriptionData subData=curSubscription.getData();
+      for (      final BundleMigrationData curBundle : accountData.getData()) {
+        final SubscriptionBundleData bundleData=curBundle.getData();
+        for (        final SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
+          final SubscriptionData subData=curSubscription.getData();
           for (          final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
             transactional.insertEvent(curEvent,context);
             recordId=transactional.getRecordId(curEvent.getId().toString());

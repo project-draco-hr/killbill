@@ -1,16 +1,16 @@
 {
   log.info("Starting testCreateCancelAddon");
   try {
-    String baseProduct="Shotgun";
-    BillingPeriod baseTerm=BillingPeriod.MONTHLY;
-    String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    final String baseProduct="Shotgun";
+    final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+    final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
     createSubscription(baseProduct,baseTerm,basePriceList);
-    String aoProduct="Telescopic-Scope";
-    BillingPeriod aoTerm=BillingPeriod.MONTHLY;
-    String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-    SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
+    final String aoProduct="Telescopic-Scope";
+    final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
+    final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    final SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
-    DateTime now=clock.getUTCNow();
+    final DateTime now=clock.getUTCNow();
     aoSubscription.cancel(now,false,context);
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CANCEL);

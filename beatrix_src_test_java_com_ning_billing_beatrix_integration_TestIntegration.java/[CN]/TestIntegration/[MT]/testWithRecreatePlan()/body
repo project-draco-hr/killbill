@@ -1,13 +1,13 @@
 {
   log.info("Starting testWithRecreatePlan");
-  DateTime initialDate=new DateTime(2012,2,1,0,3,42,0);
-  int billingDay=2;
+  final DateTime initialDate=new DateTime(2012,2,1,0,3,42,0);
+  final int billingDay=2;
   log.info("Beginning test with BCD of " + billingDay);
-  Account account=createAccountWithPaymentMethod(getAccountData(billingDay));
-  UUID accountId=account.getId();
+  final Account account=createAccountWithPaymentMethod(getAccountData(billingDay));
+  final UUID accountId=account.getId();
   assertNotNull(account);
   clock.setDeltaFromReality(initialDate.getMillis() - clock.getUTCNow().getMillis());
-  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever2",context);
+  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever2",context);
   String productName="Shotgun";
   BillingPeriod term=BillingPeriod.MONTHLY;
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
@@ -16,10 +16,10 @@
   SubscriptionData subscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
-  DateTime startDate=subscription.getCurrentPhaseStart();
+  final DateTime startDate=subscription.getCurrentPhaseStart();
   DateTime endDate=startDate.plusDays(30);
-  BigDecimal rate=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
-  int invoiceItemCount=1;
+  final BigDecimal rate=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
+  final int invoiceItemCount=1;
   verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate,invoiceItemCount);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
@@ -30,7 +30,7 @@
   subscription.cancel(clock.getUTCNow(),false,context);
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
   endDate=subscription.getChargedThroughDate();
-  Interval it=new Interval(clock.getUTCNow(),endDate);
+  final Interval it=new Interval(clock.getUTCNow(),endDate);
   clock.addDeltaFromReality(it.toDurationMillis());
   assertTrue(busHandler.isCompleted(DELAY));
   productName="Assault-Rifle";

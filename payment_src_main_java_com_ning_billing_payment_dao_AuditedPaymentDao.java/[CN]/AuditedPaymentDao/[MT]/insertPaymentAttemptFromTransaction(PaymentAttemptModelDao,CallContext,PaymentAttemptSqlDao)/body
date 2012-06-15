@@ -1,11 +1,11 @@
 {
   transactional.insertPaymentAttempt(attempt,context);
-  PaymentAttemptModelDao savedAttempt=transactional.getPaymentAttempt(attempt.getId().toString());
-  Long recordId=transactional.getRecordId(savedAttempt.getId().toString());
-  EntityHistory<PaymentAttemptModelDao> history=new EntityHistory<PaymentAttemptModelDao>(savedAttempt.getId(),recordId,savedAttempt,ChangeType.INSERT);
+  final PaymentAttemptModelDao savedAttempt=transactional.getPaymentAttempt(attempt.getId().toString());
+  final Long recordId=transactional.getRecordId(savedAttempt.getId().toString());
+  final EntityHistory<PaymentAttemptModelDao> history=new EntityHistory<PaymentAttemptModelDao>(savedAttempt.getId(),recordId,savedAttempt,ChangeType.INSERT);
   transactional.insertHistoryFromTransaction(history,context);
-  Long historyRecordId=transactional.getHistoryRecordId(recordId);
-  EntityAudit audit=new EntityAudit(TableName.PAYMENT_ATTEMPTS,historyRecordId,ChangeType.INSERT);
+  final Long historyRecordId=transactional.getHistoryRecordId(recordId);
+  final EntityAudit audit=new EntityAudit(TableName.PAYMENT_ATTEMPTS,historyRecordId,ChangeType.INSERT);
   transactional.insertAuditFromTransaction(audit,context);
   return savedAttempt;
 }

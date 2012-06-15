@@ -1,8 +1,8 @@
 {
   try {
     SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
-    PlanPhase trialPhase=subscription.getCurrentPhase();
-    DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    final PlanPhase trialPhase=subscription.getCurrentPhase();
+    final DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
@@ -10,8 +10,8 @@
     assertTrue(testListener.isCompleted(5000));
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
-    Duration ctd=getDurationMonth(1);
-    DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
+    final Duration ctd=getDurationMonth(1);
+    final DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
     testListener.setNonExpectedMode();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
@@ -21,9 +21,9 @@
     testListener.reset();
     currentPhase=subscription.getCurrentPhase();
     checkChangePlan(subscription,fromProd,ProductCategory.BASE,fromTerm,PhaseType.DISCOUNT);
-    DateTime nextExpectedPhaseChange=DefaultClock.addDuration(expectedPhaseTrialChange,currentPhase.getDuration());
+    final DateTime nextExpectedPhaseChange=DefaultClock.addDuration(expectedPhaseTrialChange,currentPhase.getDuration());
     checkNextPhaseChange(subscription,2,nextExpectedPhaseChange);
-    List<EntitlementEvent> events=dao.getPendingEventsForSubscription(subscription.getId());
+    final List<EntitlementEvent> events=dao.getPendingEventsForSubscription(subscription.getId());
     assertTrue(events.get(0) instanceof ApiEvent);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));

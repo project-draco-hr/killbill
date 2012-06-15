@@ -1,10 +1,10 @@
 {
   List<PaymentMethod> methods=paymentApi.getPaymentMethods(account,false);
   assertEquals(methods.size(),1);
-  PaymentMethod initDefaultMethod=methods.get(0);
+  final PaymentMethod initDefaultMethod=methods.get(0);
   assertEquals(initDefaultMethod.getId(),account.getPaymentMethodId());
-  PaymentMethodPlugin newPaymenrMethod=new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),true,null);
-  UUID newPaymentMethodId=paymentApi.addPaymentMethod(PaymentTestModuleWithMocks.PLUGIN_TEST_NAME,account,true,newPaymenrMethod,context);
+  final PaymentMethodPlugin newPaymenrMethod=new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),true,null);
+  final UUID newPaymentMethodId=paymentApi.addPaymentMethod(PaymentTestModuleWithMocks.PLUGIN_TEST_NAME,account,true,newPaymenrMethod,context);
   ((ZombieControl)account).addResult("getPaymentMethodId",newPaymentMethodId);
   methods=paymentApi.getPaymentMethods(account,false);
   assertEquals(methods.size(),2);
