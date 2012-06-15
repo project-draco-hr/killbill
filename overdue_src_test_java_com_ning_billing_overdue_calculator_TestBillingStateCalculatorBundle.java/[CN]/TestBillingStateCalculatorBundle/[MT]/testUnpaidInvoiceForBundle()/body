@@ -1,19 +1,19 @@
 {
-  UUID thisBundleId=new UUID(0L,0L);
-  UUID thatBundleId=new UUID(0L,1L);
+  final UUID thisBundleId=new UUID(0L,0L);
+  final UUID thatBundleId=new UUID(0L,1L);
   now=new DateTime();
-  List<Invoice> invoices=new ArrayList<Invoice>(5);
+  final List<Invoice> invoices=new ArrayList<Invoice>(5);
   invoices.add(createInvoice(now,BigDecimal.ZERO,createInvoiceItems(new UUID[]{thisBundleId,thatBundleId})));
   invoices.add(createInvoice(now,BigDecimal.TEN,createInvoiceItems(new UUID[]{thatBundleId})));
   invoices.add(createInvoice(now,new BigDecimal("100.00"),createInvoiceItems(new UUID[]{thatBundleId,thisBundleId,thatBundleId})));
   invoices.add(createInvoice(now,new BigDecimal("1000.00"),createInvoiceItems(new UUID[]{thisBundleId})));
   invoices.add(createInvoice(now,new BigDecimal("10000.00"),createInvoiceItems(new UUID[]{thatBundleId,thisBundleId})));
-  Clock clock=new ClockMock();
-  InvoiceUserApi invoiceApi=BrainDeadProxyFactory.createBrainDeadProxyFor(InvoiceUserApi.class);
-  EntitlementUserApi entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
+  final Clock clock=new ClockMock();
+  final InvoiceUserApi invoiceApi=BrainDeadProxyFactory.createBrainDeadProxyFor(InvoiceUserApi.class);
+  final EntitlementUserApi entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
   ((ZombieControl)invoiceApi).addResult("getUnpaidInvoicesByAccountId",invoices);
-  BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,clock);
-  SortedSet<Invoice> resultinvoices=calc.unpaidInvoicesForBundle(thisBundleId,new UUID(0L,0L));
+  final BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,clock);
+  final SortedSet<Invoice> resultinvoices=calc.unpaidInvoicesForBundle(thisBundleId,new UUID(0L,0L));
   Assert.assertEquals(resultinvoices.size(),4);
   Assert.assertEquals(BigDecimal.ZERO.compareTo(resultinvoices.first().getBalance()),0);
   Assert.assertEquals(new BigDecimal("10000.0").compareTo(resultinvoices.last().getBalance()),0);

@@ -1,17 +1,17 @@
 {
-  DateTime now=clock.getUTCNow();
-  Product baseProduct=(baseSubscription.getState() == SubscriptionState.CANCELLED) ? null : baseSubscription.getCurrentPlan().getProduct();
-  List<Subscription> subscriptions=dao.getSubscriptions(subscriptionFactory,baseSubscription.getBundleId());
-  Map<UUID,EntitlementEvent> addOnCancellations=new HashMap<UUID,EntitlementEvent>();
-  Iterator<Subscription> it=subscriptions.iterator();
+  final DateTime now=clock.getUTCNow();
+  final Product baseProduct=(baseSubscription.getState() == SubscriptionState.CANCELLED) ? null : baseSubscription.getCurrentPlan().getProduct();
+  final List<Subscription> subscriptions=dao.getSubscriptions(subscriptionFactory,baseSubscription.getBundleId());
+  final Map<UUID,EntitlementEvent> addOnCancellations=new HashMap<UUID,EntitlementEvent>();
+  final Iterator<Subscription> it=subscriptions.iterator();
   while (it.hasNext()) {
-    SubscriptionData cur=(SubscriptionData)it.next();
+    final SubscriptionData cur=(SubscriptionData)it.next();
     if (cur.getState() == SubscriptionState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
       continue;
     }
-    Plan addonCurrentPlan=cur.getCurrentPlan();
+    final Plan addonCurrentPlan=cur.getCurrentPlan();
     if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
-      EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(event.getEffectiveDate()).setRequestedDate(now).setUserToken(context.getUserToken()).setFromDisk(true));
+      final EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(event.getEffectiveDate()).setRequestedDate(now).setUserToken(context.getUserToken()).setFromDisk(true));
       addOnCancellations.put(cur.getId(),cancelEvent);
     }
   }

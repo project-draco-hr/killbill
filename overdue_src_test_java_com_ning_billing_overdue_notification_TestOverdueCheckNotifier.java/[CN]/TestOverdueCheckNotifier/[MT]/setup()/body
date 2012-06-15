@@ -12,7 +12,7 @@
       bind(CatalogService.class).to(DefaultCatalogService.class).asEagerSingleton();
       final MysqlTestingHelper helper=new MysqlTestingHelper();
       bind(MysqlTestingHelper.class).toInstance(helper);
-      IDBI dbi=helper.getDBI();
+      final IDBI dbi=helper.getDBI();
       bind(IDBI.class).toInstance(dbi);
       bind(TagDao.class).to(AuditedTagDao.class).asEagerSingleton();
       bind(CustomFieldDao.class).to(AuditedCustomFieldDao.class).asEagerSingleton();
@@ -23,13 +23,13 @@
   }
 );
   clock=g.getInstance(Clock.class);
-  IDBI dbi=g.getInstance(IDBI.class);
+  final IDBI dbi=g.getInstance(IDBI.class);
   eventBus=g.getInstance(Bus.class);
   helper=g.getInstance(MysqlTestingHelper.class);
   notificationQueueService=g.getInstance(NotificationQueueService.class);
-  OverdueProperties properties=g.getInstance(OverdueProperties.class);
-  Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
-  EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
+  final OverdueProperties properties=g.getInstance(OverdueProperties.class);
+  final Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
+  final EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
   ((ZombieControl)entitlementUserApi).addResult("getSubscriptionFromId",subscription);
   listener=new OverdueListenerMock();
   notifier=new DefaultOverdueCheckNotifier(notificationQueueService,properties,listener);

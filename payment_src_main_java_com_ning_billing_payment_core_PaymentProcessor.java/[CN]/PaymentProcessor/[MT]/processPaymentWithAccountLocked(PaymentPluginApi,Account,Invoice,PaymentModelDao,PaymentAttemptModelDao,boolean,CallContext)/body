@@ -5,7 +5,7 @@
   PaymentModelDao payment=null;
   PaymentStatus paymentStatus=PaymentStatus.UNKNOWN;
   try {
-    PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(account.getExternalKey(),paymentInput.getId(),attemptInput.getRequestedAmount());
+    final PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(account.getExternalKey(),paymentInput.getId(),attemptInput.getRequestedAmount());
 switch (paymentPluginInfo.getStatus()) {
 case PROCESSED:
       paymentStatus=PaymentStatus.SUCCESS;
@@ -31,7 +31,7 @@ log.info(String.format("Could not process payment for account %s, invoice %s, er
 event=new DefaultPaymentErrorEvent(account.getId(),invoice.getId(),paymentInput.getId(),paymentPluginInfo.getGatewayError(),context.getUserToken());
 throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),paymentPluginInfo.getGatewayError());
 default :
-String formatError=String.format("Plugin return status %s for payment %s",paymentPluginInfo.getStatus(),paymentInput.getId());
+final String formatError=String.format("Plugin return status %s for payment %s",paymentPluginInfo.getStatus(),paymentInput.getId());
 throw new PaymentPluginApiException("",formatError);
 }
 }

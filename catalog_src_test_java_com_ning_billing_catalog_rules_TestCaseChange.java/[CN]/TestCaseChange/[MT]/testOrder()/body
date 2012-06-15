@@ -1,16 +1,16 @@
 {
-  MockCatalog cat=new MockCatalog();
-  DefaultProduct product1=cat.getCurrentProducts()[0];
-  DefaultPriceList priceList1=cat.findCurrentPriceList(PriceListSet.DEFAULT_PRICELIST_NAME);
-  DefaultProduct product2=cat.getCurrentProducts()[2];
-  DefaultPriceList priceList2=cat.getPriceLists().getChildPriceLists()[1];
-  CaseChangeResult cr0=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1,priceList2,PhaseType.EVERGREEN,Result.FOO);
-  CaseChangeResult cr1=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1,priceList2,PhaseType.EVERGREEN,Result.BAR);
-  CaseChangeResult cr2=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1,priceList2,PhaseType.EVERGREEN,Result.TINKYWINKY);
-  CaseChangeResult cr3=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.ANNUAL,priceList1,priceList2,PhaseType.EVERGREEN,Result.DIPSY);
-  CaseChangeResult cr4=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.ANNUAL,priceList1,priceList2,PhaseType.EVERGREEN,Result.LALA);
-  Result r1=CaseChange.getResult(new CaseChangeResult[]{cr0,cr1,cr2,cr3,cr4},new PlanPhaseSpecifier(product1.getName(),product1.getCategory(),BillingPeriod.MONTHLY,priceList1.getName(),PhaseType.EVERGREEN),new PlanSpecifier(product2.getName(),product2.getCategory(),BillingPeriod.MONTHLY,priceList2.getName()),cat);
+  final MockCatalog cat=new MockCatalog();
+  final DefaultProduct product1=cat.getCurrentProducts()[0];
+  final DefaultPriceList priceList1=cat.findCurrentPriceList(PriceListSet.DEFAULT_PRICELIST_NAME);
+  final DefaultProduct product2=cat.getCurrentProducts()[2];
+  final DefaultPriceList priceList2=cat.getPriceLists().getChildPriceLists()[1];
+  final CaseChangeResult cr0=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1,priceList2,PhaseType.EVERGREEN,Result.FOO);
+  final CaseChangeResult cr1=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1,priceList2,PhaseType.EVERGREEN,Result.BAR);
+  final CaseChangeResult cr2=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.MONTHLY,priceList1,priceList2,PhaseType.EVERGREEN,Result.TINKYWINKY);
+  final CaseChangeResult cr3=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.ANNUAL,priceList1,priceList2,PhaseType.EVERGREEN,Result.DIPSY);
+  final CaseChangeResult cr4=new CaseChangeResult(product1,product2,ProductCategory.BASE,ProductCategory.BASE,BillingPeriod.MONTHLY,BillingPeriod.ANNUAL,priceList1,priceList2,PhaseType.EVERGREEN,Result.LALA);
+  final Result r1=CaseChange.getResult(new CaseChangeResult[]{cr0,cr1,cr2,cr3,cr4},new PlanPhaseSpecifier(product1.getName(),product1.getCategory(),BillingPeriod.MONTHLY,priceList1.getName(),PhaseType.EVERGREEN),new PlanSpecifier(product2.getName(),product2.getCategory(),BillingPeriod.MONTHLY,priceList2.getName()),cat);
   assertEquals(Result.FOO,r1);
-  Result r2=CaseChange.getResult(new CaseChangeResult[]{cr0,cr1,cr2,cr3,cr4},new PlanPhaseSpecifier(product1.getName(),product1.getCategory(),BillingPeriod.MONTHLY,priceList1.getName(),PhaseType.EVERGREEN),new PlanSpecifier(product2.getName(),product2.getCategory(),BillingPeriod.ANNUAL,priceList2.getName()),cat);
+  final Result r2=CaseChange.getResult(new CaseChangeResult[]{cr0,cr1,cr2,cr3,cr4},new PlanPhaseSpecifier(product1.getName(),product1.getCategory(),BillingPeriod.MONTHLY,priceList1.getName(),PhaseType.EVERGREEN),new PlanSpecifier(product2.getName(),product2.getCategory(),BillingPeriod.ANNUAL,priceList2.getName()),cat);
   assertEquals(Result.DIPSY,r2);
 }

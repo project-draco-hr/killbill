@@ -3,10 +3,10 @@
     return data.getEvents();
   }
   int nbDeleted=0;
-  LinkedList<EntitlementEvent> result=new LinkedList<EntitlementEvent>();
-  for (  EntitlementEvent cur : data.getEvents()) {
+  final LinkedList<EntitlementEvent> result=new LinkedList<EntitlementEvent>();
+  for (  final EntitlementEvent cur : data.getEvents()) {
     boolean foundDeletedEvent=false;
-    for (    SubscriptionTimeline.DeletedEvent d : deletedEvents) {
+    for (    final SubscriptionTimeline.DeletedEvent d : deletedEvents) {
       if (cur.getId().equals(d.getEventId())) {
         foundDeletedEvent=true;
         nbDeleted++;
@@ -24,9 +24,9 @@
     }
   }
   if (nbDeleted != deletedEvents.size()) {
-    for (    SubscriptionTimeline.DeletedEvent d : deletedEvents) {
+    for (    final SubscriptionTimeline.DeletedEvent d : deletedEvents) {
       boolean found=false;
-      for (      SubscriptionTransitionData cur : data.getAllTransitions()) {
+      for (      final SubscriptionTransitionData cur : data.getAllTransitions()) {
         if (cur.getId().equals(d.getEventId())) {
           found=true;
           continue;

@@ -2,20 +2,20 @@
   log.info("Starting testENT_REPAIR_BP_RECREATE_MISSING_AO");
   test.withException(new TestWithExceptionCallback(){
     @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
-      Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
+      final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
       clock.addDeltaFromReality(it.toDurationMillis());
-      SubscriptionData aoSubscription=createSubscription("Laser-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
-      BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+      final SubscriptionData aoSubscription=createSubscription("Laser-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+      final BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
       sortEventsOnBundle(bundleRepair);
-      DateTime newCreateTime=baseSubscription.getStartDate().plusDays(3);
-      PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Pistol",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
-      NewEvent ne=createNewEvent(SubscriptionTransitionType.CREATE,newCreateTime,spec);
-      List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+      final DateTime newCreateTime=baseSubscription.getStartDate().plusDays(3);
+      final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Pistol",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
+      final NewEvent ne=createNewEvent(SubscriptionTransitionType.CREATE,newCreateTime,spec);
+      final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
       des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(0).getEventId()));
       des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
-      SubscriptionTimeline sRepair=createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
-      BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
-      boolean dryRun=true;
+      final SubscriptionTimeline sRepair=createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
+      final BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      final boolean dryRun=true;
       repairApi.repairBundle(bRepair,dryRun,context);
     }
   }

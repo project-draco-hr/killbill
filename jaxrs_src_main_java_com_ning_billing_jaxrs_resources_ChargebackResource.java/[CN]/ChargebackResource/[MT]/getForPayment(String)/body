@@ -1,8 +1,8 @@
 {
   try {
-    Payment payment=paymentApi.getPayment(UUID.fromString(paymentId));
-    Collection<PaymentAttempt> attempts=Collections2.filter(payment.getAttempts(),new Predicate<PaymentAttempt>(){
-      @Override public boolean apply(      PaymentAttempt input){
+    final Payment payment=paymentApi.getPayment(UUID.fromString(paymentId));
+    final Collection<PaymentAttempt> attempts=Collections2.filter(payment.getAttempts(),new Predicate<PaymentAttempt>(){
+      @Override public boolean apply(      final PaymentAttempt input){
         return input.getPaymentStatus() == PaymentStatus.SUCCESS;
       }
     }
@@ -11,10 +11,10 @@
       final String error=String.format("Failed to locate succesful payment attempts for paymentId %s",paymentId);
       return Response.status(Response.Status.NO_CONTENT).entity(error).build();
     }
-    UUID paymentAttemptId=attempts.iterator().next().getId();
-    List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentAttemptId(paymentAttemptId);
-    List<ChargebackJson> chargebacksJson=convertToJson(chargebacks);
-    String accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(UUID.fromString(paymentId)).toString();
+    final UUID paymentAttemptId=attempts.iterator().next().getId();
+    final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentAttemptId(paymentAttemptId);
+    final List<ChargebackJson> chargebacksJson=convertToJson(chargebacks);
+    final String accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(UUID.fromString(paymentId)).toString();
     final ChargebackCollectionJson json=new ChargebackCollectionJson(accountId,chargebacksJson);
     return Response.status(Response.Status.OK).entity(json).build();
   }

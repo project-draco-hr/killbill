@@ -5,17 +5,17 @@
     manualQueues=new ArrayList<NotificationQueue>(queues.values());
   }
  else {
-    Joiner join=Joiner.on(",");
+    final Joiner join=Joiner.on(",");
     join.join(services);
     log.info("Trigger manual processing for services {} ",join.toString());
     manualQueues=new LinkedList<NotificationQueue>();
 synchronized (queues) {
-      for (      String svc : services) {
+      for (      final String svc : services) {
         addQueuesForService(manualQueues,svc);
       }
     }
   }
-  for (  NotificationQueue cur : manualQueues) {
+  for (  final NotificationQueue cur : manualQueues) {
     int processedNotifications=0;
     do {
       processedNotifications=cur.processReadyNotification();

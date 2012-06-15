@@ -1,13 +1,13 @@
 {
   log.info("Starting testCancelBPWithAddon");
   try {
-    String baseProduct="Shotgun";
-    BillingPeriod baseTerm=BillingPeriod.MONTHLY;
-    String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    final String baseProduct="Shotgun";
+    final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+    final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
     SubscriptionData baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
-    String aoProduct="Telescopic-Scope";
-    BillingPeriod aoTerm=BillingPeriod.MONTHLY;
-    String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    final String aoProduct="Telescopic-Scope";
+    final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
+    final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
     SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.PHASE);
@@ -15,9 +15,9 @@
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(2));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
-    DateTime now=clock.getUTCNow();
-    Duration ctd=getDurationMonth(1);
-    DateTime newChargedThroughDate=DefaultClock.addDuration(now,ctd);
+    final DateTime now=clock.getUTCNow();
+    final Duration ctd=getDurationMonth(1);
+    final DateTime newChargedThroughDate=DefaultClock.addDuration(now,ctd);
     billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,context);
     baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
     baseSubscription.cancel(now,false,context);

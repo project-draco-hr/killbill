@@ -1,6 +1,6 @@
 {
   try {
-    PaymentModelDao payment=paymentDao.getPayment(paymentId);
+    final PaymentModelDao payment=paymentDao.getPayment(paymentId);
     if (payment == null) {
       log.error("Invalid retry for non existnt paymentId {}",paymentId);
       return;
@@ -10,9 +10,9 @@
     final CallContext context=factory.createCallContext("PaymentRetry",CallOrigin.INTERNAL,UserType.SYSTEM);
     voidPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Void>(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
       @Override public Void doOperation() throws PaymentApiException {
-        PaymentModelDao payment=paymentDao.getPayment(paymentId);
+        final PaymentModelDao payment=paymentDao.getPayment(paymentId);
         boolean foundExpectedState=false;
-        for (        PaymentStatus cur : expectedPaymentStates) {
+        for (        final PaymentStatus cur : expectedPaymentStates) {
           if (payment.getPaymentStatus() == cur) {
             foundExpectedState=true;
             break;

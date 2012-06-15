@@ -2,15 +2,15 @@
   log.info("Starting testChangeSubscriptionFutureCancelled");
   try {
     Subscription subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
-    PlanPhase trialPhase=subscription.getCurrentPhase();
-    PlanPhase currentPhase=subscription.getCurrentPhase();
+    final PlanPhase trialPhase=subscription.getCurrentPhase();
+    final PlanPhase currentPhase=subscription.getCurrentPhase();
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
-    DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
-    Duration ctd=getDurationMonth(1);
-    DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
+    final DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    final Duration ctd=getDurationMonth(1);
+    final DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
     subscription=entitlementApi.getSubscriptionFromId(subscription.getId());
     subscription.cancel(clock.getUTCNow(),false,context);

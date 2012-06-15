@@ -20,11 +20,11 @@
     boolean isFromDisk=true;
 switch (cur.getType()) {
 case PHASE:
-      PhaseEvent phaseEV=(PhaseEvent)cur;
+      final PhaseEvent phaseEV=(PhaseEvent)cur;
     nextPhaseName=phaseEV.getPhase();
   break;
 case API_USER:
-ApiEvent userEV=(ApiEvent)cur;
+final ApiEvent userEV=(ApiEvent)cur;
 apiEventType=userEV.getEventType();
 isFromDisk=userEV.isFromDisk();
 nextUserToken=userEV.getUserToken();
@@ -72,7 +72,7 @@ nextPriceList=(nextPriceListName != null) ? catalog.findPriceList(nextPriceListN
  catch (CatalogApiException e) {
 log.error(String.format("Failed to build transition for subscription %s",id),e);
 }
-SubscriptionTransitionData transition=new SubscriptionTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),previousState,previousPlan,previousPhase,previousPriceList,nextState,nextPlan,nextPhase,nextPriceList,cur.getTotalOrdering(),nextUserToken,isFromDisk);
+final SubscriptionTransitionData transition=new SubscriptionTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),previousState,previousPlan,previousPhase,previousPriceList,nextState,nextPlan,nextPhase,nextPriceList,cur.getTotalOrdering(),nextUserToken,isFromDisk);
 transitions.add(transition);
 previousState=nextState;
 previousPlan=nextPlan;

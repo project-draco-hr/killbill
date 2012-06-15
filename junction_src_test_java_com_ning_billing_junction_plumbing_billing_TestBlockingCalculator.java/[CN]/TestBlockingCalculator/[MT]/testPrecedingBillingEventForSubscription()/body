@@ -1,13 +1,13 @@
 {
-  DateTime now=new DateTime();
-  SortedSet<BillingEvent> events=new TreeSet<BillingEvent>();
+  final DateTime now=new DateTime();
+  final SortedSet<BillingEvent> events=new TreeSet<BillingEvent>();
   events.add(createRealEvent(now.minusDays(10),subscription1));
   events.add(createRealEvent(now.minusDays(6),subscription1));
   events.add(createRealEvent(now.minusDays(5),subscription1));
   events.add(createRealEvent(now.minusDays(1),subscription1));
-  BillingEvent minus11=odc.precedingBillingEventForSubscription(now.minusDays(11),events,subscription1);
+  final BillingEvent minus11=odc.precedingBillingEventForSubscription(now.minusDays(11),events,subscription1);
   assertNull(minus11);
-  BillingEvent minus5andAHalf=odc.precedingBillingEventForSubscription(now.minusDays(5).minusHours(12),events,subscription1);
+  final BillingEvent minus5andAHalf=odc.precedingBillingEventForSubscription(now.minusDays(5).minusHours(12),events,subscription1);
   assertNotNull(minus5andAHalf);
   assertEquals(minus5andAHalf.getEffectiveDate(),now.minusDays(6));
 }

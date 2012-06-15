@@ -1,8 +1,8 @@
 {
   final Map<String,Boolean> expectedNotificationsFred=new TreeMap<String,Boolean>();
   final Map<String,Boolean> expectedNotificationsBarney=new TreeMap<String,Boolean>();
-  NotificationQueueService notificationQueueService=new DefaultNotificationQueueService(dbi,clock);
-  NotificationConfig config=new NotificationConfig(){
+  final NotificationQueueService notificationQueueService=new DefaultNotificationQueueService(dbi,clock);
+  final NotificationConfig config=new NotificationConfig(){
     @Override public boolean isNotificationProcessingOff(){
       return false;
     }
@@ -12,7 +12,7 @@
   }
 ;
   final NotificationQueue queueFred=notificationQueueService.createNotificationQueue("UtilTest","Fred",new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    String notificationKey,    DateTime eventDateTime){
+    @Override public void handleReadyNotification(    final String notificationKey,    final DateTime eventDateTime){
       log.info("Fred received key: " + notificationKey);
       expectedNotificationsFred.put(notificationKey,Boolean.TRUE);
       eventsReceived++;
@@ -20,7 +20,7 @@
   }
 ,config);
   final NotificationQueue queueBarney=notificationQueueService.createNotificationQueue("UtilTest","Barney",new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    String notificationKey,    DateTime eventDateTime){
+    @Override public void handleReadyNotification(    final String notificationKey,    final DateTime eventDateTime){
       log.info("Barney received key: " + notificationKey);
       expectedNotificationsBarney.put(notificationKey,Boolean.TRUE);
       eventsReceived++;
@@ -47,7 +47,7 @@
   expectedNotificationsFred.put(notificationKeyFred.toString(),Boolean.FALSE);
   expectedNotificationsFred.put(notificationKeyBarney.toString(),Boolean.FALSE);
   dao.inTransaction(new Transaction<Void,DummySqlTest>(){
-    @Override public Void inTransaction(    DummySqlTest transactional,    TransactionStatus status) throws Exception {
+    @Override public Void inTransaction(    final DummySqlTest transactional,    final TransactionStatus status) throws Exception {
       transactional.insertDummy(obj);
       queueFred.recordFutureNotificationFromTransaction(transactional,readyTime,notificationKeyFred);
       log.info("posted key: " + notificationKeyFred.toString());

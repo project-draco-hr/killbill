@@ -1,20 +1,20 @@
 {
   log.info("Starting testChangePlanBundleAlignIMM");
   try {
-    SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
+    final SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
     clock.addDeltaFromReality(it.toDurationMillis());
     subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow(),context);
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.TRIAL);
     assertTrue(testListener.isCompleted(5000));
-    PlanPhase currentPhase=subscription.getCurrentPhase();
-    DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
+    final PlanPhase currentPhase=subscription.getCurrentPhase();
+    final DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
     clock.addDeltaFromReality(it.toDurationMillis());
-    DateTime futureNow=clock.getUTCNow();
+    final DateTime futureNow=clock.getUTCNow();
     assertTrue(futureNow.isAfter(nextExpectedPhaseChange));
     assertTrue(testListener.isCompleted(5000));
     assertListenerStatus();

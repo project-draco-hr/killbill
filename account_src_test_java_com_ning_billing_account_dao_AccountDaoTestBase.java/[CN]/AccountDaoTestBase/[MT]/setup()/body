@@ -7,13 +7,13 @@
     helper.initDb(utilDdl);
     dbi=helper.getDBI();
     bus=new InMemoryBus();
-    BusService busService=new DefaultBusService(bus);
+    final BusService busService=new DefaultBusService(bus);
     ((DefaultBusService)busService).startBus();
     accountDao=new AuditedAccountDao(dbi,bus);
     accountDao.test();
     accountEmailDao=new AuditedAccountEmailDao(dbi);
     accountEmailDao.test();
-    Clock clock=new ClockMock();
+    final Clock clock=new ClockMock();
     context=new DefaultCallContextFactory(clock).createCallContext("Account Dao Tests",CallOrigin.TEST,UserType.TEST);
   }
  catch (  Throwable t) {

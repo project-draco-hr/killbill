@@ -1,23 +1,23 @@
 {
   log.info("Starting testCreateWithInitialPhase");
   try {
-    DateTime init=clock.getUTCNow();
-    String productName="Shotgun";
-    BillingPeriod term=BillingPeriod.MONTHLY;
-    String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+    final DateTime init=clock.getUTCNow();
+    final String productName="Shotgun";
+    final BillingPeriod term=BillingPeriod.MONTHLY;
+    final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
     testListener.pushExpectedEvent(NextEvent.CREATE);
-    SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,PhaseType.EVERGREEN),clock.getUTCNow(),context);
+    final SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,PhaseType.EVERGREEN),clock.getUTCNow(),context);
     assertNotNull(subscription);
     assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
     assertEquals(subscription.getBundleId(),bundle.getId());
     assertDateWithin(subscription.getStartDate(),init,clock.getUTCNow());
     assertDateWithin(subscription.getBundleStartDate(),init,clock.getUTCNow());
-    Plan currentPlan=subscription.getCurrentPlan();
+    final Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),productName);
     assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
     assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.MONTHLY);
-    PlanPhase currentPhase=subscription.getCurrentPhase();
+    final PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
     assertListenerStatus();

@@ -2,13 +2,13 @@
   return new EntitlementAccountMigration(){
     private final UUID accountId=UUID.randomUUID();
     @Override public EntitlementBundleMigration[] getBundles(){
-      List<EntitlementBundleMigration> bundles=new ArrayList<EntitlementBundleMigration>();
-      EntitlementBundleMigration bundle0=new EntitlementBundleMigration(){
+      final List<EntitlementBundleMigration> bundles=new ArrayList<EntitlementBundleMigration>();
+      final EntitlementBundleMigration bundle0=new EntitlementBundleMigration(){
         @Override public EntitlementSubscriptionMigration[] getSubscriptions(){
-          EntitlementSubscriptionMigration[] result=new EntitlementSubscriptionMigration[cases.size()];
+          final EntitlementSubscriptionMigration[] result=new EntitlementSubscriptionMigration[cases.size()];
           for (int i=0; i < cases.size(); i++) {
             final List<EntitlementSubscriptionMigrationCaseWithCTD> curCases=cases.get(i);
-            EntitlementSubscriptionMigration subscription=new EntitlementSubscriptionMigration(){
+            final EntitlementSubscriptionMigration subscription=new EntitlementSubscriptionMigration(){
               @Override public EntitlementSubscriptionMigrationCaseWithCTD[] getSubscriptionCases(){
                 return curCases.toArray(new EntitlementSubscriptionMigrationCaseWithCTD[curCases.size()]);
               }
@@ -16,7 +16,7 @@
                 return curCases.get(0).getPlanPhaseSpecifier().getProductCategory();
               }
               @Override public DateTime getChargedThroughDate(){
-                for (                EntitlementSubscriptionMigrationCaseWithCTD cur : curCases) {
+                for (                final EntitlementSubscriptionMigrationCaseWithCTD cur : curCases) {
                   if (cur.getChargedThroughDate() != null) {
                     return cur.getChargedThroughDate();
                   }
