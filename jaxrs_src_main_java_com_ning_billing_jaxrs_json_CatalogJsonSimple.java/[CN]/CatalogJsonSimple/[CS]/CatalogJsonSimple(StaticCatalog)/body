@@ -1,0 +1,27 @@
+{
+  Map<String,ProductJson> productMap=new HashMap<String,CatalogJsonSimple.ProductJson>();
+  Plan[] plans=catalog.getCurrentPlans();
+  for (  Plan plan : plans) {
+    Product product=plan.getProduct();
+    ProductJson jProduct=productMap.get(product.getName());
+    if (jProduct == null) {
+      jProduct=new ProductJson(product.getCategory().toString(),product.getName(),toProductNames(product.getIncluded()),toProductNames(product.getAvailable()));
+      productMap.put(product.getName(),jProduct);
+    }
+    int i=0;
+    PhaseJson[] phases=new PhaseJson[plan.getAllPhases().length];
+    for (    PlanPhase phase : plan.getAllPhases()) {
+      Map<String,BigDecimal> prices=new HashMap<String,BigDecimal>();
+      if (phase.getRecurringPrice() != null) {
+        for (        Price cur : phase.getRecurringPrice().getPrices()) {
+          prices.put(cur.getCurrency().toString(),cur.getValue());
+        }
+      }
+      PhaseJson jPhase=new PhaseJson(phase.getPhaseType().toString(),prices);
+      phases[i++]=jPhase;
+    }
+    PlanJson jPlan=new PlanJson(plan.getName(),phases);
+    jProduct.addPlan(jPlan);
+  }
+  products=productMap.values().toArray(new ProductJson[productMap.values().size()]);
+}
