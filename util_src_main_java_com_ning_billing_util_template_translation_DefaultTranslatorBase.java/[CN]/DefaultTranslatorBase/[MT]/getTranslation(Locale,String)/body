@@ -1,18 +1,13 @@
 {
-  ResourceBundle bundle=null;
-  try {
-    bundle=ResourceBundle.getBundle(getBundlePath(),locale);
-  }
- catch (  MissingResourceException mrex) {
-    log.warn(String.format(ErrorCode.MISSING_TRANSLATION_RESOURCE.toString(),getTranslationType()));
-  }
+  final String bundlePath=getBundlePath();
+  ResourceBundle bundle=getBundle(locale,bundlePath);
   if ((bundle != null) && (bundle.containsKey(originalText))) {
     return bundle.getString(originalText);
   }
  else {
+    final Locale defaultLocale=new Locale(config.getDefaultLocale());
     try {
-      final Locale defaultLocale=new Locale(config.getDefaultLocale());
-      bundle=ResourceBundle.getBundle(getBundlePath(),defaultLocale);
+      bundle=getBundle(defaultLocale,bundlePath);
       if ((bundle != null) && (bundle.containsKey(originalText))) {
         return bundle.getString(originalText);
       }
