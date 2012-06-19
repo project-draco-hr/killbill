@@ -1,15 +1,19 @@
 {
   nextBillingQueue=notificationQueueService.createNotificationQueue(DefaultInvoiceService.INVOICE_SERVICE_NAME,NEXT_BILLING_DATE_NOTIFIER_QUEUE,new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    final String notificationKey,    final DateTime eventDate){
+    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDate){
       try {
-        final UUID key=UUID.fromString(notificationKey);
+        if (!(notificationKey instanceof NextBillingDateNotificationKey)) {
+          log.error("Invoice service received an unexpected event type {}",notificationKey.getClass().getName());
+          return;
+        }
+        final NextBillingDateNotificationKey key=(NextBillingDateNotificationKey)notificationKey;
         try {
-          final Subscription subscription=entitlementUserApi.getSubscriptionFromId(key);
+          final Subscription subscription=entitlementUserApi.getSubscriptionFromId(key.getUuidKey());
           if (subscription == null) {
             log.warn("Next Billing Date Notification Queue handled spurious notification (key: " + key + ")");
           }
  else {
-            processEvent(key,eventDate);
+            processEvent(key.getUuidKey(),eventDate);
           }
         }
  catch (        EntitlementUserApiException e) {

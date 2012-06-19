@@ -14,8 +14,9 @@ synchronized (notifications) {
   }
   result=readyNotifications.size();
   for (  final Notification cur : readyNotifications) {
-    handler.handleReadyNotification(cur.getNotificationKey(),cur.getEffectiveDate());
-    final DefaultNotification processedNotification=new DefaultNotification(-1L,cur.getId(),hostname,hostname,"MockQueue",clock.getUTCNow().plus(CLAIM_TIME_MS),PersistentQueueEntryLifecycleState.PROCESSED,cur.getNotificationKey(),cur.getEffectiveDate());
+    NotificationKey key=deserializeEvent(cur.getNotificationKeyClass(),cur.getNotificationKey());
+    handler.handleReadyNotification(key,cur.getEffectiveDate());
+    final DefaultNotification processedNotification=new DefaultNotification(-1L,cur.getId(),hostname,hostname,"MockQueue",clock.getUTCNow().plus(CLAIM_TIME_MS),PersistentQueueEntryLifecycleState.PROCESSED,cur.getNotificationKeyClass(),cur.getNotificationKey(),cur.getEffectiveDate());
     oldNotifications.add(cur);
     processedNotifications.add(processedNotification);
   }

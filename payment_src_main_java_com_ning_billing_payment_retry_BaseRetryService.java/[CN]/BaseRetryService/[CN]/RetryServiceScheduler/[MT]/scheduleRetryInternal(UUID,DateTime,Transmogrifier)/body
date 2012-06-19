@@ -1,12 +1,7 @@
 {
   try {
     final NotificationQueue retryQueue=notificationQueueService.getNotificationQueue(DefaultPaymentService.SERVICE_NAME,getQueueName());
-    final NotificationKey key=new NotificationKey(){
-      @Override public String toString(){
-        return paymentId.toString();
-      }
-    }
-;
+    final NotificationKey key=new PaymentRetryNotificationKey(paymentId);
     if (retryQueue != null) {
       if (transactionalDao == null) {
         retryQueue.recordFutureNotification(timeOfRetry,key);
@@ -18,6 +13,10 @@
   }
  catch (  NoSuchNotificationQueue e) {
     log.error(String.format("Failed to retrieve notification queue %s:%s",DefaultPaymentService.SERVICE_NAME,getQueueName()));
+    return false;
+  }
+catch (  IOException e) {
+    log.error(String.format("Failed to serialize notificationQueue event for paymentId %s",paymentId));
     return false;
   }
   return true;

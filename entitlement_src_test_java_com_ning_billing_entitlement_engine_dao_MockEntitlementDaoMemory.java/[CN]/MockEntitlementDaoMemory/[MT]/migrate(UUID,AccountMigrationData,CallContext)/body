@@ -6,12 +6,7 @@ synchronized (events) {
         final SubscriptionData subData=curSubscription.getData();
         for (        final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
           events.add(curEvent);
-          recordFutureNotificationFromTransaction(null,curEvent.getEffectiveDate(),new NotificationKey(){
-            @Override public String toString(){
-              return curEvent.getId().toString();
-            }
-          }
-);
+          recordFutureNotificationFromTransaction(null,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()));
         }
         subscriptions.add(subData);
       }

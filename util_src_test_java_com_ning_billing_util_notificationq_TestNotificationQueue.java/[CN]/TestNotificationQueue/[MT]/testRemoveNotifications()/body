@@ -1,21 +1,11 @@
 {
   final UUID key=UUID.randomUUID();
-  final NotificationKey notificationKey=new NotificationKey(){
-    @Override public String toString(){
-      return key.toString();
-    }
-  }
-;
+  final NotificationKey notificationKey=new TestNotificationKey(key.toString());
   final UUID key2=UUID.randomUUID();
-  final NotificationKey notificationKey2=new NotificationKey(){
-    @Override public String toString(){
-      return key2.toString();
-    }
-  }
-;
+  final NotificationKey notificationKey2=new TestNotificationKey(key2.toString());
   final DefaultNotificationQueue queue=new DefaultNotificationQueue(dbi,clock,"test-svc","many",new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    final String key,    final DateTime eventDateTime){
-      if (key.equals(notificationKey) || key.equals(notificationKey2)) {
+    @Override public void handleReadyNotification(    final NotificationKey inputKey,    final DateTime eventDateTime){
+      if (inputKey.equals(notificationKey) || inputKey.equals(notificationKey2)) {
         log.info("Received notification with key: " + notificationKey);
         eventsReceived++;
       }
