@@ -1,5 +1,8 @@
 {
   final Invoice invoice=getInvoice(invoiceId);
+  if (invoice == null) {
+    throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
+  }
   final Account account=accountUserApi.getAccountById(invoice.getAccountId());
   return generator.generateInvoice(account,invoice);
 }
