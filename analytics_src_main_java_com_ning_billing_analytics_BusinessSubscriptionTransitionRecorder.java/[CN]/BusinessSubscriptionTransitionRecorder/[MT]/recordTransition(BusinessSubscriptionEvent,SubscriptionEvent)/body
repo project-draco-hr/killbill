@@ -1,10 +1,10 @@
 {
   Currency currency=null;
-  String transitionKey=null;
+  String externalKey=null;
   String accountKey=null;
   final SubscriptionBundle bundle=entitlementApi.getBundleFromId(transition.getBundleId());
   if (bundle != null) {
-    transitionKey=bundle.getKey();
+    externalKey=bundle.getKey();
     final Account account=accountApi.getAccountById(bundle.getAccountId());
     if (account != null) {
       accountKey=account.getExternalKey();
@@ -13,7 +13,7 @@
   }
   DateTime previousEffectiveTransitionTime=null;
   if (event.getEventType() != BusinessSubscriptionEvent.EventType.ADD) {
-    final List<BusinessSubscriptionTransition> transitions=dao.getTransitions(transitionKey);
+    final List<BusinessSubscriptionTransition> transitions=dao.getTransitions(externalKey);
     if (transitions != null && transitions.size() > 0) {
       final BusinessSubscriptionTransition lastTransition=transitions.get(transitions.size() - 1);
       if (lastTransition != null && lastTransition.getNextSubscription() != null) {
@@ -35,5 +35,5 @@
  else {
     nextSubscription=new BusinessSubscription(transition.getNextPriceList(),transition.getNextPlan(),transition.getNextPhase(),currency,transition.getEffectiveTransitionTime(),transition.getNextState(),transition.getSubscriptionId(),transition.getBundleId(),catalogService.getFullCatalog());
   }
-  record(transition.getId(),transitionKey,accountKey,transition.getRequestedTransitionTime(),event,prevSubscription,nextSubscription);
+  record(transition.getTotalOrdering(),externalKey,accountKey,transition.getRequestedTransitionTime(),event,prevSubscription,nextSubscription);
 }

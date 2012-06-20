@@ -1,8 +1,8 @@
 {
   final BusinessSubscription subscriptionWithNullFields=new BusinessSubscription(null,plan.getName(),phase.getName(),Currency.USD,null,null,null,null,catalog);
-  final BusinessSubscriptionTransition transitionWithNullFields=new BusinessSubscriptionTransition(transition.getId(),transition.getKey(),transition.getAccountKey(),transition.getRequestedTimestamp(),transition.getEvent(),subscriptionWithNullFields,subscriptionWithNullFields);
+  final BusinessSubscriptionTransition transitionWithNullFields=new BusinessSubscriptionTransition(transition.getTotalOrdering(),transition.getExternalKey(),transition.getAccountKey(),transition.getRequestedTimestamp(),transition.getEvent(),subscriptionWithNullFields,subscriptionWithNullFields);
   businessSubscriptionTransitionDao.createTransition(transitionWithNullFields);
-  final List<BusinessSubscriptionTransition> transitions=businessSubscriptionTransitionDao.getTransitions(EVENT_KEY);
+  final List<BusinessSubscriptionTransition> transitions=businessSubscriptionTransitionDao.getTransitions(EXTERNAL_KEY);
   Assert.assertEquals(transitions.size(),1);
   Assert.assertEquals(transitions.get(0),transitionWithNullFields);
 }
