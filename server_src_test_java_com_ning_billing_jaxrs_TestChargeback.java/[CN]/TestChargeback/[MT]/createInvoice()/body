@@ -1,0 +1,19 @@
+{
+  final AccountJson accountJson=createAccountWithDefaultPaymentMethod(UUID.randomUUID().toString(),UUID.randomUUID().toString(),"nohup@yahoo.com");
+  final BundleJsonNoSubscriptions bundleJson=createBundle(accountJson.getAccountId(),UUID.randomUUID().toString());
+  assertNotNull(bundleJson);
+  final SubscriptionJsonNoEvents subscriptionJson=createSubscription(bundleJson.getBundleId(),"Shotgun",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),true);
+  assertNotNull(subscriptionJson);
+  clock.addDays(32);
+  crappyWaitForLackOfProperSynchonization();
+  final Response response=doGet(JaxrsResource.INVOICES_PATH,ImmutableMap.<String,String>of(JaxrsResource.QUERY_ACCOUNT_ID,accountJson.getAccountId()),DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
+  final String baseJson=response.getResponseBody();
+  final List<InvoiceJsonSimple> objFromJson=mapper.readValue(baseJson,new TypeReference<List<InvoiceJsonSimple>>(){
+  }
+);
+  assertNotNull(objFromJson);
+  assertEquals(objFromJson.size(),2);
+  assertTrue(objFromJson.get(1).getAmount().doubleValue() > 0);
+  return objFromJson.get(1);
+}
