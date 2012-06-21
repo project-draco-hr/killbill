@@ -1,11 +1,11 @@
 {
-  final SubscriptionBundle bundle=entitlementApi.createBundleForAccount(account.getId(),KEY,context);
+  final SubscriptionBundle bundle=entitlementApi.createBundleForAccount(account.getId(),EXTERNAL_KEY,context);
   Assert.assertNotNull(bundle);
-  Assert.assertEquals(bundle.getKey(),KEY);
+  Assert.assertEquals(bundle.getKey(),EXTERNAL_KEY);
   final UUID subscriptionId=UUID.randomUUID();
   final DateTime effectiveTransitionTime=clock.getUTCNow();
   final DateTime requestedTransitionTime=clock.getUTCNow();
   final PriceList priceList=new MockPriceList().setName("something");
-  transition=new DefaultSubscriptionEvent(new SubscriptionTransitionData(ID,subscriptionId,bundle.getId(),EntitlementEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,Subscription.SubscriptionState.ACTIVE,plan,phase,priceList,1L,null,true),null);
-  expectedTransition=new BusinessSubscriptionTransition(ID,KEY,ACCOUNT_KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan.getName(),catalog,new DateTime(),new DateTime()),null,new BusinessSubscription(priceList.getName(),plan.getName(),phase.getName(),ACCOUNT_CURRENCY,effectiveTransitionTime,Subscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId(),catalog));
+  transition=new DefaultSubscriptionEvent(new SubscriptionTransitionData(UUID.randomUUID(),subscriptionId,bundle.getId(),EntitlementEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,Subscription.SubscriptionState.ACTIVE,plan,phase,priceList,TOTAL_ORDERING,null,true),null);
+  expectedTransition=new BusinessSubscriptionTransition(TOTAL_ORDERING,EXTERNAL_KEY,ACCOUNT_KEY,requestedTransitionTime,BusinessSubscriptionEvent.subscriptionCreated(plan.getName(),catalog,new DateTime(),new DateTime()),null,new BusinessSubscription(priceList.getName(),plan.getName(),phase.getName(),ACCOUNT_CURRENCY,effectiveTransitionTime,Subscription.SubscriptionState.ACTIVE,subscriptionId,bundle.getId(),catalog));
 }

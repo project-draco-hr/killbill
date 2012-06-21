@@ -1,21 +1,18 @@
 {
-  businessAccountDao.createAccount(account);
-  final BusinessAccount foundAccount=businessAccountDao.getAccount(ACCOUNT_KEY);
+  businessAccountSqlDao.createAccount(account);
+  final BusinessAccount foundAccount=businessAccountSqlDao.getAccount(ACCOUNT_KEY);
   Assert.assertNotNull(foundAccount.getCreatedDt());
   Assert.assertEquals(foundAccount.getCreatedDt(),foundAccount.getUpdatedDt());
-  Assert.assertEquals(foundAccount.getTags().size(),2);
-  Assert.assertEquals(foundAccount.getTags().get(0).getTagDefinitionName(),"batch1");
-  Assert.assertEquals(foundAccount.getTags().get(1).getTagDefinitionName(),"great,guy");
   account.setCreatedDt(foundAccount.getCreatedDt());
   account.setUpdatedDt(foundAccount.getUpdatedDt());
   Assert.assertTrue(foundAccount.equals(account));
   final DateTime previousUpdatedDt=account.getUpdatedDt();
   account.setBalance(BigDecimal.TEN);
   account.setPaymentMethod("PayPal");
-  businessAccountDao.saveAccount(account);
-  account=businessAccountDao.getAccount(ACCOUNT_KEY);
+  businessAccountSqlDao.saveAccount(account);
+  account=businessAccountSqlDao.getAccount(ACCOUNT_KEY);
   Assert.assertEquals(Rounder.round(BigDecimal.TEN),account.getRoundedBalance());
   Assert.assertEquals("PayPal",account.getPaymentMethod());
   Assert.assertTrue(account.getUpdatedDt().compareTo(previousUpdatedDt) > 0);
-  Assert.assertNull(businessAccountDao.getAccount("Doesn't exist"));
+  Assert.assertNull(businessAccountSqlDao.getAccount("Doesn't exist"));
 }
