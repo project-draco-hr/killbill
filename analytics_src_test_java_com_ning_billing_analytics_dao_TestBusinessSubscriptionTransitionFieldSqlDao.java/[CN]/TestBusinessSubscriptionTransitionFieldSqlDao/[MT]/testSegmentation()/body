@@ -1,0 +1,13 @@
+{
+  final String externalKey1=UUID.randomUUID().toString();
+  final String name1=UUID.randomUUID().toString().substring(0,30);
+  final String externalKey2=UUID.randomUUID().toString();
+  final String name2=UUID.randomUUID().toString().substring(0,30);
+  Assert.assertEquals(subscriptionTransitionFieldSqlDao.addField(externalKey1,name1,UUID.randomUUID().toString()),1);
+  Assert.assertEquals(subscriptionTransitionFieldSqlDao.addField(externalKey2,name2,UUID.randomUUID().toString()),1);
+  Assert.assertEquals(subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransition(externalKey1).size(),1);
+  Assert.assertEquals(subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransition(externalKey2).size(),1);
+  Assert.assertEquals(subscriptionTransitionFieldSqlDao.removeField(externalKey1,name1),1);
+  Assert.assertEquals(subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransition(externalKey1).size(),0);
+  Assert.assertEquals(subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransition(externalKey2).size(),1);
+}
