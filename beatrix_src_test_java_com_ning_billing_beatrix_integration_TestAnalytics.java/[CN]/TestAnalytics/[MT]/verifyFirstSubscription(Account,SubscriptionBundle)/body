@@ -26,5 +26,8 @@
   Assert.assertEquals(transition.getNextSubscription().getStartDate(),subscription.getStartDate());
   Assert.assertEquals(transition.getNextSubscription().getState(),subscription.getState());
   Assert.assertEquals(transition.getNextSubscription().getSubscriptionId(),subscription.getId());
+  final BusinessAccount businessAccount=analyticsUserApi.getAccountByKey(account.getExternalKey());
+  Assert.assertEquals(businessAccount.getBalance().doubleValue(),Rounder.round(BigDecimal.ZERO));
+  Assert.assertEquals(businessAccount.getTotalInvoiceBalance().doubleValue(),Rounder.round(BigDecimal.ZERO));
   return subscription;
 }
