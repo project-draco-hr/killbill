@@ -1,0 +1,25 @@
+{
+  final Invoice invoice=invoiceApi.getInvoice(invoiceId);
+  if (invoice == null) {
+    log.warn("Ignoring invoice creation for invoice id {} (invoice does not exist)",invoiceId.toString());
+    return;
+  }
+  final String accountKey;
+  try {
+    final Account account=accountApi.getAccountById(invoice.getAccountId());
+    accountKey=account.getExternalKey();
+  }
+ catch (  AccountApiException e) {
+    log.warn("Ignoring invoice creation for invoice id {} and account id {} (account does not exist)",invoice.getId().toString(),invoice.getAccountId().toString());
+    return;
+  }
+  final BusinessInvoice businessInvoice=new BusinessInvoice(accountKey,invoice);
+  final List<BusinessInvoiceItem> businessInvoiceItems=new ArrayList<BusinessInvoiceItem>();
+  for (  final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+    final BusinessInvoiceItem businessInvoiceItem=createBusinessInvoiceItem(invoiceItem);
+    if (businessInvoiceItem != null) {
+      businessInvoiceItems.add(businessInvoiceItem);
+    }
+  }
+  analyticsDao.createInvoice(accountKey,businessInvoice,businessInvoiceItems);
+}

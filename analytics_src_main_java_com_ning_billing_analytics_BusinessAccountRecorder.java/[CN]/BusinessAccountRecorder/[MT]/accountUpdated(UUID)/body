@@ -1,14 +1,9 @@
 {
   try {
     final Account account=accountApi.getAccountById(accountId);
-    final Map<String,Tag> tags=tagUserApi.getTags(accountId,ObjectType.ACCOUNT);
-    if (account == null) {
-      log.warn("Couldn't find account {}",accountId);
-      return;
-    }
     BusinessAccount bac=sqlDao.getAccount(account.getExternalKey());
     if (bac == null) {
-      bac=createBusinessAccountFromAccount(account,new ArrayList<Tag>(tags.values()));
+      bac=createBusinessAccountFromAccount(account);
       log.info("ACCOUNT CREATION " + bac);
       sqlDao.createAccount(bac);
     }

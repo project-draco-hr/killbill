@@ -1,0 +1,22 @@
+{
+  BusinessAccount account=new BusinessAccount(UUID.randomUUID().toString(),UUID.randomUUID().toString(),BigDecimal.ONE,new DateTime(DateTimeZone.UTC),BigDecimal.TEN,"ERROR_NOT_ENOUGH_FUNDS","CreditCard","Visa","FRANCE");
+  Assert.assertEquals(accountSqlDao.createAccount(account),1);
+  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(account.getKey()).size(),0);
+  account=accountSqlDao.getAccount(account.getKey());
+  final BusinessInvoice invoice=createInvoice(account.getKey());
+  final List<BusinessInvoiceItem> invoiceItems=new ArrayList<BusinessInvoiceItem>();
+  for (int i=0; i < 10; i++) {
+    invoiceItems.add(createInvoiceItem(invoice.getInvoiceId(),BigDecimal.valueOf(1242 + i)));
+  }
+  analyticsDao.createInvoice(account.getKey(),invoice,invoiceItems);
+  final List<BusinessInvoice> invoicesForAccount=invoiceSqlDao.getInvoicesForAccount(account.getKey());
+  Assert.assertEquals(invoicesForAccount.size(),1);
+  Assert.assertEquals(invoicesForAccount.get(0).getInvoiceId(),invoice.getInvoiceId());
+  Assert.assertEquals(invoiceItemSqlDao.getInvoiceItemsForInvoice(invoice.getInvoiceId().toString()).size(),10);
+  final BusinessAccount finalAccount=accountSqlDao.getAccount(account.getKey());
+  Assert.assertEquals(finalAccount.getCreatedDt(),account.getCreatedDt());
+  Assert.assertTrue(finalAccount.getUpdatedDt().isAfter(account.getCreatedDt()));
+  Assert.assertTrue(finalAccount.getUpdatedDt().isAfter(account.getUpdatedDt()));
+  Assert.assertTrue(finalAccount.getLastInvoiceDate().equals(invoice.getInvoiceDate()));
+  Assert.assertEquals(finalAccount.getTotalInvoiceBalance(),account.getTotalInvoiceBalance().add(invoice.getBalance()));
+}
