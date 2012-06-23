@@ -29,5 +29,11 @@
   final BusinessAccount businessAccount=analyticsUserApi.getAccountByKey(account.getExternalKey());
   Assert.assertEquals(businessAccount.getBalance().doubleValue(),Rounder.round(BigDecimal.ZERO));
   Assert.assertEquals(businessAccount.getTotalInvoiceBalance().doubleValue(),Rounder.round(BigDecimal.ZERO));
+  Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).size(),1);
+  Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).get(0).getBalance().doubleValue(),0.0);
+  Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).get(0).getAmountCharged().doubleValue(),0.0);
+  Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).get(0).getAmountCredited().doubleValue(),0.0);
+  Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).get(0).getAmountPaid().doubleValue(),0.0);
+  Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).get(0).getCurrency(),account.getCurrency());
   return subscription;
 }
