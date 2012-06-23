@@ -1,0 +1,23 @@
+{
+  final IDBI dbi=helper.getDBI();
+  accountTagSqlDao=dbi.onDemand(BusinessAccountTagSqlDao.class);
+  final BusinessInvoiceTagSqlDao invoiceTagSqlDao=dbi.onDemand(BusinessInvoiceTagSqlDao.class);
+  final BusinessInvoicePaymentTagSqlDao invoicePaymentTagSqlDao=dbi.onDemand(BusinessInvoicePaymentTagSqlDao.class);
+  subscriptionTransitionTagSqlDao=dbi.onDemand(BusinessSubscriptionTransitionTagSqlDao.class);
+  eventBus=new InMemoryBus();
+  final AccountDao accountDao=new AuditedAccountDao(dbi,eventBus);
+  final AccountEmailDao accountEmailDao=new AuditedAccountEmailDao(dbi);
+  final DefaultClock clock=new DefaultClock();
+  callContextFactory=new DefaultCallContextFactory(clock);
+  accountUserApi=new DefaultAccountUserApi(callContextFactory,accountDao,accountEmailDao);
+  final CatalogService catalogService=new DefaultCatalogService(Mockito.mock(CatalogConfig.class),Mockito.mock(VersionedCatalogLoader.class));
+  final AddonUtils addonUtils=new AddonUtils(catalogService);
+  final DefaultNotificationQueueService notificationQueueService=new DefaultNotificationQueueService(dbi,clock);
+  final EntitlementDao entitlementDao=new AuditedEntitlementDao(dbi,clock,addonUtils,notificationQueueService,eventBus);
+  final PlanAligner planAligner=new PlanAligner(catalogService);
+  final DefaultSubscriptionApiService apiService=new DefaultSubscriptionApiService(clock,entitlementDao,catalogService,planAligner);
+  final DefaultSubscriptionFactory subscriptionFactory=new DefaultSubscriptionFactory(apiService,clock,catalogService);
+  entitlementUserApi=new DefaultEntitlementUserApi(clock,entitlementDao,catalogService,apiService,subscriptionFactory,addonUtils);
+  tagRecorder=new BusinessTagRecorder(accountTagSqlDao,invoicePaymentTagSqlDao,invoiceTagSqlDao,subscriptionTransitionTagSqlDao,accountUserApi,entitlementUserApi);
+  eventBus.start();
+}

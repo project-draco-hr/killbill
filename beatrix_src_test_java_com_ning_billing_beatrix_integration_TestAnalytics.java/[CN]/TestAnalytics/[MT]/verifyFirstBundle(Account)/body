@@ -1,0 +1,8 @@
+{
+  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),UUID.randomUUID().toString(),context);
+  Assert.assertNotNull(bundle);
+  waitALittle();
+  Assert.assertEquals(analyticsUserApi.getTransitionsForBundle(bundle.getKey()).size(),0);
+  Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).size(),0);
+  return bundle;
+}

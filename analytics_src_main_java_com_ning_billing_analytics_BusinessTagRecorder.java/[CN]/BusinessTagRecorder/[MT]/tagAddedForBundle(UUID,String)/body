@@ -1,0 +1,12 @@
+{
+  final SubscriptionBundle bundle;
+  try {
+    bundle=entitlementUserApi.getBundleFromId(objectId);
+  }
+ catch (  EntitlementUserApiException e) {
+    log.warn("Ignoring tag addition of {} for bundle id {} (bundle does not exist)",name,objectId.toString());
+    return;
+  }
+  final String externalKey=bundle.getKey();
+  subscriptionTransitionTagSqlDao.addTag(externalKey,name);
+}
