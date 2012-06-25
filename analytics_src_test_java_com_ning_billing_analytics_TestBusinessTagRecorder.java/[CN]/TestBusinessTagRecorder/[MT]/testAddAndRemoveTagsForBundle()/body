@@ -2,7 +2,8 @@
   final String name=UUID.randomUUID().toString().substring(0,20);
   final CallContext callContext=callContextFactory.createCallContext(UUID.randomUUID().toString(),CallOrigin.TEST,UserType.TEST);
   final String externalKey=UUID.randomUUID().toString();
-  final Account account=accountUserApi.createAccount(new MockAccount(UUID.randomUUID(),UUID.randomUUID().toString(),Currency.MXN),callContext);
+  final Account accountData=new MockAccountBuilder().currency(Currency.MXN).build();
+  final Account account=accountUserApi.createAccount(accountData,callContext);
   final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),externalKey,callContext);
   final UUID bundleId=bundle.getId();
   Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransition(externalKey).size(),0);

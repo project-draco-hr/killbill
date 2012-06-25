@@ -2,7 +2,8 @@
   final String name=UUID.randomUUID().toString().substring(0,20);
   final CallContext callContext=callContextFactory.createCallContext(UUID.randomUUID().toString(),CallOrigin.TEST,UserType.TEST);
   final String accountKey=UUID.randomUUID().toString();
-  final Account account=accountUserApi.createAccount(new MockAccount(UUID.randomUUID(),accountKey,Currency.MXN),callContext);
+  final Account accountData=new MockAccountBuilder().externalKey(accountKey).currency(Currency.MXN).build();
+  final Account account=accountUserApi.createAccount(accountData,callContext);
   final UUID accountId=account.getId();
   Assert.assertEquals(accountTagSqlDao.getTagsForAccount(accountKey).size(),0);
   tagRecorder.tagAdded(ObjectType.ACCOUNT,accountId,name);
