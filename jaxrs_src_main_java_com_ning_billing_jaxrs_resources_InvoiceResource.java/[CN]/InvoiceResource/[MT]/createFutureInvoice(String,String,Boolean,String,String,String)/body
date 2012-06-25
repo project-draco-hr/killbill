@@ -16,7 +16,12 @@
     return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
   }
 catch (  InvoiceApiException e) {
-    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+    if (e.getCode() == ErrorCode.INVOICE_NOTHING_TO_DO.getCode()) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+ else {
+      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+    }
   }
 catch (  NullPointerException e) {
     return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
