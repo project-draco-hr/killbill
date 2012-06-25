@@ -1,0 +1,13 @@
+{
+  final String paymentId1=UUID.randomUUID().toString();
+  final String name1=UUID.randomUUID().toString().substring(0,30);
+  final String paymentId2=UUID.randomUUID().toString();
+  final String name2=UUID.randomUUID().toString().substring(0,30);
+  Assert.assertEquals(invoicePaymentFieldSqlDao.addField(paymentId1,name1,UUID.randomUUID().toString()),1);
+  Assert.assertEquals(invoicePaymentFieldSqlDao.addField(paymentId2,name2,UUID.randomUUID().toString()),1);
+  Assert.assertEquals(invoicePaymentFieldSqlDao.getFieldsForInvoicePayment(paymentId1).size(),1);
+  Assert.assertEquals(invoicePaymentFieldSqlDao.getFieldsForInvoicePayment(paymentId2).size(),1);
+  Assert.assertEquals(invoicePaymentFieldSqlDao.removeField(paymentId1,name1),1);
+  Assert.assertEquals(invoicePaymentFieldSqlDao.getFieldsForInvoicePayment(paymentId1).size(),0);
+  Assert.assertEquals(invoicePaymentFieldSqlDao.getFieldsForInvoicePayment(paymentId2).size(),1);
+}

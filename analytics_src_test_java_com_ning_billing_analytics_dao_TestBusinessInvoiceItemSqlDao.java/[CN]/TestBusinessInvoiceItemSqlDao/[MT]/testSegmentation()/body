@@ -1,0 +1,19 @@
+{
+  final UUID invoiceId1=UUID.randomUUID();
+  final String externalKey1=UUID.randomUUID().toString();
+  final BusinessInvoiceItem invoiceItem1=createInvoiceItem(invoiceId1,externalKey1);
+  final UUID invoiceId2=UUID.randomUUID();
+  final String externalKey2=UUID.randomUUID().toString();
+  final BusinessInvoiceItem invoiceItem2=createInvoiceItem(invoiceId2,externalKey2);
+  Assert.assertEquals(invoiceItemSqlDao.createInvoiceItem(invoiceItem1),1);
+  Assert.assertEquals(invoiceItemSqlDao.createInvoiceItem(invoiceItem2),1);
+  Assert.assertEquals(invoiceItemSqlDao.getInvoiceItemsForBundle(externalKey1).size(),1);
+  Assert.assertEquals(invoiceItemSqlDao.getInvoiceItemsForBundle(externalKey2).size(),1);
+  Assert.assertEquals(invoiceItemSqlDao.getInvoiceItemsForInvoice(invoiceId1.toString()).size(),1);
+  Assert.assertEquals(invoiceItemSqlDao.getInvoiceItemsForInvoice(invoiceId2.toString()).size(),1);
+  Assert.assertEquals(invoiceItemSqlDao.deleteInvoiceItem(invoiceItem1.getItemId().toString()),1);
+  Assert.assertEquals(invoiceItemSqlDao.getInvoiceItemsForBundle(externalKey1).size(),0);
+  Assert.assertEquals(invoiceItemSqlDao.getInvoiceItemsForBundle(externalKey2).size(),1);
+  Assert.assertEquals(invoiceItemSqlDao.getInvoiceItemsForInvoice(invoiceId1.toString()).size(),0);
+  Assert.assertEquals(invoiceItemSqlDao.getInvoiceItemsForInvoice(invoiceId2.toString()).size(),1);
+}

@@ -1,0 +1,30 @@
+{
+  final String externalKey;
+  try {
+    final SubscriptionBundle bundle=entitlementApi.getBundleFromId(invoiceItem.getBundleId());
+    externalKey=bundle.getKey();
+  }
+ catch (  EntitlementUserApiException e) {
+    log.warn("Ignoring invoice item {} for bundle {} (bundle does not exist)",invoiceItem.getId().toString(),invoiceItem.getBundleId().toString());
+    return null;
+  }
+  final Subscription subscription;
+  try {
+    subscription=entitlementApi.getSubscriptionFromId(invoiceItem.getSubscriptionId());
+  }
+ catch (  EntitlementUserApiException e) {
+    log.warn("Ignoring invoice item {} for subscription {} (subscription does not exist)",invoiceItem.getId().toString(),invoiceItem.getSubscriptionId().toString());
+    return null;
+  }
+  final Plan plan=subscription.getCurrentPlan();
+  if (plan == null) {
+    log.warn("Ignoring invoice item {} for subscription {} (null plan)",invoiceItem.getId().toString(),invoiceItem.getSubscriptionId().toString());
+    return null;
+  }
+  final PlanPhase planPhase=subscription.getCurrentPhase();
+  if (planPhase == null) {
+    log.warn("Ignoring invoice item {} for subscription {} (null phase)",invoiceItem.getId().toString(),invoiceItem.getSubscriptionId().toString());
+    return null;
+  }
+  return new BusinessInvoiceItem(externalKey,invoiceItem,plan,planPhase);
+}

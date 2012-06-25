@@ -1,0 +1,14 @@
+{
+  final String paymentId=UUID.randomUUID().toString();
+  final String name=UUID.randomUUID().toString().substring(0,20);
+  Assert.assertEquals(invoicePaymentTagSqlDao.getTagsForInvoicePayment(paymentId).size(),0);
+  Assert.assertEquals(invoicePaymentTagSqlDao.removeTag(paymentId,name),0);
+  Assert.assertEquals(invoicePaymentTagSqlDao.addTag(paymentId,name),1);
+  final List<BusinessInvoicePaymentTag> tagsForInvoicePayment=invoicePaymentTagSqlDao.getTagsForInvoicePayment(paymentId);
+  Assert.assertEquals(tagsForInvoicePayment.size(),1);
+  final BusinessInvoicePaymentTag invoicePaymentTag=tagsForInvoicePayment.get(0);
+  Assert.assertEquals(invoicePaymentTag.getPaymentId().toString(),paymentId);
+  Assert.assertEquals(invoicePaymentTag.getName(),name);
+  Assert.assertEquals(invoicePaymentTagSqlDao.removeTag(paymentId,name),1);
+  Assert.assertEquals(invoicePaymentTagSqlDao.getTagsForInvoicePayment(paymentId).size(),0);
+}

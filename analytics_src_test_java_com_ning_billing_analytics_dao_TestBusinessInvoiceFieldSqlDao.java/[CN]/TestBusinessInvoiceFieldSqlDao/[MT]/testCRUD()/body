@@ -1,0 +1,16 @@
+{
+  final String invoiceId=UUID.randomUUID().toString();
+  final String name=UUID.randomUUID().toString().substring(0,30);
+  final String value=UUID.randomUUID().toString();
+  Assert.assertEquals(invoiceFieldSqlDao.getFieldsForInvoice(invoiceId).size(),0);
+  Assert.assertEquals(invoiceFieldSqlDao.removeField(invoiceId,name),0);
+  Assert.assertEquals(invoiceFieldSqlDao.addField(invoiceId,name,value),1);
+  final List<BusinessInvoiceField> fieldsForInvoice=invoiceFieldSqlDao.getFieldsForInvoice(invoiceId);
+  Assert.assertEquals(fieldsForInvoice.size(),1);
+  final BusinessInvoiceField invoiceField=fieldsForInvoice.get(0);
+  Assert.assertEquals(invoiceField.getInvoiceId().toString(),invoiceId);
+  Assert.assertEquals(invoiceField.getName(),name);
+  Assert.assertEquals(invoiceField.getValue(),value);
+  Assert.assertEquals(invoiceFieldSqlDao.removeField(invoiceId,name),1);
+  Assert.assertEquals(invoiceFieldSqlDao.getFieldsForInvoice(invoiceId).size(),0);
+}
