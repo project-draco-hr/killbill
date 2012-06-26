@@ -7,10 +7,6 @@
         if (currentAccount == null) {
           throw new EntityPersistenceException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
         }
-        final String currentKey=currentAccount.getExternalKey();
-        if (!currentKey.equals(specifiedAccount.getExternalKey())) {
-          throw new EntityPersistenceException(ErrorCode.ACCOUNT_CANNOT_CHANGE_EXTERNAL_KEY,currentKey);
-        }
         final Account account=specifiedAccount.mergeWithDelegate(currentAccount);
         transactional.update(account,context);
         final Long recordId=accountSqlDao.getRecordId(accountId.toString());
