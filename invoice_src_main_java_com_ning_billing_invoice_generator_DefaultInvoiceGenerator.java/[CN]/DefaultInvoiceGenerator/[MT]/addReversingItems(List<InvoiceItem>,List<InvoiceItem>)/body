@@ -1,0 +1,10 @@
+{
+  for (  final InvoiceItem existingItem : existingItems) {
+    if (existingItem instanceof RecurringInvoiceItem) {
+      final RecurringInvoiceItem ri=(RecurringInvoiceItem)existingItem;
+      final BigDecimal amountNegated=ri.getAmount() == null ? null : ri.getAmount().negate();
+      RepairAdjInvoiceItem repairItem=new RepairAdjInvoiceItem(ri.getInvoiceId(),ri.getAccountId(),ri.getStartDate(),ri.getEndDate(),amountNegated,ri.getCurrency(),ri.getId());
+      proposedItems.add(repairItem);
+    }
+  }
+}

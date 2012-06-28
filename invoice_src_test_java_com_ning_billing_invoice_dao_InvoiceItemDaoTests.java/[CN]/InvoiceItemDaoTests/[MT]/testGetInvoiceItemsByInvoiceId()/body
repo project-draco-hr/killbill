@@ -8,8 +8,8 @@
     final UUID subscriptionId=UUID.randomUUID();
     final BigDecimal amount=rate.multiply(new BigDecimal(i + 1));
     final RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate,startDate.plusMonths(1),amount,amount,Currency.USD);
-    recurringInvoiceItemDao.create(item,context);
+    invoiceItemSqlDao.create(item,context);
   }
-  final List<InvoiceItem> items=recurringInvoiceItemDao.getInvoiceItemsByInvoice(invoiceId.toString());
+  final List<InvoiceItem> items=invoiceItemSqlDao.getInvoiceItemsByInvoice(invoiceId.toString());
   assertEquals(items.size(),5);
 }

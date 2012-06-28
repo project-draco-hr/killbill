@@ -1,0 +1,38 @@
+{
+  DateTime startDate=clock.getUTCNow();
+  DateTime endDate=startDate.plusDays(30);
+  DateTime nextEndDate=startDate.plusMonths(1);
+  BigDecimal rate1=new BigDecimal("10.00");
+  BigDecimal amount1=rate1;
+  List<InvoiceItem> existing=new LinkedList<InvoiceItem>();
+  InvoiceItem item1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount1,rate1,currency,null);
+  existing.add(item1);
+  UUID existingInvoiceId=UUID.randomUUID();
+  List<Invoice> existingInvoices=new LinkedList<Invoice>();
+  Invoice existingInvoice=mock(Invoice.class);
+  when(existingInvoice.getId()).thenReturn(existingInvoiceId);
+  when(existingInvoice.getBalance()).thenReturn(BigDecimal.ZERO);
+  when(existingInvoice.getInvoiceItems()).thenReturn(existing);
+  BigDecimal rate2=new BigDecimal("20.0");
+  BigDecimal amount2=rate2;
+  List<InvoiceItem> proposed=new LinkedList<InvoiceItem>();
+  InvoiceItem reversedItem1=new RepairAdjInvoiceItem(existingInvoiceId,accountId,startDate,nextEndDate,item1.getAmount().negate(),currency,item1.getId());
+  InvoiceItem newItem1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount2,rate2,currency,null);
+  proposed.add(reversedItem1);
+  proposed.add(newItem1);
+  gen.generateCreditsForPastRepairedInvoices(accountId,existingInvoices,proposed,currency);
+  assertEquals(proposed.size(),3);
+  InvoiceItem reversedItemCheck1=proposed.get(0);
+  assertEquals(reversedItemCheck1.getInvoiceId(),existingInvoiceId);
+  assertEquals(reversedItemCheck1.getInvoiceItemType(),InvoiceItemType.REPAIR_ADJ);
+  assertEquals(reversedItemCheck1.getAmount(),item1.getAmount().negate());
+  assertEquals(reversedItemCheck1.getReversedItemId(),item1.getId());
+  InvoiceItem newItemCheck1=proposed.get(1);
+  assertEquals(newItemCheck1.getInvoiceId(),invoiceId);
+  assertEquals(newItemCheck1.getInvoiceItemType(),InvoiceItemType.RECURRING);
+  assertEquals(newItemCheck1.getAmount(),amount2);
+  InvoiceItem creditItemCheck=proposed.get(2);
+  assertEquals(creditItemCheck.getInvoiceId(),existingInvoiceId);
+  assertEquals(creditItemCheck.getInvoiceItemType(),InvoiceItemType.CBA_ADJ);
+  assertEquals(creditItemCheck.getAmount(),amount2.add(rate1.negate()));
+}
