@@ -1,0 +1,26 @@
+{
+switch (eventEffective.getTransitionType()) {
+case MIGRATE_ENTITLEMENT:
+case CREATE:
+    bstRecorder.subscriptionCreated(eventEffective);
+  break;
+case RE_CREATE:
+bstRecorder.subscriptionRecreated(eventEffective);
+break;
+case MIGRATE_BILLING:
+break;
+case CANCEL:
+bstRecorder.subscriptionCancelled(eventEffective);
+break;
+case CHANGE:
+bstRecorder.subscriptionChanged(eventEffective);
+break;
+case UNCANCEL:
+break;
+case PHASE:
+bstRecorder.subscriptionPhaseChanged(eventEffective);
+break;
+default :
+throw new RuntimeException("Unexpected event type " + eventEffective.getTransitionType());
+}
+}
