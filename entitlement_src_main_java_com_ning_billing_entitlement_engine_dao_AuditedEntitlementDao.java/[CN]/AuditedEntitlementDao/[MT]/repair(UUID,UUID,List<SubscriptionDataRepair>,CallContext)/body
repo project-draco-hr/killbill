@@ -7,10 +7,12 @@
         for (        final EntitlementEvent event : cur.getInitialEvents()) {
           transEventDao.updateVersion(event.getId().toString(),event.getActiveVersion(),context);
         }
-        for (        final EntitlementEvent event : cur.getNewEvents()) {
-          transEventDao.insertEvent(event,context);
-          if (event.getEffectiveDate().isAfter(clock.getUTCNow())) {
-            recordFutureNotificationFromTransaction(transactional,event.getEffectiveDate(),new EntitlementNotificationKey(event.getId()));
+        EntitlementEvent prevEvent=getLastStoredEventForSubscription(cur.getId());
+        for (        final EntitlementEvent newEvent : cur.getNewEvents()) {
+          transEventDao.insertEvent(newEvent,context);
+          if (newEvent.getEffectiveDate().isAfter(clock.getUTCNow())) {
+            recordFutureNotificationFromTransaction(transactional,cur,prevEvent,newEvent,new EntitlementNotificationKey(newEvent.getId()));
+            prevEvent=newEvent;
           }
         }
       }

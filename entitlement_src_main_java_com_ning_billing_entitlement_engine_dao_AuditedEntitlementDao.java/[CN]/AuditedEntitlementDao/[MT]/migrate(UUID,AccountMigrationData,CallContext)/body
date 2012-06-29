@@ -9,11 +9,13 @@
         final SubscriptionBundleData bundleData=curBundle.getData();
         for (        final SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
           final SubscriptionData subData=curSubscription.getData();
+          EntitlementEvent prevEvent=getLastStoredEventForSubscription(subData.getId());
           for (          final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
             transactional.insertEvent(curEvent,context);
             recordId=transactional.getRecordId(curEvent.getId().toString());
             audits.add(new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.INSERT));
-            recordFutureNotificationFromTransaction(transactional,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()));
+            recordFutureNotificationFromTransaction(transactional,subData,prevEvent,curEvent,new EntitlementNotificationKey(curEvent.getId()));
+            prevEvent=curEvent;
           }
           transSubDao.insertSubscription(subData,context);
           recordId=transSubDao.getRecordId(subData.getId().toString());

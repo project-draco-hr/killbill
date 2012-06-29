@@ -1,0 +1,16 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
+    @Override public Void inTransaction(    final EntitlementEventSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final UUID subscriptionId=subscription.getId();
+      final EntitlementEvent prevPhase=getLastStoredEventForSubscription(subscriptionId);
+      cancelNextPhaseEventFromTransaction(subscriptionId,transactional,context);
+      transactional.insertEvent(nextPhase,context);
+      final Long recordId=transactional.getRecordId(nextPhase.getId().toString());
+      final EntityAudit audit=new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.INSERT);
+      transactional.insertAuditFromTransaction(audit,context);
+      recordFutureNotificationFromTransaction(transactional,subscription,prevPhase,nextPhase,new EntitlementNotificationKey(nextPhase.getId()));
+      return null;
+    }
+  }
+);
+}
