@@ -1,3 +1,19 @@
 {
-  return invoiceSqlDao.getAccountBalance(accountId.toString());
+  return invoiceSqlDao.inTransaction(new Transaction<BigDecimal,InvoiceSqlDao>(){
+    @Override public BigDecimal inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      BigDecimal accountBalance=BigDecimal.ZERO;
+      List<Invoice> invoices=getAllInvoicesByAccountFromTransaction(accountId,transactional);
+      List<InvoiceItem> creditBalanceItems=new LinkedList<InvoiceItem>();
+      for (      Invoice cur : invoices) {
+        accountBalance=accountBalance.add(cur.getBalance());
+        creditBalanceItems.addAll(cur.getInvoiceItems(CreditBalanceAdjInvoiceItem.class));
+      }
+      BigDecimal cbaTotal=BigDecimal.ZERO;
+      for (      InvoiceItem cur : creditBalanceItems) {
+        cbaTotal=cbaTotal.add(cur.getAmount());
+      }
+      return accountBalance.add(cbaTotal.negate());
+    }
+  }
+);
 }
