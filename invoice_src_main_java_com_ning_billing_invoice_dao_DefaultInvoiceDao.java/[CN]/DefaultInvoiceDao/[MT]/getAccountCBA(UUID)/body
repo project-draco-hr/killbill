@@ -1,12 +1,12 @@
 {
   return invoiceSqlDao.inTransaction(new Transaction<BigDecimal,InvoiceSqlDao>(){
     @Override public BigDecimal inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
-      BigDecimal accountBalance=BigDecimal.ZERO;
+      BigDecimal cba=BigDecimal.ZERO;
       List<Invoice> invoices=getAllInvoicesByAccountFromTransaction(accountId,transactional);
       for (      Invoice cur : invoices) {
-        accountBalance=accountBalance.add(cur.getBalance());
+        cba=cba.add(cur.getCBAAmount());
       }
-      return accountBalance;
+      return cba;
     }
   }
 );

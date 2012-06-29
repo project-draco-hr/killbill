@@ -1,0 +1,17 @@
+{
+  return invoiceSqlDao.inTransaction(new Transaction<InvoiceItem,InvoiceSqlDao>(){
+    @Override public InvoiceItem inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      UUID invoiceIdForRefund=invoiceId;
+      if (invoiceIdForRefund == null) {
+        final Invoice invoiceForRefund=new DefaultInvoice(accountId,effectiveDate,effectiveDate,currency);
+        transactional.create(invoiceForRefund,context);
+        invoiceIdForRefund=invoiceForRefund.getId();
+      }
+      final InvoiceItem credit=new CreditAdjInvoiceItem(invoiceIdForRefund,accountId,effectiveDate,amount,currency);
+      InvoiceItemSqlDao transInvoiceItemDao=transactional.become(InvoiceItemSqlDao.class);
+      transInvoiceItemDao.create(credit,context);
+      return credit;
+    }
+  }
+);
+}
