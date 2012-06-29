@@ -2,18 +2,16 @@
   BigDecimal totalUnusedCreditAmount=BigDecimal.ZERO;
   BigDecimal totalAmountOwed=BigDecimal.ZERO;
   for (  final InvoiceItem item : existingItems) {
-    if (item instanceof CreditBalanceAdjInvoiceItem) {
+    if (item.getInvoiceItemType() == InvoiceItemType.CBA_ADJ) {
       totalUnusedCreditAmount=totalUnusedCreditAmount.add(item.getAmount());
     }
   }
   for (  final InvoiceItem item : proposedItems) {
-    if (item instanceof CreditBalanceAdjInvoiceItem) {
+    if (item.getInvoiceItemType() == InvoiceItemType.CBA_ADJ) {
       totalUnusedCreditAmount=totalUnusedCreditAmount.add(item.getAmount());
     }
- else     if ((item instanceof RecurringInvoiceItem) || (item instanceof FixedPriceInvoiceItem)) {
-      totalAmountOwed=totalAmountOwed.add(item.getAmount());
-    }
  else {
+      totalAmountOwed=totalAmountOwed.add(item.getAmount());
     }
   }
   BigDecimal creditAmount=BigDecimal.ZERO;

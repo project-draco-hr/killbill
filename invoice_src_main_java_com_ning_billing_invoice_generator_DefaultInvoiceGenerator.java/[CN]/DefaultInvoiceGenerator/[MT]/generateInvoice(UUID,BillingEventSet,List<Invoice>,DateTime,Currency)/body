@@ -20,8 +20,8 @@
   final List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,targetDate,targetCurrency);
   removeCancellingInvoiceItems(existingItems);
   removeDuplicatedInvoiceItems(proposedItems,existingItems);
-  addReversingItems(existingItems,proposedItems);
-  generateCreditsForPastRepairedInvoices(accountId,existingInvoices,proposedItems,targetCurrency);
+  addRepairedItems(existingItems,proposedItems);
+  generateCBAForExistingInvoices(accountId,existingInvoices,proposedItems,targetCurrency);
   consumeExistingCredit(invoiceId,accountId,existingItems,proposedItems,targetCurrency);
   if (proposedItems == null || proposedItems.size() == 0) {
     return null;
