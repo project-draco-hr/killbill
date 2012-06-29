@@ -1,5 +1,26 @@
 {
   final BusinessSubscriptionTransition transition=new BusinessSubscriptionTransition(totalOrdering,externalKey,accountKey,requestedDateTime,event,prevSubscription,nextSubscription);
   log.info(transition.getEvent() + " " + transition);
-  sqlDao.createTransition(transition);
+  sqlDao.inTransaction(new Transaction<Void,BusinessSubscriptionTransitionSqlDao>(){
+    @Override public Void inTransaction(    final BusinessSubscriptionTransitionSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final String subscriptionId;
+      if (nextSubscription.getSubscriptionId() != null) {
+        subscriptionId=nextSubscription.getSubscriptionId().toString();
+      }
+ else {
+        subscriptionId=prevSubscription.getSubscriptionId().toString();
+      }
+      final List<BusinessSubscriptionTransition> currentTransitions=transactional.getTransitionForSubscription(subscriptionId);
+      if (currentTransitions != null && currentTransitions.size() > 0) {
+        for (        final BusinessSubscriptionTransition currentTransition : currentTransitions) {
+          if (currentTransition.isDuplicateOf(transition)) {
+            return null;
+          }
+        }
+      }
+      transactional.createTransition(transition);
+      return null;
+    }
+  }
+);
 }

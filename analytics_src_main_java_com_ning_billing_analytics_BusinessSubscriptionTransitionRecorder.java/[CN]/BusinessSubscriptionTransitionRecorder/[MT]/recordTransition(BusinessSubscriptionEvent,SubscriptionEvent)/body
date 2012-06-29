@@ -15,9 +15,10 @@
   if (event.getEventType() != BusinessSubscriptionEvent.EventType.ADD) {
     final List<BusinessSubscriptionTransition> transitions=sqlDao.getTransitions(externalKey);
     if (transitions != null && transitions.size() > 0) {
-      final BusinessSubscriptionTransition lastTransition=transitions.get(transitions.size() - 1);
-      if (lastTransition != null && lastTransition.getNextSubscription() != null) {
-        previousEffectiveTransitionTime=lastTransition.getNextSubscription().getStartDate();
+      for (      final BusinessSubscriptionTransition candidate : transitions) {
+        if (candidate != null && candidate.getNextSubscription() != null && candidate.getNextSubscription().getStartDate().isBefore(transition.getEffectiveTransitionTime())) {
+          previousEffectiveTransitionTime=candidate.getNextSubscription().getStartDate();
+        }
       }
     }
   }
