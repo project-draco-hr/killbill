@@ -4,7 +4,7 @@
   Mockito.when(catalogService.getFullCatalog()).thenReturn(Mockito.mock(Catalog.class));
   final BusinessSubscriptionTransitionSqlDao sqlDao=new MockBusinessSubscriptionTransitionSqlDao();
   final BusinessSubscription nextPrevSubscription=new BusinessSubscription(UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),Currency.USD,new DateTime(DateTimeZone.UTC),Subscription.SubscriptionState.ACTIVE,UUID.randomUUID(),UUID.randomUUID(),catalogService.getFullCatalog());
-  sqlDao.createTransition(new BusinessSubscriptionTransition(10L,externalKey.toString(),UUID.randomUUID().toString(),new DateTime(DateTimeZone.UTC),BusinessSubscriptionEvent.valueOf("ADD_MISC"),null,nextPrevSubscription));
+  sqlDao.createTransition(new BusinessSubscriptionTransition(UUID.randomUUID(),10L,externalKey.toString(),UUID.randomUUID().toString(),new DateTime(DateTimeZone.UTC),BusinessSubscriptionEvent.valueOf("ADD_MISC"),null,nextPrevSubscription));
   final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
   Mockito.when(bundle.getKey()).thenReturn(externalKey.toString());
   final EntitlementUserApi entitlementApi=Mockito.mock(EntitlementUserApi.class);
@@ -16,6 +16,7 @@
   final BusinessSubscriptionTransitionRecorder recorder=new BusinessSubscriptionTransitionRecorder(sqlDao,catalogService,entitlementApi,accountApi);
   final EffectiveSubscriptionEvent eventEffective=Mockito.mock(EffectiveSubscriptionEvent.class);
   Mockito.when(eventEffective.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(eventEffective.getSubscriptionId()).thenReturn(UUID.randomUUID());
   Mockito.when(eventEffective.getRequestedTransitionTime()).thenReturn(new DateTime(DateTimeZone.UTC));
   Mockito.when(eventEffective.getNextPlan()).thenReturn(UUID.randomUUID().toString());
   Mockito.when(eventEffective.getEffectiveTransitionTime()).thenReturn(new DateTime(DateTimeZone.UTC));

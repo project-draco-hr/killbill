@@ -1,5 +1,5 @@
 {
-  final BusinessSubscriptionTransition transitionWithNullPrev=new BusinessSubscriptionTransition(transition.getTotalOrdering(),transition.getExternalKey(),transition.getAccountKey(),transition.getRequestedTimestamp(),transition.getEvent(),null,transition.getNextSubscription());
+  final BusinessSubscriptionTransition transitionWithNullPrev=new BusinessSubscriptionTransition(transition.getSubscriptionId(),transition.getTotalOrdering(),transition.getExternalKey(),transition.getAccountKey(),transition.getRequestedTimestamp(),transition.getEvent(),null,transition.getNextSubscription());
   businessSubscriptionTransitionSqlDao.createTransition(transitionWithNullPrev);
   List<BusinessSubscriptionTransition> transitions=businessSubscriptionTransitionSqlDao.getTransitions(EXTERNAL_KEY);
   Assert.assertEquals(transitions.size(),1);
@@ -8,7 +8,7 @@
   transitions=businessSubscriptionTransitionSqlDao.getTransitions(EXTERNAL_KEY);
   Assert.assertEquals(transitions.size(),1);
   Assert.assertEquals(transitions.get(0),transitionWithNullPrev);
-  final BusinessSubscriptionTransition secondTransitionWithNullPrev=new BusinessSubscriptionTransition(12L,transition.getExternalKey(),transition.getAccountKey(),transition.getRequestedTimestamp(),transition.getEvent(),null,transition.getNextSubscription());
+  final BusinessSubscriptionTransition secondTransitionWithNullPrev=new BusinessSubscriptionTransition(transition.getSubscriptionId(),12L,transition.getExternalKey(),transition.getAccountKey(),transition.getRequestedTimestamp(),transition.getEvent(),null,transition.getNextSubscription());
   businessSubscriptionTransitionSqlDao.createTransition(secondTransitionWithNullPrev);
   transitions=businessSubscriptionTransitionSqlDao.getTransitions(EXTERNAL_KEY);
   Assert.assertEquals(transitions.size(),2);
