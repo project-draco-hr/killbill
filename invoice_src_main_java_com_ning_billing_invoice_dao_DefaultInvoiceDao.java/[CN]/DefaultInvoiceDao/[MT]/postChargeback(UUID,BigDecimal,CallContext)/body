@@ -3,7 +3,7 @@
     @Override public InvoicePayment inTransaction(    final InvoicePaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
       final BigDecimal maxChargedBackAmount=getRemainingAmountPaidFromTransaction(invoicePaymentId,transactional);
       final BigDecimal requestedChargedBackAmout=(amount == null) ? maxChargedBackAmount : amount;
-      if (requestedChargedBackAmout.compareTo(BigDecimal.ZERO) < 0) {
+      if (requestedChargedBackAmout.compareTo(BigDecimal.ZERO) <= 0) {
         throw new InvoiceApiException(ErrorCode.CHARGE_BACK_AMOUNT_IS_NEGATIVE);
       }
       if (requestedChargedBackAmout.compareTo(maxChargedBackAmount) > 0) {

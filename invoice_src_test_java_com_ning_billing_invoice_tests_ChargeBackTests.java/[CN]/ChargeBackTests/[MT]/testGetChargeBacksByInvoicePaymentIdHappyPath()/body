@@ -1,7 +1,7 @@
 {
   final Invoice invoice=createAndPersistInvoice(THIRTY);
   final InvoicePayment payment=createAndPersistPayment(invoice.getId(),THIRTY);
-  invoicePaymentApi.processChargeback(payment.getId(),FIFTEEN,context);
+  invoicePaymentApi.createChargeback(payment.getId(),FIFTEEN,context);
   final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentAttemptId(payment.getPaymentAttemptId());
   assertNotNull(chargebacks);
   assertEquals(chargebacks.size(),1);
