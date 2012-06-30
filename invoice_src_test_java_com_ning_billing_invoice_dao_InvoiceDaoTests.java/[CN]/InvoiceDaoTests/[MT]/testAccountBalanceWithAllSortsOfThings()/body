@@ -18,7 +18,7 @@
   balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(new BigDecimal("25.00")),0);
   final BigDecimal payment1=amount1.add(rate1);
-  final InvoicePayment payment=new DefaultInvoicePayment(UUID.randomUUID(),invoice1.getId(),new DateTime(),payment1,Currency.USD);
+  final InvoicePayment payment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice1.getId(),new DateTime(),payment1,Currency.USD);
   invoicePaymentDao.create(payment,context);
   balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(new BigDecimal("0.00")),0);
@@ -34,7 +34,7 @@
   assertEquals(balance.compareTo(new BigDecimal("-10.00")),0);
   BigDecimal cba=invoiceDao.getAccountCBA(accountId);
   assertEquals(cba.compareTo(new BigDecimal("10.00")),0);
-  final InvoicePayment refund=new DefaultInvoicePayment(UUID.randomUUID(),UUID.randomUUID(),invoice1.getId(),new DateTime(),rate2.negate(),Currency.USD,payment.getId());
+  final InvoicePayment refund=new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice1.getId(),new DateTime(),rate2.negate(),Currency.USD,payment.getId());
   invoicePaymentDao.create(refund,context);
   final CreditBalanceAdjInvoiceItem cbaItem2=new CreditBalanceAdjInvoiceItem(invoice1.getId(),accountId,new DateTime(),rate2.negate(),Currency.USD);
   invoiceItemSqlDao.create(cbaItem2,context);

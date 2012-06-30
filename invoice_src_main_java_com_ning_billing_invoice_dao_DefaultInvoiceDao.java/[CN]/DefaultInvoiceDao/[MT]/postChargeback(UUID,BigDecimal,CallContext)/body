@@ -1,15 +1,20 @@
 {
   return invoicePaymentSqlDao.inTransaction(new Transaction<InvoicePayment,InvoicePaymentSqlDao>(){
     @Override public InvoicePayment inTransaction(    final InvoicePaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final BigDecimal maxChargedBackAmount=getRemainingAmountPaidFromTransaction(invoicePaymentId,transactional);
+      final BigDecimal requestedChargedBackAmout=(amount == null) ? maxChargedBackAmount : amount;
+      if (requestedChargedBackAmout.compareTo(BigDecimal.ZERO) < 0) {
+        throw new InvoiceApiException(ErrorCode.CHARGE_BACK_AMOUNT_IS_NEGATIVE);
+      }
+      if (requestedChargedBackAmout.compareTo(maxChargedBackAmount) > 0) {
+        throw new InvoiceApiException(ErrorCode.CHARGE_BACK_AMOUNT_TOO_HIGH,requestedChargedBackAmout,maxChargedBackAmount);
+      }
       final InvoicePayment payment=invoicePaymentSqlDao.getById(invoicePaymentId.toString());
       if (payment == null) {
         throw new InvoiceApiException(ErrorCode.INVOICE_PAYMENT_NOT_FOUND,invoicePaymentId.toString());
       }
  else {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-          throw new InvoiceApiException(ErrorCode.CHARGE_BACK_AMOUNT_IS_NEGATIVE);
-        }
-        final InvoicePayment chargeBack=payment.asChargeBack(amount,context.getCreatedDate());
+        final InvoicePayment chargeBack=new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.CHARGED_BACK,null,payment.getInvoiceId(),context.getCreatedDate(),requestedChargedBackAmout.negate(),payment.getCurrency(),payment.getId());
         invoicePaymentSqlDao.create(chargeBack,context);
         return chargeBack;
       }
