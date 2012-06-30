@@ -4,9 +4,12 @@
   dbi=mysqlTestingHelper.getDBI();
   final String invoiceDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/invoice/ddl.sql"));
   final String utilDdl=IOUtils.toString(DefaultInvoiceDao.class.getResourceAsStream("/com/ning/billing/util/ddl.sql"));
+  clock=new ClockMock();
   mysqlTestingHelper.startMysql();
   mysqlTestingHelper.initDb(invoiceDdl);
   mysqlTestingHelper.initDb(utilDdl);
+  bus=new InMemoryBus();
+  bus.start();
   final NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
   final TagDefinitionDao tagDefinitionDao=new MockTagDefinitionDao();
   final TagDao tagDao=new AuditedTagDao(dbi,tagEventBuilder,bus);
@@ -15,10 +18,7 @@
   invoiceDao.test();
   invoiceItemSqlDao=dbi.onDemand(InvoiceItemSqlDao.class);
   invoicePaymentDao=dbi.onDemand(InvoicePaymentSqlDao.class);
-  clock=new ClockMock();
   context=new TestCallContext("Invoice Dao Tests");
   generator=new DefaultInvoiceGenerator(clock,invoiceConfig);
-  bus=new InMemoryBus();
-  bus.start();
   assertTrue(true);
 }

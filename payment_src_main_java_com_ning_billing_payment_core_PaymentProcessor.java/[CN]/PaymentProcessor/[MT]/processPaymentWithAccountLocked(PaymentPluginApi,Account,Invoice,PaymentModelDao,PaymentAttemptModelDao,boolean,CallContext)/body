@@ -13,7 +13,7 @@ case PROCESSED:
   allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId());
 lastAttempt=allAttempts.get(allAttempts.size() - 1);
 payment=paymentDao.getPayment(paymentInput.getId());
-invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),paymentStatus == PaymentStatus.SUCCESS ? payment.getAmount() : null,paymentStatus == PaymentStatus.SUCCESS ? payment.getCurrency() : null,lastAttempt.getId(),lastAttempt.getEffectiveDate(),context);
+invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),payment.getAmount(),paymentStatus == PaymentStatus.SUCCESS ? payment.getCurrency() : null,lastAttempt.getId(),lastAttempt.getEffectiveDate(),context);
 event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,context.getUserToken(),payment.getEffectiveDate());
 break;
 case ERROR:
