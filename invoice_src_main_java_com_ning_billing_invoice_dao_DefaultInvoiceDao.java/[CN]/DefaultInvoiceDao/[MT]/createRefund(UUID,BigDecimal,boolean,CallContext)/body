@@ -30,7 +30,7 @@
         final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate(),cbaAdjAmount,invoice.getCurrency());
         transInvoiceItemDao.create(cbaAdjItem,context);
       }
-      final BigDecimal requestedPositiveAmountAfterCbaAdj=requestedPositiveAmount.subtract(cbaAdjAmount);
+      final BigDecimal requestedPositiveAmountAfterCbaAdj=requestedPositiveAmount.add(cbaAdjAmount);
       if (isInvoiceAdjusted) {
         BigDecimal maxBalanceToAdjust=(invoiceBalanceAfterRefund.compareTo(BigDecimal.ZERO) <= 0) ? BigDecimal.ZERO : invoiceBalanceAfterRefund;
         BigDecimal requestedPositiveAmountToAdjust=requestedPositiveAmountAfterCbaAdj.compareTo(maxBalanceToAdjust) > 0 ? maxBalanceToAdjust : requestedPositiveAmountAfterCbaAdj;
