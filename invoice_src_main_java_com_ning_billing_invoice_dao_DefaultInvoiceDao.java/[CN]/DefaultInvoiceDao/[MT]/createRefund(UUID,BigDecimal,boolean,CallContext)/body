@@ -23,10 +23,10 @@
       }
       final BigDecimal invoiceBalanceAfterRefund=invoice.getBalance();
       InvoiceItemSqlDao transInvoiceItemDao=transInvoiceDao.become(InvoiceItemSqlDao.class);
-      final BigDecimal cbaAmountAfterRefund=invoice.getCBAAmount();
+      final BigDecimal accountCbaAvailable=getAccountCBAFromTransaction(invoice.getAccountId(),transInvoiceDao);
       BigDecimal cbaAdjAmount=BigDecimal.ZERO;
-      if (cbaAmountAfterRefund.compareTo(BigDecimal.ZERO) > 0) {
-        cbaAdjAmount=(requestedPositiveAmount.compareTo(cbaAmountAfterRefund) > 0) ? cbaAmountAfterRefund.negate() : requestedPositiveAmount.negate();
+      if (accountCbaAvailable.compareTo(BigDecimal.ZERO) > 0) {
+        cbaAdjAmount=(requestedPositiveAmount.compareTo(accountCbaAvailable) > 0) ? accountCbaAvailable.negate() : requestedPositiveAmount.negate();
         final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate(),cbaAdjAmount,invoice.getCurrency());
         transInvoiceItemDao.create(cbaAdjItem,context);
       }
