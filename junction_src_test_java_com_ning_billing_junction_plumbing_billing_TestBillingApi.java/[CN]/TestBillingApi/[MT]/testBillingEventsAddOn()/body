@@ -4,8 +4,8 @@
   final Plan nextPlan=catalogService.getFullCatalog().findPlan("Horn1USD",now);
   final PlanPhase nextPhase=nextPlan.getAllPhases()[0];
   final PriceList nextPriceList=catalogService.getFullCatalog().findPriceList(PriceListSet.DEFAULT_PRICELIST_NAME,now);
-  final SubscriptionEvent t=new MockSubscriptionEvent(eventId,subId,bunId,then,now,null,null,null,null,SubscriptionState.ACTIVE,nextPlan.getName(),nextPhase.getName(),nextPriceList.getName(),1L,null,SubscriptionTransitionType.CREATE,0,null);
-  subscriptionTransitions.add(t);
+  final EffectiveSubscriptionEvent t=new MockEffectiveSubscriptionEvent(eventId,subId,bunId,then,now,null,null,null,null,SubscriptionState.ACTIVE,nextPlan.getName(),nextPhase.getName(),nextPriceList.getName(),1L,null,SubscriptionTransitionType.CREATE,0,null);
+  effectiveSubscriptionTransitions.add(t);
   final Account account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
   ((ZombieControl)account).addResult("getBillCycleDay",1).addResult("getTimeZone",DateTimeZone.UTC);
   ((ZombieControl)account).addResult("getCurrency",Currency.USD);

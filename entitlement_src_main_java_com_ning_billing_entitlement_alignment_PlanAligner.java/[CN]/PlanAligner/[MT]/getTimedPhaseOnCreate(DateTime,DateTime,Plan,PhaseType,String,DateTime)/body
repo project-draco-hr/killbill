@@ -1,9 +1,9 @@
 {
   final Catalog catalog=catalogService.getFullCatalog();
   final PlanSpecifier planSpecifier=new PlanSpecifier(plan.getProduct().getName(),plan.getProduct().getCategory(),plan.getBillingPeriod(),priceList);
-  DateTime planStartDate=null;
-  final PlanAlignmentCreate alignement=catalog.planCreateAlignment(planSpecifier,requestedDate);
-switch (alignement) {
+  final DateTime planStartDate;
+  final PlanAlignmentCreate alignment=catalog.planCreateAlignment(planSpecifier,requestedDate);
+switch (alignment) {
 case START_OF_SUBSCRIPTION:
     planStartDate=subscriptionStartDate;
   break;
@@ -11,7 +11,7 @@ case START_OF_BUNDLE:
 planStartDate=bundleStartDate;
 break;
 default :
-throw new EntitlementError(String.format("Unknwon PlanAlignmentCreate %s",alignement));
+throw new EntitlementError(String.format("Unknown PlanAlignmentCreate %s",alignment));
 }
 return getPhaseAlignments(plan,initialPhase,planStartDate);
 }

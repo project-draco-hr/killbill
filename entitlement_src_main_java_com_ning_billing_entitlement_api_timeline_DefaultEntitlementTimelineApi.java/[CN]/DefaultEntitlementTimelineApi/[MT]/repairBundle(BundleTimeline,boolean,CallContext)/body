@@ -80,9 +80,8 @@ break;
 validateBasePlanRecreate(isBasePlanRecreate,subscriptions,input.getSubscriptions());
 validateInputSubscriptionsKnown(subscriptions,input.getSubscriptions());
 final Collection<NewEvent> newEvents=createOrderedNewEventInput(input.getSubscriptions());
-final Iterator<NewEvent> it=newEvents.iterator();
-while (it.hasNext()) {
-final DefaultNewEvent cur=(DefaultNewEvent)it.next();
+for (final NewEvent newEvent : newEvents) {
+final DefaultNewEvent cur=(DefaultNewEvent)newEvent;
 final SubscriptionDataRepair curDataRepair=findSubscriptionDataRepair(cur.getSubscriptionId(),inRepair);
 if (curDataRepair == null) {
 throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_SUBSCRIPTION,cur.getSubscriptionId());
