@@ -1,7 +1,7 @@
 {
   return paymentSqlDao.inTransaction(new Transaction<PaymentModelDao,PaymentSqlDao>(){
-    @Override public PaymentModelDao inTransaction(    PaymentSqlDao transactional,    TransactionStatus status) throws Exception {
-      PaymentModelDao result=insertPaymentFromTransaction(payment,context,transactional);
+    @Override public PaymentModelDao inTransaction(    final PaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final PaymentModelDao result=insertPaymentFromTransaction(payment,context,transactional);
       final PaymentAttemptSqlDao transactionalAttempt=transactional.become(PaymentAttemptSqlDao.class);
       insertPaymentAttemptFromTransaction(attempt,context,transactionalAttempt);
       return result;

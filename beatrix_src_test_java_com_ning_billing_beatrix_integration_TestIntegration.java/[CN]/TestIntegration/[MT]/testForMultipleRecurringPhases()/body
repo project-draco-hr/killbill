@@ -1,14 +1,14 @@
 {
   log.info("Starting testForMultipleRecurringPhases");
-  DateTime initialCreationDate=new DateTime(2012,2,1,0,3,42,0);
+  final DateTime initialCreationDate=new DateTime(2012,2,1,0,3,42,0);
   clock.setDeltaFromReality(initialCreationDate.getMillis() - clock.getUTCNow().getMillis());
-  Account account=createAccountWithPaymentMethod(getAccountData(2));
-  UUID accountId=account.getId();
-  String productName="Blowdart";
-  String planSetName="DEFAULT";
+  final Account account=createAccountWithPaymentMethod(getAccountData(2));
+  final UUID accountId=account.getId();
+  final String productName="Blowdart";
+  final String planSetName="DEFAULT";
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(accountId,"testKey",context);
+  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(accountId,"testKey",context);
   subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,BillingPeriod.MONTHLY,planSetName,PhaseType.TRIAL),null,context));
   assertTrue(busHandler.isCompleted(DELAY));
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId);

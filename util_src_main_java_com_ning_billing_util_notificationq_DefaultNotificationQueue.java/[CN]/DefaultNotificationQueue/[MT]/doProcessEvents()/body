@@ -1,6 +1,6 @@
 {
   logDebug("ENTER doProcessEvents");
-  List<Notification> notifications=getReadyNotifications();
+  final List<Notification> notifications=getReadyNotifications();
   if (notifications.size() == 0) {
     logDebug("EXIT doProcessEvents");
     return 0;
@@ -10,7 +10,8 @@
   for (  final Notification cur : notifications) {
     nbProcessedEvents.incrementAndGet();
     logDebug("handling notification %s, key = %s for time %s",cur.getId(),cur.getNotificationKey(),cur.getEffectiveDate());
-    handler.handleReadyNotification(cur.getNotificationKey(),cur.getEffectiveDate());
+    NotificationKey key=deserializeEvent(cur.getNotificationKeyClass(),cur.getNotificationKey());
+    handler.handleReadyNotification(key,cur.getEffectiveDate());
     result++;
     clearNotification(cur);
     logDebug("done handling notification %s, key = %s for time %s",cur.getId(),cur.getNotificationKey(),cur.getEffectiveDate());

@@ -1,11 +1,11 @@
 {
-  SubscriptionCallCompletionCallback<Response> callback=new SubscriptionCallCompletionCallback<Response>(){
+  final SubscriptionCallCompletionCallback<Response> callback=new SubscriptionCallCompletionCallback<Response>(){
     private boolean isImmediateOp=true;
-    @Override public Response doOperation(    CallContext ctx) throws EntitlementUserApiException, InterruptedException, TimeoutException {
+    @Override public Response doOperation(    final CallContext ctx) throws EntitlementUserApiException, InterruptedException, TimeoutException {
       try {
-        UUID uuid=UUID.fromString(subscriptionId);
-        Subscription current=entitlementApi.getSubscriptionFromId(uuid);
-        DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
+        final UUID uuid=UUID.fromString(subscriptionId);
+        final Subscription current=entitlementApi.getSubscriptionFromId(uuid);
+        final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
         isImmediateOp=current.changePlan(subscription.getProductName(),BillingPeriod.valueOf(subscription.getBillingPeriod()),subscription.getPriceList(),inputDate,ctx);
         return Response.status(Status.OK).build();
       }
@@ -17,7 +17,7 @@
     @Override public boolean isImmOperation(){
       return isImmediateOp;
     }
-    @Override public Response doResponseOk(    Response operationResponse){
+    @Override public Response doResponseOk(    final Response operationResponse){
       if (operationResponse.getStatus() != Status.OK.getStatusCode()) {
         return operationResponse;
       }
@@ -35,6 +35,6 @@
     }
   }
 ;
-  SubscriptionCallCompletion<Response> callCompletionCreation=new SubscriptionCallCompletion<Response>();
+  final SubscriptionCallCompletion<Response> callCompletionCreation=new SubscriptionCallCompletion<Response>();
   return callCompletionCreation.withSynchronization(callback,timeoutSec,callCompletion,createdBy,reason,comment);
 }

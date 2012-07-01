@@ -1,29 +1,29 @@
 {
-  UpdatableEntityCollectionSqlDao<T> dao=transmogrifyDao(transactionalDao);
-  List<T> currentEntities=dao.load(objectId.toString(),objectType);
-  Map<V,T> currentObjs=new HashMap<V,T>(currentEntities.size());
-  Map<V,T> updatedObjs=new HashMap<V,T>(newEntities.size());
-  for (  T currentObj : currentEntities) {
+  final UpdatableEntityCollectionSqlDao<T> dao=transmogrifyDao(transactionalDao);
+  final List<T> currentEntities=dao.load(objectId.toString(),objectType);
+  final Map<V,T> currentObjs=new HashMap<V,T>(currentEntities.size());
+  final Map<V,T> updatedObjs=new HashMap<V,T>(newEntities.size());
+  for (  final T currentObj : currentEntities) {
     currentObjs.put(getEquivalenceObjectFor(currentObj),currentObj);
   }
-  for (  T updatedObj : newEntities) {
+  for (  final T updatedObj : newEntities) {
     updatedObjs.put(getEquivalenceObjectFor(updatedObj),updatedObj);
   }
-  Set<V> equivToRemove=Sets.difference(currentObjs.keySet(),updatedObjs.keySet());
-  Set<V> equivToAdd=Sets.difference(updatedObjs.keySet(),currentObjs.keySet());
-  Set<V> equivToCheckForUpdate=Sets.intersection(updatedObjs.keySet(),currentObjs.keySet());
-  List<T> objsToAdd=new ArrayList<T>(equivToAdd.size());
-  List<T> objsToRemove=new ArrayList<T>(equivToRemove.size());
-  List<T> objsToUpdate=new ArrayList<T>(equivToCheckForUpdate.size());
-  for (  V equiv : equivToAdd) {
+  final Set<V> equivToRemove=Sets.difference(currentObjs.keySet(),updatedObjs.keySet());
+  final Set<V> equivToAdd=Sets.difference(updatedObjs.keySet(),currentObjs.keySet());
+  final Set<V> equivToCheckForUpdate=Sets.intersection(updatedObjs.keySet(),currentObjs.keySet());
+  final List<T> objsToAdd=new ArrayList<T>(equivToAdd.size());
+  final List<T> objsToRemove=new ArrayList<T>(equivToRemove.size());
+  final List<T> objsToUpdate=new ArrayList<T>(equivToCheckForUpdate.size());
+  for (  final V equiv : equivToAdd) {
     objsToAdd.add(updatedObjs.get(equiv));
   }
-  for (  V equiv : equivToRemove) {
+  for (  final V equiv : equivToRemove) {
     objsToRemove.add(currentObjs.get(equiv));
   }
-  for (  V equiv : equivToCheckForUpdate) {
-    T currentObj=currentObjs.get(equiv);
-    T updatedObj=updatedObjs.get(equiv);
+  for (  final V equiv : equivToCheckForUpdate) {
+    final T currentObj=currentObjs.get(equiv);
+    final T updatedObj=updatedObjs.get(equiv);
     if (!currentObj.equals(updatedObj)) {
       objsToUpdate.add(updatedObj);
     }
@@ -34,19 +34,19 @@
   if (objsToUpdate.size() != 0) {
     dao.updateFromTransaction(objectId.toString(),objectType,objsToUpdate,context);
   }
-  List<Mapper<UUID,Long>> recordIds=dao.getRecordIds(objectId.toString(),objectType);
-  Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
+  final List<Mapper<UUID,Long>> recordIds=dao.getRecordIds(objectId.toString(),objectType);
+  final Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
   if (objsToRemove.size() != 0) {
     dao.deleteFromTransaction(objectId.toString(),objectType,objsToRemove,context);
   }
-  List<EntityHistory<T>> entityHistories=new ArrayList<EntityHistory<T>>();
+  final List<EntityHistory<T>> entityHistories=new ArrayList<EntityHistory<T>>();
   entityHistories.addAll(convertToHistory(objsToAdd,recordIdMap,ChangeType.INSERT));
   entityHistories.addAll(convertToHistory(objsToUpdate,recordIdMap,ChangeType.UPDATE));
   entityHistories.addAll(convertToHistory(objsToRemove,recordIdMap,ChangeType.DELETE));
-  Long maxHistoryRecordId=dao.getMaxHistoryRecordId();
+  final Long maxHistoryRecordId=dao.getMaxHistoryRecordId();
   dao.addHistoryFromTransaction(objectId.toString(),objectType,entityHistories,context);
-  List<Mapper<Long,Long>> historyRecordIds=dao.getHistoryRecordIds(maxHistoryRecordId);
-  Map<Long,Long> historyRecordIdMap=convertToAuditMap(historyRecordIds);
-  List<EntityAudit> entityAudits=convertToAudits(entityHistories,historyRecordIdMap);
+  final List<Mapper<Long,Long>> historyRecordIds=dao.getHistoryRecordIds(maxHistoryRecordId);
+  final Map<Long,Long> historyRecordIdMap=convertToAuditMap(historyRecordIds);
+  final List<EntityAudit> entityAudits=convertToAudits(entityHistories,historyRecordIdMap);
   dao.insertAuditFromTransaction(entityAudits,context);
 }

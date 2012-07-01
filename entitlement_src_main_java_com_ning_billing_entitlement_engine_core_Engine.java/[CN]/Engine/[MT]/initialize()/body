@@ -1,8 +1,12 @@
 {
   try {
     subscriptionEventQueue=notificationQueueService.createNotificationQueue(ENTITLEMENT_SERVICE_NAME,NOTIFICATION_QUEUE_NAME,new NotificationQueueHandler(){
-      @Override public void handleReadyNotification(      final String inputKey,      final DateTime eventDateTime){
-        EntitlementNotificationKey key=new EntitlementNotificationKey(inputKey);
+      @Override public void handleReadyNotification(      final NotificationKey inputKey,      final DateTime eventDateTime){
+        if (!(inputKey instanceof EntitlementNotificationKey)) {
+          log.error("Entitlement service received an unexpected event type {}" + inputKey.getClass().getName());
+          return;
+        }
+        EntitlementNotificationKey key=(EntitlementNotificationKey)inputKey;
         final EntitlementEvent event=dao.getEventById(key.getEventId());
         if (event == null) {
           log.warn("Failed to extract event for notification key {}",inputKey);

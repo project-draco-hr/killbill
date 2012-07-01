@@ -1,0 +1,9 @@
+{
+  final UUID accountId=UUID.fromString(id);
+  final List<AccountEmail> emails=accountApi.getEmails(accountId);
+  final List<AccountEmailJson> emailsJson=new ArrayList<AccountEmailJson>();
+  for (  final AccountEmail email : emails) {
+    emailsJson.add(new AccountEmailJson(email.getAccountId().toString(),email.getEmail()));
+  }
+  return Response.status(Response.Status.OK).entity(emailsJson).build();
+}

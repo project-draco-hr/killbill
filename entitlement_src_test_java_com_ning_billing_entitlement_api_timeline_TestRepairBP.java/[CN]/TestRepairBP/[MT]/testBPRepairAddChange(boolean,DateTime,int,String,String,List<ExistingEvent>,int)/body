@@ -1,26 +1,26 @@
 {
-  Subscription baseSubscription=createSubscription(baseProduct,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
+  final Subscription baseSubscription=createSubscription(baseProduct,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
   if (!inTrial) {
     testListener.pushExpectedEvent(NextEvent.PHASE);
   }
-  Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(clockShift));
+  final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(clockShift));
   clock.addDeltaFromReality(it.toDurationMillis());
   if (!inTrial) {
     assertTrue(testListener.isCompleted(5000));
   }
-  BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+  final BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
   sortEventsOnBundle(bundleRepair);
-  DateTime changeTime=baseSubscription.getStartDate().plusDays(clockShift - 1);
-  PlanPhaseSpecifier spec=new PlanPhaseSpecifier(newBaseProduct,ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
-  NewEvent ne=createNewEvent(SubscriptionTransitionType.CHANGE,changeTime,spec);
-  List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+  final DateTime changeTime=baseSubscription.getStartDate().plusDays(clockShift - 1);
+  final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(newBaseProduct,ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
+  final NewEvent ne=createNewEvent(SubscriptionTransitionType.CHANGE,changeTime,spec);
+  final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
   if (inTrial) {
     des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
   }
-  SubscriptionTimeline sRepair=createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
-  BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+  final SubscriptionTimeline sRepair=createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
+  final BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
   boolean dryRun=true;
-  BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
   List<SubscriptionTimeline> subscriptionRepair=dryRunBundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),1);
   SubscriptionTimeline cur=subscriptionRepair.get(0);
@@ -28,10 +28,10 @@
   List<ExistingEvent> events=cur.getExistingEvents();
   assertEquals(expectedEvents.size(),events.size());
   int index=0;
-  for (  ExistingEvent e : expectedEvents) {
+  for (  final ExistingEvent e : expectedEvents) {
     validateExistingEventForAssertion(e,events.get(index++));
   }
-  SubscriptionData dryRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  final SubscriptionData dryRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
   assertEquals(dryRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   assertEquals(dryRunBaseSubscription.getBundleId(),bundle.getId());
   assertEquals(dryRunBaseSubscription.getStartDate(),baseSubscription.getStartDate());
@@ -50,7 +50,7 @@
   }
   dryRun=false;
   testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
-  BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  final BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
   assertTrue(testListener.isCompleted(5000));
   subscriptionRepair=realRunBundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),1);
@@ -59,10 +59,10 @@
   events=cur.getExistingEvents();
   assertEquals(expectedEvents.size(),events.size());
   index=0;
-  for (  ExistingEvent e : expectedEvents) {
+  for (  final ExistingEvent e : expectedEvents) {
     validateExistingEventForAssertion(e,events.get(index++));
   }
-  SubscriptionData realRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  final SubscriptionData realRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
   assertEquals(realRunBaseSubscription.getAllTransitions().size(),expectedTransitions);
   assertEquals(realRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
   assertEquals(realRunBaseSubscription.getBundleId(),bundle.getId());

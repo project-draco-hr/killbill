@@ -1,9 +1,9 @@
 {
   return bundlesDao.inTransaction(new Transaction<SubscriptionBundle,BundleSqlDao>(){
-    @Override public SubscriptionBundle inTransaction(    BundleSqlDao transactional,    TransactionStatus status){
+    @Override public SubscriptionBundle inTransaction(    final BundleSqlDao transactional,    final TransactionStatus status){
       bundlesDao.insertBundle(bundle,context);
-      Long recordId=bundlesDao.getRecordId(bundle.getId().toString());
-      EntityAudit audit=new EntityAudit(TableName.BUNDLES,recordId,ChangeType.INSERT);
+      final Long recordId=bundlesDao.getRecordId(bundle.getId().toString());
+      final EntityAudit audit=new EntityAudit(TableName.BUNDLES,recordId,ChangeType.INSERT);
       bundlesDao.insertAuditFromTransaction(audit,context);
       return bundle;
     }

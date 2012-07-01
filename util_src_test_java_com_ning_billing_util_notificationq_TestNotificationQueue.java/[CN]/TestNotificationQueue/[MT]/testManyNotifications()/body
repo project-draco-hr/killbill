@@ -1,7 +1,7 @@
 {
-  final Map<String,Boolean> expectedNotifications=new TreeMap<String,Boolean>();
+  final Map<NotificationKey,Boolean> expectedNotifications=new TreeMap<NotificationKey,Boolean>();
   final DefaultNotificationQueue queue=new DefaultNotificationQueue(dbi,clock,"test-svc","many",new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    String notificationKey,    DateTime eventDateTime){
+    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime){
 synchronized (expectedNotifications) {
         expectedNotifications.put(notificationKey,Boolean.TRUE);
         expectedNotifications.notify();
@@ -17,15 +17,10 @@ synchronized (expectedNotifications) {
     final UUID key=UUID.randomUUID();
     final DummyObject obj=new DummyObject("foo",key);
     final int currentIteration=i;
-    final NotificationKey notificationKey=new NotificationKey(){
-      @Override public String toString(){
-        return key.toString();
-      }
-    }
-;
-    expectedNotifications.put(notificationKey.toString(),Boolean.FALSE);
+    final NotificationKey notificationKey=new TestNotificationKey(key.toString());
+    expectedNotifications.put(notificationKey,Boolean.FALSE);
     dao.inTransaction(new Transaction<Void,DummySqlTest>(){
-      @Override public Void inTransaction(      DummySqlTest transactional,      TransactionStatus status) throws Exception {
+      @Override public Void inTransaction(      final DummySqlTest transactional,      final TransactionStatus status) throws Exception {
         transactional.insertDummy(obj);
         queue.recordFutureNotificationFromTransaction(transactional,now.plus((currentIteration + 1) * nextReadyTimeIncrementMs),notificationKey);
         return null;
@@ -43,8 +38,8 @@ synchronized (expectedNotifications) {
   boolean success=false;
   do {
 synchronized (expectedNotifications) {
-      Collection<Boolean> completed=Collections2.filter(expectedNotifications.values(),new Predicate<Boolean>(){
-        @Override public boolean apply(        Boolean input){
+      final Collection<Boolean> completed=Collections2.filter(expectedNotifications.values(),new Predicate<Boolean>(){
+        @Override public boolean apply(        final Boolean input){
           return input;
         }
       }
@@ -58,5 +53,11 @@ synchronized (expectedNotifications) {
   }
  while (nbTry-- > 0);
   queue.stopQueue();
+  log.info("STEPH GOT SIZE " + Collections2.filter(expectedNotifications.values(),new Predicate<Boolean>(){
+    @Override public boolean apply(    final Boolean input){
+      return input;
+    }
+  }
+).size());
   assertEquals(success,true);
 }

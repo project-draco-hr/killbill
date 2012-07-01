@@ -2,7 +2,7 @@
   clock.setTime(new DateTime(2012,5,1,0,3,42,0));
   paymentPlugin.makeAllInvoicesFailWithError(true);
   busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE);
-  SubscriptionData baseSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
+  final SubscriptionData baseSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
   assertNotNull(baseSubscription);
   assertTrue(busHandler.isCompleted(DELAY));
   busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
@@ -27,9 +27,9 @@
   assertTrue(busHandler.isCompleted(DELAY));
   checkODState("OD3");
   paymentPlugin.makeAllInvoicesFailWithError(false);
-  Collection<Invoice> invoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCNow());
-  List<String> invoiceIds=new ArrayList<String>();
-  for (  Invoice invoice : invoices) {
+  final Collection<Invoice> invoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCNow());
+  final List<String> invoiceIds=new ArrayList<String>();
+  for (  final Invoice invoice : invoices) {
     invoiceIds.add(invoice.getId().toString());
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
       busHandler.pushExpectedEvent(NextEvent.PAYMENT);

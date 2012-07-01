@@ -2,9 +2,9 @@
   if (transitions == null) {
     throw new EntitlementError(String.format("No transitions for subscription %s",getId()));
   }
-  SubscriptionTransitionDataIterator it=new SubscriptionTransitionDataIterator(clock,transitions,Order.DESC_FROM_FUTURE,Kind.ENTITLEMENT,Visibility.ALL,TimeLimit.PAST_OR_PRESENT_ONLY);
+  final SubscriptionTransitionDataIterator it=new SubscriptionTransitionDataIterator(clock,transitions,Order.DESC_FROM_FUTURE,Kind.ENTITLEMENT,Visibility.ALL,TimeLimit.PAST_OR_PRESENT_ONLY);
   while (it.hasNext()) {
-    SubscriptionTransitionData cur=it.next();
+    final SubscriptionTransitionData cur=it.next();
     if (cur.getTransitionType() == SubscriptionTransitionType.PHASE || cur.getTransitionType() == SubscriptionTransitionType.CREATE || cur.getTransitionType() == SubscriptionTransitionType.RE_CREATE || cur.getTransitionType() == SubscriptionTransitionType.CHANGE || cur.getTransitionType() == SubscriptionTransitionType.MIGRATE_ENTITLEMENT) {
       return cur.getEffectiveTransitionTime();
     }

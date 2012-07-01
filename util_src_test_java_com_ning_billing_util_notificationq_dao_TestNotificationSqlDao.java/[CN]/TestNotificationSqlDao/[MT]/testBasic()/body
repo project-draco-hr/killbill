@@ -1,12 +1,12 @@
 {
   final String ownerId=UUID.randomUUID().toString();
-  String notificationKey=UUID.randomUUID().toString();
-  DateTime effDt=new DateTime();
-  Notification notif=new DefaultNotification("testBasic",hostname,notificationKey,effDt);
+  final String notificationKey=UUID.randomUUID().toString();
+  final DateTime effDt=new DateTime();
+  final Notification notif=new DefaultNotification("testBasic",hostname,notificationKey.getClass().getName(),notificationKey,effDt);
   dao.insertNotification(notif);
   Thread.sleep(1000);
-  DateTime now=new DateTime();
-  List<Notification> notifications=dao.getReadyNotifications(now.toDate(),hostname,3,"testBasic");
+  final DateTime now=new DateTime();
+  final List<Notification> notifications=dao.getReadyNotifications(now.toDate(),hostname,3,"testBasic");
   assertNotNull(notifications);
   assertEquals(notifications.size(),1);
   Notification notification=notifications.get(0);
@@ -15,8 +15,8 @@
   assertEquals(notification.getOwner(),null);
   assertEquals(notification.getProcessingState(),PersistentQueueEntryLifecycleState.AVAILABLE);
   assertEquals(notification.getNextAvailableDate(),null);
-  DateTime nextAvailable=now.plusMinutes(5);
-  int res=dao.claimNotification(ownerId,nextAvailable.toDate(),notification.getId().toString(),now.toDate());
+  final DateTime nextAvailable=now.plusMinutes(5);
+  final int res=dao.claimNotification(ownerId,nextAvailable.toDate(),notification.getId().toString(),now.toDate());
   assertEquals(res,1);
   dao.insertClaimedHistory(ownerId,now.toDate(),notification.getId().toString());
   notification=fetchNotification(notification.getId().toString());

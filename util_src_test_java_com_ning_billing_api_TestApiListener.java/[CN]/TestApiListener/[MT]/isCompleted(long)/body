@@ -6,12 +6,12 @@ synchronized (this) {
     long waitTimeMs=timeout;
     do {
       try {
-        DateTime before=new DateTime();
+        final DateTime before=new DateTime();
         wait(500);
         if (completed) {
           return completed;
         }
-        DateTime after=new DateTime();
+        final DateTime after=new DateTime();
         waitTimeMs-=after.getMillis() - before.getMillis();
       }
  catch (      Exception ignore) {
@@ -22,7 +22,7 @@ synchronized (this) {
  while (waitTimeMs > 0 && !completed);
   }
   if (!completed && !nonExpectedMode) {
-    Joiner joiner=Joiner.on(" ");
+    final Joiner joiner=Joiner.on(" ");
     log.error("TestApiListener did not complete in " + timeout + " ms, remaining events are "+ joiner.join(nextExpectedEvent));
   }
   return completed;

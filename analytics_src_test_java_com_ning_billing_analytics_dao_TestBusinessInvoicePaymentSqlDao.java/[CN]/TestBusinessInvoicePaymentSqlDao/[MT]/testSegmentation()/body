@@ -1,0 +1,23 @@
+{
+  final UUID attemptId1=UUID.randomUUID();
+  final String accountKey1=UUID.randomUUID().toString();
+  final BusinessInvoicePayment invoicePayment1=createInvoicePayment(attemptId1,accountKey1);
+  final UUID attemptId2=UUID.randomUUID();
+  final String accountKey2=UUID.randomUUID().toString();
+  final BusinessInvoicePayment invoicePayment2=createInvoicePayment(attemptId2,accountKey2);
+  Assert.assertEquals(invoicePaymentSqlDao.createInvoicePayment(invoicePayment1),1);
+  Assert.assertEquals(invoicePaymentSqlDao.createInvoicePayment(invoicePayment2),1);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentForPaymentAttempt(invoicePayment1.getAttemptId().toString()),invoicePayment1);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentForPaymentAttempt(invoicePayment2.getAttemptId().toString()),invoicePayment2);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForAccount(invoicePayment1.getAccountKey()).size(),1);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForAccount(invoicePayment2.getAccountKey()).size(),1);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForPayment(invoicePayment1.getPaymentId().toString()).size(),1);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForPayment(invoicePayment2.getPaymentId().toString()).size(),1);
+  Assert.assertEquals(invoicePaymentSqlDao.deleteInvoicePaymentForPaymentAttempt(invoicePayment1.getAttemptId().toString()),1);
+  Assert.assertNull(invoicePaymentSqlDao.getInvoicePaymentForPaymentAttempt(invoicePayment1.getAttemptId().toString()));
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentForPaymentAttempt(invoicePayment2.getAttemptId().toString()),invoicePayment2);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForAccount(invoicePayment1.getAccountKey()).size(),0);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForAccount(invoicePayment2.getAccountKey()).size(),1);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForPayment(invoicePayment1.getPaymentId().toString()).size(),0);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForPayment(invoicePayment2.getPaymentId().toString()).size(),1);
+}

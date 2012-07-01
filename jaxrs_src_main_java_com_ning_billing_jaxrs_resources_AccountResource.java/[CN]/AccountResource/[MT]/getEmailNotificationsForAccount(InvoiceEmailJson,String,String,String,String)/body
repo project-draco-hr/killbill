@@ -1,0 +1,13 @@
+{
+  try {
+    final UUID accountId=UUID.fromString(accountIdString);
+    final Account account=accountApi.getAccountById(accountId);
+    final MutableAccountData mutableAccountData=account.toMutableAccountData();
+    mutableAccountData.setIsNotifiedForInvoices(json.isNotifiedForInvoices());
+    accountApi.updateAccount(accountId,mutableAccountData,context.createContext(createdBy,reason,comment));
+    return Response.status(Status.OK).build();
+  }
+ catch (  AccountApiException e) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+}

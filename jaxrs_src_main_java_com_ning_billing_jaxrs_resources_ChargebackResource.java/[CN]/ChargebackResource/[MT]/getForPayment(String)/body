@@ -1,20 +1,24 @@
 {
   try {
-    Payment payment=paymentApi.getPayment(UUID.fromString(paymentId));
-    Collection<PaymentAttempt> attempts=Collections2.filter(payment.getAttempts(),new Predicate<PaymentAttempt>(){
-      @Override public boolean apply(      PaymentAttempt input){
+    final Payment payment=paymentApi.getPayment(UUID.fromString(paymentId));
+    final Collection<PaymentAttempt> attempts=Collections2.filter(payment.getAttempts(),new Predicate<PaymentAttempt>(){
+      @Override public boolean apply(      final PaymentAttempt input){
         return input.getPaymentStatus() == PaymentStatus.SUCCESS;
       }
     }
 );
     if (attempts.size() == 0) {
-      final String error=String.format("Failed to locate succesful payment attempts for paymentId %s",paymentId);
+      final String error=String.format("Failed to locate successful payment attempts for paymentId %s",paymentId);
       return Response.status(Response.Status.NO_CONTENT).entity(error).build();
     }
-    UUID paymentAttemptId=attempts.iterator().next().getId();
-    List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentAttemptId(paymentAttemptId);
-    List<ChargebackJson> chargebacksJson=convertToJson(chargebacks);
-    String accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(UUID.fromString(paymentId)).toString();
+    final UUID paymentAttemptId=attempts.iterator().next().getId();
+    final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentAttemptId(paymentAttemptId);
+    if (chargebacks.size() == 0) {
+      return Response.status(Response.Status.NO_CONTENT).build();
+    }
+    final UUID invoicePaymentId=chargebacks.get(0).getId();
+    final String accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(invoicePaymentId).toString();
+    final List<ChargebackJson> chargebacksJson=convertToJson(chargebacks);
     final ChargebackCollectionJson json=new ChargebackCollectionJson(accountId,chargebacksJson);
     return Response.status(Response.Status.OK).entity(json).build();
   }

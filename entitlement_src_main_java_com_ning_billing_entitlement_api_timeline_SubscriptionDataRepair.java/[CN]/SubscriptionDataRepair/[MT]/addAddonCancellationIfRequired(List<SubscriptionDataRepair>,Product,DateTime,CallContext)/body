@@ -1,14 +1,14 @@
 {
-  DateTime now=clock.getUTCNow();
-  Iterator<SubscriptionDataRepair> it=addOnSubscriptionInRepair.iterator();
+  final DateTime now=clock.getUTCNow();
+  final Iterator<SubscriptionDataRepair> it=addOnSubscriptionInRepair.iterator();
   while (it.hasNext()) {
-    SubscriptionDataRepair cur=it.next();
+    final SubscriptionDataRepair cur=it.next();
     if (cur.getState() == SubscriptionState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
       continue;
     }
-    Plan addonCurrentPlan=cur.getCurrentPlan();
+    final Plan addonCurrentPlan=cur.getCurrentPlan();
     if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
-      EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now).setUserToken(context.getUserToken()).setFromDisk(true));
+      final EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now).setUserToken(context.getUserToken()).setFromDisk(true));
       repairDao.cancelSubscription(cur.getId(),cancelEvent,context,0);
       cur.rebuildTransitions(repairDao.getEventsForSubscription(cur.getId()),catalogService.getFullCatalog());
     }

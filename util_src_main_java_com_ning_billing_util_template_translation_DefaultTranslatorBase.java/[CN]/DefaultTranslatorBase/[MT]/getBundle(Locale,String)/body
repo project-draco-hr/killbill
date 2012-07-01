@@ -1,0 +1,20 @@
+{
+  try {
+    return ResourceBundle.getBundle(bundlePath,locale);
+  }
+ catch (  MissingResourceException ignored) {
+  }
+  final String propertiesFileNameWithCountry=bundlePath + "_" + locale.getLanguage()+ "_"+ locale.getCountry()+ ".properties";
+  ResourceBundle bundle=getBundleFromPropertiesFile(propertiesFileNameWithCountry);
+  if (bundle != null) {
+    return bundle;
+  }
+ else {
+    final String propertiesFileName=bundlePath + "_" + locale.getLanguage()+ ".properties";
+    bundle=getBundleFromPropertiesFile(propertiesFileName);
+  }
+  if (bundle == null) {
+    log.warn(String.format(ErrorCode.MISSING_TRANSLATION_RESOURCE.toString(),getTranslationType()));
+  }
+  return bundle;
+}

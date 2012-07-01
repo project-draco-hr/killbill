@@ -1,9 +1,8 @@
 {
   try {
-    Account account=accountApi.getAccountById(UUID.fromString(payment.getAccountId()));
+    final Account account=accountApi.getAccountById(UUID.fromString(payment.getAccountId()));
     paymentApi.createPayment(account,UUID.fromString(payment.getInvoiceId()),null,context.createContext(createdBy,reason,comment));
-    Response response=uriBuilder.buildResponse(InvoiceResource.class,"getPayments",payment.getInvoiceId());
-    return response;
+    return uriBuilder.buildResponse(InvoiceResource.class,"getPayments",payment.getInvoiceId());
   }
  catch (  PaymentApiException e) {
     final String error=String.format("Failed to create payment %s",e.getMessage());

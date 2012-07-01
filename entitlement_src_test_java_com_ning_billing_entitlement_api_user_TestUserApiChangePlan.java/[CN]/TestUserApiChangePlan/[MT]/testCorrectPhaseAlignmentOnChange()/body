@@ -11,7 +11,7 @@
     subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
     assertTrue(testListener.isCompleted(5000));
     testListener.reset();
-    Plan currentPlan=subscription.getCurrentPlan();
+    final Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),"Assault-Rifle");
     assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
@@ -25,9 +25,9 @@
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.DISCOUNT);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
-    DateTime expectedNextPhaseDate=subscription.getStartDate().plusDays(30).plusMonths(6);
-    SubscriptionEvent nextPhase=subscription.getPendingTransition();
-    DateTime nextPhaseEffectiveDate=nextPhase.getEffectiveTransitionTime();
+    final DateTime expectedNextPhaseDate=subscription.getStartDate().plusDays(30).plusMonths(6);
+    final SubscriptionEvent nextPhase=subscription.getPendingTransition();
+    final DateTime nextPhaseEffectiveDate=nextPhase.getEffectiveTransitionTime();
     assertEquals(nextPhaseEffectiveDate,expectedNextPhaseDate);
     assertListenerStatus();
   }

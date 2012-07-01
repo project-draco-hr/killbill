@@ -1,4 +1,10 @@
 {
-  final BusinessSubscriptionTransitionRecorder recorder=new BusinessSubscriptionTransitionRecorder(dao,catalogService,new MockEntitlementUserApi(bundleUUID,KEY),new MockAccountUserApi(ACCOUNT_KEY,CURRENCY));
-  listener=new AnalyticsListener(recorder,null);
+  final MockAccountUserApi accountApi=new MockAccountUserApi();
+  final Account accountData=new MockAccountBuilder().externalKey(ACCOUNT_KEY).currency(CURRENCY).build();
+  final Account account=accountApi.createAccount(accountData,Mockito.mock(CallContext.class));
+  accountId=account.getId();
+  final MockEntitlementUserApi entitlementApi=new MockEntitlementUserApi();
+  entitlementApi.addBundle(bundleUUID,EXTERNAL_KEY,accountId);
+  final BusinessSubscriptionTransitionRecorder recorder=new BusinessSubscriptionTransitionRecorder(dao,catalogService,entitlementApi,accountApi);
+  listener=new AnalyticsListener(recorder,null,null,null);
 }

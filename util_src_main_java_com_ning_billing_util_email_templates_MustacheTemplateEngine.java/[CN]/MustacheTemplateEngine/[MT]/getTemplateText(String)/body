@@ -1,6 +1,10 @@
 {
-  InputStream templateStream=this.getClass().getResourceAsStream(templateName + ".mustache");
-  StringWriter writer=new StringWriter();
-  IOUtils.copy(templateStream,writer,"UTF-8");
-  return writer.toString();
+  final InputStream templateStream;
+  try {
+    templateStream=UriAccessor.accessUri(templateName);
+  }
+ catch (  URISyntaxException e) {
+    throw new IOException(e);
+  }
+  return IOUtils.toString(templateStream);
 }

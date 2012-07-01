@@ -12,8 +12,11 @@
  else   if (verb.equals("DELETE")) {
     builder=httpClient.prepareDelete(url);
   }
+ else {
+    Assert.fail("Unknown verb " + verb);
+  }
   builder.addHeader(HEADER_CONTENT_TYPE,CONTENT_TYPE);
-  for (  Entry<String,String> q : queryParams.entrySet()) {
+  for (  final Entry<String,String> q : queryParams.entrySet()) {
     builder.addQueryParameter(q.getKey(),q.getValue());
   }
   return builder;

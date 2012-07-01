@@ -1,16 +1,16 @@
 {
   log.info("Starting testCancelSubscriptionIMM");
   try {
-    DateTime init=clock.getUTCNow();
-    String prod="Shotgun";
-    BillingPeriod term=BillingPeriod.MONTHLY;
-    String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
-    SubscriptionData subscription=createSubscription(prod,term,planSet);
+    final DateTime init=clock.getUTCNow();
+    final String prod="Shotgun";
+    final BillingPeriod term=BillingPeriod.MONTHLY;
+    final String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
+    final SubscriptionData subscription=createSubscription(prod,term,planSet);
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
-    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
+    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
     clock.addDeltaFromReality(it.toDurationMillis());
-    DateTime future=clock.getUTCNow();
+    final DateTime future=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     subscription.cancel(clock.getUTCNow(),false,context);
     currentPhase=subscription.getCurrentPhase();

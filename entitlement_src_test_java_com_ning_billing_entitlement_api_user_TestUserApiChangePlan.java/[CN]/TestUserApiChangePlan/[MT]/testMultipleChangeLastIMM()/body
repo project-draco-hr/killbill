@@ -2,17 +2,17 @@
   log.info("Starting testMultipleChangeLastIMM");
   try {
     SubscriptionData subscription=createSubscription("Assault-Rifle",BillingPeriod.MONTHLY,"gunclubDiscount");
-    PlanPhase trialPhase=subscription.getCurrentPhase();
+    final PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
-    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
-    List<Duration> durationList=new ArrayList<Duration>();
+    final List<Duration> durationList=new ArrayList<Duration>();
     durationList.add(trialPhase.getDuration());
-    DateTime startDiscountPhase=DefaultClock.addDuration(subscription.getStartDate(),durationList);
-    Duration ctd=getDurationMonth(1);
-    DateTime newChargedThroughDate=DefaultClock.addDuration(startDiscountPhase,ctd);
+    final DateTime startDiscountPhase=DefaultClock.addDuration(subscription.getStartDate(),durationList);
+    final Duration ctd=getDurationMonth(1);
+    final DateTime newChargedThroughDate=DefaultClock.addDuration(startDiscountPhase,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     testListener.setNonExpectedMode();
@@ -23,12 +23,12 @@
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
     assertTrue(testListener.isCompleted(5000));
-    Plan currentPlan=subscription.getCurrentPlan();
+    final Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),"Assault-Rifle");
     assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
     assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.ANNUAL);
-    PlanPhase currentPhase=subscription.getCurrentPhase();
+    final PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
     assertListenerStatus();

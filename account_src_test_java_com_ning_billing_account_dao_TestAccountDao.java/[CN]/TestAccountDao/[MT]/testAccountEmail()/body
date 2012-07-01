@@ -1,13 +1,13 @@
 {
   List<AccountEmail> emails=new ArrayList<AccountEmail>();
-  UUID accountId=UUID.randomUUID();
+  final UUID accountId=UUID.randomUUID();
   final AccountEmail email=new DefaultAccountEmail(accountId,"test@gmail.com");
   emails.add(email);
   accountEmailDao.saveEmails(accountId,emails,context);
   emails=accountEmailDao.getEmails(accountId);
   assertEquals(emails.size(),1);
   verifyAccountEmailAuditAndHistoryCount(accountId,1);
-  AccountEmail updatedEmail=new DefaultAccountEmail(email,"test2@gmail.com");
+  final AccountEmail updatedEmail=new DefaultAccountEmail(email,"test2@gmail.com");
   emails.clear();
   emails.add(updatedEmail);
   accountEmailDao.saveEmails(accountId,emails,context);

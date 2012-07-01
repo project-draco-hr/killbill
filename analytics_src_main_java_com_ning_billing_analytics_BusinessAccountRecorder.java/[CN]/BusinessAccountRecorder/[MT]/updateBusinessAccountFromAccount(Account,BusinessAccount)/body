@@ -1,25 +1,25 @@
 {
-  final List<UUID> invoiceIds=new ArrayList<UUID>();
+  bac.setName(account.getName());
+  bac.setKey(account.getExternalKey());
   try {
-    DateTime lastInvoiceDate=null;
-    BigDecimal totalInvoiceBalance=BigDecimal.ZERO;
-    String lastPaymentStatus=null;
-    String paymentMethod=null;
-    String creditCardType=null;
-    String billingAddressCountry=null;
+    DateTime lastInvoiceDate=bac.getLastInvoiceDate();
+    BigDecimal totalInvoiceBalance=bac.getTotalInvoiceBalance();
+    String lastPaymentStatus=bac.getLastPaymentStatus();
+    String paymentMethod=bac.getPaymentMethod();
+    String creditCardType=bac.getCreditCardType();
+    String billingAddressCountry=bac.getBillingAddressCountry();
     final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId());
     if (invoices != null && invoices.size() > 0) {
       for (      final Invoice invoice : invoices) {
-        invoiceIds.add(invoice.getId());
         totalInvoiceBalance=totalInvoiceBalance.add(invoice.getBalance());
         if (lastInvoiceDate == null || invoice.getInvoiceDate().isAfter(lastInvoiceDate)) {
           lastInvoiceDate=invoice.getInvoiceDate();
         }
       }
       DateTime lastPaymentDate=null;
-      List<Payment> payments=paymentApi.getAccountPayments(account.getId());
+      final List<Payment> payments=paymentApi.getAccountPayments(account.getId());
       if (payments != null) {
-        for (        Payment cur : payments) {
+        for (        final Payment cur : payments) {
           if (lastPaymentDate == null || cur.getEffectiveDate().isAfter(lastPaymentDate)) {
             lastPaymentDate=cur.getEffectiveDate();
             lastPaymentStatus=cur.getPaymentStatus().toString();

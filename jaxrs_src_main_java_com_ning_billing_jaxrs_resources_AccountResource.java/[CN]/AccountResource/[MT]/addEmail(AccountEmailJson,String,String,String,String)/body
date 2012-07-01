@@ -1,0 +1,16 @@
+{
+  try {
+    final UUID accountId=UUID.fromString(id);
+    if (accountApi.getAccountById(accountId) == null) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Account id " + accountId + " does not exist").build();
+    }
+    accountApi.addEmail(accountId,json.toAccountEmail(),context.createContext(createdBy,reason,comment));
+    return uriBuilder.buildResponse(AccountResource.class,"getEmails",json.getAccountId());
+  }
+ catch (  RuntimeException e) {
+    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+catch (  AccountApiException e) {
+    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+  }
+}

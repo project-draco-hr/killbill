@@ -1,17 +1,17 @@
 {
   final Date ctd=(subscription.getChargedThroughDate() != null) ? subscription.getChargedThroughDate().toDate() : null;
   subscriptionsDao.inTransaction(new Transaction<Void,SubscriptionSqlDao>(){
-    @Override public Void inTransaction(    SubscriptionSqlDao transactionalDao,    TransactionStatus status) throws Exception {
-      String subscriptionId=subscription.getId().toString();
+    @Override public Void inTransaction(    final SubscriptionSqlDao transactionalDao,    final TransactionStatus status) throws Exception {
+      final String subscriptionId=subscription.getId().toString();
       transactionalDao.updateChargedThroughDate(subscription.getId().toString(),ctd,context);
-      Long subscriptionRecordId=transactionalDao.getRecordId(subscriptionId);
-      EntityAudit subscriptionAudit=new EntityAudit(TableName.SUBSCRIPTIONS,subscriptionRecordId,ChangeType.UPDATE);
+      final Long subscriptionRecordId=transactionalDao.getRecordId(subscriptionId);
+      final EntityAudit subscriptionAudit=new EntityAudit(TableName.SUBSCRIPTIONS,subscriptionRecordId,ChangeType.UPDATE);
       transactionalDao.insertAuditFromTransaction(subscriptionAudit,context);
-      BundleSqlDao bundleSqlDao=transactionalDao.become(BundleSqlDao.class);
-      String bundleId=subscription.getBundleId().toString();
+      final BundleSqlDao bundleSqlDao=transactionalDao.become(BundleSqlDao.class);
+      final String bundleId=subscription.getBundleId().toString();
       bundleSqlDao.updateBundleLastSysTime(bundleId,clock.getUTCNow().toDate());
-      Long recordId=bundleSqlDao.getRecordId(bundleId);
-      EntityAudit bundleAudit=new EntityAudit(TableName.BUNDLES,recordId,ChangeType.UPDATE);
+      final Long recordId=bundleSqlDao.getRecordId(bundleId);
+      final EntityAudit bundleAudit=new EntityAudit(TableName.BUNDLES,recordId,ChangeType.UPDATE);
       bundleSqlDao.insertAuditFromTransaction(bundleAudit,context);
       return null;
     }

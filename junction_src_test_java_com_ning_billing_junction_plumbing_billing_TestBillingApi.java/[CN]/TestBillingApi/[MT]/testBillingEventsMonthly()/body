@@ -1,22 +1,22 @@
 {
-  DateTime now=clock.getUTCNow();
-  DateTime then=now.minusDays(1);
-  Plan nextPlan=catalogService.getFullCatalog().findPlan("PickupTrialEvergreen10USD",now);
-  PlanPhase nextPhase=nextPlan.getAllPhases()[1];
-  PriceList nextPriceList=catalogService.getFullCatalog().findPriceList(PriceListSet.DEFAULT_PRICELIST_NAME,now);
-  SubscriptionEvent t=new MockSubscriptionEvent(eventId,subId,bunId,then,now,null,null,null,null,SubscriptionState.ACTIVE,nextPlan.getName(),nextPhase.getName(),nextPriceList.getName(),1L,null,SubscriptionTransitionType.CREATE,0,null);
+  final DateTime now=clock.getUTCNow();
+  final DateTime then=now.minusDays(1);
+  final Plan nextPlan=catalogService.getFullCatalog().findPlan("PickupTrialEvergreen10USD",now);
+  final PlanPhase nextPhase=nextPlan.getAllPhases()[1];
+  final PriceList nextPriceList=catalogService.getFullCatalog().findPriceList(PriceListSet.DEFAULT_PRICELIST_NAME,now);
+  final SubscriptionEvent t=new MockSubscriptionEvent(eventId,subId,bunId,then,now,null,null,null,null,SubscriptionState.ACTIVE,nextPlan.getName(),nextPhase.getName(),nextPriceList.getName(),1L,null,SubscriptionTransitionType.CREATE,0,null);
   subscriptionTransitions.add(t);
-  AccountUserApi accountApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
-  Account account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
+  final AccountUserApi accountApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
+  final Account account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
   ((ZombieControl)account).addResult("getBillCycleDay",32);
   ((ZombieControl)account).addResult("getCurrency",Currency.USD);
   ((ZombieControl)account).addResult("getId",UUID.randomUUID());
   ((ZombieControl)account).addResult("getTimeZone",DateTimeZone.UTC);
   ((ZombieControl)accountApi).addResult("getAccountById",account);
   ((MockCatalog)catalogService.getFullCatalog()).setBillingAlignment(BillingAlignment.ACCOUNT);
-  BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
-  CallContextFactory factory=new DefaultCallContextFactory(clock);
-  BillingApi api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi,blockCalculator,catalogService,tagApi);
-  SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(new UUID(0L,0L));
+  final BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
+  final CallContextFactory factory=new DefaultCallContextFactory(clock);
+  final BillingApi api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi,blockCalculator,catalogService,tagApi);
+  final SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(new UUID(0L,0L));
   checkFirstEvent(events,nextPlan,32,subId,now,nextPhase,SubscriptionTransitionType.CREATE.toString());
 }

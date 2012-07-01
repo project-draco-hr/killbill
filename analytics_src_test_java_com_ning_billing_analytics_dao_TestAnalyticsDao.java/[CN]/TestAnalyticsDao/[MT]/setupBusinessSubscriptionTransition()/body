@@ -3,11 +3,11 @@
   final BusinessSubscription prevSubscription=new BusinessSubscription(null,plan.getName(),phase.getName(),Currency.USD,new DateTime(DateTimeZone.UTC),Subscription.SubscriptionState.ACTIVE,UUID.randomUUID(),UUID.randomUUID(),catalog);
   final BusinessSubscription nextSubscription=new BusinessSubscription(null,plan.getName(),phase.getName(),Currency.USD,new DateTime(DateTimeZone.UTC),Subscription.SubscriptionState.CANCELLED,UUID.randomUUID(),UUID.randomUUID(),catalog);
   final BusinessSubscriptionEvent event=BusinessSubscriptionEvent.subscriptionCancelled(plan.getName(),catalog,requestedTimestamp,requestedTimestamp);
-  transition=new BusinessSubscriptionTransition(EVENT_ID,EVENT_KEY,ACCOUNT_KEY,requestedTimestamp,event,prevSubscription,nextSubscription);
+  transition=new BusinessSubscriptionTransition(TOTAL_ORDERING,EXTERNAL_KEY,ACCOUNT_KEY,requestedTimestamp,event,prevSubscription,nextSubscription);
   final IDBI dbi=helper.getDBI();
-  businessSubscriptionTransitionDao=dbi.onDemand(BusinessSubscriptionTransitionDao.class);
+  businessSubscriptionTransitionSqlDao=dbi.onDemand(BusinessSubscriptionTransitionSqlDao.class);
   try {
-    businessSubscriptionTransitionDao.test();
+    businessSubscriptionTransitionSqlDao.test();
   }
  catch (  Throwable t) {
     Assert.fail(t.toString());

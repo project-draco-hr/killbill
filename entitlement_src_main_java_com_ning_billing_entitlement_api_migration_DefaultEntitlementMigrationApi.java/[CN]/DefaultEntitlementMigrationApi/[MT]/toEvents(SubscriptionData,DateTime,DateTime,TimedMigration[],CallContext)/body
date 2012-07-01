@@ -1,13 +1,13 @@
 {
   ApiEventMigrateEntitlement creationEvent=null;
-  List<EntitlementEvent> events=new ArrayList<EntitlementEvent>(migrationEvents.length);
-  for (  TimedMigration cur : migrationEvents) {
+  final List<EntitlementEvent> events=new ArrayList<EntitlementEvent>(migrationEvents.length);
+  for (  final TimedMigration cur : migrationEvents) {
     if (cur.getEventType() == EventType.PHASE) {
-      PhaseEvent nextPhaseEvent=PhaseEventData.createNextPhaseEvent(cur.getPhase().getName(),subscriptionData,now,cur.getEventTime());
+      final PhaseEvent nextPhaseEvent=PhaseEventData.createNextPhaseEvent(cur.getPhase().getName(),subscriptionData,now,cur.getEventTime());
       events.add(nextPhaseEvent);
     }
  else     if (cur.getEventType() == EventType.API_USER) {
-      ApiEventBuilder builder=new ApiEventBuilder().setSubscriptionId(subscriptionData.getId()).setEventPlan((cur.getPlan() != null) ? cur.getPlan().getName() : null).setEventPlanPhase((cur.getPhase() != null) ? cur.getPhase().getName() : null).setEventPriceList(cur.getPriceList()).setActiveVersion(subscriptionData.getActiveVersion()).setEffectiveDate(cur.getEventTime()).setProcessedDate(now).setRequestedDate(now).setUserToken(context.getUserToken()).setFromDisk(true);
+      final ApiEventBuilder builder=new ApiEventBuilder().setSubscriptionId(subscriptionData.getId()).setEventPlan((cur.getPlan() != null) ? cur.getPlan().getName() : null).setEventPlanPhase((cur.getPhase() != null) ? cur.getPhase().getName() : null).setEventPriceList(cur.getPriceList()).setActiveVersion(subscriptionData.getActiveVersion()).setEffectiveDate(cur.getEventTime()).setProcessedDate(now).setRequestedDate(now).setUserToken(context.getUserToken()).setFromDisk(true);
 switch (cur.getApiEventType()) {
 case MIGRATE_ENTITLEMENT:
         creationEvent=new ApiEventMigrateEntitlement(builder);
@@ -32,7 +32,7 @@ throw new EntitlementError(String.format("Could not create migration billing eve
 }
 events.add(new ApiEventMigrateBilling(creationEvent,ctd));
 Collections.sort(events,new Comparator<EntitlementEvent>(){
-int compForApiType(EntitlementEvent o1,EntitlementEvent o2,ApiEventType type){
+int compForApiType(final EntitlementEvent o1,final EntitlementEvent o2,final ApiEventType type){
 ApiEventType apiO1=null;
 if (o1.getType() == EventType.API_USER) {
 apiO1=((ApiEvent)o1).getEventType();
@@ -51,7 +51,7 @@ return 1;
 return 0;
 }
 }
-@Override public int compare(EntitlementEvent o1,EntitlementEvent o2){
+@Override public int compare(final EntitlementEvent o1,final EntitlementEvent o2){
 int comp=o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
 if (comp == 0) {
 comp=compForApiType(o1,o2,ApiEventType.MIGRATE_ENTITLEMENT);

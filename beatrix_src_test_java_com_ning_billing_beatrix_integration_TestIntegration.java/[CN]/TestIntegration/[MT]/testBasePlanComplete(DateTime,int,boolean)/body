@@ -1,12 +1,12 @@
 {
   log.info("Beginning test with BCD of " + billingDay);
-  Account account=createAccountWithPaymentMethod(getAccountData(billingDay));
-  UUID accountId=account.getId();
+  final Account account=createAccountWithPaymentMethod(getAccountData(billingDay));
+  final UUID accountId=account.getId();
   clock.setDeltaFromReality(initialCreationDate.getMillis() - clock.getUTCNow().getMillis());
-  SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",context);
-  String productName="Shotgun";
-  BillingPeriod term=BillingPeriod.MONTHLY;
-  String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",context);
+  final String productName="Shotgun";
+  final BillingPeriod term=BillingPeriod.MONTHLY;
+  final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   SubscriptionData subscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
@@ -40,7 +40,7 @@
   startDate=subscription.getCurrentPhaseStart();
   rate=subscription.getCurrentPhase().getRecurringPrice().getPrice(Currency.USD);
   BigDecimal price;
-  DateTime chargeThroughDate;
+  final DateTime chargeThroughDate;
 switch (billingDay) {
 case 1:
     price=THIRTY.divide(THIRTY_ONE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD).multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
@@ -56,7 +56,7 @@ verifyTestResult(accountId,subscription.getId(),startDate,chargeThroughDate,pric
 break;
 case 3:
 price=ONE.divide(TWENTY_NINE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD).multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
-DateTime firstEndDate=startDate.plusDays(1);
+final DateTime firstEndDate=startDate.plusDays(1);
 chargeThroughDate=firstEndDate.plusMonths(1);
 invoiceItemCount+=2;
 verifyTestResult(accountId,subscription.getId(),startDate,firstEndDate,price,chargeThroughDate,invoiceItemCount);
@@ -95,8 +95,8 @@ assertTrue(busHandler.isCompleted(DELAY));
 startDate=endDate;
 endDate=startDate.plusMonths(1);
 if (endDate.dayOfMonth().get() != billingDay) {
-int maximumDay=endDate.dayOfMonth().getMaximumValue();
-int newDay=(maximumDay < billingDay) ? maximumDay : billingDay;
+final int maximumDay=endDate.dayOfMonth().getMaximumValue();
+final int newDay=(maximumDay < billingDay) ? maximumDay : billingDay;
 endDate=endDate.toMutableDateTime().dayOfMonth().set(newDay).toDateTime();
 }
 invoiceItemCount+=1;
@@ -106,14 +106,14 @@ verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate,
 subscription=subscriptionDataFromSubscription(entitlementUserApi.getSubscriptionFromId(subscription.getId()));
 subscription.cancel(clock.getUTCNow(),false,context);
 busHandler.pushExpectedEvent(NextEvent.CANCEL);
-Interval it=new Interval(clock.getUTCNow(),endDate);
+final Interval it=new Interval(clock.getUTCNow(),endDate);
 clock.addDeltaFromReality(it.toDurationMillis());
 assertTrue(busHandler.isCompleted(DELAY));
 busHandler.reset();
 clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 1000);
 assertTrue(busHandler.isCompleted(DELAY));
 subscription=subscriptionDataFromSubscription(entitlementUserApi.getSubscriptionFromId(subscription.getId()));
-DateTime lastCtd=subscription.getChargedThroughDate();
+final DateTime lastCtd=subscription.getChargedThroughDate();
 assertNotNull(lastCtd);
 log.info("Checking CTD: " + lastCtd.toString() + "; clock is "+ clock.getUTCNow().toString());
 assertTrue(lastCtd.isBefore(clock.getUTCNow()));

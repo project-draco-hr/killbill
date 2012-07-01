@@ -1,20 +1,20 @@
 {
   log.info("Starting testFetchBundleRepair");
-  String baseProduct="Shotgun";
-  BillingPeriod baseTerm=BillingPeriod.MONTHLY;
-  String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
-  String aoProduct="Telescopic-Scope";
-  BillingPeriod aoTerm=BillingPeriod.MONTHLY;
-  String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
-  BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
-  List<SubscriptionTimeline> subscriptionRepair=bundleRepair.getSubscriptions();
+  final String baseProduct="Shotgun";
+  final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+  final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+  final String aoProduct="Telescopic-Scope";
+  final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
+  final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
+  final BundleTimeline bundleRepair=repairApi.getBundleRepair(bundle.getId());
+  final List<SubscriptionTimeline> subscriptionRepair=bundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),2);
-  for (  SubscriptionTimeline cur : subscriptionRepair) {
+  for (  final SubscriptionTimeline cur : subscriptionRepair) {
     assertNull(cur.getDeletedEvents());
     assertNull(cur.getNewEvents());
-    List<ExistingEvent> events=cur.getExistingEvents();
+    final List<ExistingEvent> events=cur.getExistingEvents();
     assertEquals(events.size(),2);
     sortExistingEvent(events);
     assertEquals(events.get(0).getSubscriptionTransitionType(),SubscriptionTransitionType.CREATE);

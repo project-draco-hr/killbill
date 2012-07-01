@@ -1,8 +1,10 @@
 {
-  UUID accountId=UUID.randomUUID();
-  String originalExternalKey="extKey1337";
-  DefaultAccount account=new DefaultAccount(accountId,originalExternalKey,"myemail1337@glam.com","John Smith",4,Currency.USD,15,null,null,null,null,null,null,null,null,null,null,null,false,false);
+  final UUID accountId=UUID.randomUUID();
+  final String originalExternalKey="extKey1337";
+  final DefaultAccount account=new DefaultAccount(accountId,originalExternalKey,"myemail1337@glam.com","John Smith",4,Currency.USD,15,null,null,null,null,null,null,null,null,null,null,null,false,false);
   accountDao.create(account,context);
-  DefaultAccount updatedAccount=new DefaultAccount(accountId,"extKey1338","myemail1337@glam.com","John Smith",4,Currency.USD,15,null,null,null,null,null,null,null,null,null,null,null,false,false);
-  accountDao.update(updatedAccount,context);
+  final String buggyKey="extKey1338";
+  final DefaultAccount updatedAccountData=new DefaultAccount(accountId,buggyKey,"myemail1337@glam.com","John Smith",4,Currency.USD,15,null,null,null,null,null,null,null,null,null,null,null,false,false);
+  accountDao.update(updatedAccountData,context);
+  Assert.assertNull(accountDao.getAccountByKey(buggyKey));
 }
