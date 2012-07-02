@@ -1,0 +1,28 @@
+{
+  DateTime startDate=clock.getUTCNow();
+  DateTime endDate=startDate.plusDays(30);
+  DateTime nextEndDate=startDate.plusMonths(1);
+  BigDecimal rate1=new BigDecimal("12.00");
+  BigDecimal amount1=rate1;
+  BigDecimal rate2=new BigDecimal("14.85");
+  BigDecimal amount2=rate2;
+  UUID firstInvoiceId=UUID.randomUUID();
+  List<InvoiceItem> existing=new LinkedList<InvoiceItem>();
+  InvoiceItem item1=new RecurringInvoiceItem(firstInvoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount1,rate1,currency,null);
+  existing.add(item1);
+  List<InvoiceItem> proposed=new LinkedList<InvoiceItem>();
+  InvoiceItem other=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,endDate,nextEndDate,amount2,rate2,currency,null);
+  proposed.add(other);
+  gen.addRepairedItems(existing,proposed);
+  assertEquals(existing.size(),1);
+  assertEquals(proposed.size(),2);
+  InvoiceItem leftItem1=proposed.get(0);
+  assertEquals(leftItem1.getInvoiceId(),invoiceId);
+  assertEquals(leftItem1.getInvoiceItemType(),InvoiceItemType.RECURRING);
+  assertEquals(leftItem1.getAmount(),amount2);
+  InvoiceItem newItem2=proposed.get(1);
+  assertEquals(newItem2.getInvoiceId(),firstInvoiceId);
+  assertEquals(newItem2.getInvoiceItemType(),InvoiceItemType.REPAIR_ADJ);
+  assertEquals(newItem2.getAmount(),item1.getAmount().negate());
+  assertEquals(newItem2.getLinkedItemId(),item1.getId());
+}

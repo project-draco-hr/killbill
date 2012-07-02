@@ -1,0 +1,36 @@
+{
+  final Currency currency=Currency.USD;
+  final DefaultPrice zeroPrice=new DefaultPrice(BigDecimal.ZERO,Currency.USD);
+  final MockInternationalPrice fixedPrice=new MockInternationalPrice(zeroPrice);
+  final MockPlanPhase phase1=new MockPlanPhase(null,fixedPrice);
+  final BigDecimal cheapAmount=new BigDecimal("24.95");
+  final DefaultPrice cheapPrice=new DefaultPrice(cheapAmount,Currency.USD);
+  final MockInternationalPrice recurringPrice=new MockInternationalPrice(cheapPrice);
+  final MockPlanPhase phase2=new MockPlanPhase(recurringPrice,null);
+  final MockPlan plan=new MockPlan();
+  final Subscription subscription=getZombieSubscription();
+  final DateTime effectiveDate1=buildDateTime(2011,1,1);
+  final BillingEvent event1=createMockBillingEvent(null,subscription,effectiveDate1,plan,phase1,fixedPrice.getPrice(currency),null,currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"testEvent1",1L,SubscriptionTransitionType.CREATE);
+  final BillingEventSet events=new MockBillingEventSet();
+  events.add(event1);
+  final UUID accountId=UUID.randomUUID();
+  final Invoice invoice1=generator.generateInvoice(accountId,events,null,effectiveDate1,Currency.USD);
+  assertNotNull(invoice1);
+  assertEquals(invoice1.getNumberOfItems(),1);
+  assertEquals(invoice1.getBalance().compareTo(ZERO),0);
+  final List<Invoice> invoiceList=new ArrayList<Invoice>();
+  invoiceList.add(invoice1);
+  final DateTime effectiveDate2=effectiveDate1.plusDays(30);
+  final BillingEvent event2=createMockBillingEvent(null,subscription,effectiveDate2,plan,phase2,null,recurringPrice.getPrice(currency),currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent2",2L,SubscriptionTransitionType.PHASE);
+  events.add(event2);
+  final Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,effectiveDate2,Currency.USD);
+  assertNotNull(invoice2);
+  assertEquals(invoice2.getNumberOfItems(),1);
+  assertEquals(invoice2.getBalance().compareTo(cheapAmount),0);
+  invoiceList.add(invoice2);
+  final DateTime effectiveDate3=effectiveDate2.plusMonths(1);
+  final Invoice invoice3=generator.generateInvoice(accountId,events,invoiceList,effectiveDate3,Currency.USD);
+  assertNotNull(invoice3);
+  assertEquals(invoice3.getNumberOfItems(),1);
+  assertEquals(invoice3.getBalance().compareTo(cheapAmount),0);
+}

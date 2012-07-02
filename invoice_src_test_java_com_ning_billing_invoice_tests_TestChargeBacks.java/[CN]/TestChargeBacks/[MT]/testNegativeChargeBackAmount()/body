@@ -1,0 +1,10 @@
+{
+  try {
+    final Invoice invoice=createAndPersistInvoice(THIRTY);
+    final InvoicePayment payment=createAndPersistPayment(invoice.getId(),THIRTY);
+    invoicePaymentApi.createChargeback(payment.getId(),BigDecimal.ONE.negate(),context);
+  }
+ catch (  TransactionFailedException expected) {
+    throw (InvoiceApiException)expected.getCause();
+  }
+}

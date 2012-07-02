@@ -1,0 +1,14 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final UUID subscriptionId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
+  final BigDecimal rate=new BigDecimal("20.00");
+  for (int i=0; i < 3; i++) {
+    final UUID invoiceId=UUID.randomUUID();
+    final RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate.plusMonths(i),startDate.plusMonths(i + 1),rate,rate,Currency.USD);
+    invoiceItemSqlDao.create(item,context);
+  }
+  final List<InvoiceItem> items=invoiceItemSqlDao.getInvoiceItemsBySubscription(subscriptionId.toString());
+  assertEquals(items.size(),3);
+}
