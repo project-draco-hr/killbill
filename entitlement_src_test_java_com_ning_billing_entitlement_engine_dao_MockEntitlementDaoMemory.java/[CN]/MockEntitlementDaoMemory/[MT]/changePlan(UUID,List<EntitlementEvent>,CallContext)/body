@@ -1,0 +1,10 @@
+{
+synchronized (events) {
+    cancelNextChangeEvent(subscriptionId);
+    cancelNextPhaseEvent(subscriptionId);
+    events.addAll(changeEvents);
+    for (    final EntitlementEvent cur : changeEvents) {
+      recordFutureNotificationFromTransaction(null,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
+    }
+  }
+}

@@ -7,13 +7,11 @@
       transactional.insertAuditFromTransaction(audit,context);
       final EntitlementEventSqlDao eventsDaoFromSameTransaction=transactional.become(EntitlementEventSqlDao.class);
       final List<EntityAudit> audits=new ArrayList<EntityAudit>();
-      EntitlementEvent prev=null;
       for (      final EntitlementEvent cur : initialEvents) {
         eventsDaoFromSameTransaction.insertEvent(cur,context);
         final Long recordId=eventsDaoFromSameTransaction.getRecordId(cur.getId().toString());
         audits.add(new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.INSERT));
-        recordFutureNotificationFromTransaction(transactional,subscription,prev,cur,new EntitlementNotificationKey(cur.getId()));
-        prev=cur;
+        recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
       }
       eventsDaoFromSameTransaction.insertAuditFromTransaction(audits,context);
       return null;
