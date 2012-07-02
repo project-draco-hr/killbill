@@ -17,7 +17,7 @@
       final String error=String.format("Failed to locate invoice payment for paymentAttemptId %s",paymentAttemptId);
       return Response.status(Response.Status.NO_CONTENT).entity(error).build();
     }
-    final InvoicePayment chargeBack=invoicePaymentApi.processChargeback(invoicePayment.getId(),json.getChargebackAmount(),context.createContext(createdBy,reason,comment));
+    final InvoicePayment chargeBack=invoicePaymentApi.createChargeback(invoicePayment.getId(),json.getChargebackAmount(),context.createContext(createdBy,reason,comment));
     return uriBuilder.buildResponse(ChargebackResource.class,"getChargeback",chargeBack.getId());
   }
  catch (  InvoiceApiException e) {

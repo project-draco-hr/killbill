@@ -1,0 +1,14 @@
+{
+  final InvoicePayment payment=BrainDeadProxyFactory.createBrainDeadProxyFor(InvoicePayment.class);
+  final ZombieControl zombie=(ZombieControl)payment;
+  zombie.addResult("getId",UUID.randomUUID());
+  zombie.addResult("getType",InvoicePaymentType.ATTEMPT);
+  zombie.addResult("getInvoiceId",invoiceId);
+  zombie.addResult("getPaymentAttemptId",UUID.randomUUID());
+  zombie.addResult("getPaymentAttemptDate",clock.getUTCNow());
+  zombie.addResult("getAmount",amount);
+  zombie.addResult("getCurrency",CURRENCY);
+  zombie.addResult("getLinkedInvoicePaymentId",BrainDeadProxyFactory.ZOMBIE_VOID);
+  invoicePaymentApi.notifyOfPaymentAttempt(payment,context);
+  return payment;
+}

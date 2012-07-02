@@ -1,0 +1,22 @@
+{
+  DateTime startDate=clock.getUTCNow();
+  DateTime endDate=startDate.plusDays(30);
+  DateTime nextEndDate=startDate.plusMonths(1);
+  BigDecimal rate1=new BigDecimal("12.00");
+  BigDecimal amount1=rate1;
+  BigDecimal rate2=new BigDecimal("14.85");
+  BigDecimal amount2=rate2;
+  List<InvoiceItem> existing=new LinkedList<InvoiceItem>();
+  InvoiceItem item1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount1,rate1,currency,null);
+  existing.add(item1);
+  List<InvoiceItem> proposed=new LinkedList<InvoiceItem>();
+  InvoiceItem other=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,endDate,nextEndDate,amount2,rate2,currency,null);
+  proposed.add(item1);
+  proposed.add(other);
+  gen.removeDuplicatedInvoiceItems(proposed,existing);
+  assertEquals(existing.size(),0);
+  assertEquals(proposed.size(),1);
+  InvoiceItem leftItem=proposed.get(0);
+  assertEquals(leftItem.getInvoiceItemType(),InvoiceItemType.RECURRING);
+  assertEquals(leftItem.getAmount(),amount2);
+}
