@@ -5,9 +5,9 @@
   final DateTime effectiveDate=clock.getUTCNow();
   final TimedPhase[] phases=getTimedPhasesOnCreate(productName,initialPhase,subscriptionData,effectiveDate);
   Assert.assertEquals(phases[0].getStartPhase(),subscriptionData.getStartDate());
-  Assert.assertEquals(phases[1].getStartPhase(),subscriptionData.getStartDate().plusDays(30));
+  Assert.assertEquals(phases[1].getStartPhase(),subscriptionData.getStartDate().plusMonths(1));
   final TimedPhase nextTimePhase=planAligner.getNextTimedPhase(subscriptionData,effectiveDate,effectiveDate);
-  Assert.assertEquals(nextTimePhase.getStartPhase(),subscriptionData.getStartDate().plusDays(30));
+  Assert.assertEquals(nextTimePhase.getStartPhase(),subscriptionData.getStartDate().plusMonths(1));
   final DateTime effectiveDateInThePast=subscriptionData.getStartDate().minusHours(10);
   final TimedPhase[] phasesInThePast=getTimedPhasesOnCreate(productName,initialPhase,subscriptionData,effectiveDateInThePast);
   Assert.assertNull(phasesInThePast[0]);
@@ -20,7 +20,7 @@
     Assert.assertTrue(true);
   }
   final String newProductName="telescopic-scope-monthly";
-  final DateTime effectiveChangeDate=subscriptionData.getStartDate().plusDays(30);
+  final DateTime effectiveChangeDate=subscriptionData.getStartDate().plusMonths(1);
   changeSubscription(effectiveChangeDate,subscriptionData,productName,newProductName,initialPhase);
   final TimedPhase newPhase=getNextTimedPhaseOnChange(subscriptionData,newProductName,effectiveChangeDate);
   Assert.assertNull(newPhase);
