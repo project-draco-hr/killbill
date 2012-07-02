@@ -3,12 +3,12 @@
   final SubscriptionBundle bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
   ((ZombieControl)bundle).addResult("getId",bunId);
   bundles.add(bundle);
-  subscriptionTransitions=new LinkedList<SubscriptionEvent>();
+  effectiveSubscriptionTransitions=new LinkedList<EffectiveSubscriptionEvent>();
   final List<Subscription> subscriptions=new LinkedList<Subscription>();
   subscriptionStartDate=clock.getUTCNow().minusDays(3);
   subscription=new MockSubscription(){
-    @Override public List<SubscriptionEvent> getBillingTransitions(){
-      return subscriptionTransitions;
+    @Override public List<EffectiveSubscriptionEvent> getBillingTransitions(){
+      return effectiveSubscriptionTransitions;
     }
     @Override public Plan getCurrentPlan(){
       return subscriptionPlan;
