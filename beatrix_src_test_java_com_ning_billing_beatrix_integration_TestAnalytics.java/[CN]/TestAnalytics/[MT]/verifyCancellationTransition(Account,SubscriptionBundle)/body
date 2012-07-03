@@ -1,0 +1,11 @@
+{
+  final Product currentProduct=subscriptionPlan.getProduct();
+  final List<BusinessSubscriptionTransition> transitions=analyticsUserApi.getTransitionsForBundle(bundle.getKey());
+  final BusinessSubscriptionTransition cancellationRequest=transitions.get(2);
+  Assert.assertEquals(cancellationRequest.getExternalKey(),bundle.getKey());
+  Assert.assertEquals(cancellationRequest.getAccountKey(),account.getExternalKey());
+  Assert.assertEquals(cancellationRequest.getEvent().getCategory(),currentProduct.getCategory());
+  Assert.assertEquals(cancellationRequest.getEvent().getEventType(),BusinessSubscriptionEvent.EventType.CANCEL);
+  Assert.assertNull(cancellationRequest.getNextSubscription());
+  Assert.assertEquals(cancellationRequest.getPreviousSubscription(),transitions.get(1).getNextSubscription());
+}
