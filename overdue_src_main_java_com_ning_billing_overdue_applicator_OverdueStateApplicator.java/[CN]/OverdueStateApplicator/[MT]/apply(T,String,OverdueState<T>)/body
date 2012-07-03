@@ -17,4 +17,10 @@
   if (nextOverdueState.isClearState()) {
     clear(overdueable);
   }
+  try {
+    bus.post(createOverdueEvent(overdueable,previousOverdueStateName,nextOverdueState.getName()));
+  }
+ catch (  Exception e) {
+    log.error("Error posting overdue change event to bus",e);
+  }
 }
