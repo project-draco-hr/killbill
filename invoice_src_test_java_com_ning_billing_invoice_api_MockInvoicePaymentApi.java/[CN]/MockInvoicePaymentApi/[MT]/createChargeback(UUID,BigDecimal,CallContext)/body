@@ -1,0 +1,13 @@
+{
+  InvoicePayment existingPayment=null;
+  for (  final InvoicePayment payment : invoicePayments) {
+    if (payment.getId() == invoicePaymentId) {
+      existingPayment=payment;
+      break;
+    }
+  }
+  if (existingPayment != null) {
+    invoicePayments.add(new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.CHARGED_BACK,null,null,DateTime.now(DateTimeZone.UTC),amount,Currency.USD,existingPayment.getId()));
+  }
+  return existingPayment;
+}

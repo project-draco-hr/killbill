@@ -1,0 +1,26 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),clock.getUTCNow(),Currency.USD);
+  final UUID invoiceId=invoice.getId();
+  final UUID subscriptionId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final DateTime startDate=new DateTime(2010,1,1,0,0,0,0);
+  final DateTime endDate=new DateTime(2010,4,1,0,0,0,0);
+  final InvoiceItem invoiceItem=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate,endDate,new BigDecimal("21.00"),new BigDecimal("7.00"),Currency.USD);
+  invoice.addInvoiceItem(invoiceItem);
+  invoiceDao.create(invoice,context);
+  final Invoice savedInvoice=invoiceDao.getById(invoiceId);
+  assertNotNull(savedInvoice);
+  assertEquals(savedInvoice.getBalance().compareTo(new BigDecimal("21.00")),0);
+  assertEquals(savedInvoice.getPaidAmount(),BigDecimal.ZERO);
+  assertEquals(savedInvoice.getInvoiceItems().size(),1);
+  final BigDecimal paymentAmount=new BigDecimal("11.00");
+  final UUID paymentAttemptId=UUID.randomUUID();
+  invoiceDao.notifyOfPaymentAttempt(new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentAttemptId,invoiceId,clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD),context);
+  final Invoice retrievedInvoice=invoiceDao.getById(invoiceId);
+  assertNotNull(retrievedInvoice);
+  assertEquals(retrievedInvoice.getInvoiceItems().size(),1);
+  assertEquals(retrievedInvoice.getChargedAmount().compareTo(new BigDecimal("21.00")),0);
+  assertEquals(retrievedInvoice.getBalance().compareTo(new BigDecimal("10.00")),0);
+  assertEquals(retrievedInvoice.getPaidAmount().compareTo(new BigDecimal("11.00")),0);
+}
