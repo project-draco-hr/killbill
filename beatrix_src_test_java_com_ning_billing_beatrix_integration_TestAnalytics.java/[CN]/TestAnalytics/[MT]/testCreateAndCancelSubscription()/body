@@ -1,0 +1,19 @@
+{
+  final Account account=verifyAccountCreation();
+  final SubscriptionBundle bundle=verifyFirstBundle(account);
+  Subscription subscription=verifyFirstSubscription(account,bundle);
+  clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
+  busHandler.pushExpectedEvent(TestApiListener.NextEvent.PHASE);
+  busHandler.pushExpectedEvent(TestApiListener.NextEvent.INVOICE);
+  busHandler.pushExpectedEvent(TestApiListener.NextEvent.PAYMENT);
+  Assert.assertTrue(busHandler.isCompleted(DELAY));
+  verifyBSTWithTrialAndEvergreenPhases(account,bundle,subscription);
+  subscription=entitlementUserApi.getSubscriptionFromId(subscription.getId());
+  subscription.cancel(clock.getUTCNow(),true,context);
+  waitALittle();
+  verifyBSTWithTrialAndEvergreenPhasesAndCancellation(account,bundle,subscription);
+  clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS + 100);
+  assertTrue(busHandler.isCompleted(DELAY));
+  waitALittle();
+  verifyBSTWithTrialAndEvergreenPhasesAndCancellationAndSystemCancellation(account,bundle,subscription);
+}

@@ -1,11 +1,12 @@
 {
+  final String accountKey=UUID.randomUUID().toString();
   final String externalKey=UUID.randomUUID().toString();
-  final BusinessOverdueStatus firstOverdueStatus=createOverdueStatus(externalKey);
+  final BusinessOverdueStatus firstOverdueStatus=createOverdueStatus(accountKey,externalKey);
   Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundle(externalKey).size(),0);
   Assert.assertEquals(overdueStatusSqlDao.createOverdueStatus(firstOverdueStatus),1);
   Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundle(externalKey).size(),1);
   Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundle(externalKey).get(0),firstOverdueStatus);
-  final BusinessOverdueStatus secondOverdueStatus=createOverdueStatus(externalKey);
+  final BusinessOverdueStatus secondOverdueStatus=createOverdueStatus(accountKey,externalKey);
   Assert.assertEquals(overdueStatusSqlDao.createOverdueStatus(secondOverdueStatus),1);
   Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundle(externalKey).size(),2);
   Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundle(externalKey).get(0),firstOverdueStatus);

@@ -1,0 +1,21 @@
+{
+switch (event.getTransitionType()) {
+case MIGRATE_ENTITLEMENT:
+case CREATE:
+    return subscriptionCreated(event);
+case RE_CREATE:
+  return subscriptionRecreated(event);
+case CANCEL:
+return subscriptionCancelled(event);
+case CHANGE:
+return subscriptionChanged(event);
+case PHASE:
+return subscriptionPhaseChanged(event);
+case MIGRATE_BILLING:
+case UNCANCEL:
+return null;
+default :
+log.warn("Unexpected event type " + event.getTransitionType());
+return null;
+}
+}

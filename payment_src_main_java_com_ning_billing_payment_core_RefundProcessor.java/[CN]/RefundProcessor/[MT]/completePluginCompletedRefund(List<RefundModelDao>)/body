@@ -1,0 +1,20 @@
+{
+  boolean fixedTheWorld=false;
+  try {
+    final CallContext context=factory.createCallContext("RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM);
+    for (    RefundModelDao cur : refunds) {
+      if (cur.getRefundStatus() == RefundStatus.PLUGIN_COMPLETED) {
+        final PaymentAttemptModelDao successfulAttempt=getPaymentAttempt(cur.getPaymentId());
+        if (successfulAttempt != null) {
+          invoicePaymentApi.createRefund(successfulAttempt.getId(),cur.getAmount(),cur.isAdjsuted(),cur.getId(),context);
+          paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
+          fixedTheWorld=true;
+        }
+      }
+    }
+  }
+ catch (  InvoiceApiException e) {
+    throw new PaymentApiException(e);
+  }
+  return fixedTheWorld;
+}

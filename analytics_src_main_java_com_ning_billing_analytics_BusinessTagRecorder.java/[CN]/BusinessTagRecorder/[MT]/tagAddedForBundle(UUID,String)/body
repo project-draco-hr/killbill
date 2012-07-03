@@ -7,6 +7,15 @@
     log.warn("Ignoring tag addition of {} for bundle id {} (bundle does not exist)",name,objectId.toString());
     return;
   }
+  final Account account;
+  try {
+    account=accountApi.getAccountById(bundle.getAccountId());
+  }
+ catch (  AccountApiException e) {
+    log.warn("Ignoring tag addition of {} for bundle id {} and account id {} (account does not exist)",new Object[]{name,objectId.toString(),bundle.getAccountId()});
+    return;
+  }
+  final String accountKey=account.getExternalKey();
   final String externalKey=bundle.getKey();
-  subscriptionTransitionTagSqlDao.addTag(externalKey,name);
+  subscriptionTransitionTagSqlDao.addTag(accountKey,externalKey,name);
 }

@@ -6,9 +6,12 @@
     return uriBuilder.buildResponse(PaymentMethodResource.class,"getPaymentMethod",paymentMethodId,uriInfo.getBaseUri().toString());
   }
  catch (  AccountApiException e) {
-    final String error=String.format("Failed to create account %s",json);
-    log.info(error,e);
-    return Response.status(Status.BAD_REQUEST).entity(error).build();
+    if (e.getCode() == ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID.getCode()) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+ else {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
   }
 catch (  PaymentApiException e) {
     final String error=String.format("Failed to create payment Method  %s",json);

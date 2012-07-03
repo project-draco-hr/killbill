@@ -12,7 +12,7 @@
     final ActionPolicy policy=catalogService.getFullCatalog().planCancelPolicy(planPhase,requestedDate);
     final DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy,requestedDate);
     final EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setUserToken(context.getUserToken()).setFromDisk(true));
-    dao.cancelSubscription(subscription.getId(),cancelEvent,context,0);
+    dao.cancelSubscription(subscription,cancelEvent,context,0);
     subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getFullCatalog());
     return (policy == ActionPolicy.IMMEDIATE);
   }
