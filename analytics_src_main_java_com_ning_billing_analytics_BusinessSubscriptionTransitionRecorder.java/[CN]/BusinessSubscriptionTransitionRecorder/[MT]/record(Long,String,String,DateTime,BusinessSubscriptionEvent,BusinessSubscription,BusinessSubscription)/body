@@ -1,36 +1,4 @@
 {
   final BusinessSubscriptionTransition transition=new BusinessSubscriptionTransition(totalOrdering,externalKey,accountKey,requestedDateTime,event,prevSubscription,nextSubscription);
-  log.info(transition.getEvent() + " " + transition);
-  sqlDao.inTransaction(new Transaction<Void,BusinessSubscriptionTransitionSqlDao>(){
-    @Override public Void inTransaction(    final BusinessSubscriptionTransitionSqlDao transactional,    final TransactionStatus status) throws Exception {
-      final String subscriptionId;
-      if (nextSubscription != null && nextSubscription.getSubscriptionId() != null) {
-        subscriptionId=nextSubscription.getSubscriptionId().toString();
-      }
- else {
-        subscriptionId=prevSubscription.getSubscriptionId().toString();
-      }
-      if (BusinessSubscriptionEvent.EventType.ADD.equals(event.getEventType())) {
-        final List<BusinessSubscriptionTransition> transitions=transactional.getTransitionForSubscription(subscriptionId);
-        if (transitions != null && transitions.size() > 0) {
-          final BusinessSubscriptionTransition firstTransition=transitions.get(0);
-          if (!BusinessSubscriptionEvent.EventType.ADD.equals(firstTransition.getEvent().getEventType()) && !BusinessSubscriptionEvent.EventType.RE_ADD.equals(firstTransition.getEvent().getEventType()) && firstTransition.getPreviousSubscription() == null) {
-            final BusinessSubscriptionTransition updatedFirstTransition=new BusinessSubscriptionTransition(firstTransition.getTotalOrdering(),firstTransition.getExternalKey(),firstTransition.getAccountKey(),firstTransition.getRequestedTimestamp(),firstTransition.getEvent(),nextSubscription,firstTransition.getNextSubscription());
-            transactional.updateTransition(updatedFirstTransition.getTotalOrdering(),updatedFirstTransition);
-          }
-        }
-      }
-      final List<BusinessSubscriptionTransition> currentTransitions=transactional.getTransitionForSubscription(subscriptionId);
-      if (currentTransitions != null && currentTransitions.size() > 0) {
-        for (        final BusinessSubscriptionTransition currentTransition : currentTransitions) {
-          if (currentTransition.isDuplicateOf(transition)) {
-            return null;
-          }
-        }
-      }
-      transactional.createTransition(transition);
-      return null;
-    }
-  }
-);
+  sqlDao.createTransition(transition);
 }
