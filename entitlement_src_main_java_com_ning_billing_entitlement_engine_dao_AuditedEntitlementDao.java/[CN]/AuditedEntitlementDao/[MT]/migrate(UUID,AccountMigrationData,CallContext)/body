@@ -18,6 +18,8 @@
           transSubDao.insertSubscription(subData,context);
           recordId=transSubDao.getRecordId(subData.getId().toString());
           audits.add(new EntityAudit(TableName.SUBSCRIPTIONS,recordId,ChangeType.INSERT));
+          final EntitlementEvent finalEvent=curSubscription.getInitialEvents().get(curSubscription.getInitialEvents().size() - 1);
+          notifyBusOfRequestedChange(transactional,subData,finalEvent);
         }
         transBundleDao.insertBundle(bundleData,context);
         recordId=transBundleDao.getRecordId(bundleData.getId().toString());
