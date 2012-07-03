@@ -14,7 +14,7 @@
       if (requestedPositiveAmount.compareTo(maxRefundAmount) > 0) {
         throw new InvoiceApiException(ErrorCode.REFUND_AMOUNT_TOO_HIGH,requestedPositiveAmount,maxRefundAmount);
       }
-      final InvoicePayment refund=new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.REFUND,paymentAttemptId,payment.getInvoiceId(),context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),payment.getId());
+      final InvoicePayment refund=new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.REFUND,paymentAttemptId,payment.getInvoiceId(),context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),paymentCookieId,payment.getId());
       transactional.create(refund,context);
       InvoiceSqlDao transInvoiceDao=transactional.become(InvoiceSqlDao.class);
       Invoice invoice=transInvoiceDao.getById(payment.getInvoiceId().toString());
