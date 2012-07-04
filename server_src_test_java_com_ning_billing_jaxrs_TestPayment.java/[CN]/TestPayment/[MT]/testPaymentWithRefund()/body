@@ -1,0 +1,47 @@
+{
+  final AccountJson accountJson=createAccountWithDefaultPaymentMethod("eraahahildo","sheqrgfhwe","eraahahildo@yahoo.com");
+  assertNotNull(accountJson);
+  final BundleJsonNoSubscriptions bundleJson=createBundle(accountJson.getAccountId(),"317199");
+  assertNotNull(bundleJson);
+  final SubscriptionJsonNoEvents subscriptionJson=createSubscription(bundleJson.getBundleId(),"Shotgun",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),true);
+  assertNotNull(subscriptionJson);
+  clock.addMonths(1);
+  crappyWaitForLackOfProperSynchonization();
+  String uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.PAYMENTS;
+  Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  String baseJson=response.getResponseBody();
+  List<PaymentJsonSimple> objFromJson=mapper.readValue(baseJson,new TypeReference<List<PaymentJsonSimple>>(){
+  }
+);
+  Assert.assertEquals(objFromJson.size(),1);
+  final String paymentId=objFromJson.get(0).getPaymentId();
+  final BigDecimal paymentAmount=objFromJson.get(0).getAmount();
+  uri=JaxrsResource.PAYMENTS_PATH + "/" + paymentId+ "/"+ JaxrsResource.REFUNDS;
+  response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  List<RefundJson> objRefundFromJson=mapper.readValue(baseJson,new TypeReference<List<RefundJson>>(){
+  }
+);
+  Assert.assertEquals(objRefundFromJson.size(),0);
+  RefundJson refundJson=new RefundJson(null,paymentId,paymentAmount.negate(),false);
+  baseJson=mapper.writeValueAsString(refundJson);
+  response=doPost(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
+  final String locationCC=response.getHeader("Location");
+  Assert.assertNotNull(locationCC);
+  response=doGetWithUrl(locationCC,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  final RefundJson refundJsonCheck=mapper.readValue(baseJson,RefundJson.class);
+  Assert.assertTrue(refundJsonCheck.equalsNoId(refundJson));
+  uri=JaxrsResource.PAYMENTS_PATH + "/" + paymentId+ "/"+ JaxrsResource.REFUNDS;
+  response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  objRefundFromJson=mapper.readValue(baseJson,new TypeReference<List<RefundJson>>(){
+  }
+);
+  Assert.assertEquals(objRefundFromJson.size(),1);
+}

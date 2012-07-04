@@ -1,0 +1,40 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final UUID paymentId1=UUID.randomUUID();
+  final BigDecimal amount1=new BigDecimal(13);
+  final Currency currency=Currency.USD;
+  RefundModelDao refund1=new RefundModelDao(accountId,paymentId1,amount1,currency,true);
+  paymentDao.insertRefund(refund1,context);
+  RefundModelDao refundCheck=paymentDao.getRefund(refund1.getId());
+  assertNotNull(refundCheck);
+  assertEquals(refundCheck.getAccountId(),accountId);
+  assertEquals(refundCheck.getPaymentId(),paymentId1);
+  assertEquals(refundCheck.getAmount().compareTo(amount1),0);
+  assertEquals(refundCheck.getCurrency(),currency);
+  assertEquals(refundCheck.isAdjsuted(),true);
+  assertEquals(refundCheck.getRefundStatus(),RefundStatus.CREATED);
+  final BigDecimal amount2=new BigDecimal(7.00);
+  final UUID paymentId2=UUID.randomUUID();
+  RefundModelDao refund2=new RefundModelDao(accountId,paymentId2,amount2,currency,true);
+  paymentDao.insertRefund(refund2,context);
+  paymentDao.updateRefundStatus(refund2.getId(),RefundStatus.COMPLETED,context);
+  List<RefundModelDao> refundChecks=paymentDao.getRefundsForPayment(paymentId1);
+  assertEquals(refundChecks.size(),1);
+  refundChecks=paymentDao.getRefundsForPayment(paymentId2);
+  assertEquals(refundChecks.size(),1);
+  refundChecks=paymentDao.getRefundsForAccount(accountId);
+  assertEquals(refundChecks.size(),2);
+  for (  RefundModelDao cur : refundChecks) {
+    if (cur.getPaymentId().equals(paymentId1)) {
+      assertEquals(cur.getAmount().compareTo(amount1),0);
+      assertEquals(cur.getRefundStatus(),RefundStatus.CREATED);
+    }
+ else     if (cur.getPaymentId().equals(paymentId2)) {
+      assertEquals(cur.getAmount().compareTo(amount2),0);
+      assertEquals(cur.getRefundStatus(),RefundStatus.COMPLETED);
+    }
+ else {
+      fail("Unexpected refund");
+    }
+  }
+}

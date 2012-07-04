@@ -1,20 +1,37 @@
 {
-  boolean fixedTheWorld=false;
-  try {
-    final CallContext context=factory.createCallContext("RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM);
-    for (    RefundModelDao cur : refunds) {
-      if (cur.getRefundStatus() == RefundStatus.PLUGIN_COMPLETED) {
-        final PaymentAttemptModelDao successfulAttempt=getPaymentAttempt(cur.getPaymentId());
-        if (successfulAttempt != null) {
-          invoicePaymentApi.createRefund(successfulAttempt.getId(),cur.getAmount(),cur.isAdjsuted(),cur.getId(),context);
-          paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
-          fixedTheWorld=true;
-        }
-      }
+  final Collection<RefundModelDao> refundsToBeFixed=Collections2.filter(refunds,new Predicate<RefundModelDao>(){
+    @Override public boolean apply(    RefundModelDao in){
+      return in.getRefundStatus() == RefundStatus.PLUGIN_COMPLETED;
     }
   }
- catch (  InvoiceApiException e) {
+);
+  if (refundsToBeFixed.size() == 0) {
+    return false;
+  }
+  try {
+    Account account=accountUserApi.getAccountById(refundsToBeFixed.iterator().next().getAccountId());
+    new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
+      @Override public Void doOperation() throws PaymentApiException {
+        try {
+          final CallContext context=factory.createCallContext("RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM);
+          for (          RefundModelDao cur : refundsToBeFixed) {
+            final PaymentAttemptModelDao successfulAttempt=getPaymentAttempt(cur.getPaymentId());
+            if (successfulAttempt != null) {
+              invoicePaymentApi.createRefund(successfulAttempt.getId(),cur.getAmount(),cur.isAdjsuted(),cur.getId(),context);
+              paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
+            }
+          }
+        }
+ catch (        InvoiceApiException e) {
+          throw new PaymentApiException(e);
+        }
+        return null;
+      }
+    }
+);
+    return true;
+  }
+ catch (  AccountApiException e) {
     throw new PaymentApiException(e);
   }
-  return fixedTheWorld;
 }

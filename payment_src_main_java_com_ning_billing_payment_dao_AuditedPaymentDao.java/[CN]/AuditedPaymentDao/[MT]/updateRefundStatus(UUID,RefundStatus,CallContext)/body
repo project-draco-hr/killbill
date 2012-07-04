@@ -1,7 +1,14 @@
 {
   refundSqlDao.inTransaction(new Transaction<Void,RefundSqlDao>(){
     @Override public Void inTransaction(    RefundSqlDao transactional,    TransactionStatus status) throws Exception {
-      transactional.updateStatus(refundId.toString(),status.toString());
+      transactional.updateStatus(refundId.toString(),refundStatus.toString());
+      final RefundModelDao savedRefund=transactional.getRefund(refundId.toString());
+      final Long recordId=transactional.getRecordId(savedRefund.getId().toString());
+      final EntityHistory<RefundModelDao> history=new EntityHistory<RefundModelDao>(savedRefund.getId(),recordId,savedRefund,ChangeType.UPDATE);
+      transactional.insertHistoryFromTransaction(history,context);
+      final Long historyRecordId=transactional.getHistoryRecordId(recordId);
+      final EntityAudit audit=new EntityAudit(TableName.REFUNDS,historyRecordId,ChangeType.UPDATE);
+      transactional.insertAuditFromTransaction(audit,context);
       return null;
     }
   }

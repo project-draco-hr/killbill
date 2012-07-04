@@ -4,6 +4,11 @@
     return Response.status(Status.OK).entity(new RefundJson(refund)).build();
   }
  catch (  PaymentApiException e) {
-    return Response.status(Status.BAD_REQUEST).build();
+    if (e.getCode() == ErrorCode.PAYMENT_NO_SUCH_REFUND.getCode()) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+ else {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
   }
 }
