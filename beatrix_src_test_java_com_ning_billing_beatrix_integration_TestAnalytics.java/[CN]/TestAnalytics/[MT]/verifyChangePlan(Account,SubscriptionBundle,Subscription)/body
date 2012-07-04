@@ -9,14 +9,16 @@
   Assert.assertEquals(transitions.size(),3);
   final BusinessSubscriptionTransition previousTransition=transitions.get(0);
   final BusinessSubscriptionTransition transition=transitions.get(1);
+  Assert.assertEquals(transition.getBundleId(),bundle.getId());
   Assert.assertEquals(transition.getExternalKey(),bundle.getKey());
+  Assert.assertEquals(transition.getAccountId(),account.getId());
   Assert.assertEquals(transition.getAccountKey(),account.getExternalKey());
+  Assert.assertEquals(transition.getSubscriptionId(),subscription.getId());
   Assert.assertEquals(transition.getEvent().getCategory(),ProductCategory.BASE);
   Assert.assertEquals(transition.getEvent().getEventType(),BusinessSubscriptionEvent.EventType.CHANGE);
   Assert.assertNull(previousTransition.getPreviousSubscription());
   Assert.assertEquals(previousTransition.getNextSubscription(),transition.getPreviousSubscription());
   Assert.assertEquals(transition.getNextSubscription().getBillingPeriod(),BillingPeriod.NO_BILLING_PERIOD.toString());
-  Assert.assertEquals(transition.getNextSubscription().getBundleId(),subscription.getBundleId());
   Assert.assertEquals(transition.getNextSubscription().getCurrency(),account.getCurrency().toString());
   Assert.assertEquals(transition.getNextSubscription().getPhase(),PhaseType.TRIAL.toString());
   Assert.assertEquals(transition.getNextSubscription().getPrice().doubleValue(),0.0);
@@ -27,7 +29,6 @@
   Assert.assertEquals(transition.getNextSubscription().getSlug(),subscription.getCurrentPhase().getName());
   Assert.assertEquals(transition.getNextSubscription().getStartDate(),requestedDate);
   Assert.assertEquals(transition.getNextSubscription().getState(),Subscription.SubscriptionState.ACTIVE);
-  Assert.assertEquals(transition.getNextSubscription().getSubscriptionId(),subscription.getId());
   Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).size(),2);
   Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).get(0).getBalance().doubleValue(),0.0);
   Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).get(0).getAmountCharged().doubleValue(),0.0);
