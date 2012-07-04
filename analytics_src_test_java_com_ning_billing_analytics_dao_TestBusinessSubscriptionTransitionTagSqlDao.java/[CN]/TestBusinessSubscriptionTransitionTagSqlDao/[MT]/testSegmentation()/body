@@ -1,13 +1,16 @@
 {
+  final String accountKey=UUID.randomUUID().toString();
+  final UUID bundleId1=UUID.randomUUID();
   final String externalKey1=UUID.randomUUID().toString();
   final String name1=UUID.randomUUID().toString().substring(0,20);
+  final UUID bundleId2=UUID.randomUUID();
   final String externalKey2=UUID.randomUUID().toString();
   final String name2=UUID.randomUUID().toString().substring(0,20);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.addTag(externalKey1,name1),1);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.addTag(externalKey2,name2),1);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.addTag(accountKey,bundleId1.toString(),externalKey1,name1),1);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.addTag(accountKey,bundleId2.toString(),externalKey2,name2),1);
   Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransition(externalKey1).size(),1);
   Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransition(externalKey2).size(),1);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.removeTag(externalKey1,name1),1);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.removeTag(bundleId1.toString(),name1),1);
   Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransition(externalKey1).size(),0);
   Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransition(externalKey2).size(),1);
 }

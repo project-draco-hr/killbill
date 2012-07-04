@@ -1,0 +1,11 @@
+{
+  final List<BusinessInvoice> invoicesToDelete=transactional.getInvoicesForAccount(accountId.toString());
+  final BusinessInvoiceItemSqlDao invoiceItemSqlDao=transactional.become(BusinessInvoiceItemSqlDao.class);
+  for (  final BusinessInvoice businessInvoice : invoicesToDelete) {
+    final List<BusinessInvoiceItem> invoiceItemsForInvoice=invoiceItemSqlDao.getInvoiceItemsForInvoice(businessInvoice.getInvoiceId().toString());
+    for (    final BusinessInvoiceItem invoiceItemToDelete : invoiceItemsForInvoice) {
+      invoiceItemSqlDao.deleteInvoiceItem(invoiceItemToDelete.getItemId().toString());
+    }
+  }
+  transactional.deleteInvoicesForAccount(accountId.toString());
+}

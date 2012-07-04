@@ -16,13 +16,11 @@
     return;
   }
   final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundleId);
-  final String externalKey=bundle.getKey();
-  final String accountKey=account.getExternalKey();
   final Currency currency=account.getCurrency();
   sqlDao.inTransaction(new Transaction<Void,BusinessSubscriptionTransitionSqlDao>(){
     @Override public Void inTransaction(    final BusinessSubscriptionTransitionSqlDao transactional,    final TransactionStatus status) throws Exception {
-      log.info("Started rebuilding transitions for bundle {}",externalKey);
-      transactional.deleteTransitionsForBundle(externalKey);
+      log.info("Started rebuilding transitions for bundle id {}",bundleId);
+      transactional.deleteTransitionsForBundle(bundleId.toString());
       final ArrayList<BusinessSubscriptionTransition> transitions=new ArrayList<BusinessSubscriptionTransition>();
       for (      final Subscription subscription : subscriptions) {
         for (        final EffectiveSubscriptionEvent event : subscription.getAllTransitions()) {
@@ -32,19 +30,19 @@
           }
           final BusinessSubscription prevSubscription=createPreviousBusinessSubscription(event,businessEvent,transitions,currency);
           final BusinessSubscription nextSubscription=createNextBusinessSubscription(event,businessEvent,currency);
-          final BusinessSubscriptionTransition transition=new BusinessSubscriptionTransition(event.getTotalOrdering(),externalKey,accountKey,event.getRequestedTransitionTime(),businessEvent,prevSubscription,nextSubscription);
+          final BusinessSubscriptionTransition transition=new BusinessSubscriptionTransition(event.getTotalOrdering(),bundleId,bundle.getKey(),bundle.getAccountId(),account.getExternalKey(),subscription.getId(),event.getRequestedTransitionTime(),businessEvent,prevSubscription,nextSubscription);
           transactional.createTransition(transition);
           transitions.add(transition);
           log.info("Adding transition {}",transition);
           if (SubscriptionTransitionType.CANCEL.equals(event.getTransitionType()) && clock.getUTCNow().isAfter(event.getEffectiveTransitionTime())) {
-            final BusinessSubscriptionTransition systemCancelTransition=new BusinessSubscriptionTransition(event.getTotalOrdering(),externalKey,accountKey,event.getRequestedTransitionTime(),new BusinessSubscriptionEvent(BusinessSubscriptionEvent.EventType.SYSTEM_CANCEL,businessEvent.getCategory()),prevSubscription,nextSubscription);
+            final BusinessSubscriptionTransition systemCancelTransition=new BusinessSubscriptionTransition(event.getTotalOrdering(),bundleId,bundle.getKey(),bundle.getAccountId(),account.getExternalKey(),subscription.getId(),event.getRequestedTransitionTime(),new BusinessSubscriptionEvent(BusinessSubscriptionEvent.EventType.SYSTEM_CANCEL,businessEvent.getCategory()),prevSubscription,nextSubscription);
             transactional.createTransition(systemCancelTransition);
             transitions.add(systemCancelTransition);
             log.info("Adding transition {}",systemCancelTransition);
           }
         }
       }
-      log.info("Finished rebuilding transitions for bundle {}",externalKey);
+      log.info("Finished rebuilding transitions for bundle id {}",bundleId);
       return null;
     }
   }
