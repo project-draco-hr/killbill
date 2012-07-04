@@ -1,13 +1,15 @@
 {
+  final UUID accountId1=UUID.randomUUID();
   final String accountKey1=UUID.randomUUID().toString();
   final String name1=UUID.randomUUID().toString().substring(0,30);
+  final UUID accountId2=UUID.randomUUID();
   final String accountKey2=UUID.randomUUID().toString();
   final String name2=UUID.randomUUID().toString().substring(0,30);
-  Assert.assertEquals(accountFieldSqlDao.addField(accountKey1,name1,UUID.randomUUID().toString()),1);
-  Assert.assertEquals(accountFieldSqlDao.addField(accountKey2,name2,UUID.randomUUID().toString()),1);
+  Assert.assertEquals(accountFieldSqlDao.addField(accountId1.toString(),accountKey1,name1,UUID.randomUUID().toString()),1);
+  Assert.assertEquals(accountFieldSqlDao.addField(accountId2.toString(),accountKey2,name2,UUID.randomUUID().toString()),1);
   Assert.assertEquals(accountFieldSqlDao.getFieldsForAccount(accountKey1).size(),1);
   Assert.assertEquals(accountFieldSqlDao.getFieldsForAccount(accountKey2).size(),1);
-  Assert.assertEquals(accountFieldSqlDao.removeField(accountKey1,name1),1);
+  Assert.assertEquals(accountFieldSqlDao.removeField(accountId1.toString(),name1),1);
   Assert.assertEquals(accountFieldSqlDao.getFieldsForAccount(accountKey1).size(),0);
   Assert.assertEquals(accountFieldSqlDao.getFieldsForAccount(accountKey2).size(),1);
 }
