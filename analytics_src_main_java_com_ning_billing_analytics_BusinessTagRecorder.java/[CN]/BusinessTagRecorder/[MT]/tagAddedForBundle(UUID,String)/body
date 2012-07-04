@@ -1,10 +1,10 @@
 {
   final SubscriptionBundle bundle;
   try {
-    bundle=entitlementUserApi.getBundleFromId(objectId);
+    bundle=entitlementUserApi.getBundleFromId(bundleId);
   }
  catch (  EntitlementUserApiException e) {
-    log.warn("Ignoring tag addition of {} for bundle id {} (bundle does not exist)",name,objectId.toString());
+    log.warn("Ignoring tag addition of {} for bundle id {} (bundle does not exist)",name,bundleId.toString());
     return;
   }
   final Account account;
@@ -12,10 +12,10 @@
     account=accountApi.getAccountById(bundle.getAccountId());
   }
  catch (  AccountApiException e) {
-    log.warn("Ignoring tag addition of {} for bundle id {} and account id {} (account does not exist)",new Object[]{name,objectId.toString(),bundle.getAccountId()});
+    log.warn("Ignoring tag addition of {} for bundle id {} and account id {} (account does not exist)",new Object[]{name,bundleId.toString(),bundle.getAccountId()});
     return;
   }
   final String accountKey=account.getExternalKey();
   final String externalKey=bundle.getKey();
-  subscriptionTransitionTagSqlDao.addTag(accountKey,externalKey,name);
+  subscriptionTransitionTagSqlDao.addTag(accountKey,bundleId.toString(),externalKey,name);
 }
