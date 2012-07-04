@@ -15,7 +15,7 @@
   SubscriptionJsonNoEvents objFromJson=mapper.readValue(baseJson,SubscriptionJsonNoEvents.class);
   Assert.assertTrue(objFromJson.equals(subscriptionJson));
   final String newProductName="Assault-Rifle";
-  final SubscriptionJsonNoEvents newInput=new SubscriptionJsonNoEvents(subscriptionJson.getSubscriptionId(),subscriptionJson.getBundleId(),null,newProductName,subscriptionJson.getProductCategory(),subscriptionJson.getBillingPeriod(),subscriptionJson.getPriceList(),null);
+  final SubscriptionJsonNoEvents newInput=new SubscriptionJsonNoEvents(subscriptionJson.getSubscriptionId(),subscriptionJson.getBundleId(),null,newProductName,subscriptionJson.getProductCategory(),subscriptionJson.getBillingPeriod(),subscriptionJson.getPriceList(),null,null);
   baseJson=mapper.writeValueAsString(newInput);
   final Map<String,String> queryParams=getQueryParamsForCallCompletion(CALL_COMPLETION_TIMEOUT_SEC);
   response=doPut(uri,baseJson,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
@@ -29,6 +29,13 @@
   uri=JaxrsResource.SUBSCRIPTIONS_PATH + "/" + subscriptionJson.getSubscriptionId().toString();
   response=doDelete(uri,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  uri=JaxrsResource.SUBSCRIPTIONS_PATH + "/" + subscriptionJson.getSubscriptionId().toString();
+  response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  objFromJson=mapper.readValue(baseJson,SubscriptionJsonNoEvents.class);
+  assertNotNull(objFromJson.getCancelledDate());
+  assertTrue(objFromJson.getCancelledDate().compareTo(clock.getUTCNow()) > 0);
   uri=JaxrsResource.SUBSCRIPTIONS_PATH + "/" + subscriptionJson.getSubscriptionId().toString()+ "/uncancel";
   response=doPut(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());

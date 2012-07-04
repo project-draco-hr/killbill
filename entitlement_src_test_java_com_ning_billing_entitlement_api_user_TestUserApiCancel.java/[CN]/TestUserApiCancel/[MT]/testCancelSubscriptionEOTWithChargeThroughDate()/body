@@ -24,11 +24,14 @@
     subscription.cancel(clock.getUTCNow(),false,context);
     assertFalse(testListener.isCompleted(3000));
     testListener.reset();
+    DateTime futureEndDate=subscription.getFutureEndDate();
+    Assert.assertNotNull(futureEndDate);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
     clock.addDeltaFromReality(it.toDurationMillis());
     final DateTime future=clock.getUTCNow();
     assertTrue(testListener.isCompleted(5000));
+    assertTrue(futureEndDate.compareTo(subscription.getEndDate()) == 0);
     final PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNull(currentPhase);
     checkNextPhaseChange(subscription,0,null);
