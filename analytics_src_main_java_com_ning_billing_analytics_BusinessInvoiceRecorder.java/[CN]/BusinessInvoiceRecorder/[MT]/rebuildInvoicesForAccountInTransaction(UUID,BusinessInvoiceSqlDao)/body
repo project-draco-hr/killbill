@@ -1,0 +1,17 @@
+{
+  final String accountKey;
+  try {
+    final Account account=accountApi.getAccountById(accountId);
+    accountKey=account.getExternalKey();
+  }
+ catch (  AccountApiException e) {
+    log.warn("Ignoring invoice update for account id {} (account does not exist)",accountId);
+    return;
+  }
+  log.info("Started rebuilding transitions for account id {}",accountId);
+  deleteInvoicesAndInvoiceItemsForAccountInTransaction(transactional,accountId);
+  for (  final Invoice invoice : invoiceApi.getInvoicesByAccount(accountId)) {
+    createInvoiceInTransaction(transactional,accountKey,invoice);
+  }
+  log.info("Finished rebuilding transitions for account id {}",accountId);
+}
