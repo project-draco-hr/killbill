@@ -1,6 +1,6 @@
 {
   final boolean scheduleRetryForPayment=!isInstantPayment;
-  final PaymentModelDao payment=new PaymentModelDao(account.getId(),invoice.getId(),requestedAmount.setScale(2,RoundingMode.HALF_EVEN),invoice.getCurrency(),invoice.getTargetDate());
+  final PaymentModelDao payment=new PaymentModelDao(account.getId(),invoice.getId(),account.getPaymentMethodId(),requestedAmount.setScale(2,RoundingMode.HALF_EVEN),invoice.getCurrency(),invoice.getTargetDate());
   final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),payment.getId(),clock.getUTCNow(),requestedAmount);
   final PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,attempt,scheduleRetryForPayment,context);
   return processPaymentWithAccountLocked(plugin,account,invoice,savedPayment,attempt,isInstantPayment,context);
