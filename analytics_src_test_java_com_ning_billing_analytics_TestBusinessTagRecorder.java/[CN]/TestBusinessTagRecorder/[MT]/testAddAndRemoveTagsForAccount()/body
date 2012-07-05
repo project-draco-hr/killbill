@@ -5,9 +5,9 @@
   final Account accountData=new MockAccountBuilder().externalKey(accountKey).currency(Currency.MXN).build();
   final Account account=accountUserApi.createAccount(accountData,callContext);
   final UUID accountId=account.getId();
-  Assert.assertEquals(accountTagSqlDao.getTagsForAccount(accountKey).size(),0);
+  Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey).size(),0);
   tagRecorder.tagAdded(ObjectType.ACCOUNT,accountId,name);
-  Assert.assertEquals(accountTagSqlDao.getTagsForAccount(accountKey).size(),1);
+  Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey).size(),1);
   tagRecorder.tagRemoved(ObjectType.ACCOUNT,accountId,name);
-  Assert.assertEquals(accountTagSqlDao.getTagsForAccount(accountKey).size(),0);
+  Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey).size(),0);
 }

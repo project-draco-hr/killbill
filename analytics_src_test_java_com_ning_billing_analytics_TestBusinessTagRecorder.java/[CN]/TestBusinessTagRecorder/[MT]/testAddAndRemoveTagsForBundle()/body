@@ -6,9 +6,9 @@
   final Account account=accountUserApi.createAccount(accountData,callContext);
   final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),externalKey,callContext);
   final UUID bundleId=bundle.getId();
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransition(externalKey).size(),0);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey).size(),0);
   tagRecorder.tagAdded(ObjectType.BUNDLE,bundleId,name);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransition(externalKey).size(),1);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey).size(),1);
   tagRecorder.tagRemoved(ObjectType.BUNDLE,bundleId,name);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransition(externalKey).size(),0);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey).size(),0);
 }

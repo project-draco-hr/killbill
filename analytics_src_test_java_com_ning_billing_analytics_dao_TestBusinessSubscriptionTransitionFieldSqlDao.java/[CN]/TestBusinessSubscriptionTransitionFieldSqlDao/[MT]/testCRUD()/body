@@ -4,10 +4,10 @@
   final String externalKey=UUID.randomUUID().toString();
   final String name=UUID.randomUUID().toString().substring(0,30);
   final String value=UUID.randomUUID().toString();
-  Assert.assertEquals(subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransition(externalKey).size(),0);
+  Assert.assertEquals(subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransitionByKey(externalKey).size(),0);
   Assert.assertEquals(subscriptionTransitionFieldSqlDao.removeField(bundleId.toString(),name),0);
   Assert.assertEquals(subscriptionTransitionFieldSqlDao.addField(accountKey,bundleId.toString(),externalKey,name,value),1);
-  final List<BusinessSubscriptionTransitionField> fieldsForBusinessSubscriptionTransition=subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransition(externalKey);
+  final List<BusinessSubscriptionTransitionField> fieldsForBusinessSubscriptionTransition=subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransitionByKey(externalKey);
   Assert.assertEquals(fieldsForBusinessSubscriptionTransition.size(),1);
   final BusinessSubscriptionTransitionField subscriptionTransitionField=fieldsForBusinessSubscriptionTransition.get(0);
   Assert.assertEquals(subscriptionTransitionField.getBundleId(),bundleId);
@@ -15,5 +15,5 @@
   Assert.assertEquals(subscriptionTransitionField.getName(),name);
   Assert.assertEquals(subscriptionTransitionField.getValue(),value);
   Assert.assertEquals(subscriptionTransitionFieldSqlDao.removeField(bundleId.toString(),name),1);
-  Assert.assertEquals(subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransition(externalKey).size(),0);
+  Assert.assertEquals(subscriptionTransitionFieldSqlDao.getFieldsForBusinessSubscriptionTransitionByKey(externalKey).size(),0);
 }
