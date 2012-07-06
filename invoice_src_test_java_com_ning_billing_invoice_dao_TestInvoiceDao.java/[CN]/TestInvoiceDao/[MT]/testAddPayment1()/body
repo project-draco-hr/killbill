@@ -1,0 +1,14 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final DateTime targetDate=new DateTime(2011,10,6,0,0,0,0);
+  Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,Currency.USD);
+  final UUID paymentId=UUID.randomUUID();
+  final DateTime paymentDate=new DateTime(2011,6,24,12,14,36,0);
+  final BigDecimal paymentAmount=new BigDecimal("14.0");
+  invoiceDao.create(invoice,context);
+  invoiceDao.notifyOfPayment(new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice.getId(),paymentDate,paymentAmount,Currency.USD),context);
+  invoice=invoiceDao.getById(invoice.getId());
+  assertEquals(invoice.getPaidAmount().compareTo(paymentAmount),0);
+  assertEquals(invoice.getLastPaymentDate().compareTo(paymentDate),0);
+  assertEquals(invoice.getNumberOfPayments(),1);
+}

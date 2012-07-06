@@ -15,8 +15,8 @@
   assertEquals(savedInvoice.getPaidAmount(),BigDecimal.ZERO);
   assertEquals(savedInvoice.getInvoiceItems().size(),1);
   final BigDecimal paymentAmount=new BigDecimal("11.00");
-  final UUID paymentAttemptId=UUID.randomUUID();
-  invoiceDao.notifyOfPaymentAttempt(new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentAttemptId,invoiceId,clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD),context);
+  final UUID paymentId=UUID.randomUUID();
+  invoiceDao.notifyOfPayment(new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoiceId,clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD),context);
   final Invoice retrievedInvoice=invoiceDao.getById(invoiceId);
   assertNotNull(retrievedInvoice);
   assertEquals(retrievedInvoice.getInvoiceItems().size(),1);

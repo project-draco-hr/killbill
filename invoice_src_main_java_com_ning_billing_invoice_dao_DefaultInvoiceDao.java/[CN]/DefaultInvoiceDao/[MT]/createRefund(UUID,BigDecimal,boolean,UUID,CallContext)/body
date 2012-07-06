@@ -1,9 +1,9 @@
 {
   return invoicePaymentSqlDao.inTransaction(new Transaction<InvoicePayment,InvoicePaymentSqlDao>(){
     @Override public InvoicePayment inTransaction(    final InvoicePaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
-      final InvoicePayment payment=transactional.getByPaymentAttemptId(paymentAttemptId.toString());
+      final InvoicePayment payment=transactional.getByPaymentId(paymentId.toString());
       if (payment == null) {
-        throw new InvoiceApiException(ErrorCode.INVOICE_PAYMENT_BY_ATTEMPT_NOT_FOUND,paymentAttemptId);
+        throw new InvoiceApiException(ErrorCode.INVOICE_PAYMENT_BY_ATTEMPT_NOT_FOUND,paymentId);
       }
       final BigDecimal maxRefundAmount=payment.getAmount() == null ? BigDecimal.ZERO : payment.getAmount();
       final BigDecimal requestedAmount=amount == null ? maxRefundAmount : amount;
@@ -18,7 +18,7 @@
       if (existingRefund != null) {
         return existingRefund;
       }
-      final InvoicePayment refund=new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.REFUND,paymentAttemptId,payment.getInvoiceId(),context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),paymentCookieId,payment.getId());
+      final InvoicePayment refund=new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.REFUND,paymentId,payment.getInvoiceId(),context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),paymentCookieId,payment.getId());
       transactional.create(refund,context);
       InvoiceSqlDao transInvoiceDao=transactional.become(InvoiceSqlDao.class);
       Invoice invoice=transInvoiceDao.getById(payment.getInvoiceId().toString());
