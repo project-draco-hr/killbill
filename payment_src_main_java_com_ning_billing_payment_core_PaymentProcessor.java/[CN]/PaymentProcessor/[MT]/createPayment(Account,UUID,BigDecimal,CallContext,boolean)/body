@@ -9,7 +9,12 @@
           return null;
         }
         final BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
-        return processNewPaymentWithAccountLocked(plugin,account,invoice,requestedAmount,isInstantPayment,context);
+        if (isAccountAutoPayOff(account.getId())) {
+          return processNewPaymentForAutoPayOffWithAccountLocked(account,invoice,requestedAmount,context);
+        }
+ else {
+          return processNewPaymentWithAccountLocked(plugin,account,invoice,requestedAmount,isInstantPayment,context);
+        }
       }
     }
 ));
