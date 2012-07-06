@@ -15,6 +15,7 @@
     log.warn("Ignoring payment {}: payment does not exist",paymentId);
     return;
   }
+  final InvoicePayment invoicePayment=invoicePaymentApi.getInvoicePayment(paymentId);
   final PaymentMethod paymentMethod;
   try {
     paymentMethod=paymentApi.getPaymentMethod(account,payment.getPaymentMethodId(),true);
@@ -23,5 +24,5 @@
     log.warn("Ignoring payment {}: payment method {} does not exist",paymentId,payment.getPaymentMethodId());
     return;
   }
-  createPayment(account,payment,paymentMethod,extPaymentRefId,message);
+  createPayment(account,invoicePayment,payment,paymentMethod,extPaymentRefId,message);
 }
