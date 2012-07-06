@@ -30,8 +30,8 @@
   Mockito.when(entitlementApi.getSubscriptionsForBundle(Mockito.<UUID>any())).thenReturn(ImmutableList.<Subscription>of(subscription));
   final BusinessSubscriptionTransitionRecorder recorder=new BusinessSubscriptionTransitionRecorder(sqlDao,catalogService,entitlementApi,accountApi,new DefaultClock());
   recorder.rebuildTransitionsForBundle(bundle.getId());
-  Assert.assertEquals(sqlDao.getTransitions(externalKey.toString()).size(),1);
-  final BusinessSubscriptionTransition transition=sqlDao.getTransitions(externalKey.toString()).get(0);
+  Assert.assertEquals(sqlDao.getTransitionsByKey(externalKey.toString()).size(),1);
+  final BusinessSubscriptionTransition transition=sqlDao.getTransitionsByKey(externalKey.toString()).get(0);
   Assert.assertEquals(transition.getTotalOrdering(),(long)eventEffective.getTotalOrdering());
   Assert.assertEquals(transition.getAccountKey(),externalKey.toString());
   Assert.assertNull(transition.getPreviousSubscription());

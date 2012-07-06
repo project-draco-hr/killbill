@@ -1,9 +1,8 @@
 {
   BusEvent event=null;
   List<PaymentAttemptModelDao> allAttempts=null;
-  PaymentAttemptModelDao lastAttempt=null;
   PaymentModelDao payment=null;
-  PaymentStatus paymentStatus=PaymentStatus.UNKNOWN;
+  PaymentStatus paymentStatus;
   try {
     final PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(account.getExternalKey(),paymentInput.getId(),attemptInput.getRequestedAmount());
 switch (paymentPluginInfo.getStatus()) {
@@ -11,9 +10,8 @@ case PROCESSED:
       paymentStatus=PaymentStatus.SUCCESS;
     paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,null,paymentPluginInfo.getExternalReferenceId(),attemptInput.getId(),context);
   allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId());
-lastAttempt=allAttempts.get(allAttempts.size() - 1);
 payment=paymentDao.getPayment(paymentInput.getId());
-invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),payment.getAmount(),paymentStatus == PaymentStatus.SUCCESS ? payment.getCurrency() : null,lastAttempt.getId(),lastAttempt.getEffectiveDate(),context);
+invoicePaymentApi.notifyOfPayment(invoice.getId(),payment.getAmount(),paymentStatus == PaymentStatus.SUCCESS ? payment.getCurrency() : null,payment.getId(),payment.getEffectiveDate(),context);
 event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,paymentPluginInfo.getExternalReferenceId(),context.getUserToken(),payment.getEffectiveDate());
 break;
 case ERROR:
