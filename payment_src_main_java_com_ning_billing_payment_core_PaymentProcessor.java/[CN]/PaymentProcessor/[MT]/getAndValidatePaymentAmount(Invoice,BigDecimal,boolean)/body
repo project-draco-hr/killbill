@@ -5,5 +5,6 @@
   if (isInstantPayment && inputAmount != null && invoice.getBalance().compareTo(inputAmount) < 0) {
     throw new PaymentApiException(ErrorCode.PAYMENT_AMOUNT_DENIED,invoice.getId(),inputAmount.floatValue(),invoice.getBalance().floatValue());
   }
-  return inputAmount != null ? inputAmount : invoice.getBalance();
+  BigDecimal result=inputAmount != null ? inputAmount : invoice.getBalance();
+  return result.setScale(2,RoundingMode.HALF_EVEN);
 }

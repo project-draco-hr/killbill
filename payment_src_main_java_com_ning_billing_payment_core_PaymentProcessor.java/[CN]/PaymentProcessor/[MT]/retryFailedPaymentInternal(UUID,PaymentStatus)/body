@@ -5,6 +5,10 @@
       log.error("Invalid retry for non existnt paymentId {}",paymentId);
       return;
     }
+    if (isAccountAutoPayOff(payment.getAccountId())) {
+      log.info(String.format("Skip retry payment %s in state %s because AUTO_PAY_OFF",payment.getId(),payment.getPaymentStatus()));
+      return;
+    }
     final Account account=accountUserApi.getAccountById(payment.getAccountId());
     final PaymentPluginApi plugin=getPaymentProviderPlugin(account);
     final CallContext context=factory.createCallContext("PaymentRetry",CallOrigin.INTERNAL,UserType.SYSTEM);

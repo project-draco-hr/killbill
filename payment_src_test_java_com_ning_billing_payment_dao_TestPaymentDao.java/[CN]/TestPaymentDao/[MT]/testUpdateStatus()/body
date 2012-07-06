@@ -6,7 +6,7 @@
   final DateTime effectiveDate=clock.getUTCNow();
   final PaymentModelDao payment=new PaymentModelDao(accountId,invoiceId,amount,currency,effectiveDate);
   final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),clock.getUTCNow(),amount);
-  PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,attempt,true,context);
+  PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,attempt,context);
   final PaymentStatus paymentStatus=PaymentStatus.SUCCESS;
   final String paymentError="No error";
   paymentDao.updateStatusForPaymentWithAttempt(payment.getId(),paymentStatus,paymentError,null,attempt.getId(),context);

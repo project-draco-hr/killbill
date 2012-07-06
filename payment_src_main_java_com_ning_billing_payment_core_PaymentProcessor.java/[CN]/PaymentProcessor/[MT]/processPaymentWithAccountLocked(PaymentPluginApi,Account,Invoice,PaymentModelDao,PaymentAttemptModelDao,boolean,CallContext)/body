@@ -17,11 +17,9 @@ invoicePaymentApi.notifyOfPaymentAttempt(invoice.getId(),payment.getAmount(),pay
 event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,paymentPluginInfo.getExternalReferenceId(),context.getUserToken(),payment.getEffectiveDate());
 break;
 case ERROR:
-if (!isInstantPayment) {
 allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId());
-final int retryAttempt=getNumberAttemptsInState(paymentInput.getId(),allAttempts,PaymentStatus.UNKNOWN,PaymentStatus.PAYMENT_FAILURE);
-final boolean isScheduledForRetry=failedPaymentRetryService.scheduleRetry(paymentInput.getId(),retryAttempt);
-paymentStatus=isScheduledForRetry ? PaymentStatus.PAYMENT_FAILURE : PaymentStatus.PAYMENT_FAILURE_ABORTED;
+if (!isInstantPayment) {
+paymentStatus=scheduleRetryOnPaymentFailure(paymentInput.getId());
 }
  else {
 paymentStatus=PaymentStatus.PAYMENT_FAILURE_ABORTED;
