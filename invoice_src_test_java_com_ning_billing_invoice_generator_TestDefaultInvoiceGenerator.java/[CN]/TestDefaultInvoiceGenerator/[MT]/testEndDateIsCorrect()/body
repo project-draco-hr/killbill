@@ -7,5 +7,5 @@
   events.add(createBillingEvent(UUID.randomUUID(),startDate,plan,planPhase,startDate.getDayOfMonth()));
   final Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,targetDate,Currency.USD);
   final RecurringInvoiceItem item=(RecurringInvoiceItem)invoice.getInvoiceItems().get(0);
-  assertEquals(item.getEndDate().compareTo(startDate.plusMonths(1)),0);
+  assertDatesEqualRounded(item.getEndDate(),startDate.plusMonths(1));
 }
