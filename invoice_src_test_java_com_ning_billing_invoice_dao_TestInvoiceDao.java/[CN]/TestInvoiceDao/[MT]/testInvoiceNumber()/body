@@ -3,12 +3,12 @@
   final DateTime targetDate1=DateTime.now().plusMonths(1);
   final DateTime targetDate2=DateTime.now().plusMonths(2);
   final Subscription subscription=getZombieSubscription();
-  final Plan plan=BrainDeadProxyFactory.createBrainDeadProxyFor(Plan.class);
-  ((ZombieControl)plan).addResult("getName","plan");
-  final PlanPhase phase1=BrainDeadProxyFactory.createBrainDeadProxyFor(PlanPhase.class);
-  ((ZombieControl)phase1).addResult("getName","plan-phase1");
-  final PlanPhase phase2=BrainDeadProxyFactory.createBrainDeadProxyFor(PlanPhase.class);
-  ((ZombieControl)phase2).addResult("getName","plan-phase2");
+  final Plan plan=Mockito.mock(Plan.class);
+  Mockito.when(plan.getName()).thenReturn("plan");
+  final PlanPhase phase1=Mockito.mock(PlanPhase.class);
+  Mockito.when(phase1.getName()).thenReturn("plan-phase1");
+  final PlanPhase phase2=Mockito.mock(PlanPhase.class);
+  Mockito.when(phase2.getName()).thenReturn("plan-phase2");
   final BillingEventSet events=new MockBillingEventSet();
   final List<Invoice> invoices=new ArrayList<Invoice>();
   final BillingEvent event1=createMockBillingEvent(null,subscription,targetDate1,plan,phase1,null,TEN,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent1",1L,SubscriptionTransitionType.CHANGE);

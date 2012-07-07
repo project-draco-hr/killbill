@@ -1,9 +1,8 @@
 {
   install(new DefaultInvoiceModule(){
     @Override protected void installNotifiers(){
-      bind(NextBillingDateNotifier.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(NextBillingDateNotifier.class));
-      final NextBillingDatePoster poster=BrainDeadProxyFactory.createBrainDeadProxyFor(NextBillingDatePoster.class);
-      ((ZombieControl)poster).addResult("insertNextBillingNotification",BrainDeadProxyFactory.ZOMBIE_VOID);
+      bind(NextBillingDateNotifier.class).toInstance(Mockito.mock(NextBillingDateNotifier.class));
+      final NextBillingDatePoster poster=Mockito.mock(NextBillingDatePoster.class);
       bind(NextBillingDatePoster.class).toInstance(poster);
       bind(InvoiceNotifier.class).to(NullInvoiceNotifier.class).asEagerSingleton();
       final TranslatorConfig config=new ConfigurationObjectFactory(System.getProperties()).build(TranslatorConfig.class);
