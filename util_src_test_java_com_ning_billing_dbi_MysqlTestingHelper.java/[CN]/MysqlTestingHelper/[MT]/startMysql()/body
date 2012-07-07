@@ -8,7 +8,8 @@
   dataDir=File.createTempFile("mysqldata","");
   Assert.assertTrue(dataDir.delete());
   Assert.assertTrue(dataDir.mkdir());
-  mysqldResource=new MysqldResource(dbDir,dataDir);
+  final PrintStream out=new PrintStream(new LoggingOutputStream(log),true);
+  mysqldResource=new MysqldResource(dbDir,dataDir,"5.1.40",out,out);
   final Map<String,String> dbOpts=new HashMap<String,String>();
   dbOpts.put(MysqldResourceI.PORT,Integer.toString(port));
   dbOpts.put(MysqldResourceI.INITIALIZE_USER,"true");
