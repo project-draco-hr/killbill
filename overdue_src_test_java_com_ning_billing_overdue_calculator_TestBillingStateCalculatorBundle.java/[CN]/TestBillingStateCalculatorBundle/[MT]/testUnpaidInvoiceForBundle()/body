@@ -9,9 +9,9 @@
   invoices.add(createInvoice(now,new BigDecimal("1000.00"),createInvoiceItems(new UUID[]{thisBundleId})));
   invoices.add(createInvoice(now,new BigDecimal("10000.00"),createInvoiceItems(new UUID[]{thatBundleId,thisBundleId})));
   final Clock clock=new ClockMock();
-  final InvoiceUserApi invoiceApi=BrainDeadProxyFactory.createBrainDeadProxyFor(InvoiceUserApi.class);
-  final EntitlementUserApi entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
-  ((ZombieControl)invoiceApi).addResult("getUnpaidInvoicesByAccountId",invoices);
+  final InvoiceUserApi invoiceApi=Mockito.mock(InvoiceUserApi.class);
+  final EntitlementUserApi entitlementApi=Mockito.mock(EntitlementUserApi.class);
+  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<DateTime>any())).thenReturn(invoices);
   final BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,clock);
   final SortedSet<Invoice> resultinvoices=calc.unpaidInvoicesForBundle(thisBundleId,new UUID(0L,0L));
   Assert.assertEquals(resultinvoices.size(),4);
