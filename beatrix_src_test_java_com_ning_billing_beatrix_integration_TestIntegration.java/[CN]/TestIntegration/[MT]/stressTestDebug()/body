@@ -1,9 +1,14 @@
 {
-  final int maxIterations=5;
+  final int maxIterations=100;
   for (int curIteration=0; curIteration < maxIterations; curIteration++) {
     log.info("################################  ITERATION " + curIteration + "  #########################");
-    Thread.sleep(1000);
-    testRepairChangeBPWithAddonIncluded();
-    setupTest();
+    if (curIteration != 0) {
+      setupTest();
+    }
+    testAddonsWithMultipleAlignments();
+    if (curIteration < maxIterations - 1) {
+      cleanupTest();
+      Thread.sleep(1000);
+    }
   }
 }
