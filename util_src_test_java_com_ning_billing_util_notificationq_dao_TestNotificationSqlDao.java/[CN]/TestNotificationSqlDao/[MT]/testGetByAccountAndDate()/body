@@ -1,0 +1,19 @@
+{
+  final String notificationKey=UUID.randomUUID().toString();
+  final DateTime effDt=new DateTime();
+  final Notification notif1=new DefaultNotification("testBasic1",hostname,notificationKey.getClass().getName(),notificationKey,accountId,effDt);
+  dao.insertNotification(notif1);
+  final Notification notif2=new DefaultNotification("testBasic2",hostname,notificationKey.getClass().getName(),notificationKey,accountId,effDt);
+  dao.insertNotification(notif2);
+  List<Notification> notifications=dao.getNotificationForAccountAndDate(accountId.toString(),effDt.toDate());
+  assertEquals(notifications.size(),2);
+  for (  Notification cur : notifications) {
+    Assert.assertEquals(cur.getProcessingState(),PersistentQueueEntryLifecycleState.AVAILABLE);
+    dao.removeNotification(cur.getId().toString());
+  }
+  notifications=dao.getNotificationForAccountAndDate(accountId.toString(),effDt.toDate());
+  assertEquals(notifications.size(),2);
+  for (  Notification cur : notifications) {
+    Assert.assertEquals(cur.getProcessingState(),PersistentQueueEntryLifecycleState.REMOVED);
+  }
+}

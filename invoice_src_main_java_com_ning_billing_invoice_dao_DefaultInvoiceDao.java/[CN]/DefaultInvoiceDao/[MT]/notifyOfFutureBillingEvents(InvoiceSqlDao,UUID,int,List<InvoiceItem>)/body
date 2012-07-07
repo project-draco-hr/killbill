@@ -1,0 +1,18 @@
+{
+  DateTime nextBCD=null;
+  UUID subscriptionForNextBCD=null;
+  for (  final InvoiceItem item : invoiceItems) {
+    if (item.getInvoiceItemType() == InvoiceItemType.RECURRING) {
+      final RecurringInvoiceItem recurringInvoiceItem=(RecurringInvoiceItem)item;
+      if ((recurringInvoiceItem.getEndDate() != null) && (recurringInvoiceItem.getAmount() == null || recurringInvoiceItem.getAmount().compareTo(BigDecimal.ZERO) >= 0)) {
+        if (nextBCD == null || nextBCD.compareTo(recurringInvoiceItem.getEndDate()) > 0) {
+          nextBCD=recurringInvoiceItem.getEndDate();
+          subscriptionForNextBCD=recurringInvoiceItem.getSubscriptionId();
+        }
+      }
+    }
+  }
+  if (subscriptionForNextBCD != null && nextBCD != null && nextBCD.getDayOfMonth() == billCycleDay) {
+    nextBillingDatePoster.insertNextBillingNotification(dao,accountId,subscriptionForNextBCD,nextBCD);
+  }
+}
