@@ -7,13 +7,13 @@
   dao.insertNotification(notif2);
   List<Notification> notifications=dao.getNotificationForAccountAndDate(accountId.toString(),effDt.toDate());
   assertEquals(notifications.size(),2);
-  for (  Notification cur : notifications) {
+  for (  final Notification cur : notifications) {
     Assert.assertEquals(cur.getProcessingState(),PersistentQueueEntryLifecycleState.AVAILABLE);
     dao.removeNotification(cur.getId().toString());
   }
   notifications=dao.getNotificationForAccountAndDate(accountId.toString(),effDt.toDate());
   assertEquals(notifications.size(),2);
-  for (  Notification cur : notifications) {
+  for (  final Notification cur : notifications) {
     Assert.assertEquals(cur.getProcessingState(),PersistentQueueEntryLifecycleState.REMOVED);
   }
 }
