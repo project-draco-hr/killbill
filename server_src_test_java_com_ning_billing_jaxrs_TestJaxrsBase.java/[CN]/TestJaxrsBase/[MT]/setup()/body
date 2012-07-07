@@ -1,7 +1,6 @@
 {
   loadSystemPropertiesFromClasspath("/killbill.properties");
   loadConfig();
-  this.helper=new MysqlTestingHelper();
   this.clock=new ClockMock();
   listener=new TestKillbillGuiceListener(helper,clock);
   server=new HttpServer();
@@ -14,7 +13,5 @@
   }
 ;
   server.configure(config,eventListeners,new HashMap<FilterHolder,String>());
-  setupMySQL();
-  helper.cleanupAllTables();
   server.start();
 }
