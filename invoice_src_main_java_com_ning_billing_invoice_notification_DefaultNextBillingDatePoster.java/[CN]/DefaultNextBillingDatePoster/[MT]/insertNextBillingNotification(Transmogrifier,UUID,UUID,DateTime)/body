@@ -3,7 +3,12 @@
   try {
     nextBillingQueue=notificationQueueService.getNotificationQueue(DefaultInvoiceService.INVOICE_SERVICE_NAME,DefaultNextBillingDateNotifier.NEXT_BILLING_DATE_NOTIFIER_QUEUE);
     log.info("Queuing next billing date notification. id: {}, timestamp: {}",subscriptionId.toString(),futureNotificationTime.toString());
-    nextBillingQueue.recordFutureNotificationFromTransaction(transactionalDao,futureNotificationTime,acountId,new NextBillingDateNotificationKey(subscriptionId));
+    List<Notification> existingNotifications=nextBillingQueue.getNotificationForAccountAndDate(accountId,futureNotificationTime);
+    if (existingNotifications.size() > 0) {
+      log.info(String.format("%s : notification for account %s and date %s already exist, skip...",DefaultNextBillingDateNotifier.NEXT_BILLING_DATE_NOTIFIER_QUEUE,accountId,futureNotificationTime));
+      return;
+    }
+    nextBillingQueue.recordFutureNotificationFromTransaction(transactionalDao,futureNotificationTime,accountId,new NextBillingDateNotificationKey(subscriptionId));
   }
  catch (  NoSuchNotificationQueue e) {
     log.error("Attempting to put items on a non-existent queue (NextBillingDateNotifier).",e);
