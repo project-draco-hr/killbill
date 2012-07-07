@@ -1,7 +1,7 @@
 {
   final UUID subscriptionId=new UUID(0L,1L);
-  final Blockable blockable=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
-  ((ZombieControl)blockable).addResult("getId",subscriptionId);
+  final Blockable blockable=Mockito.mock(Subscription.class);
+  Mockito.when(blockable.getId()).thenReturn(subscriptionId);
   final DateTime now=new DateTime();
   final DateTime readyTime=now.plusMillis(2000);
   final OverdueCheckPoster poster=new DefaultOverdueCheckPoster(notificationQueueService);
