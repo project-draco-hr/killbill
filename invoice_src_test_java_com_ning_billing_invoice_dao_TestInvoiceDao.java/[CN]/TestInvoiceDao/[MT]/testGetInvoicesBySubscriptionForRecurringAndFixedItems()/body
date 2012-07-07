@@ -11,7 +11,7 @@
   final BigDecimal rate4=new BigDecimal("12.0");
   final DateTime targetDate=new DateTime(2011,5,23,0,0,0,0);
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,Currency.USD);
-  invoiceDao.create(invoice1,context);
+  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),context);
   final UUID invoiceId1=invoice1.getId();
   DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
   DateTime endDate=startDate.plusMonths(1);
@@ -32,7 +32,7 @@
   final FixedPriceInvoiceItem fixedItem4=new FixedPriceInvoiceItem(invoiceId1,accountId,bundleId,subscriptionId4,"test plan","test D",startDate,endDate,rate4,Currency.USD);
   invoiceItemSqlDao.create(fixedItem4,context);
   final DefaultInvoice invoice2=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,Currency.USD);
-  invoiceDao.create(invoice2,context);
+  invoiceDao.create(invoice2,invoice2.getTargetDate().getDayOfMonth(),context);
   final UUID invoiceId2=invoice2.getId();
   startDate=endDate;
   endDate=startDate.plusMonths(1);

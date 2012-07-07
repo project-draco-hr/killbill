@@ -2,10 +2,10 @@
   final UUID accountId=UUID.randomUUID();
   final DateTime targetDate1=new DateTime(2011,10,6,0,0,0,0);
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate1,Currency.USD);
-  invoiceDao.create(invoice1,context);
+  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),context);
   final DateTime targetDate2=new DateTime(2011,12,6,0,0,0,0);
   final Invoice invoice2=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate2,Currency.USD);
-  invoiceDao.create(invoice2,context);
+  invoiceDao.create(invoice2,invoice2.getTargetDate().getDayOfMonth(),context);
   List<Invoice> invoices;
   invoices=invoiceDao.getInvoicesByAccount(accountId,new DateTime(2011,1,1,0,0,0,0));
   assertEquals(invoices.size(),2);
