@@ -39,9 +39,9 @@
   dao.inTransaction(new Transaction<Void,DummySqlTest>(){
     @Override public Void inTransaction(    final DummySqlTest transactional,    final TransactionStatus status) throws Exception {
       transactional.insertDummy(obj);
-      queueFred.recordFutureNotificationFromTransaction(transactional,readyTime,notificationKeyFred);
+      queueFred.recordFutureNotificationFromTransaction(transactional,readyTime,accountId,notificationKeyFred);
       log.info("posted key: " + notificationKeyFred.toString());
-      queueBarney.recordFutureNotificationFromTransaction(transactional,readyTime,notificationKeyBarney);
+      queueBarney.recordFutureNotificationFromTransaction(transactional,readyTime,accountId,notificationKeyBarney);
       log.info("posted key: " + notificationKeyBarney.toString());
       return null;
     }
