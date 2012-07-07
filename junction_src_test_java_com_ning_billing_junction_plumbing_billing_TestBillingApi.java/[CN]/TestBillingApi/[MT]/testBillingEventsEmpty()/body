@@ -1,9 +1,10 @@
 {
   final UUID accountId=UUID.randomUUID();
-  final Account account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
-  ((ZombieControl)account).addResult("getId",accountId).addResult("getCurrency",Currency.USD);
-  final AccountUserApi accountApi=BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class);
-  ((ZombieControl)accountApi).addResult("getAccountById",account);
+  final Account account=Mockito.mock(Account.class);
+  Mockito.when(account.getId()).thenReturn(accountId);
+  Mockito.when(account.getCurrency()).thenReturn(Currency.USD);
+  final AccountUserApi accountApi=Mockito.mock(AccountUserApi.class);
+  Mockito.when(accountApi.getAccountById(Mockito.<UUID>any())).thenReturn(account);
   final BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
   final CallContextFactory factory=new DefaultCallContextFactory(clock);
   final BillingApi api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi,blockCalculator,catalogService,tagApi);

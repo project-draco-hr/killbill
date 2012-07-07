@@ -14,7 +14,7 @@
   final SortedSet<BlockingState> blockingStates=new TreeSet<BlockingState>();
   blockingStates.add(new DefaultBlockingState(bundleId1,DISABLED_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now));
   blockingStates.add(new DefaultBlockingState(bundleId1,CLEAR_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now.plusDays(2)));
-  ((ZombieControl)blockingApi).addResult("getBlockingHistory",blockingStates);
+  Mockito.when(blockingApi.getBlockingHistory(Mockito.<Blockable>anyObject())).thenReturn(blockingStates);
   odc.insertBlockingEvents(billingEvents);
   assertEquals(billingEvents.size(),7);
   final SortedSet<BillingEvent> s1Events=odc.filter(billingEvents,subscription1);
