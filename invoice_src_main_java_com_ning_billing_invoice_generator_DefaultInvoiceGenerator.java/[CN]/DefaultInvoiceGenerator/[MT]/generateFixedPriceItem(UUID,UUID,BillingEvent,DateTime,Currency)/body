@@ -1,13 +1,14 @@
 {
-  if (thisEvent.getEffectiveDate().isAfter(targetDate)) {
+  final DateTime roundedStartDate=InvoiceDateUtils.roundDateTimeToDate(thisEvent.getEffectiveDate(),thisEvent.getTimeZone());
+  if (roundedStartDate.isAfter(roundedTargetDate)) {
     return null;
   }
  else {
     final BigDecimal fixedPrice=thisEvent.getFixedPrice();
     if (fixedPrice != null) {
       final Duration duration=thisEvent.getPlanPhase().getDuration();
-      final DateTime endDate=duration.addToDateTime(thisEvent.getEffectiveDate());
-      return new FixedPriceInvoiceItem(invoiceId,accountId,thisEvent.getSubscription().getBundleId(),thisEvent.getSubscription().getId(),thisEvent.getPlan().getName(),thisEvent.getPlanPhase().getName(),thisEvent.getEffectiveDate(),endDate,fixedPrice,currency);
+      final DateTime endDate=InvoiceDateUtils.roundDateTimeToDate(duration.addToDateTime(roundedStartDate),thisEvent.getTimeZone());
+      return new FixedPriceInvoiceItem(invoiceId,accountId,thisEvent.getSubscription().getBundleId(),thisEvent.getSubscription().getId(),thisEvent.getPlan().getName(),thisEvent.getPlanPhase().getName(),roundedStartDate,endDate,fixedPrice,currency);
     }
  else {
       return null;
