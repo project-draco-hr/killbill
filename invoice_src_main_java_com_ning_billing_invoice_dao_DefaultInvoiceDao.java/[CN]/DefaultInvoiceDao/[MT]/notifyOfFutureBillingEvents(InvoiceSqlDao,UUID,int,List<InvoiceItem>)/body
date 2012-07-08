@@ -12,7 +12,11 @@
       }
     }
   }
-  if (subscriptionForNextBCD != null && nextBCD != null && nextBCD.getDayOfMonth() == billCycleDay) {
-    nextBillingDatePoster.insertNextBillingNotification(dao,accountId,subscriptionForNextBCD,nextBCD);
+  if (subscriptionForNextBCD != null && nextBCD != null) {
+    final int lastDayOfMonth=nextBCD.dayOfMonth().withMaximumValue().getDayOfMonth();
+    final int nextBCDDay=nextBCD.getDayOfMonth();
+    if (nextBCDDay == billCycleDay || (lastDayOfMonth == nextBCDDay && billCycleDay > lastDayOfMonth)) {
+      nextBillingDatePoster.insertNextBillingNotification(dao,accountId,subscriptionForNextBCD,nextBCD);
+    }
   }
 }
