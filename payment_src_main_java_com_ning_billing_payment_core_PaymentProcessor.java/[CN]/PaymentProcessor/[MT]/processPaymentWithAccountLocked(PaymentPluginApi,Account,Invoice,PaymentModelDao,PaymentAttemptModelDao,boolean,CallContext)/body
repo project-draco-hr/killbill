@@ -34,7 +34,7 @@ throw new PaymentPluginApiException("",formatError);
  catch (PaymentPluginApiException e) {
 paymentStatus=isInstantPayment ? PaymentStatus.PAYMENT_FAILURE_ABORTED : scheduleRetryOnPluginFailure(paymentInput.getId());
 paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,e.getMessage(),null,attemptInput.getId(),context);
-throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),e.getMessage());
+throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),e.toString());
 }
  finally {
 if (event != null) {
