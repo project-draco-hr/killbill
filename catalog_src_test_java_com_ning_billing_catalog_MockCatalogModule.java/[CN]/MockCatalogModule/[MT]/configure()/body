@@ -1,8 +1,7 @@
 {
-  CatalogService catalogService=BrainDeadProxyFactory.createBrainDeadProxyFor(CatalogService.class);
-  ((ZombieControl)catalogService).addResult("getCurrentCatalog",new MockCatalog());
-  catalogService=BrainDeadProxyFactory.createBrainDeadProxyFor(CatalogService.class);
-  final Catalog catalog=BrainDeadProxyFactory.createBrainDeadProxyFor(Catalog.class);
-  ((ZombieControl)catalogService).addResult("getFullCatalog",catalog);
+  final Catalog catalog=Mockito.mock(Catalog.class);
+  final CatalogService catalogService=Mockito.mock(CatalogService.class);
+  Mockito.when(catalogService.getCurrentCatalog()).thenReturn(new MockCatalog());
+  Mockito.when(catalogService.getFullCatalog()).thenReturn(catalog);
   bind(CatalogService.class).toInstance(catalogService);
 }

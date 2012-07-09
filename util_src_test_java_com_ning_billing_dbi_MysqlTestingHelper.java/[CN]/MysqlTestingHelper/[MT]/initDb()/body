@@ -1,0 +1,12 @@
+{
+  for (  final String pack : new String[]{"account","analytics","entitlement","util","payment","invoice","junction"}) {
+    final String ddl;
+    try {
+      ddl=IOUtils.toString(Resources.getResource("com/ning/billing/" + pack + "/ddl.sql").openStream());
+    }
+ catch (    IllegalArgumentException ignored) {
+      continue;
+    }
+    initDb(ddl);
+  }
+}

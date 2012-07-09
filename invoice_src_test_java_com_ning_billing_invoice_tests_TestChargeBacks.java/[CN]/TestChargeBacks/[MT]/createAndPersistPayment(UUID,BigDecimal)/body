@@ -1,15 +1,12 @@
 {
-  final InvoicePayment payment=BrainDeadProxyFactory.createBrainDeadProxyFor(InvoicePayment.class);
-  final ZombieControl zombie=(ZombieControl)payment;
-  zombie.addResult("getId",UUID.randomUUID());
-  zombie.addResult("getType",InvoicePaymentType.ATTEMPT);
-  zombie.addResult("getInvoiceId",invoiceId);
-  zombie.addResult("getPaymentId",UUID.randomUUID());
-  zombie.addResult("getPaymentDate",clock.getUTCNow());
-  zombie.addResult("getAmount",amount);
-  zombie.addResult("getCurrency",CURRENCY);
-  zombie.addResult("getLinkedInvoicePaymentId",BrainDeadProxyFactory.ZOMBIE_VOID);
-  zombie.addResult("getPaymentCookieId",BrainDeadProxyFactory.ZOMBIE_VOID);
+  final InvoicePayment payment=Mockito.mock(InvoicePayment.class);
+  Mockito.when(payment.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(payment.getType()).thenReturn(InvoicePaymentType.ATTEMPT);
+  Mockito.when(payment.getInvoiceId()).thenReturn(invoiceId);
+  Mockito.when(payment.getPaymentId()).thenReturn(UUID.randomUUID());
+  Mockito.when(payment.getPaymentDate()).thenReturn(clock.getUTCNow());
+  Mockito.when(payment.getAmount()).thenReturn(amount);
+  Mockito.when(payment.getCurrency()).thenReturn(CURRENCY);
   invoicePaymentApi.notifyOfPayment(payment,context);
   return payment;
 }

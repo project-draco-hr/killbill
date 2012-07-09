@@ -10,30 +10,27 @@
       final CatalogConfig catalogConfig=new ConfigurationObjectFactory(System.getProperties()).build(CatalogConfig.class);
       bind(CatalogConfig.class).toInstance(catalogConfig);
       bind(CatalogService.class).to(DefaultCatalogService.class).asEagerSingleton();
-      final MysqlTestingHelper helper=new MysqlTestingHelper();
+      final MysqlTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getMysqlTestingHelper();
       bind(MysqlTestingHelper.class).toInstance(helper);
       final IDBI dbi=helper.getDBI();
       bind(IDBI.class).toInstance(dbi);
       bind(TagDao.class).to(AuditedTagDao.class).asEagerSingleton();
       bind(CustomFieldDao.class).to(AuditedCustomFieldDao.class).asEagerSingleton();
       bind(GlobalLocker.class).to(MySqlGlobalLocker.class).asEagerSingleton();
-      bind(ChargeThruApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(ChargeThruApi.class));
+      bind(ChargeThruApi.class).toInstance(Mockito.mock(ChargeThruApi.class));
       install(new MockJunctionModule());
     }
   }
 );
   clock=g.getInstance(Clock.class);
-  final IDBI dbi=g.getInstance(IDBI.class);
   eventBus=g.getInstance(Bus.class);
-  helper=g.getInstance(MysqlTestingHelper.class);
   notificationQueueService=g.getInstance(NotificationQueueService.class);
   final OverdueProperties properties=g.getInstance(OverdueProperties.class);
-  final Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
-  final EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
-  ((ZombieControl)entitlementUserApi).addResult("getSubscriptionFromId",subscription);
+  final Subscription subscription=Mockito.mock(Subscription.class);
+  final EntitlementUserApi entitlementUserApi=Mockito.mock(EntitlementUserApi.class);
+  Mockito.when(entitlementUserApi.getSubscriptionFromId(Mockito.<UUID>any())).thenReturn(subscription);
   listener=new OverdueListenerMock();
   notifier=new DefaultOverdueCheckNotifier(notificationQueueService,properties,listener);
-  startMysql();
   eventBus.start();
   notifier.initialize();
   notifier.start();

@@ -1,30 +1,31 @@
 {
-  try {
-    overdueQueue=notificationQueueService.createNotificationQueue(DefaultOverdueService.OVERDUE_SERVICE_NAME,OVERDUE_CHECK_NOTIFIER_QUEUE,new NotificationQueueHandler(){
-      @Override public void handleReadyNotification(      final NotificationKey notificationKey,      final DateTime eventDate){
-        try {
-          if (!(notificationKey instanceof OverdueCheckNotificationKey)) {
-            log.error("Overdue service received Unexpected notificationKey {}",notificationKey.getClass().getName());
-            return;
-          }
-          final OverdueCheckNotificationKey key=(OverdueCheckNotificationKey)notificationKey;
-          processEvent(key.getUuidKey(),eventDate);
-        }
- catch (        IllegalArgumentException e) {
-          log.error("The key returned from the NextBillingNotificationQueue is not a valid UUID",e);
+  final NotificationConfig notificationConfig=new NotificationConfig(){
+    @Override public boolean isNotificationProcessingOff(){
+      return config.isNotificationProcessingOff();
+    }
+    @Override public long getSleepTimeMs(){
+      return config.getSleepTimeMs();
+    }
+  }
+;
+  final NotificationQueueHandler notificationQueueHandler=new NotificationQueueHandler(){
+    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDate){
+      try {
+        if (!(notificationKey instanceof OverdueCheckNotificationKey)) {
+          log.error("Overdue service received Unexpected notificationKey {}",notificationKey.getClass().getName());
           return;
         }
+        final OverdueCheckNotificationKey key=(OverdueCheckNotificationKey)notificationKey;
+        processEvent(key.getUuidKey(),eventDate);
+      }
+ catch (      IllegalArgumentException e) {
+        log.error("The key returned from the NextBillingNotificationQueue is not a valid UUID",e);
       }
     }
-,new NotificationConfig(){
-      @Override public boolean isNotificationProcessingOff(){
-        return config.isNotificationProcessingOff();
-      }
-      @Override public long getSleepTimeMs(){
-        return config.getSleepTimeMs();
-      }
-    }
-);
+  }
+;
+  try {
+    overdueQueue=notificationQueueService.createNotificationQueue(DefaultOverdueService.OVERDUE_SERVICE_NAME,OVERDUE_CHECK_NOTIFIER_QUEUE,notificationQueueHandler,notificationConfig);
   }
  catch (  NotificationQueueAlreadyExists e) {
     throw new RuntimeException(e);

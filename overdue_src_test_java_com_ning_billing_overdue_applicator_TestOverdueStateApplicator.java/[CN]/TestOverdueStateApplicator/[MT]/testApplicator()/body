@@ -4,8 +4,8 @@
   final InputStream is=new ByteArrayInputStream(configXml.getBytes());
   config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
   overdueWrapperFactory.setOverdueConfig(config);
-  final SubscriptionBundle bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
-  ((ZombieControl)bundle).addResult("getId",UUID.randomUUID());
+  final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
+  Mockito.when(bundle.getId()).thenReturn(UUID.randomUUID());
   OverdueState<SubscriptionBundle> state;
   state=config.getBundleStateSet().findState("OD1");
   applicator.apply(bundle,BlockingApi.CLEAR_STATE_NAME,state);

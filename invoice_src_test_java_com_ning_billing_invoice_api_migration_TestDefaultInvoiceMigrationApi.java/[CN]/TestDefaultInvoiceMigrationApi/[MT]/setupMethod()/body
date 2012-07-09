@@ -1,0 +1,13 @@
+{
+  accountId=UUID.randomUUID();
+  subscriptionId=UUID.randomUUID();
+  date_migrated=clock.getUTCNow().minusYears(1);
+  date_regular=clock.getUTCNow();
+  account=Mockito.mock(Account.class);
+  Mockito.when(accountUserApi.getAccountById(accountId)).thenReturn(account);
+  Mockito.when(account.getCurrency()).thenReturn(Currency.USD);
+  Mockito.when(account.getId()).thenReturn(accountId);
+  Mockito.when(account.isNotifiedForInvoices()).thenReturn(true);
+  migrationInvoiceId=createAndCheckMigrationInvoice();
+  regularInvoiceId=generateRegularInvoice();
+}

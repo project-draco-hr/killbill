@@ -1,18 +1,27 @@
 {
-  final int maxIterations=7;
+  final int maxIterations=100;
   for (int curIteration=0; curIteration < maxIterations; curIteration++) {
+    if (curIteration != 0) {
+      setupTest();
+    }
     log.info("################################  ITERATION " + curIteration + "  #########################");
     Thread.sleep(1000);
-    setupTest();
     testBasePlanCompleteWithBillingDayPresent();
     Thread.sleep(1000);
+    cleanupTest();
     setupTest();
     testBasePlanCompleteWithBillingDayInPast();
     Thread.sleep(1000);
+    cleanupTest();
     setupTest();
     testBasePlanCompleteWithBillingDayAlignedWithTrial();
     Thread.sleep(1000);
+    cleanupTest();
     setupTest();
     testBasePlanCompleteWithBillingDayInFuture();
+    if (curIteration < maxIterations - 1) {
+      cleanupTest();
+      Thread.sleep(1000);
+    }
   }
 }
