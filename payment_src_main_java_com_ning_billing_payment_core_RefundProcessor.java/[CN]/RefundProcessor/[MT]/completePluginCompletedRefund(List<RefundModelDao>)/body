@@ -15,11 +15,8 @@
         try {
           final CallContext context=factory.createCallContext("RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM);
           for (          RefundModelDao cur : refundsToBeFixed) {
-            final PaymentAttemptModelDao successfulAttempt=getPaymentAttempt(cur.getPaymentId());
-            if (successfulAttempt != null) {
-              invoicePaymentApi.createRefund(successfulAttempt.getId(),cur.getAmount(),cur.isAdjsuted(),cur.getId(),context);
-              paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
-            }
+            invoicePaymentApi.createRefund(cur.getPaymentId(),cur.getAmount(),cur.isAdjsuted(),cur.getId(),context);
+            paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
           }
         }
  catch (        InvoiceApiException e) {
