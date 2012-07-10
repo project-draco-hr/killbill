@@ -9,7 +9,7 @@
         }
         final List<Tag> tagList=Arrays.asList(tag);
         final List<Mapper<UUID,Long>> recordIds=tagSqlDao.getRecordIds(objectId.toString(),objectType);
-        final Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
+        final Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds,objectType);
         tagSqlDao.deleteFromTransaction(objectId.toString(),objectType,tagList,context);
         final List<EntityHistory<Tag>> entityHistories=convertToHistory(tagList,recordIdMap,ChangeType.DELETE);
         final Long maxHistoryRecordId=tagSqlDao.getMaxHistoryRecordId();
