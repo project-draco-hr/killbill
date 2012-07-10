@@ -7,7 +7,7 @@
       final Tag tag=tagSqlDao.findTag(tagName,objectId.toString(),objectType);
       final List<Tag> tagList=Arrays.asList(tag);
       final List<Mapper<UUID,Long>> recordIds=tagSqlDao.getRecordIds(objectId.toString(),objectType);
-      final Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds);
+      final Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds,objectType);
       final List<EntityHistory<Tag>> entityHistories=convertToHistory(tagList,recordIdMap,ChangeType.INSERT);
       final Long maxHistoryRecordId=tagSqlDao.getMaxHistoryRecordId();
       tagSqlDao.addHistoryFromTransaction(objectId.toString(),objectType,entityHistories,context);
