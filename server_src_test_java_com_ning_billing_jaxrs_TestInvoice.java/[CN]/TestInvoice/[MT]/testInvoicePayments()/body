@@ -6,7 +6,7 @@
   assertNotNull(bundleJson);
   final SubscriptionJsonNoEvents subscriptionJson=createSubscription(bundleJson.getBundleId(),"Shotgun",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),true);
   assertNotNull(subscriptionJson);
-  clock.addMonths(3);
+  clock.addDays(31);
   crappyWaitForLackOfProperSynchonization();
   final Map<String,String> queryParams=new HashMap<String,String>();
   queryParams.put(JaxrsResource.QUERY_ACCOUNT_ID,accountJson.getAccountId());
@@ -19,7 +19,7 @@
 );
   assertNotNull(invoices);
   log.info(baseJson);
-  assertEquals(invoices.size(),4);
+  assertEquals(invoices.size(),2);
   for (  final InvoiceJsonSimple cur : invoices) {
     uri=JaxrsResource.INVOICES_PATH + "/" + cur.getInvoiceId()+ "/"+ JaxrsResource.PAYMENTS;
     response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
