@@ -4,8 +4,10 @@
   for (  final BusinessInvoice businessInvoice : invoicesToDelete) {
     final List<BusinessInvoiceItem> invoiceItemsForInvoice=invoiceItemSqlDao.getInvoiceItemsForInvoice(businessInvoice.getInvoiceId().toString());
     for (    final BusinessInvoiceItem invoiceItemToDelete : invoiceItemsForInvoice) {
+      log.info("Deleting invoice item {}",invoiceItemToDelete.getItemId());
       invoiceItemSqlDao.deleteInvoiceItem(invoiceItemToDelete.getItemId().toString());
     }
   }
+  log.info("Deleting invoices for account {}",accountId);
   transactional.deleteInvoicesForAccount(accountId.toString());
 }
