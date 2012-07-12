@@ -1,0 +1,34 @@
+{
+  final Collection<RefundModelDao> refundsToBeFixed=Collections2.filter(refunds,new Predicate<RefundModelDao>(){
+    @Override public boolean apply(    RefundModelDao in){
+      return in.getRefundStatus() == RefundStatus.PLUGIN_COMPLETED;
+    }
+  }
+);
+  if (refundsToBeFixed.size() == 0) {
+    return false;
+  }
+  try {
+    Account account=accountUserApi.getAccountById(refundsToBeFixed.iterator().next().getAccountId());
+    new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
+      @Override public Void doOperation() throws PaymentApiException {
+        try {
+          final CallContext context=factory.createCallContext("RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM);
+          for (          RefundModelDao cur : refundsToBeFixed) {
+            invoicePaymentApi.createRefund(cur.getPaymentId(),cur.getAmount(),cur.isAdjsuted(),cur.getId(),context);
+            paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
+          }
+        }
+ catch (        InvoiceApiException e) {
+          throw new PaymentApiException(e);
+        }
+        return null;
+      }
+    }
+);
+    return true;
+  }
+ catch (  AccountApiException e) {
+    throw new PaymentApiException(e);
+  }
+}

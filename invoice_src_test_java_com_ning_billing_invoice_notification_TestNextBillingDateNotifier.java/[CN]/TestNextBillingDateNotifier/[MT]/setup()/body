@@ -1,6 +1,6 @@
 {
   final Injector g=Guice.createInjector(Stage.PRODUCTION,new AbstractModule(){
-    protected void configure(){
+    @Override protected void configure(){
       install(new MockClockModule());
       install(new BusModule(BusType.MEMORY));
       install(new InvoiceModuleWithMocks());
@@ -8,7 +8,7 @@
       install(new MockCatalogModule());
       install(new NotificationQueueModule());
       install(new TemplateModule());
-      final MysqlTestingHelper helper=new MysqlTestingHelper();
+      final MysqlTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getMysqlTestingHelper();
       bind(MysqlTestingHelper.class).toInstance(helper);
       if (helper.isUsingLocalInstance()) {
         bind(IDBI.class).toProvider(DBIProvider.class).asEagerSingleton();
@@ -26,14 +26,12 @@
   final IDBI dbi=g.getInstance(IDBI.class);
   dao=dbi.onDemand(DummySqlTest.class);
   eventBus=g.getInstance(Bus.class);
-  helper=g.getInstance(MysqlTestingHelper.class);
   notificationQueueService=g.getInstance(NotificationQueueService.class);
   final InvoiceDispatcher dispatcher=g.getInstance(InvoiceDispatcher.class);
-  final Subscription subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
-  final EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
-  ((ZombieControl)entitlementUserApi).addResult("getSubscriptionFromId",subscription);
+  final Subscription subscription=Mockito.mock(Subscription.class);
+  final EntitlementUserApi entitlementUserApi=Mockito.mock(EntitlementUserApi.class);
+  Mockito.when(entitlementUserApi.getSubscriptionFromId(Mockito.<UUID>any())).thenReturn(subscription);
   final CallContextFactory factory=new DefaultCallContextFactory(clock);
   listener=new InvoiceListenerMock(factory,dispatcher);
   notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),entitlementUserApi,listener);
-  startMysql();
 }

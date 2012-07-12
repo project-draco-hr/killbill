@@ -1,0 +1,18 @@
+{
+  final DateTime startDate=new DateTime().minusMonths(1);
+  final DateTime endDate=new DateTime();
+  final BigDecimal price1=new BigDecimal("29.95");
+  final BigDecimal price2=new BigDecimal("59.95");
+  final Invoice dummyInvoice=Mockito.mock(Invoice.class);
+  Mockito.when(dummyInvoice.getInvoiceDate()).thenReturn(startDate);
+  Mockito.when(dummyInvoice.getInvoiceNumber()).thenReturn(42);
+  Mockito.when(dummyInvoice.getCurrency()).thenReturn(Currency.USD);
+  Mockito.when(dummyInvoice.getChargedAmount()).thenReturn(price1.add(price2));
+  Mockito.when(dummyInvoice.getPaidAmount()).thenReturn(BigDecimal.ZERO);
+  Mockito.when(dummyInvoice.getBalance()).thenReturn(price1.add(price2));
+  final List<InvoiceItem> items=new ArrayList<InvoiceItem>();
+  items.add(createInvoiceItem(price1,"Domain 1",startDate,endDate,"ning-plus"));
+  items.add(createInvoiceItem(price2,"Domain 2",startDate,endDate,"ning-pro"));
+  Mockito.when(dummyInvoice.getInvoiceItems()).thenReturn(items);
+  return dummyInvoice;
+}

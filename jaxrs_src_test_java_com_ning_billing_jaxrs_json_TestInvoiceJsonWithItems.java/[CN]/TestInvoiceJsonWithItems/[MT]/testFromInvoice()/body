@@ -1,7 +1,6 @@
 {
   final Invoice invoice=Mockito.mock(Invoice.class);
-  Mockito.when(invoice.getAmountCharged()).thenReturn(BigDecimal.TEN);
-  Mockito.when(invoice.getAmountCredited()).thenReturn(BigDecimal.ONE);
+  Mockito.when(invoice.getChargedAmount()).thenReturn(BigDecimal.TEN);
   Mockito.when(invoice.getId()).thenReturn(UUID.randomUUID());
   Mockito.when(invoice.getInvoiceDate()).thenReturn(new DateTime(DateTimeZone.UTC));
   Mockito.when(invoice.getTargetDate()).thenReturn(new DateTime(DateTimeZone.UTC));
@@ -11,8 +10,7 @@
   final InvoiceItem invoiceItem=createInvoiceItem();
   Mockito.when(invoice.getInvoiceItems()).thenReturn(ImmutableList.<InvoiceItem>of(invoiceItem));
   final InvoiceJsonWithItems invoiceJsonWithItems=new InvoiceJsonWithItems(invoice);
-  Assert.assertEquals(invoiceJsonWithItems.getAmount(),invoice.getAmountCharged());
-  Assert.assertEquals(invoiceJsonWithItems.getCredit(),invoice.getAmountCredited());
+  Assert.assertEquals(invoiceJsonWithItems.getAmount(),invoice.getChargedAmount());
   Assert.assertEquals(invoiceJsonWithItems.getInvoiceId(),invoice.getId().toString());
   Assert.assertEquals(invoiceJsonWithItems.getInvoiceDate(),invoice.getInvoiceDate());
   Assert.assertEquals(invoiceJsonWithItems.getTargetDate(),invoice.getTargetDate());

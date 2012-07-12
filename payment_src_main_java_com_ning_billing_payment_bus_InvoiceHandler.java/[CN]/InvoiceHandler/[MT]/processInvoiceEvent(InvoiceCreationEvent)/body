@@ -2,11 +2,8 @@
   log.info("Received invoice creation notification for account {} and invoice {}",event.getAccountId(),event.getInvoiceId());
   Account account=null;
   try {
-    account=accountUserApi.getAccountById(event.getAccountId());
-    if (isAccountAutoPayOff(account.getId())) {
-      return;
-    }
     final CallContext context=new DefaultCallContext("PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken(),clock);
+    account=accountUserApi.getAccountById(event.getAccountId());
     paymentProcessor.createPayment(account,event.getInvoiceId(),null,context,false);
   }
  catch (  AccountApiException e) {

@@ -1,0 +1,7 @@
+{
+  if (BusinessSubscriptionEvent.EventType.ADD.equals(businessEvent.getEventType()) || BusinessSubscriptionEvent.EventType.RE_ADD.equals(businessEvent.getEventType())) {
+    return null;
+  }
+  final BusinessSubscriptionTransition prevTransition=getPreviousBusinessSubscriptionTransitionForEvent(event,transitions);
+  return new BusinessSubscription(event.getPreviousPriceList(),event.getPreviousPlan(),event.getPreviousPhase(),currency,prevTransition.getNextSubscription().getStartDate(),event.getPreviousState(),catalogService.getFullCatalog());
+}

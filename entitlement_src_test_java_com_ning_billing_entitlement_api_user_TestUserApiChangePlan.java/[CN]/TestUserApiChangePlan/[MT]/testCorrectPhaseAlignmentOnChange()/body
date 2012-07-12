@@ -1,5 +1,4 @@
 {
-  log.info("Starting testCorrectPhaseAlignmentOnChange");
   try {
     SubscriptionData subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
     PlanPhase trialPhase=subscription.getCurrentPhase();
@@ -26,7 +25,7 @@
     assertEquals(trialPhase.getPhaseType(),PhaseType.DISCOUNT);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     final DateTime expectedNextPhaseDate=subscription.getStartDate().plusDays(30).plusMonths(6);
-    final SubscriptionEvent nextPhase=subscription.getPendingTransition();
+    final EffectiveSubscriptionEvent nextPhase=subscription.getPendingTransition();
     final DateTime nextPhaseEffectiveDate=nextPhase.getEffectiveTransitionTime();
     assertEquals(nextPhaseEffectiveDate,expectedNextPhaseDate);
     assertListenerStatus();

@@ -1,6 +1,8 @@
 {
-  log.warn("RESET TEST FRAMEWORK\n\n");
-  cleanupDao();
+  log.warn("RESET TEST FRAMEWORK");
+  if (!isSqlTest(dao)) {
+    ((MockEntitlementDaoMemory)dao).reset();
+  }
   if (testListener != null) {
     testListener.reset();
     resetTestListenerStatus();

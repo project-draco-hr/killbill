@@ -1,0 +1,41 @@
+{
+  final SubscriptionBundle bundle;
+  try {
+    bundle=entitlementApi.getBundleFromId(bundleId);
+  }
+ catch (  EntitlementUserApiException e) {
+    log.warn("Ignoring update for bundle {}: bundle does not exist",bundleId);
+    return;
+  }
+  final Account account;
+  try {
+    account=accountApi.getAccountById(bundle.getAccountId());
+  }
+ catch (  AccountApiException e) {
+    log.warn("Ignoring update for bundle {}: account {} does not exist",bundleId,bundle.getAccountId());
+    return;
+  }
+  final String accountKey=account.getExternalKey();
+  final String externalKey=bundle.getKey();
+  overdueStatusSqlDao.inTransaction(new Transaction<Void,BusinessOverdueStatusSqlDao>(){
+    @Override public Void inTransaction(    final BusinessOverdueStatusSqlDao transactional,    final TransactionStatus status) throws Exception {
+      log.info("Started rebuilding overdue statuses for bundle id {}",bundleId);
+      transactional.deleteOverdueStatusesForBundle(bundleId.toString());
+      final SortedSet<BlockingState> blockingHistory=blockingApi.getBlockingHistory(bundleId);
+      if (blockingHistory != null && blockingHistory.size() > 0) {
+        final List<BlockingState> overdueStates=ImmutableList.<BlockingState>copyOf(blockingHistory);
+        final List<BlockingState> overdueStatesReversed=Lists.reverse(overdueStates);
+        DateTime previousStartDate=null;
+        for (        final BlockingState state : overdueStatesReversed) {
+          final BusinessOverdueStatus overdueStatus=new BusinessOverdueStatus(accountKey,bundleId,previousStartDate,externalKey,state.getTimestamp(),state.getStateName());
+          log.info("Adding overdue state {}",overdueStatus);
+          overdueStatusSqlDao.createOverdueStatus(overdueStatus);
+          previousStartDate=state.getTimestamp();
+        }
+      }
+      log.info("Finished rebuilding overdue statuses for bundle id {}",bundleId);
+      return null;
+    }
+  }
+);
+}

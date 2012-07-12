@@ -1,0 +1,34 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final List<Invoice> invoiceList=new ArrayList<Invoice>();
+  final DateTime targetDate=new DateTime(2011,2,16,0,0,0,0);
+  final Currency currency=Currency.USD;
+  final DefaultPrice price1=new DefaultPrice(TEN,Currency.USD);
+  final MockInternationalPrice recurringPrice=new MockInternationalPrice(price1);
+  final MockPlanPhase phase1=new MockPlanPhase(recurringPrice,null,BillingPeriod.MONTHLY,PhaseType.TRIAL);
+  final MockPlan plan1=new MockPlan(phase1);
+  final Subscription subscription=getZombieSubscription();
+  final DateTime effectiveDate1=new DateTime(2011,2,1,0,0,0,0);
+  final BillingEvent event1=createMockBillingEvent(null,subscription,effectiveDate1,plan1,phase1,null,recurringPrice.getPrice(currency),currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"testEvent1",1L,SubscriptionTransitionType.CREATE);
+  final BillingEventSet events=new MockBillingEventSet();
+  events.add(event1);
+  final Invoice invoice1=generator.generateInvoice(accountId,events,invoiceList,targetDate,Currency.USD);
+  assertEquals(invoice1.getBalance(),TEN);
+  invoiceList.add(invoice1);
+  final DefaultPrice price2=new DefaultPrice(TWENTY,Currency.USD);
+  final MockInternationalPrice recurringPrice2=new MockInternationalPrice(price2);
+  final MockPlanPhase phase2=new MockPlanPhase(recurringPrice,null,BillingPeriod.MONTHLY,PhaseType.TRIAL);
+  final MockPlan plan2=new MockPlan(phase2);
+  final DateTime effectiveDate2=new DateTime(2011,2,15,0,0,0,0);
+  final BillingEvent event2=createMockBillingEvent(null,subscription,effectiveDate2,plan2,phase2,null,recurringPrice2.getPrice(currency),currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"testEvent2",2L,SubscriptionTransitionType.CREATE);
+  events.add(event2);
+  final Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,targetDate,Currency.USD);
+  assertEquals(invoice2.getBalance(),FIVE);
+  invoiceList.add(invoice2);
+  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),context);
+  invoiceDao.create(invoice2,invoice2.getTargetDate().getDayOfMonth(),context);
+  final Invoice savedInvoice1=invoiceDao.getById(invoice1.getId());
+  assertEquals(savedInvoice1.getBalance(),ZERO);
+  final Invoice savedInvoice2=invoiceDao.getById(invoice2.getId());
+  assertEquals(savedInvoice2.getBalance(),FIFTEEN);
+}

@@ -1,0 +1,26 @@
+{
+  final AccountJson accountJson=createAccountWithDefaultPaymentMethod("ermenehildo","shtyrgfhwe","ermenehildo@yahoo.com");
+  assertNotNull(accountJson);
+  final BundleJsonNoSubscriptions bundleJson=createBundle(accountJson.getAccountId(),"396199");
+  assertNotNull(bundleJson);
+  final SubscriptionJsonNoEvents subscriptionJson=createSubscription(bundleJson.getBundleId(),"Shotgun",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),true);
+  assertNotNull(subscriptionJson);
+  clock.addMonths(1);
+  crappyWaitForLackOfProperSynchonization();
+  String uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.PAYMENTS;
+  Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  String baseJson=response.getResponseBody();
+  List<PaymentJsonSimple> objFromJson=mapper.readValue(baseJson,new TypeReference<List<PaymentJsonSimple>>(){
+  }
+);
+  Assert.assertEquals(objFromJson.size(),1);
+  uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.REFUNDS;
+  response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  baseJson=response.getResponseBody();
+  List<RefundJson> objRefundFromJson=mapper.readValue(baseJson,new TypeReference<List<RefundJson>>(){
+  }
+);
+  Assert.assertEquals(objRefundFromJson.size(),0);
+}

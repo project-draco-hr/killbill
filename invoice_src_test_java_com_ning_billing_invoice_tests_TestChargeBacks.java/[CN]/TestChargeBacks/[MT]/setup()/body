@@ -1,0 +1,14 @@
+{
+  loadSystemPropertiesFromClasspath("/resource.properties");
+  final MysqlTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getMysqlTestingHelper();
+  final IDBI dbi=helper.getDBI();
+  invoiceSqlDao=dbi.onDemand(InvoiceSqlDao.class);
+  invoiceSqlDao.test();
+  final NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
+  final TagDefinitionDao tagDefinitionDao=new MockTagDefinitionDao();
+  final TagDao tagDao=new MockTagDao();
+  final TagUserApi tagUserApi=new DefaultTagUserApi(tagDefinitionDao,tagDao);
+  final InvoiceDao invoiceDao=new DefaultInvoiceDao(dbi,nextBillingDatePoster,tagUserApi);
+  invoicePaymentApi=new DefaultInvoicePaymentApi(invoiceDao);
+  context=new TestCallContext("Charge back tests");
+}

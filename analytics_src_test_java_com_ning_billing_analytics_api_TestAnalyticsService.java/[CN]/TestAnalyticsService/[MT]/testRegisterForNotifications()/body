@@ -6,16 +6,16 @@
  catch (  Throwable t) {
     Assert.fail("Unable to start the bus or service! " + t);
   }
-  Assert.assertNull(accountSqlDao.getAccount(ACCOUNT_KEY));
+  Assert.assertNull(accountSqlDao.getAccountByKey(ACCOUNT_KEY));
   bus.post(transition);
   bus.post(accountCreationNotification);
   Thread.sleep(5000);
-  Assert.assertEquals(subscriptionSqlDao.getTransitions(EXTERNAL_KEY).size(),1);
-  Assert.assertEquals(subscriptionSqlDao.getTransitions(EXTERNAL_KEY).get(0),expectedTransition);
-  Assert.assertTrue(accountSqlDao.getAccount(ACCOUNT_KEY).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
+  Assert.assertEquals(subscriptionSqlDao.getTransitionsByKey(EXTERNAL_KEY).size(),1);
+  Assert.assertEquals(subscriptionSqlDao.getTransitionsByKey(EXTERNAL_KEY).get(0),expectedTransition);
+  Assert.assertTrue(accountSqlDao.getAccountByKey(ACCOUNT_KEY).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
   bus.post(invoiceCreationNotification);
   Thread.sleep(5000);
-  Assert.assertTrue(accountSqlDao.getAccount(ACCOUNT_KEY).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
+  Assert.assertTrue(accountSqlDao.getAccountByKey(ACCOUNT_KEY).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
   bus.post(paymentInfoNotification);
   Thread.sleep(5000);
   try {

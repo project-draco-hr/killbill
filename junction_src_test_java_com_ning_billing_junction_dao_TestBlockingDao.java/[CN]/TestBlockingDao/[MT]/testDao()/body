@@ -12,8 +12,8 @@
   final String overdueStateName2="NoReallyThisCantGoOn";
   final BlockingState state2=new DefaultBlockingState(uuid,overdueStateName2,Blockable.Type.SUBSCRIPTION_BUNDLE,service,blockChange,blockEntitlement,blockBilling);
   dao.setBlockingState(state2,clock);
-  final SubscriptionBundle bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
-  ((ZombieControl)bundle).addResult("getId",uuid);
+  final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
+  Mockito.when(bundle.getId()).thenReturn(uuid);
   Assert.assertEquals(dao.getBlockingStateFor(bundle).getStateName(),state2.getStateName());
   Assert.assertEquals(dao.getBlockingStateFor(bundle.getId()).getStateName(),overdueStateName2);
 }

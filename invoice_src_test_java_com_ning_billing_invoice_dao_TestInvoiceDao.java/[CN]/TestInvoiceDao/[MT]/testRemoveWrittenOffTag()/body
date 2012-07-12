@@ -1,0 +1,22 @@
+{
+  final Subscription subscription=getZombieSubscription();
+  final Plan plan=Mockito.mock(Plan.class);
+  Mockito.when(plan.getName()).thenReturn("plan");
+  final PlanPhase phase1=Mockito.mock(PlanPhase.class);
+  Mockito.when(phase1.getName()).thenReturn("plan-phase1");
+  final DateTime targetDate1=clock.getUTCNow();
+  final Currency currency=Currency.USD;
+  final BillingEvent event1=createMockBillingEvent(null,subscription,targetDate1,plan,phase1,null,TEN,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent1",1L,SubscriptionTransitionType.CHANGE);
+  final BillingEventSet events=new MockBillingEventSet();
+  events.add(event1);
+  final Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,targetDate1,Currency.USD);
+  invoiceDao.create(invoice,invoice.getTargetDate().getDayOfMonth(),context);
+  invoiceDao.setWrittenOff(invoice.getId(),context);
+  final TagDao tagDao=new AuditedTagDao(dbi,tagEventBuilder,bus);
+  Map<String,Tag> tags=tagDao.loadEntities(invoice.getId(),ObjectType.INVOICE);
+  assertEquals(tags.size(),1);
+  assertTrue(tags.containsKey(ControlTagType.WRITTEN_OFF.toString()));
+  invoiceDao.removeWrittenOff(invoice.getId(),context);
+  tags=tagDao.loadEntities(invoice.getId(),ObjectType.INVOICE);
+  assertEquals(tags.size(),0);
+}

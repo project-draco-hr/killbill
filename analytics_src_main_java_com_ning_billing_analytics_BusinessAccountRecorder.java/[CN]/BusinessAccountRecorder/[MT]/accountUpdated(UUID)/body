@@ -1,20 +1,11 @@
 {
+  final Account account;
   try {
-    final Account account=accountApi.getAccountById(accountId);
-    BusinessAccount bac=sqlDao.getAccount(account.getExternalKey());
-    if (bac == null) {
-      bac=new BusinessAccount();
-      updateBusinessAccountFromAccount(account,bac);
-      log.info("ACCOUNT CREATION " + bac);
-      sqlDao.createAccount(bac);
-    }
- else {
-      updateBusinessAccountFromAccount(account,bac);
-      log.info("ACCOUNT UPDATE " + bac);
-      sqlDao.saveAccount(bac);
-    }
+    account=accountApi.getAccountById(accountId);
   }
  catch (  AccountApiException e) {
     log.warn("Error encountered creating BusinessAccount",e);
+    return;
   }
+  updateAccountInTransaction(account,sqlDao);
 }

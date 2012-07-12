@@ -1,36 +1,19 @@
 {
   final List<SubscriptionBundle> bundles=new ArrayList<SubscriptionBundle>();
-  final SubscriptionBundle bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
-  ((ZombieControl)bundle).addResult("getId",bunId);
+  final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
+  Mockito.when(bundle.getId()).thenReturn(bunId);
   bundles.add(bundle);
-  subscriptionTransitions=new LinkedList<SubscriptionEvent>();
+  effectiveSubscriptionTransitions=new LinkedList<EffectiveSubscriptionEvent>();
   final List<Subscription> subscriptions=new LinkedList<Subscription>();
   subscriptionStartDate=clock.getUTCNow().minusDays(3);
-  subscription=new MockSubscription(){
-    @Override public List<SubscriptionEvent> getBillingTransitions(){
-      return subscriptionTransitions;
-    }
-    @Override public Plan getCurrentPlan(){
-      return subscriptionPlan;
-    }
-    @Override public UUID getId(){
-      return subId;
-    }
-    @Override public UUID getBundleId(){
-      return bunId;
-    }
-    @Override public DateTime getStartDate(){
-      return subscriptionStartDate;
-    }
-  }
-;
+  subscription=new MockSubscription(subId,bunId,subscriptionPlan,subscriptionStartDate,effectiveSubscriptionTransitions);
   subscriptions.add(subscription);
-  entitlementApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
-  ((ZombieControl)entitlementApi).addResult("getBundlesForAccount",bundles);
-  ((ZombieControl)entitlementApi).addResult("getSubscriptionsForBundle",subscriptions);
-  ((ZombieControl)entitlementApi).addResult("getSubscriptionFromId",subscription);
-  ((ZombieControl)entitlementApi).addResult("getBundleFromId",bundle);
-  ((ZombieControl)entitlementApi).addResult("getBaseSubscription",subscription);
+  entitlementApi=Mockito.mock(EntitlementUserApi.class);
+  Mockito.when(entitlementApi.getBundlesForAccount(Mockito.<UUID>any())).thenReturn(bundles);
+  Mockito.when(entitlementApi.getSubscriptionsForBundle(Mockito.<UUID>any())).thenReturn(subscriptions);
+  Mockito.when(entitlementApi.getSubscriptionFromId(Mockito.<UUID>any())).thenReturn(subscription);
+  Mockito.when(entitlementApi.getBundleFromId(Mockito.<UUID>any())).thenReturn(bundle);
+  Mockito.when(entitlementApi.getBaseSubscription(Mockito.<UUID>any())).thenReturn(subscription);
   tagApi=mock(TagUserApi.class);
   assertTrue(true);
 }

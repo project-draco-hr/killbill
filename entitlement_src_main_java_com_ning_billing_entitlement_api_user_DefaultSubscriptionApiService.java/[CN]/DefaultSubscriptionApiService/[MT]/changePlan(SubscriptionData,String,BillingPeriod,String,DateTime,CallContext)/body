@@ -1,7 +1,7 @@
 {
   try {
     final DateTime now=clock.getUTCNow();
-    requestedDate=(requestedDate != null) ? DefaultClock.truncateMs(requestedDate) : now;
+    final DateTime requestedDate=(requestedDateWithMs != null) ? DefaultClock.truncateMs(requestedDateWithMs) : now;
     validateRequestedDate(subscription,now,requestedDate);
     final PriceList currentPriceList=subscription.getCurrentPriceList();
     final SubscriptionState currentState=subscription.getState();
@@ -35,7 +35,7 @@
       changeEvents.add(nextPhaseEvent);
     }
     changeEvents.add(changeEvent);
-    dao.changePlan(subscription.getId(),changeEvents,context);
+    dao.changePlan(subscription,changeEvents,context);
     subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getFullCatalog());
     return (policy == ActionPolicy.IMMEDIATE);
   }

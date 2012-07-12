@@ -1,12 +1,12 @@
 {
   final Account account;
   try {
-    account=accountApi.getAccountById(objectId);
+    account=accountApi.getAccountById(accountId);
   }
  catch (  AccountApiException e) {
-    log.warn("Ignoring tag addition of {} for account id {} (account does not exist)",name,objectId.toString());
+    log.warn("Ignoring tag addition of {} for account id {} (account does not exist)",name,accountId.toString());
     return;
   }
   final String accountKey=account.getExternalKey();
-  accountTagSqlDao.addTag(accountKey,name);
+  accountTagSqlDao.addTag(accountId.toString(),accountKey,name);
 }

@@ -14,6 +14,9 @@
         recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()));
       }
       eventsDaoFromSameTransaction.insertAuditFromTransaction(audits,context);
+      if (initialEvents.size() > 0) {
+        notifyBusOfRequestedChange(eventsDaoFromSameTransaction,subscription,initialEvents.get(initialEvents.size() - 1));
+      }
       return null;
     }
   }

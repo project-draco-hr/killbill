@@ -1,16 +1,17 @@
 {
   final UUID accountId=UUID.randomUUID();
   final UUID invoiceId=UUID.randomUUID();
+  final UUID paymentMethodId=UUID.randomUUID();
   final BigDecimal amount=new BigDecimal(13);
   final Currency currency=Currency.USD;
   final DateTime effectiveDate=clock.getUTCNow();
-  final PaymentModelDao payment=new PaymentModelDao(accountId,invoiceId,amount,currency,effectiveDate);
+  final PaymentModelDao payment=new PaymentModelDao(accountId,invoiceId,paymentMethodId,amount,currency,effectiveDate);
   final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),clock.getUTCNow(),amount);
-  PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,attempt,true,context);
+  PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,attempt,context);
   assertEquals(savedPayment.getId(),payment.getId());
   assertEquals(savedPayment.getAccountId(),accountId);
   assertEquals(savedPayment.getInvoiceId(),invoiceId);
-  assertEquals(savedPayment.getPaymentMethodId(),null);
+  assertEquals(savedPayment.getPaymentMethodId(),paymentMethodId);
   assertEquals(savedPayment.getAmount().compareTo(amount),0);
   assertEquals(savedPayment.getCurrency(),currency);
   assertEquals(savedPayment.getEffectiveDate().compareTo(effectiveDate),0);
@@ -27,7 +28,7 @@
   assertEquals(savedPayment.getId(),payment.getId());
   assertEquals(savedPayment.getAccountId(),accountId);
   assertEquals(savedPayment.getInvoiceId(),invoiceId);
-  assertEquals(savedPayment.getPaymentMethodId(),null);
+  assertEquals(savedPayment.getPaymentMethodId(),paymentMethodId);
   assertEquals(savedPayment.getAmount().compareTo(amount),0);
   assertEquals(savedPayment.getCurrency(),currency);
   assertEquals(savedPayment.getEffectiveDate().compareTo(effectiveDate),0);

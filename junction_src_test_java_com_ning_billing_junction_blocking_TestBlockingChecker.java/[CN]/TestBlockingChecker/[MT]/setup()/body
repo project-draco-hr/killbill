@@ -1,20 +1,27 @@
 {
-  account=BrainDeadProxyFactory.createBrainDeadProxyFor(Account.class);
-  ((ZombieControl)account).addResult("getId",UUID.randomUUID());
-  bundle=BrainDeadProxyFactory.createBrainDeadProxyFor(SubscriptionBundle.class);
-  ((ZombieControl)bundle).addResult("getAccountId",account.getId());
-  ((ZombieControl)bundle).addResult("getId",UUID.randomUUID());
-  ((ZombieControl)bundle).addResult("getKey","key");
-  subscription=BrainDeadProxyFactory.createBrainDeadProxyFor(Subscription.class);
-  ((ZombieControl)subscription).addResult("getId",UUID.randomUUID());
-  ((ZombieControl)subscription).addResult("getBundleId",bundle.getId());
+  final UUID accountId=UUID.randomUUID();
+  account=Mockito.mock(Account.class);
+  Mockito.when(account.getId()).thenReturn(accountId);
+  bundle=Mockito.mock(SubscriptionBundle.class);
+  Mockito.when(bundle.getAccountId()).thenReturn(accountId);
+  final UUID bundleId=UUID.randomUUID();
+  Mockito.when(bundle.getId()).thenReturn(bundleId);
+  Mockito.when(bundle.getKey()).thenReturn("key");
+  subscription=Mockito.mock(Subscription.class);
+  Mockito.when(subscription.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(subscription.getBundleId()).thenReturn(bundleId);
   final Injector i=Guice.createInjector(new AbstractModule(){
     @Override protected void configure(){
       bind(BlockingChecker.class).to(DefaultBlockingChecker.class).asEagerSingleton();
       bind(BlockingStateDao.class).toInstance(dao);
-      final EntitlementUserApi entitlementUserApi=BrainDeadProxyFactory.createBrainDeadProxyFor(EntitlementUserApi.class);
+      final EntitlementUserApi entitlementUserApi=Mockito.mock(EntitlementUserApi.class);
       bind(EntitlementUserApi.class).toInstance(entitlementUserApi);
-      ((ZombieControl)entitlementUserApi).addResult("getBundleFromId",bundle);
+      try {
+        Mockito.when(entitlementUserApi.getBundleFromId(Mockito.<UUID>any())).thenReturn(bundle);
+      }
+ catch (      EntitlementUserApiException e) {
+        Assert.fail(e.toString());
+      }
     }
   }
 );

@@ -1,16 +1,18 @@
 {
+  final UUID accountId=UUID.randomUUID();
   final String accountKey=UUID.randomUUID().toString();
   final String name=UUID.randomUUID().toString().substring(0,30);
   final String value=UUID.randomUUID().toString();
-  Assert.assertEquals(accountFieldSqlDao.getFieldsForAccount(accountKey).size(),0);
-  Assert.assertEquals(accountFieldSqlDao.removeField(accountKey,name),0);
-  Assert.assertEquals(accountFieldSqlDao.addField(accountKey,name,value),1);
-  final List<BusinessAccountField> fieldsForAccount=accountFieldSqlDao.getFieldsForAccount(accountKey);
+  Assert.assertEquals(accountFieldSqlDao.getFieldsForAccountByKey(accountKey).size(),0);
+  Assert.assertEquals(accountFieldSqlDao.removeField(accountId.toString(),name),0);
+  Assert.assertEquals(accountFieldSqlDao.addField(accountId.toString(),accountKey,name,value),1);
+  final List<BusinessAccountField> fieldsForAccount=accountFieldSqlDao.getFieldsForAccountByKey(accountKey);
   Assert.assertEquals(fieldsForAccount.size(),1);
   final BusinessAccountField accountField=fieldsForAccount.get(0);
+  Assert.assertEquals(accountField.getAccountId(),accountId);
   Assert.assertEquals(accountField.getAccountKey(),accountKey);
   Assert.assertEquals(accountField.getName(),name);
   Assert.assertEquals(accountField.getValue(),value);
-  Assert.assertEquals(accountFieldSqlDao.removeField(accountKey,name),1);
-  Assert.assertEquals(accountFieldSqlDao.getFieldsForAccount(accountKey).size(),0);
+  Assert.assertEquals(accountFieldSqlDao.removeField(accountId.toString(),name),1);
+  Assert.assertEquals(accountFieldSqlDao.getFieldsForAccountByKey(accountKey).size(),0);
 }

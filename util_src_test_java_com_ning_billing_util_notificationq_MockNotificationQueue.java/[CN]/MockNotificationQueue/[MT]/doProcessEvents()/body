@@ -1,22 +1,20 @@
 {
-  int result=0;
+  final int result;
   final List<Notification> processedNotifications=new ArrayList<Notification>();
   final List<Notification> oldNotifications=new ArrayList<Notification>();
   final List<Notification> readyNotifications=new ArrayList<Notification>();
 synchronized (notifications) {
-    final Iterator<Notification> it=notifications.iterator();
-    while (it.hasNext()) {
-      final Notification cur=it.next();
-      if (cur.isAvailableForProcessing(clock.getUTCNow())) {
+    for (    final Notification cur : notifications) {
+      if (cur.isAvailableForProcessing(getClock().getUTCNow())) {
         readyNotifications.add(cur);
       }
     }
   }
   result=readyNotifications.size();
   for (  final Notification cur : readyNotifications) {
-    NotificationKey key=deserializeEvent(cur.getNotificationKeyClass(),cur.getNotificationKey());
-    handler.handleReadyNotification(key,cur.getEffectiveDate());
-    final DefaultNotification processedNotification=new DefaultNotification(-1L,cur.getId(),hostname,hostname,"MockQueue",clock.getUTCNow().plus(CLAIM_TIME_MS),PersistentQueueEntryLifecycleState.PROCESSED,cur.getNotificationKeyClass(),cur.getNotificationKey(),cur.getEffectiveDate());
+    final NotificationKey key=deserializeEvent(cur.getNotificationKeyClass(),cur.getNotificationKey());
+    getHandler().handleReadyNotification(key,cur.getEffectiveDate());
+    final DefaultNotification processedNotification=new DefaultNotification(-1L,cur.getId(),getHostname(),getHostname(),"MockQueue",getClock().getUTCNow().plus(CLAIM_TIME_MS),PersistentQueueEntryLifecycleState.PROCESSED,cur.getNotificationKeyClass(),cur.getNotificationKey(),cur.getAccountId(),cur.getEffectiveDate());
     oldNotifications.add(cur);
     processedNotifications.add(processedNotification);
   }

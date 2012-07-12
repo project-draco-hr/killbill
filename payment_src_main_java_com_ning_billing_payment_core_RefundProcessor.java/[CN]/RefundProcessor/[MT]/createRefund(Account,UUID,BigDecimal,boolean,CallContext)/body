@@ -1,0 +1,53 @@
+{
+  return new WithAccountLock<Refund>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Refund>(){
+    @Override public Refund doOperation() throws PaymentApiException {
+      try {
+        final PaymentAttemptModelDao successfulAttempt=getPaymentAttempt(paymentId);
+        if (successfulAttempt == null) {
+          throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_SUCCESS_PAYMENT,paymentId);
+        }
+        if (successfulAttempt.getRequestedAmount().compareTo(refundAmount) < 0) {
+          throw new PaymentApiException(ErrorCode.PAYMENT_REFUND_AMOUNT_TOO_LARGE);
+        }
+        int foundPluginCompletedRefunds=0;
+        RefundModelDao refundInfo=null;
+        List<RefundModelDao> existingRefunds=paymentDao.getRefundsForPayment(paymentId);
+        for (        RefundModelDao cur : existingRefunds) {
+          if (cur.getAmount().compareTo(refundAmount) == 0) {
+            if (cur.getRefundStatus() == RefundStatus.CREATED) {
+              if (refundInfo == null) {
+                refundInfo=cur;
+              }
+            }
+ else {
+              foundPluginCompletedRefunds++;
+            }
+          }
+        }
+        if (refundInfo == null) {
+          refundInfo=new RefundModelDao(account.getId(),paymentId,refundAmount,account.getCurrency(),isAdjusted);
+          paymentDao.insertRefund(refundInfo,context);
+        }
+        final PaymentPluginApi plugin=getPaymentProviderPlugin(account);
+        int nbExistingRefunds=plugin.getNbRefundForPaymentAmount(account,paymentId,refundAmount);
+        if (nbExistingRefunds > foundPluginCompletedRefunds) {
+          log.info("Found existing plugin refund for paymentId {}, skip plugin",paymentId);
+        }
+ else {
+          plugin.processRefund(account,paymentId,refundAmount);
+        }
+        paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.PLUGIN_COMPLETED,context);
+        invoicePaymentApi.createRefund(paymentId,refundAmount,isAdjusted,refundInfo.getId(),context);
+        paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.COMPLETED,context);
+        return new DefaultRefund(refundInfo.getId(),paymentId,refundInfo.getAmount(),account.getCurrency(),isAdjusted);
+      }
+ catch (      PaymentPluginApiException e) {
+        throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_REFUND,account.getId(),e.getMessage());
+      }
+catch (      InvoiceApiException e) {
+        throw new PaymentApiException(e);
+      }
+    }
+  }
+);
+}

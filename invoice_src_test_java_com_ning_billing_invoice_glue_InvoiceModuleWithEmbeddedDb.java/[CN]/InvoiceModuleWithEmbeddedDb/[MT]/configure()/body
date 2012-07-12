@@ -1,21 +1,19 @@
 {
   loadSystemPropertiesFromClasspath("/resource.properties");
-  dbi=helper.getDBI();
+  final IDBI dbi=helper.getDBI();
   bind(IDBI.class).toInstance(dbi);
   bind(Clock.class).to(DefaultClock.class).asEagerSingleton();
   bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
   install(new CustomFieldModule());
   install(new TagStoreModule());
   installNotificationQueue();
-  bind(AccountUserApi.class).toInstance(BrainDeadProxyFactory.createBrainDeadProxyFor(AccountUserApi.class));
-  final BillingApi billingApi=BrainDeadProxyFactory.createBrainDeadProxyFor(BillingApi.class);
-  ((ZombieControl)billingApi).addResult("setChargedThroughDateFromTransaction",BrainDeadProxyFactory.ZOMBIE_VOID);
+  bind(AccountUserApi.class).toInstance(Mockito.mock(AccountUserApi.class));
+  final BillingApi billingApi=Mockito.mock(BillingApi.class);
   bind(BillingApi.class).toInstance(billingApi);
   install(new CatalogModule());
   install(new MockEntitlementModule());
   install(new GlobalLockerModule());
   super.configure();
-  bind(InvoiceTestApi.class).to(DefaultInvoiceTestApi.class).asEagerSingleton();
   install(new BusModule());
   install(new TemplateModule());
 }

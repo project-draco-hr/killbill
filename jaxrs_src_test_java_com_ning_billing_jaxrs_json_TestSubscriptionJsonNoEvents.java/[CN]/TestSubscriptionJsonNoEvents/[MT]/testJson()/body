@@ -7,7 +7,8 @@
   final String billingPeriod=UUID.randomUUID().toString();
   final String priceList=UUID.randomUUID().toString();
   final DateTime chargedThroughDate=new DateTime(DateTimeZone.UTC);
-  final SubscriptionJsonNoEvents subscriptionJsonNoEvents=new SubscriptionJsonNoEvents(subscriptionId,bundleId,startDate,productName,productCategory,billingPeriod,priceList,chargedThroughDate);
+  final DateTime endDate=new DateTime(DateTimeZone.UTC);
+  final SubscriptionJsonNoEvents subscriptionJsonNoEvents=new SubscriptionJsonNoEvents(subscriptionId,bundleId,startDate,productName,productCategory,billingPeriod,priceList,chargedThroughDate,endDate);
   Assert.assertEquals(subscriptionJsonNoEvents.getSubscriptionId(),subscriptionId);
   Assert.assertEquals(subscriptionJsonNoEvents.getBundleId(),bundleId);
   Assert.assertEquals(subscriptionJsonNoEvents.getStartDate(),startDate);
@@ -17,7 +18,7 @@
   Assert.assertEquals(subscriptionJsonNoEvents.getPriceList(),priceList);
   Assert.assertEquals(subscriptionJsonNoEvents.getChargedThroughDate(),chargedThroughDate);
   final String asJson=mapper.writeValueAsString(subscriptionJsonNoEvents);
-  Assert.assertEquals(asJson,"{\"subscriptionId\":\"" + subscriptionJsonNoEvents.getSubscriptionId() + "\","+ "\"bundleId\":\""+ subscriptionJsonNoEvents.getBundleId()+ "\","+ "\"startDate\":\""+ subscriptionJsonNoEvents.getStartDate().toDateTimeISO().toString()+ "\","+ "\"productName\":\""+ subscriptionJsonNoEvents.getProductName()+ "\","+ "\"productCategory\":\""+ subscriptionJsonNoEvents.getProductCategory()+ "\","+ "\"billingPeriod\":\""+ subscriptionJsonNoEvents.getBillingPeriod()+ "\","+ "\"priceList\":\""+ subscriptionJsonNoEvents.getPriceList()+ "\","+ "\"chargedThroughDate\":\""+ subscriptionJsonNoEvents.getChargedThroughDate().toDateTimeISO().toString()+ "\"}");
+  Assert.assertEquals(asJson,"{\"subscriptionId\":\"" + subscriptionJsonNoEvents.getSubscriptionId() + "\","+ "\"bundleId\":\""+ subscriptionJsonNoEvents.getBundleId()+ "\","+ "\"startDate\":\""+ subscriptionJsonNoEvents.getStartDate().toDateTimeISO().toString()+ "\","+ "\"productName\":\""+ subscriptionJsonNoEvents.getProductName()+ "\","+ "\"productCategory\":\""+ subscriptionJsonNoEvents.getProductCategory()+ "\","+ "\"billingPeriod\":\""+ subscriptionJsonNoEvents.getBillingPeriod()+ "\","+ "\"priceList\":\""+ subscriptionJsonNoEvents.getPriceList()+ "\","+ "\"chargedThroughDate\":\""+ subscriptionJsonNoEvents.getChargedThroughDate().toDateTimeISO().toString()+ "\","+ "\"cancelledDate\":\""+ subscriptionJsonNoEvents.getCancelledDate().toDateTimeISO().toString()+ "\"}");
   final SubscriptionJsonNoEvents fromJson=mapper.readValue(asJson,SubscriptionJsonNoEvents.class);
   Assert.assertEquals(fromJson,subscriptionJsonNoEvents);
 }

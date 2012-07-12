@@ -1,0 +1,15 @@
+{
+  try {
+    List<Refund> refunds=paymentApi.getPaymentRefunds(UUID.fromString(paymentId));
+    List<RefundJson> result=new ArrayList<RefundJson>(Collections2.transform(refunds,new Function<Refund,RefundJson>(){
+      @Override public RefundJson apply(      Refund input){
+        return new RefundJson(input);
+      }
+    }
+));
+    return Response.status(Status.OK).entity(result).build();
+  }
+ catch (  PaymentApiException e) {
+    return Response.status(Status.BAD_REQUEST).build();
+  }
+}

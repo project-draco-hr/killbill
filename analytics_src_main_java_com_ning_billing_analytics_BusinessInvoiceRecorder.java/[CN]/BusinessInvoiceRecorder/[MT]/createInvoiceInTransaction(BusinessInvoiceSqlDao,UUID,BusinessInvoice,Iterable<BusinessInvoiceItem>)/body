@@ -1,0 +1,19 @@
+{
+  log.info("Adding invoice {}",invoice);
+  transactional.createInvoice(invoice);
+  final BusinessInvoiceItemSqlDao invoiceItemSqlDao=transactional.become(BusinessInvoiceItemSqlDao.class);
+  for (  final BusinessInvoiceItem invoiceItem : invoiceItems) {
+    log.info("Adding invoice item {}",invoiceItem);
+    invoiceItemSqlDao.createInvoiceItem(invoiceItem);
+  }
+  final BusinessAccountSqlDao accountSqlDao=transactional.become(BusinessAccountSqlDao.class);
+  final BusinessAccount account=accountSqlDao.getAccount(accountId.toString());
+  if (account == null) {
+    throw new IllegalStateException("Account does not exist for id " + accountId);
+  }
+  account.setBalance(account.getBalance().add(invoice.getBalance()));
+  account.setLastInvoiceDate(invoice.getInvoiceDate());
+  account.setTotalInvoiceBalance(account.getTotalInvoiceBalance().add(invoice.getBalance()));
+  account.setUpdatedDt(clock.getUTCNow());
+  accountSqlDao.saveAccount(account);
+}

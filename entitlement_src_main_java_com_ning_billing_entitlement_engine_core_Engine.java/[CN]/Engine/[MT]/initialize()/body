@@ -1,12 +1,12 @@
 {
   try {
-    subscriptionEventQueue=notificationQueueService.createNotificationQueue(ENTITLEMENT_SERVICE_NAME,NOTIFICATION_QUEUE_NAME,new NotificationQueueHandler(){
+    final NotificationQueueHandler queueHandler=new NotificationQueueHandler(){
       @Override public void handleReadyNotification(      final NotificationKey inputKey,      final DateTime eventDateTime){
         if (!(inputKey instanceof EntitlementNotificationKey)) {
           log.error("Entitlement service received an unexpected event type {}" + inputKey.getClass().getName());
           return;
         }
-        EntitlementNotificationKey key=(EntitlementNotificationKey)inputKey;
+        final EntitlementNotificationKey key=(EntitlementNotificationKey)inputKey;
         final EntitlementEvent event=dao.getEventById(key.getEventId());
         if (event == null) {
           log.warn("Failed to extract event for notification key {}",inputKey);
@@ -17,7 +17,8 @@
         processEventReady(event,key.getSeqId(),context);
       }
     }
-,new NotificationConfig(){
+;
+    final NotificationConfig notificationConfig=new NotificationConfig(){
       @Override public long getSleepTimeMs(){
         return config.getSleepTimeMs();
       }
@@ -25,7 +26,8 @@
         return config.isNotificationProcessingOff();
       }
     }
-);
+;
+    subscriptionEventQueue=notificationQueueService.createNotificationQueue(ENTITLEMENT_SERVICE_NAME,NOTIFICATION_QUEUE_NAME,queueHandler,notificationConfig);
   }
  catch (  NotificationQueueAlreadyExists e) {
     throw new RuntimeException(e);
