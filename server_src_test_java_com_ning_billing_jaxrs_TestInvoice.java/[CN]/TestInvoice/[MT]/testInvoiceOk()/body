@@ -7,7 +7,7 @@
   assertNotNull(bundleJson);
   final SubscriptionJsonNoEvents subscriptionJson=createSubscription(bundleJson.getBundleId(),"Shotgun",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),true);
   assertNotNull(subscriptionJson);
-  final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(3).plusDays(1));
+  final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
   clock.addDeltaFromReality(it.toDurationMillis());
   crappyWaitForLackOfProperSynchonization();
   String uri=JaxrsResource.INVOICES_PATH;
@@ -21,7 +21,7 @@
 );
   assertNotNull(objFromJson);
   log.info(baseJson);
-  assertEquals(objFromJson.size(),4);
+  assertEquals(objFromJson.size(),2);
   uri=JaxrsResource.INVOICES_PATH + "/" + objFromJson.get(0).getInvoiceId();
   response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
@@ -53,5 +53,5 @@
 );
   assertNotNull(objFromJson);
   log.info(baseJson);
-  assertEquals(objFromJson.size(),5);
+  assertEquals(objFromJson.size(),3);
 }
