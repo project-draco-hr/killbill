@@ -1,11 +1,24 @@
 {
-  events=new TreeSet<EntitlementEvent>(new Comparator<EntitlementEvent>(){
-    @Override public int compare(    final EntitlementEvent o1,    final EntitlementEvent o2){
-      return o1.compareTo(o2);
+  this.events=new TreeSet<EntitlementEventWithOrderingId>(new Comparator<EntitlementEventWithOrderingId>(){
+    @Override public int compare(    final EntitlementEventWithOrderingId o1,    final EntitlementEventWithOrderingId o2){
+      int result=o1.getEvent().getEffectiveDate().compareTo(o2.getEvent().getEffectiveDate());
+      if (result == 0) {
+        if (o1.getOrderingId() < o2.getOrderingId()) {
+          return -1;
+        }
+ else         if (o1.getOrderingId() > o2.getOrderingId()) {
+          return 1;
+        }
+ else {
+          throw new RuntimeException("Repair entitlement events should not have the same orderingId");
+        }
+      }
+      return result;
     }
   }
 );
+  this.curOrderingId=0;
   if (initialEvents != null) {
-    events.addAll(initialEvents);
+    addEvents(initialEvents);
   }
 }
