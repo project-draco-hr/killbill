@@ -29,7 +29,7 @@
         invoiceDao.create(invoice,account.getBillCycleDay(),context);
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
-        setChargedThroughDates(fixedPriceInvoiceItems,recurringInvoiceItems,context);
+        setChargedThroughDates(account.getBillCycleDay(),fixedPriceInvoiceItems,recurringInvoiceItems,context);
         final InvoiceCreationEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
         postEvent(event,accountId);
       }
