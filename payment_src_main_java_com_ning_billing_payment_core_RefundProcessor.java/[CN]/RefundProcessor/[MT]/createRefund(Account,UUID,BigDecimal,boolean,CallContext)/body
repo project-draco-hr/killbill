@@ -6,11 +6,9 @@
         if (payment == null) {
           throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_SUCCESS_PAYMENT,paymentId);
         }
-        if (payment.getAmount().compareTo(refundAmount) < 0) {
-          throw new PaymentApiException(ErrorCode.PAYMENT_REFUND_AMOUNT_TOO_LARGE);
-        }
         int foundPluginCompletedRefunds=0;
         RefundModelDao refundInfo=null;
+        BigDecimal totalAmountRefunded=BigDecimal.ZERO;
         List<RefundModelDao> existingRefunds=paymentDao.getRefundsForPayment(paymentId);
         for (        RefundModelDao cur : existingRefunds) {
           final BigDecimal existingPositiveAmount=cur.getAmount();
@@ -24,6 +22,12 @@
               foundPluginCompletedRefunds++;
             }
           }
+          if (cur.getRefundStatus() != RefundStatus.CREATED) {
+            totalAmountRefunded=totalAmountRefunded.add(existingPositiveAmount);
+          }
+        }
+        if (payment.getAmount().subtract(totalAmountRefunded).compareTo(refundAmount) < 0) {
+          throw new PaymentApiException(ErrorCode.PAYMENT_REFUND_AMOUNT_TOO_LARGE);
         }
         if (refundInfo == null) {
           refundInfo=new RefundModelDao(account.getId(),paymentId,refundAmount,account.getCurrency(),isAdjusted);
@@ -31,7 +35,7 @@
         }
         final PaymentPluginApi plugin=getPaymentProviderPlugin(payment.getPaymentMethodId());
         int nbExistingRefunds=plugin.getNbRefundForPaymentAmount(account,paymentId,refundAmount);
-        log.info(String.format("STEPH debug : found %d pluginRefunds for paymentId %s and amount %s",nbExistingRefunds,paymentId,refundAmount));
+        log.debug(String.format("found %d pluginRefunds for paymentId %s and amount %s",nbExistingRefunds,paymentId,refundAmount));
         if (nbExistingRefunds > foundPluginCompletedRefunds) {
           log.info("Found existing plugin refund for paymentId {}, skip plugin",paymentId);
         }
