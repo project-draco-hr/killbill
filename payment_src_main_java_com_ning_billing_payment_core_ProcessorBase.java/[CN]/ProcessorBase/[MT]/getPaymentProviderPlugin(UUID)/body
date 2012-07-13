@@ -1,0 +1,8 @@
+{
+  final PaymentMethodModelDao methodDao=paymentDao.getPaymentMethod(paymentMethodId);
+  if (methodDao == null) {
+    log.error("PaymentMethod dpes not exist",paymentMethodId);
+    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,paymentMethodId);
+  }
+  return pluginRegistry.getPlugin(methodDao.getPluginName());
+}
