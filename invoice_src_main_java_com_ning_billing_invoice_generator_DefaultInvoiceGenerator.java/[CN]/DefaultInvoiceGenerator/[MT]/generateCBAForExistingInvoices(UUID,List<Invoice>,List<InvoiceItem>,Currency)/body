@@ -17,7 +17,9 @@
   for (  final UUID invoiceId : amountOwedByInvoice.keySet()) {
     final BigDecimal invoiceBalance=amountOwedByInvoice.get(invoiceId);
     if (invoiceBalance.compareTo(BigDecimal.ZERO) < 0) {
-      proposedItems.add(new CreditBalanceAdjInvoiceItem(invoiceId,accountId,clock.getUTCNow(),invoiceBalance.negate(),currency));
+      final DateTime creditDate=InvoiceDateUtils.roundDateTimeToDate(clock.getUTCNow(),DateTimeZone.UTC);
+      final CreditBalanceAdjInvoiceItem creditInvoiceItem=new CreditBalanceAdjInvoiceItem(invoiceId,accountId,creditDate,invoiceBalance.negate(),currency);
+      proposedItems.add(creditInvoiceItem);
     }
   }
 }

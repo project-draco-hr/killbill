@@ -24,6 +24,8 @@
     }
   }
   if (creditAmount.compareTo(BigDecimal.ZERO) < 0) {
-    proposedItems.add(new CreditBalanceAdjInvoiceItem(invoiceId,accountId,clock.getUTCNow(),creditAmount,targetCurrency));
+    final DateTime creditDate=InvoiceDateUtils.roundDateTimeToDate(clock.getUTCNow(),DateTimeZone.UTC);
+    final CreditBalanceAdjInvoiceItem creditInvoiceItem=new CreditBalanceAdjInvoiceItem(invoiceId,accountId,creditDate,creditAmount,targetCurrency);
+    proposedItems.add(creditInvoiceItem);
   }
 }
