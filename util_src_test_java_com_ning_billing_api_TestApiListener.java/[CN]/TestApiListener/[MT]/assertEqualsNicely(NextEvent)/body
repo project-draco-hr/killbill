@@ -8,19 +8,19 @@ synchronized (this) {
         it.remove();
         foundIt=true;
         if (!nonExpectedMode) {
-          log.info("TestApiListener found event {}. Yeah!",received);
+          log.info("Found expected event {}. Yeah!",received);
         }
  else {
-          log.error("TestApiListener found non expected event {}. Boohh! ",received);
+          log.error("Found non expected event {}. Boohh! ",received);
         }
         break;
       }
     }
     if (!foundIt && !nonExpectedMode) {
       final Joiner joiner=Joiner.on(" ");
-      log.error("TestApiListener Received event " + received + "; expecting "+ joiner.join(nextExpectedEvent));
+      log.error("Received unexpected event " + received + "; remaining expected events ["+ joiner.join(nextExpectedEvent)+ "]");
       if (testStatus != null) {
-        testStatus.failed("TestApiListener [ApiListenerStatus]: Received event " + received + "; expecting "+ joiner.join(nextExpectedEvent));
+        testStatus.failed("TestApiListener [ApiListenerStatus]: Received unexpected event " + received + "; remaining expected events ["+ joiner.join(nextExpectedEvent)+ "]");
       }
     }
   }
