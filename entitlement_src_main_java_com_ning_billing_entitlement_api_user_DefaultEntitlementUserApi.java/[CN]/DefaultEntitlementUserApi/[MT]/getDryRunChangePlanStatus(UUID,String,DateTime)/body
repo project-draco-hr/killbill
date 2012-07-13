@@ -12,11 +12,11 @@
     if (cur.getId().equals(subscriptionId)) {
       continue;
     }
-    DryRunChangeReason reason=null;
-    if (addonUtils.isAddonIncludedFromProdName(baseProductName,requestedDate,cur.getCurrentPlan())) {
+    final DryRunChangeReason reason;
+    if (baseProductName != null && addonUtils.isAddonIncludedFromProdName(baseProductName,requestedDate,cur.getCurrentPlan())) {
       reason=DryRunChangeReason.AO_INCLUDED_IN_NEW_PLAN;
     }
- else     if (addonUtils.isAddonAvailableFromProdName(baseProductName,requestedDate,cur.getCurrentPlan())) {
+ else     if (baseProductName != null && addonUtils.isAddonAvailableFromProdName(baseProductName,requestedDate,cur.getCurrentPlan())) {
       reason=DryRunChangeReason.AO_AVAILABLE_IN_NEW_PLAN;
     }
  else {
