@@ -1,0 +1,12 @@
+{
+  if (paymentStatus != PaymentStatus.SUCCESS) {
+    return BigDecimal.ZERO;
+  }
+  BigDecimal result=amount;
+  for (  RefundModelDao cur : refunds) {
+    if (cur.getRefundStatus() != RefundStatus.CREATED) {
+      result=result.subtract(cur.getAmount());
+    }
+  }
+  return result;
+}
