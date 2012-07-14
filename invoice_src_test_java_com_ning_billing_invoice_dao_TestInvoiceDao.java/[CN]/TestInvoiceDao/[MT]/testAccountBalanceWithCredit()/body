@@ -1,15 +1,15 @@
 {
   final UUID accountId=UUID.randomUUID();
   final UUID bundleId=UUID.randomUUID();
-  final DateTime targetDate1=new DateTime(2011,10,6,0,0,0,0);
-  final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate1,Currency.USD);
+  final LocalDate targetDate1=new LocalDate(2011,10,6);
+  final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1,Currency.USD);
   invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),context);
-  final DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
-  final DateTime endDate=startDate.plusMonths(1);
+  final LocalDate startDate=new LocalDate(2011,3,1);
+  final LocalDate endDate=startDate.plusMonths(1);
   final BigDecimal rate1=new BigDecimal("17.0");
   final RecurringInvoiceItem item1=new RecurringInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase A",startDate,endDate,rate1,rate1,Currency.USD);
   invoiceItemSqlDao.create(item1,context);
-  final CreditAdjInvoiceItem creditItem=new CreditAdjInvoiceItem(invoice1.getId(),accountId,new DateTime(),rate1.negate(),Currency.USD);
+  final CreditAdjInvoiceItem creditItem=new CreditAdjInvoiceItem(invoice1.getId(),accountId,new LocalDate(),rate1.negate(),Currency.USD);
   invoiceItemSqlDao.create(creditItem,context);
   final BigDecimal balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(BigDecimal.ZERO),0);

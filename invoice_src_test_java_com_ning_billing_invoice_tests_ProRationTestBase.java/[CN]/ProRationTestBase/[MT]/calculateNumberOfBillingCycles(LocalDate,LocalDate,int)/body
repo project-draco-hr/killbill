@@ -1,0 +1,8 @@
+{
+  final List<RecurringInvoiceItemData> items=getBillingMode().calculateInvoiceItemData(startDate,targetDate,DateTimeZone.UTC,billingCycleDay,getBillingPeriod());
+  BigDecimal numberOfBillingCycles=ZERO;
+  for (  final RecurringInvoiceItemData item : items) {
+    numberOfBillingCycles=numberOfBillingCycles.add(item.getNumberOfCycles());
+  }
+  return numberOfBillingCycles.setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
+}

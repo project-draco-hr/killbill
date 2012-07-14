@@ -6,7 +6,7 @@
   final InputStream is=new ByteArrayInputStream(configXml.getBytes());
   config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
   state=config.getBundleStateSet().findState(BlockingApi.CLEAR_STATE_NAME);
-  bundle=createBundle(clock.getUTCNow().minusDays(31));
+  bundle=createBundle(clock.getUTCToday().minusDays(31));
   wrapper=overdueWrapperFactory.createOverdueWrapperFor(bundle);
   final OverdueState<SubscriptionBundle> result=wrapper.refresh();
   Assert.assertEquals(result.getName(),state.getName());

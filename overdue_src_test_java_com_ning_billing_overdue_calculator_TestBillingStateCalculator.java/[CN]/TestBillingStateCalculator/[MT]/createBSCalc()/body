@@ -1,10 +1,10 @@
 {
-  now=new DateTime();
+  now=new LocalDate();
   final Collection<Invoice> invoices=new ArrayList<Invoice>();
   invoices.add(createInvoice(now,BigDecimal.ZERO,null));
   invoices.add(createInvoice(now.plusDays(1),BigDecimal.TEN,null));
   invoices.add(createInvoice(now.plusDays(2),new BigDecimal("100.0"),null));
-  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<DateTime>any())).thenReturn(invoices);
+  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any())).thenReturn(invoices);
   return new BillingStateCalculator<SubscriptionBundle>(invoiceApi,clock){
     @Override public BillingState<SubscriptionBundle> calculateBillingState(    final SubscriptionBundle overdueable){
       return null;

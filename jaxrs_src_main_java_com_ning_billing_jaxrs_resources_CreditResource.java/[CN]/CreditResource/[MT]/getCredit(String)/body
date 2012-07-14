@@ -5,13 +5,17 @@
       return Response.status(Response.Status.NOT_FOUND).build();
     }
  else {
-      final CreditJson creditJson=new CreditJson(credit);
+      final Account account=accountUserApi.getAccountById(credit.getAccountId());
+      final CreditJson creditJson=new CreditJson(credit,account.getTimeZone());
       return Response.status(Response.Status.OK).entity(creditJson).build();
     }
   }
  catch (  InvoiceApiException e) {
-    final String error=String.format("Failed to locate credit for id %s",creditId);
-    log.info(error,e);
+    log.warn(String.format("Failed to locate credit for id %s",creditId),e);
+    return Response.status(Response.Status.NO_CONTENT).build();
+  }
+catch (  AccountApiException e) {
+    log.warn(String.format("Failed to locate account for credit id %s",creditId),e);
     return Response.status(Response.Status.NO_CONTENT).build();
   }
 }

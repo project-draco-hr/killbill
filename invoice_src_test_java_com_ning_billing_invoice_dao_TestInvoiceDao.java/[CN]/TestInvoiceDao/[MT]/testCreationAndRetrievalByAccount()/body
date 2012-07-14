@@ -1,7 +1,7 @@
 {
   final UUID accountId=UUID.randomUUID();
-  final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCNow(),clock.getUTCNow(),Currency.USD);
-  final DateTime invoiceDate=invoice.getInvoiceDate();
+  final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),clock.getUTCToday(),Currency.USD);
+  final LocalDate invoiceDate=invoice.getInvoiceDate();
   invoiceDao.create(invoice,invoice.getTargetDate().getDayOfMonth(),context);
   final List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId);
   assertNotNull(invoices);

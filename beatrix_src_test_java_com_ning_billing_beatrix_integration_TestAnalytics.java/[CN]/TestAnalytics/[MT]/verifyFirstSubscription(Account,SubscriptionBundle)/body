@@ -24,9 +24,7 @@
   Assert.assertEquals(invoiceItem.getAmount().doubleValue(),0.0);
   Assert.assertEquals(invoiceItem.getBillingPeriod(),subscription.getCurrentPhase().getBillingPeriod().toString());
   Assert.assertEquals(invoiceItem.getCurrency(),account.getCurrency());
-  final DateTime subscriptionEndDate=subscription.getStartDate().plus(subscription.getCurrentPhase().getDuration().toJodaPeriod());
-  final DateTime roundedSubscriptionEndDate=InvoiceDateUtils.roundDateTimeToDate(subscriptionEndDate,DateTimeZone.UTC);
-  Assert.assertEquals(invoiceItem.getEndDate(),roundedSubscriptionEndDate);
+  Assert.assertNull(invoiceItem.getEndDate());
   Assert.assertEquals(invoiceItem.getExternalKey(),bundle.getKey());
   Assert.assertEquals(invoiceItem.getInvoiceId(),invoice.getInvoiceId());
   Assert.assertEquals(invoiceItem.getItemType(),"FIXED");
@@ -36,7 +34,6 @@
   Assert.assertEquals(invoiceItem.getProductType(),subscription.getCurrentPlan().getProduct().getCatalogName());
   Assert.assertEquals(invoiceItem.getSlug(),subscription.getCurrentPhase().getName());
   final DateTime subscriptionStartDate=subscription.getStartDate();
-  final DateTime roundedSubscriptionStartDate=InvoiceDateUtils.roundDateTimeToDate(subscriptionStartDate,DateTimeZone.UTC);
-  Assert.assertEquals(invoiceItem.getStartDate(),roundedSubscriptionStartDate);
+  Assert.assertEquals(invoiceItem.getStartDate(),new LocalDate(subscriptionStartDate.getYear(),subscriptionStartDate.getMonthOfYear(),subscriptionStartDate.getDayOfMonth()));
   return subscription;
 }

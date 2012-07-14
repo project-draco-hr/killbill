@@ -1,11 +1,12 @@
 {
   try {
-    final SortedSet<Invoice> unpaidInvoices=unpaidInvoicesForBundle(bundle.getId(),bundle.getAccountId());
+    final Account account=accountApi.getAccountById(bundle.getAccountId());
+    final SortedSet<Invoice> unpaidInvoices=unpaidInvoicesForBundle(bundle.getId(),bundle.getAccountId(),account.getTimeZone());
     final Subscription basePlan=entitlementApi.getBaseSubscription(bundle.getId());
     final UUID id=bundle.getId();
     final int numberOfUnpaidInvoices=unpaidInvoices.size();
     final BigDecimal unpaidInvoiceBalance=sumBalance(unpaidInvoices);
-    DateTime dateOfEarliestUnpaidInvoice=null;
+    LocalDate dateOfEarliestUnpaidInvoice=null;
     UUID idOfEarliestUnpaidInvoice=null;
     final Invoice invoice=earliest(unpaidInvoices);
     if (invoice != null) {
@@ -30,9 +31,12 @@
       basePlanPriceList=basePlan.getCurrentPriceList();
       basePlanPhaseType=basePlan.getCurrentPhase().getPhaseType();
     }
-    return new BillingStateBundle(id,numberOfUnpaidInvoices,unpaidInvoiceBalance,dateOfEarliestUnpaidInvoice,idOfEarliestUnpaidInvoice,responseForLastFailedPayment,tags,basePlanProduct,basePlanBillingPeriod,basePlanPriceList,basePlanPhaseType);
+    return new BillingStateBundle(id,numberOfUnpaidInvoices,unpaidInvoiceBalance,dateOfEarliestUnpaidInvoice,account.getTimeZone(),idOfEarliestUnpaidInvoice,responseForLastFailedPayment,tags,basePlanProduct,basePlanBillingPeriod,basePlanPriceList,basePlanPhaseType);
   }
  catch (  EntitlementUserApiException e) {
+    throw new OverdueError(e);
+  }
+catch (  AccountApiException e) {
     throw new OverdueError(e);
   }
 }

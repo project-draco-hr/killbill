@@ -1,7 +1,6 @@
 {
-  final InvoiceCreationEvent e=new DefaultInvoiceCreationEvent(UUID.randomUUID(),UUID.randomUUID(),new BigDecimal(12.0),Currency.USD,new DateTime(),UUID.randomUUID());
+  final InvoiceCreationEvent e=new DefaultInvoiceCreationEvent(UUID.randomUUID(),UUID.randomUUID(),new BigDecimal(12.0),Currency.USD,UUID.randomUUID());
   final String json=mapper.writeValueAsString(e);
-  final Class<?> claz=Class.forName(DefaultInvoiceCreationEvent.class.getName());
-  final Object obj=mapper.readValue(json,claz);
-  Assert.assertTrue(obj.equals(e));
+  final Object obj=mapper.readValue(json,DefaultInvoiceCreationEvent.class);
+  Assert.assertEquals(obj,e);
 }

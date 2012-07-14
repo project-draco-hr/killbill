@@ -1,7 +1,13 @@
 {
   for (  final InvoiceItem item : items) {
     final UUID subscriptionId=item.getSubscriptionId();
-    final DateTime endDate=item.getEndDate();
+    final DateTime endDate;
+    if (item.getEndDate() != null) {
+      endDate=new DateTime(item.getEndDate().toDateTimeAtStartOfDay(),DateTimeZone.UTC);
+    }
+ else {
+      endDate=new DateTime(item.getStartDate().toDateTimeAtStartOfDay(),DateTimeZone.UTC);
+    }
     if (chargeThroughDates.containsKey(subscriptionId)) {
       if (chargeThroughDates.get(subscriptionId).isBefore(endDate)) {
         chargeThroughDates.put(subscriptionId,InvoiceDateUtils.calculateBillingCycleDateOnOrAfter(endDate,billCycleDay));

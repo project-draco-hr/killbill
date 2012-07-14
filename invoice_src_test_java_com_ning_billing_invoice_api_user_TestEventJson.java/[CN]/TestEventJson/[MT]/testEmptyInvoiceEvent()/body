@@ -1,7 +1,6 @@
 {
-  final NullInvoiceEvent e=new DefaultNullInvoiceEvent(UUID.randomUUID(),new DateTime(),UUID.randomUUID());
+  final NullInvoiceEvent e=new DefaultNullInvoiceEvent(UUID.randomUUID(),new LocalDate(),UUID.randomUUID());
   final String json=mapper.writeValueAsString(e);
-  final Class<?> claz=Class.forName(DefaultNullInvoiceEvent.class.getName());
-  final Object obj=mapper.readValue(json,claz);
-  Assert.assertTrue(obj.equals(e));
+  final Object obj=mapper.readValue(json,DefaultNullInvoiceEvent.class);
+  Assert.assertEquals(obj,e);
 }

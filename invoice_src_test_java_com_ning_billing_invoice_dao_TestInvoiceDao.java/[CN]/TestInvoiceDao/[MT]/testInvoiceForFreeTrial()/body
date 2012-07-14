@@ -5,12 +5,12 @@
   final MockPlanPhase phase=new MockPlanPhase(recurringPrice,null);
   final MockPlan plan=new MockPlan(phase);
   final Subscription subscription=getZombieSubscription();
-  final DateTime effectiveDate=buildDateTime(2011,1,1);
+  final DateTime effectiveDate=buildDate(2011,1,1).toDateTimeAtStartOfDay();
   final BillingEvent event=createMockBillingEvent(null,subscription,effectiveDate,plan,phase,null,recurringPrice.getPrice(currency),currency,BillingPeriod.MONTHLY,15,BillingModeType.IN_ADVANCE,"testEvent",1L,SubscriptionTransitionType.CREATE);
   final BillingEventSet events=new MockBillingEventSet();
   events.add(event);
-  final DateTime targetDate=buildDateTime(2011,1,15);
-  final Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,targetDate,Currency.USD);
+  final LocalDate targetDate=buildDate(2011,1,15);
+  final Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,targetDate,DateTimeZone.UTC,Currency.USD);
   assertEquals(invoice.getNumberOfItems(),2);
   assertEquals(invoice.getBalance().compareTo(ZERO),0);
 }
