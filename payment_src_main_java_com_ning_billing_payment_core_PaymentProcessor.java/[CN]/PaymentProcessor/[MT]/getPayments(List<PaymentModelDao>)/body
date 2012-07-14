@@ -5,7 +5,8 @@
   final List<Payment> result=new LinkedList<Payment>();
   for (  final PaymentModelDao cur : payments) {
     final List<PaymentAttemptModelDao> attempts=paymentDao.getAttemptsForPayment(cur.getId());
-    final Payment entry=new DefaultPayment(cur,attempts);
+    final List<RefundModelDao> refunds=paymentDao.getRefundsForPayment(cur.getId());
+    final Payment entry=new DefaultPayment(cur,attempts,refunds);
     result.add(entry);
   }
   return result;
