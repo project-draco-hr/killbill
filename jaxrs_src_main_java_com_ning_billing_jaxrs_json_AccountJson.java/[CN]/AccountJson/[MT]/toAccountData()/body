@@ -48,8 +48,19 @@
     @Override public String getCity(){
       return null;
     }
-    @Override public Integer getBillCycleDay(){
-      return billCycleDay;
+    @Override public BillCycleDay getBillCycleDay(){
+      if (billCycleDayJson == null) {
+        return null;
+      }
+      return new BillCycleDay(){
+        @Override public int getDayOfMonthUTC(){
+          return billCycleDayJson.getDayOfMonthUTC();
+        }
+        @Override public int getDayOfMonthLocal(){
+          return billCycleDayJson.getDayOfMonthLocal();
+        }
+      }
+;
     }
     @Override public String getAddress2(){
       return address2;
