@@ -1,3 +1,7 @@
 {
-  return dao.getCreditById(creditId);
+  InvoiceItem creditItem=dao.getCreditById(creditId);
+  if (creditItem == null) {
+    throw new InvoiceApiException(ErrorCode.INVOICE_NO_SUCH_CREDIT,creditId);
+  }
+  return new CreditAdjInvoiceItem(creditItem.getId(),creditItem.getInvoiceId(),creditItem.getAccountId(),creditItem.getStartDate(),creditItem.getAmount().negate(),creditItem.getCurrency());
 }

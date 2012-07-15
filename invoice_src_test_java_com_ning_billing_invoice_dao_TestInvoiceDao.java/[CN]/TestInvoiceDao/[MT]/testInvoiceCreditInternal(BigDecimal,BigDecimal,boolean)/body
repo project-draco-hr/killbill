@@ -1,0 +1,33 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final DateTime targetDate=new DateTime(2011,2,15,0,0,0,0);
+  final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate,Currency.USD);
+  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),context);
+  final DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
+  final DateTime endDate=startDate.plusMonths(1);
+  final BigDecimal amount1=new BigDecimal("5.0");
+  final FixedPriceInvoiceItem item1=new FixedPriceInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase A",startDate,endDate,amount1,Currency.USD);
+  invoiceItemSqlDao.create(item1,context);
+  final DateTime effectiveDate=new DateTime(2011,3,1,0,0,0,0);
+  invoiceDao.insertCredit(accountId,invoice1.getId(),creditAmount,effectiveDate,Currency.USD,context);
+  final List<Invoice> invoices=invoiceDao.getAllInvoicesByAccount(accountId);
+  assertEquals(invoices.size(),1);
+  Invoice invoice=invoices.get(0);
+  assertTrue(invoice.getBalance().compareTo(expectedBalance) == 0);
+  List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
+  assertEquals(invoiceItems.size(),expectCBA ? 3 : 2);
+  boolean foundCredit=false;
+  boolean foundCBA=false;
+  for (  InvoiceItem cur : invoiceItems) {
+    if (cur.getInvoiceItemType() == InvoiceItemType.CREDIT_ADJ) {
+      foundCredit=true;
+      assertTrue(cur.getAmount().compareTo(creditAmount.negate()) == 0);
+    }
+ else     if (cur.getInvoiceItemType() == InvoiceItemType.CBA_ADJ) {
+      foundCBA=true;
+    }
+  }
+  assertEquals(foundCBA,expectCBA);
+  assertTrue(foundCredit);
+}
