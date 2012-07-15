@@ -7,9 +7,20 @@
         transactional.create(invoiceForRefund,context);
         invoiceIdForRefund=invoiceForRefund.getId();
       }
-      final InvoiceItem credit=new CreditAdjInvoiceItem(invoiceIdForRefund,accountId,effectiveDate,amount,currency);
+      final InvoiceItem credit=new CreditAdjInvoiceItem(invoiceIdForRefund,accountId,effectiveDate,positiveCreditAmount.negate(),currency);
       final InvoiceItemSqlDao transInvoiceItemDao=transactional.become(InvoiceItemSqlDao.class);
       transInvoiceItemDao.create(credit,context);
+      final Invoice invoice=transactional.getById(invoiceIdForRefund.toString());
+      if (invoice != null) {
+        populateChildren(invoice,transactional);
+      }
+ else {
+        throw new IllegalStateException("Invoice shouldn't be null for credit at this stage " + invoiceIdForRefund);
+      }
+      if (invoice.getBalance().compareTo(BigDecimal.ZERO) < 0) {
+        final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),invoice.getBalance().negate(),invoice.getCurrency());
+        transInvoiceItemDao.create(cbaAdjItem,context);
+      }
       return credit;
     }
   }
