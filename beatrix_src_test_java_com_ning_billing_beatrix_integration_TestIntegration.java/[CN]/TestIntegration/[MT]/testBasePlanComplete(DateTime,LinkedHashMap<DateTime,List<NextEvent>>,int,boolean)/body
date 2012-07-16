@@ -13,10 +13,9 @@
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
   DateTime startDate=subscription.getCurrentPhaseStart();
-  DateTime endDate=startDate.plusDays(30);
   BigDecimal rate=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
   int invoiceItemCount=1;
-  verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate,invoiceItemCount);
+  verifyTestResult(accountId,subscription.getId(),startDate,null,rate,clock.getUTCNow(),invoiceItemCount);
   busHandler.pushExpectedEvent(NextEvent.CHANGE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   BillingPeriod newTerm=BillingPeriod.MONTHLY;
@@ -25,9 +24,8 @@
   subscription.changePlan(newProductName,newTerm,newPlanSetName,clock.getUTCNow(),context);
   assertTrue(busHandler.isCompleted(DELAY));
   startDate=subscription.getCurrentPhaseStart();
-  endDate=startDate.plusDays(30);
   invoiceItemCount=2;
-  verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate,invoiceItemCount);
+  verifyTestResult(accountId,subscription.getId(),startDate,null,rate,clock.getUTCNow(),invoiceItemCount);
   for (  final DateTime dateTimeToSet : expectedStates.keySet()) {
     for (    final NextEvent expectedEvent : expectedStates.get(dateTimeToSet)) {
       busHandler.pushExpectedEvent(expectedEvent);
@@ -80,7 +78,7 @@ busHandler.pushExpectedEvent(NextEvent.PAYMENT);
 clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
 assertTrue(busHandler.isCompleted(DELAY));
 startDate=chargeThroughDate;
-endDate=chargeThroughDate.plusMonths(1);
+DateTime endDate=chargeThroughDate.plusMonths(1);
 price=subscription.getCurrentPhase().getRecurringPrice().getPrice(Currency.USD);
 invoiceItemCount+=1;
 verifyTestResult(accountId,subscription.getId(),startDate,endDate,price,endDate,invoiceItemCount);

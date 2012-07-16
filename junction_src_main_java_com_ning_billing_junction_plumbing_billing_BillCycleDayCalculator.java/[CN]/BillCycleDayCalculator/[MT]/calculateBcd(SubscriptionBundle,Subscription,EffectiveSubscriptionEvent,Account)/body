@@ -8,11 +8,11 @@
   final PlanPhase nextPhase=(transition.getNextPhase() != null) ? catalog.findPhase(transition.getNextPhase(),transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
   final PlanPhase phase=(transition.getTransitionType() != SubscriptionTransitionType.CANCEL) ? nextPhase : prevPhase;
   final BillingAlignment alignment=catalog.billingAlignment(new PlanPhaseSpecifier(product.getName(),product.getCategory(),phase.getBillingPeriod(),transition.getNextPriceList(),phase.getPhaseType()),transition.getRequestedTransitionTime());
-  int result=-1;
+  BillCycleDay result=null;
 switch (alignment) {
 case ACCOUNT:
     result=account.getBillCycleDay();
-  if (result == 0) {
+  if (result.getDayOfMonthUTC() == 0) {
     result=calculateBcdFromSubscription(subscription,plan,account);
   }
 break;
@@ -29,7 +29,7 @@ case SUBSCRIPTION:
 result=calculateBcdFromSubscription(subscription,plan,account);
 break;
 }
-if (result == -1) {
+if (result == null) {
 throw new CatalogApiException(ErrorCode.CAT_INVALID_BILLING_ALIGNMENT,alignment.toString());
 }
 return result;

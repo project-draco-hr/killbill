@@ -1,8 +1,8 @@
 {
-  final DateTime today=new DateTime(2012,4,1,0,0,0,0,testTimeZone);
-  final DateTime trialEndDate=new DateTime(2012,5,1,0,0,0,0,testTimeZone);
+  final LocalDate today=new LocalDate(2012,4,1);
+  final LocalDate trialEndDate=new LocalDate(2012,5,1);
   final Account account=createAccountWithPaymentMethod(getAccountData(1));
-  clock.setDeltaFromReality(today.getMillis() - clock.getUTCNow().getMillis());
+  clock.setDeltaFromReality(today.toDateTimeAtCurrentTime().getMillis() - clock.getUTCNow().getMillis());
   final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",context);
   final String productName="Shotgun";
   final BillingPeriod term=BillingPeriod.MONTHLY;
@@ -15,7 +15,7 @@
   assertListenerStatus();
   busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE,NextEvent.PAYMENT);
   final PlanPhaseSpecifier addonPlanPhaseSpecifier=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
-  final SubscriptionData aoSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),addonPlanPhaseSpecifier,null,context));
+  entitlementUserApi.createSubscription(bundle.getId(),addonPlanPhaseSpecifier,null,context);
   assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   busHandler.pushExpectedEvents(NextEvent.CANCEL,NextEvent.CANCEL,NextEvent.INVOICE);
@@ -26,7 +26,7 @@
   assertEquals(invoices.size(),3);
   assertEquals(invoices.get(0).getNumberOfItems(),1);
   assertEquals(invoices.get(0).getInvoiceItems().get(0).getStartDate().compareTo(today),0);
-  assertEquals(invoices.get(0).getInvoiceItems().get(0).getEndDate().compareTo(trialEndDate),0);
+  assertNull(invoices.get(0).getInvoiceItems().get(0).getEndDate());
   assertEquals(invoices.get(1).getNumberOfItems(),3);
   for (  final InvoiceItem item : invoices.get(1).getInvoiceItems()) {
     if (InvoiceItemType.RECURRING.equals(item.getInvoiceItemType())) {

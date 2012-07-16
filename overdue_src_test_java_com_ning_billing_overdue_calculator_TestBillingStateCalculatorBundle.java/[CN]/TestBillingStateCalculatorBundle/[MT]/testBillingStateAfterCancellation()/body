@@ -1,12 +1,12 @@
 {
-  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<DateTime>any())).thenReturn(ImmutableList.<Invoice>of());
+  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any())).thenReturn(ImmutableList.<Invoice>of());
   final UUID bundleId=UUID.randomUUID();
   final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
   Mockito.when(bundle.getId()).thenReturn(bundleId);
   final EntitlementUserApi entitlementApi=Mockito.mock(EntitlementUserApi.class);
   final Subscription subscription=Mockito.mock(Subscription.class);
   Mockito.when(entitlementApi.getBaseSubscription(bundleId)).thenReturn(subscription);
-  final BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,clock);
+  final BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,accountApi,clock);
   final BillingStateBundle billingStateBundle=calc.calculateBillingState(bundle);
   Assert.assertNull(billingStateBundle.getBasePlanBillingPeriod());
   Assert.assertNull(billingStateBundle.getBasePlanPhaseType());

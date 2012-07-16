@@ -1,15 +1,15 @@
 {
   final UUID accountId=UUID.randomUUID();
   final UUID bundleId=UUID.randomUUID();
-  final DateTime targetDate1=new DateTime(2011,10,6,0,0,0,0);
-  final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate1,Currency.USD);
+  final LocalDate targetDate1=new LocalDate(2011,10,6);
+  final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1,Currency.USD);
   invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),context);
-  final DateTime startDate=new DateTime(2011,3,1,0,0,0,0);
-  final DateTime endDate=startDate.plusMonths(1);
+  final LocalDate startDate=new LocalDate(2011,3,1);
+  final LocalDate endDate=startDate.plusMonths(1);
   final BigDecimal amount1=new BigDecimal("5.0");
   final BigDecimal rate1=new BigDecimal("20.0");
   final BigDecimal rate2=new BigDecimal("10.0");
-  final FixedPriceInvoiceItem item1=new FixedPriceInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase A",startDate,endDate,amount1,Currency.USD);
+  final FixedPriceInvoiceItem item1=new FixedPriceInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase A",startDate,amount1,Currency.USD);
   invoiceItemSqlDao.create(item1,context);
   BigDecimal balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(new BigDecimal("5.00")),0);
@@ -28,7 +28,7 @@
   invoiceItemSqlDao.create(item2Replace,context);
   balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(new BigDecimal("-10.00")),0);
-  final CreditBalanceAdjInvoiceItem cbaItem=new CreditBalanceAdjInvoiceItem(invoice1.getId(),accountId,new DateTime(),balance.negate(),Currency.USD);
+  final CreditBalanceAdjInvoiceItem cbaItem=new CreditBalanceAdjInvoiceItem(invoice1.getId(),accountId,new LocalDate(),balance.negate(),Currency.USD);
   invoiceItemSqlDao.create(cbaItem,context);
   balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(new BigDecimal("-10.00")),0);
@@ -36,13 +36,13 @@
   assertEquals(cba.compareTo(new BigDecimal("10.00")),0);
   final InvoicePayment refund=new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice1.getId(),new DateTime(),rate2.negate(),Currency.USD,null,payment.getId());
   invoicePaymentDao.create(refund,context);
-  final CreditBalanceAdjInvoiceItem cbaItem2=new CreditBalanceAdjInvoiceItem(invoice1.getId(),accountId,new DateTime(),rate2.negate(),Currency.USD);
+  final CreditBalanceAdjInvoiceItem cbaItem2=new CreditBalanceAdjInvoiceItem(invoice1.getId(),accountId,new LocalDate(),rate2.negate(),Currency.USD);
   invoiceItemSqlDao.create(cbaItem2,context);
   balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(BigDecimal.ZERO),0);
   cba=invoiceDao.getAccountCBA(accountId);
   assertEquals(cba.compareTo(BigDecimal.ZERO),0);
-  final Invoice invoice2=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate1.plusMonths(1),Currency.USD);
+  final Invoice invoice2=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1.plusMonths(1),Currency.USD);
   invoiceDao.create(invoice2,invoice2.getTargetDate().getDayOfMonth(),context);
   final RecurringInvoiceItem nextItem=new RecurringInvoiceItem(invoice2.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test bla",startDate.plusMonths(1),endDate.plusMonths(1),rate2,rate2,Currency.USD);
   invoiceItemSqlDao.create(nextItem,context);
@@ -50,7 +50,7 @@
   assertEquals(balance.compareTo(new BigDecimal("10.00")),0);
   cba=invoiceDao.getAccountCBA(accountId);
   assertEquals(cba.compareTo(new BigDecimal("0.00")),0);
-  final CreditAdjInvoiceItem creditItem=new CreditAdjInvoiceItem(invoice2.getId(),accountId,new DateTime(),rate2.negate(),Currency.USD);
+  final CreditAdjInvoiceItem creditItem=new CreditAdjInvoiceItem(invoice2.getId(),accountId,new LocalDate(),rate2.negate(),Currency.USD);
   invoiceItemSqlDao.create(creditItem,context);
   balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(new BigDecimal("0.00")),0);

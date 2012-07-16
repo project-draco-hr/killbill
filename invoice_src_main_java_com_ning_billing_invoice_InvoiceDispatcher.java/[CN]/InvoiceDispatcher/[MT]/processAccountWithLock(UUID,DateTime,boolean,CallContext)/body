@@ -7,12 +7,13 @@
       invoices=invoiceDao.getInvoicesByAccount(accountId);
     }
     final Currency targetCurrency=account.getCurrency();
-    final Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,targetCurrency);
+    final LocalDate targetDate=new LocalDate(targetDateTime,account.getTimeZone());
+    final Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,account.getTimeZone(),targetCurrency);
     if (invoice == null) {
       log.info("Generated null invoice.");
       outputDebugData(billingEvents,invoices);
       if (!dryRun) {
-        final BusEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCNow(),context.getUserToken());
+        final BusEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday(),context.getUserToken());
         postEvent(event,accountId);
       }
     }
@@ -26,11 +27,11 @@
       }
       outputDebugData(billingEvents,invoices);
       if (!dryRun) {
-        invoiceDao.create(invoice,account.getBillCycleDay(),context);
+        invoiceDao.create(invoice,account.getBillCycleDay().getDayOfMonthUTC(),context);
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         setChargedThroughDates(account.getBillCycleDay(),fixedPriceInvoiceItems,recurringInvoiceItems,context);
-        final InvoiceCreationEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
+        final InvoiceCreationEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getUserToken());
         postEvent(event,accountId);
       }
     }

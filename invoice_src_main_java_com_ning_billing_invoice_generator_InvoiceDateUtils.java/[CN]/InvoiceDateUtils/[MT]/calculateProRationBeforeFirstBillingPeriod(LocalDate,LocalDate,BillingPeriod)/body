@@ -1,0 +1,10 @@
+{
+  final LocalDate previousBillingCycleDate=nextBillingCycleDate.plusMonths(-billingPeriod.getNumberOfMonths());
+  final int daysBetween=Days.daysBetween(previousBillingCycleDate,nextBillingCycleDate).getDays();
+  if (daysBetween <= 0) {
+    return BigDecimal.ZERO;
+  }
+  final BigDecimal daysInPeriod=new BigDecimal(daysBetween);
+  final BigDecimal days=new BigDecimal(Days.daysBetween(startDate,nextBillingCycleDate).getDays());
+  return days.divide(daysInPeriod,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD);
+}

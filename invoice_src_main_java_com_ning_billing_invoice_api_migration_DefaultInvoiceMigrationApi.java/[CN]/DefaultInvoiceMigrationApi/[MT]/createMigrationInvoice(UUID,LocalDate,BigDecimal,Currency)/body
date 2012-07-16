@@ -1,0 +1,16 @@
+{
+  final Account account;
+  try {
+    account=accountUserApi.getAccountById(accountId);
+  }
+ catch (  AccountApiException e) {
+    log.warn("Unable to find account for id {}",accountId);
+    return null;
+  }
+  final CallContext context=new DefaultCallContextFactory(clock).createMigrationCallContext("Migration",CallOrigin.INTERNAL,UserType.MIGRATION,clock.getUTCNow(),clock.getUTCNow());
+  final Invoice migrationInvoice=new MigrationInvoice(accountId,clock.getUTCToday(),targetDate,currency);
+  final InvoiceItem migrationInvoiceItem=new MigrationInvoiceItem(migrationInvoice.getId(),accountId,targetDate,balance,currency);
+  migrationInvoice.addInvoiceItem(migrationInvoiceItem);
+  dao.create(migrationInvoice,account.getBillCycleDay().getDayOfMonthUTC(),context);
+  return migrationInvoice.getId();
+}

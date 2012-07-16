@@ -1,7 +1,7 @@
 {
   final UUID accountId=UUID.randomUUID();
-  final DateTime targetDate1=new DateTime(2011,10,6,0,0,0,0);
-  final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCNow(),targetDate1,Currency.USD);
+  final LocalDate targetDate1=new LocalDate(2011,10,6);
+  final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1,Currency.USD);
   invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),context);
   final BigDecimal payment1=new BigDecimal("48.0");
   final InvoicePayment payment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice1.getId(),new DateTime(),payment1,Currency.USD);

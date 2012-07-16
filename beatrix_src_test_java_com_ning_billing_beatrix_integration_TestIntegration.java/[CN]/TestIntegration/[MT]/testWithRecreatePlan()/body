@@ -16,10 +16,9 @@
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
   final DateTime startDate=subscription.getCurrentPhaseStart();
-  DateTime endDate=startDate.plusDays(30);
   final BigDecimal rate=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
   final int invoiceItemCount=1;
-  verifyTestResult(accountId,subscription.getId(),startDate,endDate,rate,endDate,invoiceItemCount);
+  verifyTestResult(accountId,subscription.getId(),startDate,null,rate,clock.getUTCNow(),invoiceItemCount);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
@@ -28,7 +27,7 @@
   subscription=subscriptionDataFromSubscription(entitlementUserApi.getSubscriptionFromId(subscription.getId()));
   subscription.cancel(clock.getUTCNow(),false,context);
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
-  endDate=subscription.getChargedThroughDate();
+  DateTime endDate=subscription.getChargedThroughDate();
   final Interval it=new Interval(clock.getUTCNow(),endDate);
   clock.addDeltaFromReality(it.toDurationMillis());
   assertTrue(busHandler.isCompleted(DELAY));

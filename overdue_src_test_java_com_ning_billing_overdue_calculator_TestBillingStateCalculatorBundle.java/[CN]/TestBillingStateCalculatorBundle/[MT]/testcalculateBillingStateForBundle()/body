@@ -1,7 +1,7 @@
 {
   final UUID thisBundleId=new UUID(0L,0L);
   final UUID thatBundleId=new UUID(0L,1L);
-  now=new DateTime();
+  now=new LocalDate();
   final List<Invoice> invoices=new ArrayList<Invoice>(5);
   invoices.add(createInvoice(now.minusDays(5),BigDecimal.ZERO,createInvoiceItems(new UUID[]{thisBundleId,thatBundleId})));
   invoices.add(createInvoice(now.minusDays(4),BigDecimal.TEN,createInvoiceItems(new UUID[]{thatBundleId})));
@@ -10,7 +10,7 @@
   invoices.add(createInvoice(now.minusDays(1),new BigDecimal("10000.00"),createInvoiceItems(new UUID[]{thatBundleId,thisBundleId})));
   final Clock clock=new ClockMock();
   final InvoiceUserApi invoiceApi=Mockito.mock(InvoiceUserApi.class);
-  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<DateTime>any())).thenReturn(invoices);
+  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any())).thenReturn(invoices);
   final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
   Mockito.when(bundle.getId()).thenReturn(thisBundleId);
   Mockito.when(bundle.getAccountId()).thenReturn(UUID.randomUUID());
@@ -22,7 +22,7 @@
   Mockito.when(subscription.getCurrentPlan()).thenReturn(plan);
   Mockito.when(subscription.getCurrentPriceList()).thenReturn(pricelist);
   Mockito.when(subscription.getCurrentPhase()).thenReturn(plan.getFinalPhase());
-  final BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,clock);
+  final BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,accountApi,clock);
   final BillingStateBundle state=calc.calculateBillingState(bundle);
   Assert.assertEquals(state.getNumberOfUnpaidInvoices(),4);
   Assert.assertEquals(state.getBalanceOfUnpaidInvoices().intValue(),11100);

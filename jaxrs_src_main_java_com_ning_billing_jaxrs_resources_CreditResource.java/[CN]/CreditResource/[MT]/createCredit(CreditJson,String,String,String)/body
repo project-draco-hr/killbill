@@ -5,7 +5,8 @@
   }
   try {
     final Account account=accountUserApi.getAccountById(accountId);
-    final InvoiceItem credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),json.getEffectiveDate(),account.getCurrency(),context.createContext(createdBy,reason,comment));
+    final LocalDate effectiveDate=json.getEffectiveDate().toDateTime(account.getTimeZone()).toLocalDate();
+    final InvoiceItem credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),effectiveDate,account.getCurrency(),context.createContext(createdBy,reason,comment));
     return uriBuilder.buildResponse(CreditResource.class,"getCredit",credit.getId());
   }
  catch (  InvoiceApiException e) {
