@@ -1,0 +1,12 @@
+{
+  final InAdvanceBillingMode billingMode=new InAdvanceBillingMode();
+  final List<RecurringInvoiceItemData> invoiceItems=billingMode.calculateInvoiceItemData(startDate,endDate,targetDate,dateTimeZone,billingCycleDayLocal,billingPeriod);
+  int i=0;
+  for (  final LocalDate periodStartDate : expectedDates.keySet()) {
+    Assert.assertEquals(invoiceItems.get(i).getStartDate(),periodStartDate);
+    Assert.assertEquals(invoiceItems.get(i).getEndDate(),expectedDates.get(periodStartDate));
+    Assert.assertTrue(invoiceItems.get(0).getNumberOfCycles().compareTo(BigDecimal.ONE) <= 0);
+    i++;
+  }
+  Assert.assertEquals(invoiceItems.size(),i);
+}
