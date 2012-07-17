@@ -10,7 +10,9 @@
   if (firstBillingCycleDate.isAfter(startDate)) {
     final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,firstBillingCycleDate,billingPeriod);
     if (leadingProRationPeriods != null && leadingProRationPeriods.compareTo(BigDecimal.ZERO) > 0) {
-      results.add(new RecurringInvoiceItemData(startDate,firstBillingCycleDate,leadingProRationPeriods));
+      final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(startDate,firstBillingCycleDate,leadingProRationPeriods);
+      log.info("Adding pro-ration: {}",itemData);
+      results.add(itemData);
     }
   }
   final LocalDate effectiveEndDate;
@@ -40,7 +42,9 @@
   if (effectiveEndDate.isAfter(lastBillingCycleDate)) {
     final BigDecimal trailingProRationPeriods=calculateProRationAfterLastBillingCycleDate(effectiveEndDate,lastBillingCycleDate,billingPeriod);
     if (trailingProRationPeriods.compareTo(BigDecimal.ZERO) > 0) {
-      results.add(new RecurringInvoiceItemData(lastBillingCycleDate,effectiveEndDate,trailingProRationPeriods));
+      final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(lastBillingCycleDate,effectiveEndDate,trailingProRationPeriods);
+      log.info("Adding trailing pro-ration: {}",itemData);
+      results.add(itemData);
     }
   }
   return results;
