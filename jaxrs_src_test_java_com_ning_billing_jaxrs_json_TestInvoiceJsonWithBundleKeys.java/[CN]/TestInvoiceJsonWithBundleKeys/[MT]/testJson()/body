@@ -10,7 +10,9 @@
   final BigDecimal balance=BigDecimal.ZERO;
   final String accountId=UUID.randomUUID().toString();
   final String bundleKeys=UUID.randomUUID().toString();
-  final InvoiceJsonWithBundleKeys invoiceJsonSimple=new InvoiceJsonWithBundleKeys(amount,cba,creditAdj,refundAdj,invoiceId,invoiceDate,targetDate,invoiceNumber,balance,accountId,bundleKeys);
+  CreditJson creditJson=createCreditJson();
+  final List<CreditJson> credits=ImmutableList.<CreditJson>of(creditJson);
+  final InvoiceJsonWithBundleKeys invoiceJsonSimple=new InvoiceJsonWithBundleKeys(amount,cba,creditAdj,refundAdj,invoiceId,invoiceDate,targetDate,invoiceNumber,balance,accountId,bundleKeys,credits);
   Assert.assertEquals(invoiceJsonSimple.getAmount(),amount);
   Assert.assertEquals(invoiceJsonSimple.getCBA(),cba);
   Assert.assertEquals(invoiceJsonSimple.getCreditAdj(),creditAdj);
@@ -22,8 +24,9 @@
   Assert.assertEquals(invoiceJsonSimple.getBalance(),balance);
   Assert.assertEquals(invoiceJsonSimple.getAccountId(),accountId);
   Assert.assertEquals(invoiceJsonSimple.getBundleKeys(),bundleKeys);
+  Assert.assertEquals(invoiceJsonSimple.getCredits(),credits);
   final String asJson=mapper.writeValueAsString(invoiceJsonSimple);
-  Assert.assertEquals(asJson,"{\"amount\":" + invoiceJsonSimple.getAmount().toString() + ","+ "\"cba\":"+ invoiceJsonSimple.getCBA().toString()+ ","+ "\"creditAdj\":"+ invoiceJsonSimple.getCreditAdj().toString()+ ","+ "\"refundAdj\":"+ invoiceJsonSimple.getRefundAdj().toString()+ ","+ "\"invoiceId\":\""+ invoiceJsonSimple.getInvoiceId()+ "\","+ "\"invoiceDate\":\""+ invoiceJsonSimple.getInvoiceDate().toString()+ "\","+ "\"targetDate\":\""+ invoiceJsonSimple.getTargetDate().toString()+ "\","+ "\"invoiceNumber\":\""+ invoiceJsonSimple.getInvoiceNumber()+ "\","+ "\"balance\":"+ invoiceJsonSimple.getBalance().toString()+ ","+ "\"accountId\":\""+ invoiceJsonSimple.getAccountId()+ "\","+ "\"bundleKeys\":\""+ invoiceJsonSimple.getBundleKeys()+ "\"}");
+  Assert.assertEquals(asJson,"{\"amount\":" + invoiceJsonSimple.getAmount().toString() + ","+ "\"cba\":"+ invoiceJsonSimple.getCBA().toString()+ ","+ "\"creditAdj\":"+ invoiceJsonSimple.getCreditAdj().toString()+ ","+ "\"refundAdj\":"+ invoiceJsonSimple.getRefundAdj().toString()+ ","+ "\"invoiceId\":\""+ invoiceJsonSimple.getInvoiceId()+ "\","+ "\"invoiceDate\":\""+ invoiceJsonSimple.getInvoiceDate().toString()+ "\","+ "\"targetDate\":\""+ invoiceJsonSimple.getTargetDate().toString()+ "\","+ "\"invoiceNumber\":\""+ invoiceJsonSimple.getInvoiceNumber()+ "\","+ "\"balance\":"+ invoiceJsonSimple.getBalance().toString()+ ","+ "\"accountId\":\""+ invoiceJsonSimple.getAccountId()+ "\","+ "\"credits\":["+ "{\"creditAmount\":"+ creditJson.getCreditAmount()+ ","+ "\"invoiceId\":\""+ creditJson.getInvoiceId().toString()+ "\","+ "\"invoiceNumber\":\""+ creditJson.getInvoiceNumber()+ "\","+ "\"requestedDate\":\""+ creditJson.getRequestedDate().toDateTimeISO().toString()+ "\","+ "\"effectiveDate\":\""+ creditJson.getEffectiveDate().toDateTimeISO().toString()+ "\","+ "\"reason\":\""+ creditJson.getReason()+ "\","+ "\"accountId\":\""+ creditJson.getAccountId().toString()+ "\"}],"+ "\"bundleKeys\":\""+ invoiceJsonSimple.getBundleKeys()+ "\"}");
   final InvoiceJsonWithBundleKeys fromJson=mapper.readValue(asJson,InvoiceJsonWithBundleKeys.class);
   Assert.assertEquals(fromJson,invoiceJsonSimple);
 }

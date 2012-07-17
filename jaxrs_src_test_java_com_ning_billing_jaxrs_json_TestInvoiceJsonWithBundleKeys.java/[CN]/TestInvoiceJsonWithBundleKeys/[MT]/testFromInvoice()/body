@@ -11,7 +11,8 @@
   Mockito.when(invoice.getBalance()).thenReturn(BigDecimal.ZERO);
   Mockito.when(invoice.getAccountId()).thenReturn(UUID.randomUUID());
   final String bundleKeys=UUID.randomUUID().toString();
-  final InvoiceJsonWithBundleKeys invoiceJsonWithBundleKeys=new InvoiceJsonWithBundleKeys(invoice,bundleKeys);
+  final List<CreditJson> credits=ImmutableList.<CreditJson>of(createCreditJson());
+  final InvoiceJsonWithBundleKeys invoiceJsonWithBundleKeys=new InvoiceJsonWithBundleKeys(invoice,bundleKeys,credits);
   Assert.assertEquals(invoiceJsonWithBundleKeys.getAmount(),invoice.getChargedAmount());
   Assert.assertEquals(invoiceJsonWithBundleKeys.getCBA(),invoice.getCBAAmount());
   Assert.assertEquals(invoiceJsonWithBundleKeys.getCreditAdj(),invoice.getCreditAdjAmount());
@@ -23,4 +24,5 @@
   Assert.assertEquals(invoiceJsonWithBundleKeys.getBalance(),invoice.getBalance());
   Assert.assertEquals(invoiceJsonWithBundleKeys.getAccountId(),invoice.getAccountId().toString());
   Assert.assertEquals(invoiceJsonWithBundleKeys.getBundleKeys(),bundleKeys);
+  Assert.assertEquals(invoiceJsonWithBundleKeys.getCredits(),credits);
 }

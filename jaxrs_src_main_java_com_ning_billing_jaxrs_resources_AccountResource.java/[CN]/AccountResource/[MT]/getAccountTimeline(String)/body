@@ -1,14 +1,25 @@
 {
   try {
-    final Account account=accountApi.getAccountById(UUID.fromString(accountId));
+    final UUID accountId=UUID.fromString(accountIdString);
+    final Account account=accountApi.getAccountById(accountId);
     final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId());
-    final List<Payment> payments=paymentApi.getAccountPayments(UUID.fromString(accountId));
+    final List<Payment> payments=paymentApi.getAccountPayments(accountId);
+    final List<Refund> refunds=paymentApi.getAccountRefunds(account);
+    final Multimap<UUID,Refund> refundsByPayment=ArrayListMultimap.<UUID,Refund>create();
+    for (    final Refund refund : refunds) {
+      refundsByPayment.put(refund.getPaymentId(),refund);
+    }
+    final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByAccountId(accountId);
+    final Multimap<UUID,InvoicePayment> chargebacksByPayment=ArrayListMultimap.<UUID,InvoicePayment>create();
+    for (    final InvoicePayment chargeback : chargebacks) {
+      chargebacksByPayment.put(chargeback.getPaymentId(),chargeback);
+    }
     final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(account.getId());
     final List<BundleTimeline> bundlesTimeline=new LinkedList<BundleTimeline>();
     for (    final SubscriptionBundle cur : bundles) {
       bundlesTimeline.add(timelineApi.getBundleRepair(cur.getId()));
     }
-    final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundlesTimeline);
+    final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundlesTimeline,refundsByPayment,chargebacksByPayment);
     return Response.status(Status.OK).entity(json).build();
   }
  catch (  AccountApiException e) {
