@@ -1,0 +1,27 @@
+{
+  BillCycleDay result=null;
+switch (alignment) {
+case ACCOUNT:
+    result=account.getBillCycleDay();
+  if (result == null || result.getDayOfMonthUTC() == 0) {
+    result=calculateBcdFromSubscription(subscription,plan,account);
+  }
+break;
+case BUNDLE:
+final Subscription baseSub=entitlementApi.getBaseSubscription(bundle.getId());
+Plan basePlan=baseSub.getCurrentPlan();
+if (basePlan == null) {
+final EffectiveSubscriptionEvent previousTransition=baseSub.getPreviousTransition();
+basePlan=catalog.findPlan(previousTransition.getPreviousPlan(),previousTransition.getEffectiveTransitionTime(),previousTransition.getSubscriptionStartDate());
+}
+result=calculateBcdFromSubscription(baseSub,basePlan,account);
+break;
+case SUBSCRIPTION:
+result=calculateBcdFromSubscription(subscription,plan,account);
+break;
+}
+if (result == null) {
+throw new CatalogApiException(ErrorCode.CAT_INVALID_BILLING_ALIGNMENT,alignment.toString());
+}
+return result;
+}
