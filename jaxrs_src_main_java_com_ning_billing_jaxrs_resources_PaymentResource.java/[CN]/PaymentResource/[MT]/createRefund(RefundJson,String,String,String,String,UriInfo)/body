@@ -1,20 +1,7 @@
 {
-  try {
-    final UUID paymentUuid=UUID.fromString(paymentId);
-    final Payment payment=paymentApi.getPayment(paymentUuid);
-    final Account account=accountApi.getAccountById(payment.getAccountId());
-    Refund result=paymentApi.createRefund(account,paymentUuid,json.getRefundAmount(),json.isAdjusted(),context.createContext(createdBy,reason,comment));
-    return uriBuilder.buildResponse(RefundResource.class,"getRefund",result.getId(),uriInfo.getBaseUri().toString());
-  }
- catch (  AccountApiException e) {
-    if (e.getCode() == ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID.getCode()) {
-      return Response.status(Status.NO_CONTENT).build();
-    }
- else {
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-  }
-catch (  PaymentApiException e) {
-    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
-  }
+  final UUID paymentUuid=UUID.fromString(paymentId);
+  final Payment payment=paymentApi.getPayment(paymentUuid);
+  final Account account=accountApi.getAccountById(payment.getAccountId());
+  final Refund result=paymentApi.createRefund(account,paymentUuid,json.getRefundAmount(),json.isAdjusted(),context.createContext(createdBy,reason,comment));
+  return uriBuilder.buildResponse(RefundResource.class,"getRefund",result.getId(),uriInfo.getBaseUri().toString());
 }
