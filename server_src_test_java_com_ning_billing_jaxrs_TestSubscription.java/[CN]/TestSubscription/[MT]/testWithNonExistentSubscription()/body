@@ -3,13 +3,9 @@
   final SubscriptionJsonNoEvents subscriptionJson=new SubscriptionJsonNoEvents(null,UUID.randomUUID().toString(),null,"Pistol",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),PriceListSet.DEFAULT_PRICELIST_NAME,null,null);
   final String baseJson=mapper.writeValueAsString(subscriptionJson);
   Response response=doPut(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.NO_CONTENT.getStatusCode());
-  String body=response.getResponseBody();
-  Assert.assertEquals(body,"");
+  Assert.assertEquals(response.getStatusCode(),Status.NOT_FOUND.getStatusCode());
   response=doDelete(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.NO_CONTENT.getStatusCode());
-  body=response.getResponseBody();
-  Assert.assertEquals(body,"");
+  Assert.assertEquals(response.getStatusCode(),Status.NOT_FOUND.getStatusCode());
   response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.NO_CONTENT.getStatusCode());
+  Assert.assertEquals(response.getStatusCode(),Status.NOT_FOUND.getStatusCode());
 }
