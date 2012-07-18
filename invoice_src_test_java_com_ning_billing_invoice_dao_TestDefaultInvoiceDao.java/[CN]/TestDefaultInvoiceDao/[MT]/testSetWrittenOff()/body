@@ -5,6 +5,6 @@
   dao.setWrittenOff(invoiceId,Mockito.mock(CallContext.class));
   final Map<String,Tag> afterTags=tagUserApi.getTags(invoiceId,ObjectType.INVOICE);
   Assert.assertEquals(afterTags.keySet().size(),1);
-  final String name=ControlTagType.WRITTEN_OFF.toTagDefinition().getName();
-  Assert.assertEquals(afterTags.get(name).getTagDefinitionName(),name);
+  final UUID tagDefinitionId=ControlTagType.WRITTEN_OFF.getId();
+  Assert.assertEquals(afterTags.values().iterator().next().getTagDefinitionId(),tagDefinitionId);
 }

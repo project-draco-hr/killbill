@@ -10,16 +10,16 @@
   assertNotNull(tagDefinition);
   final UUID objectId=UUID.randomUUID();
   final TagStore tagStore=new DefaultTagStore(objectId,ObjectType.ACCOUNT);
-  final Tag tag=new DescriptiveTag(tagDefinition);
+  final Tag tag=new DescriptiveTag(tagDefinition.getId());
   tagStore.add(tag);
   tagDao.saveEntities(objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
   final Map<String,Tag> tagMap=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
   assertEquals(tagMap.size(),1);
-  tagDao.deleteTag(objectId,ObjectType.ACCOUNT,tagDefinition,context);
+  tagDao.deleteTag(objectId,ObjectType.ACCOUNT,tagDefinition.getId(),context);
   final Map<String,Tag> tagMapAfterDeletion=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
   assertEquals(tagMapAfterDeletion.size(),0);
   try {
-    tagDefinitionDao.deleteTagDefinition(definitionName,context);
+    tagDefinitionDao.deleteById(tagDefinition.getId(),context);
   }
  catch (  TagDefinitionApiException e) {
     fail("Could not delete tag definition",e);

@@ -1,8 +1,8 @@
 {
   final UUID objectId=UUID.randomUUID();
   final ObjectType objectType=ObjectType.INVOICE;
-  final TagDefinition tagDefinition=new DefaultTagDefinition("test tag","test",false);
-  tagDao.insertTag(objectId,objectType,tagDefinition,context);
+  final TagDefinition tagDefinition=tagDefinitionDao.create("test tag","test",context);
+  tagDao.insertTag(objectId,objectType,tagDefinition.getId(),context);
   final Map<String,Tag> savedTags=tagDao.loadEntities(objectId,objectType);
   assertEquals(savedTags.size(),1);
 }

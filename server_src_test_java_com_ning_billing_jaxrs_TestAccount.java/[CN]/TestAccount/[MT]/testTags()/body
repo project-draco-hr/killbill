@@ -1,12 +1,9 @@
 {
-  final TagDefinitionJson input=new TagDefinitionJson("yoyo","nothing more to say");
-  final String baseJson=mapper.writeValueAsString(input);
-  Response response=doPost(JaxrsResource.TAG_DEFINITIONS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
+  final TagDefinitionJson input=new TagDefinitionJson(new UUID(0,1).toString(),"AUTO_PAY_OFF","nothing more to say");
   final Map<String,String> queryParams=new HashMap<String,String>();
-  queryParams.put(JaxrsResource.QUERY_TAGS,input.getName());
+  queryParams.put(JaxrsResource.QUERY_TAGS,input.getId());
   final String uri=JaxrsResource.ACCOUNTS_PATH + "/" + UUID.randomUUID().toString()+ "/"+ JaxrsResource.TAGS;
-  response=doPost(uri,null,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
+  Response response=doPost(uri,null,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
   final String url=getUrlFromUri(uri);
   response=doGetWithUrl(url,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);

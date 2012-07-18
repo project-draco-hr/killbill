@@ -1,0 +1,16 @@
+{
+  final List<UUID> uuids=new ArrayList<UUID>();
+  TagDefinition defYo=tagDefinitionDao.create("yo","defintion yo",context);
+  uuids.add(defYo.getId());
+  TagDefinition defBah=tagDefinitionDao.create("bah","defintion bah",context);
+  uuids.add(defBah.getId());
+  TagDefinition defZoo=tagDefinitionDao.create("zoo","defintion zoo",context);
+  uuids.add(defZoo.getId());
+  List<TagDefinition> result=tagDefinitionDao.getByIds(uuids);
+  assertEquals(result.size(),3);
+  uuids.add(ControlTagType.AUTO_PAY_OFF.getId());
+  result=tagDefinitionDao.getByIds(uuids);
+  assertEquals(result.size(),4);
+  result=tagDefinitionDao.getTagDefinitions();
+  assertEquals(result.size(),7);
+}

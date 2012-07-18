@@ -9,7 +9,7 @@
  catch (  TagDefinitionApiException e) {
     fail("Tag definition creation failed.",e);
   }
-  final DescriptiveTag descriptiveTag=new DescriptiveTag(tagDefinition);
+  final DescriptiveTag descriptiveTag=new DescriptiveTag(tagDefinition.getId());
   tagStore.add(descriptiveTag);
   assertEquals(tagStore.generateInvoice(),true);
   final ControlTag controlTag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
@@ -20,5 +20,12 @@
   assertEquals(tagStore.getEntityList().size(),0);
   final Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   assertEquals(tagMap.size(),2);
-  assertEquals(tagMap.containsKey(ControlTagType.AUTO_INVOICING_OFF.toString()),true);
+  boolean found_AUTO_INVOICING_OFF_tag=false;
+  for (  Tag cur : tagMap.values()) {
+    if (cur.getTagDefinitionId().equals(ControlTagType.AUTO_INVOICING_OFF.getId())) {
+      found_AUTO_INVOICING_OFF_tag=true;
+      break;
+    }
+  }
+  assertEquals(found_AUTO_INVOICING_OFF_tag,true);
 }

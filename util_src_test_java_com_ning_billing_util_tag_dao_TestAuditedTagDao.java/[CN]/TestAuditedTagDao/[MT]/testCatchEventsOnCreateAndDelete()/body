@@ -8,10 +8,10 @@
   final TagDefinition createdTagDefinition=tagDefinitionDao.create(definitionName,description,context);
   Assert.assertEquals(createdTagDefinition.getName(),definitionName);
   Assert.assertEquals(createdTagDefinition.getDescription(),description);
-  tagDao.insertTag(objectId,objectType,createdTagDefinition,context);
+  tagDao.insertTag(objectId,objectType,createdTagDefinition.getId(),context);
   final Map<String,Tag> foundTags=tagDao.loadEntities(objectId,objectType);
   Assert.assertEquals(foundTags.keySet().size(),1);
-  Assert.assertEquals(foundTags.get(definitionName).getTagDefinitionName(),definitionName);
+  Assert.assertEquals(foundTags.values().iterator().next().getTagDefinitionId(),createdTagDefinition.getId());
   Assert.assertEquals(eventsListener.getEvents().size(),2);
   Assert.assertEquals(eventsListener.getTagEvents().size(),1);
   final TagEvent tagFirstEventReceived=eventsListener.getTagEvents().get(0);
@@ -22,7 +22,7 @@
   Assert.assertEquals(tagFirstEventReceived.getTagDefinition().getDescription(),createdTagDefinition.getDescription());
   Assert.assertEquals(tagFirstEventReceived.getBusEventType(),BusEvent.BusEventType.USER_TAG_CREATION);
   Assert.assertEquals(tagFirstEventReceived.getUserToken(),context.getUserToken());
-  tagDao.deleteTag(objectId,objectType,createdTagDefinition,context);
+  tagDao.deleteTag(objectId,objectType,createdTagDefinition.getId(),context);
   Assert.assertEquals(tagDao.loadEntities(objectId,objectType).keySet().size(),0);
   Assert.assertEquals(eventsListener.getEvents().size(),3);
   Assert.assertEquals(eventsListener.getTagEvents().size(),2);

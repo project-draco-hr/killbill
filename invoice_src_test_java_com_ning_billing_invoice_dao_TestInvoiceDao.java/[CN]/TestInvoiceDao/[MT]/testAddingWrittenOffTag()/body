@@ -15,5 +15,5 @@
   final TagDao tagDao=new AuditedTagDao(dbi,tagEventBuilder,bus);
   final Map<String,Tag> tags=tagDao.loadEntities(invoice.getId(),ObjectType.INVOICE);
   assertEquals(tags.size(),1);
-  assertTrue(tags.containsKey(ControlTagType.WRITTEN_OFF.toString()));
+  assertEquals(tags.values().iterator().next().getTagDefinitionId(),ControlTagType.WRITTEN_OFF.getId());
 }

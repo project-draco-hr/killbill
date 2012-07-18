@@ -1,12 +1,12 @@
 {
   final UUID accountId=UUID.randomUUID();
   final TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
-  final Tag tag=new DescriptiveTag(testTag);
+  final Tag tag=new DescriptiveTag(testTag.getId());
   tagStore.add(tag);
   tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
   final Map<String,Tag> savedTags=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   assertEquals(savedTags.size(),1);
-  final Tag savedTag=savedTags.get(tag.getTagDefinitionName());
-  assertEquals(savedTag.getTagDefinitionName(),tag.getTagDefinitionName());
+  final Tag savedTag=savedTags.get(tag.getId().toString());
+  assertEquals(savedTag.getTagDefinitionId(),tag.getTagDefinitionId());
   assertEquals(savedTag.getId(),tag.getId());
 }

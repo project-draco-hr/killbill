@@ -2,7 +2,14 @@
   for (  final SubscriptionBundle bundle : bundles) {
     final List<Subscription> subscriptions=entitlementUserApi.getSubscriptionsForBundle(bundle.getId());
     final Map<String,Tag> bundleTags=tagApi.getTags(bundle.getId(),ObjectType.BUNDLE);
-    if (bundleTags.get(ControlTagType.AUTO_INVOICING_OFF.name()) != null) {
+    boolean found_AUTO_INVOICING_OFF=false;
+    for (    Tag cur : bundleTags.values()) {
+      if (ControlTagType.AUTO_INVOICING_OFF.getId().equals(cur.getTagDefinitionId())) {
+        found_AUTO_INVOICING_OFF=true;
+        break;
+      }
+    }
+    if (found_AUTO_INVOICING_OFF) {
       for (      final Subscription subscription : subscriptions) {
         result.getSubscriptionIdsWithAutoInvoiceOff().add(subscription.getId());
       }

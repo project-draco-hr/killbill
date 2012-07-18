@@ -1,0 +1,17 @@
+{
+  TagDefinition tagDefintion=null;
+  for (  ControlTagType t : ControlTagType.values()) {
+    if (t.getId().equals(tagDefinitionId)) {
+      tagDefintion=new DefaultTagDefinition(t.getId(),t.toString(),t.getDescription(),true);
+      break;
+    }
+  }
+  if (tagDefintion == null) {
+    TagDefinitionSqlDao transTagDefintionSqlDao=tagSqlDao.become(TagDefinitionSqlDao.class);
+    tagDefintion=transTagDefintionSqlDao.getById(tagDefinitionId.toString());
+  }
+  if (tagDefintion == null) {
+    throw new TagApiException(ErrorCode.TAG_DEFINITION_DOES_NOT_EXIST,tagDefinitionId);
+  }
+  return tagDefintion;
+}

@@ -1,6 +1,6 @@
 {
   try {
-    final List<TagDefinition> input=tagHelper.getTagDefinitionFromTagList(tagList);
+    final Collection<UUID> input=getTagDefinitionUUIDs(tagList);
     tagUserApi.removeTags(id,getObjectType(),input,context);
     return Response.status(Response.Status.OK).build();
   }
@@ -8,9 +8,6 @@
     return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
   }
 catch (  NullPointerException e) {
-    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-  }
-catch (  TagDefinitionApiException e) {
     return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
   }
 catch (  TagApiException e) {

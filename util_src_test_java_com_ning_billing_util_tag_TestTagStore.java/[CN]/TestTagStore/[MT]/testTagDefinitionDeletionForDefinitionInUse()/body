@@ -5,10 +5,10 @@
   assertNotNull(tagDefinition);
   final UUID objectId=UUID.randomUUID();
   final TagStore tagStore=new DefaultTagStore(objectId,ObjectType.ACCOUNT);
-  final Tag tag=new DescriptiveTag(tagDefinition);
+  final Tag tag=new DescriptiveTag(tagDefinition.getId());
   tagStore.add(tag);
   tagDao.saveEntities(objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
   final Map<String,Tag> tagMap=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
   assertEquals(tagMap.size(),1);
-  tagDefinitionDao.deleteTagDefinition(definitionName,context);
+  tagDefinitionDao.deleteById(tagDefinition.getId(),context);
 }

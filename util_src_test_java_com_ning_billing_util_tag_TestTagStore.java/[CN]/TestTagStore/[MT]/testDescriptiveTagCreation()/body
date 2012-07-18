@@ -9,7 +9,7 @@
  catch (  TagDefinitionApiException e) {
     fail("Tag definition creation failed.",e);
   }
-  final DescriptiveTag tag=new DescriptiveTag(tagDefinition);
+  final DescriptiveTag tag=new DescriptiveTag(tagDefinition.getId());
   tagStore.add(tag);
   assertEquals(tagStore.generateInvoice(),true);
   tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
@@ -17,5 +17,5 @@
   assertEquals(tagStore.getEntityList().size(),0);
   final Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
   assertEquals(tagMap.size(),1);
-  assertEquals(tagMap.containsKey(ControlTagType.AUTO_INVOICING_OFF.toString()),false);
+  assertEquals(tagMap.values().iterator().next().getTagDefinitionId(),tagDefinition.getId());
 }
