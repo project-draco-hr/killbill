@@ -6,7 +6,13 @@
   try {
     final Account account=accountUserApi.getAccountById(accountId);
     final LocalDate effectiveDate=json.getEffectiveDate().toDateTime(account.getTimeZone()).toLocalDate();
-    final InvoiceItem credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),effectiveDate,account.getCurrency(),context.createContext(createdBy,reason,comment));
+    final InvoiceItem credit;
+    if (json.getInvoiceId() != null) {
+      credit=invoiceUserApi.insertCreditForInvoice(account.getId(),json.getInvoiceId(),json.getCreditAmount(),effectiveDate,account.getCurrency(),context.createContext(createdBy,reason,comment));
+    }
+ else {
+      credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),effectiveDate,account.getCurrency(),context.createContext(createdBy,reason,comment));
+    }
     return uriBuilder.buildResponse(CreditResource.class,"getCredit",credit.getId());
   }
  catch (  InvoiceApiException e) {
