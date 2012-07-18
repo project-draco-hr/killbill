@@ -1,17 +1,9 @@
 {
   final Invoice invoice=invoiceApi.getInvoice(UUID.fromString(invoiceId));
   if (invoice == null) {
-    return Response.status(Status.NOT_FOUND).build();
+    throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND);
   }
-  try {
-    final Account account=accountApi.getAccountById(invoice.getAccountId());
-    invoiceNotifier.notify(account,invoice);
-    return Response.status(Status.OK).build();
-  }
- catch (  AccountApiException e) {
-    return Response.status(Status.NOT_FOUND).build();
-  }
-catch (  InvoiceApiException e) {
-    return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
-  }
+  final Account account=accountApi.getAccountById(invoice.getAccountId());
+  invoiceNotifier.notify(account,invoice);
+  return Response.status(Status.OK).build();
 }
