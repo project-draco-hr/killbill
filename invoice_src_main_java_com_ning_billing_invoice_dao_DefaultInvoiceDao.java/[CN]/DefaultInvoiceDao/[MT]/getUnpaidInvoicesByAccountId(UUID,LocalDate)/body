@@ -4,7 +4,7 @@
       final List<Invoice> invoices=getAllInvoicesByAccountFromTransaction(accountId,invoiceDao);
       final Collection<Invoice> unpaidInvoices=Collections2.filter(invoices,new Predicate<Invoice>(){
         @Override public boolean apply(        final Invoice in){
-          return (in.getBalance().compareTo(BigDecimal.ZERO) >= 1) && !in.getTargetDate().isAfter(upToDate);
+          return (in.getBalance().compareTo(BigDecimal.ZERO) >= 1) && (upToDate == null || !in.getTargetDate().isAfter(upToDate));
         }
       }
 );

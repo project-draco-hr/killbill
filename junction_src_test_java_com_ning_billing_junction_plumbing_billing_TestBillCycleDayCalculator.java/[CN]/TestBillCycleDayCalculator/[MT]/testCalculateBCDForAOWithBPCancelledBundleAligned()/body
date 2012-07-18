@@ -1,0 +1,22 @@
+{
+  final DateTimeZone accountTimeZone=DateTimeZone.UTC;
+  final DateTime bpStartDateUTC=new DateTime(2012,7,16,21,0,0,DateTimeZone.UTC);
+  final int expectedBCDUTC=16;
+  final CatalogService catalogService=Mockito.mock(CatalogService.class);
+  final EntitlementUserApi entitlementUserApi=Mockito.mock(EntitlementUserApi.class);
+  final BillCycleDayCalculator billCycleDayCalculator=new BillCycleDayCalculator(catalogService,entitlementUserApi);
+  final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
+  final EffectiveSubscriptionEvent previousTransition=Mockito.mock(EffectiveSubscriptionEvent.class);
+  final Subscription subscription=Mockito.mock(Subscription.class);
+  Mockito.when(subscription.getStartDate()).thenReturn(bpStartDateUTC);
+  Mockito.when(subscription.getPreviousTransition()).thenReturn(previousTransition);
+  Mockito.when(entitlementUserApi.getBaseSubscription(Mockito.<UUID>any())).thenReturn(subscription);
+  final Plan plan=Mockito.mock(Plan.class);
+  Mockito.when(plan.dateOfFirstRecurringNonZeroCharge(bpStartDateUTC)).thenReturn(bpStartDateUTC);
+  final Catalog catalog=Mockito.mock(Catalog.class);
+  Mockito.when(catalog.findPlan(Mockito.anyString(),Mockito.<DateTime>any(),Mockito.<DateTime>any())).thenReturn(plan);
+  final Account account=Mockito.mock(Account.class);
+  Mockito.when(account.getTimeZone()).thenReturn(accountTimeZone);
+  final BillCycleDay billCycleDay=billCycleDayCalculator.calculateBcdForAlignment(BillingAlignment.BUNDLE,bundle,subscription,account,catalog,null);
+  Assert.assertEquals(billCycleDay.getDayOfMonthUTC(),expectedBCDUTC);
+}

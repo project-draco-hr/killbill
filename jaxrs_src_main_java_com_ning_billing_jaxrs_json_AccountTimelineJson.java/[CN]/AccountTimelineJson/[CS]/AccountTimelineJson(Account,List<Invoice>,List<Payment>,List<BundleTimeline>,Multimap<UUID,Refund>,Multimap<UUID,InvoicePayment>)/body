@@ -1,0 +1,32 @@
+{
+  this.account=new AccountJsonSimple(account.getId().toString(),account.getExternalKey());
+  this.bundles=new LinkedList<BundleJsonWithSubscriptions>();
+  for (  final BundleTimeline cur : bundles) {
+    this.bundles.add(new BundleJsonWithSubscriptions(account.getId(),cur));
+  }
+  this.invoices=new LinkedList<InvoiceJsonWithBundleKeys>();
+  final List<CreditJson> credits=new ArrayList<CreditJson>();
+  for (  final Invoice invoice : invoices) {
+    for (    final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+      if (InvoiceItemType.CREDIT_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+        credits.add(new CreditJson(invoiceItem,account.getTimeZone()));
+      }
+    }
+  }
+  for (  final Invoice invoice : invoices) {
+    this.invoices.add(new InvoiceJsonWithBundleKeys(invoice.getPaidAmount(),invoice.getCBAAmount(),invoice.getCreditAdjAmount(),invoice.getRefundAdjAmount(),invoice.getId().toString(),invoice.getInvoiceDate(),invoice.getTargetDate(),Integer.toString(invoice.getInvoiceNumber()),invoice.getBalance(),invoice.getAccountId().toString(),getBundleExternalKey(invoice,bundles),credits));
+  }
+  this.payments=new LinkedList<PaymentJsonWithBundleKeys>();
+  for (  final Payment payment : payments) {
+    final List<RefundJson> refunds=new ArrayList<RefundJson>();
+    for (    final Refund refund : refundsByPayment.get(payment.getId())) {
+      refunds.add(new RefundJson(refund));
+    }
+    final List<ChargebackJson> chargebacks=new ArrayList<ChargebackJson>();
+    for (    final InvoicePayment chargeback : chargebacksByPayment.get(payment.getId())) {
+      chargebacks.add(new ChargebackJson(chargeback));
+    }
+    final String status=payment.getPaymentStatus().toString();
+    this.payments.add(new PaymentJsonWithBundleKeys(payment.getAmount(),payment.getPaidAmount(),account.getId().toString(),payment.getInvoiceId().toString(),payment.getId().toString(),payment.getEffectiveDate(),payment.getEffectiveDate(),payment.getAttempts().size(),payment.getCurrency().toString(),status,getBundleExternalKey(payment.getInvoiceId(),invoices,bundles),refunds,chargebacks));
+  }
+}
