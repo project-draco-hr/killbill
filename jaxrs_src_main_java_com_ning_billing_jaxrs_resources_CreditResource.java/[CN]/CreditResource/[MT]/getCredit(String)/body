@@ -1,20 +1,6 @@
 {
-  try {
-    final InvoiceItem credit=invoiceUserApi.getCreditById(UUID.fromString(creditId));
-    final Account account=accountUserApi.getAccountById(credit.getAccountId());
-    final CreditJson creditJson=new CreditJson(credit,account.getTimeZone());
-    return Response.status(Response.Status.OK).entity(creditJson).build();
-  }
- catch (  InvoiceApiException e) {
-    if (e.getCode() == ErrorCode.INVOICE_NO_SUCH_CREDIT.getCode()) {
-      return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
- else {
-      return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
-  }
-catch (  AccountApiException e) {
-    log.warn(String.format("Failed to locate account for credit id %s",creditId),e);
-    return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).type(MediaType.TEXT_PLAIN_TYPE).build();
-  }
+  final InvoiceItem credit=invoiceUserApi.getCreditById(UUID.fromString(creditId));
+  final Account account=accountUserApi.getAccountById(credit.getAccountId());
+  final CreditJson creditJson=new CreditJson(credit,account.getTimeZone());
+  return Response.status(Response.Status.OK).entity(creditJson).build();
 }

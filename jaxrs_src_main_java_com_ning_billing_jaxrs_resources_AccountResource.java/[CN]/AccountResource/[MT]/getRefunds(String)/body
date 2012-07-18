@@ -1,24 +1,11 @@
 {
-  try {
-    final Account account=accountApi.getAccountById(UUID.fromString(accountId));
-    List<Refund> refunds=paymentApi.getAccountRefunds(account);
-    List<RefundJson> result=new ArrayList<RefundJson>(Collections2.transform(refunds,new Function<Refund,RefundJson>(){
-      @Override public RefundJson apply(      Refund input){
-        return new RefundJson(input);
-      }
+  final Account account=accountApi.getAccountById(UUID.fromString(accountId));
+  final List<Refund> refunds=paymentApi.getAccountRefunds(account);
+  final List<RefundJson> result=new ArrayList<RefundJson>(Collections2.transform(refunds,new Function<Refund,RefundJson>(){
+    @Override public RefundJson apply(    Refund input){
+      return new RefundJson(input);
     }
+  }
 ));
-    return Response.status(Status.OK).entity(result).build();
-  }
- catch (  AccountApiException e) {
-    if (e.getCode() == ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID.getCode()) {
-      return Response.status(Status.NO_CONTENT).build();
-    }
- else {
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-  }
-catch (  PaymentApiException e) {
-    return Response.status(Status.BAD_REQUEST).build();
-  }
+  return Response.status(Status.OK).entity(result).build();
 }

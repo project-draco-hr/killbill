@@ -11,7 +11,7 @@
   Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   String baseJson=response.getResponseBody();
-  List<PaymentJsonSimple> objFromJson=mapper.readValue(baseJson,new TypeReference<List<PaymentJsonSimple>>(){
+  final List<PaymentJsonSimple> objFromJson=mapper.readValue(baseJson,new TypeReference<List<PaymentJsonSimple>>(){
   }
 );
   Assert.assertEquals(objFromJson.size(),1);
@@ -25,7 +25,7 @@
   }
 );
   Assert.assertEquals(objRefundFromJson.size(),0);
-  RefundJson refundJson=new RefundJson(null,paymentId,paymentAmount,false);
+  final RefundJson refundJson=new RefundJson(null,paymentId,paymentAmount,false);
   baseJson=mapper.writeValueAsString(refundJson);
   response=doPost(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());

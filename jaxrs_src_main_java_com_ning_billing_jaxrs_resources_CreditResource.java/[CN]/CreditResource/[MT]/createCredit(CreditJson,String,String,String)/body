@@ -1,31 +1,12 @@
 {
-  final UUID accountId=json.getAccountId();
-  if (accountId == null) {
-    return Response.status(Response.Status.BAD_REQUEST).entity("AccountId cannot be null").build();
+  final Account account=accountUserApi.getAccountById(json.getAccountId());
+  final LocalDate effectiveDate=json.getEffectiveDate().toDateTime(account.getTimeZone()).toLocalDate();
+  final InvoiceItem credit;
+  if (json.getInvoiceId() != null) {
+    credit=invoiceUserApi.insertCreditForInvoice(account.getId(),json.getInvoiceId(),json.getCreditAmount(),effectiveDate,account.getCurrency(),context.createContext(createdBy,reason,comment));
   }
-  try {
-    final Account account=accountUserApi.getAccountById(accountId);
-    final LocalDate effectiveDate=json.getEffectiveDate().toDateTime(account.getTimeZone()).toLocalDate();
-    final InvoiceItem credit;
-    if (json.getInvoiceId() != null) {
-      credit=invoiceUserApi.insertCreditForInvoice(account.getId(),json.getInvoiceId(),json.getCreditAmount(),effectiveDate,account.getCurrency(),context.createContext(createdBy,reason,comment));
-    }
  else {
-      credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),effectiveDate,account.getCurrency(),context.createContext(createdBy,reason,comment));
-    }
-    return uriBuilder.buildResponse(CreditResource.class,"getCredit",credit.getId());
+    credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),effectiveDate,account.getCurrency(),context.createContext(createdBy,reason,comment));
   }
- catch (  InvoiceApiException e) {
-    final String error=String.format("Failed to create credit %s",json);
-    log.info(error,e);
-    return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
-  }
-catch (  IllegalArgumentException e) {
-    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-  }
-catch (  AccountApiException e) {
-    final String error=String.format("Failed to create credit %s",json);
-    log.info(error,e);
-    return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
-  }
+  return uriBuilder.buildResponse(CreditResource.class,"getCredit",credit.getId());
 }

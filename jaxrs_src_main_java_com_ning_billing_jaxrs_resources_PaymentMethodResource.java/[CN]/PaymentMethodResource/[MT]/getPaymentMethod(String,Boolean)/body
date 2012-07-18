@@ -1,17 +1,9 @@
 {
-  try {
-    PaymentMethod paymentMethod=paymentApi.getPaymentMethodById(UUID.fromString(paymentMethodId));
-    final Account account=accountApi.getAccountById(paymentMethod.getAccountId());
-    if (withPluginInfo) {
-      paymentMethod=paymentApi.getPaymentMethod(account,paymentMethod.getId(),true);
-    }
-    final PaymentMethodJson json=PaymentMethodJson.toPaymentMethodJson(account,paymentMethod);
-    return Response.status(Status.OK).entity(json).build();
+  PaymentMethod paymentMethod=paymentApi.getPaymentMethodById(UUID.fromString(paymentMethodId));
+  final Account account=accountApi.getAccountById(paymentMethod.getAccountId());
+  if (withPluginInfo) {
+    paymentMethod=paymentApi.getPaymentMethod(account,paymentMethod.getId(),true);
   }
- catch (  AccountApiException e) {
-    return Response.status(Status.NO_CONTENT).build();
-  }
-catch (  PaymentApiException e) {
-    return Response.status(Status.NO_CONTENT).entity("PaymentMethod does not exist").build();
-  }
+  final PaymentMethodJson json=PaymentMethodJson.toPaymentMethodJson(account,paymentMethod);
+  return Response.status(Status.OK).entity(json).build();
 }

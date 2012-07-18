@@ -1,0 +1,21 @@
+{
+  final SubscriptionCallCompletionCallback<Response> callback=new SubscriptionCallCompletionCallback<Response>(){
+    private boolean isImmediateOp=true;
+    @Override public Response doOperation(    final CallContext ctx) throws EntitlementUserApiException, InterruptedException, TimeoutException {
+      final UUID uuid=UUID.fromString(subscriptionId);
+      final Subscription current=entitlementApi.getSubscriptionFromId(uuid);
+      final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
+      isImmediateOp=current.cancel(inputDate,false,ctx);
+      return Response.status(Status.OK).build();
+    }
+    @Override public boolean isImmOperation(){
+      return isImmediateOp;
+    }
+    @Override public Response doResponseOk(    final Response operationResponse){
+      return operationResponse;
+    }
+  }
+;
+  final SubscriptionCallCompletion<Response> callCompletionCreation=new SubscriptionCallCompletion<Response>();
+  return callCompletionCreation.withSynchronization(callback,timeoutSec,callCompletion,createdBy,reason,comment);
+}

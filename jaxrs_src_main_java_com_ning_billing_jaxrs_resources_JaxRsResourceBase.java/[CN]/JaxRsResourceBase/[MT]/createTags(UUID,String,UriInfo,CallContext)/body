@@ -1,17 +1,5 @@
 {
-  try {
-    Preconditions.checkNotNull(tagList,"Query % list cannot be null",JaxrsResource.QUERY_TAGS);
-    final Collection<UUID> input=getTagDefinitionUUIDs(tagList);
-    tagUserApi.addTags(id,getObjectType(),input,context);
-    return uriBuilder.buildResponse(this.getClass(),"getTags",id,uriInfo.getBaseUri().toString());
-  }
- catch (  IllegalArgumentException e) {
-    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-  }
-catch (  NullPointerException e) {
-    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-  }
-catch (  TagApiException e) {
-    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-  }
+  final Collection<UUID> input=getTagDefinitionUUIDs(tagList);
+  tagUserApi.addTags(id,getObjectType(),input,context);
+  return uriBuilder.buildResponse(this.getClass(),"getTags",id,uriInfo.getBaseUri().toString());
 }
