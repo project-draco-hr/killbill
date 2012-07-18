@@ -1,17 +1,6 @@
 {
-  try {
-    final PaymentMethod paymentMethod=paymentApi.getPaymentMethodById(UUID.fromString(paymentMethodId));
-    final Account account=accountApi.getAccountById(paymentMethod.getAccountId());
-    paymentApi.deletedPaymentMethod(account,UUID.fromString(paymentMethodId),context.createContext(createdBy,reason,comment));
-    return Response.status(Status.OK).build();
-  }
- catch (  PaymentApiException e) {
-    return Response.status(Status.NO_CONTENT).entity("PaymentMethod does not exist").build();
-  }
-catch (  AccountApiException e) {
-    return Response.status(Status.NO_CONTENT).build();
-  }
-catch (  IllegalArgumentException e) {
-    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
-  }
+  final PaymentMethod paymentMethod=paymentApi.getPaymentMethodById(UUID.fromString(paymentMethodId));
+  final Account account=accountApi.getAccountById(paymentMethod.getAccountId());
+  paymentApi.deletedPaymentMethod(account,UUID.fromString(paymentMethodId),context.createContext(createdBy,reason,comment));
+  return Response.status(Status.OK).build();
 }
