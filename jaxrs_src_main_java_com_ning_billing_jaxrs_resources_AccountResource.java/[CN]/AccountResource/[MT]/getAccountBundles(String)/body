@@ -1,22 +1,12 @@
 {
-  try {
-    final UUID uuid=UUID.fromString(accountId);
-    accountApi.getAccountById(uuid);
-    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(uuid);
-    final Collection<BundleJsonNoSubscriptions> result=Collections2.transform(bundles,new Function<SubscriptionBundle,BundleJsonNoSubscriptions>(){
-      @Override public BundleJsonNoSubscriptions apply(      final SubscriptionBundle input){
-        return new BundleJsonNoSubscriptions(input);
-      }
+  final UUID uuid=UUID.fromString(accountId);
+  accountApi.getAccountById(uuid);
+  final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(uuid);
+  final Collection<BundleJsonNoSubscriptions> result=Collections2.transform(bundles,new Function<SubscriptionBundle,BundleJsonNoSubscriptions>(){
+    @Override public BundleJsonNoSubscriptions apply(    final SubscriptionBundle input){
+      return new BundleJsonNoSubscriptions(input);
     }
+  }
 );
-    return Response.status(Status.OK).entity(result).build();
-  }
- catch (  AccountApiException e) {
-    if (e.getCode() == ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID.getCode()) {
-      return Response.status(Status.NO_CONTENT).build();
-    }
- else {
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-  }
+  return Response.status(Status.OK).entity(result).build();
 }
