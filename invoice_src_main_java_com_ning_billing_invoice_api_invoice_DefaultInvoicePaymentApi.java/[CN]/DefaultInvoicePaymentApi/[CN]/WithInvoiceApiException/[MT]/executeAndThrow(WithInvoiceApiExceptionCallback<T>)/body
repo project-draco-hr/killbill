@@ -1,0 +1,14 @@
+{
+  try {
+    return callback.doHandle();
+  }
+ catch (  TransactionFailedException e) {
+    if (e.getCause() instanceof InvoiceApiException) {
+      InvoiceApiException realException=(InvoiceApiException)e.getCause();
+      throw realException;
+    }
+ else {
+      throw e;
+    }
+  }
+}

@@ -1,3 +1,8 @@
 {
-  return dao.postChargeback(invoicePaymentId,amount,context);
+  return invoicePaymentWithException.executeAndThrow(new WithInvoiceApiExceptionCallback<InvoicePayment>(){
+    @Override public InvoicePayment doHandle() throws InvoiceApiException {
+      return dao.postChargeback(invoicePaymentId,amount,context);
+    }
+  }
+);
 }

@@ -1,0 +1,26 @@
+{
+  final PaymentJsonSimple payment=createAccountWithInvoiceAndPayment();
+  final ChargebackJson input=new ChargebackJson(null,null,new BigDecimal("50.00"),payment.getPaymentId(),null);
+  final String jsonInput=mapper.writeValueAsString(input);
+  int count=4;
+  Response response=null;
+  while (count-- > 0) {
+    response=doPost(JaxrsResource.CHARGEBACKS_PATH,jsonInput,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+    assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.CREATED.getStatusCode(),response.getResponseBody());
+  }
+  response=doPost(JaxrsResource.CHARGEBACKS_PATH,jsonInput,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode(),response.getResponseBody());
+  response=doGet(JaxrsResource.CHARGEBACKS_PATH + "/accounts/" + payment.getAccountId(),DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
+  ChargebackCollectionJson objFromJson=mapper.readValue(response.getResponseBody(),ChargebackCollectionJson.class);
+  assertEquals(objFromJson.getChargebacks().size(),4);
+  for (int i=0; i < objFromJson.getChargebacks().size(); i++) {
+    ChargebackJson chargeBack=objFromJson.getChargebacks().get(i);
+    assertTrue(chargeBack.getChargebackAmount().compareTo(input.getChargebackAmount()) == 0);
+    assertEquals(chargeBack.getPaymentId(),input.getPaymentId());
+  }
+  response=doGet(JaxrsResource.CHARGEBACKS_PATH + "/payments/" + payment.getPaymentId(),DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
+  objFromJson=mapper.readValue(response.getResponseBody(),ChargebackCollectionJson.class);
+  assertEquals(objFromJson.getChargebacks().size(),4);
+}
