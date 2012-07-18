@@ -1,16 +1,11 @@
 {
-  try {
-    final Map<String,Tag> tags=tagUserApi.getTags(id,getObjectType());
-    final Collection<UUID> tagIdList=(tags.size() == 0) ? Collections.<UUID>emptyList() : Collections2.transform(tags.values(),new Function<Tag,UUID>(){
-      @Override public UUID apply(      final Tag input){
-        return input.getTagDefinitionId();
-      }
+  final Map<String,Tag> tags=tagUserApi.getTags(id,getObjectType());
+  final Collection<UUID> tagIdList=(tags.size() == 0) ? Collections.<UUID>emptyList() : Collections2.transform(tags.values(),new Function<Tag,UUID>(){
+    @Override public UUID apply(    final Tag input){
+      return input.getTagDefinitionId();
     }
+  }
 );
-    final List<TagDefinition> tagDefinitionList=tagUserApi.getTagDefinitions(tagIdList);
-    return Response.status(Response.Status.OK).entity(tagDefinitionList).build();
-  }
- catch (  TagDefinitionApiException e) {
-    return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
-  }
+  final List<TagDefinition> tagDefinitionList=tagUserApi.getTagDefinitions(tagIdList);
+  return Response.status(Response.Status.OK).entity(tagDefinitionList).build();
 }

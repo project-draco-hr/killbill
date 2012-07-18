@@ -1,16 +1,8 @@
 {
-  try {
-    final LinkedList<CustomField> input=new LinkedList<CustomField>();
-    for (    final CustomFieldJson cur : customFields) {
-      input.add(new StringCustomField(cur.getName(),cur.getValue()));
-    }
-    customFieldUserApi.saveCustomFields(id,getObjectType(),input,context);
-    return uriBuilder.buildResponse(this.getClass(),"createCustomFields",id);
+  final LinkedList<CustomField> input=new LinkedList<CustomField>();
+  for (  final CustomFieldJson cur : customFields) {
+    input.add(new StringCustomField(cur.getName(),cur.getValue()));
   }
- catch (  IllegalArgumentException e) {
-    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-  }
-catch (  NullPointerException e) {
-    return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-  }
+  customFieldUserApi.saveCustomFields(id,getObjectType(),input,context);
+  return uriBuilder.buildResponse(this.getClass(),"createCustomFields",id);
 }
