@@ -1,14 +1,5 @@
 {
-  try {
-    final UUID accountId=UUID.fromString(json.getAccountId());
-    final SubscriptionBundle bundle=entitlementApi.createBundleForAccount(accountId,json.getExternalKey(),context.createContext(createdBy,reason,comment));
-    return uriBuilder.buildResponse(BundleResource.class,"getBundle",bundle.getId());
-  }
- catch (  EntitlementUserApiException e) {
-    log.info(String.format("Failed to create bundle %s",json),e);
-    return Response.status(Status.BAD_REQUEST).build();
-  }
-catch (  IllegalArgumentException e) {
-    return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
-  }
+  final UUID accountId=UUID.fromString(json.getAccountId());
+  final SubscriptionBundle bundle=entitlementApi.createBundleForAccount(accountId,json.getExternalKey(),context.createContext(createdBy,reason,comment));
+  return uriBuilder.buildResponse(BundleResource.class,"getBundle",bundle.getId());
 }
