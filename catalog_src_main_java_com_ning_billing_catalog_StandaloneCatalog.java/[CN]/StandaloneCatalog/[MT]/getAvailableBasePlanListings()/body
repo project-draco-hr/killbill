@@ -1,0 +1,14 @@
+{
+  final List<Listing> availBasePlans=new ArrayList<Listing>();
+  for (  Plan plan : getCurrentPlans()) {
+    if (plan.getProduct().getCategory().equals(ProductCategory.BASE)) {
+      for (      PriceList priceList : getPriceLists().getAllPriceLists()) {
+        Plan planInList=priceList.findPlan(plan.getProduct(),plan.getBillingPeriod());
+        if (planInList != null) {
+          availBasePlans.add(new DefaultListing(plan,priceList));
+        }
+      }
+    }
+  }
+  return availBasePlans;
+}
