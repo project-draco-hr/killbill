@@ -1,14 +1,33 @@
 {
-  if (!this.equalsNoId(obj)) {
+  if (!this.equalsNoIdNoDates(obj)) {
     return false;
   }
  else {
-    RefundJson other=(RefundJson)obj;
-    if (getRefundId() == null) {
-      return other.getRefundId() == null;
+    final RefundJson other=(RefundJson)obj;
+    if (refundId == null) {
+      if (other.getRefundId() != null) {
+        return false;
+      }
     }
- else {
-      return getRefundId().equals(other.getRefundId());
+ else     if (!refundId.equals(other.getRefundId())) {
+      return false;
     }
+    if (requestedDate == null) {
+      if (other.getRequestedDate() != null) {
+        return false;
+      }
+    }
+ else     if (requestedDate.compareTo(other.getRequestedDate()) != 0) {
+      return false;
+    }
+    if (effectiveDate == null) {
+      if (other.getEffectiveDate() != null) {
+        return false;
+      }
+    }
+ else     if (effectiveDate.compareTo(other.getEffectiveDate()) != 0) {
+      return false;
+    }
+    return true;
   }
 }
