@@ -1,0 +1,15 @@
+{
+  final PlanChangeResult planChangeResult;
+  try {
+    final Product destProduct=catalogService.getFullCatalog().findProduct(productName,requestedDate);
+    final Plan currentPlan=subscription.getCurrentPlan();
+    final PriceList currentPriceList=subscription.getCurrentPriceList();
+    final PlanPhaseSpecifier fromPlanPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),currentPlan.getBillingPeriod(),currentPriceList.getName(),subscription.getCurrentPhase().getPhaseType());
+    final PlanSpecifier toPlanPhase=new PlanSpecifier(productName,destProduct.getCategory(),term,priceList);
+    planChangeResult=catalogService.getFullCatalog().planChange(fromPlanPhase,toPlanPhase,requestedDate);
+  }
+ catch (  CatalogApiException e) {
+    throw new EntitlementUserApiException(e);
+  }
+  return planChangeResult;
+}

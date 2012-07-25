@@ -1,0 +1,13 @@
+{
+  final Subscription subscription=createSubscription("Shotgun",BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME);
+  try {
+    subscription.changePlanWithPolicy("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),ActionPolicy.ILLEGAL,context);
+    Assert.fail();
+  }
+ catch (  EntitlementError error) {
+    assertTrue(true);
+    assertEquals(entitlementApi.getSubscriptionFromId(subscription.getId()).getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
+  }
+  assertTrue(subscription.changePlanWithPolicy("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),ActionPolicy.IMMEDIATE,context));
+  assertEquals(entitlementApi.getSubscriptionFromId(subscription.getId()).getCurrentPlan().getBillingPeriod(),BillingPeriod.MONTHLY);
+}
