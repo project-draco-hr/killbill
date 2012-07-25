@@ -5,7 +5,13 @@
       final UUID uuid=UUID.fromString(subscriptionId);
       final Subscription current=entitlementApi.getSubscriptionFromId(uuid);
       final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
-      isImmediateOp=current.changePlan(subscription.getProductName(),BillingPeriod.valueOf(subscription.getBillingPeriod()),subscription.getPriceList(),inputDate,ctx);
+      if (policyString == null) {
+        isImmediateOp=current.changePlan(subscription.getProductName(),BillingPeriod.valueOf(subscription.getBillingPeriod()),subscription.getPriceList(),inputDate,ctx);
+      }
+ else {
+        final ActionPolicy policy=ActionPolicy.valueOf(policyString.toUpperCase());
+        isImmediateOp=current.changePlanWithPolicy(subscription.getProductName(),BillingPeriod.valueOf(subscription.getBillingPeriod()),subscription.getPriceList(),inputDate,policy,ctx);
+      }
       return Response.status(Status.OK).build();
     }
     @Override public boolean isImmOperation(){

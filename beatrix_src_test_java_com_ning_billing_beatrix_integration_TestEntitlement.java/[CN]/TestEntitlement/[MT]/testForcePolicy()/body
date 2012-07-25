@@ -1,0 +1,25 @@
+{
+  final LocalDate today=new LocalDate(2012,4,1);
+  final Account account=createAccountWithPaymentMethod(getAccountData(1));
+  clock.setDeltaFromReality(today.toDateTimeAtCurrentTime().getMillis() - clock.getUTCNow().getMillis());
+  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",context);
+  final String productName="Shotgun";
+  final BillingPeriod term=BillingPeriod.ANNUAL;
+  final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE);
+  final PlanPhaseSpecifier bpPlanPhaseSpecifier=new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null);
+  final SubscriptionData bpSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),bpPlanPhaseSpecifier,null,context));
+  assertNotNull(bpSubscription);
+  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
+  assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId()).size(),1);
+  assertEquals(entitlementUserApi.getSubscriptionFromId(bpSubscription.getId()).getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
+  busHandler.pushExpectedEvent(NextEvent.PHASE);
+  clock.addDays(40);
+  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
+  assertTrue(bpSubscription.changePlanWithPolicy(productName,BillingPeriod.MONTHLY,planSetName,clock.getUTCNow(),ActionPolicy.IMMEDIATE,context));
+  assertEquals(entitlementUserApi.getSubscriptionFromId(bpSubscription.getId()).getCurrentPlan().getBillingPeriod(),BillingPeriod.MONTHLY);
+  assertTrue(bpSubscription.changePlanWithPolicy(productName,BillingPeriod.ANNUAL,planSetName,clock.getUTCNow(),ActionPolicy.IMMEDIATE,context));
+  assertEquals(entitlementUserApi.getSubscriptionFromId(bpSubscription.getId()).getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
+}
