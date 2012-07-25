@@ -6,9 +6,17 @@
   for (  final AccountEmail email : accountEmailList) {
     cc.add(email.getEmail());
   }
+  boolean manualPay=false;
+  final Map<String,Tag> accountTags=tagUserApi.getTags(account.getId(),ObjectType.ACCOUNT);
+  for (  final Tag tag : accountTags.values()) {
+    if (ControlTagType.MANUAL_PAY.getId().equals(tag.getTagDefinitionId())) {
+      manualPay=true;
+      break;
+    }
+  }
   final String htmlBody;
   try {
-    htmlBody=generator.generateInvoice(account,invoice);
+    htmlBody=generator.generateInvoice(account,invoice,manualPay);
   }
  catch (  IOException e) {
     throw new InvoiceApiException(e,ErrorCode.EMAIL_SENDING_FAILED);

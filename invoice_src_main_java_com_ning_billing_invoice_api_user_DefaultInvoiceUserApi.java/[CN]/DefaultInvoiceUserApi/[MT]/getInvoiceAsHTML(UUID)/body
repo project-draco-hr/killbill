@@ -4,5 +4,13 @@
     throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
   }
   final Account account=accountUserApi.getAccountById(invoice.getAccountId());
-  return generator.generateInvoice(account,invoice);
+  boolean manualPay=false;
+  final Map<String,Tag> accountTags=tagUserApi.getTags(account.getId(),ObjectType.ACCOUNT);
+  for (  final Tag tag : accountTags.values()) {
+    if (ControlTagType.MANUAL_PAY.getId().equals(tag.getTagDefinitionId())) {
+      manualPay=true;
+      break;
+    }
+  }
+  return generator.generateInvoice(account,invoice,manualPay);
 }

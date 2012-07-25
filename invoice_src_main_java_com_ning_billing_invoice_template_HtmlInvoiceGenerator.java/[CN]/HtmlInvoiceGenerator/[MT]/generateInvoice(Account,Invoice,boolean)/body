@@ -10,5 +10,10 @@
   data.put("account",account);
   final InvoiceFormatter formattedInvoice=factory.createInvoiceFormatter(config,invoice,locale);
   data.put("invoice",formattedInvoice);
-  return templateEngine.executeTemplate(config.getTemplateName(),data);
+  if (manualPay) {
+    return templateEngine.executeTemplate(config.getManualPayTemplateName(),data);
+  }
+ else {
+    return templateEngine.executeTemplate(config.getTemplateName(),data);
+  }
 }
