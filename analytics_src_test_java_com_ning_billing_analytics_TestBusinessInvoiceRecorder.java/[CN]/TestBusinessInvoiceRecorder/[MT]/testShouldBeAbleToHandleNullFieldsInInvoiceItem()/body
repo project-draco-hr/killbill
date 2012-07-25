@@ -1,0 +1,29 @@
+{
+  final BusinessInvoiceRecorder recorder=new BusinessInvoiceRecorder(accountApi,entitlementApi,invoiceApi,sqlDao,clock);
+  final InvoiceItem invoiceItem=Mockito.mock(InvoiceItem.class);
+  Mockito.when(invoiceItem.getAmount()).thenReturn(BigDecimal.TEN);
+  Mockito.when(invoiceItem.getCurrency()).thenReturn(Currency.AUD);
+  Mockito.when(invoiceItem.getEndDate()).thenReturn(new LocalDate(1200,1,12));
+  final UUID invoiceId=UUID.randomUUID();
+  Mockito.when(invoiceItem.getInvoiceId()).thenReturn(invoiceId);
+  final UUID id=UUID.randomUUID();
+  Mockito.when(invoiceItem.getId()).thenReturn(id);
+  Mockito.when(invoiceItem.getStartDate()).thenReturn(new LocalDate(1985,9,10));
+  Mockito.when(invoiceItem.getInvoiceItemType()).thenReturn(InvoiceItemType.CREDIT_ADJ);
+  final BusinessInvoiceItem bii=recorder.createBusinessInvoiceItem(invoiceItem);
+  Assert.assertNotNull(bii);
+  Assert.assertEquals(bii.getAmount(),invoiceItem.getAmount());
+  Assert.assertEquals(bii.getCurrency(),invoiceItem.getCurrency());
+  Assert.assertEquals(bii.getEndDate(),invoiceItem.getEndDate());
+  Assert.assertEquals(bii.getInvoiceId(),invoiceItem.getInvoiceId());
+  Assert.assertEquals(bii.getItemId(),invoiceItem.getId());
+  Assert.assertEquals(bii.getStartDate(),invoiceItem.getStartDate());
+  Assert.assertEquals(bii.getItemType(),invoiceItem.getInvoiceItemType().toString());
+  Assert.assertNull(bii.getBillingPeriod());
+  Assert.assertNull(bii.getPhase());
+  Assert.assertNull(bii.getProductCategory());
+  Assert.assertNull(bii.getProductName());
+  Assert.assertNull(bii.getProductType());
+  Assert.assertNull(bii.getSlug());
+  Assert.assertNull(bii.getExternalKey());
+}
