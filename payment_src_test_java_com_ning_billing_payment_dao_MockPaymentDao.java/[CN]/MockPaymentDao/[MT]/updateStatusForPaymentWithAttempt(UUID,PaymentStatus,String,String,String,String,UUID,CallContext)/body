@@ -1,0 +1,12 @@
+{
+synchronized (this) {
+    final PaymentModelDao entry=payments.remove(paymentId);
+    if (entry != null) {
+      payments.put(paymentId,new PaymentModelDao(entry,paymentStatus));
+    }
+    final PaymentAttemptModelDao tmp=attempts.remove(attemptId);
+    if (tmp != null) {
+      attempts.put(attemptId,new PaymentAttemptModelDao(tmp,paymentStatus,gatewayErrorCode,gatewayErrorMsg));
+    }
+  }
+}
