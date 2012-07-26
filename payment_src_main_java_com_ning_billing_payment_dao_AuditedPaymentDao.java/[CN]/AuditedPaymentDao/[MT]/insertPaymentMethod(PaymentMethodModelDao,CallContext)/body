@@ -1,15 +1,7 @@
 {
   return paymentMethodSqlDao.inTransaction(new Transaction<PaymentMethodModelDao,PaymentMethodSqlDao>(){
     @Override public PaymentMethodModelDao inTransaction(    final PaymentMethodSqlDao transactional,    final TransactionStatus status) throws Exception {
-      transactional.insertPaymentMethod(paymentMethod,context);
-      final PaymentMethodModelDao savedPaymentMethod=transactional.getPaymentMethod(paymentMethod.getId().toString());
-      final Long recordId=transactional.getRecordId(savedPaymentMethod.getId().toString());
-      final EntityHistory<PaymentMethodModelDao> history=new EntityHistory<PaymentMethodModelDao>(savedPaymentMethod.getId(),recordId,savedPaymentMethod,ChangeType.INSERT);
-      transactional.insertHistoryFromTransaction(history,context);
-      final Long historyRecordId=transactional.getHistoryRecordId(recordId);
-      final EntityAudit audit=new EntityAudit(TableName.PAYMENT_METHODS,historyRecordId,ChangeType.INSERT);
-      transactional.insertAuditFromTransaction(audit,context);
-      return savedPaymentMethod;
+      return insertPaymentMethodInTransaction(transactional,paymentMethod,context);
     }
   }
 );

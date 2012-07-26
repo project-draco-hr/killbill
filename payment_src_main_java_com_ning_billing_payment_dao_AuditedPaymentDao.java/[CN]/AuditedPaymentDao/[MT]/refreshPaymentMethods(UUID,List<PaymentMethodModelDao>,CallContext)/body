@@ -1,0 +1,31 @@
+{
+  paymentMethodSqlDao.inTransaction(new Transaction<Void,PaymentMethodSqlDao>(){
+    @Override public Void inTransaction(    final PaymentMethodSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final List<PaymentMethodModelDao> existingPaymentMethods=getPaymentMethodsInTransaction(transactional,accountId);
+      for (      final PaymentMethodModelDao finalPaymentMethod : paymentMethods) {
+        boolean isExistingPaymentMethod=false;
+        for (        final PaymentMethodModelDao existingPaymentMethod : existingPaymentMethods) {
+          if (existingPaymentMethod.equals(finalPaymentMethod)) {
+            isExistingPaymentMethod=true;
+            break;
+          }
+ else           if (existingPaymentMethod.equalsButActive(finalPaymentMethod)) {
+            if (finalPaymentMethod.isActive()) {
+              undeletedPaymentMethodInTransaction(transactional,existingPaymentMethod.getId());
+            }
+ else {
+              deletedPaymentMethodInTransaction(transactional,existingPaymentMethod.getId());
+            }
+            isExistingPaymentMethod=true;
+            break;
+          }
+        }
+        if (!isExistingPaymentMethod) {
+          insertPaymentMethodInTransaction(transactional,finalPaymentMethod,context);
+        }
+      }
+      return null;
+    }
+  }
+);
+}

@@ -9,12 +9,14 @@
         if (pluginPms == null) {
           return result;
         }
+        final List<PaymentMethodModelDao> finalPaymentMethods=new ArrayList<PaymentMethodModelDao>();
         for (        final PaymentMethodPlugin cur : pluginPms) {
           final PaymentMethod input=new DefaultPaymentMethod(account.getId(),pluginName,cur);
-          final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(input.getId(),input.getAccountId(),input.getPluginName(),input.isActive(),input.getPluginDetail().getExternalPaymentMethodId());
-          paymentDao.insertPaymentMethod(pmModel,context);
           result.add(input);
+          final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(input.getId(),input.getAccountId(),input.getPluginName(),input.isActive(),input.getPluginDetail().getExternalPaymentMethodId());
+          finalPaymentMethods.add(pmModel);
         }
+        paymentDao.refreshPaymentMethods(account.getId(),finalPaymentMethods,context);
       }
  catch (      PaymentPluginApiException e) {
         throw new PaymentApiException(ErrorCode.PAYMENT_REFRESH_PAYMENT_METHOD,account.getId(),e.getErrorMessage());
