@@ -9,8 +9,8 @@
   final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),clock.getUTCNow(),amount);
   PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,attempt,context);
   final PaymentStatus paymentStatus=PaymentStatus.SUCCESS;
-  final String paymentError="No error";
-  paymentDao.updateStatusForPaymentWithAttempt(payment.getId(),paymentStatus,paymentError,null,attempt.getId(),context);
+  final String gatewayErrorCode="OK";
+  paymentDao.updateStatusForPaymentWithAttempt(payment.getId(),paymentStatus,gatewayErrorCode,null,null,null,attempt.getId(),context);
   final List<PaymentModelDao> payments=paymentDao.getPaymentsForInvoice(invoiceId);
   assertEquals(payments.size(),1);
   savedPayment=payments.get(0);
@@ -30,6 +30,6 @@
   assertEquals(savedAttempt.getAccountId(),accountId);
   assertEquals(savedAttempt.getInvoiceId(),invoiceId);
   assertEquals(savedAttempt.getPaymentStatus(),PaymentStatus.SUCCESS);
-  assertEquals(savedAttempt.getPaymentError(),paymentError);
+  assertEquals(savedAttempt.getGatewayErrorCode(),gatewayErrorCode);
   assertEquals(savedAttempt.getRequestedAmount().compareTo(amount),0);
 }

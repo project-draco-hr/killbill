@@ -1,0 +1,11 @@
+{
+  paymentSqlDao.inTransaction(new Transaction<Void,PaymentSqlDao>(){
+    @Override public Void inTransaction(    final PaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
+      updatePaymentStatusFromTransaction(paymentId,paymentStatus,extFirstPaymentRefId,extSecondPaymentRefId,context,transactional);
+      final PaymentAttemptSqlDao transPaymentAttemptSqlDao=transactional.become(PaymentAttemptSqlDao.class);
+      updatePaymentAttemptStatusFromTransaction(attemptId,paymentStatus,gatewayErrorCode,gatewayErrorMsg,context,transPaymentAttemptSqlDao);
+      return null;
+    }
+  }
+);
+}
