@@ -1,0 +1,21 @@
+{
+  final LocalDate startDate=clock.getUTCToday();
+  final LocalDate endDate=startDate.plusMonths(1);
+  final BigDecimal amount=new BigDecimal("12.00");
+  final List<InvoiceItem> existing=new LinkedList<InvoiceItem>();
+  final InvoiceItem item1=new FixedPriceInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,amount,currency);
+  final InvoiceItem item2=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount,amount,currency);
+  existing.add(item1);
+  existing.add(item2);
+  existing.add(item1);
+  final List<InvoiceItem> proposed=new LinkedList<InvoiceItem>();
+  final InvoiceItem other1=new FixedPriceInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,amount,currency);
+  final InvoiceItem other2=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount,amount,currency);
+  proposed.add(item1);
+  proposed.add(other1);
+  proposed.add(other1);
+  proposed.add(other2);
+  gen.removeDuplicatedInvoiceItems(proposed,existing);
+  assertEquals(existing.size(),0);
+  assertEquals(proposed.size(),1);
+}

@@ -1,7 +1,15 @@
 {
-  final Set<InvoiceItem> proposedSet=new HashSet<InvoiceItem>(proposedItems);
-  final Set<InvoiceItem> existingSet=new HashSet<InvoiceItem>(existingInvoiceItems);
-  final SetView<InvoiceItem> intersection=Sets.intersection(proposedSet,existingSet);
-  proposedItems.removeAll(intersection);
-  existingInvoiceItems.removeAll(intersection);
+  final Iterator<InvoiceItem> proposedItemIterator=proposedItems.iterator();
+  while (proposedItemIterator.hasNext()) {
+    final InvoiceItem proposedItem=proposedItemIterator.next();
+    final Iterator<InvoiceItem> existingItemIterator=existingInvoiceItems.iterator();
+    while (existingItemIterator.hasNext()) {
+      final InvoiceItem existingItem=existingItemIterator.next();
+      if (existingItem.equals(proposedItem)) {
+        existingItemIterator.remove();
+        proposedItemIterator.remove();
+        break;
+      }
+    }
+  }
 }
