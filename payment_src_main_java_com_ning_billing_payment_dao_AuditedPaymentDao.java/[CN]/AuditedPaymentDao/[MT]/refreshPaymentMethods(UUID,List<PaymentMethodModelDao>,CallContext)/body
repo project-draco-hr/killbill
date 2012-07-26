@@ -1,6 +1,6 @@
 {
-  paymentMethodSqlDao.inTransaction(new Transaction<Void,PaymentMethodSqlDao>(){
-    @Override public Void inTransaction(    final PaymentMethodSqlDao transactional,    final TransactionStatus status) throws Exception {
+  return paymentMethodSqlDao.inTransaction(new Transaction<List<PaymentMethodModelDao>,PaymentMethodSqlDao>(){
+    @Override public List<PaymentMethodModelDao> inTransaction(    final PaymentMethodSqlDao transactional,    final TransactionStatus status) throws Exception {
       final List<PaymentMethodModelDao> existingPaymentMethods=getPaymentMethodsInTransaction(transactional,accountId);
       for (      final PaymentMethodModelDao finalPaymentMethod : paymentMethods) {
         boolean isExistingPaymentMethod=false;
@@ -24,7 +24,7 @@
           insertPaymentMethodInTransaction(transactional,finalPaymentMethod,context);
         }
       }
-      return null;
+      return getPaymentMethodsInTransaction(transactional,accountId);
     }
   }
 );
