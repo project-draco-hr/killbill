@@ -1,5 +1,14 @@
 {
-  final PaymentPluginApi plugin=getPaymentProviderPlugin(account);
+  final PaymentPluginApi plugin;
+  final UUID paymentMethodId;
+  if (isExternalPayment) {
+    plugin=paymentMethodProcessor.getExternalPaymentProviderPlugin(account,context);
+    paymentMethodId=paymentMethodProcessor.getExternalPaymentMethod(account).getId();
+  }
+ else {
+    plugin=getPaymentProviderPlugin(account);
+    paymentMethodId=account.getPaymentMethodId();
+  }
   try {
     return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
       @Override public Payment doOperation() throws PaymentApiException {
@@ -15,10 +24,10 @@
         }
         final BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
         if (isAccountAutoPayOff) {
-          return processNewPaymentForAutoPayOffWithAccountLocked(account,invoice,requestedAmount,context);
+          return processNewPaymentForAutoPayOffWithAccountLocked(paymentMethodId,account,invoice,requestedAmount,context);
         }
  else {
-          return processNewPaymentWithAccountLocked(plugin,account,invoice,requestedAmount,isInstantPayment,context);
+          return processNewPaymentWithAccountLocked(paymentMethodId,plugin,account,invoice,requestedAmount,isInstantPayment,context);
         }
       }
     }

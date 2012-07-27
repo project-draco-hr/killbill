@@ -1,0 +1,24 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final Account account=Mockito.mock(Account.class);
+  Mockito.when(account.getId()).thenReturn(accountId);
+  Mockito.when(account.getExternalKey()).thenReturn(accountId.toString());
+  final CallContext context=Mockito.mock(CallContext.class);
+  Assert.assertEquals(processor.getPaymentMethods(account,false).size(),0);
+  final ExternalPaymentProviderPlugin providerPlugin=processor.getExternalPaymentProviderPlugin(account,context);
+  Assert.assertEquals(providerPlugin.getName(),ExternalPaymentProviderPlugin.PLUGIN_NAME);
+  final List<PaymentMethod> paymentMethods=processor.getPaymentMethods(account,false);
+  Assert.assertEquals(paymentMethods.size(),1);
+  Assert.assertEquals(paymentMethods.get(0).getPluginName(),ExternalPaymentProviderPlugin.PLUGIN_NAME);
+  Assert.assertEquals(paymentMethods.get(0).getAccountId(),account.getId());
+  final UUID externalPaymentMethodId=paymentMethods.get(0).getId();
+  for (int i=0; i < 50; i++) {
+    final ExternalPaymentProviderPlugin foundProviderPlugin=processor.getExternalPaymentProviderPlugin(account,context);
+    Assert.assertEquals(foundProviderPlugin.getName(),ExternalPaymentProviderPlugin.PLUGIN_NAME);
+    final List<PaymentMethod> foundPaymentMethods=processor.getPaymentMethods(account,false);
+    Assert.assertEquals(foundPaymentMethods.size(),1);
+    Assert.assertEquals(foundPaymentMethods.get(0).getPluginName(),ExternalPaymentProviderPlugin.PLUGIN_NAME);
+    Assert.assertEquals(foundPaymentMethods.get(0).getAccountId(),account.getId());
+    Assert.assertEquals(foundPaymentMethods.get(0).getId(),externalPaymentMethodId);
+  }
+}

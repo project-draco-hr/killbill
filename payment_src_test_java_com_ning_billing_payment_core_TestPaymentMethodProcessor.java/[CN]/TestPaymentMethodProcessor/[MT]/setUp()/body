@@ -1,0 +1,10 @@
+{
+  final DefaultPaymentProviderPluginRegistry pluginRegistry=new DefaultPaymentProviderPluginRegistry(Mockito.mock(PaymentConfig.class));
+  pluginRegistry.register(new ExternalPaymentProviderPlugin(new ClockMock()),ExternalPaymentProviderPlugin.PLUGIN_NAME);
+  final AccountUserApi accountUserApi=Mockito.mock(AccountUserApi.class);
+  final Bus bus=Mockito.mock(Bus.class);
+  final MockPaymentDao paymentDao=new MockPaymentDao();
+  final GlobalLocker globalLocker=Mockito.mock(GlobalLocker.class);
+  final ExecutorService executorService=Mockito.mock(ExecutorService.class);
+  processor=new PaymentMethodProcessor(pluginRegistry,accountUserApi,bus,paymentDao,globalLocker,executorService);
+}
