@@ -1,0 +1,32 @@
+{
+  final int sampleCount=240;
+  final int firstTime=1293846;
+  final List<DateTime> unencodedTimes1=new ArrayList<DateTime>();
+  final List<DateTime> unencodedTimes2=new ArrayList<DateTime>();
+  for (int i=0; i < sampleCount; i++) {
+    unencodedTimes1.add(DateTimeUtils.dateTimeFromUnixSeconds(firstTime + i * 100));
+    unencodedTimes2.add(DateTimeUtils.dateTimeFromUnixSeconds(firstTime + sampleCount * 100 + i * 100));
+  }
+  final byte[] compressedTimes1=timelineCoder.compressDateTimes(unencodedTimes1);
+  final byte[] compressedTimes2=timelineCoder.compressDateTimes(unencodedTimes2);
+  Assert.assertEquals(compressedTimes1.length,8);
+  Assert.assertEquals(compressedTimes1[0] & 0xff,TimelineOpcode.FULL_TIME.getOpcodeIndex());
+  Assert.assertEquals(compressedTimes1[5] & 0xff,TimelineOpcode.REPEATED_DELTA_TIME_BYTE.getOpcodeIndex());
+  Assert.assertEquals(compressedTimes1[6] & 0xff,sampleCount - 1);
+  Assert.assertEquals(compressedTimes1[7] & 0xff,100);
+  Assert.assertEquals(compressedTimes2.length,8);
+  Assert.assertEquals(compressedTimes2[0] & 0xff,TimelineOpcode.FULL_TIME.getOpcodeIndex());
+  Assert.assertEquals(compressedTimes2[5] & 0xff,TimelineOpcode.REPEATED_DELTA_TIME_BYTE.getOpcodeIndex());
+  Assert.assertEquals(compressedTimes2[6] & 0xff,sampleCount - 1);
+  Assert.assertEquals(compressedTimes2[7] & 0xff,100);
+  final List<byte[]> timesList=new ArrayList<byte[]>();
+  timesList.add(compressedTimes1);
+  timesList.add(compressedTimes2);
+  final byte[] combinedTimes=timelineCoder.combineTimelines(timesList,null);
+  Assert.assertEquals(combinedTimes.length,9);
+  Assert.assertEquals(combinedTimes[0] & 0xff,TimelineOpcode.FULL_TIME.getOpcodeIndex());
+  Assert.assertEquals(combinedTimes[5] & 0xff,TimelineOpcode.REPEATED_DELTA_TIME_SHORT.getOpcodeIndex());
+  Assert.assertEquals(combinedTimes[6] & 0xff,1);
+  Assert.assertEquals(combinedTimes[7] & 0xff,sampleCount * 2 - 1 - 256);
+  Assert.assertEquals(combinedTimes[8],100);
+}

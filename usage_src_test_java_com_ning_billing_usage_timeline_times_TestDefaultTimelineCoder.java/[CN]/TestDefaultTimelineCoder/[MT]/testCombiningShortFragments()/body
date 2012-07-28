@@ -1,0 +1,24 @@
+{
+  final byte[] fragment0=new byte[]{(byte)-1,(byte)0,(byte)15,(byte)66,(byte)84,(byte)20};
+  final byte[] fragment1=new byte[]{(byte)-1,(byte)0,(byte)15,(byte)66,(byte)-122,(byte)30};
+  final byte[] fragment2=new byte[]{(byte)-1,(byte)0,(byte)15,(byte)66,(byte)-62,(byte)30};
+  final byte[] fragment3=new byte[]{(byte)-1,(byte)0,(byte)15,(byte)66,(byte)-2,(byte)30};
+  final byte[][] fragmentArray=new byte[][]{fragment0,fragment1,fragment2,fragment3};
+  final byte[] combined=timelineCoder.combineTimelines(Arrays.asList(fragmentArray),null);
+  final List<DateTime> restoredTimes=timelineCoder.decompressDateTimes(combined);
+  final List<List<DateTime>> fragmentIntTimes=new ArrayList<List<DateTime>>();
+  final List<DateTime> allFragmentTimes=new ArrayList<DateTime>();
+  int totalLength=0;
+  for (  final byte[] aFragmentArray : fragmentArray) {
+    final List<DateTime> fragmentTimes=timelineCoder.decompressDateTimes(aFragmentArray);
+    fragmentIntTimes.add(fragmentTimes);
+    totalLength+=fragmentTimes.size();
+    for (    final DateTime time : fragmentTimes) {
+      allFragmentTimes.add(time);
+    }
+  }
+  Assert.assertEquals(restoredTimes.size(),totalLength);
+  for (int i=0; i < totalLength; i++) {
+    Assert.assertEquals(restoredTimes.get(i),allFragmentTimes.get(i));
+  }
+}
