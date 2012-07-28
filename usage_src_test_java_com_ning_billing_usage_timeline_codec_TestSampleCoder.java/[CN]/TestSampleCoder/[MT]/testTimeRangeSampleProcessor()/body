@@ -1,0 +1,25 @@
+{
+  final DateTime startTime=new DateTime(dateFormatter.parseDateTime("2012-03-23T17:35:11.000Z"));
+  final DateTime endTime=new DateTime(dateFormatter.parseDateTime("2012-03-23T17:35:17.000Z"));
+  final int sampleCount=2;
+  final List<DateTime> dateTimes=ImmutableList.<DateTime>of(startTime,endTime);
+  final byte[] compressedTimes=timelineCoder.compressDateTimes(dateTimes);
+  final TimelineCursor cursor=new DefaultTimelineCursor(compressedTimes,sampleCount);
+  Assert.assertEquals(cursor.getNextTime(),startTime);
+  Assert.assertEquals(cursor.getNextTime(),endTime);
+  final byte[] samples=new byte[]{(byte)0xff,2,2,0,12};
+  final AtomicInteger samplesCount=new AtomicInteger(0);
+  sampleCoder.scan(samples,compressedTimes,sampleCount,new TimeRangeSampleProcessor(startTime,endTime){
+    @Override public void processOneSample(    final DateTime time,    final SampleOpcode opcode,    final Object value){
+      if (samplesCount.get() == 0) {
+        Assert.assertEquals(DateTimeUtils.unixSeconds(time),DateTimeUtils.unixSeconds(startTime));
+      }
+ else {
+        Assert.assertEquals(DateTimeUtils.unixSeconds(time),DateTimeUtils.unixSeconds(endTime));
+      }
+      samplesCount.incrementAndGet();
+    }
+  }
+);
+  Assert.assertEquals(samplesCount.get(),sampleCount);
+}

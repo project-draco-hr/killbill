@@ -1,0 +1,14 @@
+{
+  final ScalarSample codedSample=sampleCoder.compressSample(new ScalarSample(SampleOpcode.DOUBLE,value));
+  Assert.assertEquals(codedSample.getOpcode(),expectedOpcode);
+  final double error=value == 0.0 ? 0.0 : Math.abs((value - codedSample.getDoubleValue()) / value);
+  Assert.assertTrue(error <= sampleCoder.getMaxFractionError());
+  final TimelineChunkAccumulator accum=new TimelineChunkAccumulator(123,456,sampleCoder);
+  accum.addSample(codedSample);
+  final DateTime now=new DateTime();
+  final List<DateTime> dateTimes=new ArrayList<DateTime>();
+  dateTimes.add(now);
+  final byte[] timeBytes=timelineCoder.compressDateTimes(dateTimes);
+  final byte[] encodedSampleBytes=accum.extractTimelineChunkAndReset(now,now,timeBytes).getTimeBytesAndSampleBytes().getSampleBytes();
+  Assert.assertEquals(encodedSampleBytes.length,expectedSize);
+}

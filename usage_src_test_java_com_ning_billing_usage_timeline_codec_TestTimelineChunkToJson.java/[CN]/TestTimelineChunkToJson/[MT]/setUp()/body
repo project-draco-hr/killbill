@@ -1,0 +1,15 @@
+{
+  final List<DateTime> dateTimes=new ArrayList<DateTime>();
+  final ByteArrayOutputStream out=new ByteArrayOutputStream();
+  final DataOutputStream output=new DataOutputStream(out);
+  for (int i=0; i < SAMPLE_COUNT; i++) {
+    sampleCoder.encodeSample(output,new ScalarSample<Long>(SampleOpcode.LONG,10L));
+    dateTimes.add(START_TIME.plusMinutes(i));
+  }
+  output.flush();
+  output.close();
+  samples=out.toByteArray();
+  final DateTime endTime=dateTimes.get(dateTimes.size() - 1);
+  final byte[] timeBytes=timelineCoder.compressDateTimes(dateTimes);
+  chunk=new TimelineChunk(CHUNK_ID,HOST_ID,SAMPLE_KIND_ID,START_TIME,endTime,timeBytes,samples,SAMPLE_COUNT);
+}

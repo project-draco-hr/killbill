@@ -1,0 +1,13 @@
+{
+  final String chunkToString=mapper.writerWithView(Compact.class).writeValueAsString(chunk);
+  final Map chunkFromString=mapper.readValue(chunkToString,Map.class);
+  Assert.assertEquals(chunkFromString.keySet().size(),11);
+  Assert.assertEquals(chunkFromString.get("hostId"),HOST_ID);
+  Assert.assertEquals(chunkFromString.get("sampleKindId"),SAMPLE_KIND_ID);
+  Assert.assertEquals(new TextNode((String)chunkFromString.get("samples")).binaryValue(),samples);
+  Assert.assertEquals(chunkFromString.get("sampleCount"),SAMPLE_COUNT);
+  Assert.assertEquals(chunkFromString.get("startTime"),START_TIME.getMillis());
+  Assert.assertEquals(chunkFromString.get("aggregationLevel"),0);
+  Assert.assertEquals(chunkFromString.get("notValid"),false);
+  Assert.assertEquals(chunkFromString.get("dontAggregate"),false);
+}
