@@ -1,0 +1,10 @@
+{
+  try {
+    final boolean deleteFilesOnClose=config.getShutdownSaveMode().equals("save_all_timelines");
+    final FileBackedBuffer fileBackedBuffer=new FileBackedBuffer(config.getSpoolDir(),"TimelineEventHandler",deleteFilesOnClose,config.getSegmentsSize(),config.getMaxNbSegments());
+    bind(FileBackedBuffer.class).toInstance(fileBackedBuffer);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+}
