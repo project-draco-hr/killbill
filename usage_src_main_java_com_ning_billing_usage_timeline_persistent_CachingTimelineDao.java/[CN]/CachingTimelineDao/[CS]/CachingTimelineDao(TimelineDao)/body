@@ -1,0 +1,17 @@
+{
+  this.delegate=delegate;
+  sourcesCache=delegate.getSources();
+  metricsCache=delegate.getMetrics();
+  eventCategoriesCache=delegate.getEventCategories();
+  sourceIdsMetricIdsCache=new HashMap<Integer,Set<Integer>>();
+  for (  final SourceIdAndMetricId both : delegate.getMetricIdsForAllSources()) {
+    final int sourceId=both.getSourceId();
+    final int metricId=both.getMetricId();
+    Set<Integer> metricIds=sourceIdsMetricIdsCache.get(sourceId);
+    if (metricIds == null) {
+      metricIds=new HashSet<Integer>();
+      sourceIdsMetricIdsCache.put(sourceId,metricIds);
+    }
+    metricIds.add(metricId);
+  }
+}
