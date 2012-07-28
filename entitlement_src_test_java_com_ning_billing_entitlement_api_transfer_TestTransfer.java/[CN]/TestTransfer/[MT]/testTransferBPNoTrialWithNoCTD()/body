@@ -1,0 +1,30 @@
+{
+  final UUID newAccountId=UUID.randomUUID();
+  final String baseProduct="Shotgun";
+  final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+  final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  clock.addDays(40);
+  assertTrue(testListener.isCompleted(3000));
+  final DateTime beforeTransferDate=clock.getUTCNow();
+  final DateTime transferRequestedDate=clock.getUTCNow();
+  testListener.pushExpectedEvent(NextEvent.TRANSFER);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getKey(),transferRequestedDate,false,context);
+  assertTrue(testListener.isCompleted(3000));
+  final DateTime afterTransferDate=clock.getUTCNow();
+  final Subscription oldBaseSubscription=entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  assertNotNull(oldBaseSubscription.getEndDate());
+  assertDateWithin(oldBaseSubscription.getEndDate(),beforeTransferDate,afterTransferDate);
+  assertTrue(oldBaseSubscription.getEndDate().compareTo(transferRequestedDate) == 0);
+  SubscriptionBundle newBundle=entitlementApi.getBundleForAccountAndKey(newAccountId,bundle.getKey());
+  List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(newBundle.getId());
+  assertEquals(subscriptions.size(),1);
+  final Subscription newBaseSubscription=subscriptions.get(0);
+  assertTrue(newBaseSubscription.getStartDate().compareTo(baseSubscription.getStartDate()) == 0);
+  assertEquals(newBaseSubscription.getAllTransitions().size(),1);
+  Plan newPlan=newBaseSubscription.getCurrentPlan();
+  assertEquals(newPlan.getProduct().getName(),baseProduct);
+  assertEquals(newBaseSubscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
+}

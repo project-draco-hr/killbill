@@ -1,0 +1,28 @@
+{
+  EntitlementEvent newEvent=null;
+  final Catalog catalog=catalogService.getFullCatalog();
+  final DateTime effectiveDate=existingEvent.getEffectiveDate().isBefore(transferDate) ? transferDate : existingEvent.getEffectiveDate();
+  final PlanPhaseSpecifier spec=existingEvent.getPlanPhaseSpecifier();
+  final PlanPhase currentPhase=catalog.findPhase(existingEvent.getPlanPhaseName(),effectiveDate,subscription.getStartDate());
+  final ApiEventBuilder apiBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(currentPhase.getPlan().getName()).setEventPlanPhase(currentPhase.getName()).setEventPriceList(spec.getPriceListName()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(clock.getUTCNow()).setEffectiveDate(effectiveDate).setRequestedDate(effectiveDate).setUserToken(context.getUserToken()).setFromDisk(true);
+switch (existingEvent.getSubscriptionTransitionType()) {
+case MIGRATE_ENTITLEMENT:
+case RE_CREATE:
+case CREATE:
+    newEvent=new ApiEventTransfer(apiBuilder);
+  break;
+case CHANGE:
+newEvent=firstEvent ? new ApiEventTransfer(apiBuilder) : new ApiEventChange(apiBuilder);
+break;
+case PHASE:
+newEvent=firstEvent ? new ApiEventTransfer(apiBuilder) : PhaseEventData.createNextPhaseEvent(currentPhase.getName(),subscription,clock.getUTCNow(),effectiveDate);
+break;
+case CANCEL:
+case UNCANCEL:
+case MIGRATE_BILLING:
+break;
+default :
+throw new EntitlementError(String.format("Unepxected transitionType %s",existingEvent.getSubscriptionTransitionType()));
+}
+return newEvent;
+}
