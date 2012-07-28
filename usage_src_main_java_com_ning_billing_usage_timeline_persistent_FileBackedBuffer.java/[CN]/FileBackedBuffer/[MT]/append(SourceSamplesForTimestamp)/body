@@ -1,0 +1,13 @@
+{
+  try {
+synchronized (recyclingMonitor) {
+      smileObjectMapper.writeValue(smileGenerator,sourceSamplesForTimestamp);
+      samplesforTimestampWritten.incrementAndGet();
+      return true;
+    }
+  }
+ catch (  IOException e) {
+    log.warn("Unable to backup samples",e);
+    return false;
+  }
+}

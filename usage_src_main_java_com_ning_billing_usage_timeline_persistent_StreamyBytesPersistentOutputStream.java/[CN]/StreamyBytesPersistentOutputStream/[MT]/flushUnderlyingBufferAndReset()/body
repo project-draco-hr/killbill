@@ -1,0 +1,20 @@
+{
+synchronized (inputBuffer) {
+    if (inputBuffer.available() == 0) {
+      return;
+    }
+    final String pathname=getFileName();
+    createdFiles.add(pathname);
+    log.debug("Flushing in-memory buffer to disk: {}",pathname);
+    try {
+      final File out=new File(pathname);
+      flushToFile(out);
+    }
+ catch (    IOException e) {
+      log.warn("Error flushing data",e);
+    }
+ finally {
+      reset();
+    }
+  }
+}
