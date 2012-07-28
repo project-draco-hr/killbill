@@ -1,0 +1,12 @@
+{
+  final Injector injector=Guice.createInjector(new AbstractModule(){
+    @Override protected void configure(){
+      bind(PaymentConfig.class).toInstance(Mockito.mock(PaymentConfig.class));
+      bind(Clock.class).toInstance(Mockito.mock(Clock.class));
+      bind(PaymentProviderPluginRegistry.class).toProvider(DefaultPaymentProviderPluginRegistryProvider.class).asEagerSingleton();
+    }
+  }
+);
+  final PaymentProviderPluginRegistry registry=injector.getInstance(PaymentProviderPluginRegistry.class);
+  Assert.assertNotNull(registry.getPlugin(ExternalPaymentProviderPlugin.PLUGIN_NAME));
+}

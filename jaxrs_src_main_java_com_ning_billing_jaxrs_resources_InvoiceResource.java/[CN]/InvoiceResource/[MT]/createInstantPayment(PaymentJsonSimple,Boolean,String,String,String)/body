@@ -1,8 +1,12 @@
 {
-  if (externalPayment) {
-    return Response.status(Status.BAD_REQUEST).entity("External payments have not been implemented yet").build();
-  }
   final Account account=accountApi.getAccountById(UUID.fromString(payment.getAccountId()));
-  paymentApi.createPayment(account,UUID.fromString(payment.getInvoiceId()),null,context.createContext(createdBy,reason,comment));
+  final UUID invoiceId=UUID.fromString(payment.getInvoiceId());
+  final CallContext callContext=context.createContext(createdBy,reason,comment);
+  if (externalPayment) {
+    paymentApi.createExternalPayment(account,invoiceId,payment.getAmount(),callContext);
+  }
+ else {
+    paymentApi.createPayment(account,invoiceId,payment.getAmount(),callContext);
+  }
   return uriBuilder.buildResponse(InvoiceResource.class,"getPayments",payment.getInvoiceId());
 }

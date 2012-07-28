@@ -1,0 +1,45 @@
+{
+  final PaymentPluginApi plugin;
+  final UUID paymentMethodId;
+  if (isExternalPayment) {
+    plugin=paymentMethodProcessor.getExternalPaymentProviderPlugin(account,context);
+    paymentMethodId=paymentMethodProcessor.getExternalPaymentMethod(account).getId();
+  }
+ else {
+    plugin=getPaymentProviderPlugin(account);
+    paymentMethodId=account.getPaymentMethodId();
+  }
+  try {
+    return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
+      @Override public Payment doOperation() throws PaymentApiException {
+        final Invoice invoice=invoicePaymentApi.getInvoice(invoiceId);
+        if (invoice.isMigrationInvoice()) {
+          log.error("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
+          return null;
+        }
+        final boolean isAccountAutoPayOff=isAccountAutoPayOff(account.getId());
+        final boolean isBadAccount=setUnsaneAccount_AUTO_PAY_OFFWithAccountLock(account.getId(),isAccountAutoPayOff,context,isInstantPayment);
+        if (isBadAccount && isInstantPayment) {
+          throw new PaymentApiException(ErrorCode.PAYMENT_BAD_ACCOUNT,account.getId());
+        }
+        final BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
+        if (isAccountAutoPayOff) {
+          return processNewPaymentForAutoPayOffWithAccountLocked(paymentMethodId,account,invoice,requestedAmount,context);
+        }
+ else {
+          return processNewPaymentWithAccountLocked(paymentMethodId,plugin,account,invoice,requestedAmount,isInstantPayment,context);
+        }
+      }
+    }
+));
+  }
+ catch (  TimeoutException e) {
+    if (isInstantPayment) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,account.getId(),invoiceId);
+    }
+ else {
+      log.warn(String.format("Payment from Account %s, Invoice %s timedout",account.getId(),invoiceId));
+      return null;
+    }
+  }
+}
