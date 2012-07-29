@@ -24,11 +24,11 @@
         TransferCancelData cancelData=new TransferCancelData(oldSubscription,cancelEvent);
         transferCancelDataList.add(cancelData);
       }
-      final DateTime subscriptionStartDate=oldSubscription.getStartDate();
+      final DateTime subscriptionAlignStartDate=oldSubscription.getAlignStartDate();
       if (bundleStartdate == null) {
         bundleStartdate=oldSubscription.getStartDate();
       }
-      final SubscriptionData subscriptionData=subscriptionFactory.createSubscription(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(subscriptionBundleData.getId()).setCategory(productCategory).setBundleStartDate(transferDate).setStartDate(subscriptionStartDate),ImmutableList.<EntitlementEvent>of());
+      final SubscriptionData subscriptionData=subscriptionFactory.createSubscription(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(subscriptionBundleData.getId()).setCategory(productCategory).setBundleStartDate(transferDate).setAlignStartDate(subscriptionAlignStartDate),ImmutableList.<EntitlementEvent>of());
       final List<EntitlementEvent> events=toEvents(existingEvents,subscriptionData,transferDate,context);
       final SubscriptionMigrationData curData=new SubscriptionMigrationData(subscriptionData,events);
       subscriptionMigrationDataList.add(curData);

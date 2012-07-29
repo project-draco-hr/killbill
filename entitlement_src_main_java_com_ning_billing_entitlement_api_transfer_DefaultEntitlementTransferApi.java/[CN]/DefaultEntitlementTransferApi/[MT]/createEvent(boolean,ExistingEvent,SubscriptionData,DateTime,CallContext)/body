@@ -3,7 +3,7 @@
   final Catalog catalog=catalogService.getFullCatalog();
   final DateTime effectiveDate=existingEvent.getEffectiveDate().isBefore(transferDate) ? transferDate : existingEvent.getEffectiveDate();
   final PlanPhaseSpecifier spec=existingEvent.getPlanPhaseSpecifier();
-  final PlanPhase currentPhase=catalog.findPhase(existingEvent.getPlanPhaseName(),effectiveDate,subscription.getStartDate());
+  final PlanPhase currentPhase=catalog.findPhase(existingEvent.getPlanPhaseName(),effectiveDate,subscription.getAlignStartDate());
   final ApiEventBuilder apiBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(currentPhase.getPlan().getName()).setEventPlanPhase(currentPhase.getName()).setEventPriceList(spec.getPriceListName()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(clock.getUTCNow()).setEffectiveDate(effectiveDate).setRequestedDate(effectiveDate).setUserToken(context.getUserToken()).setFromDisk(true);
 switch (existingEvent.getSubscriptionTransitionType()) {
 case MIGRATE_ENTITLEMENT:
