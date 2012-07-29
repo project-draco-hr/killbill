@@ -1,0 +1,19 @@
+{
+  final UUID uuid=UUID.fromString(accountId);
+  accountApi.getAccountById(uuid);
+  if (externalKey != null) {
+    final SubscriptionBundle bundle=entitlementApi.getBundleForAccountAndKey(uuid,externalKey);
+    final BundleJsonNoSubscriptions json=new BundleJsonNoSubscriptions(bundle);
+    return Response.status(Status.OK).entity(json).build();
+  }
+ else {
+    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(uuid);
+    final Collection<BundleJsonNoSubscriptions> result=Collections2.transform(bundles,new Function<SubscriptionBundle,BundleJsonNoSubscriptions>(){
+      @Override public BundleJsonNoSubscriptions apply(      final SubscriptionBundle input){
+        return new BundleJsonNoSubscriptions(input);
+      }
+    }
+);
+    return Response.status(Status.OK).entity(result).build();
+  }
+}
