@@ -1,0 +1,21 @@
+{
+  final TimelineChunk firstCandidate=timelineChunkCandidates.get(0);
+  final int sourceId=firstCandidate.getSourceId();
+  final int metricId=firstCandidate.getMetricId();
+  log.debug("For sourceId {}, metricId {}, looking to aggregate {} candidates in {} chunks",new Object[]{sourceId,metricId,timelineChunkCandidates.size(),chunksToAggregate});
+  int aggregatesCreated=0;
+  int chunkIndex=0;
+  while (timelineChunkCandidates.size() >= chunkIndex + chunksToAggregate) {
+    final List<TimelineChunk> chunkCandidates=timelineChunkCandidates.subList(chunkIndex,chunkIndex + chunksToAggregate);
+    chunkIndex+=chunksToAggregate;
+    timelineChunksCombined.addAndGet(chunksToAggregate);
+    try {
+      aggregateHostSampleChunks(chunkCandidates,aggregationLevel);
+    }
+ catch (    IOException e) {
+      log.error(String.format("IOException aggregating {} chunks, sourceId %s, metricId %s, looking to aggregate %s candidates in %s chunks",new Object[]{firstCandidate.getSourceId(),firstCandidate.getMetricId(),timelineChunkCandidates.size(),chunksToAggregate}),e);
+    }
+    aggregatesCreated++;
+  }
+  return aggregatesCreated;
+}
