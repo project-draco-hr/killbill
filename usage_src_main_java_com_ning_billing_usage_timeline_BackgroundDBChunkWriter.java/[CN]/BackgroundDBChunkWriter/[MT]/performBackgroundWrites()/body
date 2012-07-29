@@ -1,0 +1,20 @@
+{
+  backgroundWritesCount.incrementAndGet();
+  List<PendingChunkMap> chunkMapsToWrite=null;
+synchronized (this) {
+    chunkMapsToWrite=pendingChunks;
+    pendingChunks=new ArrayList<PendingChunkMap>();
+    pendingChunkCount.set(0);
+  }
+  final List<TimelineChunk> chunks=new ArrayList<TimelineChunk>();
+  for (  final PendingChunkMap map : chunkMapsToWrite) {
+    pendingChunkMapsWritten.incrementAndGet();
+    pendingChunksWritten.addAndGet(map.getChunkMap().size());
+    chunks.addAll(map.getChunkMap().values());
+  }
+  timelineDAO.bulkInsertTimelineChunks(chunks);
+  for (  final PendingChunkMap map : chunkMapsToWrite) {
+    pendingChunkMapsMarkedConsumed.incrementAndGet();
+    map.getAccumulator().markPendingChunkMapConsumed(map.getPendingChunkMapId());
+  }
+}
