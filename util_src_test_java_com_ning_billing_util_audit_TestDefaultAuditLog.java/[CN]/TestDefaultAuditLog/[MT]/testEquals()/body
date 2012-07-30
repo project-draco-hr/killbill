@@ -1,0 +1,20 @@
+{
+  final TableName tableName=TableName.ACCOUNT_EMAIL_HISTORY;
+  final long recordId=Long.MAX_VALUE;
+  final ChangeType changeType=ChangeType.DELETE;
+  final EntityAudit entityAudit=new EntityAudit(tableName,recordId,changeType);
+  final String userName=UUID.randomUUID().toString();
+  final CallOrigin callOrigin=CallOrigin.EXTERNAL;
+  final UserType userType=UserType.CUSTOMER;
+  final UUID userToken=UUID.randomUUID();
+  final ClockMock clock=new ClockMock();
+  final CallContext callContext=new DefaultCallContext(userName,callOrigin,userType,userToken,clock);
+  final AuditLog auditLog=new DefaultAuditLog(entityAudit,callContext);
+  Assert.assertEquals(auditLog,auditLog);
+  final AuditLog sameAuditLog=new DefaultAuditLog(entityAudit,callContext);
+  Assert.assertEquals(sameAuditLog,auditLog);
+  clock.addMonths(1);
+  final CallContext otherCallContext=new DefaultCallContext(userName,callOrigin,userType,userToken,clock);
+  final AuditLog otherAuditLog=new DefaultAuditLog(entityAudit,otherCallContext);
+  Assert.assertNotEquals(otherAuditLog,auditLog);
+}
