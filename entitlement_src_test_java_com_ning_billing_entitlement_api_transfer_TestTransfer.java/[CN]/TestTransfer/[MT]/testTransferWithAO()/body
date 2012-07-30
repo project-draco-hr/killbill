@@ -1,0 +1,64 @@
+{
+  final UUID newAccountId=UUID.randomUUID();
+  final String baseProduct="Shotgun";
+  final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+  final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+  clock.addDays(3);
+  final String aoProduct1="Telescopic-Scope";
+  final BillingPeriod aoTerm1=BillingPeriod.MONTHLY;
+  final SubscriptionData aoSubscription1=createSubscription(aoProduct1,aoTerm1,basePriceList);
+  assertEquals(aoSubscription1.getState(),SubscriptionState.ACTIVE);
+  clock.addDays(25);
+  final String aoProduct2="Laser-Scope";
+  final BillingPeriod aoTerm2=BillingPeriod.MONTHLY;
+  final SubscriptionData aoSubscription2=createSubscription(aoProduct2,aoTerm2,basePriceList);
+  assertEquals(aoSubscription2.getState(),SubscriptionState.ACTIVE);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  clock.addDays(5);
+  assertTrue(testListener.isCompleted(3000));
+  final DateTime ctd=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
+  billingApi.setChargedThroughDate(baseSubscription.getId(),ctd,context);
+  final DateTime transferRequestedDate=clock.getUTCNow();
+  testListener.pushExpectedEvent(NextEvent.TRANSFER);
+  transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getKey(),transferRequestedDate,true,context);
+  assertTrue(testListener.isCompleted(3000));
+  SubscriptionBundle newBundle=entitlementApi.getBundleForAccountAndKey(newAccountId,bundle.getKey());
+  List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(newBundle.getId());
+  assertEquals(subscriptions.size(),3);
+  boolean foundBP=false;
+  boolean foundAO1=false;
+  boolean foundAO2=false;
+  for (  Subscription cur : subscriptions) {
+    Plan curPlan=cur.getCurrentPlan();
+    Product curProduct=curPlan.getProduct();
+    if (curProduct.getName().equals(baseProduct)) {
+      foundBP=true;
+      assertTrue(((SubscriptionData)cur).getAlignStartDate().compareTo(((SubscriptionData)baseSubscription).getAlignStartDate()) == 0);
+      assertNull(cur.getPendingTransition());
+    }
+ else     if (curProduct.getName().equals(aoProduct1)) {
+      foundAO1=true;
+      assertTrue(((SubscriptionData)cur).getAlignStartDate().compareTo((aoSubscription1).getAlignStartDate()) == 0);
+      assertNull(cur.getPendingTransition());
+    }
+ else     if (curProduct.getName().equals(aoProduct2)) {
+      foundAO2=true;
+      assertTrue(((SubscriptionData)cur).getAlignStartDate().compareTo((aoSubscription2).getAlignStartDate()) == 0);
+      assertNotNull(cur.getPendingTransition());
+    }
+ else {
+      Assert.fail("Unexpected product " + curProduct.getName());
+    }
+  }
+  assertTrue(foundBP);
+  assertTrue(foundAO1);
+  assertTrue(foundAO2);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  clock.addMonths(1);
+  assertTrue(testListener.isCompleted(3000));
+}

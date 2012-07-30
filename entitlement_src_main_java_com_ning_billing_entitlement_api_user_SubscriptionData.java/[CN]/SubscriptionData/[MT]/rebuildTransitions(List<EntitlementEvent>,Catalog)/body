@@ -29,6 +29,7 @@ apiEventType=userEV.getEventType();
 isFromDisk=userEV.isFromDisk();
 nextUserToken=userEV.getUserToken();
 switch (apiEventType) {
+case TRANSFER:
 case MIGRATE_BILLING:
 case MIGRATE_ENTITLEMENT:
 case CREATE:
@@ -65,8 +66,8 @@ Plan nextPlan=null;
 PlanPhase nextPhase=null;
 PriceList nextPriceList=null;
 try {
-nextPlan=(nextPlanName != null) ? catalog.findPlan(nextPlanName,cur.getRequestedDate(),getStartDate()) : null;
-nextPhase=(nextPhaseName != null) ? catalog.findPhase(nextPhaseName,cur.getRequestedDate(),getStartDate()) : null;
+nextPlan=(nextPlanName != null) ? catalog.findPlan(nextPlanName,cur.getRequestedDate(),getAlignStartDate()) : null;
+nextPhase=(nextPhaseName != null) ? catalog.findPhase(nextPhaseName,cur.getRequestedDate(),getAlignStartDate()) : null;
 nextPriceList=(nextPriceListName != null) ? catalog.findPriceList(nextPriceListName,cur.getRequestedDate()) : null;
 }
  catch (CatalogApiException e) {

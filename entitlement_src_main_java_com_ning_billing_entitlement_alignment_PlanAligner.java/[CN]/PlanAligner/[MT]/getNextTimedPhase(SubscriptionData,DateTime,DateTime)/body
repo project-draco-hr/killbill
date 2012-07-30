@@ -8,10 +8,11 @@ switch (lastPlanTransition.getTransitionType()) {
 case MIGRATE_ENTITLEMENT:
 case CREATE:
 case RE_CREATE:
-      final List<TimedPhase> timedPhases=getTimedPhaseOnCreate(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPhase().getPhaseType(),lastPlanTransition.getNextPriceList().getName(),requestedDate);
+case TRANSFER:
+      final List<TimedPhase> timedPhases=getTimedPhaseOnCreate(subscription.getAlignStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPhase().getPhaseType(),lastPlanTransition.getNextPriceList().getName(),requestedDate);
     return getTimedPhase(timedPhases,effectiveDate,WhichPhase.NEXT);
 case CHANGE:
-  return getTimedPhaseOnChange(subscription.getStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getPreviousPhase(),lastPlanTransition.getPreviousPlan(),lastPlanTransition.getPreviousPriceList().getName(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPriceList().getName(),requestedDate,effectiveDate,WhichPhase.NEXT);
+  return getTimedPhaseOnChange(subscription.getAlignStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getPreviousPhase(),lastPlanTransition.getPreviousPlan(),lastPlanTransition.getPreviousPriceList().getName(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPriceList().getName(),requestedDate,effectiveDate,WhichPhase.NEXT);
 default :
 throw new EntitlementError(String.format("Unexpected initial transition %s for current plan %s on subscription %s",lastPlanTransition.getTransitionType(),subscription.getCurrentPlan(),subscription.getId()));
 }

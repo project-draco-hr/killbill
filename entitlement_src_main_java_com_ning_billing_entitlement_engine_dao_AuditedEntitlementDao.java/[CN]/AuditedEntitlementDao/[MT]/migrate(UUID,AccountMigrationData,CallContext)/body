@@ -1,31 +1,9 @@
 {
   eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
     @Override public Void inTransaction(    final EntitlementEventSqlDao transactional,    final TransactionStatus status) throws Exception {
-      final SubscriptionSqlDao transSubDao=transactional.become(SubscriptionSqlDao.class);
-      final BundleSqlDao transBundleDao=transactional.become(BundleSqlDao.class);
-      final List<EntityAudit> audits=new ArrayList<EntityAudit>();
-      Long recordId;
       for (      final BundleMigrationData curBundle : accountData.getData()) {
-        final SubscriptionBundleData bundleData=curBundle.getData();
-        for (        final SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
-          final SubscriptionData subData=curSubscription.getData();
-          for (          final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
-            transactional.insertEvent(curEvent,context);
-            recordId=transactional.getRecordId(curEvent.getId().toString());
-            audits.add(new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.INSERT));
-            recordFutureNotificationFromTransaction(transactional,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()));
-          }
-          transSubDao.insertSubscription(subData,context);
-          recordId=transSubDao.getRecordId(subData.getId().toString());
-          audits.add(new EntityAudit(TableName.SUBSCRIPTIONS,recordId,ChangeType.INSERT));
-          final EntitlementEvent finalEvent=curSubscription.getInitialEvents().get(curSubscription.getInitialEvents().size() - 1);
-          notifyBusOfRequestedChange(transactional,subData,finalEvent);
-        }
-        transBundleDao.insertBundle(bundleData,context);
-        recordId=transBundleDao.getRecordId(bundleData.getId().toString());
-        audits.add(new EntityAudit(TableName.BUNDLES,recordId,ChangeType.INSERT));
+        migrateBundleDataFromTransaction(curBundle,transactional,context);
       }
-      transSubDao.insertAuditFromTransaction(audits,context);
       return null;
     }
   }
