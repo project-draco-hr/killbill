@@ -1,0 +1,49 @@
+{
+  final UUID accountId=UUID.fromString(accountIdString);
+  final Account account=accountApi.getAccountById(accountId);
+  final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId());
+  final Map<UUID,List<AuditLog>> invoiceAuditLogs=new HashMap<UUID,List<AuditLog>>();
+  final Map<UUID,List<AuditLog>> invoiceItemsAuditLogs=new HashMap<UUID,List<AuditLog>>();
+  if (withAudit) {
+    for (    final Invoice invoice : invoices) {
+      invoiceAuditLogs.put(invoice.getId(),auditUserApi.getAuditLogs(invoice.getId(),ObjectType.INVOICE));
+      for (      final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+        invoiceItemsAuditLogs.put(invoiceItem.getId(),auditUserApi.getAuditLogs(invoiceItem.getId(),ObjectType.INVOICE_ITEM));
+      }
+    }
+  }
+  final List<Payment> payments=paymentApi.getAccountPayments(accountId);
+  final Map<UUID,List<AuditLog>> paymentsAuditLogs=new HashMap<UUID,List<AuditLog>>();
+  if (withAudit) {
+    for (    final Payment payment : payments) {
+      paymentsAuditLogs.put(payment.getId(),auditUserApi.getAuditLogs(payment.getId(),ObjectType.PAYMENT));
+    }
+  }
+  final List<Refund> refunds=paymentApi.getAccountRefunds(account);
+  final Map<UUID,List<AuditLog>> refundsAuditLogs=new HashMap<UUID,List<AuditLog>>();
+  final Multimap<UUID,Refund> refundsByPayment=ArrayListMultimap.<UUID,Refund>create();
+  for (  final Refund refund : refunds) {
+    if (withAudit) {
+      refundsAuditLogs.put(refund.getId(),auditUserApi.getAuditLogs(refund.getId(),ObjectType.REFUND));
+    }
+    refundsByPayment.put(refund.getPaymentId(),refund);
+  }
+  final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByAccountId(accountId);
+  final Map<UUID,List<AuditLog>> chargebacksAuditLogs=new HashMap<UUID,List<AuditLog>>();
+  final Multimap<UUID,InvoicePayment> chargebacksByPayment=ArrayListMultimap.<UUID,InvoicePayment>create();
+  for (  final InvoicePayment chargeback : chargebacks) {
+    chargebacksAuditLogs.put(chargeback.getId(),auditUserApi.getAuditLogs(chargeback.getId(),ObjectType.INVOICE_PAYMENT));
+    chargebacksByPayment.put(chargeback.getPaymentId(),chargeback);
+  }
+  final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(account.getId());
+  final Map<UUID,List<AuditLog>> bundlesAuditLogs=new HashMap<UUID,List<AuditLog>>();
+  final List<BundleTimeline> bundlesTimeline=new LinkedList<BundleTimeline>();
+  for (  final SubscriptionBundle bundle : bundles) {
+    if (withAudit) {
+      bundlesAuditLogs.put(bundle.getId(),auditUserApi.getAuditLogs(bundle.getId(),ObjectType.BUNDLE));
+    }
+    bundlesTimeline.add(timelineApi.getBundleTimeline(bundle.getId()));
+  }
+  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundlesTimeline,refundsByPayment,chargebacksByPayment,invoiceAuditLogs,invoiceItemsAuditLogs,paymentsAuditLogs,refundsAuditLogs,chargebacksAuditLogs,bundlesAuditLogs);
+  return Response.status(Status.OK).entity(json).build();
+}
