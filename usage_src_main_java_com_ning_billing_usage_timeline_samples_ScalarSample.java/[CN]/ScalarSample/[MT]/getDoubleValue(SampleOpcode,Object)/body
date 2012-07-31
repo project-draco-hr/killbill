@@ -1,0 +1,29 @@
+{
+switch (opcode) {
+case NULL:
+case DOUBLE_ZERO:
+case INT_ZERO:
+    return 0.0;
+case BYTE:
+case BYTE_FOR_DOUBLE:
+  return (double)((Byte)sampleValue);
+case SHORT:
+case SHORT_FOR_DOUBLE:
+return (double)((Short)sampleValue);
+case INT:
+return (double)((Integer)sampleValue);
+case LONG:
+return (double)((Long)sampleValue);
+case FLOAT:
+case FLOAT_FOR_DOUBLE:
+return (double)((Float)sampleValue);
+case HALF_FLOAT_FOR_DOUBLE:
+return (double)HalfFloat.toFloat((Short)sampleValue);
+case DOUBLE:
+return (Double)sampleValue;
+case BIGINT:
+return ((BigInteger)sampleValue).doubleValue();
+default :
+throw new IllegalArgumentException(String.format("In getDoubleValue(), sample opcode is %s, sample value is %s",opcode.name(),String.valueOf(sampleValue)));
+}
+}

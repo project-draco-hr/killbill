@@ -1,0 +1,35 @@
+{
+  final List<Integer> oldSourceIds=new ArrayList<Integer>();
+  for (  final Map.Entry<Integer,SourceAccumulatorsAndUpdateDate> entry : accumulators.entrySet()) {
+    final int sourceId=entry.getKey();
+    final SourceAccumulatorsAndUpdateDate accumulatorsAndDate=entry.getValue();
+    final DateTime lastUpdatedDate=accumulatorsAndDate.getLastUpdateDate();
+    if (lastUpdatedDate.isBefore(purgeIfBeforeDate)) {
+      oldSourceIds.add(sourceId);
+      purgedAccumsBecauseSourceNotUpdated.incrementAndGet();
+      for (      final TimelineSourceEventAccumulator categoryAccumulator : accumulatorsAndDate.getCategoryAccumulators().values()) {
+        categoryAccumulator.extractAndQueueTimelineChunks();
+      }
+    }
+ else {
+      final List<Integer> categoryIdsToPurge=new ArrayList<Integer>();
+      final Map<Integer,TimelineSourceEventAccumulator> categoryMap=accumulatorsAndDate.getCategoryAccumulators();
+      for (      final Map.Entry<Integer,TimelineSourceEventAccumulator> eventEntry : categoryMap.entrySet()) {
+        final int categoryId=eventEntry.getKey();
+        final TimelineSourceEventAccumulator categoryAccumulator=eventEntry.getValue();
+        final DateTime latestTime=categoryAccumulator.getLatestSampleAddTime();
+        if (latestTime != null && latestTime.isBefore(purgeIfBeforeDate)) {
+          purgedAccumsBecauseCategoryNotUpdated.incrementAndGet();
+          categoryAccumulator.extractAndQueueTimelineChunks();
+          categoryIdsToPurge.add(categoryId);
+        }
+      }
+      for (      final int categoryId : categoryIdsToPurge) {
+        categoryMap.remove(categoryId);
+      }
+    }
+  }
+  for (  final int sourceIdToPurge : oldSourceIds) {
+    accumulators.remove(sourceIdToPurge);
+  }
+}

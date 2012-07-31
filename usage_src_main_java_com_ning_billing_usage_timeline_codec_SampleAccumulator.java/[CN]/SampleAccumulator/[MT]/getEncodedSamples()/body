@@ -1,0 +1,14 @@
+{
+  if (lastSample != null) {
+    sampleCoder.encodeSample(outputStream,lastSample);
+    lastSample=null;
+  }
+  try {
+    outputStream.flush();
+    return new EncodedBytesAndSampleCount(byteStream.toByteArray(),sampleCount);
+  }
+ catch (  IOException e) {
+    log.error("In getEncodedSamples, IOException flushing outputStream",e);
+    return new EncodedBytesAndSampleCount(new byte[0],0);
+  }
+}

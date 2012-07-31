@@ -1,0 +1,51 @@
+{
+  final int hostId=123;
+  final int sampleKindId=456;
+  final TimelineChunkAccumulator accum=new TimelineChunkAccumulator(hostId,sampleKindId,sampleCoder);
+  final List<DateTime> dateTimes=new ArrayList<DateTime>();
+  final DateTime startTime=new DateTime();
+  final DateTime endTime=startTime.plus(1000);
+  accum.addSample(new ScalarSample(SampleOpcode.INT,25));
+  int timesCounter=0;
+  dateTimes.add(startTime.plusSeconds(30 * timesCounter++));
+  for (int i=0; i < 5; i++) {
+    accum.addSample(new ScalarSample(SampleOpcode.INT,10));
+    dateTimes.add(startTime.plusSeconds(30 * timesCounter++));
+  }
+  accum.addSample(new ScalarSample(SampleOpcode.DOUBLE,100.0));
+  dateTimes.add(startTime.plusSeconds(30 * timesCounter++));
+  accum.addSample(new ScalarSample(SampleOpcode.DOUBLE,100.0));
+  dateTimes.add(startTime.plusSeconds(30 * timesCounter++));
+  accum.addSample(new ScalarSample(SampleOpcode.STRING,"Hiya!"));
+  dateTimes.add(startTime.plusSeconds(30 * timesCounter++));
+  final byte[] compressedTimes=timelineCoder.compressDateTimes(dateTimes);
+  final TimelineChunk chunk=accum.extractTimelineChunkAndReset(startTime,endTime,compressedTimes);
+  Assert.assertEquals(chunk.getSampleCount(),9);
+  sampleCoder.scan(chunk.getTimeBytesAndSampleBytes().getSampleBytes(),compressedTimes,dateTimes.size(),new SampleProcessor(){
+    private int sampleNumber=0;
+    @Override public void processSamples(    final TimelineCursor timeCursor,    final int sampleCount,    final SampleOpcode opcode,    final Object value){
+      if (sampleNumber == 0) {
+        Assert.assertEquals(opcode,SampleOpcode.INT);
+        Assert.assertEquals(value,25);
+      }
+ else       if (sampleNumber >= 1 && sampleNumber < 6) {
+        Assert.assertEquals(opcode,SampleOpcode.INT);
+        Assert.assertEquals(value,10);
+      }
+ else       if (sampleNumber >= 6 && sampleNumber < 8) {
+        Assert.assertEquals(opcode,SampleOpcode.DOUBLE);
+        Assert.assertEquals(value,100.0);
+      }
+ else       if (sampleNumber == 8) {
+        Assert.assertEquals(opcode,SampleOpcode.STRING);
+        Assert.assertEquals(value,"Hiya!");
+      }
+ else {
+        Assert.assertTrue(false);
+      }
+      sampleNumber+=sampleCount;
+    }
+  }
+);
+  final TimelineChunkDecoded chunkDecoded=new TimelineChunkDecoded(chunk,sampleCoder);
+}

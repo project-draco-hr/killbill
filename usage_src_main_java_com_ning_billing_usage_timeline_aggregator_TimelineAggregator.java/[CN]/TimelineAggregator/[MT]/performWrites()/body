@@ -1,0 +1,29 @@
+{
+  final long startWriteTime=System.currentTimeMillis();
+  aggregatorSqlDao.begin();
+  timelineDao.bulkInsertTimelineChunks(chunksToWrite);
+  if (config.getDeleteAggregatedChunks()) {
+    aggregatorSqlDao.deleteTimelineChunks(chunkIdsToInvalidateOrDelete);
+  }
+ else {
+    aggregatorSqlDao.makeTimelineChunksInvalid(chunkIdsToInvalidateOrDelete);
+  }
+  aggregatorSqlDao.commit();
+  msWritingDb.addAndGet(System.currentTimeMillis() - startWriteTime);
+  timelineChunksWritten.addAndGet(chunksToWrite.size());
+  timelineChunksInvalidatedOrDeleted.addAndGet(chunkIdsToInvalidateOrDelete.size());
+  chunksToWrite.clear();
+  chunkIdsToInvalidateOrDelete.clear();
+  final long sleepMs=config.getAggregationSleepBetweenBatches().getMillis();
+  if (sleepMs > 0) {
+    final long timeBeforeSleep=System.currentTimeMillis();
+    try {
+      Thread.sleep(sleepMs);
+    }
+ catch (    InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+    msSpentSleeping.addAndGet(System.currentTimeMillis() - timeBeforeSleep);
+  }
+  timelineChunkBatchesProcessed.incrementAndGet();
+}

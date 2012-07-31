@@ -1,0 +1,12 @@
+{
+  for (  final Map.Entry<Integer,SourceAccumulatorsAndUpdateDate> entry : accumulators.entrySet()) {
+    final int sourceId=entry.getKey();
+    final Map<Integer,TimelineSourceEventAccumulator> hostAccumulators=entry.getValue().getCategoryAccumulators();
+    for (    final Map.Entry<Integer,TimelineSourceEventAccumulator> accumulatorEntry : hostAccumulators.entrySet()) {
+      final int categoryId=accumulatorEntry.getKey();
+      final TimelineSourceEventAccumulator accumulator=accumulatorEntry.getValue();
+      log.debug("Saving Timeline start time for sourceId [{}] and category [{}]",sourceId,categoryId);
+      startTimes.addTime(sourceId,categoryId,accumulator.getStartTime());
+    }
+  }
+}

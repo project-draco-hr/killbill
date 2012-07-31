@@ -1,0 +1,20 @@
+{
+  final DateTime startTime=new DateTime(DateTimeZone.UTC);
+  final DateTime endTime=startTime.plusSeconds(5);
+  final List<DateTime> dateTimes=ImmutableList.<DateTime>of(startTime.plusSeconds(1),startTime.plusSeconds(2),startTime.plusSeconds(3),startTime.plusSeconds(4));
+  final byte[] compressedTimes=timelineCoder.compressDateTimes(dateTimes);
+  final ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+  final DataOutputStream dataOutputStream=new DataOutputStream(outputStream);
+  final ScalarSample<Short> sample=new ScalarSample<Short>(SampleOpcode.SHORT,(short)4);
+  sampleCoder.encodeSample(dataOutputStream,sample);
+  sampleCoder.encodeSample(dataOutputStream,new RepeatSample<Short>(3,sample));
+  dataOutputStream.close();
+  sampleCoder.scan(outputStream.toByteArray(),compressedTimes,dateTimes.size(),new TimeRangeSampleProcessor(startTime,endTime){
+    @Override public void processOneSample(    final DateTime time,    final SampleOpcode opcode,    final Object value){
+      Assert.assertTrue(time.isAfter(startTime));
+      Assert.assertTrue(time.isBefore(endTime));
+      Assert.assertEquals(Short.valueOf(value.toString()),sample.getSampleValue());
+    }
+  }
+);
+}

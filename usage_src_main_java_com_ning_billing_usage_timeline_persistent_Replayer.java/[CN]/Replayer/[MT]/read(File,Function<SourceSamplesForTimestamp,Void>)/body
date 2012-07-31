@@ -1,0 +1,11 @@
+{
+  final JsonParser smileParser=smileFactory.createJsonParser(file);
+  if (smileParser.nextToken() != JsonToken.START_ARRAY) {
+    return;
+  }
+  while (!shuttingDown.get() && smileParser.nextToken() != JsonToken.END_ARRAY) {
+    final SourceSamplesForTimestamp sourceSamplesForTimestamp=smileParser.readValueAs(SourceSamplesForTimestamp.class);
+    fn.apply(sourceSamplesForTimestamp);
+  }
+  smileParser.close();
+}

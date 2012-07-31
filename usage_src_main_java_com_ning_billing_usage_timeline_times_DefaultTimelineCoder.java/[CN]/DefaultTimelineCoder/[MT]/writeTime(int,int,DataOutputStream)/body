@@ -1,0 +1,15 @@
+{
+  if (newTime > lastTime) {
+    final int delta=(newTime - lastTime);
+    if (delta <= TimelineOpcode.MAX_DELTA_TIME) {
+      dataStream.writeByte(delta);
+    }
+ else {
+      dataStream.writeByte(TimelineOpcode.FULL_TIME.getOpcodeIndex());
+      dataStream.writeInt(newTime);
+    }
+  }
+ else   if (newTime == lastTime) {
+    dataStream.writeByte(0);
+  }
+}

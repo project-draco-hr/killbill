@@ -1,0 +1,23 @@
+{
+  final int count=0;
+  final TimelineChunkAccumulator accum=new TimelineChunkAccumulator(0,0,sampleCoder);
+  final List<ScalarSample> samples=new ArrayList<ScalarSample>();
+  final ScalarSample sample1=new ScalarSample(SampleOpcode.BYTE,(byte)1);
+  final ScalarSample sample2=new ScalarSample(SampleOpcode.BYTE,(byte)2);
+  for (int i=0; i < 20; i++) {
+    samples.add(sample1);
+    accum.addSample(sample1);
+  }
+  for (int i=0; i < 0xFFFF + 100; i++) {
+    samples.add(sample2);
+    accum.addSample(sample2);
+  }
+  final byte[] sampleBytes=sampleCoder.compressSamples(samples);
+  final String hex=new String(Hex.encodeHex(sampleBytes));
+  Assert.assertEquals(sampleBytes,Hex.decodeHex("ff140101feffff0102ff640102".toCharArray()));
+  final List<ScalarSample> restoredSamples=sampleCoder.decompressSamples(sampleBytes);
+  Assert.assertEquals(restoredSamples.size(),samples.size());
+  for (int i=0; i < count; i++) {
+    Assert.assertEquals(restoredSamples.get(i),samples.get(i));
+  }
+}

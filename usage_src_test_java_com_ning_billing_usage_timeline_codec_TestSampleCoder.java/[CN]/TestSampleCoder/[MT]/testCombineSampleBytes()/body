@@ -1,0 +1,40 @@
+{
+  final ScalarSample[] samplesToChoose=new ScalarSample[]{new ScalarSample(SampleOpcode.DOUBLE,2.0),new ScalarSample(SampleOpcode.DOUBLE,1.0),new ScalarSample(SampleOpcode.INT_ZERO,0)};
+  final int[] repetitions=new int[]{1,2,3,4,5,240,250,300};
+  final Random rand=new Random(0);
+  int count=0;
+  final TimelineChunkAccumulator accum=new TimelineChunkAccumulator(0,0,sampleCoder);
+  final List<ScalarSample> samples=new ArrayList<ScalarSample>();
+  for (int i=0; i < 20; i++) {
+    final ScalarSample sample=samplesToChoose[rand.nextInt(samplesToChoose.length)];
+    final int repetition=repetitions[rand.nextInt(repetitions.length)];
+    for (int r=0; r < repetition; r++) {
+      samples.add(sample);
+      accum.addSample(sample);
+      count++;
+    }
+  }
+  final byte[] sampleBytes=sampleCoder.compressSamples(samples);
+  final byte[] accumBytes=accum.getEncodedSamples().getEncodedBytes();
+  Assert.assertEquals(accumBytes,sampleBytes);
+  final List<ScalarSample> restoredSamples=sampleCoder.decompressSamples(sampleBytes);
+  Assert.assertEquals(restoredSamples.size(),samples.size());
+  for (int i=0; i < count; i++) {
+    Assert.assertEquals(restoredSamples.get(i),samples.get(i));
+  }
+  for (int fragmentLength=2; fragmentLength < count / 2; fragmentLength++) {
+    final List<byte[]> fragments=new ArrayList<byte[]>();
+    final int fragmentCount=(int)Math.ceil((double)count / (double)fragmentLength);
+    for (int fragCounter=0; fragCounter < fragmentCount; fragCounter++) {
+      final int fragIndex=fragCounter * fragmentLength;
+      final List<ScalarSample> fragment=samples.subList(fragIndex,Math.min(count,fragIndex + fragmentLength));
+      fragments.add(sampleCoder.compressSamples(fragment));
+    }
+    final byte[] combined=sampleCoder.combineSampleBytes(fragments);
+    final List<ScalarSample> restored=sampleCoder.decompressSamples(combined);
+    Assert.assertEquals(restored.size(),samples.size());
+    for (int i=0; i < count; i++) {
+      Assert.assertEquals(restored.get(i),samples.get(i));
+    }
+  }
+}

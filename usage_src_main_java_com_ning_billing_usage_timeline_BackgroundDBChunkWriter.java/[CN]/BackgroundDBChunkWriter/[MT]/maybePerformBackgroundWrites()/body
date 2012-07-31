@@ -1,0 +1,23 @@
+{
+  maybePerformBackgroundWritesCount.incrementAndGet();
+  if (!doingWritesNow.compareAndSet(false,true)) {
+    return;
+  }
+ else {
+    try {
+      if (shuttingDown.get()) {
+        performBackgroundWrites();
+      }
+      final int pendingCount=pendingChunkCount.get();
+      if (pendingCount > 0) {
+        if (pendingCount >= config.getBackgroundWriteBatchSize() || new DateTime().isBefore(lastWriteTime.plusMillis((int)config.getBackgroundWriteMaxDelay().getMillis()))) {
+          performBackgroundWrites();
+          lastWriteTime=new DateTime();
+        }
+      }
+    }
+  finally {
+      doingWritesNow.set(false);
+    }
+  }
+}

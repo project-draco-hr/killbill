@@ -1,0 +1,59 @@
+{
+  final List<TimelineChunk> sourceTimelineCandidates=new ArrayList<TimelineChunk>();
+  final TimelineChunkConsumer aggregationConsumer=new TimelineChunkConsumer(){
+    int lastSourceId=0;
+    int lastMetricId=0;
+    @Override public void processTimelineChunk(    final TimelineChunk candidate){
+      timelineChunksConsidered.incrementAndGet();
+      final int sourceId=candidate.getSourceId();
+      final int metricId=candidate.getMetricId();
+      if (lastSourceId == 0) {
+        lastSourceId=sourceId;
+        lastMetricId=metricId;
+      }
+      if (lastSourceId != sourceId || lastMetricId != metricId) {
+        aggregatesCreated.addAndGet(aggregateTimelineCandidates(sourceTimelineCandidates,aggregationLevel,chunksToAggregate));
+        sourceTimelineCandidates.clear();
+        lastSourceId=sourceId;
+        lastMetricId=metricId;
+      }
+      sourceTimelineCandidates.add(candidate);
+    }
+  }
+;
+  final long startTime=System.currentTimeMillis();
+  try {
+    dbi.withHandle(new HandleCallback<Void>(){
+      @Override public Void withHandle(      final Handle handle) throws Exception {
+        final Query<Map<String,Object>> query=handle.createQuery("getStreamingAggregationCandidates").setFetchSize(Integer.MIN_VALUE).bind("aggregationLevel",aggregationLevel);
+        query.setStatementLocator(new StringTemplate3StatementLocator(TimelineAggregatorSqlDao.class));
+        ResultIterator<TimelineChunk> iterator=null;
+        try {
+          iterator=query.map(timelineChunkMapper).iterator();
+          while (iterator.hasNext()) {
+            aggregationConsumer.processTimelineChunk(iterator.next());
+          }
+        }
+ catch (        Exception e) {
+          log.error(String.format("Exception during aggregation of level %d",aggregationLevel),e);
+        }
+ finally {
+          if (iterator != null) {
+            iterator.close();
+          }
+        }
+        return null;
+      }
+    }
+);
+    if (sourceTimelineCandidates.size() >= chunksToAggregate) {
+      aggregatesCreated.addAndGet(aggregateTimelineCandidates(sourceTimelineCandidates,aggregationLevel,chunksToAggregate));
+    }
+    if (chunkIdsToInvalidateOrDelete.size() > 0) {
+      performWrites();
+    }
+  }
+  finally {
+    msSpentAggregating.addAndGet(System.currentTimeMillis() - startTime);
+  }
+}

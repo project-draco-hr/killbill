@@ -1,0 +1,51 @@
+{
+  if (finalSampleNumber > sampleCount) {
+    log.error("In TimeIterator.skipToSampleNumber(), finalSampleCount {} > sampleCount {}",finalSampleNumber,sampleCount);
+  }
+  while (sampleNumber < finalSampleNumber) {
+    try {
+      if (repeatCount > 0) {
+        final int countToSkipInRepeat=Math.min(finalSampleNumber - sampleNumber,repeatCount);
+        sampleNumber+=countToSkipInRepeat;
+        repeatCount-=countToSkipInRepeat;
+        lastValue+=countToSkipInRepeat * delta;
+      }
+ else {
+        final int nextOpcode=timelineDataStream.read();
+        if (nextOpcode == -1) {
+          return;
+        }
+        byteCursor++;
+        if (nextOpcode == TimelineOpcode.FULL_TIME.getOpcodeIndex()) {
+          lastValue=timelineDataStream.readInt();
+          byteCursor+=4;
+          sampleNumber++;
+        }
+ else         if (nextOpcode == TimelineOpcode.REPEATED_DELTA_TIME_BYTE.getOpcodeIndex()) {
+          repeatCount=timelineDataStream.readUnsignedByte() - 1;
+          delta=timelineDataStream.read();
+          byteCursor+=2;
+          lastValue+=delta;
+          sampleNumber++;
+        }
+ else         if (nextOpcode == TimelineOpcode.REPEATED_DELTA_TIME_SHORT.getOpcodeIndex()) {
+          repeatCount=timelineDataStream.readUnsignedShort() - 1;
+          delta=timelineDataStream.read();
+          byteCursor+=3;
+          lastValue+=delta;
+          sampleNumber++;
+        }
+ else         if (nextOpcode <= TimelineOpcode.MAX_DELTA_TIME) {
+          lastValue+=nextOpcode;
+          sampleNumber++;
+        }
+ else {
+          throw new IllegalStateException(String.format("In TimeIterator.skipToSampleNumber(), unknown opcode %x at offset %d",nextOpcode,byteCursor));
+        }
+      }
+    }
+ catch (    IOException e) {
+      log.error("IOException in TimeIterator.getNextTime()",e);
+    }
+  }
+}

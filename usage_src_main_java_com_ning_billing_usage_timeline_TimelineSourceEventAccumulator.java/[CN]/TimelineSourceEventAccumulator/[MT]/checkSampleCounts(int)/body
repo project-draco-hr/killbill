@@ -1,0 +1,17 @@
+{
+  boolean success=true;
+  if (assertedCount != sampleCount) {
+    log.error("For host {}, start time {}, the SourceTimeLines sampleCount {} is not equal to the assertedCount {}",new Object[]{sourceId,dateFormatter.print(startTime),sampleCount,assertedCount});
+    success=false;
+  }
+  for (  final Map.Entry<Integer,TimelineChunkAccumulator> entry : timelines.entrySet()) {
+    final int metricId=entry.getKey();
+    final TimelineChunkAccumulator timeline=entry.getValue();
+    final int lineSampleCount=timeline.getSampleCount();
+    if (lineSampleCount != assertedCount) {
+      log.error("For host {}, start time {}, sample kind id {}, the sampleCount {} is not equal to the assertedCount {}",new Object[]{sourceId,dateFormatter.print(startTime),metricId,lineSampleCount,assertedCount});
+      success=false;
+    }
+  }
+  return success;
+}

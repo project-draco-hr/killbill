@@ -1,0 +1,29 @@
+{
+  final List<byte[]> timeParts=new ArrayList<byte[]>();
+  for (  final String timeline : timelines) {
+    timeParts.add(Hex.decodeHex(timeline.toCharArray()));
+  }
+  int sampleCount=0;
+  int byteCount=0;
+  for (  final byte[] timePart : timeParts) {
+    byteCount+=timePart.length;
+    sampleCount+=timelineCoder.countTimeBytesSamples(timePart);
+  }
+  final byte[] concatedTimes=new byte[byteCount];
+  int offset=0;
+  for (  final byte[] timePart : timeParts) {
+    final int length=timePart.length;
+    System.arraycopy(timePart,0,concatedTimes,offset,length);
+    offset+=length;
+  }
+  final byte[] newCombined=timelineCoder.combineTimelines(timeParts,null);
+  final int newCombinedLength=timelineCoder.countTimeBytesSamples(newCombined);
+  final DefaultTimelineCursor concatedCursor=new DefaultTimelineCursor(concatedTimes,sampleCount);
+  final DefaultTimelineCursor combinedCursor=new DefaultTimelineCursor(newCombined,sampleCount);
+  for (int i=0; i < sampleCount; i++) {
+    final DateTime concatedTime=concatedCursor.getNextTime();
+    final DateTime combinedTime=combinedCursor.getNextTime();
+    Assert.assertEquals(combinedTime,concatedTime);
+  }
+  Assert.assertEquals(newCombinedLength,sampleCount);
+}

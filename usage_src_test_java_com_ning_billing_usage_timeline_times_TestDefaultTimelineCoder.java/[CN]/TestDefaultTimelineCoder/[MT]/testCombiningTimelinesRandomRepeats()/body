@@ -1,0 +1,39 @@
+{
+  final int[] increments=new int[]{30,45,10,30,20};
+  final int[] repetitions=new int[]{1,2,3,4,5,240,250,300};
+  final int firstTimeInt=1000000;
+  final DateTime startTime=DateTimeUtils.dateTimeFromUnixSeconds(firstTimeInt);
+  final List<DateTime> dateTimes=new ArrayList<DateTime>();
+  final Random rand=new Random(0);
+  DateTime nextTime=startTime;
+  int count=0;
+  for (int i=0; i < 20; i++) {
+    final int increment=increments[rand.nextInt(increments.length)];
+    final int repetition=repetitions[rand.nextInt(repetitions.length)];
+    for (int r=0; i < repetition; i++) {
+      nextTime=nextTime.plusSeconds(increment);
+      dateTimes.add(nextTime);
+      count++;
+    }
+  }
+  final byte[] allCompressedTime=timelineCoder.compressDateTimes(dateTimes);
+  final List<DateTime> restoredTimes=timelineCoder.decompressDateTimes(allCompressedTime);
+  Assert.assertEquals(restoredTimes.size(),dateTimes.size());
+  for (int i=0; i < count; i++) {
+    Assert.assertEquals(restoredTimes.get(i),dateTimes.get(i));
+  }
+  for (int fragmentLength=2; fragmentLength < count / 2; fragmentLength++) {
+    final List<byte[]> fragments=new ArrayList<byte[]>();
+    final int fragmentCount=(int)Math.ceil((double)count / (double)fragmentLength);
+    for (int fragCounter=0; fragCounter < fragmentCount; fragCounter++) {
+      final int fragIndex=fragCounter * fragmentLength;
+      final List<DateTime> fragment=dateTimes.subList(fragIndex,Math.min(count,fragIndex + fragmentLength));
+      fragments.add(timelineCoder.compressDateTimes(fragment));
+    }
+    final byte[] combined=timelineCoder.combineTimelines(fragments,null);
+    final List<DateTime> restoredDateTimes=timelineCoder.decompressDateTimes(combined);
+    for (int i=0; i < count; i++) {
+      Assert.assertEquals(restoredDateTimes.get(i),dateTimes.get(i));
+    }
+  }
+}

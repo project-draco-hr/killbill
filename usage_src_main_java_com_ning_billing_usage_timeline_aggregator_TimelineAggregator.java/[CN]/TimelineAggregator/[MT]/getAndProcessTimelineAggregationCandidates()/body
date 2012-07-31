@@ -1,0 +1,37 @@
+{
+  if (!isAggregating.compareAndSet(false,true)) {
+    log.info("Asked to aggregate, but we're already aggregating!");
+    return;
+  }
+ else {
+    log.debug("Starting aggregating");
+  }
+  aggregationRuns.incrementAndGet();
+  final String[] chunkCountsToAggregate=config.getChunksToAggregate().split(",");
+  for (int aggregationLevel=0; aggregationLevel < config.getMaxAggregationLevel(); aggregationLevel++) {
+    final long startingAggregatesCreated=aggregatesCreated.get();
+    final Map<String,Long> initialCounters=captureAggregatorCounters();
+    final int chunkCountIndex=aggregationLevel >= chunkCountsToAggregate.length ? chunkCountsToAggregate.length - 1 : aggregationLevel;
+    final int chunksToAggregate=Integer.parseInt(chunkCountsToAggregate[chunkCountIndex]);
+    streamingAggregateLevel(aggregationLevel,chunksToAggregate);
+    final Map<String,Long> counterDeltas=subtractFromAggregatorCounters(initialCounters);
+    final long netAggregatesCreated=aggregatesCreated.get() - startingAggregatesCreated;
+    if (netAggregatesCreated == 0) {
+      if (aggregationLevel == 0) {
+        foundNothingRuns.incrementAndGet();
+      }
+      log.debug("Created no new aggregates, so skipping higher-level aggregations");
+      break;
+    }
+ else {
+      final StringBuilder builder=new StringBuilder();
+      builder.append("For aggregation level ").append(aggregationLevel).append(", runs ").append(aggregationRuns.get()).append(", foundNothingRuns ").append(foundNothingRuns.get());
+      for (      final Map.Entry<String,Long> entry : counterDeltas.entrySet()) {
+        builder.append(", ").append(entry.getKey()).append(": ").append(entry.getValue());
+      }
+      log.info(builder.toString());
+    }
+  }
+  log.debug("Aggregation done");
+  isAggregating.set(false);
+}
