@@ -1,11 +1,12 @@
 {
-  final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
+  final BundleTimeline bundle=Mockito.mock(BundleTimeline.class);
   final UUID bundleId=UUID.randomUUID();
   final String externalKey=UUID.randomUUID().toString();
-  Mockito.when(bundle.getId()).thenReturn(bundleId);
-  Mockito.when(bundle.getKey()).thenReturn(externalKey);
-  final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=new BundleJsonWithSubscriptions(bundle);
+  Mockito.when(bundle.getBundleId()).thenReturn(bundleId);
+  Mockito.when(bundle.getExternalKey()).thenReturn(externalKey);
+  final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=new BundleJsonWithSubscriptions(null,bundle,null);
   Assert.assertEquals(bundleJsonWithSubscriptions.getBundleId(),bundleId.toString());
   Assert.assertEquals(bundleJsonWithSubscriptions.getExternalKey(),externalKey);
-  Assert.assertNull(bundleJsonWithSubscriptions.getSubscriptions());
+  Assert.assertEquals(bundleJsonWithSubscriptions.getSubscriptions().size(),0);
+  Assert.assertNull(bundleJsonWithSubscriptions.getAuditLogs());
 }

@@ -16,7 +16,7 @@
   Mockito.when(bundleTimeline.getBundleId()).thenReturn(bundleId);
   Mockito.when(bundleTimeline.getExternalKey()).thenReturn(externalKey);
   Mockito.when(bundleTimeline.getSubscriptions()).thenReturn(ImmutableList.<SubscriptionTimeline>of(subscriptionTimeline));
-  final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=new BundleJsonWithSubscriptions(null,bundleTimeline);
+  final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=new BundleJsonWithSubscriptions(null,bundleTimeline,null);
   Assert.assertEquals(bundleJsonWithSubscriptions.getBundleId(),bundleId.toString());
   Assert.assertEquals(bundleJsonWithSubscriptions.getExternalKey(),externalKey);
   Assert.assertEquals(bundleJsonWithSubscriptions.getSubscriptions().size(),1);
@@ -26,4 +26,5 @@
   Assert.assertEquals(events.getEvents().size(),1);
   Assert.assertEquals(events.getEvents().get(0).getEffectiveDate(),DefaultClock.toUTCDateTime(effectiveDate));
   Assert.assertEquals(events.getEvents().get(0).getEventId(),eventId.toString());
+  Assert.assertNull(bundleJsonWithSubscriptions.getAuditLogs());
 }
