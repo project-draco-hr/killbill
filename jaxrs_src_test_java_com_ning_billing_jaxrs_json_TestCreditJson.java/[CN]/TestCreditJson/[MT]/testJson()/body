@@ -6,7 +6,8 @@
   final DateTime effectiveDate=clock.getUTCNow();
   final String reason=UUID.randomUUID().toString();
   final UUID accountId=UUID.randomUUID();
-  final CreditJson creditJson=new CreditJson(creditAmount,invoiceId,invoiceNumber,requestedDate,effectiveDate,reason,accountId);
+  final List<AuditLogJson> auditLogs=createAuditLogsJson();
+  final CreditJson creditJson=new CreditJson(creditAmount,invoiceId,invoiceNumber,requestedDate,effectiveDate,reason,accountId,auditLogs);
   Assert.assertEquals(creditJson.getRequestedDate(),requestedDate);
   Assert.assertEquals(creditJson.getEffectiveDate(),effectiveDate);
   Assert.assertEquals(creditJson.getCreditAmount(),creditAmount);
@@ -15,7 +16,6 @@
   Assert.assertEquals(creditJson.getReason(),reason);
   Assert.assertEquals(creditJson.getAccountId(),accountId);
   final String asJson=mapper.writeValueAsString(creditJson);
-  Assert.assertEquals(asJson,"{\"creditAmount\":" + creditJson.getCreditAmount() + ","+ "\"invoiceId\":\""+ creditJson.getInvoiceId().toString()+ "\","+ "\"invoiceNumber\":\""+ creditJson.getInvoiceNumber()+ "\","+ "\"requestedDate\":\""+ creditJson.getRequestedDate().toDateTimeISO().toString()+ "\","+ "\"effectiveDate\":\""+ creditJson.getEffectiveDate().toDateTimeISO().toString()+ "\","+ "\"reason\":\""+ creditJson.getReason()+ "\","+ "\"accountId\":\""+ creditJson.getAccountId().toString()+ "\"}");
   final CreditJson fromJson=mapper.readValue(asJson,CreditJson.class);
   Assert.assertEquals(fromJson,creditJson);
 }

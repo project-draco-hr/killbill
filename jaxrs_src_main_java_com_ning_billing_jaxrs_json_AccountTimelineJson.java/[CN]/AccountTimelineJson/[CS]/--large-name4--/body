@@ -1,0 +1,40 @@
+{
+  this.account=new AccountJsonSimple(account.getId().toString(),account.getExternalKey());
+  this.bundles=new LinkedList<BundleJsonWithSubscriptions>();
+  for (  final BundleTimeline bundle : bundles) {
+    final List<AuditLog> auditLogs=bundlesAuditLogs.get(bundle.getBundleId());
+    final BundleJsonWithSubscriptions jsonWithSubscriptions=new BundleJsonWithSubscriptions(account.getId(),bundle,auditLogs);
+    this.bundles.add(jsonWithSubscriptions);
+  }
+  this.invoices=new LinkedList<InvoiceJsonWithBundleKeys>();
+  final List<CreditJson> credits=new ArrayList<CreditJson>();
+  for (  final Invoice invoice : invoices) {
+    for (    final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+      if (InvoiceItemType.CREDIT_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+        final List<AuditLog> auditLogs=invoiceItemsAuditLogs.get(invoiceItem.getId());
+        credits.add(new CreditJson(invoiceItem,account.getTimeZone(),auditLogs));
+      }
+    }
+  }
+  for (  final Invoice invoice : invoices) {
+    final List<AuditLog> auditLogs=invoiceAuditLogs.get(invoice.getId());
+    this.invoices.add(new InvoiceJsonWithBundleKeys(invoice,getBundleExternalKey(invoice,bundles),credits,auditLogs));
+  }
+  this.payments=new LinkedList<PaymentJsonWithBundleKeys>();
+  for (  final Payment payment : payments) {
+    final List<RefundJson> refunds=new ArrayList<RefundJson>();
+    for (    final Refund refund : refundsByPayment.get(payment.getId())) {
+      final List<AuditLog> auditLogs=refundsAuditLogs.get(refund.getId());
+      refunds.add(new RefundJson(refund,auditLogs));
+    }
+    final List<ChargebackJson> chargebacks=new ArrayList<ChargebackJson>();
+    for (    final InvoicePayment chargeback : chargebacksByPayment.get(payment.getId())) {
+      final List<AuditLog> auditLogs=chargebacksAuditLogs.get(chargeback.getId());
+      chargebacks.add(new ChargebackJson(chargeback,auditLogs));
+    }
+    final int nbOfPaymentAttempts=payment.getAttempts().size();
+    final String status=payment.getPaymentStatus().toString();
+    final List<AuditLog> auditLogs=paymentsAuditLogs.get(payment.getId());
+    this.payments.add(new PaymentJsonWithBundleKeys(payment,status,nbOfPaymentAttempts,getBundleExternalKey(payment.getInvoiceId(),invoices,bundles),account.getId(),refunds,chargebacks,auditLogs));
+  }
+}

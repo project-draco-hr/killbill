@@ -1,0 +1,50 @@
+{
+switch (opcode) {
+case NULL:
+    return null;
+case DOUBLE_ZERO:
+  return 0.0;
+case INT_ZERO:
+return 0;
+case BYTE:
+return inputStream.readByte();
+case SHORT:
+return inputStream.readShort();
+case INT:
+return inputStream.readInt();
+case LONG:
+return inputStream.readLong();
+case FLOAT:
+return inputStream.readFloat();
+case DOUBLE:
+return inputStream.readDouble();
+case STRING:
+final short s=inputStream.readShort();
+final byte[] bytes=new byte[s];
+final int byteCount=inputStream.read(bytes,0,s);
+if (byteCount != s) {
+log.error("Reading string came up short");
+}
+return new String(bytes,"UTF-8");
+case BIGINT:
+final short bs=inputStream.readShort();
+final byte[] bbytes=new byte[bs];
+final int bbyteCount=inputStream.read(bbytes,0,bs);
+if (bbyteCount != bs) {
+log.error("Reading bigint came up short");
+}
+return new BigInteger(new String(bbytes,"UTF-8"),10);
+case BYTE_FOR_DOUBLE:
+return inputStream.readByte();
+case SHORT_FOR_DOUBLE:
+return inputStream.readShort();
+case FLOAT_FOR_DOUBLE:
+return inputStream.readFloat();
+case HALF_FLOAT_FOR_DOUBLE:
+return inputStream.readShort();
+default :
+final String err=String.format("In decodeOpcodeArg(), opcode %s unrecognized",opcode.name());
+log.error(err);
+throw new IllegalArgumentException(err);
+}
+}

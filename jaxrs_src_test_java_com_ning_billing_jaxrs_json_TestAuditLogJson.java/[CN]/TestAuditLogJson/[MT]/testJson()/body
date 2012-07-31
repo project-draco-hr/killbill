@@ -1,0 +1,19 @@
+{
+  final String changeType=UUID.randomUUID().toString();
+  final DateTime changeDate=clock.getUTCNow();
+  final String changedBy=UUID.randomUUID().toString();
+  final String reasonCode=UUID.randomUUID().toString();
+  final String comments=UUID.randomUUID().toString();
+  final String userToken=UUID.randomUUID().toString();
+  final AuditLogJson auditLogJson=new AuditLogJson(changeType,changeDate,changedBy,reasonCode,comments,userToken);
+  Assert.assertEquals(auditLogJson.getChangeType(),changeType);
+  Assert.assertEquals(auditLogJson.getChangeDate(),changeDate);
+  Assert.assertEquals(auditLogJson.getChangedBy(),changedBy);
+  Assert.assertEquals(auditLogJson.getReasonCode(),reasonCode);
+  Assert.assertEquals(auditLogJson.getComments(),comments);
+  Assert.assertEquals(auditLogJson.getUserToken(),userToken);
+  final String asJson=mapper.writeValueAsString(auditLogJson);
+  Assert.assertEquals(asJson,"{\"changeType\":\"" + auditLogJson.getChangeType() + "\","+ "\"changeDate\":\""+ auditLogJson.getChangeDate().toDateTimeISO().toString()+ "\","+ "\"changedBy\":\""+ auditLogJson.getChangedBy()+ "\","+ "\"reasonCode\":\""+ auditLogJson.getReasonCode()+ "\","+ "\"comments\":\""+ auditLogJson.getComments()+ "\","+ "\"userToken\":\""+ auditLogJson.getUserToken()+ "\"}");
+  final AuditLogJson fromJson=mapper.readValue(asJson,AuditLogJson.class);
+  Assert.assertEquals(fromJson,auditLogJson);
+}

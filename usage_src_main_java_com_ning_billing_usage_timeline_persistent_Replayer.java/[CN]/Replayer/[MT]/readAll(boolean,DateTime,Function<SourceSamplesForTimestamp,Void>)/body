@@ -1,0 +1,25 @@
+{
+  final Collection<File> files=ImmutableList.<File>copyOf(findCandidates());
+  int filesSkipped=0;
+  for (  final File file : FILE_ORDERING.sortedCopy(files)) {
+    try {
+      if (minStartTime != null && file.lastModified() < minStartTime.getMillis()) {
+        filesSkipped++;
+        continue;
+      }
+      read(file,fn);
+      if (shuttingDown.get()) {
+        break;
+      }
+      if (deleteFiles) {
+        if (!file.delete()) {
+          log.warn("Unable to delete file: {}",file.getAbsolutePath());
+        }
+      }
+    }
+ catch (    IOException e) {
+      log.warn("Exception replaying file: {}",file.getAbsolutePath(),e);
+    }
+  }
+  return filesSkipped;
+}

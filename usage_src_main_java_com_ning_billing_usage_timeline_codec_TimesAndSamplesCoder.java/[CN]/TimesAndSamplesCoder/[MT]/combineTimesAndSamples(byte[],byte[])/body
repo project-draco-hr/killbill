@@ -1,0 +1,15 @@
+{
+  final int totalSamplesSize=4 + times.length + samples.length;
+  final ByteArrayOutputStream baStream=new ByteArrayOutputStream(totalSamplesSize);
+  final DataOutputStream outputStream=new DataOutputStream(baStream);
+  try {
+    outputStream.writeInt(times.length);
+    outputStream.write(times);
+    outputStream.write(samples);
+    outputStream.flush();
+    return baStream.toByteArray();
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException(String.format("Exception reading timeByteCount in TimelineChunkMapper.map() for times %s, samples %s",new String(Hex.encodeHex(times)),new String(Hex.encodeHex(samples))),e);
+  }
+}

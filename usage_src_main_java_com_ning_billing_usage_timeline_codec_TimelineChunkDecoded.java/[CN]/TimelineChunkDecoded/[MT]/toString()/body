@@ -1,0 +1,18 @@
+{
+  try {
+    final ByteArrayOutputStream out=new ByteArrayOutputStream();
+    final JsonGenerator generator=objectMapper.getJsonFactory().createJsonGenerator(out);
+    generator.writeStartObject();
+    generator.writeFieldName("metric");
+    generator.writeNumber(chunk.getMetricId());
+    generator.writeFieldName("decodedSamples");
+    generator.writeString(getDecodedSamples());
+    generator.writeEndObject();
+    generator.close();
+    return out.toString();
+  }
+ catch (  IOException e) {
+    log.error("IOException in toString()",e);
+  }
+  return null;
+}

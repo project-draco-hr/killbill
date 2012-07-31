@@ -1,0 +1,21 @@
+{
+  final int count=0;
+  final List<DateTime> dateTimes=new ArrayList<DateTime>();
+  DateTime time=DateTimeUtils.dateTimeFromUnixSeconds(1000000);
+  for (int i=0; i < 20; i++) {
+    time=time.plusSeconds(200);
+    dateTimes.add(time);
+  }
+  for (int i=0; i < 0xFFFF + 100; i++) {
+    time=time.plusSeconds(100);
+    dateTimes.add(time);
+  }
+  final byte[] timeBytes=timelineCoder.compressDateTimes(dateTimes);
+  final String hex=new String(Hex.encodeHex(timeBytes));
+  Assert.assertEquals(timeBytes,Hex.decodeHex("ff000f4308fe13c8fdffff64fe6464".toCharArray()));
+  final List<DateTime> restoredSamples=timelineCoder.decompressDateTimes(timeBytes);
+  Assert.assertEquals(restoredSamples.size(),dateTimes.size());
+  for (int i=0; i < count; i++) {
+    Assert.assertEquals(restoredSamples.get(i),DateTimeUtils.unixSeconds(dateTimes.get(i)));
+  }
+}

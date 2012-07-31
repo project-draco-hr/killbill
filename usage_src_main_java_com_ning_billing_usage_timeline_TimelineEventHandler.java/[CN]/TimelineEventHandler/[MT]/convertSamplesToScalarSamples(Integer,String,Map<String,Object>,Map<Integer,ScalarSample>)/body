@@ -1,0 +1,11 @@
+{
+  if (inputSamples == null) {
+    return;
+  }
+  final Integer eventCategoryId=timelineDAO.getOrAddEventCategory(eventType);
+  for (  final String attributeName : inputSamples.keySet()) {
+    final Integer metricId=timelineDAO.getOrAddMetric(sourceId,eventCategoryId,attributeName);
+    final Object sample=inputSamples.get(attributeName);
+    outputSamples.put(metricId,ScalarSample.fromObject(sample));
+  }
+}
