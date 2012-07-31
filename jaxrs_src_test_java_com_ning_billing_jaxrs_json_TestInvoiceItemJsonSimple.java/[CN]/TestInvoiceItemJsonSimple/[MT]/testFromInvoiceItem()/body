@@ -1,5 +1,6 @@
 {
   final InvoiceItem invoiceItem=Mockito.mock(InvoiceItem.class);
+  Mockito.when(invoiceItem.getId()).thenReturn(UUID.randomUUID());
   Mockito.when(invoiceItem.getInvoiceId()).thenReturn(UUID.randomUUID());
   Mockito.when(invoiceItem.getAccountId()).thenReturn(UUID.randomUUID());
   Mockito.when(invoiceItem.getBundleId()).thenReturn(UUID.randomUUID());
@@ -12,6 +13,7 @@
   Mockito.when(invoiceItem.getAmount()).thenReturn(BigDecimal.TEN);
   Mockito.when(invoiceItem.getCurrency()).thenReturn(Currency.EUR);
   final InvoiceItemJsonSimple invoiceItemJsonSimple=new InvoiceItemJsonSimple(invoiceItem);
+  Assert.assertEquals(invoiceItemJsonSimple.getInvoiceItemId(),invoiceItem.getId());
   Assert.assertEquals(invoiceItemJsonSimple.getInvoiceId(),invoiceItem.getInvoiceId());
   Assert.assertEquals(invoiceItemJsonSimple.getAccountId(),invoiceItem.getAccountId());
   Assert.assertEquals(invoiceItemJsonSimple.getBundleId(),invoiceItem.getBundleId());
