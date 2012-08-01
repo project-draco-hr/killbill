@@ -1,14 +1,13 @@
 {
-  final InvoiceItemSqlDao transInvoiceItemDao=transactional.become(InvoiceItemSqlDao.class);
-  transInvoiceItemDao.create(item,context);
-  final Invoice invoice=transactional.getById(item.getInvoiceId().toString());
+  final Invoice invoice=transactional.getById(invoiceId.toString());
   if (invoice != null) {
     populateChildren(invoice,transactional);
   }
  else {
-    throw new IllegalStateException("Invoice shouldn't be null for this item at this stage " + item.getInvoiceId());
+    throw new IllegalStateException("Invoice shouldn't be null for this item at this stage " + invoiceId);
   }
   if (invoice.getBalance().compareTo(BigDecimal.ZERO) < 0) {
+    final InvoiceItemSqlDao transInvoiceItemDao=transactional.become(InvoiceItemSqlDao.class);
     final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),invoice.getBalance().negate(),invoice.getCurrency());
     transInvoiceItemDao.create(cbaAdjItem,context);
   }
