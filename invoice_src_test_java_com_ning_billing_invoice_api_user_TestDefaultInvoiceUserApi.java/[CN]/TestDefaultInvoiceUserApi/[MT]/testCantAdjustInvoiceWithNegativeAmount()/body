@@ -1,0 +1,9 @@
+{
+  try {
+    invoiceUserApi.insertCreditForInvoice(accountId,invoiceId,BigDecimal.TEN.negate(),clock.getUTCToday(),accountCurrency,context);
+    Assert.fail("Should not have been able to adjust an invoice with a negative amount");
+  }
+ catch (  InvoiceApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.CREDIT_AMOUNT_INVALID.getCode());
+  }
+}

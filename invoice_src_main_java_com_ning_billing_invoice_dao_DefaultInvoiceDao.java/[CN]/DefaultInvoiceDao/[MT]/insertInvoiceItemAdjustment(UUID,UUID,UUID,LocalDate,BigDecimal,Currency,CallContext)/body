@@ -1,0 +1,20 @@
+{
+  return invoiceSqlDao.inTransaction(new Transaction<InvoiceItem,InvoiceSqlDao>(){
+    @Override public InvoiceItem inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final InvoiceItemSqlDao invoiceItemSqlDao=transactional.become(InvoiceItemSqlDao.class);
+      final InvoiceItem invoiceItemToBeAdjusted=invoiceItemSqlDao.getById(invoiceItemId.toString());
+      if (invoiceItemToBeAdjusted == null) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_NOT_FOUND,invoiceItemId);
+      }
+      if (!invoiceItemToBeAdjusted.getInvoiceId().equals(invoiceId)) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_INVALID_FOR_INVOICE_ITEM_ADJUSTMENT,invoiceItemId,invoiceId);
+      }
+      final BigDecimal amountToRefund=Objects.firstNonNull(positiveAdjAmount,invoiceItemToBeAdjusted.getAmount());
+      final Currency currencyForAdjustment=Objects.firstNonNull(currency,invoiceItemToBeAdjusted.getCurrency());
+      final InvoiceItem invoiceItemAdjustment=new ItemAdjInvoiceItem(invoiceItemToBeAdjusted,effectiveDate,amountToRefund.negate(),currencyForAdjustment);
+      createItemAndAddCBAIfNeeded(transactional,invoiceItemAdjustment,context);
+      return invoiceItemAdjustment;
+    }
+  }
+);
+}
