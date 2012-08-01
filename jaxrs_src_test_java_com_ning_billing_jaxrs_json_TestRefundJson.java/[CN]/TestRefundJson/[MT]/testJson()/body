@@ -1,0 +1,22 @@
+{
+  final String refundId=UUID.randomUUID().toString();
+  final String paymentId=UUID.randomUUID().toString();
+  final BigDecimal refundAmount=BigDecimal.TEN;
+  final boolean isAdjusted=true;
+  final DateTime requestedDate=clock.getUTCNow();
+  final DateTime effectiveDate=clock.getUTCNow();
+  final List<InvoiceItemJsonSimple> adjustments=ImmutableList.<InvoiceItemJsonSimple>of(createInvoiceItemJson());
+  final List<AuditLogJson> auditLogs=createAuditLogsJson();
+  final RefundJson refundJson=new RefundJson(refundId,paymentId,refundAmount,isAdjusted,requestedDate,effectiveDate,adjustments,auditLogs);
+  Assert.assertEquals(refundJson.getRefundId(),refundId);
+  Assert.assertEquals(refundJson.getPaymentId(),paymentId);
+  Assert.assertEquals(refundJson.getRefundAmount(),refundAmount);
+  Assert.assertEquals(refundJson.isAdjusted(),isAdjusted);
+  Assert.assertEquals(refundJson.getRequestedDate(),requestedDate);
+  Assert.assertEquals(refundJson.getEffectiveDate(),effectiveDate);
+  Assert.assertEquals(refundJson.getAdjustments(),adjustments);
+  Assert.assertEquals(refundJson.getAuditLogs(),auditLogs);
+  final String asJson=mapper.writeValueAsString(refundJson);
+  final RefundJson fromJson=mapper.readValue(asJson,RefundJson.class);
+  Assert.assertEquals(fromJson,refundJson);
+}
