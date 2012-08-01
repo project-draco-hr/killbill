@@ -9,8 +9,8 @@
         int foundPluginCompletedRefunds=0;
         RefundModelDao refundInfo=null;
         BigDecimal totalAmountRefunded=BigDecimal.ZERO;
-        List<RefundModelDao> existingRefunds=paymentDao.getRefundsForPayment(paymentId);
-        for (        RefundModelDao cur : existingRefunds) {
+        final List<RefundModelDao> existingRefunds=paymentDao.getRefundsForPayment(paymentId);
+        for (        final RefundModelDao cur : existingRefunds) {
           final BigDecimal existingPositiveAmount=cur.getAmount();
           if (existingPositiveAmount.compareTo(refundAmount) == 0) {
             if (cur.getRefundStatus() == RefundStatus.CREATED) {
@@ -34,7 +34,7 @@
           paymentDao.insertRefund(refundInfo,context);
         }
         final PaymentPluginApi plugin=getPaymentProviderPlugin(payment.getPaymentMethodId());
-        int nbExistingRefunds=plugin.getNbRefundForPaymentAmount(account,paymentId,refundAmount);
+        final int nbExistingRefunds=plugin.getNbRefundForPaymentAmount(account,paymentId,refundAmount);
         log.debug(String.format("found %d pluginRefunds for paymentId %s and amount %s",nbExistingRefunds,paymentId,refundAmount));
         if (nbExistingRefunds > foundPluginCompletedRefunds) {
           log.info("Found existing plugin refund for paymentId {}, skip plugin",paymentId);
