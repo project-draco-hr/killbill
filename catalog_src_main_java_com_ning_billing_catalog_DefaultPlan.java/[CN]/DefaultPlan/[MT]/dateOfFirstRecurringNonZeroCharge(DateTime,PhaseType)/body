@@ -1,6 +1,15 @@
 {
   DateTime result=subscriptionStartDate.toDateTime();
+  boolean skipPhase=initialPhaseType == null ? false : true;
   for (  final PlanPhase phase : getAllPhases()) {
+    if (skipPhase) {
+      if (phase.getPhaseType() != initialPhaseType) {
+        continue;
+      }
+ else {
+        skipPhase=false;
+      }
+    }
     if (phase.getRecurringPrice() == null || phase.getRecurringPrice().isZero()) {
       result=phase.getDuration().addToDateTime(result);
     }
