@@ -1,6 +1,6 @@
 {
   final Collection<RefundModelDao> refundsToBeFixed=Collections2.filter(refunds,new Predicate<RefundModelDao>(){
-    @Override public boolean apply(    RefundModelDao in){
+    @Override public boolean apply(    final RefundModelDao in){
       return in.getRefundStatus() == RefundStatus.PLUGIN_COMPLETED;
     }
   }
@@ -9,12 +9,12 @@
     return false;
   }
   try {
-    Account account=accountUserApi.getAccountById(refundsToBeFixed.iterator().next().getAccountId());
+    final Account account=accountUserApi.getAccountById(refundsToBeFixed.iterator().next().getAccountId());
     new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
       @Override public Void doOperation() throws PaymentApiException {
         try {
           final CallContext context=factory.createCallContext("RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM);
-          for (          RefundModelDao cur : refundsToBeFixed) {
+          for (          final RefundModelDao cur : refundsToBeFixed) {
             invoicePaymentApi.createRefund(cur.getPaymentId(),cur.getAmount(),cur.isAdjsuted(),cur.getId(),context);
             paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
           }

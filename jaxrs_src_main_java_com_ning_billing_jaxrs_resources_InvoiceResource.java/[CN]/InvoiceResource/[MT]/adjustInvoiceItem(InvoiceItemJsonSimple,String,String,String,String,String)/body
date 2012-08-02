@@ -1,0 +1,19 @@
+{
+  final Account account=accountApi.getAccountById(UUID.fromString(json.getAccountId()));
+  final LocalDate requestedDate;
+  if (requestedDateTimeString == null) {
+    requestedDate=clock.getUTCToday();
+  }
+ else {
+    final DateTime requestedDateTime=DATE_TIME_FORMATTER.parseDateTime(requestedDateTimeString);
+    requestedDate=requestedDateTime.toDateTime(account.getTimeZone()).toLocalDate();
+  }
+  final InvoiceItem adjustmentItem;
+  if (json.getAmount() == null) {
+    adjustmentItem=invoiceApi.insertInvoiceItemAdjustment(account.getId(),UUID.fromString(invoiceId),UUID.fromString(json.getInvoiceItemId()),requestedDate,context.createContext(createdBy,reason,comment));
+  }
+ else {
+    adjustmentItem=invoiceApi.insertInvoiceItemAdjustment(account.getId(),UUID.fromString(invoiceId),UUID.fromString(json.getInvoiceItemId()),requestedDate,json.getAmount(),json.getCurrency(),context.createContext(createdBy,reason,comment));
+  }
+  return uriBuilder.buildResponse(InvoiceResource.class,"getInvoice",adjustmentItem.getInvoiceId());
+}

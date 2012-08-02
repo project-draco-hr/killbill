@@ -1,0 +1,12 @@
+{
+  final AccountJson accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
+  final List<InvoiceJsonWithItems> invoices=getInvoicesWithItemsForAccount(accountJson.getAccountId());
+  assertEquals(invoices.size(),2);
+  final InvoiceJsonWithItems invoice=invoices.get(1);
+  assertEquals(invoice.getAmount().compareTo(BigDecimal.ZERO),1);
+  final InvoiceItemJsonSimple invoiceItem=invoice.getItems().get(0);
+  assertEquals(invoiceItem.getAmount().compareTo(BigDecimal.ZERO),1);
+  adjustInvoiceItem(accountJson.getAccountId(),invoice.getInvoiceId(),invoiceItem.getInvoiceItemId(),null,null,null);
+  final InvoiceJsonSimple adjustedInvoice=getInvoice(invoice.getInvoiceId());
+  assertEquals(adjustedInvoice.getAmount().compareTo(BigDecimal.ZERO),1);
+}

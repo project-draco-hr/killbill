@@ -1,26 +1,14 @@
 {
   return invoiceSqlDao.inTransaction(new Transaction<InvoiceItem,InvoiceSqlDao>(){
     @Override public InvoiceItem inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
-      UUID invoiceIdForRefund=invoiceId;
-      if (invoiceIdForRefund == null) {
-        final Invoice invoiceForRefund=new DefaultInvoice(accountId,effectiveDate,effectiveDate,currency);
-        transactional.create(invoiceForRefund,context);
-        invoiceIdForRefund=invoiceForRefund.getId();
+      UUID invoiceIdForCredit=invoiceId;
+      if (invoiceIdForCredit == null) {
+        final Invoice invoiceForCredit=new DefaultInvoice(accountId,effectiveDate,effectiveDate,currency);
+        transactional.create(invoiceForCredit,context);
+        invoiceIdForCredit=invoiceForCredit.getId();
       }
-      final InvoiceItem credit=new CreditAdjInvoiceItem(invoiceIdForRefund,accountId,effectiveDate,positiveCreditAmount.negate(),currency);
-      final InvoiceItemSqlDao transInvoiceItemDao=transactional.become(InvoiceItemSqlDao.class);
-      transInvoiceItemDao.create(credit,context);
-      final Invoice invoice=transactional.getById(invoiceIdForRefund.toString());
-      if (invoice != null) {
-        populateChildren(invoice,transactional);
-      }
- else {
-        throw new IllegalStateException("Invoice shouldn't be null for credit at this stage " + invoiceIdForRefund);
-      }
-      if (invoice.getBalance().compareTo(BigDecimal.ZERO) < 0) {
-        final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),invoice.getBalance().negate(),invoice.getCurrency());
-        transInvoiceItemDao.create(cbaAdjItem,context);
-      }
+      final InvoiceItem credit=new CreditAdjInvoiceItem(invoiceIdForCredit,accountId,effectiveDate,positiveCreditAmount.negate(),currency);
+      insertItemAndAddCBAIfNeeded(transactional,credit,context);
       return credit;
     }
   }
