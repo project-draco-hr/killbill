@@ -19,7 +19,7 @@
   invoicePaymentDao.create(payment,context);
   balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(new BigDecimal("0.00")),0);
-  invoiceDao.createRefund(paymentId,refund1,withAdjustment,UUID.randomUUID(),context);
+  invoiceDao.createRefund(paymentId,refund1,withAdjustment,ImmutableMap.<UUID,BigDecimal>of(),UUID.randomUUID(),context);
   balance=invoiceDao.getAccountBalance(accountId);
   if (withAdjustment) {
     assertEquals(balance.compareTo(BigDecimal.ZERO),0);

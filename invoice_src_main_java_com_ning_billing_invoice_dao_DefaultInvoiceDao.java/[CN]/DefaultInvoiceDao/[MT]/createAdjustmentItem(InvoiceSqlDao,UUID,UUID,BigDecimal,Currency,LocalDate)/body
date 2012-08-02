@@ -7,7 +7,7 @@
   if (!invoiceItemToBeAdjusted.getInvoiceId().equals(invoiceId)) {
     throw new InvoiceApiException(ErrorCode.INVOICE_INVALID_FOR_INVOICE_ITEM_ADJUSTMENT,invoiceItemId,invoiceId);
   }
-  final BigDecimal amountToRefund=Objects.firstNonNull(positiveAdjAmount,invoiceItemToBeAdjusted.getAmount());
+  final BigDecimal amountToAdjust=Objects.firstNonNull(positiveAdjAmount,invoiceItemToBeAdjusted.getAmount());
   final Currency currencyForAdjustment=Objects.firstNonNull(currency,invoiceItemToBeAdjusted.getCurrency());
-  return new ItemAdjInvoiceItem(invoiceItemToBeAdjusted,effectiveDate,amountToRefund.negate(),currencyForAdjustment);
+  return new ItemAdjInvoiceItem(invoiceItemToBeAdjusted,effectiveDate,amountToAdjust.negate(),currencyForAdjustment);
 }

@@ -1,0 +1,10 @@
+{
+  BigDecimal amountFromItems=BigDecimal.ZERO;
+  for (  final BigDecimal itemAmount : invoiceItemIdsWithAmounts.values()) {
+    amountFromItems=amountFromItems.add(itemAmount);
+  }
+  if (amountFromItems.compareTo(BigDecimal.ZERO) != 0 && specifiedRefundAmount != null && specifiedRefundAmount.compareTo(amountFromItems) != 0) {
+    throw new IllegalArgumentException("You can't specify a refund amount that doesn't match the invoice items amounts");
+  }
+  return Objects.firstNonNull(specifiedRefundAmount,amountFromItems);
+}
