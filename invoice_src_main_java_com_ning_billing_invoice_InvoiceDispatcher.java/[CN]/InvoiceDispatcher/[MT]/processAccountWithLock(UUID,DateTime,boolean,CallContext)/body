@@ -27,7 +27,13 @@
       }
       outputDebugData(billingEvents,invoices);
       if (!dryRun) {
-        invoiceDao.create(invoice,account.getBillCycleDay().getDayOfMonthUTC(),context);
+        final boolean isRealInvoiceWithItems=Collections2.filter(invoice.getInvoiceItems(),new Predicate<InvoiceItem>(){
+          @Override public boolean apply(          InvoiceItem input){
+            return input.getInvoiceId().equals(invoice.getId());
+          }
+        }
+).size() > 0;
+        invoiceDao.create(invoice,account.getBillCycleDay().getDayOfMonthUTC(),isRealInvoiceWithItems,context);
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         setChargedThroughDates(account.getBillCycleDay(),fixedPriceInvoiceItems,recurringInvoiceItems,context);

@@ -1,11 +1,10 @@
 {
-  final Account account=verifyAccountCreation();
   final SubscriptionBundle bundle=verifyFirstBundle(account);
   Subscription subscription=verifyFirstSubscription(account,bundle);
-  clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   busHandler.pushExpectedEvent(TestApiListener.NextEvent.PHASE);
   busHandler.pushExpectedEvent(TestApiListener.NextEvent.INVOICE);
   busHandler.pushExpectedEvent(TestApiListener.NextEvent.PAYMENT);
+  clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   Assert.assertTrue(busHandler.isCompleted(DELAY));
   verifyBSTWithTrialAndEvergreenPhases(account,bundle,subscription);
   subscription=entitlementUserApi.getSubscriptionFromId(subscription.getId());

@@ -4,9 +4,11 @@
       final Invoice currentInvoice=transactional.getById(invoice.getId().toString());
       if (currentInvoice == null) {
         final List<EntityAudit> audits=new ArrayList<EntityAudit>();
-        transactional.create(invoice,context);
-        final Long recordId=transactional.getRecordId(invoice.getId().toString());
-        audits.add(new EntityAudit(TableName.INVOICES,recordId,ChangeType.INSERT));
+        if (isRealInvoice) {
+          transactional.create(invoice,context);
+          final Long recordId=transactional.getRecordId(invoice.getId().toString());
+          audits.add(new EntityAudit(TableName.INVOICES,recordId,ChangeType.INSERT));
+        }
         List<Long> recordIdList;
         final List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
         final InvoiceItemSqlDao transInvoiceItemSqlDao=transactional.become(InvoiceItemSqlDao.class);
