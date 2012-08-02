@@ -3,14 +3,15 @@
     final UUID subscriptionId=item.getSubscriptionId();
     final DateTime endDate;
     if (item.getEndDate() != null) {
-      endDate=new DateTime(item.getEndDate().toDateTimeAtStartOfDay(),DateTimeZone.UTC);
+      endDate=new DateTime(item.getEndDate().toDateTime(clock.getUTCNow()),DateTimeZone.UTC);
     }
  else {
-      endDate=new DateTime(item.getStartDate().toDateTimeAtStartOfDay(),DateTimeZone.UTC);
+      endDate=new DateTime(item.getStartDate().toDateTime(clock.getUTCNow()),DateTimeZone.UTC);
     }
     if (chargeThroughDates.containsKey(subscriptionId)) {
       if (chargeThroughDates.get(subscriptionId).isBefore(endDate)) {
-        chargeThroughDates.put(subscriptionId,InvoiceDateUtils.calculateBillingCycleDateOnOrAfter(endDate,billCycleDay.getDayOfMonthLocal()));
+        final DateTime ctd=InvoiceDateUtils.calculateBillingCycleDateOnOrAfter(endDate,billCycleDay.getDayOfMonthLocal());
+        chargeThroughDates.put(subscriptionId,ctd);
       }
     }
  else {

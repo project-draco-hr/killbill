@@ -7,6 +7,15 @@
   }
   final List<RecurringInvoiceItemData> results=new ArrayList<RecurringInvoiceItemData>();
   final LocalDate firstBillingCycleDate=calculateBillingCycleDateOnOrAfter(startDate,accountTimeZone,billingCycleDayLocal);
+  if (endDate != null && endDate.equals(startDate)) {
+    return results;
+  }
+  if (endDate != null && !endDate.isAfter(firstBillingCycleDate)) {
+    final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,endDate,billingPeriod);
+    final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(startDate,endDate,leadingProRationPeriods);
+    results.add(itemData);
+    return results;
+  }
   if (firstBillingCycleDate.isAfter(startDate)) {
     final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,firstBillingCycleDate,billingPeriod);
     if (leadingProRationPeriods != null && leadingProRationPeriods.compareTo(BigDecimal.ZERO) > 0) {

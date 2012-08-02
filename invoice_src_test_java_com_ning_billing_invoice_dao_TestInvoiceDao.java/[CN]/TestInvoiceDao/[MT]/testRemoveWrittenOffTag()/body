@@ -10,7 +10,7 @@
   final BillingEventSet events=new MockBillingEventSet();
   events.add(event1);
   final Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,new LocalDate(targetDate1),DateTimeZone.UTC,Currency.USD);
-  invoiceDao.create(invoice,invoice.getTargetDate().getDayOfMonth(),context);
+  invoiceDao.create(invoice,invoice.getTargetDate().getDayOfMonth(),true,context);
   invoiceDao.setWrittenOff(invoice.getId(),context);
   final TagDao tagDao=new AuditedTagDao(dbi,tagEventBuilder,bus);
   Map<String,Tag> tags=tagDao.loadEntities(invoice.getId(),ObjectType.INVOICE);

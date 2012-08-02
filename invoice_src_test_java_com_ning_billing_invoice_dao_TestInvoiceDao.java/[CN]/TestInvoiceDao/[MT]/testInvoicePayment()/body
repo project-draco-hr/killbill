@@ -8,7 +8,7 @@
   final LocalDate endDate=new LocalDate(2010,4,1);
   final InvoiceItem invoiceItem=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate,endDate,new BigDecimal("21.00"),new BigDecimal("7.00"),Currency.USD);
   invoice.addInvoiceItem(invoiceItem);
-  invoiceDao.create(invoice,invoice.getTargetDate().getDayOfMonth(),context);
+  invoiceDao.create(invoice,invoice.getTargetDate().getDayOfMonth(),true,context);
   final Invoice savedInvoice=invoiceDao.getById(invoiceId);
   assertNotNull(savedInvoice);
   assertEquals(savedInvoice.getBalance().compareTo(new BigDecimal("21.00")),0);
