@@ -1,6 +1,6 @@
 {
-  final Invoice invoice=createAndPersistInvoice(THIRTY);
-  final InvoicePayment payment=createAndPersistPayment(invoice.getId(),THIRTY);
+  final Invoice invoice=createAndPersistInvoice(invoiceSqlDao,invoiceItemSqlDao,clock,THIRTY,CURRENCY,context);
+  final InvoicePayment payment=createAndPersistPayment(invoicePaymentApi,clock,invoice.getId(),THIRTY,CURRENCY,context);
   final UUID accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(payment.getId());
   assertEquals(accountId,invoice.getAccountId());
 }

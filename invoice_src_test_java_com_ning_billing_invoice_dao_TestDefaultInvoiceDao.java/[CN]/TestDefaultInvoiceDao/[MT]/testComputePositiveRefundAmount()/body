@@ -1,0 +1,23 @@
+{
+  final Map<UUID,BigDecimal> noItemAdjustment=ImmutableMap.<UUID,BigDecimal>of();
+  verifyComputedRefundAmount(null,null,noItemAdjustment,BigDecimal.ZERO);
+  verifyComputedRefundAmount(null,BigDecimal.ZERO,noItemAdjustment,BigDecimal.ZERO);
+  verifyComputedRefundAmount(BigDecimal.TEN,null,noItemAdjustment,BigDecimal.TEN);
+  verifyComputedRefundAmount(BigDecimal.TEN,BigDecimal.ONE,noItemAdjustment,BigDecimal.ONE);
+  try {
+    verifyComputedRefundAmount(BigDecimal.ONE,BigDecimal.TEN,noItemAdjustment,BigDecimal.TEN);
+    Assert.fail("Shouldn't have been able to compute a refund amount");
+  }
+ catch (  InvoiceApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.REFUND_AMOUNT_TOO_HIGH.getCode());
+  }
+  final Map<UUID,BigDecimal> itemAdjustments=ImmutableMap.<UUID,BigDecimal>of(UUID.randomUUID(),BigDecimal.ONE,UUID.randomUUID(),BigDecimal.TEN,UUID.randomUUID(),BigDecimal.ZERO);
+  verifyComputedRefundAmount(new BigDecimal("100"),new BigDecimal("11"),itemAdjustments,new BigDecimal("11"));
+  try {
+    verifyComputedRefundAmount(new BigDecimal("100"),BigDecimal.TEN,itemAdjustments,BigDecimal.TEN);
+    Assert.fail("Shouldn't have been able to compute a refund amount");
+  }
+ catch (  InvoiceApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.REFUND_AMOUNT_DONT_MATCH_ITEMS_TO_ADJUST.getCode());
+  }
+}
