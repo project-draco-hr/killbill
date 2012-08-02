@@ -1,6 +1,7 @@
 {
   return new WithAccountLock<Refund>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Refund>(){
     @Override public Refund doOperation() throws PaymentApiException {
+      final BigDecimal refundAmount=computeRefundAmount(specifiedRefundAmount,invoiceItemIdsWithAmounts);
       try {
         final PaymentModelDao payment=paymentDao.getPayment(paymentId);
         if (payment == null) {
@@ -43,7 +44,7 @@
           plugin.processRefund(account,paymentId,refundAmount);
         }
         paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.PLUGIN_COMPLETED,context);
-        invoicePaymentApi.createRefund(paymentId,refundAmount,isAdjusted,refundInfo.getId(),context);
+        invoicePaymentApi.createRefund(paymentId,refundAmount,isAdjusted,invoiceItemIdsWithAmounts,refundInfo.getId(),context);
         paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.COMPLETED,context);
         return new DefaultRefund(refundInfo.getId(),paymentId,refundInfo.getAmount(),account.getCurrency(),isAdjusted,refundInfo.getCreatedDate());
       }
