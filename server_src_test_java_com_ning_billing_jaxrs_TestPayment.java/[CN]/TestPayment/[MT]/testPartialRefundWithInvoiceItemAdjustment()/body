@@ -1,0 +1,10 @@
+{
+  final PaymentJsonSimple paymentJsonSimple=setupScenarioWithPayment();
+  final InvoiceJsonWithItems invoice=getInvoiceWithItems(paymentJsonSimple.getInvoiceId());
+  final InvoiceItemJsonSimple itemToAdjust=invoice.getItems().get(0);
+  final BigDecimal refundAmount=getFractionOfAmount(itemToAdjust.getAmount());
+  final BigDecimal expectedInvoiceBalance=BigDecimal.ZERO;
+  final RefundJson refundJsonCheck=createRefundWithInvoiceItemAdjustment(paymentJsonSimple.getPaymentId(),itemToAdjust.getInvoiceItemId(),refundAmount);
+  verifyRefund(paymentJsonSimple,refundJsonCheck,refundAmount);
+  verifyInvoice(paymentJsonSimple,expectedInvoiceBalance);
+}

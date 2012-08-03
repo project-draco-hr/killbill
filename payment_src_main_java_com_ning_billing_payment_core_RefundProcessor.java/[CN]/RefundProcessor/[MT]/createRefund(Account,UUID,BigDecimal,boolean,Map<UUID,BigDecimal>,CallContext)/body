@@ -1,7 +1,7 @@
 {
   return new WithAccountLock<Refund>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Refund>(){
     @Override public Refund doOperation() throws PaymentApiException {
-      final BigDecimal refundAmount=computeRefundAmount(specifiedRefundAmount,invoiceItemIdsWithAmounts);
+      final BigDecimal refundAmount=computeRefundAmount(paymentId,specifiedRefundAmount,invoiceItemIdsWithAmounts);
       try {
         final PaymentModelDao payment=paymentDao.getPayment(paymentId);
         if (payment == null) {

@@ -1,0 +1,12 @@
+{
+  Assert.assertEquals(refundJsonCheck.getPaymentId(),paymentJsonSimple.getPaymentId());
+  Assert.assertEquals(refundJsonCheck.getRefundAmount().setScale(2,RoundingMode.HALF_UP),refundAmount.setScale(2,RoundingMode.HALF_UP));
+  Assert.assertEquals(refundJsonCheck.getEffectiveDate().getYear(),clock.getUTCNow().getYear());
+  Assert.assertEquals(refundJsonCheck.getEffectiveDate().getMonthOfYear(),clock.getUTCNow().getMonthOfYear());
+  Assert.assertEquals(refundJsonCheck.getEffectiveDate().getDayOfMonth(),clock.getUTCNow().getDayOfMonth());
+  Assert.assertEquals(refundJsonCheck.getRequestedDate().getYear(),clock.getUTCNow().getYear());
+  Assert.assertEquals(refundJsonCheck.getRequestedDate().getMonthOfYear(),clock.getUTCNow().getMonthOfYear());
+  Assert.assertEquals(refundJsonCheck.getRequestedDate().getDayOfMonth(),clock.getUTCNow().getDayOfMonth());
+  final List<RefundJson> retrievedRefunds=getRefundsForPayment(paymentJsonSimple.getPaymentId());
+  Assert.assertEquals(retrievedRefunds.size(),1);
+}

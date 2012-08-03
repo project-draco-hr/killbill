@@ -4,7 +4,16 @@
   final Account account=accountApi.getAccountById(payment.getAccountId());
   final Refund result;
   if (json.isAdjusted()) {
-    result=paymentApi.createRefundWithAdjustment(account,paymentUuid,json.getRefundAmount(),context.createContext(createdBy,reason,comment));
+    if (json.getAdjustments() != null && json.getAdjustments().size() > 0) {
+      final Map<UUID,BigDecimal> adjustments=new HashMap<UUID,BigDecimal>();
+      for (      final InvoiceItemJsonSimple item : json.getAdjustments()) {
+        adjustments.put(UUID.fromString(item.getInvoiceItemId()),item.getAmount());
+      }
+      result=paymentApi.createRefundWithItemsAdjustments(account,paymentUuid,adjustments,context.createContext(createdBy,reason,comment));
+    }
+ else {
+      result=paymentApi.createRefundWithAdjustment(account,paymentUuid,json.getRefundAmount(),context.createContext(createdBy,reason,comment));
+    }
   }
  else {
     result=paymentApi.createRefund(account,paymentUuid,json.getRefundAmount(),context.createContext(createdBy,reason,comment));
