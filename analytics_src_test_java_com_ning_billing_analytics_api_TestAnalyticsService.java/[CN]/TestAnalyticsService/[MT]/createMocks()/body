@@ -1,5 +1,8 @@
 {
-  final Account account=new MockAccountBuilder(UUID.randomUUID()).externalKey(ACCOUNT_KEY).currency(ACCOUNT_CURRENCY).build();
+  final PaymentMethod paymentMethod=Mockito.mock(PaymentMethod.class);
+  final UUID paymentMethodId=UUID.randomUUID();
+  Mockito.when(paymentMethod.getId()).thenReturn(paymentMethodId);
+  final Account account=new MockAccountBuilder(UUID.randomUUID()).externalKey(ACCOUNT_KEY).currency(ACCOUNT_CURRENCY).paymentMethodId(paymentMethodId).build();
   try {
     final Account storedAccount=accountApi.createAccount(account,context);
     createSubscriptionTransitionEvent(storedAccount);
