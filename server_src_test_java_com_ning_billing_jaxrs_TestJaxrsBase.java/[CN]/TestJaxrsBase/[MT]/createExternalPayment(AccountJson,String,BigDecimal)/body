@@ -1,0 +1,8 @@
+{
+  final PaymentJsonSimple payment=new PaymentJsonSimple(paidAmount,BigDecimal.ZERO,accountJson.getAccountId(),invoiceId,null,null,null,null,0,null,null,null,null,null,null,null);
+  final String postJson=mapper.writeValueAsString(payment);
+  final String paymentURI=JaxrsResource.INVOICES_PATH + "/" + invoiceId+ "/"+ JaxrsResource.PAYMENTS;
+  final Response paymentResponse=doPost(paymentURI,postJson,ImmutableMap.<String,String>of("externalPayment","true"),DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(paymentResponse.getStatusCode(),Status.CREATED.getStatusCode());
+  return getPaymentsForInvoice(invoiceId);
+}

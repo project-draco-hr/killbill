@@ -1,0 +1,31 @@
+{
+  invoiceSqlDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
+    @Override public Void inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final Invoice currentInvoice=transactional.getById(invoice.getId().toString());
+      if (currentInvoice == null) {
+        final List<EntityAudit> audits=new ArrayList<EntityAudit>();
+        if (isRealInvoice) {
+          transactional.create(invoice,context);
+          final Long recordId=transactional.getRecordId(invoice.getId().toString());
+          audits.add(new EntityAudit(TableName.INVOICES,recordId,ChangeType.INSERT));
+        }
+        List<Long> recordIdList;
+        final List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
+        final InvoiceItemSqlDao transInvoiceItemSqlDao=transactional.become(InvoiceItemSqlDao.class);
+        transInvoiceItemSqlDao.batchCreateFromTransaction(invoiceItems,context);
+        recordIdList=transInvoiceItemSqlDao.getRecordIds(invoice.getId().toString());
+        audits.addAll(createAudits(TableName.INVOICE_ITEMS,recordIdList));
+        final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
+        notifyOfFutureBillingEvents(transactional,invoice.getAccountId(),billCycleDayUTC,recurringInvoiceItems);
+        final List<InvoicePayment> invoicePayments=invoice.getPayments();
+        final InvoicePaymentSqlDao invoicePaymentSqlDao=transactional.become(InvoicePaymentSqlDao.class);
+        invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);
+        recordIdList=invoicePaymentSqlDao.getRecordIds(invoice.getId().toString());
+        audits.addAll(createAudits(TableName.INVOICE_PAYMENTS,recordIdList));
+        transactional.insertAuditFromTransaction(audits,context);
+      }
+      return null;
+    }
+  }
+);
+}

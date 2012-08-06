@@ -1,0 +1,11 @@
+{
+  final List<InvoiceItem> items=invoicePaymentApi.getInvoiceForPaymentId(paymentId).getInvoiceItems();
+  BigDecimal amountFromItems=BigDecimal.ZERO;
+  for (  final UUID itemId : invoiceItemIdsWithAmounts.keySet()) {
+    amountFromItems=amountFromItems.add(Objects.firstNonNull(invoiceItemIdsWithAmounts.get(itemId),getAmountFromItem(items,itemId)));
+  }
+  if (amountFromItems.compareTo(BigDecimal.ZERO) != 0 && specifiedRefundAmount != null && specifiedRefundAmount.compareTo(amountFromItems) != 0) {
+    throw new IllegalArgumentException("You can't specify a refund amount that doesn't match the invoice items amounts");
+  }
+  return Objects.firstNonNull(specifiedRefundAmount,amountFromItems);
+}

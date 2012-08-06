@@ -1,0 +1,11 @@
+{
+  return invoicePaymentWithException.executeAndThrow(new WithInvoiceApiExceptionCallback<InvoicePayment>(){
+    @Override public InvoicePayment doHandle() throws InvoiceApiException {
+      if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+        throw new InvoiceApiException(ErrorCode.PAYMENT_REFUND_AMOUNT_NEGATIVE_OR_NULL);
+      }
+      return dao.createRefund(paymentId,amount,isInvoiceAdjusted,invoiceItemIdsWithAmounts,paymentCookieId,context);
+    }
+  }
+);
+}

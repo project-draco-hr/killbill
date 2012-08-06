@@ -1,0 +1,17 @@
+{
+  final AccountData accountData=getAccountData(billCycleDay);
+  Assert.assertNull(analyticsUserApi.getAccountByKey(accountData.getExternalKey()));
+  final Account account=createAccountWithPaymentMethod(accountData);
+  Assert.assertNotNull(account);
+  waitALittle();
+  final BusinessAccount businessAccount=analyticsUserApi.getAccountByKey(account.getExternalKey());
+  Assert.assertNotNull(businessAccount);
+  Assert.assertEquals(businessAccount.getBalance().doubleValue(),Rounder.round(BigDecimal.ZERO));
+  Assert.assertEquals(businessAccount.getKey(),account.getExternalKey());
+  Assert.assertNull(businessAccount.getLastInvoiceDate());
+  Assert.assertNull(businessAccount.getLastPaymentStatus());
+  Assert.assertEquals(businessAccount.getName(),account.getName());
+  Assert.assertEquals(businessAccount.getTotalInvoiceBalance().doubleValue(),Rounder.round(BigDecimal.ZERO));
+  Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey()).size(),0);
+  return account;
+}

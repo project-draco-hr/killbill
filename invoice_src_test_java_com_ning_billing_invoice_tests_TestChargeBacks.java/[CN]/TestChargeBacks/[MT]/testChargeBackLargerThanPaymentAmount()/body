@@ -1,7 +1,7 @@
 {
   try {
-    final Invoice invoice=createAndPersistInvoice(THIRTY);
-    final InvoicePayment payment=createAndPersistPayment(invoice.getId(),THIRTY);
+    final Invoice invoice=createAndPersistInvoice(invoiceSqlDao,invoiceItemSqlDao,clock,THIRTY,CURRENCY,context);
+    final InvoicePayment payment=createAndPersistPayment(invoicePaymentApi,clock,invoice.getId(),THIRTY,CURRENCY,context);
     invoicePaymentApi.createChargeback(payment.getId(),ONE_MILLION,context);
     fail("Expected a failure...");
   }

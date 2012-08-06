@@ -3,7 +3,7 @@
   final UUID bundleId=UUID.randomUUID();
   final LocalDate targetDate1=new LocalDate(2011,10,6);
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1,Currency.USD);
-  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),context);
+  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),true,context);
   final LocalDate startDate=new LocalDate(2011,3,1);
   final LocalDate endDate=startDate.plusMonths(1);
   final BigDecimal rate1=new BigDecimal("20.0");
@@ -19,7 +19,7 @@
   invoicePaymentDao.create(payment,context);
   balance=invoiceDao.getAccountBalance(accountId);
   assertEquals(balance.compareTo(new BigDecimal("0.00")),0);
-  invoiceDao.createRefund(paymentId,refund1,withAdjustment,UUID.randomUUID(),context);
+  invoiceDao.createRefund(paymentId,refund1,withAdjustment,ImmutableMap.<UUID,BigDecimal>of(),UUID.randomUUID(),context);
   balance=invoiceDao.getAccountBalance(accountId);
   if (withAdjustment) {
     assertEquals(balance.compareTo(BigDecimal.ZERO),0);

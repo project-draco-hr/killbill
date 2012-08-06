@@ -1,0 +1,13 @@
+{
+  final String uri=JaxrsResource.INVOICES_PATH;
+  final Map<String,String> queryParams=new HashMap<String,String>();
+  queryParams.put(JaxrsResource.QUERY_ACCOUNT_ID,accountId);
+  queryParams.put(JaxrsResource.QUERY_TARGET_DATE,futureDate.toString());
+  queryParams.put(JaxrsResource.QUERY_DRY_RUN,"true");
+  final Response response=doPost(uri,null,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  final String baseJson=response.getResponseBody();
+  final InvoiceJsonSimple futureInvoice=mapper.readValue(baseJson,InvoiceJsonSimple.class);
+  assertNotNull(futureInvoice);
+  return futureInvoice;
+}
