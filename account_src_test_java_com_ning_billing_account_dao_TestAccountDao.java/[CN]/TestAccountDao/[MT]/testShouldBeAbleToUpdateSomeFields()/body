@@ -1,0 +1,10 @@
+{
+  final Account account=createTestAccount();
+  accountDao.create(account,context);
+  final MutableAccountData otherAccount=account.toMutableAccountData();
+  otherAccount.setAddress1(UUID.randomUUID().toString());
+  otherAccount.setEmail(UUID.randomUUID().toString());
+  final DefaultAccount newAccount=new DefaultAccount(account.getId(),otherAccount);
+  accountDao.update(newAccount,context);
+  Assert.assertEquals(accountDao.getById(account.getId()),newAccount);
+}

@@ -1,11 +1,17 @@
 {
   final DefaultMutableAccountData accountData=new DefaultMutableAccountData(this);
-  accountData.setExternalKey(Objects.firstNonNull(externalKey,delegate.getExternalKey()));
+  if (externalKey != null ? !externalKey.equals(delegate.getExternalKey()) : delegate.getExternalKey() != null) {
+    throw new IllegalArgumentException(String.format("Killbill doesn't support updating the account external key yet: this=%s, delegate=%s",externalKey,delegate.getExternalKey()));
+  }
+  if (currency != null ? !currency.equals(delegate.getCurrency()) : delegate.getCurrency() != null) {
+    throw new IllegalArgumentException(String.format("Killbill doesn't support updating the account currency yet: this=%s, delegate=%s",currency,delegate.getCurrency()));
+  }
+  if (billCycleDay != null ? !billCycleDay.equals(delegate.getBillCycleDay()) : delegate.getBillCycleDay() != null) {
+    throw new IllegalArgumentException(String.format("Killbill doesn't support updating the account BCD yet: this=%s, delegate=%s",billCycleDay,delegate.getBillCycleDay()));
+  }
   accountData.setEmail(Objects.firstNonNull(email,delegate.getEmail()));
   accountData.setName(Objects.firstNonNull(name,delegate.getName()));
   accountData.setFirstNameLength(Objects.firstNonNull(firstNameLength,delegate.getFirstNameLength()));
-  accountData.setCurrency(Objects.firstNonNull(currency,delegate.getCurrency()));
-  accountData.setBillCycleDay(Objects.firstNonNull(billCycleDay,delegate.getBillCycleDay()));
   accountData.setPaymentMethodId(Optional.<UUID>fromNullable(paymentMethodId).or(Optional.<UUID>fromNullable(delegate.getPaymentMethodId())).orNull());
   accountData.setTimeZone(Objects.firstNonNull(timeZone,delegate.getTimeZone()));
   accountData.setLocale(Objects.firstNonNull(locale,delegate.getLocale()));
