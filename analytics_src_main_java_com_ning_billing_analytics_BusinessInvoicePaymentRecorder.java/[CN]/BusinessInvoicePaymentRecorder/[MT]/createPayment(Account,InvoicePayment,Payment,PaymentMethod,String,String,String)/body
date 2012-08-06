@@ -1,8 +1,8 @@
 {
   final PaymentMethodPlugin pluginDetail=paymentMethod.getPluginDetail();
-  final String cardCountry=pluginDetail != null ? pluginDetail.getValueString("country") : null;
-  final String cardType=pluginDetail != null ? pluginDetail.getValueString("cardType") : null;
-  final String paymentMethodString=cardType != null ? "CreditCard" : "Other";
+  final String cardCountry=PaymentMethodUtils.getCardCountry(pluginDetail);
+  final String cardType=PaymentMethodUtils.getCardType(pluginDetail);
+  final String paymentMethodString=PaymentMethodUtils.getPaymentMethodType(pluginDetail);
   invoicePaymentSqlDao.inTransaction(new Transaction<Void,BusinessInvoicePaymentSqlDao>(){
     @Override public Void inTransaction(    final BusinessInvoicePaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
       transactional.deleteInvoicePayment(payment.getId().toString());

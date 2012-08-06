@@ -1,11 +1,13 @@
 {
   bac.setName(account.getName());
   bac.setKey(account.getExternalKey());
+  final Currency currency=account.getCurrency();
+  bac.setCurrency(currency != null ? currency.toString() : bac.getCurrency());
   try {
     LocalDate lastInvoiceDate=bac.getLastInvoiceDate();
     BigDecimal totalInvoiceBalance=bac.getTotalInvoiceBalance();
     String lastPaymentStatus=bac.getLastPaymentStatus();
-    String paymentMethod=bac.getPaymentMethod();
+    String paymentMethodType=bac.getPaymentMethod();
     String creditCardType=bac.getCreditCardType();
     String billingAddressCountry=bac.getBillingAddressCountry();
     final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId());
@@ -23,15 +25,20 @@
           if (lastPaymentDate == null || cur.getEffectiveDate().isAfter(lastPaymentDate)) {
             lastPaymentDate=cur.getEffectiveDate();
             lastPaymentStatus=cur.getPaymentStatus().toString();
-            paymentMethod=null;
-            creditCardType=null;
-            billingAddressCountry=null;
           }
         }
       }
     }
+    for (    final PaymentMethod paymentMethod : paymentApi.getPaymentMethods(account,true)) {
+      if (paymentMethod.getId().equals(account.getPaymentMethodId()) && paymentMethod.getPluginDetail() != null) {
+        paymentMethodType=PaymentMethodUtils.getPaymentMethodType(paymentMethod.getPluginDetail());
+        creditCardType=PaymentMethodUtils.getCardType(paymentMethod.getPluginDetail());
+        billingAddressCountry=PaymentMethodUtils.getCardCountry(paymentMethod.getPluginDetail());
+        break;
+      }
+    }
     bac.setLastPaymentStatus(lastPaymentStatus);
-    bac.setPaymentMethod(paymentMethod);
+    bac.setPaymentMethod(paymentMethodType);
     bac.setCreditCardType(creditCardType);
     bac.setBillingAddressCountry(billingAddressCountry);
     bac.setLastInvoiceDate(lastInvoiceDate);
