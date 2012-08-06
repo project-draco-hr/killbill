@@ -18,12 +18,9 @@
           return null;
         }
         final boolean isAccountAutoPayOff=isAccountAutoPayOff(account.getId());
-        final boolean isBadAccount=setUnsaneAccount_AUTO_PAY_OFFWithAccountLock(account.getId(),isAccountAutoPayOff,context,isInstantPayment);
-        if (isBadAccount && isInstantPayment) {
-          throw new PaymentApiException(ErrorCode.PAYMENT_BAD_ACCOUNT,account.getId());
-        }
+        setUnsaneAccount_AUTO_PAY_OFFWithAccountLock(account.getId(),paymentMethodId,isAccountAutoPayOff,context,isInstantPayment);
         final BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
-        if (isAccountAutoPayOff) {
+        if (!isInstantPayment && isAccountAutoPayOff) {
           return processNewPaymentForAutoPayOffWithAccountLocked(paymentMethodId,account,invoice,requestedAmount,context);
         }
  else {
