@@ -1,0 +1,10 @@
+{
+  final Account account=createTestAccount(0);
+  accountDao.create(account,context);
+  final Account fetchedAccount=accountDao.getById(account.getId());
+  final MutableAccountData otherAccount=account.toMutableAccountData();
+  otherAccount.setBillCycleDay(null);
+  final DefaultAccount newAccount=new DefaultAccount(account.getId(),otherAccount);
+  accountDao.update(newAccount,context);
+  Assert.assertEquals(accountDao.getById(account.getId()),fetchedAccount);
+}

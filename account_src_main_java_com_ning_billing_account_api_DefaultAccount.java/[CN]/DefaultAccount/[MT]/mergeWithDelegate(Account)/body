@@ -6,7 +6,7 @@
   if (currency != null ? !currency.equals(delegate.getCurrency()) : delegate.getCurrency() != null) {
     throw new IllegalArgumentException(String.format("Killbill doesn't support updating the account currency yet: this=%s, delegate=%s",currency,delegate.getCurrency()));
   }
-  if (billCycleDay != null ? !(billCycleDay.getDayOfMonthUTC() == delegate.getBillCycleDay().getDayOfMonthUTC() && billCycleDay.getDayOfMonthLocal() == delegate.getBillCycleDay().getDayOfMonthLocal()) : delegate.getBillCycleDay() != null) {
+  if (!(billCycleDay == null && (delegate.getBillCycleDay() == null || delegate.getBillCycleDay().getDayOfMonthUTC() == 0 && delegate.getBillCycleDay().getDayOfMonthLocal() == 0)) && !(billCycleDay != null && (billCycleDay.getDayOfMonthUTC() == delegate.getBillCycleDay().getDayOfMonthUTC() && billCycleDay.getDayOfMonthLocal() == delegate.getBillCycleDay().getDayOfMonthLocal()))) {
     throw new IllegalArgumentException(String.format("Killbill doesn't support updating the account BCD yet: this=%s, delegate=%s",billCycleDay,delegate.getBillCycleDay()));
   }
   accountData.setEmail(Objects.firstNonNull(email,delegate.getEmail()));
