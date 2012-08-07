@@ -61,4 +61,9 @@
   testListener.pushExpectedEvent(NextEvent.CANCEL);
   clock.addMonths(1);
   assertTrue(testListener.isCompleted(3000));
+  final UUID finalNewAccountId=UUID.randomUUID();
+  final DateTime newTransferRequestedDate=clock.getUTCNow();
+  testListener.pushExpectedEvent(NextEvent.TRANSFER);
+  transferApi.transferBundle(newBundle.getAccountId(),finalNewAccountId,newBundle.getKey(),newTransferRequestedDate,true,false,context);
+  assertTrue(testListener.isCompleted(3000));
 }
