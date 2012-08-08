@@ -1,0 +1,18 @@
+{
+  final BigDecimal invoiceBalance=invoiceUserApi.getInvoice(invoiceId).getBalance();
+  Assert.assertEquals(invoiceBalance.compareTo(BigDecimal.ZERO),1);
+  final BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId);
+  Assert.assertEquals(accountBalance,invoiceBalance);
+  final BigDecimal externalChargeAmount=BigDecimal.TEN;
+  final InvoiceItem externalChargeInvoiceItem=invoiceUserApi.insertExternalChargeForInvoice(accountId,invoiceId,externalChargeAmount,UUID.randomUUID().toString(),clock.getUTCToday(),accountCurrency,context);
+  Assert.assertEquals(externalChargeInvoiceItem.getInvoiceId(),invoiceId);
+  Assert.assertEquals(externalChargeInvoiceItem.getInvoiceItemType(),InvoiceItemType.EXTERNAL_CHARGE);
+  Assert.assertEquals(externalChargeInvoiceItem.getAccountId(),accountId);
+  Assert.assertEquals(externalChargeInvoiceItem.getAmount(),externalChargeAmount);
+  Assert.assertEquals(externalChargeInvoiceItem.getCurrency(),accountCurrency);
+  Assert.assertNull(externalChargeInvoiceItem.getLinkedItemId());
+  final BigDecimal adjustedInvoiceBalance=invoiceUserApi.getInvoice(invoiceId).getBalance();
+  Assert.assertEquals(adjustedInvoiceBalance.compareTo(invoiceBalance.add(externalChargeAmount)),0);
+  final BigDecimal adjustedAccountBalance=invoiceUserApi.getAccountBalance(accountId);
+  Assert.assertEquals(adjustedAccountBalance,adjustedInvoiceBalance);
+}
