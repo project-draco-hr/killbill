@@ -10,6 +10,12 @@
     requestedDate=requestedDateTime.toDateTime(account.getTimeZone()).toLocalDate();
   }
   final Currency currency=Objects.firstNonNull(externalChargeJson.getCurrency(),account.getCurrency());
-  final InvoiceItem externalCharge=invoiceApi.insertExternalCharge(account.getId(),externalChargeJson.getAmount(),externalChargeJson.getDescription(),requestedDate,currency,callContext);
+  final InvoiceItem externalCharge;
+  if (externalChargeJson.getBundleId() != null) {
+    externalCharge=invoiceApi.insertExternalChargeForBundle(account.getId(),UUID.fromString(externalChargeJson.getBundleId()),externalChargeJson.getAmount(),externalChargeJson.getDescription(),requestedDate,currency,callContext);
+  }
+ else {
+    externalCharge=invoiceApi.insertExternalCharge(account.getId(),externalChargeJson.getAmount(),externalChargeJson.getDescription(),requestedDate,currency,callContext);
+  }
   return uriBuilder.buildResponse(InvoiceResource.class,"getInvoice",externalCharge.getInvoiceId(),uriInfo.getBaseUri().toString());
 }

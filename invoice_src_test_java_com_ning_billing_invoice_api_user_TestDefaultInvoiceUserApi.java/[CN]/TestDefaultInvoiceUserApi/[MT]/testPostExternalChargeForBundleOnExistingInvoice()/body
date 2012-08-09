@@ -1,0 +1,10 @@
+{
+  final BigDecimal invoiceBalance=invoiceUserApi.getInvoice(invoiceId).getBalance();
+  Assert.assertEquals(invoiceBalance.compareTo(BigDecimal.ZERO),1);
+  final BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId);
+  Assert.assertEquals(accountBalance,invoiceBalance);
+  final BigDecimal externalChargeAmount=BigDecimal.TEN;
+  final UUID bundleId=UUID.randomUUID();
+  final InvoiceItem externalChargeInvoiceItem=invoiceUserApi.insertExternalChargeForInvoiceAndBundle(accountId,invoiceId,bundleId,externalChargeAmount,UUID.randomUUID().toString(),clock.getUTCToday(),accountCurrency,context);
+  verifyExternalChargeOnExistingInvoice(invoiceBalance,bundleId,externalChargeAmount,externalChargeInvoiceItem);
+}
