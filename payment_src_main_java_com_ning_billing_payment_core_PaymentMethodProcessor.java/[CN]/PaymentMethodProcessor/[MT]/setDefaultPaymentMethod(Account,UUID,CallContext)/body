@@ -8,9 +8,7 @@
       try {
         final PaymentPluginApi pluginApi=getPluginApi(paymentMethodId,account.getId());
         pluginApi.setDefaultPaymentMethod(account.getExternalKey(),paymentMethodModel.getExternalId());
-        final MutableAccountData updateAccountData=new DefaultMutableAccountData(account);
-        updateAccountData.setPaymentMethodId(paymentMethodId);
-        accountUserApi.updateAccount(account.getId(),updateAccountData,context);
+        accountUserApi.updatePaymentMethod(account.getId(),paymentMethodId,context);
         return null;
       }
  catch (      PaymentPluginApiException e) {
