@@ -10,11 +10,16 @@
   final String timeZone=UUID.randomUUID().toString();
   final String address1=UUID.randomUUID().toString();
   final String address2=UUID.randomUUID().toString();
+  final String postalCode=UUID.randomUUID().toString();
   final String company=UUID.randomUUID().toString();
+  final String city=UUID.randomUUID().toString();
   final String state=UUID.randomUUID().toString();
   final String country=UUID.randomUUID().toString();
+  final String locale=UUID.randomUUID().toString();
   final String phone=UUID.randomUUID().toString();
-  final AccountJson accountJson=new AccountJson(accountId,name,length,externalKey,email,billCycleDay,currency,paymentMethodId,timeZone,address1,address2,company,state,country,phone);
+  final Boolean isMigrated=true;
+  final Boolean isNotifiedForInvoice=false;
+  final AccountJson accountJson=new AccountJson(accountId,name,length,externalKey,email,billCycleDay,currency,paymentMethodId,timeZone,address1,address2,postalCode,company,city,state,country,locale,phone,isMigrated,isNotifiedForInvoice);
   Assert.assertEquals(accountJson.getAccountId(),accountId);
   Assert.assertEquals(accountJson.getName(),name);
   Assert.assertEquals(accountJson.getLength(),length);
@@ -26,12 +31,16 @@
   Assert.assertEquals(accountJson.getTimeZone(),timeZone);
   Assert.assertEquals(accountJson.getAddress1(),address1);
   Assert.assertEquals(accountJson.getAddress2(),address2);
+  Assert.assertEquals(accountJson.getPostalCode(),postalCode);
   Assert.assertEquals(accountJson.getCompany(),company);
+  Assert.assertEquals(accountJson.getCity(),city);
   Assert.assertEquals(accountJson.getState(),state);
   Assert.assertEquals(accountJson.getCountry(),country);
+  Assert.assertEquals(accountJson.getLocale(),locale);
   Assert.assertEquals(accountJson.getPhone(),phone);
+  Assert.assertEquals(accountJson.isMigrated(),isMigrated);
+  Assert.assertEquals(accountJson.isNotifiedForInvoices(),isNotifiedForInvoice);
   final String asJson=mapper.writeValueAsString(accountJson);
-  Assert.assertEquals(asJson,"{\"accountId\":\"" + accountJson.getAccountId() + "\",\"name\":\""+ accountJson.getName()+ "\","+ "\"externalKey\":\""+ accountJson.getExternalKey()+ "\",\"email\":\""+ accountJson.getEmail()+ "\","+ "\"billCycleDay\":"+ accountJson.getBillCycleDay()+ ","+ "\"currency\":\""+ accountJson.getCurrency()+ "\",\"paymentMethodId\":\""+ accountJson.getPaymentMethodId()+ "\","+ "\"address1\":\""+ accountJson.getAddress1()+ "\",\"address2\":\""+ accountJson.getAddress2()+ "\","+ "\"company\":\""+ accountJson.getCompany()+ "\",\"state\":\""+ accountJson.getState()+ "\","+ "\"country\":\""+ accountJson.getCountry()+ "\",\"phone\":\""+ accountJson.getPhone()+ "\","+ "\"length\":"+ accountJson.getLength()+ ",\"timeZone\":\""+ accountJson.getTimeZone()+ "\"}");
   final AccountJson fromJson=mapper.readValue(asJson,AccountJson.class);
   Assert.assertEquals(fromJson,accountJson);
 }
