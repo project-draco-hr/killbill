@@ -1,0 +1,17 @@
+{
+  return invoiceSqlDao.inTransaction(new Transaction<InvoiceItem,InvoiceSqlDao>(){
+    @Override public InvoiceItem inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      UUID invoiceIdForExternalCharge=invoiceId;
+      if (invoiceIdForExternalCharge == null) {
+        final Invoice invoiceForExternalCharge=new DefaultInvoice(accountId,effectiveDate,effectiveDate,currency);
+        transactional.create(invoiceForExternalCharge,context);
+        invoiceIdForExternalCharge=invoiceForExternalCharge.getId();
+      }
+      final InvoiceItem externalCharge=new ExternalChargeInvoiceItem(invoiceIdForExternalCharge,accountId,description,effectiveDate,amount,currency);
+      final InvoiceItemSqlDao transInvoiceItemDao=transactional.become(InvoiceItemSqlDao.class);
+      transInvoiceItemDao.create(externalCharge,context);
+      return externalCharge;
+    }
+  }
+);
+}
