@@ -6,9 +6,10 @@
   final BigDecimal originalInvoiceAmount=invoices.get(1).getAmount();
   final int originalNumberOfItemsForInvoice=invoices.get(1).getItems().size();
   final BigDecimal chargeAmount=BigDecimal.TEN;
-  final InvoiceJsonWithItems invoiceWithItems=createExternalChargeForInvoice(accountJson.getAccountId(),invoiceId,null,chargeAmount,null,null);
+  final String bundleId=UUID.randomUUID().toString();
+  final InvoiceJsonWithItems invoiceWithItems=createExternalChargeForInvoice(accountJson.getAccountId(),invoiceId,bundleId,chargeAmount,null,null);
   assertEquals(invoiceWithItems.getItems().size(),originalNumberOfItemsForInvoice + 1);
-  assertNull(invoiceWithItems.getItems().get(originalNumberOfItemsForInvoice).getBundleId());
+  assertEquals(invoiceWithItems.getItems().get(originalNumberOfItemsForInvoice).getBundleId(),bundleId);
   final InvoiceJsonSimple adjustedInvoice=getInvoice(invoiceId);
   final BigDecimal adjustedInvoiceBalance=originalInvoiceAmount.add(chargeAmount.setScale(2,RoundingMode.HALF_UP));
   assertEquals(adjustedInvoice.getBalance().compareTo(adjustedInvoiceBalance),0);
