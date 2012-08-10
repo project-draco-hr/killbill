@@ -1,0 +1,11 @@
+{
+  final String uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountId+ "/"+ JaxrsResource.REFUNDS;
+  final Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  final String baseJson=response.getResponseBody();
+  List<RefundJson> refunds=mapper.readValue(baseJson,new TypeReference<List<RefundJson>>(){
+  }
+);
+  assertNotNull(refunds);
+  return refunds;
+}
