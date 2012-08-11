@@ -1,9 +1,8 @@
 {
-  final Long recordId=auditSqlDao.getRecordIdForTable(tableName.getTableName().toLowerCase(),objectId.toString());
-  if (recordId == null) {
-    return ImmutableList.<AuditLog>of();
+  if (tableName.hasHistoryTable()) {
+    return doGetAuditLogsViaHistoryForId(tableName,objectId);
   }
  else {
-    return auditSqlDao.getAuditLogsForRecordId(tableName,recordId);
+    return doGetAuditLogsForId(tableName,objectId);
   }
 }

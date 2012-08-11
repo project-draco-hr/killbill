@@ -1,0 +1,13 @@
+{
+  final List<AuditLog> auditLogs=new ArrayList<AuditLog>();
+  final List<Long> recordIds=auditSqlDao.getHistoryRecordIdsForTable(tableName.getHistoryTableName().getTableName().toLowerCase(),objectId.toString());
+  if (recordIds == null) {
+    return auditLogs;
+  }
+ else {
+    for (    final Long recordId : recordIds) {
+      auditLogs.addAll(auditSqlDao.getAuditLogsForRecordId(tableName.getHistoryTableName(),recordId));
+    }
+    return auditLogs;
+  }
+}

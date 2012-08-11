@@ -1,0 +1,8 @@
+{
+  addTag();
+  final Handle handle=dbi.open();
+  final String tagHistoryString=(String)handle.select("select id from tag_history limit 1").get(0).get("id");
+  handle.close();
+  final List<AuditLog> auditLogs=auditDao.getAuditLogsForId(TableName.TAG_HISTORY,UUID.fromString(tagHistoryString));
+  verifyAuditLogsForTag(auditLogs);
+}
