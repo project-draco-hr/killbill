@@ -8,7 +8,9 @@
         invoiceIdForCredit=invoiceForCredit.getId();
       }
       final InvoiceItem credit=new CreditAdjInvoiceItem(invoiceIdForCredit,accountId,effectiveDate,positiveCreditAmount.negate(),currency);
-      insertItemAndAddCBAIfNeeded(transactional,credit,context);
+      final Long recordId=insertItemAndAddCBAIfNeeded(transactional,credit,context);
+      final EntityAudit audit=new EntityAudit(TableName.INVOICE_ITEMS,recordId,ChangeType.INSERT);
+      transactional.insertAuditFromTransaction(audit,context);
       return credit;
     }
   }
