@@ -1,8 +1,11 @@
 {
   final TagDefinition tagDefinition=tagDefinitionDao.create(UUID.randomUUID().toString().substring(0,5),UUID.randomUUID().toString().substring(0,5),context);
   Assert.assertEquals(tagDefinitionDao.getById(tagDefinition.getId()),tagDefinition);
-  tagDao.insertTag(objectTagged,ObjectType.ACCOUNT,tagDefinition.getId(),context);
-  final Map<String,Tag> tags=tagDao.loadEntities(objectTagged,ObjectType.ACCOUNT);
+  final UUID objectId=UUID.randomUUID();
+  tagDao.insertTag(objectId,ObjectType.ACCOUNT,tagDefinition.getId(),context);
+  final Map<String,Tag> tags=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
   Assert.assertEquals(tags.size(),1);
-  Assert.assertEquals(tags.values().iterator().next().getTagDefinitionId(),tagDefinition.getId());
+  final Tag tag=tags.values().iterator().next();
+  Assert.assertEquals(tag.getTagDefinitionId(),tagDefinition.getId());
+  tagId=tag.getId();
 }
