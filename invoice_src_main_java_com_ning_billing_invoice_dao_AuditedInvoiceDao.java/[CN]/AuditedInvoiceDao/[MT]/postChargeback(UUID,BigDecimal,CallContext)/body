@@ -16,6 +16,9 @@
  else {
         final InvoicePayment chargeBack=new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.CHARGED_BACK,payment.getPaymentId(),payment.getInvoiceId(),context.getCreatedDate(),requestedChargedBackAmout.negate(),payment.getCurrency(),null,payment.getId());
         invoicePaymentSqlDao.create(chargeBack,context);
+        final Long recordId=invoicePaymentSqlDao.getRecordId(chargeBack.getId().toString());
+        final EntityAudit audit=new EntityAudit(TableName.INVOICE_PAYMENTS,recordId,ChangeType.INSERT);
+        invoicePaymentSqlDao.insertAuditFromTransaction(audit,context);
         return chargeBack;
       }
     }
