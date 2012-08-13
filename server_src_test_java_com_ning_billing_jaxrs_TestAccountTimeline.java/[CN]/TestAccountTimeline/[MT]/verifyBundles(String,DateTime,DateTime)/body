@@ -1,0 +1,22 @@
+{
+  for (  final AuditLevel auditLevel : AuditLevel.values()) {
+    final AccountTimelineJson timeline=getAccountTimelineWithAudits(accountId,auditLevel);
+    Assert.assertEquals(timeline.getBundles().size(),1);
+    Assert.assertEquals(timeline.getBundles().get(0).getSubscriptions().size(),1);
+    Assert.assertEquals(timeline.getBundles().get(0).getSubscriptions().get(0).getEvents().size(),2);
+    final List<AuditLogJson> bundleAuditLogs=timeline.getBundles().get(0).getAuditLogs();
+    if (AuditLevel.NONE.equals(auditLevel)) {
+      Assert.assertEquals(bundleAuditLogs.size(),0);
+    }
+ else     if (AuditLevel.MINIMAL.equals(auditLevel)) {
+      Assert.assertEquals(bundleAuditLogs.size(),1);
+      verifyAuditLog(bundleAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
+    }
+ else {
+      Assert.assertEquals(bundleAuditLogs.size(),3);
+      verifyAuditLog(bundleAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
+      verifyAuditLog(bundleAuditLogs.get(1),ChangeType.UPDATE,null,null,TRANSITION,startTime,endTime);
+      verifyAuditLog(bundleAuditLogs.get(2),ChangeType.UPDATE,null,null,TRANSITION,startTime,endTime);
+    }
+  }
+}
