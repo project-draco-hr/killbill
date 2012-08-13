@@ -3,11 +3,10 @@
   final DateTime requestedDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
   final DateTime effectiveDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
   final UUID eventId=UUID.randomUUID();
-  final SubscriptionJsonWithEvents.SubscriptionReadEventJson newEvent=new SubscriptionJsonWithEvents.SubscriptionReadEventJson(eventId.toString(),BillingPeriod.NO_BILLING_PERIOD.toString(),requestedDate,effectiveDate,UUID.randomUUID().toString(),UUID.randomUUID().toString(),SubscriptionTransitionType.CREATE.toString(),PhaseType.DISCOUNT.toString());
-  final SubscriptionJsonWithEvents subscriptionJsonWithEvents=new SubscriptionJsonWithEvents(subscriptionId,ImmutableList.<SubscriptionJsonWithEvents.SubscriptionReadEventJson>of(newEvent),null,null);
+  final List<AuditLogJson> auditLogs=createAuditLogsJson();
+  final SubscriptionJsonWithEvents.SubscriptionReadEventJson newEvent=new SubscriptionJsonWithEvents.SubscriptionReadEventJson(eventId.toString(),BillingPeriod.NO_BILLING_PERIOD.toString(),requestedDate,effectiveDate,UUID.randomUUID().toString(),UUID.randomUUID().toString(),SubscriptionTransitionType.CREATE.toString(),PhaseType.DISCOUNT.toString(),auditLogs);
+  final SubscriptionJsonWithEvents subscriptionJsonWithEvents=new SubscriptionJsonWithEvents(subscriptionId,ImmutableList.<SubscriptionJsonWithEvents.SubscriptionReadEventJson>of(newEvent),null,null,null);
   final String asJson=mapper.writeValueAsString(subscriptionJsonWithEvents);
-  final SubscriptionJsonWithEvents.SubscriptionReadEventJson event=subscriptionJsonWithEvents.getEvents().get(0);
-  Assert.assertEquals(asJson,"{\"events\":[{\"eventId\":\"" + event.getEventId() + "\","+ "\"billingPeriod\":\""+ event.getBillingPeriod()+ "\","+ "\"product\":\""+ event.getProduct()+ "\","+ "\"priceList\":\""+ event.getPriceList()+ "\","+ "\"eventType\":\""+ event.getEventType()+ "\","+ "\"phase\":\""+ event.getPhase()+ "\","+ "\"requestedDate\":\""+ event.getRequestedDate()+ "\","+ "\"effectiveDate\":\""+ event.getEffectiveDate()+ "\"}],"+ "\"subscriptionId\":\""+ subscriptionJsonWithEvents.getSubscriptionId()+ "\","+ "\"deletedEvents\":null,"+ "\"newEvents\":null}");
   final SubscriptionJsonWithEvents fromJson=mapper.readValue(asJson,SubscriptionJsonWithEvents.class);
   Assert.assertEquals(fromJson,subscriptionJsonWithEvents);
 }

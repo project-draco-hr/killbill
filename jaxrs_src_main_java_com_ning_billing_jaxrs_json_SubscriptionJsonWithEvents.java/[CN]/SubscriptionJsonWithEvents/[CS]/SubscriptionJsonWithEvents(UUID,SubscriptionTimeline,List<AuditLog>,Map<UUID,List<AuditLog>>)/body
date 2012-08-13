@@ -1,0 +1,10 @@
+{
+  super(input.getId().toString(),toAuditLogJson(bundleAuditLogs));
+  this.events=new LinkedList<SubscriptionReadEventJson>();
+  for (  final ExistingEvent event : input.getExistingEvents()) {
+    final PlanPhaseSpecifier spec=event.getPlanPhaseSpecifier();
+    this.events.add(new SubscriptionReadEventJson(event.getEventId().toString(),spec.getBillingPeriod().toString(),event.getRequestedDate(),event.getEffectiveDate(),spec.getProductName(),spec.getPriceListName(),event.getSubscriptionTransitionType().toString(),spec.getPhaseType().toString(),toAuditLogJson(subscriptionEventsAuditLogs.get(event.getEventId()))));
+  }
+  this.newEvents=null;
+  this.deletedEvents=null;
+}

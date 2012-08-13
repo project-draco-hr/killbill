@@ -18,7 +18,7 @@
   Mockito.when(subscription.getCurrentPlan()).thenReturn(plan);
   Mockito.when(subscription.getCurrentPriceList()).thenReturn(priceList);
   Mockito.when(subscription.getChargedThroughDate()).thenReturn(new DateTime(DateTimeZone.UTC));
-  final SubscriptionJsonNoEvents subscriptionJsonNoEvents=new SubscriptionJsonNoEvents(subscription);
+  final SubscriptionJsonNoEvents subscriptionJsonNoEvents=new SubscriptionJsonNoEvents(subscription,null);
   Assert.assertEquals(subscriptionJsonNoEvents.getSubscriptionId(),subscription.getId().toString());
   Assert.assertEquals(subscriptionJsonNoEvents.getStartDate(),subscription.getStartDate());
   Assert.assertEquals(subscriptionJsonNoEvents.getBundleId(),subscription.getBundleId().toString());
@@ -26,4 +26,5 @@
   Assert.assertEquals(subscriptionJsonNoEvents.getProductCategory(),subscription.getCurrentPlan().getProduct().getCategory().toString());
   Assert.assertEquals(subscriptionJsonNoEvents.getBillingPeriod(),subscription.getCurrentPlan().getBillingPeriod().toString());
   Assert.assertEquals(subscriptionJsonNoEvents.getChargedThroughDate(),subscription.getChargedThroughDate());
+  Assert.assertNull(subscriptionJsonNoEvents.getAuditLogs());
 }

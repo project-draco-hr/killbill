@@ -1,9 +1,10 @@
 {
   final String subscriptionId=UUID.randomUUID().toString();
-  final SubscriptionJsonSimple subscriptionJsonSimple=new SubscriptionJsonSimple(subscriptionId);
+  final List<AuditLogJson> auditLogs=createAuditLogsJson();
+  final SubscriptionJsonSimple subscriptionJsonSimple=new SubscriptionJsonSimple(subscriptionId,auditLogs);
   Assert.assertEquals(subscriptionJsonSimple.getSubscriptionId(),subscriptionId);
+  Assert.assertEquals(subscriptionJsonSimple.getAuditLogs(),auditLogs);
   final String asJson=mapper.writeValueAsString(subscriptionJsonSimple);
-  Assert.assertEquals(asJson,"{\"subscriptionId\":\"" + subscriptionJsonSimple.getSubscriptionId() + "\"}");
   final SubscriptionJsonSimple fromJson=mapper.readValue(asJson,SubscriptionJsonSimple.class);
   Assert.assertEquals(fromJson,subscriptionJsonSimple);
 }

@@ -5,18 +5,38 @@
     Assert.assertEquals(timeline.getBundles().get(0).getSubscriptions().size(),1);
     Assert.assertEquals(timeline.getBundles().get(0).getSubscriptions().get(0).getEvents().size(),2);
     final List<AuditLogJson> bundleAuditLogs=timeline.getBundles().get(0).getAuditLogs();
+    final List<AuditLogJson> subscriptionAuditLogs=timeline.getBundles().get(0).getSubscriptions().get(0).getAuditLogs();
+    final List<AuditLogJson> subscriptionEvent1AuditLogs=timeline.getBundles().get(0).getSubscriptions().get(0).getEvents().get(0).getAuditLogs();
+    final List<AuditLogJson> subscriptionEvent2AuditLogs=timeline.getBundles().get(0).getSubscriptions().get(0).getEvents().get(1).getAuditLogs();
     if (AuditLevel.NONE.equals(auditLevel)) {
       Assert.assertEquals(bundleAuditLogs.size(),0);
+      Assert.assertEquals(subscriptionAuditLogs.size(),0);
+      Assert.assertEquals(subscriptionEvent1AuditLogs.size(),0);
+      Assert.assertEquals(subscriptionEvent2AuditLogs.size(),0);
     }
  else     if (AuditLevel.MINIMAL.equals(auditLevel)) {
       Assert.assertEquals(bundleAuditLogs.size(),1);
       verifyAuditLog(bundleAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
+      Assert.assertEquals(subscriptionAuditLogs.size(),1);
+      verifyAuditLog(subscriptionAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
+      Assert.assertEquals(subscriptionEvent1AuditLogs.size(),1);
+      verifyAuditLog(subscriptionEvent1AuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
+      Assert.assertEquals(subscriptionEvent2AuditLogs.size(),1);
+      verifyAuditLog(subscriptionEvent2AuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
     }
  else {
       Assert.assertEquals(bundleAuditLogs.size(),3);
       verifyAuditLog(bundleAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
       verifyAuditLog(bundleAuditLogs.get(1),ChangeType.UPDATE,null,null,TRANSITION,startTime,endTime);
       verifyAuditLog(bundleAuditLogs.get(2),ChangeType.UPDATE,null,null,TRANSITION,startTime,endTime);
+      Assert.assertEquals(subscriptionAuditLogs.size(),3);
+      verifyAuditLog(subscriptionAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
+      verifyAuditLog(subscriptionAuditLogs.get(1),ChangeType.UPDATE,null,null,TRANSITION,startTime,endTime);
+      verifyAuditLog(subscriptionAuditLogs.get(2),ChangeType.UPDATE,null,null,TRANSITION,startTime,endTime);
+      Assert.assertEquals(subscriptionEvent1AuditLogs.size(),1);
+      verifyAuditLog(subscriptionEvent1AuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
+      Assert.assertEquals(subscriptionEvent2AuditLogs.size(),1);
+      verifyAuditLog(subscriptionEvent2AuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
     }
   }
 }
