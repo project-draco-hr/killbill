@@ -1,17 +1,9 @@
 {
-  final DateTime requestedDate=clock.getUTCNow();
+  final InvoiceJsonSimple invoice=getInvoicesForAccount(accountJson.getAccountId()).get(1);
   final DateTime effectiveDate=clock.getUTCNow();
-  final InvoiceJsonSimple invoice=createInvoice();
-  final CreditJson input=new CreditJson(BigDecimal.TEN,invoice.getInvoiceId(),UUID.randomUUID().toString(),requestedDate,effectiveDate,UUID.randomUUID().toString(),accountJson.getAccountId(),null);
-  final String jsonInput=mapper.writeValueAsString(input);
-  Response response=doPost(JaxrsResource.CREDITS_PATH,jsonInput,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode(),response.getResponseBody());
-  final String location=response.getHeader("Location");
-  assertNotNull(location);
-  response=doGetWithUrl(location,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  final CreditJson objFromJson=mapper.readValue(response.getResponseBody(),CreditJson.class);
-  assertEquals(objFromJson.getAccountId(),input.getAccountId());
-  assertEquals(objFromJson.getCreditAmount().compareTo(input.getCreditAmount()),0);
-  assertEquals(objFromJson.getEffectiveDate().toLocalDate().compareTo(input.getEffectiveDate().toLocalDate()),0);
+  final BigDecimal creditAmount=BigDecimal.ONE;
+  final CreditJson objFromJson=createCreditForInvoice(accountJson.getAccountId(),invoice.getInvoiceId(),creditAmount,clock.getUTCNow(),effectiveDate);
+  assertEquals(objFromJson.getAccountId(),accountJson.getAccountId());
+  assertEquals(objFromJson.getCreditAmount().compareTo(creditAmount),0);
+  assertEquals(objFromJson.getEffectiveDate().toLocalDate().compareTo(effectiveDate.toLocalDate()),0);
 }

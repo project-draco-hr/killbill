@@ -1,0 +1,10 @@
+{
+  final String baseJson=mapper.writeValueAsString(newInput);
+  final String uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountId;
+  final Response response=doPut(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  final String retrievedJson=response.getResponseBody();
+  final AccountJson objFromJson=mapper.readValue(retrievedJson,AccountJson.class);
+  assertNotNull(objFromJson);
+  return objFromJson;
+}

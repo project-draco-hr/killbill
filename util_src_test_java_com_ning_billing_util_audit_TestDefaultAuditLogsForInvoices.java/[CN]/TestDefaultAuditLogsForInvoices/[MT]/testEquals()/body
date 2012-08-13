@@ -1,0 +1,12 @@
+{
+  final Map<UUID,List<AuditLog>> invoicesAuditLogs=createAuditLogsAssociation();
+  final Map<UUID,List<AuditLog>> invoiceItemsAuditLogs=createAuditLogsAssociation();
+  Assert.assertEquals(new DefaultAuditLogsForInvoices(invoicesAuditLogs,invoiceItemsAuditLogs).getInvoiceAuditLogs(),invoicesAuditLogs);
+  Assert.assertEquals(new DefaultAuditLogsForInvoices(invoicesAuditLogs,invoiceItemsAuditLogs).getInvoiceItemsAuditLogs(),invoiceItemsAuditLogs);
+  Assert.assertNotEquals(new DefaultAuditLogsForInvoices(createAuditLogsAssociation(),invoiceItemsAuditLogs).getInvoiceAuditLogs(),invoicesAuditLogs);
+  Assert.assertEquals(new DefaultAuditLogsForInvoices(createAuditLogsAssociation(),invoiceItemsAuditLogs).getInvoiceItemsAuditLogs(),invoiceItemsAuditLogs);
+  Assert.assertEquals(new DefaultAuditLogsForInvoices(invoicesAuditLogs,createAuditLogsAssociation()).getInvoiceAuditLogs(),invoicesAuditLogs);
+  Assert.assertNotEquals(new DefaultAuditLogsForInvoices(invoicesAuditLogs,createAuditLogsAssociation()).getInvoiceItemsAuditLogs(),invoiceItemsAuditLogs);
+  Assert.assertNotEquals(new DefaultAuditLogsForInvoices(createAuditLogsAssociation(),createAuditLogsAssociation()).getInvoiceAuditLogs(),invoicesAuditLogs);
+  Assert.assertNotEquals(new DefaultAuditLogsForInvoices(createAuditLogsAssociation(),createAuditLogsAssociation()).getInvoiceItemsAuditLogs(),invoiceItemsAuditLogs);
+}

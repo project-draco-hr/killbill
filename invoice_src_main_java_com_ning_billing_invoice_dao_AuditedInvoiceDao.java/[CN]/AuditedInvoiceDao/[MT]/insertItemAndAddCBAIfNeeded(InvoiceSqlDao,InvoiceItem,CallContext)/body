@@ -1,0 +1,6 @@
+{
+  final InvoiceItemSqlDao transInvoiceItemDao=transactional.become(InvoiceItemSqlDao.class);
+  transInvoiceItemDao.create(item,context);
+  addCBAIfNeeded(transactional,item.getInvoiceId(),context);
+  return transInvoiceItemDao.getRecordId(item.getId().toString());
+}

@@ -1,0 +1,18 @@
+{
+  return invoiceSqlDao.inTransaction(new Transaction<InvoiceItem,InvoiceSqlDao>(){
+    @Override public InvoiceItem inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      UUID invoiceIdForCredit=invoiceId;
+      if (invoiceIdForCredit == null) {
+        final Invoice invoiceForCredit=new DefaultInvoice(accountId,effectiveDate,effectiveDate,currency);
+        transactional.create(invoiceForCredit,context);
+        invoiceIdForCredit=invoiceForCredit.getId();
+      }
+      final InvoiceItem credit=new CreditAdjInvoiceItem(invoiceIdForCredit,accountId,effectiveDate,positiveCreditAmount.negate(),currency);
+      final Long recordId=insertItemAndAddCBAIfNeeded(transactional,credit,context);
+      final EntityAudit audit=new EntityAudit(TableName.INVOICE_ITEMS,recordId,ChangeType.INSERT);
+      transactional.insertAuditFromTransaction(audit,context);
+      return credit;
+    }
+  }
+);
+}
