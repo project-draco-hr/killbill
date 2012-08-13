@@ -1,5 +1,10 @@
 {
-  final List<SubscriptionBundle> bundles=createMocks(SubscriptionBundle.class);
+  final List<BundleTimeline> bundles=new ArrayList<BundleTimeline>();
+  for (  final UUID objectId : objectIds) {
+    final BundleTimeline entity=Mockito.mock(BundleTimeline.class);
+    Mockito.when(entity.getBundleId()).thenReturn(objectId);
+    bundles.add(entity);
+  }
   for (  final AuditLevel level : AuditLevel.values()) {
     final AuditLogsForBundles auditLogsForBundles=auditUserApi.getAuditLogsForBundles(bundles,level);
     verifyAuditLogs(auditLogsForBundles.getBundlesAuditLogs(),level);
