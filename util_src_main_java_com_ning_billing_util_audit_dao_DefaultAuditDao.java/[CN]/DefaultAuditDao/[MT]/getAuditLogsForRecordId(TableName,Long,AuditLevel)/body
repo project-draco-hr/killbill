@@ -1,0 +1,15 @@
+{
+  final List<AuditLog> allAuditLogs=auditSqlDao.getAuditLogsForRecordId(tableName,recordId);
+  if (AuditLevel.FULL.equals(auditLevel)) {
+    return allAuditLogs;
+  }
+ else   if (AuditLevel.MINIMAL.equals(auditLevel) && allAuditLogs.size() > 0) {
+    return ImmutableList.<AuditLog>of(allAuditLogs.get(0));
+  }
+ else   if (AuditLevel.NONE.equals(auditLevel)) {
+    return ImmutableList.<AuditLog>of();
+  }
+ else {
+    return allAuditLogs;
+  }
+}

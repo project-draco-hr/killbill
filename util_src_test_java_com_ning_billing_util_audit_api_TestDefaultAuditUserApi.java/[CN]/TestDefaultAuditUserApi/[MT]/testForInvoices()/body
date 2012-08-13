@@ -4,7 +4,9 @@
   for (  final Invoice invoice : invoices) {
     Mockito.when(invoice.getInvoiceItems()).thenReturn(invoiceItems);
   }
-  final AuditLogsForInvoices auditLogsForInvoices=auditUserApi.getAuditLogsForInvoices(invoices);
-  verifyAuditLogs(auditLogsForInvoices.getInvoiceAuditLogs());
-  verifyAuditLogs(auditLogsForInvoices.getInvoiceItemsAuditLogs());
+  for (  final AuditLevel level : AuditLevel.values()) {
+    final AuditLogsForInvoices auditLogsForInvoices=auditUserApi.getAuditLogsForInvoices(invoices,level);
+    verifyAuditLogs(auditLogsForInvoices.getInvoiceAuditLogs(),level);
+    verifyAuditLogs(auditLogsForInvoices.getInvoiceItemsAuditLogs(),level);
+  }
 }

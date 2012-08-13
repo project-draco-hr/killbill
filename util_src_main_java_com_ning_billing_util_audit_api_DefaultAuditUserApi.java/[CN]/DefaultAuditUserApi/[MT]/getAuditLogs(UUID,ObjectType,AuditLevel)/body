@@ -1,0 +1,10 @@
+{
+  if (AuditLevel.NONE.equals(auditLevel)) {
+    return ImmutableList.<AuditLog>of();
+  }
+  final TableName tableName=getTableNameFromObjectType(objectType);
+  if (tableName == null) {
+    return ImmutableList.<AuditLog>of();
+  }
+  return auditDao.getAuditLogsForId(tableName,objectId,auditLevel);
+}

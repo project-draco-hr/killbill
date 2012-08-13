@@ -1,5 +1,7 @@
 {
   final List<Payment> payments=createMocks(Payment.class);
-  final AuditLogsForPayments auditLogsForPayments=auditUserApi.getAuditLogsForPayments(payments);
-  verifyAuditLogs(auditLogsForPayments.getPaymentsAuditLogs());
+  for (  final AuditLevel level : AuditLevel.values()) {
+    final AuditLogsForPayments auditLogsForPayments=auditUserApi.getAuditLogsForPayments(payments,level);
+    verifyAuditLogs(auditLogsForPayments.getPaymentsAuditLogs(),level);
+  }
 }

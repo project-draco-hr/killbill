@@ -1,7 +1,17 @@
 {
   for (  final ObjectType objectType : ObjectType.values()) {
     for (    final UUID objectId : objectIds) {
-      Assert.assertEquals(auditUserApi.getAuditLogs(objectId,objectType),auditLogs);
+      for (      final AuditLevel level : AuditLevel.values()) {
+        if (AuditLevel.NONE.equals(level)) {
+          Assert.assertEquals(auditUserApi.getAuditLogs(objectId,objectType,level).size(),0);
+        }
+ else         if (AuditLevel.MINIMAL.equals(level)) {
+          Assert.assertEquals(auditUserApi.getAuditLogs(objectId,objectType,level),ImmutableList.<AuditLog>of(auditLogs.get(0)));
+        }
+ else {
+          Assert.assertEquals(auditUserApi.getAuditLogs(objectId,objectType,level),auditLogs);
+        }
+      }
     }
   }
 }

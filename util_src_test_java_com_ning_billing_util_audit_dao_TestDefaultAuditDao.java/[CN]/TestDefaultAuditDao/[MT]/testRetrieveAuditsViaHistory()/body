@@ -1,5 +1,7 @@
 {
   addTag();
-  final List<AuditLog> auditLogs=auditDao.getAuditLogsForId(TableName.TAG,tagId);
-  verifyAuditLogsForTag(auditLogs);
+  for (  final AuditLevel level : AuditLevel.values()) {
+    final List<AuditLog> auditLogs=auditDao.getAuditLogsForId(TableName.TAG,tagId,level);
+    verifyAuditLogsForTag(auditLogs,level);
+  }
 }

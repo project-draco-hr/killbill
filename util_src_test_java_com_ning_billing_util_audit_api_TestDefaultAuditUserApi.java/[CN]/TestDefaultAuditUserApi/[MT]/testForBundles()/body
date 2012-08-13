@@ -1,5 +1,7 @@
 {
   final List<SubscriptionBundle> bundles=createMocks(SubscriptionBundle.class);
-  final AuditLogsForBundles auditLogsForBundles=auditUserApi.getAuditLogsForBundles(bundles);
-  verifyAuditLogs(auditLogsForBundles.getBundlesAuditLogs());
+  for (  final AuditLevel level : AuditLevel.values()) {
+    final AuditLogsForBundles auditLogsForBundles=auditUserApi.getAuditLogsForBundles(bundles,level);
+    verifyAuditLogs(auditLogsForBundles.getBundlesAuditLogs(),level);
+  }
 }
