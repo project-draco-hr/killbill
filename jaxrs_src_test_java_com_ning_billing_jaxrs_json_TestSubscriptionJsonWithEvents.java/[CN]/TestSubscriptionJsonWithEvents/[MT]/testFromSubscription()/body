@@ -2,14 +2,16 @@
   final DateTime requestedDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
   final DateTime effectiveDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
   final UUID eventId=UUID.randomUUID();
-  final SubscriptionJsonWithEvents.SubscriptionReadEventJson newEvent=new SubscriptionJsonWithEvents.SubscriptionReadEventJson(eventId.toString(),BillingPeriod.NO_BILLING_PERIOD.toString(),requestedDate,effectiveDate,UUID.randomUUID().toString(),UUID.randomUUID().toString(),SubscriptionTransitionType.CREATE.toString(),PhaseType.DISCOUNT.toString());
+  final List<AuditLogJson> auditLogs=createAuditLogsJson();
+  final SubscriptionJsonWithEvents.SubscriptionReadEventJson newEvent=new SubscriptionJsonWithEvents.SubscriptionReadEventJson(eventId.toString(),BillingPeriod.NO_BILLING_PERIOD.toString(),requestedDate,effectiveDate,UUID.randomUUID().toString(),UUID.randomUUID().toString(),SubscriptionTransitionType.CREATE.toString(),PhaseType.DISCOUNT.toString(),auditLogs);
   final Subscription subscription=Mockito.mock(Subscription.class);
   Mockito.when(subscription.getId()).thenReturn(UUID.randomUUID());
-  final SubscriptionJsonWithEvents subscriptionJsonWithEvents=new SubscriptionJsonWithEvents(subscription,ImmutableList.<SubscriptionJsonWithEvents.SubscriptionReadEventJson>of(newEvent),null,null);
+  final SubscriptionJsonWithEvents subscriptionJsonWithEvents=new SubscriptionJsonWithEvents(subscription,ImmutableList.<SubscriptionJsonWithEvents.SubscriptionReadEventJson>of(newEvent),null,null,null);
   Assert.assertEquals(subscriptionJsonWithEvents.getSubscriptionId(),subscription.getId().toString());
   Assert.assertNull(subscriptionJsonWithEvents.getNewEvents());
   Assert.assertNull(subscriptionJsonWithEvents.getDeletedEvents());
   Assert.assertEquals(subscriptionJsonWithEvents.getEvents().size(),1);
   Assert.assertEquals(subscriptionJsonWithEvents.getEvents().get(0).getEffectiveDate(),newEvent.getEffectiveDate());
   Assert.assertEquals(subscriptionJsonWithEvents.getEvents().get(0).getEventId(),newEvent.getEventId());
+  Assert.assertEquals(subscriptionJsonWithEvents.getEvents().get(0).getAuditLogs(),auditLogs);
 }

@@ -1,0 +1,19 @@
+{
+  Assert.assertEquals(objectsAuditLogs.size(),objectIds.size());
+  if (AuditLevel.NONE.equals(level)) {
+    for (    final UUID objectId : objectIds) {
+      Assert.assertEquals(objectsAuditLogs.get(objectId).size(),0);
+    }
+  }
+ else   if (AuditLevel.MINIMAL.equals(level)) {
+    for (    final UUID objectId : objectIds) {
+      Assert.assertEquals(objectsAuditLogs.get(objectId).size(),1);
+      Assert.assertEquals(objectsAuditLogs.get(objectId).get(0),auditLogs.get(0));
+    }
+  }
+ else {
+    for (    final UUID objectId : objectIds) {
+      Assert.assertEquals(objectsAuditLogs.get(objectId),auditLogs);
+    }
+  }
+}

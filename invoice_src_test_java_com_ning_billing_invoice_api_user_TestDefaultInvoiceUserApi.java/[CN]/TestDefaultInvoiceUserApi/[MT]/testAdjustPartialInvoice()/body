@@ -12,7 +12,7 @@
   Assert.assertEquals(creditInvoiceItem.getCurrency(),accountCurrency);
   Assert.assertNull(creditInvoiceItem.getLinkedItemId());
   final BigDecimal adjustedInvoiceBalance=invoiceUserApi.getInvoice(invoiceId).getBalance();
-  Assert.assertEquals(adjustedInvoiceBalance,invoiceBalance.add(creditAmount.negate()).setScale(InvoicingConfiguration.getNumberOfDecimals(),InvoicingConfiguration.getRoundingMode()));
+  verifyAdjustedInvoiceBalance(invoiceBalance,creditAmount,adjustedInvoiceBalance);
   final BigDecimal adjustedAccountBalance=invoiceUserApi.getAccountBalance(accountId);
   Assert.assertEquals(adjustedAccountBalance,adjustedInvoiceBalance);
 }

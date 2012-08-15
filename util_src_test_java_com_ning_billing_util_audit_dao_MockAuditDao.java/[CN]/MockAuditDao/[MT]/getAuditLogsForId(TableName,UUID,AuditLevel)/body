@@ -1,0 +1,20 @@
+{
+  final Map<UUID,List<AuditLog>> auditLogsForTableName=auditLogsForTables.get(tableName);
+  if (auditLogsForTableName == null) {
+    return ImmutableList.<AuditLog>of();
+  }
+  final List<AuditLog> auditLogsForObjectId=auditLogsForTableName.get(objectId);
+  final List<AuditLog> allAuditLogs=Objects.firstNonNull(auditLogsForObjectId,ImmutableList.<AuditLog>of());
+  if (AuditLevel.FULL.equals(auditLevel)) {
+    return allAuditLogs;
+  }
+ else   if (AuditLevel.MINIMAL.equals(auditLevel) && allAuditLogs.size() > 0) {
+    return ImmutableList.<AuditLog>of(allAuditLogs.get(0));
+  }
+ else   if (AuditLevel.NONE.equals(auditLevel)) {
+    return ImmutableList.<AuditLog>of();
+  }
+ else {
+    return allAuditLogs;
+  }
+}
