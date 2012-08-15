@@ -1,0 +1,12 @@
+{
+  final Account account=accountApi.getAccountByKey(externalKey);
+  AccountJson json=null;
+  if (accountWithBalance) {
+    final BigDecimal accountBalance=invoiceApi.getAccountBalance(account.getId());
+    json=new AccountJsonWithBalance(account,accountBalance);
+  }
+ else {
+    json=new AccountJson(account);
+  }
+  return Response.status(Status.OK).entity(json).build();
+}
