@@ -1,0 +1,22 @@
+{
+  final UUID paymentId=UUID.fromString(paymentIdString);
+  final Payment payment=paymentApi.getPayment(paymentId);
+  final PaymentJsonSimple paymentJsonSimple;
+  if (withRefundsAndChargebacks) {
+    final List<RefundJson> refunds=new ArrayList<RefundJson>();
+    for (    final Refund refund : paymentApi.getPaymentRefunds(paymentId)) {
+      refunds.add(new RefundJson(refund));
+    }
+    final List<ChargebackJson> chargebacks=new ArrayList<ChargebackJson>();
+    for (    final InvoicePayment chargeback : invoicePaymentApi.getChargebacksByPaymentId(paymentId)) {
+      chargebacks.add(new ChargebackJson(chargeback));
+    }
+    final int nbOfPaymentAttempts=payment.getAttempts().size();
+    final String status=payment.getPaymentStatus().toString();
+    paymentJsonSimple=new PaymentJsonWithBundleKeys(payment,status,nbOfPaymentAttempts,null,payment.getAccountId(),refunds,chargebacks);
+  }
+ else {
+    paymentJsonSimple=new PaymentJsonSimple(payment);
+  }
+  return Response.status(Status.OK).entity(paymentJsonSimple).build();
+}
