@@ -1,7 +1,12 @@
 {
-  BusEvent event=null;
-  List<PaymentAttemptModelDao> allAttempts=null;
   PaymentModelDao payment=null;
+  List<PaymentAttemptModelDao> allAttempts=null;
+  if (paymentConfig.isPaymentOff()) {
+    paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),PaymentStatus.PAYMENT_SYSTEM_OFF,null,null,null,null,attemptInput.getId(),context);
+    allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId());
+    return new DefaultPayment(payment,allAttempts,Collections.<RefundModelDao>emptyList());
+  }
+  BusEvent event=null;
   PaymentStatus paymentStatus;
   try {
     final PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(account.getExternalKey(),paymentInput.getId(),attemptInput.getRequestedAmount());
