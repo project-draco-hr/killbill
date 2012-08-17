@@ -10,4 +10,23 @@
   Assert.assertEquals(refundJsonCheck.getRequestedDate().getDayOfMonth(),clock.getUTCNow().getDayOfMonth());
   final List<RefundJson> retrievedRefunds=getRefundsForPayment(paymentJsonSimple.getPaymentId());
   Assert.assertEquals(retrievedRefunds.size(),1);
+  final PaymentJsonWithBundleKeys retrievedPaymentJsonWithBundleKeys=getPaymentWithRefundsAndChargebacks(paymentJsonSimple.getPaymentId());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getPaymentId(),paymentJsonSimple.getPaymentId());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getPaidAmount(),paymentJsonSimple.getPaidAmount().add(refundAmount.negate()).setScale(2,RoundingMode.HALF_UP));
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getAmount(),paymentJsonSimple.getAmount());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getAccountId(),paymentJsonSimple.getAccountId());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getInvoiceId(),paymentJsonSimple.getInvoiceId());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getRequestedDate(),paymentJsonSimple.getRequestedDate());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getEffectiveDate(),paymentJsonSimple.getEffectiveDate());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getRetryCount(),paymentJsonSimple.getRetryCount());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getCurrency(),paymentJsonSimple.getCurrency());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getStatus(),paymentJsonSimple.getStatus());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getGatewayErrorCode(),paymentJsonSimple.getGatewayErrorCode());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getGatewayErrorMsg(),paymentJsonSimple.getGatewayErrorMsg());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getPaymentMethodId(),paymentJsonSimple.getPaymentMethodId());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getExtFirstPaymentIdRef(),paymentJsonSimple.getExtFirstPaymentIdRef());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getExtSecondPaymentIdRef(),paymentJsonSimple.getExtSecondPaymentIdRef());
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getChargebacks().size(),0);
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getRefunds().size(),1);
+  Assert.assertEquals(retrievedPaymentJsonWithBundleKeys.getRefunds().get(0),refundJsonCheck);
 }
