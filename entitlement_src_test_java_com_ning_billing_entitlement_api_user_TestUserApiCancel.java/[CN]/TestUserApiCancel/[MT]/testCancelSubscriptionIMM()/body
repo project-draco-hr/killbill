@@ -11,9 +11,17 @@
     clock.addDeltaFromReality(it.toDurationMillis());
     final DateTime future=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.CANCEL);
+    assertEquals(subscription.getLastActiveProductName(),prod);
+    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
+    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
     subscription.cancel(clock.getUTCNow(),false,context);
     currentPhase=subscription.getCurrentPhase();
     testListener.isCompleted(3000);
+    assertEquals(subscription.getLastActiveProductName(),prod);
+    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
+    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
     assertNull(currentPhase);
     checkNextPhaseChange(subscription,0,null);
     assertListenerStatus();
