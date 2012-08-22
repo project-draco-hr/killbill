@@ -1,3 +1,13 @@
 {
-  this(tagDefinition.getId().toString(),tagDefinition.getName(),tagDefinition.getDescription());
+  this(tagDefinition.getId().toString(),tagDefinition.isControlTag(),tagDefinition.getName(),tagDefinition.getDescription(),ImmutableList.<String>copyOf(Collections2.transform(tagDefinition.getApplicableObjectTypes(),new Function<ObjectType,String>(){
+    @Override public String apply(    @Nullable final ObjectType input){
+      if (input == null) {
+        return "";
+      }
+ else {
+        return input.toString();
+      }
+    }
+  }
+)));
 }

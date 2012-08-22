@@ -1,5 +1,5 @@
 {
-  final TagDefinitionJson input=new TagDefinitionJson(null,"blue","relaxing color");
+  final TagDefinitionJson input=new TagDefinitionJson(null,false,"blue","relaxing color",ImmutableList.<String>of());
   String baseJson=mapper.writeValueAsString(input);
   Response response=doPost(JaxrsResource.TAG_DEFINITIONS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
@@ -10,5 +10,6 @@
   baseJson=response.getResponseBody();
   final TagDefinitionJson objFromJson=mapper.readValue(baseJson,TagDefinitionJson.class);
   assertNotNull(objFromJson);
-  assertTrue(objFromJson.equalsNoId(input));
+  assertEquals(objFromJson.getName(),input.getName());
+  assertEquals(objFromJson.getDescription(),input.getDescription());
 }
