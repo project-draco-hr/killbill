@@ -1,0 +1,16 @@
+{
+  try {
+    subscription.changePlan("Pistol",term,planSetName,clock.getUTCNow(),context);
+    if (shouldFail) {
+      fail("Expected change plan to fail because of OD1 state");
+    }
+  }
+ catch (  EntitlementUserApiException expected) {
+    if (shouldFail) {
+      assertTrue(expected.getCause() instanceof BlockingApiException);
+    }
+ else {
+      fail("Expected change plan to succeed because of clean OD state");
+    }
+  }
+}

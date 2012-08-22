@@ -2,7 +2,7 @@
   clock.setTime(new DateTime(2012,5,1,0,3,42,0));
   paymentPlugin.makeAllInvoicesFailWithError(true);
   busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE);
-  final SubscriptionData baseSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context));
+  final Subscription baseSubscription=entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,context);
   assertNotNull(baseSubscription);
   assertTrue(busHandler.isCompleted(DELAY));
   busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
@@ -16,16 +16,20 @@
   clock.addDays(20);
   assertTrue(busHandler.isCompleted(DELAY));
   checkODState("OD1");
+  checkChangePlanWithOverdueState(baseSubscription,true);
   clock.addDays(2);
   assertTrue(busHandler.isCompleted(DELAY));
   checkODState("OD1");
+  checkChangePlanWithOverdueState(baseSubscription,true);
   clock.addDays(8);
   assertTrue(busHandler.isCompleted(DELAY));
   checkODState("OD2");
+  checkChangePlanWithOverdueState(baseSubscription,true);
   busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
   clock.addDays(10);
   assertTrue(busHandler.isCompleted(DELAY));
   checkODState("OD3");
+  checkChangePlanWithOverdueState(baseSubscription,true);
   paymentPlugin.makeAllInvoicesFailWithError(false);
   final Collection<Invoice> invoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday());
   final List<String> invoiceIds=new ArrayList<String>();
@@ -38,4 +42,5 @@
     }
   }
   checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkChangePlanWithOverdueState(baseSubscription,false);
 }
