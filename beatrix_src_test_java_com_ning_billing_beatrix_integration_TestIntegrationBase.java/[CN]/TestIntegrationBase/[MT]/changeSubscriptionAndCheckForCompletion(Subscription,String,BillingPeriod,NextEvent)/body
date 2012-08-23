@@ -1,0 +1,15 @@
+{
+  return doCallAndCheckForCompletion(new Function<Void,Subscription>(){
+    @Override public Subscription apply(    @Nullable final Void dontcare){
+      try {
+        subscription.changePlan(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),context);
+        return subscription;
+      }
+ catch (      EntitlementUserApiException e) {
+        fail();
+        return null;
+      }
+    }
+  }
+,events);
+}
