@@ -11,7 +11,6 @@
     final Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,account.getTimeZone(),targetCurrency);
     if (invoice == null) {
       log.info("Generated null invoice.");
-      outputDebugData(billingEvents,invoices);
       if (!dryRun) {
         final BusEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday(),context.getUserToken());
         postEvent(event,accountId);
@@ -19,13 +18,6 @@
     }
  else {
       log.info("Generated invoice {} with {} items.",invoice.getId().toString(),invoice.getNumberOfItems());
-      if (VERBOSE_OUTPUT) {
-        log.info("New items");
-        for (        final InvoiceItem item : invoice.getInvoiceItems()) {
-          log.info(item.toString());
-        }
-      }
-      outputDebugData(billingEvents,invoices);
       if (!dryRun) {
         final boolean isRealInvoiceWithItems=Collections2.filter(invoice.getInvoiceItems(),new Predicate<InvoiceItem>(){
           @Override public boolean apply(          InvoiceItem input){
