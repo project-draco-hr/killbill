@@ -38,7 +38,9 @@
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         setChargedThroughDates(account.getBillCycleDay(),fixedPriceInvoiceItems,recurringInvoiceItems,context);
         final InvoiceCreationEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getUserToken());
-        postEvent(event,accountId);
+        if (isRealInvoiceWithItems) {
+          postEvent(event,accountId);
+        }
       }
     }
     if (account.isNotifiedForInvoices()) {

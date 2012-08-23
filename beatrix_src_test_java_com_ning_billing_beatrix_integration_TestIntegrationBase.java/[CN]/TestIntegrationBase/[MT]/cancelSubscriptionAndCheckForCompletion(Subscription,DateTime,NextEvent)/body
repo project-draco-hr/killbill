@@ -2,8 +2,9 @@
   return doCallAndCheckForCompletion(new Function<Void,Subscription>(){
     @Override public Subscription apply(    @Nullable final Void dontcare){
       try {
-        subscription.cancel(requestedDate,true,context);
-        return subscription;
+        final Subscription refreshedSubscription=entitlementUserApi.getSubscriptionFromId(subscription.getId());
+        refreshedSubscription.cancel(requestedDate,true,context);
+        return refreshedSubscription;
       }
  catch (      EntitlementUserApiException e) {
         fail();
