@@ -16,7 +16,7 @@
     assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
     final Duration ctd=getDurationMonth(1);
     final DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
-    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,context);
+    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate.toLocalDate(),context);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
     subscription.cancel(clock.getUTCNow(),false,context);
     subscription.uncancel(context);

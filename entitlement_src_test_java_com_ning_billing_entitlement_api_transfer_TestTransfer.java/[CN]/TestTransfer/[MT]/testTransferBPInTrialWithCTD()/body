@@ -5,7 +5,7 @@
   final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
   final Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
   final DateTime ctd=baseSubscription.getStartDate().plusDays(30);
-  billingApi.setChargedThroughDate(baseSubscription.getId(),ctd,context);
+  billingApi.setChargedThroughDate(baseSubscription.getId(),ctd.toLocalDate(),context);
   final DateTime evergreenPhaseDate=baseSubscription.getPendingTransition().getEffectiveTransitionTime();
   clock.addDays(20);
   testListener.pushExpectedEvent(NextEvent.TRANSFER);
