@@ -7,7 +7,7 @@
   final SortedSet<BillingEvent> billingEventsToAdd=new TreeSet<BillingEvent>();
   final SortedSet<BillingEvent> billingEventsToRemove=new TreeSet<BillingEvent>();
   for (  final UUID bundleId : bundleMap.keySet()) {
-    final SortedSet<BlockingState> blockingEvents=blockingApi.getBlockingHistory(bundleId);
+    final List<BlockingState> blockingEvents=blockingApi.getBlockingHistory(bundleId);
     blockingEvents.addAll(blockingApi.getBlockingHistory(account.getId()));
     final List<DisabledDuration> blockingDurations=createBlockingDurations(blockingEvents);
     for (    final Subscription subscription : bundleMap.get(bundleId)) {

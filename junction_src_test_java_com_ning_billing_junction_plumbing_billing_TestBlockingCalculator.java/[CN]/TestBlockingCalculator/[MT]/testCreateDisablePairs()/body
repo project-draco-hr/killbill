@@ -1,8 +1,8 @@
 {
-  SortedSet<BlockingState> blockingEvents;
+  List<BlockingState> blockingEvents;
   final UUID ovdId=UUID.randomUUID();
   final DateTime now=clock.getUTCNow();
-  blockingEvents=new TreeSet<BlockingState>();
+  blockingEvents=new ArrayList<BlockingState>();
   blockingEvents.add(new DefaultBlockingState(ovdId,CLEAR_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now));
   blockingEvents.add(new DefaultBlockingState(ovdId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(1)));
   List<DisabledDuration> pairs=odc.createBlockingDurations(blockingEvents);
@@ -10,7 +10,7 @@
   assertNotNull(pairs.get(0).getStart());
   assertEquals(pairs.get(0).getStart(),now.plusDays(1));
   assertNull(pairs.get(0).getEnd());
-  blockingEvents=new TreeSet<BlockingState>();
+  blockingEvents=new ArrayList<BlockingState>();
   blockingEvents.add(new DefaultBlockingState(ovdId,CLEAR_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now));
   blockingEvents.add(new DefaultBlockingState(ovdId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(1)));
   blockingEvents.add(new DefaultBlockingState(ovdId,CLEAR_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now.plusDays(2)));
@@ -20,7 +20,7 @@
   assertEquals(pairs.get(0).getStart(),now.plusDays(1));
   assertNotNull(pairs.get(0).getEnd());
   assertEquals(pairs.get(0).getEnd(),now.plusDays(2));
-  blockingEvents=new TreeSet<BlockingState>();
+  blockingEvents=new ArrayList<BlockingState>();
   blockingEvents.add(new DefaultBlockingState(ovdId,CLEAR_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now));
   blockingEvents.add(new DefaultBlockingState(ovdId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(1)));
   blockingEvents.add(new DefaultBlockingState(ovdId,CLEAR_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now.plusDays(2)));
@@ -30,7 +30,7 @@
   assertEquals(pairs.get(0).getStart(),now.plusDays(1));
   assertNotNull(pairs.get(0).getEnd());
   assertEquals(pairs.get(0).getEnd(),now.plusDays(2));
-  blockingEvents=new TreeSet<BlockingState>();
+  blockingEvents=new ArrayList<BlockingState>();
   blockingEvents.add(new DefaultBlockingState(ovdId,CLEAR_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now));
   blockingEvents.add(new DefaultBlockingState(ovdId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(1)));
   blockingEvents.add(new DefaultBlockingState(ovdId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(2)));
@@ -41,7 +41,7 @@
   assertEquals(pairs.get(0).getStart(),now.plusDays(1));
   assertNotNull(pairs.get(0).getEnd());
   assertEquals(pairs.get(0).getEnd(),now.plusDays(3));
-  blockingEvents=new TreeSet<BlockingState>();
+  blockingEvents=new ArrayList<BlockingState>();
   blockingEvents.add(new DefaultBlockingState(ovdId,CLEAR_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now));
   blockingEvents.add(new DefaultBlockingState(ovdId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(1)));
   blockingEvents.add(new DefaultBlockingState(ovdId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(2)));
