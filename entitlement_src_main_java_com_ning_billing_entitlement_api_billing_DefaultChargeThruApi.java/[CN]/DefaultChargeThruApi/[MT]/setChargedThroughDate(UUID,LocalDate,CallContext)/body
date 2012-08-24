@@ -1,6 +1,6 @@
 {
   final SubscriptionData subscription=(SubscriptionData)entitlementDao.getSubscriptionFromId(subscriptionFactory,subscriptionId);
-  final DateTime chargedThroughDate=ctd.toDateTime(new LocalTime(subscription.getStartDate()));
+  final DateTime chargedThroughDate=ctd.toDateTime(new LocalTime(subscription.getStartDate(),DateTimeZone.UTC),DateTimeZone.UTC);
   final SubscriptionBuilder builder=new SubscriptionBuilder(subscription).setChargedThroughDate(chargedThroughDate).setPaidThroughDate(subscription.getPaidThroughDate());
   entitlementDao.updateChargedThroughDate(new SubscriptionData(builder),context);
 }
