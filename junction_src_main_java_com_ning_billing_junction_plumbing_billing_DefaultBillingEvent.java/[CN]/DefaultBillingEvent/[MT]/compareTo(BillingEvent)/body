@@ -7,7 +7,41 @@
       return getEffectiveDate().compareTo(e1.getEffectiveDate());
     }
  else {
-      return getTotalOrdering().compareTo(e1.getTotalOrdering());
+      if (SubscriptionTransitionType.START_BILLING_DISABLED.equals(getTransitionType())) {
+        if (SubscriptionTransitionType.END_BILLING_DISABLED.equals(e1.getTransitionType())) {
+          return -1;
+        }
+ else {
+          return 1;
+        }
+      }
+ else       if (SubscriptionTransitionType.START_BILLING_DISABLED.equals(e1.getTransitionType())) {
+        if (SubscriptionTransitionType.END_BILLING_DISABLED.equals(getTransitionType())) {
+          return 1;
+        }
+ else {
+          return -1;
+        }
+      }
+ else       if (SubscriptionTransitionType.END_BILLING_DISABLED.equals(getTransitionType())) {
+        if (SubscriptionTransitionType.START_BILLING_DISABLED.equals(e1.getTransitionType())) {
+          return 1;
+        }
+ else {
+          return -1;
+        }
+      }
+ else       if (SubscriptionTransitionType.END_BILLING_DISABLED.equals(e1.getTransitionType())) {
+        if (SubscriptionTransitionType.START_BILLING_DISABLED.equals(getTransitionType())) {
+          return -1;
+        }
+ else {
+          return 1;
+        }
+      }
+ else {
+        return getTotalOrdering().compareTo(e1.getTotalOrdering());
+      }
     }
   }
 }
