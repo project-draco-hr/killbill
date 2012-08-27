@@ -1,12 +1,13 @@
 {
+  accountApi=Mockito.mock(AccountUserApi.class);
   final List<SubscriptionBundle> bundles=new ArrayList<SubscriptionBundle>();
   final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
   Mockito.when(bundle.getId()).thenReturn(bunId);
   bundles.add(bundle);
   effectiveSubscriptionTransitions=new LinkedList<EffectiveSubscriptionEvent>();
   final List<Subscription> subscriptions=new LinkedList<Subscription>();
-  subscriptionStartDate=clock.getUTCNow().minusDays(3);
-  subscription=new MockSubscription(subId,bunId,subscriptionPlan,subscriptionStartDate,effectiveSubscriptionTransitions);
+  final DateTime subscriptionStartDate=clock.getUTCNow().minusDays(3);
+  subscription=new MockSubscription(subId,bunId,null,subscriptionStartDate,effectiveSubscriptionTransitions);
   subscriptions.add(subscription);
   entitlementApi=Mockito.mock(EntitlementUserApi.class);
   Mockito.when(entitlementApi.getBundlesForAccount(Mockito.<UUID>any())).thenReturn(bundles);
@@ -15,5 +16,8 @@
   Mockito.when(entitlementApi.getBundleFromId(Mockito.<UUID>any())).thenReturn(bundle);
   Mockito.when(entitlementApi.getBaseSubscription(Mockito.<UUID>any())).thenReturn(subscription);
   tagApi=mock(TagUserApi.class);
-  assertTrue(true);
+  bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
+  factory=new DefaultCallContextFactory(clock);
+  api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi,blockCalculator,catalogService,tagApi);
+  ((MockCatalog)catalogService.getFullCatalog()).setBillingAlignment(BillingAlignment.ACCOUNT);
 }

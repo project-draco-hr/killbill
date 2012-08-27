@@ -1,13 +1,4 @@
 {
-  final UUID accountId=UUID.randomUUID();
-  final Account account=Mockito.mock(Account.class);
-  Mockito.when(account.getId()).thenReturn(accountId);
-  Mockito.when(account.getCurrency()).thenReturn(Currency.USD);
-  final AccountUserApi accountApi=Mockito.mock(AccountUserApi.class);
-  Mockito.when(accountApi.getAccountById(Mockito.<UUID>any())).thenReturn(account);
-  final BillCycleDayCalculator bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
-  final CallContextFactory factory=new DefaultCallContextFactory(clock);
-  final BillingApi api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi,blockCalculator,catalogService,tagApi);
   final SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(new UUID(0L,0L));
   Assert.assertEquals(events.size(),0);
 }
