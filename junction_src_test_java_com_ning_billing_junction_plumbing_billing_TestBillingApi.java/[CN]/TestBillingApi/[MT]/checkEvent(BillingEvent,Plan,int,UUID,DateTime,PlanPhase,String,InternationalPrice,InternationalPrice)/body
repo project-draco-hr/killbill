@@ -16,7 +16,9 @@
   Assert.assertEquals(time.getDayOfMonth(),event.getEffectiveDate().getDayOfMonth());
   Assert.assertEquals(nextPhase,event.getPlanPhase());
   Assert.assertEquals(nextPlan,event.getPlan());
-  Assert.assertEquals(nextPhase.getBillingPeriod(),event.getBillingPeriod());
+  if (!SubscriptionTransitionType.START_BILLING_DISABLED.equals(event.getTransitionType())) {
+    Assert.assertEquals(nextPhase.getBillingPeriod(),event.getBillingPeriod());
+  }
   Assert.assertEquals(BillingModeType.IN_ADVANCE,event.getBillingMode());
   Assert.assertEquals(desc,event.getTransitionType().toString());
 }

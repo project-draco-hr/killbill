@@ -7,6 +7,8 @@
   final SortedSet<BillingEvent> results=odc.createNewEvents(disabledDuration,billingEvents,account,subscription1);
   assertEquals(results.size(),1);
   assertEquals(results.first().getEffectiveDate(),now);
-  assertEquals(results.first().getRecurringPrice(),BigDecimal.ZERO);
+  assertNull(results.first().getFixedPrice());
+  assertNull(results.first().getRecurringPrice());
+  assertEquals(results.first().getBillingPeriod(),BillingPeriod.NO_BILLING_PERIOD);
   assertEquals(results.first().getTransitionType(),SubscriptionTransitionType.START_BILLING_DISABLED);
 }

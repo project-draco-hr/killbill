@@ -3,4 +3,16 @@
   notifier.start();
   context=new DefaultCallContextFactory(clock).createCallContext("Miracle Max",CallOrigin.TEST,UserType.TEST);
   busService.getBus().start();
+  accountUserApi=Mockito.mock(AccountUserApi.class);
+  account=Mockito.mock(Account.class);
+  final UUID accountId=UUID.randomUUID();
+  Mockito.when(accountUserApi.getAccountById(accountId)).thenReturn(account);
+  Mockito.when(account.getCurrency()).thenReturn(Currency.USD);
+  Mockito.when(account.getId()).thenReturn(accountId);
+  Mockito.when(account.isNotifiedForInvoices()).thenReturn(true);
+  Mockito.when(account.getBillCycleDay()).thenReturn(new MockBillCycleDay(30));
+  subscription=Mockito.mock(Subscription.class);
+  final UUID subscriptionId=UUID.randomUUID();
+  Mockito.when(subscription.getId()).thenReturn(subscriptionId);
+  Mockito.when(subscription.getBundleId()).thenReturn(new UUID(0L,0L));
 }
