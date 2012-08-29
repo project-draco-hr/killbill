@@ -1,13 +1,20 @@
 {
   final PaymentPluginApi plugin;
   final UUID paymentMethodId;
-  if (isExternalPayment) {
-    plugin=paymentMethodProcessor.getExternalPaymentProviderPlugin(account,context);
-    paymentMethodId=paymentMethodProcessor.getExternalPaymentMethod(account).getId();
-  }
+  try {
+    if (isExternalPayment) {
+      plugin=paymentMethodProcessor.getExternalPaymentProviderPlugin(account,context);
+      paymentMethodId=paymentMethodProcessor.getExternalPaymentMethod(account).getId();
+    }
  else {
-    plugin=getPaymentProviderPlugin(account);
-    paymentMethodId=account.getPaymentMethodId();
+      plugin=getPaymentProviderPlugin(account);
+      paymentMethodId=account.getPaymentMethodId();
+    }
+  }
+ catch (  PaymentApiException e) {
+    final PaymentErrorEvent event=new DefaultPaymentErrorEvent(account.getId(),invoiceId,null,ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD.toString(),context.getUserToken());
+    postPaymentEvent(event,account.getId());
+    throw e;
   }
   try {
     return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){

@@ -5,22 +5,7 @@
   overdueWrapperFactory.setOverdueConfig(config);
   account=createAccountWithPaymentMethod(getAccountData(0));
   assertNotNull(account);
-  final PaymentMethodPlugin info=new PaymentMethodPlugin(){
-    @Override public boolean isDefaultPaymentMethod(){
-      return false;
-    }
-    @Override public String getValueString(    final String key){
-      return null;
-    }
-    @Override public List<PaymentMethodKVInfo> getProperties(){
-      return null;
-    }
-    @Override public String getExternalPaymentMethodId(){
-      return UUID.randomUUID().toString();
-    }
-  }
-;
-  paymentApi.addPaymentMethod(BeatrixModule.PLUGIN_NAME,account,true,info,context);
+  paymentApi.addPaymentMethod(BeatrixModule.PLUGIN_NAME,account,true,paymentMethodPlugin,context);
   bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",context);
   productName="Shotgun";
   term=BillingPeriod.MONTHLY;
