@@ -11,6 +11,7 @@
       final Long recordId=insertItemAndAddCBAIfNeeded(transactional,credit,context);
       final EntityAudit audit=new EntityAudit(TableName.INVOICE_ITEMS,recordId,ChangeType.INSERT);
       transactional.insertAuditFromTransaction(audit,context);
+      notifyBusOfInvoiceAdjustment(transactional,invoiceId,accountId,context.getUserToken());
       return credit;
     }
   }

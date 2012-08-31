@@ -3,6 +3,7 @@
     @Override public InvoiceItem inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
       final InvoiceItem invoiceItemAdjustment=createAdjustmentItem(transactional,invoiceId,invoiceItemId,positiveAdjAmount,currency,effectiveDate);
       insertItemAndAddCBAIfNeeded(transactional,invoiceItemAdjustment,context);
+      notifyBusOfInvoiceAdjustment(transactional,invoiceId,accountId,context.getUserToken());
       return invoiceItemAdjustment;
     }
   }

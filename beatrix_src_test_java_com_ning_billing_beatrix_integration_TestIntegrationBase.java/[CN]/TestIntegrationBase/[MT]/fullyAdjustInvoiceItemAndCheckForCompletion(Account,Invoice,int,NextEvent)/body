@@ -1,0 +1,14 @@
+{
+  doCallAndCheckForCompletion(new Function<Void,Void>(){
+    @Override public Void apply(    @Nullable final Void input){
+      try {
+        invoiceUserApi.insertInvoiceItemAdjustment(account.getId(),invoice.getId(),invoice.getInvoiceItems().get(itemNb - 1).getId(),invoice.getInvoiceDate(),new DefaultCallContext("test",null,null,clock));
+      }
+ catch (      InvoiceApiException e) {
+        fail(e.toString());
+      }
+      return null;
+    }
+  }
+,events);
+}
