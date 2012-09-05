@@ -2,8 +2,7 @@
   eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
     @Override public Void inTransaction(    final EntitlementEventSqlDao transactional,    final TransactionStatus status) throws Exception {
       final UUID subscriptionId=subscription.getId();
-      cancelNextChangeEventFromTransaction(subscriptionId,transactional,context);
-      cancelNextPhaseEventFromTransaction(subscriptionId,transactional,context);
+      cancelFutureEventsFromTransaction(subscriptionId,transactional,context);
       final List<EntityAudit> eventAudits=new ArrayList<EntityAudit>();
       for (      final EntitlementEvent cur : changeEvents) {
         transactional.insertEvent(cur,context);

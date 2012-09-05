@@ -10,11 +10,5 @@
       futureEvent=cur;
     }
   }
-  if (futureEvent != null) {
-    final String eventId=futureEvent.getId().toString();
-    dao.unactiveEvent(eventId,context);
-    final Long recordId=dao.getRecordId(eventId);
-    final EntityAudit audit=new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.UPDATE);
-    dao.insertAuditFromTransaction(audit,context);
-  }
+  unactivateEventFromTransaction(futureEvent,dao,context);
 }

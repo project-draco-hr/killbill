@@ -1,4 +1,5 @@
 {
+  final UUID newAccountId=UUID.randomUUID();
   try {
     final DateTime startDate=clock.getUTCNow().minusMonths(2);
     final DateTime beforeMigration=clock.getUTCNow();
@@ -20,7 +21,20 @@
     assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-annual");
     assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
+    assertEquals(subscription.getBillingTransitions().size(),1);
+    assertEquals(subscription.getBillingTransitions().get(0).getTransitionType(),SubscriptionTransitionType.MIGRATE_BILLING);
+    assertTrue(subscription.getBillingTransitions().get(0).getEffectiveTransitionTime().compareTo(clock.getUTCNow()) > 0);
     assertListenerStatus();
+    clock.addDays(20);
+    final DateTime transferRequestedDate=clock.getUTCNow();
+    testListener.pushExpectedEvent(NextEvent.TRANSFER);
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getKey(),transferRequestedDate,false,true,context);
+    assertTrue(testListener.isCompleted(3000));
+    final Subscription oldBaseSubscription=entitlementApi.getBaseSubscription(bundle.getId());
+    assertTrue(oldBaseSubscription.getState() == SubscriptionState.CANCELLED);
+    assertEquals(oldBaseSubscription.getBillingTransitions().size(),1);
+    assertEquals(oldBaseSubscription.getBillingTransitions().get(0).getTransitionType(),SubscriptionTransitionType.CANCEL);
   }
  catch (  EntitlementMigrationApiException e) {
     Assert.fail("",e);
