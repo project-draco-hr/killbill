@@ -18,7 +18,7 @@
     final DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate.toLocalDate(),context);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
-    subscription.cancel(clock.getUTCNow(),false,context);
+    subscription.cancel(clock.getUTCNow(),context);
     subscription.uncancel(context);
     testListener.pushExpectedEvent(NextEvent.UNCANCEL);
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));

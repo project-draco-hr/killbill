@@ -1,0 +1,9 @@
+{
+  final UUID uuid=UUID.randomUUID();
+  final Blockable.Type type=Blockable.Type.SUBSCRIPTION;
+  final OverdueCheckNotificationKey e=new OverdueCheckNotificationKey(uuid,type);
+  final String json=mapper.writeValueAsString(e);
+  final Class<?> claz=Class.forName(OverdueCheckNotificationKey.class.getName());
+  final Object obj=mapper.readValue(json,claz);
+  Assert.assertTrue(obj.equals(e));
+}

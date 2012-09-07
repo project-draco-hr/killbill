@@ -1,0 +1,27 @@
+{
+  if (nextOverdueState.getSubscriptionCancellationPolicy() == OverdueCancellationPolicicy.NONE) {
+    return;
+  }
+  try {
+    ActionPolicy actionPolicy=null;
+switch (nextOverdueState.getSubscriptionCancellationPolicy()) {
+case END_OF_TERM:
+      actionPolicy=ActionPolicy.END_OF_TERM;
+    break;
+case IMMEDIATE:
+  actionPolicy=ActionPolicy.IMMEDIATE;
+break;
+default :
+throw new IllegalStateException("Unexpected OverdueCancellationPolicy " + nextOverdueState.getSubscriptionCancellationPolicy());
+}
+final List<Subscription> toBeCancelled=new LinkedList<Subscription>();
+computeSubscriptionsToCancel(blockable,toBeCancelled);
+final CallContext context=factory.createCallContext(API_USER_NAME,CallOrigin.INTERNAL,UserType.SYSTEM);
+for (Subscription cur : toBeCancelled) {
+cur.cancelWithPolicy(clock.getUTCNow(),actionPolicy,context);
+}
+}
+ catch (EntitlementUserApiException e) {
+throw new OverdueException(e);
+}
+}

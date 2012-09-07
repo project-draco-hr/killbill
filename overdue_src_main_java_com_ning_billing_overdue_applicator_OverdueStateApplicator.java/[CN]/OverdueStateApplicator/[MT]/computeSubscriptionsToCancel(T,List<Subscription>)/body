@@ -1,0 +1,16 @@
+{
+  if (blockable instanceof Subscription) {
+    result.add((Subscription)blockable);
+    return;
+  }
+ else   if (blockable instanceof SubscriptionBundle) {
+    for (    Subscription cur : entitlementUserApi.getSubscriptionsForBundle(blockable.getId())) {
+      computeSubscriptionsToCancel((T)cur,result);
+    }
+  }
+ else   if (blockable instanceof Account) {
+    for (    SubscriptionBundle cur : entitlementUserApi.getBundlesForAccount(blockable.getId())) {
+      computeSubscriptionsToCancel((T)cur,result);
+    }
+  }
+}

@@ -19,7 +19,7 @@
     final DateTime newChargedThroughDate=DefaultClock.addDuration(now,ctd);
     billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate.toLocalDate(),context);
     baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
-    baseSubscription.cancel(now,false,context);
+    baseSubscription.cancel(now,context);
     aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
