@@ -1,0 +1,34 @@
+{
+  try {
+    if (nextOverdueState.isClearState() && firstOverdueState != null && billingState != null) {
+      final LocalDate firstUnpaidInvoice=billingState.getDateOfEarliestUnpaidInvoice();
+      if (firstUnpaidInvoice != null) {
+        final Period reevaluationInterval=firstOverdueState.getReevaluationInterval();
+        createFutureNotification(overdueable,firstUnpaidInvoice.toDateTimeAtCurrentTime().plus(reevaluationInterval));
+      }
+    }
+    if (nextOverdueState == null || previousOverdueStateName.equals(nextOverdueState.getName())) {
+      return;
+    }
+    storeNewState(overdueable,nextOverdueState);
+    cancelSubscriptionsIfRequired(overdueable,nextOverdueState);
+    final Period reevaluationInterval=nextOverdueState.getReevaluationInterval();
+    if (!nextOverdueState.isClearState()) {
+      createFutureNotification(overdueable,clock.getUTCNow().plus(reevaluationInterval));
+    }
+  }
+ catch (  OverdueApiException e) {
+    if (e.getCode() != ErrorCode.OVERDUE_NO_REEVALUATION_INTERVAL.getCode()) {
+      throw new OverdueException(e);
+    }
+  }
+  if (nextOverdueState.isClearState()) {
+    clear(overdueable);
+  }
+  try {
+    bus.post(createOverdueEvent(overdueable,previousOverdueStateName,nextOverdueState.getName()));
+  }
+ catch (  Exception e) {
+    log.error("Error posting overdue change event to bus",e);
+  }
+}
