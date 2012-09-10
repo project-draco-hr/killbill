@@ -11,15 +11,25 @@
       log.warn("Ignoring subscription fields for invoice item {} for bundle {} (bundle does not exist)",invoiceItem.getId().toString(),invoiceItem.getBundleId().toString());
     }
   }
-  if (invoiceItem.getSubscriptionId() != null) {
+  if (invoiceItem.getPlanName() != null) {
+    try {
+      plan=catalogService.getFullCatalog().findPlan(invoiceItem.getPlanName(),invoiceItem.getStartDate().toDateTimeAtStartOfDay());
+    }
+ catch (    CatalogApiException e) {
+      log.warn("Unable to retrieve plan for invoice item {}",invoiceItem.getId());
+    }
+  }
+  if (invoiceItem.getSubscriptionId() != null && invoiceItem.getPhaseName() != null) {
     final Subscription subscription;
     try {
       subscription=entitlementApi.getSubscriptionFromId(invoiceItem.getSubscriptionId());
-      plan=subscription.getCurrentPlan();
-      planPhase=subscription.getCurrentPhase();
+      planPhase=catalogService.getFullCatalog().findPhase(invoiceItem.getPhaseName(),invoiceItem.getStartDate().toDateTimeAtStartOfDay(),subscription.getStartDate());
     }
  catch (    EntitlementUserApiException e) {
       log.warn("Ignoring subscription fields for invoice item {} for subscription {} (subscription does not exist)",invoiceItem.getId().toString(),invoiceItem.getSubscriptionId().toString());
+    }
+catch (    CatalogApiException e) {
+      log.warn("Unable to retrieve phase for invoice item {}",invoiceItem.getId());
     }
   }
   return new BusinessInvoiceItem(externalKey,invoiceItem,plan,planPhase);
