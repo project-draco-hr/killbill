@@ -1,9 +1,12 @@
 {
   for (  final InvoiceItem existingItem : existingItems) {
     if (existingItem.getInvoiceItemType() == InvoiceItemType.RECURRING || existingItem.getInvoiceItemType() == InvoiceItemType.FIXED) {
-      final BigDecimal amountNegated=existingItem.getAmount() == null ? null : existingItem.getAmount().negate();
-      final RepairAdjInvoiceItem repairItem=new RepairAdjInvoiceItem(existingItem.getInvoiceId(),existingItem.getAccountId(),existingItem.getStartDate(),existingItem.getEndDate(),amountNegated,existingItem.getCurrency(),existingItem.getId());
-      proposedItems.add(repairItem);
+      final BigDecimal existingAdjustedPositiveAmount=getAdjustedPositiveAmount(existingItems,existingItem.getId());
+      final BigDecimal amountNegated=existingItem.getAmount() == null ? null : existingItem.getAmount().subtract(existingAdjustedPositiveAmount).negate();
+      if (amountNegated.compareTo(BigDecimal.ZERO) < 0) {
+        final RepairAdjInvoiceItem repairItem=new RepairAdjInvoiceItem(existingItem.getInvoiceId(),existingItem.getAccountId(),existingItem.getStartDate(),existingItem.getEndDate(),amountNegated,existingItem.getCurrency(),existingItem.getId());
+        proposedItems.add(repairItem);
+      }
     }
   }
 }
