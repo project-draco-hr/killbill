@@ -19,19 +19,24 @@
   try {
     return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
       @Override public Payment doOperation() throws PaymentApiException {
-        final Invoice invoice=invoicePaymentApi.getInvoice(invoiceId);
-        if (invoice.isMigrationInvoice()) {
-          log.error("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
-          return null;
-        }
-        final boolean isAccountAutoPayOff=isAccountAutoPayOff(account.getId());
-        setUnsaneAccount_AUTO_PAY_OFFWithAccountLock(account.getId(),paymentMethodId,isAccountAutoPayOff,context,isInstantPayment);
-        final BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
-        if (!isInstantPayment && isAccountAutoPayOff) {
-          return processNewPaymentForAutoPayOffWithAccountLocked(paymentMethodId,account,invoice,requestedAmount,context);
-        }
+        try {
+          final Invoice invoice=invoicePaymentApi.getInvoice(invoiceId);
+          if (invoice.isMigrationInvoice()) {
+            log.error("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
+            return null;
+          }
+          final boolean isAccountAutoPayOff=isAccountAutoPayOff(account.getId());
+          setUnsaneAccount_AUTO_PAY_OFFWithAccountLock(account.getId(),paymentMethodId,isAccountAutoPayOff,context,isInstantPayment);
+          final BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
+          if (!isInstantPayment && isAccountAutoPayOff) {
+            return processNewPaymentForAutoPayOffWithAccountLocked(paymentMethodId,account,invoice,requestedAmount,context);
+          }
  else {
-          return processNewPaymentWithAccountLocked(paymentMethodId,plugin,account,invoice,requestedAmount,isInstantPayment,context);
+            return processNewPaymentWithAccountLocked(paymentMethodId,plugin,account,invoice,requestedAmount,isInstantPayment,context);
+          }
+        }
+ catch (        InvoiceApiException e) {
+          throw new PaymentApiException(e);
         }
       }
     }

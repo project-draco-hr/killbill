@@ -1,4 +1,11 @@
 {
-  final Invoice invoice=invoiceDao.getById(UUID.randomUUID());
-  assertNull(invoice);
+  try {
+    invoiceDao.getById(UUID.randomUUID());
+    Assert.fail();
+  }
+ catch (  InvoiceApiException e) {
+    if (e.getCode() != ErrorCode.INVOICE_NOT_FOUND.getCode()) {
+      Assert.fail();
+    }
+  }
 }

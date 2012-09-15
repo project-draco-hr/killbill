@@ -1,3 +1,7 @@
 {
-  return invoiceSqlDao.getByRecordId(number.longValue());
+  final Invoice result=invoiceSqlDao.getByRecordId(number.longValue());
+  if (result == null) {
+    throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,number);
+  }
+  return result;
 }
