@@ -4,7 +4,7 @@
   Mockito.when(idbi.onDemand(InvoiceSqlDao.class)).thenReturn(invoiceSqlDao);
   Mockito.when(invoiceSqlDao.getById(Mockito.anyString())).thenReturn(Mockito.mock(Invoice.class));
   Mockito.when(invoiceSqlDao.inTransaction(Mockito.<Transaction<Void,InvoiceSqlDao>>any())).thenAnswer(new Answer(){
-    public Object answer(    final InvocationOnMock invocation){
+    @Override public Object answer(    final InvocationOnMock invocation){
       final Object[] args=invocation.getArguments();
       try {
         ((Transaction<Void,InvoiceSqlDao>)args[0]).inTransaction(invoiceSqlDao,null);

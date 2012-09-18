@@ -3,5 +3,10 @@
   final Invoice invoice=Mockito.mock(Invoice.class);
   Mockito.when(invoiceSqlDao.getByRecordId(number.longValue())).thenReturn(invoice);
   Assert.assertEquals(dao.getByNumber(number),invoice);
-  Assert.assertNull(dao.getByNumber(Integer.MIN_VALUE));
+  try {
+    dao.getByNumber(Integer.MIN_VALUE);
+    Assert.fail();
+  }
+ catch (  InvoiceApiException e) {
+  }
 }

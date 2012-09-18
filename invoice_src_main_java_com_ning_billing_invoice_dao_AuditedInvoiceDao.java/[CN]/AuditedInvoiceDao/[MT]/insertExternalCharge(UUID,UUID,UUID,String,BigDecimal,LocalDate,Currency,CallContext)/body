@@ -10,6 +10,17 @@
       final InvoiceItem externalCharge=new ExternalChargeInvoiceItem(invoiceIdForExternalCharge,accountId,bundleId,description,effectiveDate,amount,currency);
       final InvoiceItemSqlDao transInvoiceItemDao=transactional.become(InvoiceItemSqlDao.class);
       transInvoiceItemDao.create(externalCharge,context);
+      final Invoice invoice=transactional.getById(invoiceIdForExternalCharge.toString());
+      if (invoice == null) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceIdForExternalCharge);
+      }
+      populateChildren(invoice,transactional);
+      final BigDecimal accountCbaAvailable=getAccountCBAFromTransaction(invoice.getAccountId(),transactional);
+      if (accountCbaAvailable.compareTo(BigDecimal.ZERO) > 0 && invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+        final BigDecimal cbaAmountToConsume=accountCbaAvailable.compareTo(invoice.getBalance()) > 0 ? invoice.getBalance().negate() : accountCbaAvailable.negate();
+        final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),cbaAmountToConsume,invoice.getCurrency());
+        transInvoiceItemDao.create(cbaAdjItem,context);
+      }
       notifyBusOfInvoiceAdjustment(transactional,invoiceId,accountId,context.getUserToken());
       return externalCharge;
     }

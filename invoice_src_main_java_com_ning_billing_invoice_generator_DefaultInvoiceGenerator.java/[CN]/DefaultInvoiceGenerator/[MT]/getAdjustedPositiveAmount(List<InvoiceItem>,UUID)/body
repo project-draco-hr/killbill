@@ -1,0 +1,19 @@
+{
+  BigDecimal totalAdjustedOnItem=BigDecimal.ZERO;
+  final Collection<InvoiceItem> c=Collections2.filter(existingItems,new Predicate<InvoiceItem>(){
+    @Override public boolean apply(    InvoiceItem item){
+      if (item.getInvoiceItemType() == InvoiceItemType.ITEM_ADJ && item.getLinkedItemId() != null && item.getLinkedItemId().equals(linkedItemId)) {
+        return true;
+      }
+ else {
+        return false;
+      }
+    }
+  }
+);
+  final Iterator<InvoiceItem> it=c.iterator();
+  while (it.hasNext()) {
+    totalAdjustedOnItem=totalAdjustedOnItem.add(it.next().getAmount());
+  }
+  return totalAdjustedOnItem.negate();
+}
