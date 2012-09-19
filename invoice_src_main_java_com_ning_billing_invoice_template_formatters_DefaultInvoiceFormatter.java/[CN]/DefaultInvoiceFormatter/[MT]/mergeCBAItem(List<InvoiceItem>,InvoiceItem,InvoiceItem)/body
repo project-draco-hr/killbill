@@ -1,0 +1,14 @@
+{
+  if (mergedCBAItem == null) {
+    mergedCBAItem=item;
+  }
+ else {
+    if (!mergedCBAItem.getCurrency().equals(item.getCurrency())) {
+      invoiceItems.add(item);
+    }
+ else {
+      mergedCBAItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),invoice.getInvoiceDate(),mergedCBAItem.getAmount().add(item.getAmount()),mergedCBAItem.getCurrency());
+    }
+  }
+  return mergedCBAItem;
+}
