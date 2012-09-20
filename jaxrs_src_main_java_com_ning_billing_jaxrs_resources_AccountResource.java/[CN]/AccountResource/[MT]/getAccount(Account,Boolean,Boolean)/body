@@ -1,0 +1,16 @@
+{
+  final AccountJson json;
+  if (accountWithBalanceAndCBA) {
+    final BigDecimal accountBalance=invoiceApi.getAccountBalance(account.getId());
+    final BigDecimal accountCBA=invoiceApi.getAccountCBA(account.getId());
+    json=new AccountJsonWithBalanceAndCBA(account,accountBalance,accountCBA);
+  }
+ else   if (accountWithBalance) {
+    final BigDecimal accountBalance=invoiceApi.getAccountBalance(account.getId());
+    json=new AccountJsonWithBalance(account,accountBalance);
+  }
+ else {
+    json=new AccountJson(account);
+  }
+  return Response.status(Status.OK).entity(json).build();
+}
