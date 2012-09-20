@@ -1,0 +1,14 @@
+{
+  if (mergedInvoiceAdjustment == null) {
+    mergedInvoiceAdjustment=item;
+  }
+ else {
+    if (!mergedInvoiceAdjustment.getCurrency().equals(item.getCurrency())) {
+      invoiceItems.add(item);
+    }
+ else {
+      mergedInvoiceAdjustment=new CreditAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),invoice.getInvoiceDate(),mergedInvoiceAdjustment.getAmount().add(item.getAmount()),mergedInvoiceAdjustment.getCurrency());
+    }
+  }
+  return mergedInvoiceAdjustment;
+}

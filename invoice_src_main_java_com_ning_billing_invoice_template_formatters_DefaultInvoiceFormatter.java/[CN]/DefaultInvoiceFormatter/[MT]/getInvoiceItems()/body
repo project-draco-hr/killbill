@@ -1,6 +1,26 @@
 {
-  final List<InvoiceItem> formatters=new ArrayList<InvoiceItem>();
+  final List<InvoiceItem> invoiceItems=new ArrayList<InvoiceItem>();
+  InvoiceItem mergedCBAItem=null;
+  InvoiceItem mergedInvoiceAdjustment=null;
   for (  final InvoiceItem item : invoice.getInvoiceItems()) {
+    if (InvoiceItemType.CBA_ADJ.equals(item.getInvoiceItemType())) {
+      mergedCBAItem=mergeCBAItem(invoiceItems,mergedCBAItem,item);
+    }
+ else     if (InvoiceItemType.REFUND_ADJ.equals(item.getInvoiceItemType()) || InvoiceItemType.CREDIT_ADJ.equals(item.getInvoiceItemType())) {
+      mergedInvoiceAdjustment=mergeInvoiceAdjustmentItem(invoiceItems,mergedInvoiceAdjustment,item);
+    }
+ else {
+      invoiceItems.add(item);
+    }
+  }
+  if (mergedCBAItem != null) {
+    invoiceItems.add(mergedCBAItem);
+  }
+  if (mergedInvoiceAdjustment != null) {
+    invoiceItems.add(mergedInvoiceAdjustment);
+  }
+  final List<InvoiceItem> formatters=new ArrayList<InvoiceItem>();
+  for (  final InvoiceItem item : invoiceItems) {
     formatters.add(new DefaultInvoiceItemFormatter(config,item,dateFormatter,locale));
   }
   return formatters;
