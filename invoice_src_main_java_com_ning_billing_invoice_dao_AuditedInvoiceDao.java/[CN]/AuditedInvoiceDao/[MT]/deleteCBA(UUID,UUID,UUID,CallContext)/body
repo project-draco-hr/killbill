@@ -10,7 +10,7 @@
       if (cbaItem == null || !cbaItem.getInvoiceId().equals(invoice.getId())) {
         throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_NOT_FOUND,invoiceItemId);
       }
-      final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),cbaItem.getAmount().negate(),cbaItem.getCurrency());
+      final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),cbaItem.getId(),cbaItem.getAmount().negate(),cbaItem.getCurrency());
       invoiceItemSqlDao.create(cbaAdjItem,context);
       final BigDecimal accountCBA=getAccountCBAFromTransaction(accountId,invoiceSqlDao);
       if (accountCBA.compareTo(BigDecimal.ZERO) < 0) {
@@ -25,7 +25,7 @@
             continue;
           }
           BigDecimal positiveCBAAdjItemAmount=BigDecimal.ZERO;
-          for (          final InvoiceItem cbaUsed : invoiceFollowing.getInvoiceItems()) {
+          for (          final InvoiceItem cbaUsed : Lists.reverse(invoiceFollowing.getInvoiceItems())) {
             if (!InvoiceItemType.CBA_ADJ.equals(cbaUsed.getInvoiceItemType()) || cbaUsed.getAmount().compareTo(BigDecimal.ZERO) >= 0) {
               continue;
             }
@@ -44,7 +44,7 @@
               break;
             }
           }
-          final InvoiceItem nextCBAAdjItem=new CreditBalanceAdjInvoiceItem(invoiceFollowing.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),positiveCBAAdjItemAmount,cbaItem.getCurrency());
+          final InvoiceItem nextCBAAdjItem=new CreditBalanceAdjInvoiceItem(invoiceFollowing.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),cbaItem.getId(),positiveCBAAdjItemAmount,cbaItem.getCurrency());
           invoiceItemSqlDao.create(nextCBAAdjItem,context);
           if (positiveRemainderToAdjust.compareTo(BigDecimal.ZERO) == 0) {
             break;
