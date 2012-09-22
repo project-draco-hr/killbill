@@ -1,0 +1,55 @@
+{
+  if (nextOverdueState.getEnterStateEmailNotification() == null) {
+    return;
+  }
+  final Account account;
+  final Type overdueableType=Blockable.Type.get(overdueable);
+  try {
+    if (Type.SUBSCRIPTION.equals(overdueableType)) {
+      final UUID bundleId=((Subscription)overdueable).getBundleId();
+      final SubscriptionBundle bundle=entitlementUserApi.getBundleFromId(bundleId);
+      account=accountUserApi.getAccountById(bundle.getAccountId());
+    }
+ else     if (Type.SUBSCRIPTION_BUNDLE.equals(overdueableType)) {
+      final UUID bundleId=((SubscriptionBundle)overdueable).getId();
+      final SubscriptionBundle bundle=entitlementUserApi.getBundleFromId(bundleId);
+      account=accountUserApi.getAccountById(bundle.getAccountId());
+    }
+ else     if (Type.ACCOUNT.equals(overdueableType)) {
+      account=(Account)overdueable;
+    }
+ else {
+      log.warn("Unable to retrieve account for overdueable {} (type {})",overdueable.getId(),overdueableType);
+      return;
+    }
+  }
+ catch (  EntitlementUserApiException e) {
+    log.warn(String.format("Unable to retrieve account for overdueable %s (type %s)",overdueable.getId(),overdueableType),e);
+    return;
+  }
+catch (  AccountApiException e) {
+    log.warn(String.format("Unable to retrieve account for overdueable %s (type %s)",overdueable.getId(),overdueableType),e);
+    return;
+  }
+  final List<String> to=ImmutableList.<String>of(account.getEmail());
+  final List<String> cc=ImmutableList.<String>of();
+  final String subject=nextOverdueState.getEnterStateEmailNotification().getSubject();
+  try {
+    final String emailBody=overdueEmailGenerator.generateEmail(account,billingState,overdueable,nextOverdueState);
+    if (nextOverdueState.getEnterStateEmailNotification().isHTML()) {
+      emailSender.sendHTMLEmail(to,cc,subject,emailBody);
+    }
+ else {
+      emailSender.sendPlainTextEmail(to,cc,subject,emailBody);
+    }
+  }
+ catch (  IOException e) {
+    log.warn(String.format("Unable to generate or send overdue notification email for account %s and overdueable %s",account.getId(),overdueable.getId()),e);
+  }
+catch (  EmailApiException e) {
+    log.warn(String.format("Unable to send overdue notification email for account %s and overdueable %s",account.getId(),overdueable.getId()),e);
+  }
+catch (  MustacheException e) {
+    log.warn(String.format("Unable to generate overdue notification email for account %s and overdueable %s",account.getId(),overdueable.getId()),e);
+  }
+}
