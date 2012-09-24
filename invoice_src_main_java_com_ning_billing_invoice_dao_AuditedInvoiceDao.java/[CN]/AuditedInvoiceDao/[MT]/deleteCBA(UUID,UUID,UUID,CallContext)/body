@@ -12,6 +12,10 @@
       }
       final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),cbaItem.getId(),cbaItem.getAmount().negate(),cbaItem.getCurrency());
       invoiceItemSqlDao.create(cbaAdjItem,context);
+      populateChildren(invoice,transactional);
+      if (invoice.getBalance().compareTo(BigDecimal.ZERO) < 0) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_WOULD_BE_NEGATIVE);
+      }
       final BigDecimal accountCBA=getAccountCBAFromTransaction(accountId,invoiceSqlDao);
       if (accountCBA.compareTo(BigDecimal.ZERO) < 0) {
         if (accountCBA.compareTo(cbaItem.getAmount().negate()) < 0) {
