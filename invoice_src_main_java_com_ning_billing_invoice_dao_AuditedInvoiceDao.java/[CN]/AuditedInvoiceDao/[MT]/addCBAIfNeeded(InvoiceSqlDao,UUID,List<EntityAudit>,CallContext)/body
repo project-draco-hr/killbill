@@ -10,5 +10,7 @@
     final InvoiceItemSqlDao transInvoiceItemDao=transactional.become(InvoiceItemSqlDao.class);
     final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),invoice.getBalance().negate(),invoice.getCurrency());
     transInvoiceItemDao.create(cbaAdjItem,context);
+    final Long cbaAdjItemRecordId=transInvoiceItemDao.getRecordId(cbaAdjItem.getId().toString());
+    audits.add(new EntityAudit(TableName.INVOICE_ITEMS,cbaAdjItemRecordId,ChangeType.INSERT));
   }
 }

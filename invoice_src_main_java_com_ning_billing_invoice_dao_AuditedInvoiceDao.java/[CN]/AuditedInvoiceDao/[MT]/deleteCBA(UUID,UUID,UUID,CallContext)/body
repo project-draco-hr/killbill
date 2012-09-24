@@ -1,6 +1,7 @@
 {
   invoiceSqlDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
     @Override public Void inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final List<EntityAudit> audits=new ArrayList<EntityAudit>();
       final Invoice invoice=transactional.getById(invoiceId.toString());
       if (invoice == null || !invoice.getAccountId().equals(accountId)) {
         throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
@@ -12,6 +13,8 @@
       }
       final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),cbaItem.getId(),cbaItem.getAmount().negate(),cbaItem.getCurrency());
       invoiceItemSqlDao.create(cbaAdjItem,context);
+      final Long cbaAdjItemRecordId=invoiceItemSqlDao.getRecordId(cbaAdjItem.getId().toString());
+      audits.add(new EntityAudit(TableName.INVOICE_ITEMS,cbaAdjItemRecordId,ChangeType.INSERT));
       populateChildren(invoice,transactional);
       if (invoice.getBalance().compareTo(BigDecimal.ZERO) < 0) {
         throw new InvoiceApiException(ErrorCode.INVOICE_WOULD_BE_NEGATIVE);
@@ -50,11 +53,14 @@
           }
           final InvoiceItem nextCBAAdjItem=new CreditBalanceAdjInvoiceItem(invoiceFollowing.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),cbaItem.getId(),positiveCBAAdjItemAmount,cbaItem.getCurrency());
           invoiceItemSqlDao.create(nextCBAAdjItem,context);
+          final Long nextCBAAdjItemRecordId=invoiceItemSqlDao.getRecordId(nextCBAAdjItem.getId().toString());
+          audits.add(new EntityAudit(TableName.INVOICE_ITEMS,nextCBAAdjItemRecordId,ChangeType.INSERT));
           if (positiveRemainderToAdjust.compareTo(BigDecimal.ZERO) == 0) {
             break;
           }
         }
       }
+      transactional.insertAuditFromTransaction(audits,context);
       return null;
     }
   }
