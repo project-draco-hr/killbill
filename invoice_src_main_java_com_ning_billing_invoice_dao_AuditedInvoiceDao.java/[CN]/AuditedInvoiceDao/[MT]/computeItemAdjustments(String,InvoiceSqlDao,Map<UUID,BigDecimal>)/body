@@ -12,7 +12,10 @@
   }
   for (  final UUID invoiceItemId : invoiceItemIdsWithNullAmounts.keySet()) {
     final BigDecimal adjAmount=Objects.firstNonNull(invoiceItemIdsWithNullAmounts.get(invoiceItemId),getInvoiceItemAmountForId(invoice,invoiceItemId));
-    invoiceItemIdsWithAmountsBuilder.put(invoiceItemId,adjAmount);
+    final BigDecimal adjAmountRemainingAfterRepair=computeItemAdjustmentAmount(invoiceItemId,adjAmount,invoice.getInvoiceItems());
+    if (adjAmountRemainingAfterRepair.compareTo(BigDecimal.ZERO) > 0) {
+      invoiceItemIdsWithAmountsBuilder.put(invoiceItemId,adjAmountRemainingAfterRepair);
+    }
   }
   return invoiceItemIdsWithAmountsBuilder.build();
 }

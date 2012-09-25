@@ -1,4 +1,5 @@
 {
+  final boolean isInvoiceItemAdjusted=isInvoiceAdjusted && invoiceItemIdsWithNullAmounts.size() > 0;
   return invoicePaymentSqlDao.inTransaction(new Transaction<InvoicePayment,InvoicePaymentSqlDao>(){
     @Override public InvoicePayment inTransaction(    final InvoicePaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
       final InvoiceSqlDao transInvoiceDao=transactional.become(InvoiceSqlDao.class);
@@ -23,7 +24,7 @@
       }
       final BigDecimal invoiceBalanceAfterRefund=invoice.getBalance();
       final InvoiceItemSqlDao transInvoiceItemDao=transInvoiceDao.become(InvoiceItemSqlDao.class);
-      if (isInvoiceAdjusted && invoiceItemIdsWithAmounts.size() == 0) {
+      if (isInvoiceAdjusted && !isInvoiceItemAdjusted) {
         final BigDecimal maxBalanceToAdjust=(invoiceBalanceAfterRefund.compareTo(BigDecimal.ZERO) <= 0) ? BigDecimal.ZERO : invoiceBalanceAfterRefund;
         final BigDecimal requestedPositiveAmountToAdjust=requestedPositiveAmount.compareTo(maxBalanceToAdjust) > 0 ? maxBalanceToAdjust : requestedPositiveAmount;
         if (requestedPositiveAmountToAdjust.compareTo(BigDecimal.ZERO) > 0) {
