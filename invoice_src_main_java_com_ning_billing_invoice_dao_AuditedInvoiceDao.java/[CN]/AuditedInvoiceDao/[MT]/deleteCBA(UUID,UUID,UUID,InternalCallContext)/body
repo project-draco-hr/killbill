@@ -1,0 +1,68 @@
+{
+  invoiceSqlDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
+    @Override public Void inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final List<EntityAudit> audits=new ArrayList<EntityAudit>();
+      final Invoice invoice=transactional.getById(invoiceId.toString(),context);
+      if (invoice == null || !invoice.getAccountId().equals(accountId)) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
+      }
+      final InvoiceItemSqlDao invoiceItemSqlDao=transactional.become(InvoiceItemSqlDao.class);
+      final InvoiceItem cbaItem=invoiceItemSqlDao.getById(invoiceItemId.toString(),context);
+      if (cbaItem == null || !cbaItem.getInvoiceId().equals(invoice.getId())) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_NOT_FOUND,invoiceItemId);
+      }
+      final InvoiceItem cbaAdjItem=new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),cbaItem.getId(),cbaItem.getAmount().negate(),cbaItem.getCurrency());
+      invoiceItemSqlDao.create(cbaAdjItem,context);
+      final Long cbaAdjItemRecordId=invoiceItemSqlDao.getRecordId(cbaAdjItem.getId().toString(),context);
+      audits.add(new EntityAudit(TableName.INVOICE_ITEMS,cbaAdjItemRecordId,ChangeType.INSERT));
+      populateChildren(invoice,transactional,context);
+      if (invoice.getBalance().compareTo(BigDecimal.ZERO) < 0) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_WOULD_BE_NEGATIVE);
+      }
+      final BigDecimal accountCBA=getAccountCBAFromTransaction(accountId,invoiceSqlDao,context);
+      if (accountCBA.compareTo(BigDecimal.ZERO) < 0) {
+        if (accountCBA.compareTo(cbaItem.getAmount().negate()) < 0) {
+          throw new IllegalStateException("The account balance can't be lower than the amount adjusted");
+        }
+        final List<Invoice> invoicesFollowing=transactional.getInvoicesByAccountAfterDate(accountId.toString(),invoice.getInvoiceDate().toDateTimeAtStartOfDay().toDate(),context);
+        populateChildren(invoicesFollowing,transactional,context);
+        BigDecimal positiveRemainderToAdjust=accountCBA.negate();
+        for (        final Invoice invoiceFollowing : invoicesFollowing) {
+          if (invoiceFollowing.getId().equals(invoice.getId())) {
+            continue;
+          }
+          BigDecimal positiveCBAAdjItemAmount=BigDecimal.ZERO;
+          for (          final InvoiceItem cbaUsed : Lists.reverse(invoiceFollowing.getInvoiceItems())) {
+            if (!InvoiceItemType.CBA_ADJ.equals(cbaUsed.getInvoiceItemType()) || cbaUsed.getAmount().compareTo(BigDecimal.ZERO) >= 0) {
+              continue;
+            }
+            final BigDecimal positiveCBAUsedAmount=cbaUsed.getAmount().negate();
+            final BigDecimal positiveNextCBAAdjItemAmount;
+            if (positiveCBAUsedAmount.compareTo(positiveRemainderToAdjust) < 0) {
+              positiveNextCBAAdjItemAmount=positiveCBAUsedAmount;
+              positiveRemainderToAdjust=positiveRemainderToAdjust.min(positiveNextCBAAdjItemAmount);
+            }
+ else {
+              positiveNextCBAAdjItemAmount=positiveRemainderToAdjust;
+              positiveRemainderToAdjust=BigDecimal.ZERO;
+            }
+            positiveCBAAdjItemAmount=positiveCBAAdjItemAmount.add(positiveNextCBAAdjItemAmount);
+            if (positiveRemainderToAdjust.compareTo(BigDecimal.ZERO) == 0) {
+              break;
+            }
+          }
+          final InvoiceItem nextCBAAdjItem=new CreditBalanceAdjInvoiceItem(invoiceFollowing.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),cbaItem.getId(),positiveCBAAdjItemAmount,cbaItem.getCurrency());
+          invoiceItemSqlDao.create(nextCBAAdjItem,context);
+          final Long nextCBAAdjItemRecordId=invoiceItemSqlDao.getRecordId(nextCBAAdjItem.getId().toString(),context);
+          audits.add(new EntityAudit(TableName.INVOICE_ITEMS,nextCBAAdjItemRecordId,ChangeType.INSERT));
+          if (positiveRemainderToAdjust.compareTo(BigDecimal.ZERO) == 0) {
+            break;
+          }
+        }
+      }
+      transactional.insertAuditFromTransaction(audits,context);
+      return null;
+    }
+  }
+);
+}

@@ -2,7 +2,7 @@
   final IDBI idbi=Mockito.mock(IDBI.class);
   invoiceSqlDao=Mockito.mock(InvoiceSqlDao.class);
   Mockito.when(idbi.onDemand(InvoiceSqlDao.class)).thenReturn(invoiceSqlDao);
-  Mockito.when(invoiceSqlDao.getById(Mockito.anyString())).thenReturn(Mockito.mock(Invoice.class));
+  Mockito.when(invoiceSqlDao.getById(Mockito.anyString(),Mockito.<InternalTenantContext>any())).thenReturn(Mockito.mock(Invoice.class));
   Mockito.when(invoiceSqlDao.inTransaction(Mockito.<Transaction<Void,InvoiceSqlDao>>any())).thenAnswer(new Answer(){
     @Override public Object answer(    final InvocationOnMock invocation){
       final Object[] args=invocation.getArguments();
@@ -19,6 +19,6 @@
   final NextBillingDatePoster poster=Mockito.mock(NextBillingDatePoster.class);
   final TagDefinitionDao tagDefinitionDao=new MockTagDefinitionDao();
   final TagDao tagDao=new MockTagDao();
-  tagUserApi=new DefaultTagUserApi(tagDefinitionDao,tagDao);
+  tagUserApi=new DefaultTagUserApi(new InternalCallContextFactory(Mockito.mock(IDBI.class),new ClockMock()),tagDefinitionDao,tagDao);
   dao=new AuditedInvoiceDao(idbi,poster,tagUserApi,Mockito.mock(Clock.class),Mockito.mock(Bus.class));
 }

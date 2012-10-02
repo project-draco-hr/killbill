@@ -1,10 +1,11 @@
 {
   this.delegate=delegate;
-  sourcesCache=delegate.getSources();
-  metricsCache=delegate.getMetrics();
-  eventCategoriesCache=delegate.getEventCategories();
+  final InternalTenantContext context=new InternalTenantContext(null,null);
+  sourcesCache=delegate.getSources(context);
+  metricsCache=delegate.getMetrics(context);
+  eventCategoriesCache=delegate.getEventCategories(context);
   sourceIdsMetricIdsCache=new HashMap<Integer,Set<Integer>>();
-  for (  final SourceIdAndMetricId both : delegate.getMetricIdsForAllSources()) {
+  for (  final SourceIdAndMetricId both : delegate.getMetricIdsForAllSources(context)) {
     final int sourceId=both.getSourceId();
     final int metricId=both.getMetricId();
     Set<Integer> metricIds=sourceIdsMetricIdsCache.get(sourceId);

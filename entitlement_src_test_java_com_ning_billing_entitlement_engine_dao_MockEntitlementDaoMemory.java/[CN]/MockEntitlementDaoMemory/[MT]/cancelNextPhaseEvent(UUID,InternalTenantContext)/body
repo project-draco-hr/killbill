@@ -1,0 +1,19 @@
+{
+  final Subscription curSubscription=getSubscriptionFromId(null,subscriptionId,context);
+  if (curSubscription.getCurrentPhase() == null || curSubscription.getCurrentPhase().getDuration().getUnit() == TimeUnit.UNLIMITED) {
+    return;
+  }
+synchronized (events) {
+    final Iterator<EntitlementEvent> it=events.descendingIterator();
+    while (it.hasNext()) {
+      final EntitlementEvent cur=it.next();
+      if (cur.getSubscriptionId() != subscriptionId) {
+        continue;
+      }
+      if (cur.getType() == EventType.PHASE && cur.getEffectiveDate().isAfter(clock.getUTCNow())) {
+        cur.deactivate();
+        break;
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  try {
+switch (type) {
+case SUBSCRIPTION_BUNDLE:
+{
+        final SubscriptionBundle bundle=entitlementApi.getBundleFromId(id,context.toTenantContext());
+        return (OverdueWrapper<T>)new OverdueWrapper<SubscriptionBundle>(bundle,api,getOverdueStateSetBundle(),clock,billingStateCalcuatorBundle,overdueStateApplicatorBundle);
+      }
+default :
+{
+      throw new OverdueException(ErrorCode.OVERDUE_TYPE_NOT_SUPPORTED,id,type);
+    }
+}
+}
+ catch (EntitlementUserApiException e) {
+throw new OverdueException(e);
+}
+}

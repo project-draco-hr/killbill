@@ -8,12 +8,11 @@
   final NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
   final TagDefinitionDao tagDefinitionDao=new MockTagDefinitionDao();
   final TagDao tagDao=new AuditedTagDao(dbi,tagEventBuilder,bus);
-  final TagUserApi tagUserApi=new DefaultTagUserApi(tagDefinitionDao,tagDao);
+  final TagUserApi tagUserApi=new DefaultTagUserApi(new InternalCallContextFactory(dbi,clock),tagDefinitionDao,tagDao);
   invoiceDao=new AuditedInvoiceDao(dbi,nextBillingDatePoster,tagUserApi,clock,bus);
-  invoiceDao.test();
+  invoiceDao.test(internalCallContext);
   invoiceItemSqlDao=dbi.onDemand(InvoiceItemSqlDao.class);
   invoicePaymentDao=dbi.onDemand(InvoicePaymentSqlDao.class);
-  context=new TestCallContext("Invoice Dao Tests");
   generator=new DefaultInvoiceGenerator(clock,invoiceConfig);
   assertTrue(true);
 }

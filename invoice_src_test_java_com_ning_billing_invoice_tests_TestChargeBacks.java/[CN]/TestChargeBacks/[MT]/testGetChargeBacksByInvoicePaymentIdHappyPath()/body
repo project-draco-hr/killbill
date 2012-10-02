@@ -1,8 +1,8 @@
 {
-  final Invoice invoice=createAndPersistInvoice(invoiceSqlDao,invoiceItemSqlDao,clock,THIRTY,CURRENCY,context);
-  final InvoicePayment payment=createAndPersistPayment(invoicePaymentApi,clock,invoice.getId(),THIRTY,CURRENCY,context);
-  invoicePaymentApi.createChargeback(payment.getId(),FIFTEEN,context);
-  final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentId(payment.getPaymentId());
+  final Invoice invoice=createAndPersistInvoice(invoiceSqlDao,invoiceItemSqlDao,clock,THIRTY,CURRENCY,callContext,internalCallContextFactory);
+  final InvoicePayment payment=createAndPersistPayment(invoicePaymentApi,clock,invoice.getId(),THIRTY,CURRENCY,callContext);
+  invoicePaymentApi.createChargeback(payment.getId(),FIFTEEN,callContext);
+  final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentId(payment.getPaymentId(),callContext);
   assertNotNull(chargebacks);
   assertEquals(chargebacks.size(),1);
   assertEquals(chargebacks.get(0).getLinkedInvoicePaymentId(),payment.getId());

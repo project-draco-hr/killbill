@@ -4,7 +4,7 @@
   final String tagHistoryString=(String)handle.select("select id from tag_history limit 1").get(0).get("id");
   handle.close();
   for (  final AuditLevel level : AuditLevel.values()) {
-    final List<AuditLog> auditLogs=auditDao.getAuditLogsForId(TableName.TAG_HISTORY,UUID.fromString(tagHistoryString),level);
+    final List<AuditLog> auditLogs=auditDao.getAuditLogsForId(TableName.TAG_HISTORY,UUID.fromString(tagHistoryString),level,internalCallContext);
     verifyAuditLogsForTag(auditLogs,level);
   }
 }

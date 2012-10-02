@@ -1,10 +1,10 @@
 {
   final Integer number=Integer.MAX_VALUE;
   final Invoice invoice=Mockito.mock(Invoice.class);
-  Mockito.when(invoiceSqlDao.getByRecordId(number.longValue())).thenReturn(invoice);
-  Assert.assertEquals(dao.getByNumber(number),invoice);
+  Mockito.when(invoiceSqlDao.getByRecordId(number.longValue(),internalCallContext)).thenReturn(invoice);
+  Assert.assertEquals(dao.getByNumber(number,internalCallContext),invoice);
   try {
-    dao.getByNumber(Integer.MIN_VALUE);
+    dao.getByNumber(Integer.MIN_VALUE,internalCallContext);
     Assert.fail();
   }
  catch (  InvoiceApiException e) {

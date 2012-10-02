@@ -2,9 +2,9 @@
   try {
     final Subscription subscription=createSubscription("Shotgun",BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    subscription.cancel(clock.getUTCNow(),context);
+    subscription.cancel(clock.getUTCNow(),callContext);
     try {
-      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),context);
+      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);
     }
  catch (    EntitlementUserApiException e) {
       assertEquals(e.getCode(),ErrorCode.ENT_CHANGE_NON_ACTIVE.getCode());

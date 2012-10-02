@@ -9,7 +9,7 @@ synchronized (expectedNotifications) {
       }
     }
   }
-,getNotificationConfig(false,100,1,10000));
+,getNotificationConfig(false,100,1,10000),new InternalCallContextFactory(dbi,clock));
   queue.startQueue();
   final UUID key=UUID.randomUUID();
   final DummyObject obj=new DummyObject("foo",key);
@@ -20,7 +20,7 @@ synchronized (expectedNotifications) {
   dao.inTransaction(new Transaction<Void,DummySqlTest>(){
     @Override public Void inTransaction(    final DummySqlTest transactional,    final TransactionStatus status) throws Exception {
       transactional.insertDummy(obj);
-      queue.recordFutureNotificationFromTransaction(transactional,readyTime,accountId,notificationKey);
+      queue.recordFutureNotificationFromTransaction(transactional,readyTime,accountId,notificationKey,internalCallContext);
       log.info("Posted key: " + notificationKey);
       return null;
     }

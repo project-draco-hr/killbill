@@ -1,4 +1,5 @@
 {
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(context);
   try {
     final TimedPhase[] curAndNextPhases=planAligner.getCurrentAndNextTimedPhaseOnCreate(subscription,plan,initialPhase,realPriceList,requestedDate,effectiveDate);
     final ApiEventBuilder createBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(plan.getName()).setEventPlanPhase(curAndNextPhases[0].getPhase().getName()).setEventPriceList(realPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(processedDate).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setUserToken(context.getUserToken()).setFromDisk(true);
@@ -11,12 +12,12 @@
       events.add(nextPhaseEvent);
     }
     if (reCreate) {
-      dao.recreateSubscription(subscription,events,context);
+      dao.recreateSubscription(subscription,events,internalCallContext);
     }
  else {
-      dao.createSubscription(subscription,events,context);
+      dao.createSubscription(subscription,events,internalCallContext);
     }
-    subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getFullCatalog());
+    subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),catalogService.getFullCatalog());
   }
  catch (  CatalogApiException e) {
     throw new EntitlementUserApiException(e);

@@ -2,16 +2,16 @@
   final UUID accountId=UUID.randomUUID();
   final LocalDate effectiveDate=new LocalDate(2011,3,1);
   final BigDecimal creditAmount=new BigDecimal("5.0");
-  invoiceDao.insertCredit(accountId,null,creditAmount,effectiveDate,Currency.USD,context);
-  final List<Invoice> invoices=invoiceDao.getAllInvoicesByAccount(accountId);
+  invoiceDao.insertCredit(accountId,null,creditAmount,effectiveDate,Currency.USD,internalCallContext);
+  final List<Invoice> invoices=invoiceDao.getAllInvoicesByAccount(accountId,internalCallContext);
   assertEquals(invoices.size(),1);
-  Invoice invoice=invoices.get(0);
+  final Invoice invoice=invoices.get(0);
   assertTrue(invoice.getBalance().compareTo(BigDecimal.ZERO) == 0);
-  List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
+  final List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
   assertEquals(invoiceItems.size(),2);
   boolean foundCredit=false;
   boolean foundCBA=false;
-  for (  InvoiceItem cur : invoiceItems) {
+  for (  final InvoiceItem cur : invoiceItems) {
     if (cur.getInvoiceItemType() == InvoiceItemType.CREDIT_ADJ) {
       foundCredit=true;
       assertTrue(cur.getAmount().compareTo(creditAmount.negate()) == 0);

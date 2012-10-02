@@ -1,13 +1,13 @@
 {
-  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any())).thenReturn(ImmutableList.<Invoice>of());
+  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any(),Mockito.<TenantContext>any())).thenReturn(ImmutableList.<Invoice>of());
   final UUID bundleId=UUID.randomUUID();
   final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
   Mockito.when(bundle.getId()).thenReturn(bundleId);
   final EntitlementUserApi entitlementApi=Mockito.mock(EntitlementUserApi.class);
   final Subscription subscription=Mockito.mock(Subscription.class);
-  Mockito.when(entitlementApi.getBaseSubscription(bundleId)).thenReturn(subscription);
+  Mockito.when(entitlementApi.getBaseSubscription(Mockito.eq(bundleId),Mockito.<TenantContext>any())).thenReturn(subscription);
   final BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,accountApi,clock);
-  final BillingStateBundle billingStateBundle=calc.calculateBillingState(bundle);
+  final BillingStateBundle billingStateBundle=calc.calculateBillingState(bundle,internalCallContext);
   Assert.assertNull(billingStateBundle.getBasePlanBillingPeriod());
   Assert.assertNull(billingStateBundle.getBasePlanPhaseType());
   Assert.assertNull(billingStateBundle.getBasePlanPriceList());

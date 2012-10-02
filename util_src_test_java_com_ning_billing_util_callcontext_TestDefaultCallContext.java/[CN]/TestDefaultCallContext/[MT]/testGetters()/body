@@ -1,10 +1,12 @@
 {
+  final UUID tenantId=UUID.randomUUID();
   final String userName=UUID.randomUUID().toString();
   final DateTime createdDate=clock.getUTCNow();
   final String reasonCode=UUID.randomUUID().toString();
   final String comment=UUID.randomUUID().toString();
   final UUID userToken=UUID.randomUUID();
-  final DefaultCallContext callContext=new DefaultCallContext(userName,createdDate,reasonCode,comment,userToken);
+  final DefaultCallContext callContext=new DefaultCallContext(tenantId,userName,createdDate,reasonCode,comment,userToken);
+  Assert.assertEquals(callContext.getTenantId(),tenantId);
   Assert.assertEquals(callContext.getCreatedDate(),createdDate);
   Assert.assertNull(callContext.getCallOrigin());
   Assert.assertEquals(callContext.getComment(),comment);

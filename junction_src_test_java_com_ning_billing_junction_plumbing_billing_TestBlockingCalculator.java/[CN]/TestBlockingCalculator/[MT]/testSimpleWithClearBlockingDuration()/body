@@ -12,8 +12,8 @@
   blockingEvents.add(new DefaultBlockingState(ovdId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,new LocalDate(2012,7,15).toDateTimeAtStartOfDay(DateTimeZone.UTC)));
   blockingEvents.add(new DefaultBlockingState(ovdId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,new LocalDate(2012,7,25).toDateTimeAtStartOfDay(DateTimeZone.UTC)));
   blockingEvents.add(new DefaultBlockingState(ovdId,CLEAR_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,new LocalDate(2012,7,25).toDateTimeAtStartOfDay(DateTimeZone.UTC)));
-  Mockito.when(blockingApi.getBlockingHistory(bundleId1)).thenReturn(blockingEvents);
-  odc.insertBlockingEvents(billingEvents);
+  Mockito.when(blockingApi.getBlockingHistory(bundleId1,callContext)).thenReturn(blockingEvents);
+  odc.insertBlockingEvents(billingEvents,callContext);
   assertEquals(billingEvents.size(),5);
   final List<BillingEvent> events=new ArrayList<BillingEvent>(billingEvents);
   assertEquals(events.get(0).getEffectiveDate(),new LocalDate(2012,5,1).toDateTimeAtStartOfDay(DateTimeZone.UTC));

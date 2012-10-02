@@ -9,13 +9,13 @@
     return false;
   }
   try {
-    final Account account=accountUserApi.getAccountById(refundsToBeFixed.iterator().next().getAccountId());
+    final InternalCallContext context=internalCallContextFactory.createInternalCallContext("RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,null);
+    final Account account=accountUserApi.getAccountById(refundsToBeFixed.iterator().next().getAccountId(),context.toCallContext());
     new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
       @Override public Void doOperation() throws PaymentApiException {
         try {
-          final CallContext context=factory.createCallContext("RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM);
           for (          final RefundModelDao cur : refundsToBeFixed) {
-            invoicePaymentApi.createRefund(cur.getPaymentId(),cur.getAmount(),cur.isAdjsuted(),ImmutableMap.<UUID,BigDecimal>of(),cur.getId(),context);
+            invoicePaymentApi.createRefund(cur.getPaymentId(),cur.getAmount(),cur.isAdjsuted(),ImmutableMap.<UUID,BigDecimal>of(),cur.getId(),context.toCallContext());
             paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
           }
         }

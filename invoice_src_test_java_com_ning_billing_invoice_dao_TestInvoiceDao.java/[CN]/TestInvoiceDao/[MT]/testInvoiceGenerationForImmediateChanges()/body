@@ -25,10 +25,10 @@
   final Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,targetDate,DateTimeZone.UTC,Currency.USD);
   assertEquals(invoice2.getBalance(),FIVE);
   invoiceList.add(invoice2);
-  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),true,context);
-  invoiceDao.create(invoice2,invoice2.getTargetDate().getDayOfMonth(),true,context);
-  final Invoice savedInvoice1=invoiceDao.getById(invoice1.getId());
+  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),true,internalCallContext);
+  invoiceDao.create(invoice2,invoice2.getTargetDate().getDayOfMonth(),true,internalCallContext);
+  final Invoice savedInvoice1=invoiceDao.getById(invoice1.getId(),internalCallContext);
   assertEquals(savedInvoice1.getBalance(),ZERO);
-  final Invoice savedInvoice2=invoiceDao.getById(invoice2.getId());
+  final Invoice savedInvoice2=invoiceDao.getById(invoice2.getId(),internalCallContext);
   assertEquals(savedInvoice2.getBalance(),FIFTEEN);
 }

@@ -1,0 +1,12 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
+    @Override public Void inTransaction(    final EntitlementEventSqlDao transactional,    final TransactionStatus status) throws Exception {
+      for (      final TransferCancelData cancel : transferCancelData) {
+        cancelSubscriptionFromTransaction(cancel.getSubscription(),cancel.getCancelEvent(),transactional,context,0);
+      }
+      migrateBundleDataFromTransaction(bundleTransferData,transactional,context);
+      return null;
+    }
+  }
+);
+}

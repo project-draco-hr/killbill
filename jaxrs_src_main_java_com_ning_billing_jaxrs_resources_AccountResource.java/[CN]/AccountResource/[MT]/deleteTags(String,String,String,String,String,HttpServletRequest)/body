@@ -1,0 +1,19 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Collection<UUID> tagDefinitionUUIDs=getTagDefinitionUUIDs(tagList);
+  boolean isTagAutoPayOff=false;
+  for (  final UUID cur : tagDefinitionUUIDs) {
+    if (cur.equals(ControlTagType.AUTO_PAY_OFF.getId())) {
+      isTagAutoPayOff=true;
+      break;
+    }
+  }
+  final UUID accountId=UUID.fromString(id);
+  if (isTagAutoPayOff) {
+    final Account account=accountApi.getAccountById(accountId,callContext);
+    if (account.getPaymentMethodId() == null) {
+      throw new TagApiException(ErrorCode.TAG_CANNOT_BE_REMOVED,ControlTagType.AUTO_PAY_OFF," the account does not have a default payment method");
+    }
+  }
+  return super.deleteTags(UUID.fromString(id),tagList,callContext);
+}

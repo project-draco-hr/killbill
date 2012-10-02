@@ -1,14 +1,14 @@
 {
   final Account a=createTestAccount(5);
-  accountDao.create(a,context);
+  accountDao.create(a,internalCallContext);
   final String key=a.getExternalKey();
-  Account r=accountDao.getAccountByKey(key);
+  Account r=accountDao.getAccountByKey(key,internalCallContext);
   assertNotNull(r);
   assertEquals(r.getExternalKey(),a.getExternalKey());
-  r=accountDao.getById(r.getId());
+  r=accountDao.getById(r.getId(),internalCallContext);
   assertNotNull(r);
   assertEquals(r.getExternalKey(),a.getExternalKey());
-  final List<Account> all=accountDao.get();
+  final List<Account> all=accountDao.get(internalCallContext);
   assertNotNull(all);
   assertTrue(all.size() >= 1);
 }

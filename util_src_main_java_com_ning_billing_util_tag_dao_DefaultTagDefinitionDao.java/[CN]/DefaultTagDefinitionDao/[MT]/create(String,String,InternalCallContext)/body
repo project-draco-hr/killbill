@@ -1,0 +1,40 @@
+{
+  if (isControlTagName(definitionName)) {
+    throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_CONFLICTS_WITH_CONTROL_TAG,definitionName);
+  }
+  try {
+    return tagDefinitionSqlDao.inTransaction(new Transaction<TagDefinition,TagDefinitionSqlDao>(){
+      @Override public TagDefinition inTransaction(      final TagDefinitionSqlDao tagDefinitionSqlDao,      final TransactionStatus status) throws Exception {
+        final TagDefinition existingDefinition=tagDefinitionSqlDao.getByName(definitionName,context);
+        if (existingDefinition != null) {
+          throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_ALREADY_EXISTS,definitionName);
+        }
+        final TagDefinition tagDefinition=new DefaultTagDefinition(definitionName,description,false);
+        tagDefinitionSqlDao.create(tagDefinition,context);
+        final TagDefinitionEvent tagDefinitionEvent;
+        if (tagDefinition.isControlTag()) {
+          tagDefinitionEvent=tagEventBuilder.newControlTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context.getUserToken());
+        }
+ else {
+          tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context.getUserToken());
+        }
+        try {
+          bus.postFromTransaction(tagDefinitionEvent,tagDefinitionSqlDao);
+        }
+ catch (        Bus.EventBusException e) {
+          log.warn("Failed to post tag definition creation event for tag " + tagDefinition.getId(),e);
+        }
+        return tagDefinition;
+      }
+    }
+);
+  }
+ catch (  TransactionFailedException exception) {
+    if (exception.getCause() instanceof TagDefinitionApiException) {
+      throw (TagDefinitionApiException)exception.getCause();
+    }
+ else {
+      throw exception;
+    }
+  }
+}

@@ -10,21 +10,21 @@
   final DateTime transferRequestedDate=clock.getUTCNow();
   testListener.pushExpectedEvent(NextEvent.TRANSFER);
   testListener.pushExpectedEvent(NextEvent.CANCEL);
-  transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getKey(),transferRequestedDate,false,false,context);
+  transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getKey(),transferRequestedDate,false,false,callContext);
   assertTrue(testListener.isCompleted(3000));
   final DateTime afterTransferDate=clock.getUTCNow();
-  final Subscription oldBaseSubscription=entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  final Subscription oldBaseSubscription=entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertNotNull(oldBaseSubscription.getEndDate());
   assertDateWithin(oldBaseSubscription.getEndDate(),beforeTransferDate,afterTransferDate);
   assertTrue(oldBaseSubscription.getEndDate().compareTo(transferRequestedDate) == 0);
-  SubscriptionBundle newBundle=entitlementApi.getBundleForAccountAndKey(newAccountId,bundle.getKey());
-  List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(newBundle.getId());
+  final SubscriptionBundle newBundle=entitlementApi.getBundleForAccountAndKey(newAccountId,bundle.getKey(),callContext);
+  final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(newBundle.getId(),callContext);
   assertEquals(subscriptions.size(),1);
   final Subscription newBaseSubscription=subscriptions.get(0);
   assertTrue(((SubscriptionData)newBaseSubscription).getAlignStartDate().compareTo(((SubscriptionData)oldBaseSubscription).getAlignStartDate()) == 0);
   assertEquals(newBaseSubscription.getAllTransitions().size(),2);
   assertTrue(newBaseSubscription.getAllTransitions().get(1).getEffectiveTransitionTime().compareTo(evergreenPhaseDate) == 0);
-  Plan newPlan=newBaseSubscription.getCurrentPlan();
+  final Plan newPlan=newBaseSubscription.getCurrentPlan();
   assertEquals(newPlan.getProduct().getName(),baseProduct);
   assertEquals(newBaseSubscription.getCurrentPhase().getPhaseType(),PhaseType.TRIAL);
 }

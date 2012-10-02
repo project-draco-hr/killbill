@@ -1,14 +1,14 @@
 {
-  TagDefinition defYo=tagDefinitionDao.create("yo","defintion yo",context);
-  TagDefinition resDefYo=tagDefinitionDao.getByName(defYo.getName());
+  final TagDefinition defYo=tagDefinitionDao.create("yo","defintion yo",internalCallContext);
+  final TagDefinition resDefYo=tagDefinitionDao.getByName(defYo.getName(),internalCallContext);
   assertEquals(defYo,resDefYo);
   try {
-    tagDefinitionDao.create(ControlTagType.AUTO_PAY_OFF.name(),ControlTagType.AUTO_INVOICING_OFF.name(),context);
+    tagDefinitionDao.create(ControlTagType.AUTO_PAY_OFF.name(),ControlTagType.AUTO_INVOICING_OFF.name(),internalCallContext);
     Assert.fail("Should not be able to create a control tag");
   }
  catch (  TagDefinitionApiException ignore) {
   }
-  TagDefinition resdef_AUTO_PAY_OFF=tagDefinitionDao.getByName(ControlTagType.AUTO_PAY_OFF.name());
+  final TagDefinition resdef_AUTO_PAY_OFF=tagDefinitionDao.getByName(ControlTagType.AUTO_PAY_OFF.name(),internalCallContext);
   assertEquals(resdef_AUTO_PAY_OFF.getId(),ControlTagType.AUTO_PAY_OFF.getId());
   assertEquals(resdef_AUTO_PAY_OFF.getName(),ControlTagType.AUTO_PAY_OFF.name());
   assertEquals(resdef_AUTO_PAY_OFF.getDescription(),ControlTagType.AUTO_PAY_OFF.getDescription());

@@ -8,7 +8,7 @@
   final SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
   it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
   clock.addDeltaFromReality(it.toDurationMillis());
-  final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId());
+  final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
   sortEventsOnBundle(bundleRepair);
   SubscriptionTimeline bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
   assertEquals(bpRepair.getExistingEvents().size(),2);
@@ -21,7 +21,7 @@
   final SubscriptionTimeline saoRepair=createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
   final BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
   boolean dryRun=true;
-  final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,callContext);
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),dryRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
   bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
@@ -33,17 +33,17 @@
   for (  final ExistingEvent e : expected) {
     validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
   }
-  SubscriptionData newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+  SubscriptionData newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
   assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newAoSubscription.getAllTransitions().size(),2);
   assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
-  SubscriptionData newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  SubscriptionData newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(newBaseSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newBaseSubscription.getAllTransitions().size(),2);
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   dryRun=false;
   testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
-  final BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  final BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,callContext);
   assertTrue(testListener.isCompleted(5000));
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),realRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
@@ -51,11 +51,11 @@
   for (  final ExistingEvent e : expected) {
     validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
   }
-  newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+  newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
   assertEquals(newAoSubscription.getState(),SubscriptionState.CANCELLED);
   assertEquals(newAoSubscription.getAllTransitions().size(),2);
   assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
-  newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(newBaseSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newBaseSubscription.getAllTransitions().size(),2);
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);

@@ -2,15 +2,15 @@
   final UUID accountId=UUID.randomUUID();
   final String accountKey=UUID.randomUUID().toString();
   final String name=UUID.randomUUID().toString().substring(0,20);
-  Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey).size(),0);
-  Assert.assertEquals(accountTagSqlDao.removeTag(accountId.toString(),name),0);
-  Assert.assertEquals(accountTagSqlDao.addTag(accountId.toString(),accountKey,name),1);
-  final List<BusinessAccountTag> tagsForAccount=accountTagSqlDao.getTagsForAccountByKey(accountKey);
+  Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey,internalCallContext).size(),0);
+  Assert.assertEquals(accountTagSqlDao.removeTag(accountId.toString(),name,internalCallContext),0);
+  Assert.assertEquals(accountTagSqlDao.addTag(accountId.toString(),accountKey,name,internalCallContext),1);
+  final List<BusinessAccountTag> tagsForAccount=accountTagSqlDao.getTagsForAccountByKey(accountKey,internalCallContext);
   Assert.assertEquals(tagsForAccount.size(),1);
   final BusinessAccountTag accountTag=tagsForAccount.get(0);
   Assert.assertEquals(accountTag.getAccountId(),accountId);
   Assert.assertEquals(accountTag.getAccountKey(),accountKey);
   Assert.assertEquals(accountTag.getName(),name);
-  Assert.assertEquals(accountTagSqlDao.removeTag(accountId.toString(),name),1);
-  Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey).size(),0);
+  Assert.assertEquals(accountTagSqlDao.removeTag(accountId.toString(),name,internalCallContext),1);
+  Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey,internalCallContext).size(),0);
 }

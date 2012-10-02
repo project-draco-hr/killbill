@@ -13,12 +13,12 @@
     if (phase == null) {
       throw new EntitlementError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",spec.getProductName(),spec.getBillingPeriod().toString(),realPriceList));
     }
-    final SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(bundleId);
+    final SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(bundleId,internalCallContextFactory.createInternalTenantContext(context));
     if (bundle == null) {
       throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_NO_BUNDLE,bundleId);
     }
     DateTime bundleStartDate=null;
-    final SubscriptionData baseSubscription=(SubscriptionData)dao.getBaseSubscription(subscriptionFactory,bundleId);
+    final SubscriptionData baseSubscription=(SubscriptionData)dao.getBaseSubscription(subscriptionFactory,bundleId,internalCallContextFactory.createInternalTenantContext(context));
 switch (plan.getProduct().getCategory()) {
 case BASE:
       if (baseSubscription != null) {

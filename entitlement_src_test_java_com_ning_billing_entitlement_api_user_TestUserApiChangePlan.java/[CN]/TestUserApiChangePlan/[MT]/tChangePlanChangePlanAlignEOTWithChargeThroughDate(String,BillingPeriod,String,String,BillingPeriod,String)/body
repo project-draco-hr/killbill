@@ -13,13 +13,13 @@
     assertTrue(testListener.isCompleted(5000));
     final Duration ctd=getDurationMonth(1);
     final DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
-    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate.toLocalDate(),context);
-    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
+    billingApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate.toLocalDate(),callContext);
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId(),callContext);
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
     currentTime=clock.getUTCNow();
-    subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow(),context);
+    subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow(),callContext);
     checkChangePlan(subscription,fromProd,ProductCategory.BASE,fromTerm,PhaseType.EVERGREEN);
     testListener.setNonExpectedMode();
     testListener.pushExpectedEvent(NextEvent.CHANGE);

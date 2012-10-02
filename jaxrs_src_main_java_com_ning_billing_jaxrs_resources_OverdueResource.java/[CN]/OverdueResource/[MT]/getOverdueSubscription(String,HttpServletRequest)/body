@@ -1,0 +1,6 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Subscription subscription=entitlementApi.getSubscriptionFromId(UUID.fromString(subscriptionId),tenantContext);
+  final OverdueState<Subscription> overdueState=overdueApi.getOverdueStateFor(subscription,tenantContext);
+  return Response.status(Status.OK).entity(new OverdueStateJson(overdueState)).build();
+}

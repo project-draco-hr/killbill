@@ -1,0 +1,11 @@
+{
+  final DefaultTenantDao tenantDao=new DefaultTenantDao(getMysqlTestingHelper().getDBI(),Mockito.mock(Bus.class));
+  final DefaultTenant tenant=new DefaultTenant(UUID.randomUUID(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString());
+  tenantDao.create(tenant,internalCallContext);
+  Assert.assertEquals(tenantDao.getTenantByApiKey(tenant.getApiKey()).getId(),tenant.getId());
+  final AuthenticationInfo authenticationInfo=tenantDao.getAuthenticationInfoForTenant(tenant.getId());
+  final AuthenticationToken goodToken=new UsernamePasswordToken(tenant.getApiKey(),tenant.getApiSecret());
+  Assert.assertTrue(KillbillCredentialsMatcher.getCredentialsMatcher().doCredentialsMatch(goodToken,authenticationInfo));
+  final AuthenticationToken badToken=new UsernamePasswordToken(tenant.getApiKey(),tenant.getApiSecret() + "T");
+  Assert.assertFalse(KillbillCredentialsMatcher.getCredentialsMatcher().doCredentialsMatch(badToken,authenticationInfo));
+}

@@ -5,8 +5,8 @@
   final List<CustomField> customFields=new ArrayList<CustomField>();
   customFields.add(new StringCustomField(fieldName,fieldValue));
   final CustomFieldDao customFieldDao=new AuditedCustomFieldDao(dbi);
-  customFieldDao.saveEntities(accountId,ObjectType.ACCOUNT,customFields,context);
-  final Map<String,CustomField> customFieldMap=customFieldDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  customFieldDao.saveEntities(accountId,ObjectType.ACCOUNT,customFields,internalCallContext);
+  final Map<String,CustomField> customFieldMap=customFieldDao.loadEntities(accountId,ObjectType.ACCOUNT,internalCallContext);
   assertEquals(customFieldMap.size(),1);
   final CustomField customField=customFieldMap.get(fieldName);
   assertEquals(customField.getName(),fieldName);

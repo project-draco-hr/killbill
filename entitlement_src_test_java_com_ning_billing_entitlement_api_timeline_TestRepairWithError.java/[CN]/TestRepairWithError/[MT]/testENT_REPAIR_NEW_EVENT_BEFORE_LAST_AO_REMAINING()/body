@@ -6,7 +6,7 @@
       final SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
       it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
       clock.addDeltaFromReality(it.toDurationMillis());
-      BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId());
+      BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
       sortEventsOnBundle(bundleRepair);
       final SubscriptionTimeline bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
       assertEquals(bpRepair.getExistingEvents().size(),2);
@@ -18,7 +18,7 @@
       final SubscriptionTimeline saoRepair=createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
       bundleRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
       final boolean dryRun=true;
-      repairApi.repairBundle(bundleRepair,dryRun,context);
+      repairApi.repairBundle(bundleRepair,dryRun,callContext);
     }
   }
 ,ErrorCode.ENT_REPAIR_NEW_EVENT_BEFORE_LAST_AO_REMAINING);

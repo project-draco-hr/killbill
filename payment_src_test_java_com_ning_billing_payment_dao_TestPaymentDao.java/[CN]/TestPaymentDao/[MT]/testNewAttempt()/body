@@ -7,8 +7,8 @@
   final DateTime effectiveDate=clock.getUTCNow();
   final PaymentModelDao payment=new PaymentModelDao(accountId,invoiceId,paymentMethodId,amount,currency,effectiveDate);
   final PaymentAttemptModelDao firstAttempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),clock.getUTCNow(),amount);
-  PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,firstAttempt,context);
-  final PaymentModelDao lastPayment=paymentDao.getLastPaymentForPaymentMethod(accountId,paymentMethodId);
+  PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,firstAttempt,internalCallContext);
+  final PaymentModelDao lastPayment=paymentDao.getLastPaymentForPaymentMethod(accountId,paymentMethodId,internalCallContext);
   assertNotNull(lastPayment);
   assertEquals(lastPayment.getId(),payment.getId());
   assertEquals(lastPayment.getAccountId(),accountId);
@@ -20,8 +20,8 @@
   assertEquals(lastPayment.getPaymentStatus(),PaymentStatus.UNKNOWN);
   final BigDecimal newAmount=new BigDecimal(15.23).setScale(2,RoundingMode.HALF_EVEN);
   final PaymentAttemptModelDao secondAttempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),clock.getUTCNow(),newAmount);
-  paymentDao.insertNewAttemptForPayment(payment.getId(),secondAttempt,context);
-  final List<PaymentModelDao> payments=paymentDao.getPaymentsForInvoice(invoiceId);
+  paymentDao.insertNewAttemptForPayment(payment.getId(),secondAttempt,internalCallContext);
+  final List<PaymentModelDao> payments=paymentDao.getPaymentsForInvoice(invoiceId,internalCallContext);
   assertEquals(payments.size(),1);
   savedPayment=payments.get(0);
   assertEquals(savedPayment.getId(),payment.getId());
@@ -32,7 +32,7 @@
   assertEquals(savedPayment.getCurrency(),currency);
   assertEquals(savedPayment.getEffectiveDate().compareTo(effectiveDate),0);
   assertEquals(savedPayment.getPaymentStatus(),PaymentStatus.UNKNOWN);
-  final List<PaymentAttemptModelDao> attempts=paymentDao.getAttemptsForPayment(payment.getId());
+  final List<PaymentAttemptModelDao> attempts=paymentDao.getAttemptsForPayment(payment.getId(),internalCallContext);
   assertEquals(attempts.size(),2);
   final PaymentAttemptModelDao savedAttempt1=attempts.get(0);
   assertEquals(savedAttempt1.getPaymentId(),payment.getId());

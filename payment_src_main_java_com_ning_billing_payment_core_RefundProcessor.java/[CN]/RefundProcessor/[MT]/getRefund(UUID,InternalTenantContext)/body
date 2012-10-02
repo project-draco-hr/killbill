@@ -1,0 +1,14 @@
+{
+  RefundModelDao result=paymentDao.getRefund(refundId,context);
+  if (result == null) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_REFUND,refundId);
+  }
+  final List<RefundModelDao> filteredInput=filterUncompletedPluginRefund(Collections.singletonList(result));
+  if (filteredInput.size() == 0) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_REFUND,refundId);
+  }
+  if (completePluginCompletedRefund(filteredInput)) {
+    result=paymentDao.getRefund(refundId,context);
+  }
+  return new DefaultRefund(result.getId(),result.getPaymentId(),result.getAmount(),result.getCurrency(),result.isAdjsuted(),result.getCreatedDate());
+}

@@ -1,7 +1,7 @@
 {
   final Account account=new DefaultAccount(accountId,accountData);
   try {
-    accountDao.update(account,context);
+    accountDao.update(account,internalCallContextFactory.createInternalCallContext(account.getId(),context));
   }
  catch (  EntityPersistenceException e) {
     throw new AccountApiException(e,e.getCode(),e.getMessage());

@@ -9,7 +9,7 @@
   final SubscriptionData aoSubscription2=createSubscription("Laser-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
   it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
   clock.addDeltaFromReality(it.toDurationMillis());
-  BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId());
+  BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
   sortEventsOnBundle(bundleRepair);
   SubscriptionTimeline bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
   assertEquals(bpRepair.getExistingEvents().size(),2);
@@ -25,7 +25,7 @@
   bpRepair=createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
   bundleRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(bpRepair));
   boolean dryRun=true;
-  final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bundleRepair,dryRun,context);
+  final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bundleRepair,dryRun,callContext);
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),dryRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
   aoRepair2=getSubscriptionRepair(aoSubscription2.getId(),dryRunBundleRepair);
@@ -54,21 +54,21 @@
   for (  final ExistingEvent e : expectedBP) {
     validateExistingEventForAssertion(e,bpRepair.getExistingEvents().get(index++));
   }
-  SubscriptionData newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+  SubscriptionData newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
   assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newAoSubscription.getAllTransitions().size(),2);
   assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
-  SubscriptionData newAoSubscription2=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription2.getId());
+  SubscriptionData newAoSubscription2=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription2.getId(),callContext);
   assertEquals(newAoSubscription2.getState(),SubscriptionState.ACTIVE);
   assertEquals(newAoSubscription2.getAllTransitions().size(),2);
   assertEquals(newAoSubscription2.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
-  SubscriptionData newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  SubscriptionData newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(newBaseSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newBaseSubscription.getAllTransitions().size(),2);
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   dryRun=false;
   testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
-  final BundleTimeline realRunBundleRepair=repairApi.repairBundle(bundleRepair,dryRun,context);
+  final BundleTimeline realRunBundleRepair=repairApi.repairBundle(bundleRepair,dryRun,callContext);
   assertTrue(testListener.isCompleted(5000));
   aoRepair=getSubscriptionRepair(aoSubscription.getId(),realRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
@@ -86,15 +86,15 @@
   for (  final ExistingEvent e : expectedBP) {
     validateExistingEventForAssertion(e,bpRepair.getExistingEvents().get(index++));
   }
-  newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+  newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
   assertEquals(newAoSubscription.getState(),SubscriptionState.CANCELLED);
   assertEquals(newAoSubscription.getAllTransitions().size(),2);
   assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
-  newAoSubscription2=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription2.getId());
+  newAoSubscription2=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription2.getId(),callContext);
   assertEquals(newAoSubscription2.getState(),SubscriptionState.ACTIVE);
   assertEquals(newAoSubscription2.getAllTransitions().size(),2);
   assertEquals(newAoSubscription2.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
-  newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(newBaseSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newBaseSubscription.getAllTransitions().size(),3);
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);

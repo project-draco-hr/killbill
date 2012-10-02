@@ -1,11 +1,11 @@
 {
   final Account account=createTestAccount(1);
-  accountDao.create(account,context);
+  accountDao.create(account,internalCallContext);
   final UUID newPaymentMethodId=UUID.randomUUID();
-  accountDao.updatePaymentMethod(account.getId(),newPaymentMethodId,context);
-  final Account newAccount=accountDao.getById(account.getId());
+  accountDao.updatePaymentMethod(account.getId(),newPaymentMethodId,internalCallContext);
+  final Account newAccount=accountDao.getById(account.getId(),internalCallContext);
   assertEquals(newAccount.getPaymentMethodId(),newPaymentMethodId);
-  accountDao.updatePaymentMethod(account.getId(),null,context);
-  final Account newAccountWithPMNull=accountDao.getById(account.getId());
+  accountDao.updatePaymentMethod(account.getId(),null,internalCallContext);
+  final Account newAccountWithPMNull=accountDao.getById(account.getId(),internalCallContext);
   assertNull(newAccountWithPMNull.getPaymentMethodId());
 }

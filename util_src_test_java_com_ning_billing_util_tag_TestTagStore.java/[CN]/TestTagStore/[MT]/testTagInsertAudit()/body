@@ -3,8 +3,8 @@
   final TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
   final Tag tag=new DescriptiveTag(testTag.getId());
   tagStore.add(tag);
-  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
-  final Map<String,Tag> savedTags=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),internalCallContext);
+  final Map<String,Tag> savedTags=tagDao.loadEntities(accountId,ObjectType.ACCOUNT,internalCallContext);
   assertEquals(savedTags.size(),1);
   final Tag savedTag=savedTags.get(tag.getId().toString());
   assertEquals(savedTag.getTagDefinitionId(),tag.getTagDefinitionId());
@@ -18,6 +18,6 @@
   assertEquals(result.get(0).get("change_type"),"INSERT");
   assertNotNull(result.get(0).get("change_date"));
   final DateTime changeDate=new DateTime(result.get(0).get("change_date"));
-  assertTrue(Seconds.secondsBetween(changeDate,context.getCreatedDate()).getSeconds() < 2);
-  assertEquals(result.get(0).get("changed_by"),context.getUserName());
+  assertTrue(Seconds.secondsBetween(changeDate,internalCallContext.getCreatedDate()).getSeconds() < 2);
+  assertEquals(result.get(0).get("changed_by"),internalCallContext.getUserName());
 }

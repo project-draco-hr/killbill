@@ -1,0 +1,25 @@
+{
+  rolledUpUsageSqlDao.inTransaction(new Transaction<Void,RolledUpUsageSqlDao>(){
+    @Override public Void inTransaction(    final RolledUpUsageSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final TimelineSqlDao timelineSqlDao=transactional.become(TimelineSqlDao.class);
+      Integer sourceId=timelineSqlDao.getSourceId(source,context);
+      if (sourceId == null) {
+        timelineSqlDao.addSource(source,context);
+        sourceId=timelineSqlDao.getSourceId(source,context);
+      }
+      Integer categoryId=timelineSqlDao.getEventCategoryId(eventType,context);
+      if (categoryId == null) {
+        timelineSqlDao.addEventCategory(eventType,context);
+        categoryId=timelineSqlDao.getEventCategoryId(eventType,context);
+      }
+      Integer metricId=timelineSqlDao.getMetricId(categoryId,metricName,context);
+      if (metricId == null) {
+        timelineSqlDao.addMetric(categoryId,metricName,context);
+        metricId=timelineSqlDao.getMetricId(categoryId,metricName,context);
+      }
+      transactional.record(sourceId,metricId,startDate.toDate(),endDate.toDate(),value,context);
+      return null;
+    }
+  }
+);
+}

@@ -4,14 +4,6 @@
   this.clock=new ClockMock();
   listener=new TestKillbillGuiceListener(helper,clock);
   server=new HttpServer();
-  final Iterable<EventListener> eventListeners=new Iterable<EventListener>(){
-    @Override public Iterator<EventListener> iterator(){
-      final ArrayList<EventListener> array=new ArrayList<EventListener>();
-      array.add(listener);
-      return array.iterator();
-    }
-  }
-;
-  server.configure(config,eventListeners,new HashMap<FilterHolder,String>());
+  server.configure(config,getListeners(),getFilters());
   server.start();
 }

@@ -1,0 +1,14 @@
+{
+  final PaymentInfoPlugin paymentInfoPlugin=getPaymentInfo(paymentId,context);
+  if (paymentInfoPlugin == null) {
+    throw new PaymentPluginApiException("",String.format("No payment found for paymentId %s (plugin %s)",paymentId,getName()));
+  }
+  BigDecimal maxAmountRefundable=paymentInfoPlugin.getAmount();
+  for (  final BigDecimal refund : refunds.get(paymentId)) {
+    maxAmountRefundable=maxAmountRefundable.add(refund.negate());
+  }
+  if (maxAmountRefundable.compareTo(refundAmount) < 0) {
+    throw new PaymentPluginApiException("",String.format("Refund amount of %s for paymentId %s is bigger than the payment amount %s (plugin %s)",refundAmount,paymentId,paymentInfoPlugin.getAmount(),getName()));
+  }
+  refunds.put(paymentId,refundAmount);
+}

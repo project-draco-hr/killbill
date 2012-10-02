@@ -6,7 +6,7 @@
   account=Mockito.mock(Account.class);
   Mockito.when(account.getId()).thenReturn(accountId);
   Mockito.when(account.getTimeZone()).thenReturn(DateTimeZone.UTC);
-  Mockito.when(accountUserApi.getAccountById(account.getId())).thenReturn(account);
+  Mockito.when(accountUserApi.getAccountById(Mockito.eq(account.getId()),Mockito.<TenantContext>any())).thenReturn(account);
   Mockito.when(bundle.getAccountId()).thenReturn(accountId);
   final Invoice invoice=Mockito.mock(Invoice.class);
   Mockito.when(invoice.getInvoiceDate()).thenReturn(dateOfLastUnPaidInvoice);
@@ -19,11 +19,11 @@
   Mockito.when(invoice.getInvoiceItems()).thenReturn(items);
   final List<Invoice> invoices=new ArrayList<Invoice>();
   invoices.add(invoice);
-  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any())).thenReturn(invoices);
+  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any(),Mockito.<TenantContext>any())).thenReturn(invoices);
   final Subscription base=Mockito.mock(Subscription.class);
   Mockito.when(base.getCurrentPlan()).thenReturn(MockPlan.createBicycleNoTrialEvergreen1USD());
   Mockito.when(base.getCurrentPriceList()).thenReturn(new MockPriceList());
   Mockito.when(base.getCurrentPhase()).thenReturn(MockPlan.createBicycleNoTrialEvergreen1USD().getFinalPhase());
-  Mockito.when(entitlementApi.getBaseSubscription(Mockito.<UUID>any())).thenReturn(base);
+  Mockito.when(entitlementApi.getBaseSubscription(Mockito.<UUID>any(),Mockito.<TenantContext>any())).thenReturn(base);
   return bundle;
 }

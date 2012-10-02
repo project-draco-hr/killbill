@@ -1,0 +1,15 @@
+{
+  accountEmailSqlDao.inTransaction(new Transaction<Object,AccountEmailSqlDao>(){
+    @Override public Object inTransaction(    final AccountEmailSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final List<AccountEmail> currentEmails=accountEmailSqlDao.load(accountId.toString(),ObjectType.ACCOUNT_EMAIL,context);
+      final Map<String,AccountEmail> newEmails=new HashMap<String,AccountEmail>();
+      for (      final AccountEmail currentEmail : currentEmails) {
+        newEmails.put(currentEmail.getEmail(),currentEmail);
+      }
+      newEmails.put(email.getEmail(),new DefaultAccountEmail(email.getAccountId(),email.getEmail()));
+      saveEntitiesFromTransaction(getSqlDao(context),accountId,ObjectType.ACCOUNT_EMAIL,ImmutableList.<AccountEmail>copyOf(newEmails.values()),context);
+      return null;
+    }
+  }
+);
+}

@@ -1,0 +1,17 @@
+{
+  final CategoryIdAndMetric categoryIdAndMetric=new CategoryIdAndMetric(eventCategoryId,metric);
+  Integer metricId=metricsCache.inverse().get(categoryIdAndMetric);
+  if (metricId == null) {
+    metricId=delegate.getOrAddMetric(sourceId,eventCategoryId,metric,context);
+    metricsCache.put(metricId,categoryIdAndMetric);
+  }
+  if (sourceId != null) {
+    Set<Integer> metricIds=sourceIdsMetricIdsCache.get(sourceId);
+    if (metricIds == null) {
+      metricIds=new HashSet<Integer>();
+      sourceIdsMetricIdsCache.put(sourceId,metricIds);
+    }
+    metricIds.add(metricId);
+  }
+  return metricId;
+}

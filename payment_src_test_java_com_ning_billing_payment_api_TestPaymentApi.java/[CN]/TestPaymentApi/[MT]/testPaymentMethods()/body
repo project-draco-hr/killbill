@@ -1,26 +1,26 @@
 {
-  List<PaymentMethod> methods=paymentApi.getPaymentMethods(account,false);
+  List<PaymentMethod> methods=paymentApi.getPaymentMethods(account,false,callContext);
   assertEquals(methods.size(),1);
   final PaymentMethod initDefaultMethod=methods.get(0);
   assertEquals(initDefaultMethod.getId(),account.getPaymentMethodId());
   final PaymentMethodPlugin newPaymenrMethod=new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),true,null);
-  final UUID newPaymentMethodId=paymentApi.addPaymentMethod(PaymentTestModuleWithMocks.PLUGIN_TEST_NAME,account,true,newPaymenrMethod,context);
+  final UUID newPaymentMethodId=paymentApi.addPaymentMethod(PaymentTestModuleWithMocks.PLUGIN_TEST_NAME,account,true,newPaymenrMethod,callContext);
   Mockito.when(account.getPaymentMethodId()).thenReturn(newPaymentMethodId);
-  methods=paymentApi.getPaymentMethods(account,false);
+  methods=paymentApi.getPaymentMethods(account,false,callContext);
   assertEquals(methods.size(),2);
   assertEquals(newPaymentMethodId,account.getPaymentMethodId());
   boolean failed=false;
   try {
-    paymentApi.deletedPaymentMethod(account,newPaymentMethodId,false,context);
+    paymentApi.deletedPaymentMethod(account,newPaymentMethodId,false,callContext);
   }
  catch (  PaymentApiException e) {
     failed=true;
   }
   assertTrue(failed);
-  paymentApi.deletedPaymentMethod(account,initDefaultMethod.getId(),true,context);
-  methods=paymentApi.getPaymentMethods(account,false);
+  paymentApi.deletedPaymentMethod(account,initDefaultMethod.getId(),true,callContext);
+  methods=paymentApi.getPaymentMethods(account,false,callContext);
   assertEquals(methods.size(),1);
-  paymentApi.deletedPaymentMethod(account,newPaymentMethodId,true,context);
-  methods=paymentApi.getPaymentMethods(account,false);
+  paymentApi.deletedPaymentMethod(account,newPaymentMethodId,true,callContext);
+  methods=paymentApi.getPaymentMethods(account,false,callContext);
   assertEquals(methods.size(),0);
 }

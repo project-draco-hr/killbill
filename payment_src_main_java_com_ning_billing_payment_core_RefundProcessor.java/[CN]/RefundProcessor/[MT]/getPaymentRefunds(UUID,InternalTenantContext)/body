@@ -1,0 +1,8 @@
+{
+  List<RefundModelDao> result=paymentDao.getRefundsForPayment(paymentId,context);
+  if (completePluginCompletedRefund(result)) {
+    result=paymentDao.getRefundsForPayment(paymentId,context);
+  }
+  final List<RefundModelDao> filteredInput=filterUncompletedPluginRefund(result);
+  return toRefunds(filteredInput);
+}

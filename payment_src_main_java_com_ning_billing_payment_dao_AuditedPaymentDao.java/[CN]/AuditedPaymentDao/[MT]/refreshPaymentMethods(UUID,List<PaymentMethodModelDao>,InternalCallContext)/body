@@ -1,0 +1,33 @@
+{
+  return paymentMethodSqlDao.inTransaction(new Transaction<List<PaymentMethodModelDao>,PaymentMethodSqlDao>(){
+    @Override public List<PaymentMethodModelDao> inTransaction(    final PaymentMethodSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final List<PaymentMethodModelDao> existingPaymentMethods=getPaymentMethodsInTransaction(transactional,accountId,context);
+      final Set<String> externalPaymentIdProcessed=new HashSet<String>();
+      for (      final PaymentMethodModelDao finalPaymentMethod : paymentMethods) {
+        boolean isExistingPaymentMethod=false;
+        for (        final PaymentMethodModelDao existingPaymentMethod : existingPaymentMethods) {
+          if (existingPaymentMethod.equals(finalPaymentMethod)) {
+            isExistingPaymentMethod=true;
+            break;
+          }
+ else           if (existingPaymentMethod.equalsButActive(finalPaymentMethod)) {
+            undeletedPaymentMethodInTransaction(transactional,existingPaymentMethod.getId(),context);
+            isExistingPaymentMethod=true;
+            break;
+          }
+        }
+        if (!isExistingPaymentMethod) {
+          insertPaymentMethodInTransaction(transactional,finalPaymentMethod,context);
+        }
+        externalPaymentIdProcessed.add(finalPaymentMethod.getExternalId());
+      }
+      for (      final PaymentMethodModelDao existingPaymentMethod : existingPaymentMethods) {
+        if (!externalPaymentIdProcessed.contains(existingPaymentMethod.getExternalId())) {
+          deletedPaymentMethodInTransaction(transactional,existingPaymentMethod.getId(),context);
+        }
+      }
+      return getPaymentMethodsInTransaction(transactional,accountId,context);
+    }
+  }
+);
+}

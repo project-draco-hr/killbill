@@ -1,9 +1,9 @@
 {
   for (  final SubscriptionBundle bundle : bundles) {
-    final List<Subscription> subscriptions=entitlementUserApi.getSubscriptionsForBundle(bundle.getId());
-    final Map<String,Tag> bundleTags=tagApi.getTags(bundle.getId(),ObjectType.BUNDLE);
+    final List<Subscription> subscriptions=entitlementUserApi.getSubscriptionsForBundle(bundle.getId(),context);
+    final Map<String,Tag> bundleTags=tagApi.getTags(bundle.getId(),ObjectType.BUNDLE,context);
     boolean found_AUTO_INVOICING_OFF=false;
-    for (    Tag cur : bundleTags.values()) {
+    for (    final Tag cur : bundleTags.values()) {
       if (ControlTagType.AUTO_INVOICING_OFF.getId().equals(cur.getTagDefinitionId())) {
         found_AUTO_INVOICING_OFF=true;
         break;

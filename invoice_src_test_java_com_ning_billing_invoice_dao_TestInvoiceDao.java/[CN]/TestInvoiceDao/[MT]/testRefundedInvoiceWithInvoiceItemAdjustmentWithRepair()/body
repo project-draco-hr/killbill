@@ -11,15 +11,15 @@
   final UUID invoiceId=invoice.getId();
   final InvoiceItem invoiceItem=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test-plan","test-phase-rec",recuringStartDate,recuringEndDate,new BigDecimal("239.00"),new BigDecimal("239.00"),Currency.USD);
   invoice.addInvoiceItem(invoiceItem);
-  invoiceDao.create(invoice,invoice.getTargetDate().getDayOfMonth(),true,context);
+  invoiceDao.create(invoice,invoice.getTargetDate().getDayOfMonth(),true,internalCallContext);
   ((ClockMock)clock).addDays(1);
   final BigDecimal paymentAmount=new BigDecimal("239.00");
   final UUID paymentId=UUID.randomUUID();
-  invoiceDao.notifyOfPayment(new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoiceId,clock.getUTCNow(),paymentAmount,Currency.USD),context);
-  Map<UUID,BigDecimal> invoiceItemMap=new HashMap<UUID,BigDecimal>();
+  invoiceDao.notifyOfPayment(new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoiceId,clock.getUTCNow(),paymentAmount,Currency.USD),internalCallContext);
+  final Map<UUID,BigDecimal> invoiceItemMap=new HashMap<UUID,BigDecimal>();
   invoiceItemMap.put(invoiceItem.getId(),new BigDecimal("239.00"));
-  invoiceDao.createRefund(paymentId,paymentAmount,true,invoiceItemMap,UUID.randomUUID(),context);
-  final Invoice savedInvoice=invoiceDao.getById(invoiceId);
+  invoiceDao.createRefund(paymentId,paymentAmount,true,invoiceItemMap,UUID.randomUUID(),internalCallContext);
+  final Invoice savedInvoice=invoiceDao.getById(invoiceId,internalCallContext);
   assertNotNull(savedInvoice);
   assertEquals(savedInvoice.getInvoiceItems().size(),2);
   final List<Invoice> invoices=new ArrayList<Invoice>();
@@ -34,9 +34,9 @@
   Mockito.when(phase2.getName()).thenReturn("plan-phase2");
   final BillingEvent event1=createMockBillingEvent(null,subscription,recuringStartDate.toDateTimeAtStartOfDay(),plan,phase1,null,TEN,Currency.USD,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"new-event",1L,SubscriptionTransitionType.CREATE);
   events.add(event1);
-  Invoice newInvoice=generator.generateInvoice(UUID.randomUUID(),events,invoices,targetDate,DateTimeZone.UTC,Currency.USD);
-  invoiceDao.create(newInvoice,newInvoice.getTargetDate().getDayOfMonth(),true,context);
-  final Invoice firstInvoice=invoiceDao.getById(invoiceId);
+  final Invoice newInvoice=generator.generateInvoice(UUID.randomUUID(),events,invoices,targetDate,DateTimeZone.UTC,Currency.USD);
+  invoiceDao.create(newInvoice,newInvoice.getTargetDate().getDayOfMonth(),true,internalCallContext);
+  final Invoice firstInvoice=invoiceDao.getById(invoiceId,internalCallContext);
   assertNotNull(firstInvoice);
   assertEquals(firstInvoice.getInvoiceItems().size(),2);
 }

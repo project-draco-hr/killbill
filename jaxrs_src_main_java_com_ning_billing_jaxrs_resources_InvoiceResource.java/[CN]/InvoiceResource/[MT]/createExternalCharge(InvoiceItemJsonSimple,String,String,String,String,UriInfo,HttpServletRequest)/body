@@ -1,0 +1,21 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Account account=accountApi.getAccountById(UUID.fromString(externalChargeJson.getAccountId()),callContext);
+  final LocalDate requestedDate;
+  if (requestedDateTimeString == null) {
+    requestedDate=clock.getUTCToday();
+  }
+ else {
+    final DateTime requestedDateTime=DATE_TIME_FORMATTER.parseDateTime(requestedDateTimeString);
+    requestedDate=requestedDateTime.toDateTime(account.getTimeZone()).toLocalDate();
+  }
+  final Currency currency=Objects.firstNonNull(externalChargeJson.getCurrency(),account.getCurrency());
+  final InvoiceItem externalCharge;
+  if (externalChargeJson.getBundleId() != null) {
+    externalCharge=invoiceApi.insertExternalChargeForBundle(account.getId(),UUID.fromString(externalChargeJson.getBundleId()),externalChargeJson.getAmount(),externalChargeJson.getDescription(),requestedDate,currency,callContext);
+  }
+ else {
+    externalCharge=invoiceApi.insertExternalCharge(account.getId(),externalChargeJson.getAmount(),externalChargeJson.getDescription(),requestedDate,currency,callContext);
+  }
+  return uriBuilder.buildResponse(InvoiceResource.class,"getInvoice",externalCharge.getInvoiceId(),uriInfo.getBaseUri().toString());
+}

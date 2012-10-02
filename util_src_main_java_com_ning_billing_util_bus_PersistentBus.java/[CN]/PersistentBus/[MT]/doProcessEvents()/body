@@ -1,5 +1,6 @@
 {
-  final List<BusEventEntry> events=getNextBusEvent();
+  final InternalCallContext context=createCallContext(null);
+  final List<BusEventEntry> events=getNextBusEvent(context);
   if (events.size() == 0) {
     return 0;
   }
@@ -8,7 +9,7 @@
     final BusEvent evt=deserializeEvent(cur.getBusEventClass(),cur.getBusEventJson());
     result++;
     eventBusDelegate.post(evt);
-    dao.clearBusEvent(cur.getId(),hostname);
+    dao.clearBusEvent(cur.getId(),hostname,context);
   }
   return result;
 }

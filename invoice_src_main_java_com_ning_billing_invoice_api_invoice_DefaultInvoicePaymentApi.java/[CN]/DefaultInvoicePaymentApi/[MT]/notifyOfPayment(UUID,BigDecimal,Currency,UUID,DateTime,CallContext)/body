@@ -1,4 +1,6 @@
 {
   final InvoicePayment invoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoiceId,paymentDate,amount,currency);
-  dao.notifyOfPayment(invoicePayment,context);
+  final Invoice invoice=dao.getById(invoiceId,internalCallContextFactory.createInternalCallContext(context));
+  final UUID accountId=invoice.getAccountId();
+  dao.notifyOfPayment(invoicePayment,internalCallContextFactory.createInternalCallContext(accountId,context));
 }

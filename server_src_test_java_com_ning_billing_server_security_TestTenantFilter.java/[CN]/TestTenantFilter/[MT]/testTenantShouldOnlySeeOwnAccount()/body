@@ -1,0 +1,21 @@
+{
+  Assert.assertEquals(createAccountNoValidation().getStatusCode(),Status.UNAUTHORIZED.getStatusCode());
+  final String apiKeyTenant1="pierre";
+  final String apiSecretTenant1="pierreIsFr3nch";
+  createTenant(apiKeyTenant1,apiSecretTenant1);
+  Assert.assertEquals(createAccountNoValidation().getStatusCode(),Status.UNAUTHORIZED.getStatusCode());
+  loginTenant(apiKeyTenant1,apiSecretTenant1);
+  final AccountJson account1=createAccount();
+  Assert.assertEquals(getAccountByExternalKey(account1.getExternalKey()),account1);
+  logoutTenant();
+  final String apiKeyTenant2="stephane";
+  final String apiSecretTenant2="stephane1sAlsoFr3nch";
+  createTenant(apiKeyTenant2,apiSecretTenant2);
+  Assert.assertEquals(createAccountNoValidation().getStatusCode(),Status.UNAUTHORIZED.getStatusCode());
+  loginTenant(apiKeyTenant2,apiSecretTenant2);
+  final AccountJson account2=createAccount();
+  Assert.assertEquals(getAccountByExternalKey(account2.getExternalKey()),account2);
+  Assert.assertEquals(getAccountByExternalKeyNoValidation(account1.getExternalKey()).getStatusCode(),Status.NOT_FOUND.getStatusCode());
+  loginTenant(apiKeyTenant1,apiSecretTenant1);
+  Assert.assertEquals(getAccountByExternalKeyNoValidation(account2.getExternalKey()).getStatusCode(),Status.NOT_FOUND.getStatusCode());
+}

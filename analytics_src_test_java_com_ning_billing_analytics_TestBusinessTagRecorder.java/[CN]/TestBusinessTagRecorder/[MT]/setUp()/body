@@ -9,15 +9,16 @@
   final AccountEmailDao accountEmailDao=new AuditedAccountEmailDao(dbi);
   final DefaultClock clock=new DefaultClock();
   callContextFactory=new DefaultCallContextFactory(clock);
-  accountUserApi=new DefaultAccountUserApi(callContextFactory,accountDao,accountEmailDao);
+  final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(dbi,clock);
+  accountUserApi=new DefaultAccountUserApi(callContextFactory,internalCallContextFactory,accountDao,accountEmailDao);
   final CatalogService catalogService=new DefaultCatalogService(Mockito.mock(CatalogConfig.class),Mockito.mock(VersionedCatalogLoader.class));
   final AddonUtils addonUtils=new AddonUtils(catalogService);
-  final DefaultNotificationQueueService notificationQueueService=new DefaultNotificationQueueService(dbi,clock);
+  final DefaultNotificationQueueService notificationQueueService=new DefaultNotificationQueueService(dbi,clock,internalCallContextFactory);
   final EntitlementDao entitlementDao=new AuditedEntitlementDao(dbi,clock,addonUtils,notificationQueueService,eventBus,catalogService);
   final PlanAligner planAligner=new PlanAligner(catalogService);
-  final DefaultSubscriptionApiService apiService=new DefaultSubscriptionApiService(clock,entitlementDao,catalogService,planAligner);
+  final DefaultSubscriptionApiService apiService=new DefaultSubscriptionApiService(clock,entitlementDao,catalogService,planAligner,internalCallContextFactory);
   final DefaultSubscriptionFactory subscriptionFactory=new DefaultSubscriptionFactory(apiService,clock,catalogService);
-  entitlementUserApi=new DefaultEntitlementUserApi(clock,entitlementDao,catalogService,apiService,subscriptionFactory,addonUtils);
+  entitlementUserApi=new DefaultEntitlementUserApi(clock,entitlementDao,catalogService,apiService,subscriptionFactory,addonUtils,internalCallContextFactory);
   tagRecorder=new BusinessTagRecorder(accountTagSqlDao,invoicePaymentTagSqlDao,invoiceTagSqlDao,subscriptionTransitionTagSqlDao,accountUserApi,entitlementUserApi);
   eventBus.start();
 }

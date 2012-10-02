@@ -7,9 +7,9 @@
   final Tag aioTag=mock(Tag.class);
   when(aioTag.getTagDefinitionId()).thenReturn(ControlTagType.AUTO_INVOICING_OFF.getId());
   tags.put(ControlTagType.AUTO_INVOICING_OFF.name(),aioTag);
-  when(tagApi.getTags(account.getId(),ObjectType.ACCOUNT)).thenReturn(tags);
-  assertEquals(tagApi.getTags(account.getId(),ObjectType.ACCOUNT),tags);
-  final BillingEventSet events=api.getBillingEventsForAccountAndUpdateAccountBCD(account.getId());
+  when(tagApi.getTags(account.getId(),ObjectType.ACCOUNT,callContext)).thenReturn(tags);
+  assertEquals(tagApi.getTags(account.getId(),ObjectType.ACCOUNT,callContext),tags);
+  final BillingEventSet events=api.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),callContext);
   assertEquals(events.isAccountAutoInvoiceOff(),true);
   assertEquals(events.size(),0);
 }

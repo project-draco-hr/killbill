@@ -5,12 +5,12 @@
   final Boolean isActive=Boolean.TRUE;
   final String externalPaymentId=UUID.randomUUID().toString();
   final PaymentMethodModelDao method=new PaymentMethodModelDao(paymentMethodId,accountId,pluginName,isActive,externalPaymentId);
-  PaymentMethodModelDao savedMethod=paymentDao.insertPaymentMethod(method,context);
+  PaymentMethodModelDao savedMethod=paymentDao.insertPaymentMethod(method,internalCallContext);
   assertEquals(savedMethod.getId(),paymentMethodId);
   assertEquals(savedMethod.getAccountId(),accountId);
   assertEquals(savedMethod.getPluginName(),pluginName);
   assertEquals(savedMethod.isActive(),isActive);
-  final List<PaymentMethodModelDao> result=paymentDao.getPaymentMethods(accountId);
+  final List<PaymentMethodModelDao> result=paymentDao.getPaymentMethods(accountId,internalCallContext);
   assertEquals(result.size(),1);
   savedMethod=result.get(0);
   assertEquals(savedMethod.getId(),paymentMethodId);
@@ -18,7 +18,7 @@
   assertEquals(savedMethod.getPluginName(),pluginName);
   assertEquals(savedMethod.isActive(),isActive);
   assertEquals(savedMethod.getExternalId(),externalPaymentId);
-  paymentDao.deletedPaymentMethod(paymentMethodId);
-  final PaymentMethodModelDao deletedPaymentMethod=paymentDao.getPaymentMethod(paymentMethodId);
+  paymentDao.deletedPaymentMethod(paymentMethodId,internalCallContext);
+  final PaymentMethodModelDao deletedPaymentMethod=paymentDao.getPaymentMethod(paymentMethodId,internalCallContext);
   assertNull(deletedPaymentMethod);
 }

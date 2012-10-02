@@ -7,13 +7,13 @@
           return;
         }
         final EntitlementNotificationKey key=(EntitlementNotificationKey)inputKey;
-        final EntitlementEvent event=dao.getEventById(key.getEventId());
+        final EntitlementEvent event=dao.getEventById(key.getEventId(),internalCallContextFactory.createInternalTenantContext());
         if (event == null) {
           log.warn("Failed to extract event for notification key {}",inputKey);
           return;
         }
         final UUID userToken=(event.getType() == EventType.API_USER) ? ((ApiEvent)event).getUserToken() : null;
-        final CallContext context=factory.createCallContext("SubscriptionEventQueue",CallOrigin.INTERNAL,UserType.SYSTEM,userToken);
+        final CallContext context=factory.createCallContext(null,"SubscriptionEventQueue",CallOrigin.INTERNAL,UserType.SYSTEM,userToken);
         processEventReady(event,key.getSeqId(),context);
       }
     }

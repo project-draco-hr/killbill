@@ -5,7 +5,7 @@
     final BillingPeriod term=BillingPeriod.MONTHLY;
     final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
     testListener.pushExpectedEvent(NextEvent.CREATE);
-    final SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),context);
+    final SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),callContext);
     assertNotNull(subscription);
     assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
     assertEquals(subscription.getBundleId(),bundle.getId());
@@ -20,7 +20,7 @@
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
     assertTrue(testListener.isCompleted(5000));
-    final List<EntitlementEvent> events=dao.getPendingEventsForSubscription(subscription.getId());
+    final List<EntitlementEvent> events=dao.getPendingEventsForSubscription(subscription.getId(),internalTenantContext);
     assertNotNull(events);
     printEvents(events);
     assertTrue(events.size() == 1);

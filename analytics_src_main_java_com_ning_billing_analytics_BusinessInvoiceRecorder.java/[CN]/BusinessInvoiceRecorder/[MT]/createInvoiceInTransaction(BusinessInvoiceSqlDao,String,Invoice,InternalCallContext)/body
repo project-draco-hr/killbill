@@ -1,0 +1,11 @@
+{
+  final BusinessInvoice businessInvoice=new BusinessInvoice(accountKey,invoice);
+  final List<BusinessInvoiceItem> businessInvoiceItems=new ArrayList<BusinessInvoiceItem>();
+  for (  final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+    final BusinessInvoiceItem businessInvoiceItem=createBusinessInvoiceItem(invoiceItem,context);
+    if (businessInvoiceItem != null) {
+      businessInvoiceItems.add(businessInvoiceItem);
+    }
+  }
+  createInvoiceInTransaction(transactional,invoice.getAccountId(),businessInvoice,businessInvoiceItems,context);
+}

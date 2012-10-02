@@ -11,14 +11,14 @@
   final Clock clock=new ClockMock();
   final InvoiceUserApi invoiceApi=Mockito.mock(InvoiceUserApi.class);
   final EntitlementUserApi entitlementApi=Mockito.mock(EntitlementUserApi.class);
-  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any())).thenReturn(Collections2.filter(invoices,new Predicate<Invoice>(){
+  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any(),Mockito.<TenantContext>any())).thenReturn(Collections2.filter(invoices,new Predicate<Invoice>(){
     @Override public boolean apply(    @Nullable final Invoice invoice){
       return invoice != null && BigDecimal.ZERO.compareTo(invoice.getBalance()) < 0;
     }
   }
 ));
   final BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,accountApi,clock);
-  final SortedSet<Invoice> resultinvoices=calc.unpaidInvoicesForBundle(thisBundleId,new UUID(0L,0L),DateTimeZone.UTC);
+  final SortedSet<Invoice> resultinvoices=calc.unpaidInvoicesForBundle(thisBundleId,new UUID(0L,0L),DateTimeZone.UTC,internalCallContext);
   Assert.assertEquals(resultinvoices.size(),3);
   Assert.assertEquals(new BigDecimal("100.0").compareTo(resultinvoices.first().getBalance()),0);
   Assert.assertEquals(new BigDecimal("10000.0").compareTo(resultinvoices.last().getBalance()),0);

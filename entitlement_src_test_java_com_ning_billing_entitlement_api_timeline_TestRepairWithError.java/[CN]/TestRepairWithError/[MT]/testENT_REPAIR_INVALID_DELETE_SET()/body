@@ -5,20 +5,20 @@
       clock.addDeltaFromReality(it.toDurationMillis());
       testListener.pushExpectedEvent(NextEvent.CHANGE);
       final DateTime changeTime=clock.getUTCNow();
-      baseSubscription.changePlan("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,changeTime,context);
+      baseSubscription.changePlan("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,changeTime,callContext);
       assertTrue(testListener.isCompleted(5000));
       testListener.pushExpectedEvent(NextEvent.PHASE);
       it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(40));
       clock.addDeltaFromReality(it.toDurationMillis());
       assertTrue(testListener.isCompleted(5000));
-      final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId());
+      final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
       sortEventsOnBundle(bundleRepair);
       final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
       final NewEvent ne=createNewEvent(SubscriptionTransitionType.CHANGE,baseSubscription.getStartDate().plusDays(10),spec);
       final DeletedEvent de=createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId());
       final SubscriptionTimeline sRepair=createSubscriptionRepair(baseSubscription.getId(),Collections.singletonList(de),Collections.singletonList(ne));
       final BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
-      repairApi.repairBundle(bRepair,true,context);
+      repairApi.repairBundle(bRepair,true,callContext);
     }
   }
 ,ErrorCode.ENT_REPAIR_INVALID_DELETE_SET);

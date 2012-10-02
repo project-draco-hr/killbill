@@ -8,10 +8,10 @@
   final String planSetName="DEFAULT";
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(accountId,"testKey",context);
-  subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,BillingPeriod.MONTHLY,planSetName,PhaseType.TRIAL),null,context));
+  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(accountId,"testKey",callContext);
+  subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,BillingPeriod.MONTHLY,planSetName,PhaseType.TRIAL),null,callContext));
   assertTrue(busHandler.isCompleted(DELAY));
-  List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId);
+  List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId,callContext);
   assertNotNull(invoices);
   assertTrue(invoices.size() == 1);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
@@ -19,7 +19,7 @@
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
-  invoices=invoiceUserApi.getInvoicesByAccount(accountId);
+  invoices=invoiceUserApi.getInvoicesByAccount(accountId,callContext);
   assertNotNull(invoices);
   assertEquals(invoices.size(),2);
   for (int i=0; i < 5; i++) {
@@ -34,7 +34,7 @@
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
-  invoices=invoiceUserApi.getInvoicesByAccount(accountId);
+  invoices=invoiceUserApi.getInvoicesByAccount(accountId,callContext);
   assertNotNull(invoices);
   assertEquals(invoices.size(),8);
   for (int i=0; i <= 5; i++) {
@@ -44,7 +44,7 @@
     clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
     assertTrue(busHandler.isCompleted(DELAY));
   }
-  invoices=invoiceUserApi.getInvoicesByAccount(accountId);
+  invoices=invoiceUserApi.getInvoicesByAccount(accountId,callContext);
   assertNotNull(invoices);
   assertEquals(invoices.size(),14);
   assertListenerStatus();

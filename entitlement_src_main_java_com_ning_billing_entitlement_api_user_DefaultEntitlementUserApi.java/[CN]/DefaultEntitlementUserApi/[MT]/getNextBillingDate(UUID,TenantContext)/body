@@ -1,0 +1,14 @@
+{
+  final List<SubscriptionBundle> bundles=getBundlesForAccount(accountId,context);
+  DateTime result=null;
+  for (  final SubscriptionBundle bundle : bundles) {
+    final List<Subscription> subscriptions=getSubscriptionsForBundle(bundle.getId(),context);
+    for (    final Subscription subscription : subscriptions) {
+      final DateTime chargedThruDate=subscription.getChargedThroughDate();
+      if (result == null || (chargedThruDate != null && chargedThruDate.isBefore(result))) {
+        result=subscription.getChargedThroughDate();
+      }
+    }
+  }
+  return result;
+}

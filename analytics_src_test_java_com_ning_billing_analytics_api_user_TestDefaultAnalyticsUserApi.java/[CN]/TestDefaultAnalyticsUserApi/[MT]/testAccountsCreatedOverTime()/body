@@ -1,7 +1,7 @@
 {
   final BusinessAccount account=new BusinessAccount(UUID.randomUUID(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),BigDecimal.ONE,clock.getUTCToday(),BigDecimal.TEN,"ERROR_NOT_ENOUGH_FUNDS","CreditCard","Visa","FRANCE","USD");
-  accountSqlDao.createAccount(account);
-  final TimeSeriesData data=analyticsUserApi.getAccountsCreatedOverTime();
+  accountSqlDao.createAccount(account,internalCallContext);
+  final TimeSeriesData data=analyticsUserApi.getAccountsCreatedOverTime(tenantContext);
   Assert.assertEquals(data.getDates().size(),1);
   Assert.assertEquals(data.getDates().get(0),new LocalDate());
   Assert.assertEquals(data.getValues().size(),1);

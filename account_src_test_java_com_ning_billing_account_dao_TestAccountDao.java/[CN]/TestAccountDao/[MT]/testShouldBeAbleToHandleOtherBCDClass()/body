@@ -1,6 +1,6 @@
 {
   final Account account=createTestAccount();
-  accountDao.create(account,context);
+  accountDao.create(account,internalCallContext);
   final MutableAccountData otherAccount=account.toMutableAccountData();
   otherAccount.setAddress1(UUID.randomUUID().toString());
   otherAccount.setEmail(UUID.randomUUID().toString());
@@ -14,8 +14,8 @@
   }
 );
   final DefaultAccount newAccount=new DefaultAccount(account.getId(),otherAccount);
-  accountDao.update(newAccount,context);
-  final Account newFetchedAccount=accountDao.getById(account.getId());
+  accountDao.update(newAccount,internalCallContext);
+  final Account newFetchedAccount=accountDao.getById(account.getId(),internalCallContext);
   Assert.assertEquals(newFetchedAccount.getAddress1(),newAccount.getAddress1());
   Assert.assertEquals(newFetchedAccount.getEmail(),newAccount.getEmail());
   Assert.assertEquals(newFetchedAccount.getBillCycleDay(),account.getBillCycleDay());

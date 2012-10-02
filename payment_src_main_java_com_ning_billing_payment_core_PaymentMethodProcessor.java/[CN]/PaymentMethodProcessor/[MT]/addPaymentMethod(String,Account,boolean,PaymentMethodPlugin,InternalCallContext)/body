@@ -1,0 +1,26 @@
+{
+  return new WithAccountLock<UUID>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<UUID>(){
+    @Override public UUID doOperation() throws PaymentApiException {
+      PaymentMethod pm=null;
+      PaymentPluginApi pluginApi=null;
+      try {
+        pluginApi=pluginRegistry.getPlugin(pluginName);
+        pm=new DefaultPaymentMethod(account.getId(),pluginName,paymentMethodProps);
+        final String externalId=pluginApi.addPaymentMethod(account.getExternalKey(),paymentMethodProps,setDefault,context.toCallContext());
+        final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getAccountId(),pm.getPluginName(),pm.isActive(),externalId);
+        paymentDao.insertPaymentMethod(pmModel,context);
+        if (setDefault) {
+          accountUserApi.updatePaymentMethod(account.getId(),pm.getId(),context.toCallContext());
+        }
+      }
+ catch (      PaymentPluginApiException e) {
+        throw new PaymentApiException(ErrorCode.PAYMENT_ADD_PAYMENT_METHOD,account.getId(),e.getErrorMessage());
+      }
+catch (      AccountApiException e) {
+        throw new PaymentApiException(e);
+      }
+      return pm.getId();
+    }
+  }
+);
+}

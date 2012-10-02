@@ -1,0 +1,35 @@
+{
+  tagSqlDao.inTransaction(new Transaction<Void,TagSqlDao>(){
+    @Override public Void inTransaction(    final TagSqlDao transTagSqlDao,    final TransactionStatus status) throws Exception {
+      final String tagId=UUID.randomUUID().toString();
+      final TagDefinition tagDefinition=getTagDefinitionFromTransaction(tagDefinitionId,context);
+      tagSqlDao.addTagFromTransaction(tagId,tagDefinitionId.toString(),objectId.toString(),objectType,context);
+      final Tag tag=tagSqlDao.findTag(tagDefinitionId.toString(),objectId.toString(),objectType,context);
+      final List<Tag> tagList=Arrays.asList(tag);
+      final List<Mapper<UUID,Long>> recordIds=tagSqlDao.getRecordIds(objectId.toString(),objectType,context);
+      final Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds,objectType);
+      final List<EntityHistory<Tag>> entityHistories=convertToHistory(tagList,recordIdMap,ChangeType.INSERT);
+      final Long maxHistoryRecordId=tagSqlDao.getMaxHistoryRecordId(context);
+      tagSqlDao.addHistoryFromTransaction(objectId.toString(),objectType,entityHistories,context);
+      final List<Mapper<Long,Long>> historyRecordIds=tagSqlDao.getHistoryRecordIds(maxHistoryRecordId,context);
+      final Map<Long,Long> historyRecordIdMap=convertToAuditMap(historyRecordIds);
+      final List<EntityAudit> entityAudits=convertToAudits(entityHistories,historyRecordIdMap,context);
+      tagSqlDao.insertAuditFromTransaction(entityAudits,context);
+      final TagEvent tagEvent;
+      if (tagDefinition.isControlTag()) {
+        tagEvent=tagEventBuilder.newControlTagCreationEvent(tag.getId(),objectId,objectType,tagDefinition,context.getUserToken());
+      }
+ else {
+        tagEvent=tagEventBuilder.newUserTagCreationEvent(tag.getId(),objectId,objectType,tagDefinition,context.getUserToken());
+      }
+      try {
+        bus.postFromTransaction(tagEvent,AuditedTagDao.this.tagSqlDao);
+      }
+ catch (      Bus.EventBusException e) {
+        log.warn("Failed to post tag creation event for tag " + tag.getId().toString(),e);
+      }
+      return null;
+    }
+  }
+);
+}

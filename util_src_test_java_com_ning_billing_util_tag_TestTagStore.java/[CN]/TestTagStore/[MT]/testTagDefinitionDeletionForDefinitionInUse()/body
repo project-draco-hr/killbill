@@ -1,14 +1,14 @@
 {
   final String definitionName="TestTag12345";
-  tagDefinitionDao.create(definitionName,"Some test tag",context);
-  final TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName);
+  tagDefinitionDao.create(definitionName,"Some test tag",internalCallContext);
+  final TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName,internalCallContext);
   assertNotNull(tagDefinition);
   final UUID objectId=UUID.randomUUID();
   final TagStore tagStore=new DefaultTagStore(objectId,ObjectType.ACCOUNT);
   final Tag tag=new DescriptiveTag(tagDefinition.getId());
   tagStore.add(tag);
-  tagDao.saveEntities(objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
-  final Map<String,Tag> tagMap=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
+  tagDao.saveEntities(objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),internalCallContext);
+  final Map<String,Tag> tagMap=tagDao.loadEntities(objectId,ObjectType.ACCOUNT,internalCallContext);
   assertEquals(tagMap.size(),1);
-  tagDefinitionDao.deleteById(tagDefinition.getId(),context);
+  tagDefinitionDao.deleteById(tagDefinition.getId(),internalCallContext);
 }

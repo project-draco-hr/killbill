@@ -12,7 +12,7 @@ synchronized (this) {
     pendingChunksWritten.addAndGet(map.getChunkMap().size());
     chunks.addAll(map.getChunkMap().values());
   }
-  timelineDAO.bulkInsertTimelineChunks(chunks);
+  timelineDAO.bulkInsertTimelineChunks(chunks,createCallContext());
   for (  final PendingChunkMap map : chunkMapsToWrite) {
     pendingChunkMapsMarkedConsumed.incrementAndGet();
     map.getAccumulator().markPendingChunkMapConsumed(map.getPendingChunkMapId());

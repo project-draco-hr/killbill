@@ -1,8 +1,8 @@
 {
   try {
-    final Invoice invoice=createAndPersistInvoice(invoiceSqlDao,invoiceItemSqlDao,clock,THIRTY,CURRENCY,context);
-    final InvoicePayment payment=createAndPersistPayment(invoicePaymentApi,clock,invoice.getId(),THIRTY,CURRENCY,context);
-    invoicePaymentApi.createChargeback(payment.getId(),BigDecimal.ONE.negate(),context);
+    final Invoice invoice=createAndPersistInvoice(invoiceSqlDao,invoiceItemSqlDao,clock,THIRTY,CURRENCY,callContext,internalCallContextFactory);
+    final InvoicePayment payment=createAndPersistPayment(invoicePaymentApi,clock,invoice.getId(),THIRTY,CURRENCY,callContext);
+    invoicePaymentApi.createChargeback(payment.getId(),BigDecimal.ONE.negate(),callContext);
   }
  catch (  TransactionFailedException expected) {
     throw (InvoiceApiException)expected.getCause();

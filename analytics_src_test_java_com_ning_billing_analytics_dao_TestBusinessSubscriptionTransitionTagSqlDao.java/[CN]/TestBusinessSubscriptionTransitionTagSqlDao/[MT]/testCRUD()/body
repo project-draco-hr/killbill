@@ -3,15 +3,15 @@
   final UUID bundleId=UUID.randomUUID();
   final String externalKey=UUID.randomUUID().toString();
   final String name=UUID.randomUUID().toString().substring(0,20);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey).size(),0);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.removeTag(bundleId.toString(),name),0);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.addTag(accountKey,bundleId.toString(),externalKey,name),1);
-  final List<BusinessSubscriptionTransitionTag> tagsForBusinessSubscriptionTransition=subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey,internalCallContext).size(),0);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.removeTag(bundleId.toString(),name,internalCallContext),0);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.addTag(accountKey,bundleId.toString(),externalKey,name,internalCallContext),1);
+  final List<BusinessSubscriptionTransitionTag> tagsForBusinessSubscriptionTransition=subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey,internalCallContext);
   Assert.assertEquals(tagsForBusinessSubscriptionTransition.size(),1);
   final BusinessSubscriptionTransitionTag subscriptionTransitionTag=tagsForBusinessSubscriptionTransition.get(0);
   Assert.assertEquals(subscriptionTransitionTag.getBundleId(),bundleId);
   Assert.assertEquals(subscriptionTransitionTag.getExternalKey(),externalKey);
   Assert.assertEquals(subscriptionTransitionTag.getName(),name);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.removeTag(bundleId.toString(),name),1);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey).size(),0);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.removeTag(bundleId.toString(),name,internalCallContext),1);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey,internalCallContext).size(),0);
 }

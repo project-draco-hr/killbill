@@ -3,9 +3,9 @@
   final UUID paymentId1=UUID.randomUUID();
   final BigDecimal amount1=new BigDecimal(13);
   final Currency currency=Currency.USD;
-  RefundModelDao refund1=new RefundModelDao(accountId,paymentId1,amount1,currency,true);
-  paymentDao.insertRefund(refund1,context);
-  RefundModelDao refundCheck=paymentDao.getRefund(refund1.getId());
+  final RefundModelDao refund1=new RefundModelDao(accountId,paymentId1,amount1,currency,true);
+  paymentDao.insertRefund(refund1,internalCallContext);
+  final RefundModelDao refundCheck=paymentDao.getRefund(refund1.getId(),internalCallContext);
   assertNotNull(refundCheck);
   assertEquals(refundCheck.getAccountId(),accountId);
   assertEquals(refundCheck.getPaymentId(),paymentId1);
@@ -16,13 +16,13 @@
   final BigDecimal amount2=new BigDecimal(7.00);
   final UUID paymentId2=UUID.randomUUID();
   RefundModelDao refund2=new RefundModelDao(accountId,paymentId2,amount2,currency,true);
-  paymentDao.insertRefund(refund2,context);
-  paymentDao.updateRefundStatus(refund2.getId(),RefundStatus.COMPLETED,context);
-  List<RefundModelDao> refundChecks=paymentDao.getRefundsForPayment(paymentId1);
+  paymentDao.insertRefund(refund2,internalCallContext);
+  paymentDao.updateRefundStatus(refund2.getId(),RefundStatus.COMPLETED,internalCallContext);
+  List<RefundModelDao> refundChecks=paymentDao.getRefundsForPayment(paymentId1,internalCallContext);
   assertEquals(refundChecks.size(),1);
-  refundChecks=paymentDao.getRefundsForPayment(paymentId2);
+  refundChecks=paymentDao.getRefundsForPayment(paymentId2,internalCallContext);
   assertEquals(refundChecks.size(),1);
-  refundChecks=paymentDao.getRefundsForAccount(accountId);
+  refundChecks=paymentDao.getRefundsForAccount(accountId,internalCallContext);
   assertEquals(refundChecks.size(),2);
   for (  RefundModelDao cur : refundChecks) {
     if (cur.getPaymentId().equals(paymentId1)) {

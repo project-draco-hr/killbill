@@ -11,7 +11,8 @@
   if (nextPhaseEvent != null) {
     uncancelEvents.add(nextPhaseEvent);
   }
-  dao.uncancelSubscription(subscription,uncancelEvents,context);
-  subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId()),catalogService.getFullCatalog());
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(context);
+  dao.uncancelSubscription(subscription,uncancelEvents,internalCallContext);
+  subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),catalogService.getFullCatalog());
   return true;
 }

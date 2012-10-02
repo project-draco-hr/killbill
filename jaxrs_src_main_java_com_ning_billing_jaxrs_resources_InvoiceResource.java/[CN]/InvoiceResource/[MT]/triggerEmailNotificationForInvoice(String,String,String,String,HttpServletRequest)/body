@@ -1,0 +1,10 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Invoice invoice=invoiceApi.getInvoice(UUID.fromString(invoiceId),callContext);
+  if (invoice == null) {
+    throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
+  }
+  final Account account=accountApi.getAccountById(invoice.getAccountId(),callContext);
+  invoiceNotifier.notify(account,invoice,callContext);
+  return Response.status(Status.OK).build();
+}

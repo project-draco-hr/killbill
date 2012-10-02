@@ -7,7 +7,7 @@
     clock.addDeltaFromReality(it.toDurationMillis());
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),context);
+    subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),callContext);
     assertTrue(testListener.isCompleted(5000));
     testListener.reset();
     final Plan currentPlan=subscription.getCurrentPlan();
@@ -23,7 +23,7 @@
     assertTrue(testListener.isCompleted(5000));
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.DISCOUNT);
-    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId());
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId(),callContext);
     final DateTime expectedNextPhaseDate=subscription.getStartDate().plusDays(30).plusMonths(6);
     final EffectiveSubscriptionEvent nextPhase=subscription.getPendingTransition();
     final DateTime nextPhaseEffectiveDate=nextPhase.getEffectiveTransitionTime();

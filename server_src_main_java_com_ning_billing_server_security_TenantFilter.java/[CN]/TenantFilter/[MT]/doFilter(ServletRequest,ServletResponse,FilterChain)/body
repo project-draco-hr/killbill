@@ -1,0 +1,17 @@
+{
+  final Subject subject=SecurityUtils.getSubject();
+  request.setAttribute(SUBJECT,subject);
+  final String apiKey=(String)subject.getPrincipal();
+  if (apiKey == null) {
+    chain.doFilter(request,response);
+    return;
+  }
+  try {
+    final Tenant tenant=tenantUserApi.getTenantByApiKey(apiKey);
+    request.setAttribute(TENANT,tenant);
+    chain.doFilter(request,response);
+  }
+ catch (  TenantApiException e) {
+    log.warn("Couldn't find the tenant?",e);
+  }
+}

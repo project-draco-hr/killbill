@@ -1,0 +1,39 @@
+{
+  try {
+    tagDefinitionSqlDao.inTransaction(new Transaction<Void,TagDefinitionSqlDao>(){
+      @Override public Void inTransaction(      final TagDefinitionSqlDao tagDefinitionSqlDao,      final TransactionStatus status) throws Exception {
+        final TagDefinition tagDefinition=tagDefinitionSqlDao.getById(definitionId.toString(),context);
+        if (tagDefinition == null) {
+          throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_DOES_NOT_EXIST,definitionId);
+        }
+        if (tagDefinitionSqlDao.tagDefinitionUsageCount(definitionId.toString(),context) > 0) {
+          throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_IN_USE,definitionId);
+        }
+        tagDefinitionSqlDao.deleteTagDefinition(definitionId.toString(),context);
+        final TagDefinitionEvent tagDefinitionEvent;
+        if (tagDefinition.isControlTag()) {
+          tagDefinitionEvent=tagEventBuilder.newControlTagDefinitionDeletionEvent(tagDefinition.getId(),tagDefinition,context.getUserToken());
+        }
+ else {
+          tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionDeletionEvent(tagDefinition.getId(),tagDefinition,context.getUserToken());
+        }
+        try {
+          bus.postFromTransaction(tagDefinitionEvent,tagDefinitionSqlDao);
+        }
+ catch (        Bus.EventBusException e) {
+          log.warn("Failed to post tag definition deletion event for tag " + tagDefinition.getId(),e);
+        }
+        return null;
+      }
+    }
+);
+  }
+ catch (  TransactionFailedException exception) {
+    if (exception.getCause() instanceof TagDefinitionApiException) {
+      throw (TagDefinitionApiException)exception.getCause();
+    }
+ else {
+      throw exception;
+    }
+  }
+}

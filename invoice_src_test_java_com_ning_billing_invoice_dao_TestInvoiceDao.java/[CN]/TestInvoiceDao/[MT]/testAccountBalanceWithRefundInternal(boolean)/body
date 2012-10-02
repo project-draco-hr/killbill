@@ -3,24 +3,24 @@
   final UUID bundleId=UUID.randomUUID();
   final LocalDate targetDate1=new LocalDate(2011,10,6);
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1,Currency.USD);
-  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),true,context);
+  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),true,internalCallContext);
   final LocalDate startDate=new LocalDate(2011,3,1);
   final LocalDate endDate=startDate.plusMonths(1);
   final BigDecimal rate1=new BigDecimal("20.0");
   final BigDecimal refund1=new BigDecimal("7.00");
   final BigDecimal rate2=new BigDecimal("10.0");
   final RecurringInvoiceItem item2=new RecurringInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase B",startDate,endDate,rate1,rate1,Currency.USD);
-  invoiceItemSqlDao.create(item2,context);
-  BigDecimal balance=invoiceDao.getAccountBalance(accountId);
+  invoiceItemSqlDao.create(item2,internalCallContext);
+  BigDecimal balance=invoiceDao.getAccountBalance(accountId,internalCallContext);
   assertEquals(balance.compareTo(new BigDecimal("20.00")),0);
   final UUID paymentId=UUID.randomUUID();
   final BigDecimal payment1=rate1;
   final InvoicePayment payment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice1.getId(),new DateTime(),payment1,Currency.USD);
-  invoicePaymentDao.create(payment,context);
-  balance=invoiceDao.getAccountBalance(accountId);
+  invoicePaymentDao.create(payment,internalCallContext);
+  balance=invoiceDao.getAccountBalance(accountId,internalCallContext);
   assertEquals(balance.compareTo(new BigDecimal("0.00")),0);
-  invoiceDao.createRefund(paymentId,refund1,withAdjustment,ImmutableMap.<UUID,BigDecimal>of(),UUID.randomUUID(),context);
-  balance=invoiceDao.getAccountBalance(accountId);
+  invoiceDao.createRefund(paymentId,refund1,withAdjustment,ImmutableMap.<UUID,BigDecimal>of(),UUID.randomUUID(),internalCallContext);
+  balance=invoiceDao.getAccountBalance(accountId,internalCallContext);
   if (withAdjustment) {
     assertEquals(balance.compareTo(BigDecimal.ZERO),0);
   }

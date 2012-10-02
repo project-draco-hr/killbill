@@ -1,12 +1,12 @@
 {
   final UUID accountId=UUID.randomUUID();
-  Assert.assertEquals(accountEmailDao.getEmails(accountId).size(),0);
+  Assert.assertEquals(accountEmailDao.getEmails(accountId,tenantContext).size(),0);
   final String email1=UUID.randomUUID().toString();
   accountUserApi.addEmail(accountId,new DefaultAccountEmail(accountId,email1),callContext);
-  Assert.assertEquals(accountEmailDao.getEmails(accountId).size(),1);
+  Assert.assertEquals(accountEmailDao.getEmails(accountId,tenantContext).size(),1);
   final String email2=UUID.randomUUID().toString();
   accountUserApi.addEmail(accountId,new DefaultAccountEmail(accountId,email2),callContext);
-  Assert.assertEquals(accountEmailDao.getEmails(accountId).size(),2);
+  Assert.assertEquals(accountEmailDao.getEmails(accountId,tenantContext).size(),2);
   accountUserApi.removeEmail(accountId,new DefaultAccountEmail(accountId,email1),callContext);
-  Assert.assertEquals(accountEmailDao.getEmails(accountId).size(),1);
+  Assert.assertEquals(accountEmailDao.getEmails(accountId,tenantContext).size(),1);
 }

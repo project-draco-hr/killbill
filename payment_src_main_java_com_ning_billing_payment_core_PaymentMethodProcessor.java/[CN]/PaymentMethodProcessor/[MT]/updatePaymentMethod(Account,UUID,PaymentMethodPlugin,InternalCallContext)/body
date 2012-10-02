@@ -1,0 +1,20 @@
+{
+  new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
+    @Override public Void doOperation() throws PaymentApiException {
+      final PaymentMethodModelDao paymentMethodModel=paymentDao.getPaymentMethod(paymentMethodId,context);
+      if (paymentMethodModel == null) {
+        throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,paymentMethodId);
+      }
+      try {
+        final PaymentMethodPlugin inputWithId=new DefaultPaymentMethodPlugin(paymentMethodProps,paymentMethodModel.getExternalId());
+        final PaymentPluginApi pluginApi=getPluginApi(paymentMethodId,account.getId(),context);
+        pluginApi.updatePaymentMethod(account.getExternalKey(),inputWithId,context.toCallContext());
+        return null;
+      }
+ catch (      PaymentPluginApiException e) {
+        throw new PaymentApiException(ErrorCode.PAYMENT_UPD_PAYMENT_METHOD,account.getId(),e.getErrorMessage());
+      }
+    }
+  }
+);
+}

@@ -1,0 +1,14 @@
+{
+  BusinessAccount bac=transactional.getAccount(account.getId().toString(),context);
+  if (bac == null) {
+    bac=new BusinessAccount(account.getId());
+    updateBusinessAccountFromAccount(account,bac,context);
+    log.info("ACCOUNT CREATION " + bac);
+    transactional.createAccount(bac,context);
+  }
+ else {
+    updateBusinessAccountFromAccount(account,bac,context);
+    log.info("ACCOUNT UPDATE " + bac);
+    transactional.saveAccount(bac,context);
+  }
+}

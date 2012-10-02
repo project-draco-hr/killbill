@@ -1,0 +1,13 @@
+{
+  final DefaultTenantDao tenantDao=new DefaultTenantDao(getMysqlTestingHelper().getDBI(),Mockito.mock(Bus.class));
+  tenant=new DefaultTenant(UUID.randomUUID(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString());
+  tenantDao.create(tenant,internalCallContext);
+  final BoneCPConfig dbConfig=new BoneCPConfig();
+  dbConfig.setJdbcUrl(getMysqlTestingHelper().getJdbcConnectionString());
+  dbConfig.setUsername(MysqlTestingHelper.USERNAME);
+  dbConfig.setPassword(MysqlTestingHelper.PASSWORD);
+  final KillbillJdbcRealm jdbcRealm;
+  jdbcRealm=new KillbillJdbcRealm();
+  jdbcRealm.setDataSource(new BoneCPDataSource(dbConfig));
+  securityManager=new DefaultSecurityManager(jdbcRealm);
+}

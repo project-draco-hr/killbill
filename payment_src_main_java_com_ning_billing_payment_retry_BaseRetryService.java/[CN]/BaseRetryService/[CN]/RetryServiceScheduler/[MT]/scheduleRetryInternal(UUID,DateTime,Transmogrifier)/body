@@ -1,13 +1,14 @@
 {
+  final InternalCallContext context=createCallContext();
   try {
     final NotificationQueue retryQueue=notificationQueueService.getNotificationQueue(DefaultPaymentService.SERVICE_NAME,getQueueName());
     final NotificationKey key=new PaymentRetryNotificationKey(paymentId);
     if (retryQueue != null) {
       if (transactionalDao == null) {
-        retryQueue.recordFutureNotification(timeOfRetry,null,key);
+        retryQueue.recordFutureNotification(timeOfRetry,null,key,context);
       }
  else {
-        retryQueue.recordFutureNotificationFromTransaction(transactionalDao,timeOfRetry,null,key);
+        retryQueue.recordFutureNotificationFromTransaction(transactionalDao,timeOfRetry,null,key,context);
       }
     }
   }

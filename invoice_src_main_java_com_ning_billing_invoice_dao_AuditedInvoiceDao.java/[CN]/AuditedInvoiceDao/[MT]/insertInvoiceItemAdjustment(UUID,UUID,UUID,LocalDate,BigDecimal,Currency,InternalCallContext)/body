@@ -1,0 +1,13 @@
+{
+  return invoiceSqlDao.inTransaction(new Transaction<InvoiceItem,InvoiceSqlDao>(){
+    @Override public InvoiceItem inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final List<EntityAudit> audits=new ArrayList<EntityAudit>();
+      final InvoiceItem invoiceItemAdjustment=createAdjustmentItem(transactional,invoiceId,invoiceItemId,positiveAdjAmount,currency,effectiveDate,context);
+      insertItemAndAddCBAIfNeeded(transactional,invoiceItemAdjustment,audits,context);
+      notifyBusOfInvoiceAdjustment(transactional,invoiceId,accountId,context.getUserToken());
+      transactional.insertAuditFromTransaction(audits,context);
+      return invoiceItemAdjustment;
+    }
+  }
+);
+}

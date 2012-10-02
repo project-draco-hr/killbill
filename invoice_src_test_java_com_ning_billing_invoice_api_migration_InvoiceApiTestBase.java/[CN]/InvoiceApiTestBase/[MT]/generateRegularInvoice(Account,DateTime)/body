@@ -9,17 +9,16 @@
   final Currency currency=Currency.USD;
   final BigDecimal fixedPrice=null;
   events.add(createMockBillingEvent(account,subscription,effectiveDate,plan,planPhase,fixedPrice,BigDecimal.ONE,currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"",1L,SubscriptionTransitionType.CREATE));
-  Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId())).thenReturn(events);
+  Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),callContext)).thenReturn(events);
   final InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
-  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,billingApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock);
-  final CallContext context=new DefaultCallContextFactory(clock).createCallContext("Unit test",CallOrigin.TEST,UserType.TEST);
-  Invoice invoice=dispatcher.processAccount(account.getId(),targetDate,true,context);
+  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,billingApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock,internalCallContextFactory);
+  Invoice invoice=dispatcher.processAccount(account.getId(),targetDate,true,callContext);
   Assert.assertNotNull(invoice);
-  List<Invoice> invoices=invoiceDao.getInvoicesByAccount(account.getId());
+  List<Invoice> invoices=invoiceDao.getInvoicesByAccount(account.getId(),internalCallContext);
   Assert.assertEquals(invoices.size(),0);
-  invoice=dispatcher.processAccount(account.getId(),targetDate,false,context);
+  invoice=dispatcher.processAccount(account.getId(),targetDate,false,callContext);
   Assert.assertNotNull(invoice);
-  invoices=invoiceDao.getInvoicesByAccount(account.getId());
+  invoices=invoiceDao.getInvoicesByAccount(account.getId(),internalCallContext);
   Assert.assertEquals(invoices.size(),1);
   return invoice.getId();
 }

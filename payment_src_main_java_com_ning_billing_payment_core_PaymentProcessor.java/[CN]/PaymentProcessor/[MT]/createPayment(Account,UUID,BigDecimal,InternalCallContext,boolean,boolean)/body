@@ -1,0 +1,54 @@
+{
+  final PaymentPluginApi plugin;
+  final UUID paymentMethodId;
+  try {
+    if (isExternalPayment) {
+      plugin=paymentMethodProcessor.getExternalPaymentProviderPlugin(account,context);
+      paymentMethodId=paymentMethodProcessor.getExternalPaymentMethod(account,context).getId();
+    }
+ else {
+      plugin=getPaymentProviderPlugin(account,context);
+      paymentMethodId=account.getPaymentMethodId();
+    }
+  }
+ catch (  PaymentApiException e) {
+    final PaymentErrorEvent event=new DefaultPaymentErrorEvent(account.getId(),invoiceId,null,ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD.toString(),context.getUserToken());
+    postPaymentEvent(event,account.getId());
+    throw e;
+  }
+  try {
+    return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
+      @Override public Payment doOperation() throws PaymentApiException {
+        try {
+          final Invoice invoice=invoicePaymentApi.getInvoice(invoiceId,context.toCallContext());
+          if (invoice.isMigrationInvoice()) {
+            log.error("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
+            return null;
+          }
+          final boolean isAccountAutoPayOff=isAccountAutoPayOff(account.getId(),context);
+          setUnsaneAccount_AUTO_PAY_OFFWithAccountLock(account.getId(),paymentMethodId,isAccountAutoPayOff,context,isInstantPayment);
+          final BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
+          if (!isInstantPayment && isAccountAutoPayOff) {
+            return processNewPaymentForAutoPayOffWithAccountLocked(paymentMethodId,account,invoice,requestedAmount,context);
+          }
+ else {
+            return processNewPaymentWithAccountLocked(paymentMethodId,plugin,account,invoice,requestedAmount,isInstantPayment,context);
+          }
+        }
+ catch (        InvoiceApiException e) {
+          throw new PaymentApiException(e);
+        }
+      }
+    }
+));
+  }
+ catch (  TimeoutException e) {
+    if (isInstantPayment) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,account.getId(),invoiceId);
+    }
+ else {
+      log.warn(String.format("Payment from Account %s, Invoice %s timedout",account.getId(),invoiceId));
+      return null;
+    }
+  }
+}

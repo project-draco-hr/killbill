@@ -1,0 +1,11 @@
+{
+  final List<Invoice> invoicesForAccount=new ArrayList<Invoice>();
+synchronized (monitor) {
+    for (    final Invoice invoice : get(context)) {
+      if (accountId.equals(invoice.getAccountId()) && !invoice.getTargetDate().isBefore(fromDate) && !invoice.isMigrationInvoice()) {
+        invoicesForAccount.add(invoice);
+      }
+    }
+  }
+  return invoicesForAccount;
+}

@@ -1,0 +1,13 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Account account=accountUserApi.getAccountById(UUID.fromString(json.getAccountId()),callContext);
+  final LocalDate effectiveDate=json.getEffectiveDate().toDateTime(account.getTimeZone()).toLocalDate();
+  final InvoiceItem credit;
+  if (json.getInvoiceId() != null) {
+    credit=invoiceUserApi.insertCreditForInvoice(account.getId(),UUID.fromString(json.getInvoiceId()),json.getCreditAmount(),effectiveDate,account.getCurrency(),callContext);
+  }
+ else {
+    credit=invoiceUserApi.insertCredit(account.getId(),json.getCreditAmount(),effectiveDate,account.getCurrency(),callContext);
+  }
+  return uriBuilder.buildResponse(CreditResource.class,"getCredit",credit.getId());
+}

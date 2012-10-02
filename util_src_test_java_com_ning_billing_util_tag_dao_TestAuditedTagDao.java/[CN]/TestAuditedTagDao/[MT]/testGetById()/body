@@ -1,14 +1,14 @@
 {
-  TagDefinition defYo=tagDefinitionDao.create("yo","defintion yo",context);
-  TagDefinition resDefYo=tagDefinitionDao.getById(defYo.getId());
+  final TagDefinition defYo=tagDefinitionDao.create("yo","defintion yo",internalCallContext);
+  final TagDefinition resDefYo=tagDefinitionDao.getById(defYo.getId(),internalCallContext);
   assertEquals(defYo,resDefYo);
   try {
-    tagDefinitionDao.create(ControlTagType.AUTO_INVOICING_OFF.name(),ControlTagType.AUTO_INVOICING_OFF.name(),context);
+    tagDefinitionDao.create(ControlTagType.AUTO_INVOICING_OFF.name(),ControlTagType.AUTO_INVOICING_OFF.name(),internalCallContext);
     Assert.fail("Should not be able to create a control tag");
   }
  catch (  TagDefinitionApiException ignore) {
   }
-  TagDefinition resdef_AUTO_INVOICING_OFF=tagDefinitionDao.getById(ControlTagType.AUTO_INVOICING_OFF.getId());
+  final TagDefinition resdef_AUTO_INVOICING_OFF=tagDefinitionDao.getById(ControlTagType.AUTO_INVOICING_OFF.getId(),internalCallContext);
   assertEquals(resdef_AUTO_INVOICING_OFF.getId(),ControlTagType.AUTO_INVOICING_OFF.getId());
   assertEquals(resdef_AUTO_INVOICING_OFF.getName(),ControlTagType.AUTO_INVOICING_OFF.name());
   assertEquals(resdef_AUTO_INVOICING_OFF.getDescription(),ControlTagType.AUTO_INVOICING_OFF.getDescription());

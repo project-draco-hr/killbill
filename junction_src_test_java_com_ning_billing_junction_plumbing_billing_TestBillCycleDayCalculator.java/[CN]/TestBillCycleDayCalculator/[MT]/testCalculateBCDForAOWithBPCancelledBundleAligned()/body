@@ -10,13 +10,13 @@
   final Subscription subscription=Mockito.mock(Subscription.class);
   Mockito.when(subscription.getStartDate()).thenReturn(bpStartDateUTC);
   Mockito.when(subscription.getPreviousTransition()).thenReturn(previousTransition);
-  Mockito.when(entitlementUserApi.getBaseSubscription(Mockito.<UUID>any())).thenReturn(subscription);
+  Mockito.when(entitlementUserApi.getBaseSubscription(Mockito.<UUID>any(),Mockito.<TenantContext>any())).thenReturn(subscription);
   final Plan plan=Mockito.mock(Plan.class);
   Mockito.when(plan.dateOfFirstRecurringNonZeroCharge(bpStartDateUTC,null)).thenReturn(bpStartDateUTC);
   final Catalog catalog=Mockito.mock(Catalog.class);
   Mockito.when(catalog.findPlan(Mockito.anyString(),Mockito.<DateTime>any(),Mockito.<DateTime>any())).thenReturn(plan);
   final Account account=Mockito.mock(Account.class);
   Mockito.when(account.getTimeZone()).thenReturn(accountTimeZone);
-  final BillCycleDay billCycleDay=billCycleDayCalculator.calculateBcdForAlignment(BillingAlignment.BUNDLE,bundle,subscription,account,catalog,null);
+  final BillCycleDay billCycleDay=billCycleDayCalculator.calculateBcdForAlignment(BillingAlignment.BUNDLE,bundle,subscription,account,catalog,null,callContext);
   Assert.assertEquals(billCycleDay.getDayOfMonthUTC(),expectedBCDUTC);
 }

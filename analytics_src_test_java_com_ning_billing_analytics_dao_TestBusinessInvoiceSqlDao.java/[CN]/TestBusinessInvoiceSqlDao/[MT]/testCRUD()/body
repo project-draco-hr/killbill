@@ -3,13 +3,13 @@
   final UUID accountId=UUID.randomUUID();
   final String accountKey=UUID.randomUUID().toString();
   final BusinessInvoice invoice=createInvoice(accountId,invoiceId,accountKey);
-  Assert.assertNull(invoiceSqlDao.getInvoice(invoice.getInvoiceId().toString()));
-  Assert.assertEquals(invoiceSqlDao.deleteInvoice(invoice.getInvoiceId().toString()),0);
-  Assert.assertEquals(invoiceSqlDao.createInvoice(invoice),1);
-  Assert.assertEquals(invoiceSqlDao.getInvoice(invoice.getInvoiceId().toString()),invoice);
-  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(invoice.getAccountId().toString()).size(),1);
-  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(invoice.getAccountId().toString()).get(0),invoice);
-  Assert.assertEquals(invoiceSqlDao.deleteInvoice(invoice.getInvoiceId().toString()),1);
-  Assert.assertNull(invoiceSqlDao.getInvoice(invoice.getInvoiceId().toString()));
-  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(invoice.getAccountId().toString()).size(),0);
+  Assert.assertNull(invoiceSqlDao.getInvoice(invoice.getInvoiceId().toString(),internalCallContext));
+  Assert.assertEquals(invoiceSqlDao.deleteInvoice(invoice.getInvoiceId().toString(),internalCallContext),0);
+  Assert.assertEquals(invoiceSqlDao.createInvoice(invoice,internalCallContext),1);
+  Assert.assertEquals(invoiceSqlDao.getInvoice(invoice.getInvoiceId().toString(),internalCallContext),invoice);
+  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(invoice.getAccountId().toString(),internalCallContext).size(),1);
+  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(invoice.getAccountId().toString(),internalCallContext).get(0),invoice);
+  Assert.assertEquals(invoiceSqlDao.deleteInvoice(invoice.getInvoiceId().toString(),internalCallContext),1);
+  Assert.assertNull(invoiceSqlDao.getInvoice(invoice.getInvoiceId().toString(),internalCallContext));
+  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(invoice.getAccountId().toString(),internalCallContext).size(),0);
 }

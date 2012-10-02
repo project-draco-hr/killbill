@@ -7,12 +7,12 @@
     final DateTime afterMigration=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
-    migrationApi.migrate(toBeMigrated,context);
+    migrationApi.migrate(toBeMigrated,callContext);
     assertTrue(testListener.isCompleted(5000));
-    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
+    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey(),callContext);
     assertEquals(bundles.size(),1);
     final SubscriptionBundle bundle=bundles.get(0);
-    final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId());
+    final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId(),callContext);
     assertEquals(subscriptions.size(),2);
     final Subscription baseSubscription=(subscriptions.get(0).getCurrentPlan().getProduct().getCategory() == ProductCategory.BASE) ? subscriptions.get(0) : subscriptions.get(1);
     assertDateWithin(baseSubscription.getStartDate(),beforeMigration,afterMigration);

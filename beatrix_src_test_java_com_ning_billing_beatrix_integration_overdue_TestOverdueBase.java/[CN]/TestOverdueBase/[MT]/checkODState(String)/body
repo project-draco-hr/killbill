@@ -2,12 +2,12 @@
   try {
     await().atMost(10,SECONDS).until(new Callable<Boolean>(){
       @Override public Boolean call() throws Exception {
-        return expected.equals(blockingApi.getBlockingStateFor(bundle).getStateName());
+        return expected.equals(blockingApi.getBlockingStateFor(bundle,callContext).getStateName());
       }
     }
 );
   }
  catch (  Exception e) {
-    Assert.assertEquals(blockingApi.getBlockingStateFor(bundle).getStateName(),expected,"Got exception: " + e.toString());
+    Assert.assertEquals(blockingApi.getBlockingStateFor(bundle,callContext).getStateName(),expected,"Got exception: " + e.toString());
   }
 }

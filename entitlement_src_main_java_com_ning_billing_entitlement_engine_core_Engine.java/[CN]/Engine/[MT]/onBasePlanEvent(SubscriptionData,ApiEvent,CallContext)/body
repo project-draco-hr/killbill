@@ -1,7 +1,7 @@
 {
   final DateTime now=clock.getUTCNow();
   final Product baseProduct=(baseSubscription.getState() == SubscriptionState.CANCELLED) ? null : baseSubscription.getCurrentPlan().getProduct();
-  final List<Subscription> subscriptions=dao.getSubscriptions(subscriptionFactory,baseSubscription.getBundleId());
+  final List<Subscription> subscriptions=dao.getSubscriptions(subscriptionFactory,baseSubscription.getBundleId(),internalCallContextFactory.createInternalTenantContext(context));
   final Map<UUID,EntitlementEvent> addOnCancellations=new HashMap<UUID,EntitlementEvent>();
   final Map<UUID,SubscriptionData> addOnCancellationSubscriptions=new HashMap<UUID,SubscriptionData>();
   for (  final Subscription subscription : subscriptions) {
@@ -19,7 +19,7 @@
   final int addOnSize=addOnCancellations.size();
   int cancelSeq=addOnSize - 1;
   for (  final UUID key : addOnCancellations.keySet()) {
-    dao.cancelSubscription(addOnCancellationSubscriptions.get(key),addOnCancellations.get(key),context,cancelSeq);
+    dao.cancelSubscription(addOnCancellationSubscriptions.get(key),addOnCancellations.get(key),internalCallContextFactory.createInternalCallContext(context),cancelSeq);
     cancelSeq--;
   }
   return addOnSize;

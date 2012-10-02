@@ -1,0 +1,35 @@
+{
+  eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
+    @Override public Void inTransaction(    final EntitlementEventSqlDao transactional,    final TransactionStatus status) throws Exception {
+      final UUID subscriptionId=subscription.getId();
+      EntitlementEvent cancelledEvent=null;
+      final Date now=clock.getUTCNow().toDate();
+      final List<EntitlementEvent> events=transactional.getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
+      for (      final EntitlementEvent cur : events) {
+        if (cur.getType() == EventType.API_USER && ((ApiEvent)cur).getEventType() == ApiEventType.CANCEL) {
+          if (cancelledEvent != null) {
+            throw new EntitlementError(String.format("Found multiple cancel active events for subscriptions %s",subscriptionId.toString()));
+          }
+          cancelledEvent=cur;
+        }
+      }
+      if (cancelledEvent != null) {
+        final List<EntityAudit> eventAudits=new ArrayList<EntityAudit>();
+        final String cancelledEventId=cancelledEvent.getId().toString();
+        transactional.unactiveEvent(cancelledEventId,context);
+        final Long cancelledRecordId=transactional.getRecordId(cancelledEventId,context);
+        eventAudits.add(new EntityAudit(TableName.SUBSCRIPTION_EVENTS,cancelledRecordId,ChangeType.UPDATE));
+        for (        final EntitlementEvent cur : uncancelEvents) {
+          transactional.insertEvent(cur,context);
+          final Long recordId=transactional.getRecordId(cur.getId().toString(),context);
+          eventAudits.add(new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.INSERT));
+          recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
+        }
+        transactional.insertAuditFromTransaction(eventAudits,context);
+        notifyBusOfRequestedChange(transactional,subscription,uncancelEvents.get(uncancelEvents.size() - 1));
+      }
+      return null;
+    }
+  }
+);
+}

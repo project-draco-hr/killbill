@@ -1,0 +1,15 @@
+{
+  return invoiceSqlDao.inTransaction(new Transaction<List<Invoice>,InvoiceSqlDao>(){
+    @Override public List<Invoice> inTransaction(    final InvoiceSqlDao invoiceDao,    final TransactionStatus status) throws Exception {
+      final List<Invoice> invoices=getAllInvoicesByAccountFromTransaction(accountId,invoiceDao,context);
+      final Collection<Invoice> unpaidInvoices=Collections2.filter(invoices,new Predicate<Invoice>(){
+        @Override public boolean apply(        final Invoice in){
+          return (in.getBalance().compareTo(BigDecimal.ZERO) >= 1) && (upToDate == null || !in.getTargetDate().isAfter(upToDate));
+        }
+      }
+);
+      return new ArrayList<Invoice>(unpaidInvoices);
+    }
+  }
+);
+}

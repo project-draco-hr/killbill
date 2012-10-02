@@ -4,7 +4,7 @@
   final Subscription baseSubscription=createSubscription(baseProduct,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
   final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(10));
   clock.addDeltaFromReality(it.toDurationMillis());
-  final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId());
+  final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
   sortEventsOnBundle(bundleRepair);
   final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
   des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
@@ -12,7 +12,7 @@
   final SubscriptionTimeline sRepair=createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
   final BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
   boolean dryRun=true;
-  final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,callContext);
   sortEventsOnBundle(dryRunBundleRepair);
   List<SubscriptionTimeline> subscriptionRepair=dryRunBundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),1);
@@ -26,7 +26,7 @@
   for (  final ExistingEvent e : expected) {
     validateExistingEventForAssertion(e,events.get(index++));
   }
-  final SubscriptionData dryRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  final SubscriptionData dryRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(dryRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   assertEquals(dryRunBaseSubscription.getBundleId(),bundle.getId());
   assertEquals(dryRunBaseSubscription.getStartDate(),baseSubscription.getStartDate());
@@ -40,7 +40,7 @@
   assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
   dryRun=false;
   testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
-  final BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,context);
+  final BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,callContext);
   assertTrue(testListener.isCompleted(5000));
   subscriptionRepair=realRunBundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),1);
@@ -50,7 +50,7 @@
   for (  final ExistingEvent e : expected) {
     validateExistingEventForAssertion(e,events.get(index++));
   }
-  final SubscriptionData realRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+  final SubscriptionData realRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(realRunBaseSubscription.getAllTransitions().size(),2);
   assertEquals(realRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
   assertEquals(realRunBaseSubscription.getBundleId(),bundle.getId());

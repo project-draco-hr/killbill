@@ -1,17 +1,18 @@
 {
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(sourceAccountId,context);
   try {
     final DateTime effectiveTransferDate=transferDate == null ? clock.getUTCNow() : transferDate;
-    final SubscriptionBundle bundle=dao.getSubscriptionBundleFromAccountAndKey(sourceAccountId,bundleKey);
+    final SubscriptionBundle bundle=dao.getSubscriptionBundleFromAccountAndKey(sourceAccountId,bundleKey,internalCallContext);
     if (bundle == null) {
       throw new EntitlementTransferApiException(ErrorCode.ENT_CREATE_NO_BUNDLE,bundleKey);
     }
-    final BundleTimeline bundleTimeline=timelineApi.getBundleTimeline(bundle);
+    final BundleTimeline bundleTimeline=timelineApi.getBundleTimeline(bundle,context);
     final SubscriptionBundleData subscriptionBundleData=new SubscriptionBundleData(bundleKey,destAccountId,effectiveTransferDate);
     final List<SubscriptionMigrationData> subscriptionMigrationDataList=new LinkedList<SubscriptionMigrationData>();
     final List<TransferCancelData> transferCancelDataList=new LinkedList<TransferCancelData>();
     DateTime bundleStartdate=null;
-    for (    SubscriptionTimeline cur : bundleTimeline.getSubscriptions()) {
-      final SubscriptionData oldSubscription=(SubscriptionData)dao.getSubscriptionFromId(subscriptionFactory,cur.getId());
+    for (    final SubscriptionTimeline cur : bundleTimeline.getSubscriptions()) {
+      final SubscriptionData oldSubscription=(SubscriptionData)dao.getSubscriptionFromId(subscriptionFactory,cur.getId(),internalCallContext);
       final List<ExistingEvent> existingEvents=cur.getExistingEvents();
       final ProductCategory productCategory=existingEvents.get(0).getPlanPhaseSpecifier().getProductCategory();
       if (productCategory == ProductCategory.ADD_ON) {
@@ -35,7 +36,7 @@
       subscriptionMigrationDataList.add(curData);
     }
     BundleMigrationData bundleMigrationData=new BundleMigrationData(subscriptionBundleData,subscriptionMigrationDataList);
-    dao.transfer(sourceAccountId,destAccountId,bundleMigrationData,transferCancelDataList,context);
+    dao.transfer(sourceAccountId,destAccountId,bundleMigrationData,transferCancelDataList,internalCallContext);
     return bundle;
   }
  catch (  EntitlementRepairException e) {

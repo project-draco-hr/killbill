@@ -1,0 +1,20 @@
+{
+  final List<TagDefinition> result=new LinkedList<TagDefinition>();
+  for (  final UUID cur : definitionIds) {
+    for (    final ControlTagType controlTag : ControlTagType.values()) {
+      if (controlTag.getId().equals(cur)) {
+        result.add(new DefaultTagDefinition(controlTag));
+        break;
+      }
+    }
+  }
+  if (definitionIds.size() > 0) {
+    result.addAll(tagDefinitionSqlDao.getByIds(Collections2.transform(definitionIds,new Function<UUID,String>(){
+      @Override public String apply(      final UUID input){
+        return input.toString();
+      }
+    }
+),context));
+  }
+  return result;
+}

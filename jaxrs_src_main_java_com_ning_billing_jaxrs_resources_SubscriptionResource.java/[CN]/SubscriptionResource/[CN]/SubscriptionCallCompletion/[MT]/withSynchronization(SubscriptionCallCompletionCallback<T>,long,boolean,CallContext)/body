@@ -1,0 +1,24 @@
+{
+  final CompletionUserRequestSubscription waiter=callCompletion ? new CompletionUserRequestSubscription(callContext.getUserToken()) : null;
+  try {
+    if (waiter != null) {
+      killbillHandler.registerCompletionUserRequestWaiter(waiter);
+    }
+    final T operationValue=callback.doOperation(callContext);
+    if (waiter != null && callback.isImmOperation()) {
+      waiter.waitForCompletion(timeoutSec * 1000);
+    }
+    return callback.doResponseOk(operationValue);
+  }
+ catch (  InterruptedException e) {
+    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+  }
+catch (  TimeoutException e) {
+    return Response.status(Status.fromStatusCode(408)).build();
+  }
+ finally {
+    if (waiter != null) {
+      killbillHandler.unregisterCompletionUserRequestWaiter(waiter);
+    }
+  }
+}

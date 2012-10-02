@@ -1,8 +1,0 @@
-{
-  final PaymentModelDao lastPaymentForPaymentMethod=paymentDao.getLastPaymentForPaymentMethod(accountId,paymentMethodId);
-  final boolean isLastPaymentForPaymentMethodBad=lastPaymentForPaymentMethod != null && (lastPaymentForPaymentMethod.getPaymentStatus() == PaymentStatus.PLUGIN_FAILURE_ABORTED || lastPaymentForPaymentMethod.getPaymentStatus() == PaymentStatus.UNKNOWN);
-  if (isLastPaymentForPaymentMethodBad && !isInstantPayment && !isAccountAutoPayOff) {
-    log.warn(String.format("Setting account %s into AUTO_PAY_OFF because of bad payment %s",accountId,lastPaymentForPaymentMethod.getId()));
-    setAccountAutoPayOff(accountId,context);
-  }
-}

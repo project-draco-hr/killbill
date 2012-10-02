@@ -4,7 +4,7 @@
   final String definitionName="MixedTagTest";
   TagDefinition tagDefinition=null;
   try {
-    tagDefinition=tagDefinitionDao.create(definitionName,"Test tag for some test purpose",context);
+    tagDefinition=tagDefinitionDao.create(definitionName,"Test tag for some test purpose",internalCallContext);
   }
  catch (  TagDefinitionApiException e) {
     fail("Tag definition creation failed.",e);
@@ -15,10 +15,10 @@
   final ControlTag controlTag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
   tagStore.add(controlTag);
   assertEquals(tagStore.generateInvoice(),false);
-  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),context);
+  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagStore.getEntityList(),internalCallContext);
   tagStore.clear();
   assertEquals(tagStore.getEntityList().size(),0);
-  final Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT);
+  final Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT,internalCallContext);
   assertEquals(tagMap.size(),2);
   boolean found_AUTO_INVOICING_OFF_tag=false;
   for (  Tag cur : tagMap.values()) {

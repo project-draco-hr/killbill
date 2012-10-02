@@ -1,0 +1,22 @@
+{
+  final List<SubscriptionBundle> bundles=entitlementUserApi.getBundlesForAccount(accountId,context);
+  final DefaultBillingEventSet result=new DefaultBillingEventSet();
+  try {
+    final Account account=accountApi.getAccountById(accountId,context);
+    final Map<String,Tag> accountTags=tagApi.getTags(accountId,ObjectType.ACCOUNT,context);
+    for (    final Tag cur : accountTags.values()) {
+      if (ControlTagType.AUTO_INVOICING_OFF.getId().equals(cur.getTagDefinitionId())) {
+        result.setAccountAutoInvoiceIsOff(true);
+        return result;
+      }
+    }
+    addBillingEventsForBundles(bundles,account,context,result);
+  }
+ catch (  AccountApiException e) {
+    log.warn("Failed while getting BillingEvent",e);
+  }
+  debugLog(result,"********* Billing Events Raw");
+  blockCalculator.insertBlockingEvents(result,context);
+  debugLog(result,"*********  Billing Events After Blocking");
+  return result;
+}

@@ -1,10 +1,11 @@
 {
+  final InternalTenantContext tenantContext=internalCallContextFactory.createInternalTenantContext(context);
   try {
-    final SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(input.getBundleId());
+    final SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(input.getBundleId(),tenantContext);
     if (bundle == null) {
       throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_BUNDLE,input.getBundleId());
     }
-    final List<Subscription> subscriptions=dao.getSubscriptions(factory,input.getBundleId());
+    final List<Subscription> subscriptions=dao.getSubscriptions(factory,input.getBundleId(),tenantContext);
     if (subscriptions.size() == 0) {
       throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_NO_ACTIVE_SUBSCRIPTIONS,input.getBundleId());
     }
@@ -44,7 +45,7 @@
           validateFirstNewEvent(curInputRepair,curRepair.getNewEvents().get(0),lastRemainingBPEventTime,lastRemainingEventTime);
         }
         final SubscriptionDataRepair curOutputRepair=createSubscriptionDataRepair(curInputRepair,newBundleStartDate,newSubscriptionStartDate,remaining);
-        repairDao.initializeRepair(curInputRepair.getId(),remaining);
+        repairDao.initializeRepair(curInputRepair.getId(),remaining,tenantContext);
         inRepair.add(curOutputRepair);
         if (curOutputRepair.getCategory() == ProductCategory.ADD_ON) {
           if (isPlanRecreate && (subscriptions.get(0)).getStartDate().isAfter(curRepair.getNewEvents().get(0).getRequestedDate())) {
@@ -63,7 +64,7 @@ case BASE_REPAIR:
       for (      final Subscription cur : subscriptions) {
         if (cur.getCategory() == ProductCategory.ADD_ON && !inRepair.contains(cur)) {
           final SubscriptionDataRepair curOutputRepair=createSubscriptionDataRepair((SubscriptionDataRepair)cur,newBundleStartDate,null,((SubscriptionDataRepair)cur).getEvents());
-          repairDao.initializeRepair(curOutputRepair.getId(),((SubscriptionDataRepair)cur).getEvents());
+          repairDao.initializeRepair(curOutputRepair.getId(),((SubscriptionDataRepair)cur).getEvents(),tenantContext);
           inRepair.add(curOutputRepair);
           addOnSubscriptionInRepair.add(curOutputRepair);
         }
@@ -94,14 +95,14 @@ final List<SubscriptionTimeline> repairs=createGetSubscriptionRepairList(subscri
 return createGetBundleRepair(input.getBundleId(),bundle.getKey(),input.getViewId(),repairs);
 }
  else {
-dao.repair(bundle.getAccountId(),input.getBundleId(),inRepair,context);
-return getBundleTimeline(input.getBundleId());
+dao.repair(bundle.getAccountId(),input.getBundleId(),inRepair,internalCallContextFactory.createInternalCallContext(context));
+return getBundleTimeline(input.getBundleId(),context);
 }
 }
  catch (CatalogApiException e) {
 throw new EntitlementRepairException(e);
 }
  finally {
-repairDao.cleanup();
+repairDao.cleanup(tenantContext);
 }
 }

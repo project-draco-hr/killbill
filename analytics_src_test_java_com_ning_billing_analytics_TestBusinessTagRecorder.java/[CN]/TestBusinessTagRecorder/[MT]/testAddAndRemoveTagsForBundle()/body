@@ -1,14 +1,13 @@
 {
   final String name=UUID.randomUUID().toString().substring(0,20);
-  final CallContext callContext=callContextFactory.createCallContext(UUID.randomUUID().toString(),CallOrigin.TEST,UserType.TEST);
   final String externalKey=UUID.randomUUID().toString();
   final Account accountData=new MockAccountBuilder().currency(Currency.MXN).build();
   final Account account=accountUserApi.createAccount(accountData,callContext);
   final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),externalKey,callContext);
   final UUID bundleId=bundle.getId();
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey).size(),0);
-  tagRecorder.tagAdded(ObjectType.BUNDLE,bundleId,name);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey).size(),1);
-  tagRecorder.tagRemoved(ObjectType.BUNDLE,bundleId,name);
-  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey).size(),0);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey,internalCallContext).size(),0);
+  tagRecorder.tagAdded(ObjectType.BUNDLE,bundleId,name,internalCallContext);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey,internalCallContext).size(),1);
+  tagRecorder.tagRemoved(ObjectType.BUNDLE,bundleId,name,internalCallContext);
+  Assert.assertEquals(subscriptionTransitionTagSqlDao.getTagsForBusinessSubscriptionTransitionByKey(externalKey,internalCallContext).size(),0);
 }

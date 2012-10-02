@@ -5,11 +5,9 @@
     final BusService busService=new DefaultBusService(bus);
     ((DefaultBusService)busService).startBus();
     accountDao=new AuditedAccountDao(dbi,bus);
-    accountDao.test();
+    accountDao.test(internalCallContext);
     accountEmailDao=new AuditedAccountEmailDao(dbi);
-    accountEmailDao.test();
-    final Clock clock=new ClockMock();
-    context=new DefaultCallContextFactory(clock).createCallContext("Account Dao Tests",CallOrigin.TEST,UserType.TEST);
+    accountEmailDao.test(internalCallContext);
   }
  catch (  Throwable t) {
     fail(t.toString());

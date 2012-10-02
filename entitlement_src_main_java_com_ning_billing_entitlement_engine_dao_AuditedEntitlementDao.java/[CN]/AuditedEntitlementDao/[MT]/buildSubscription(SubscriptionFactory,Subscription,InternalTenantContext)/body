@@ -1,0 +1,21 @@
+{
+  if (input == null) {
+    return null;
+  }
+  final List<Subscription> bundleInput=new ArrayList<Subscription>();
+  if (input.getCategory() == ProductCategory.ADD_ON) {
+    final Subscription baseSubscription=getBaseSubscription(factory,input.getBundleId(),false,context);
+    bundleInput.add(baseSubscription);
+    bundleInput.add(input);
+  }
+ else {
+    bundleInput.add(input);
+  }
+  final List<Subscription> reloadedSubscriptions=buildBundleSubscriptions(input.getBundleId(),factory,bundleInput,context);
+  for (  final Subscription cur : reloadedSubscriptions) {
+    if (cur.getId().equals(input.getId())) {
+      return cur;
+    }
+  }
+  throw new EntitlementError("Unexpected code path in buildSubscription");
+}

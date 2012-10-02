@@ -1,0 +1,14 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Account account=accountApi.getAccountById(UUID.fromString(payment.getAccountId()),callContext);
+  final Collection<Invoice> unpaidInvoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
+  for (  final Invoice invoice : unpaidInvoices) {
+    if (externalPayment) {
+      paymentApi.createExternalPayment(account,invoice.getId(),invoice.getBalance(),callContext);
+    }
+ else {
+      paymentApi.createPayment(account,invoice.getId(),invoice.getBalance(),callContext);
+    }
+  }
+  return Response.status(Status.OK).build();
+}

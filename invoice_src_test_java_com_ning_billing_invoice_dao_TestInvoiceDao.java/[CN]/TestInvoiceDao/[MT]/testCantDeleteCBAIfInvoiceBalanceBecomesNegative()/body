@@ -3,19 +3,19 @@
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),clock.getUTCToday(),Currency.USD);
   final RepairAdjInvoiceItem repairAdjInvoiceItem=new RepairAdjInvoiceItem(invoice1.getId(),invoice1.getAccountId(),invoice1.getInvoiceDate(),invoice1.getInvoiceDate(),BigDecimal.TEN.negate(),invoice1.getCurrency(),UUID.randomUUID());
   final CreditBalanceAdjInvoiceItem creditBalanceAdjInvoiceItem1=new CreditBalanceAdjInvoiceItem(invoice1.getId(),invoice1.getAccountId(),invoice1.getInvoiceDate(),repairAdjInvoiceItem.getAmount().negate(),invoice1.getCurrency());
-  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),true,context);
-  invoiceItemSqlDao.create(repairAdjInvoiceItem,context);
-  invoiceItemSqlDao.create(creditBalanceAdjInvoiceItem1,context);
-  Assert.assertEquals(invoiceDao.getAccountCBA(accountId).doubleValue(),10.00);
+  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),true,internalCallContext);
+  invoiceItemSqlDao.create(repairAdjInvoiceItem,internalCallContext);
+  invoiceItemSqlDao.create(creditBalanceAdjInvoiceItem1,internalCallContext);
+  Assert.assertEquals(invoiceDao.getAccountCBA(accountId,internalCallContext).doubleValue(),10.00);
   verifyInvoice(invoice1.getId(),0.00,10.00);
   try {
-    invoiceDao.deleteCBA(accountId,invoice1.getId(),creditBalanceAdjInvoiceItem1.getId(),context);
+    invoiceDao.deleteCBA(accountId,invoice1.getId(),creditBalanceAdjInvoiceItem1.getId(),internalCallContext);
     Assert.fail();
   }
  catch (  TransactionFailedException e) {
     Assert.assertTrue(e.getCause() instanceof InvoiceApiException);
     Assert.assertEquals(((InvoiceApiException)e.getCause()).getCode(),ErrorCode.INVOICE_WOULD_BE_NEGATIVE.getCode());
   }
-  Assert.assertEquals(invoiceDao.getAccountCBA(accountId).doubleValue(),10.00);
+  Assert.assertEquals(invoiceDao.getAccountCBA(accountId,internalCallContext).doubleValue(),10.00);
   verifyInvoice(invoice1.getId(),0.00,10.00);
 }

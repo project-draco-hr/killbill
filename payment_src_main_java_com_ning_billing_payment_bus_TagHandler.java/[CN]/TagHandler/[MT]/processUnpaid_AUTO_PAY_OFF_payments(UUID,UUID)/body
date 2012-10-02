@@ -1,8 +1,8 @@
 {
   try {
-    final CallContext context=new DefaultCallContext("PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,userToken,clock);
-    final Account account=accountUserApi.getAccountById(accountId);
-    paymentProcessor.process_AUTO_PAY_OFF_removal(account,context);
+    final CallContext context=new DefaultCallContext(null,"PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,userToken,clock);
+    final Account account=accountUserApi.getAccountById(accountId,context);
+    paymentProcessor.process_AUTO_PAY_OFF_removal(account,internalCallContextFactory.createInternalCallContext(accountId,context));
   }
  catch (  AccountApiException e) {
     log.warn(String.format("Failed to process process  removal AUTO_PAY_OFF for account %s",accountId),e);

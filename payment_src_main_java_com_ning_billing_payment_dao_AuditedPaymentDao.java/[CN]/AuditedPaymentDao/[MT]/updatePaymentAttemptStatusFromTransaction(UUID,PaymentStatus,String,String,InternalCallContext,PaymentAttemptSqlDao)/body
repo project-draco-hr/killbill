@@ -1,0 +1,10 @@
+{
+  transactional.updatePaymentAttemptStatus(attemptId.toString(),processingStatus.toString(),gatewayErrorCode,gatewayErrorMsg,context);
+  final PaymentAttemptModelDao savedAttempt=transactional.getPaymentAttempt(attemptId.toString(),context);
+  final Long recordId=transactional.getRecordId(savedAttempt.getId().toString(),context);
+  final EntityHistory<PaymentAttemptModelDao> history=new EntityHistory<PaymentAttemptModelDao>(savedAttempt.getId(),recordId,savedAttempt,ChangeType.UPDATE);
+  transactional.insertHistoryFromTransaction(history,context);
+  final Long historyRecordId=transactional.getHistoryRecordId(recordId,context);
+  final EntityAudit audit=new EntityAudit(TableName.PAYMENT_ATTEMPT_HISTORY,historyRecordId,ChangeType.UPDATE);
+  transactional.insertAuditFromTransaction(audit,context);
+}

@@ -12,8 +12,8 @@
   final List<BlockingState> blockingStates=new ArrayList<BlockingState>();
   blockingStates.add(new DefaultBlockingState(bundleId1,DISABLED_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now));
   blockingStates.add(new DefaultBlockingState(bundleId1,CLEAR_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now.plusDays(2)));
-  Mockito.when(blockingApi.getBlockingHistory(bundleId1)).thenReturn(blockingStates);
-  odc.insertBlockingEvents(billingEvents);
+  Mockito.when(blockingApi.getBlockingHistory(bundleId1,callContext)).thenReturn(blockingStates);
+  odc.insertBlockingEvents(billingEvents,callContext);
   assertEquals(billingEvents.size(),7);
   final SortedSet<BillingEvent> s1Events=odc.filter(billingEvents,subscription1);
   final Iterator<BillingEvent> it1=s1Events.iterator();

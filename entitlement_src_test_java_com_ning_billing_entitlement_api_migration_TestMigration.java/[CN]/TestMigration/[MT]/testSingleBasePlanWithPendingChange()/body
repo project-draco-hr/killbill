@@ -4,12 +4,12 @@
     final EntitlementAccountMigration toBeMigrated=createAccountForMigrationFuturePendingChange();
     final DateTime afterMigration=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
-    migrationApi.migrate(toBeMigrated,context);
+    migrationApi.migrate(toBeMigrated,callContext);
     assertTrue(testListener.isCompleted(5000));
-    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
+    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey(),callContext);
     assertEquals(bundles.size(),1);
     final SubscriptionBundle bundle=bundles.get(0);
-    final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId());
+    final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId(),callContext);
     assertEquals(subscriptions.size(),1);
     final Subscription subscription=subscriptions.get(0);
     assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);

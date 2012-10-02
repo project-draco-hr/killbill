@@ -1,0 +1,23 @@
+{
+  try {
+    return invoiceSqlDao.inTransaction(new Transaction<Invoice,InvoiceSqlDao>(){
+      @Override public Invoice inTransaction(      final InvoiceSqlDao invoiceDao,      final TransactionStatus status) throws Exception {
+        final Invoice invoice=invoiceDao.getById(invoiceId.toString(),context);
+        if (invoice == null) {
+          throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
+        }
+        populateChildren(invoice,invoiceDao,context);
+        return invoice;
+      }
+    }
+);
+  }
+ catch (  TransactionFailedException e) {
+    if (e.getCause() instanceof InvoiceApiException) {
+      throw (InvoiceApiException)e.getCause();
+    }
+ else {
+      throw e;
+    }
+  }
+}

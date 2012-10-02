@@ -1,10 +1,10 @@
 {
-  final List<Invoice> byAccount=invoiceUserApi.getInvoicesByAccount(accountId);
+  final List<Invoice> byAccount=invoiceUserApi.getInvoicesByAccount(accountId,callContext);
   Assert.assertEquals(byAccount.size(),1);
   Assert.assertEquals(byAccount.get(0).getId(),regularInvoiceId);
-  final List<Invoice> byAccountAndDate=invoiceUserApi.getInvoicesByAccount(accountId,date_migrated.minusDays(1));
+  final List<Invoice> byAccountAndDate=invoiceUserApi.getInvoicesByAccount(accountId,date_migrated.minusDays(1),callContext);
   Assert.assertEquals(byAccountAndDate.size(),1);
   Assert.assertEquals(byAccountAndDate.get(0).getId(),regularInvoiceId);
-  final Collection<Invoice> unpaid=invoiceUserApi.getUnpaidInvoicesByAccountId(accountId,new LocalDate(date_regular.plusDays(1)));
+  final Collection<Invoice> unpaid=invoiceUserApi.getUnpaidInvoicesByAccountId(accountId,new LocalDate(date_regular.plusDays(1)),callContext);
   Assert.assertEquals(unpaid.size(),2);
 }

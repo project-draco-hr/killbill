@@ -17,12 +17,12 @@
     final DateTime now=clock.getUTCNow();
     final Duration ctd=getDurationMonth(1);
     final DateTime newChargedThroughDate=DefaultClock.addDuration(now,ctd);
-    billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate.toLocalDate(),context);
-    baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId());
+    billingApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate.toLocalDate(),callContext);
+    baseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
     final String newBaseProduct="Assault-Rifle";
     final BillingPeriod newBaseTerm=BillingPeriod.MONTHLY;
     final String newBasePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-    final List<SubscriptionStatusDryRun> aoStatus=entitlementApi.getDryRunChangePlanStatus(baseSubscription.getId(),newBaseProduct,now);
+    final List<SubscriptionStatusDryRun> aoStatus=entitlementApi.getDryRunChangePlanStatus(baseSubscription.getId(),newBaseProduct,now,callContext);
     assertEquals(aoStatus.size(),1);
     assertEquals(aoStatus.get(0).getId(),aoSubscription.getId());
     assertEquals(aoStatus.get(0).getProductName(),aoProduct);
@@ -33,9 +33,9 @@
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    baseSubscription.changePlan(newBaseProduct,newBaseTerm,newBasePriceList,now,context);
+    baseSubscription.changePlan(newBaseProduct,newBaseTerm,newBasePriceList,now,callContext);
     assertTrue(testListener.isCompleted(5000));
-    aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId());
+    aoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
     assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);
     assertListenerStatus();
   }

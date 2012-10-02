@@ -6,12 +6,12 @@
     final EntitlementAccountMigration toBeMigrated=createAccountForMigrationWithRegularBasePlan(startDate);
     final DateTime afterMigration=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
-    migrationApi.migrate(toBeMigrated,context);
+    migrationApi.migrate(toBeMigrated,callContext);
     assertTrue(testListener.isCompleted(5000));
-    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey());
+    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey(),callContext);
     assertEquals(bundles.size(),1);
     final SubscriptionBundle bundle=bundles.get(0);
-    final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId());
+    final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId(),callContext);
     assertEquals(subscriptions.size(),1);
     final Subscription subscription=subscriptions.get(0);
     assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
@@ -29,9 +29,9 @@
     final DateTime transferRequestedDate=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.TRANSFER);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
-    transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getKey(),transferRequestedDate,false,true,context);
+    transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getKey(),transferRequestedDate,false,true,callContext);
     assertTrue(testListener.isCompleted(3000));
-    final Subscription oldBaseSubscription=entitlementApi.getBaseSubscription(bundle.getId());
+    final Subscription oldBaseSubscription=entitlementApi.getBaseSubscription(bundle.getId(),callContext);
     assertTrue(oldBaseSubscription.getState() == SubscriptionState.CANCELLED);
     assertEquals(oldBaseSubscription.getBillingTransitions().size(),1);
     assertEquals(oldBaseSubscription.getBillingTransitions().get(0).getTransitionType(),SubscriptionTransitionType.CANCEL);

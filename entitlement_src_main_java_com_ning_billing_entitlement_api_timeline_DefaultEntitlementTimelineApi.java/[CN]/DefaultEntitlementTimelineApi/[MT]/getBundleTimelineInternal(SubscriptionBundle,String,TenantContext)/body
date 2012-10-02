@@ -1,0 +1,17 @@
+{
+  try {
+    if (bundle == null) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_BUNDLE,descBundle);
+    }
+    final List<Subscription> subscriptions=dao.getSubscriptions(factory,bundle.getId(),internalCallContextFactory.createInternalTenantContext(context));
+    if (subscriptions.size() == 0) {
+      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_NO_ACTIVE_SUBSCRIPTIONS,bundle.getId());
+    }
+    final String viewId=getViewId(((SubscriptionBundleData)bundle).getLastSysUpdateTime(),subscriptions);
+    final List<SubscriptionTimeline> repairs=createGetSubscriptionRepairList(subscriptions,Collections.<SubscriptionTimeline>emptyList());
+    return createGetBundleRepair(bundle.getId(),bundle.getKey(),viewId,repairs);
+  }
+ catch (  CatalogApiException e) {
+    throw new EntitlementRepairException(e);
+  }
+}

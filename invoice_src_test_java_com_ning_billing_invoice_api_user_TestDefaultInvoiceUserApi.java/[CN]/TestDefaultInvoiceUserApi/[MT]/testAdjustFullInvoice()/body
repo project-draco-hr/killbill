@@ -1,7 +1,7 @@
 {
-  final BigDecimal invoiceBalance=invoiceUserApi.getInvoice(invoiceId).getBalance();
+  final BigDecimal invoiceBalance=invoiceUserApi.getInvoice(invoiceId,tenantContext).getBalance();
   Assert.assertEquals(invoiceBalance.compareTo(BigDecimal.ZERO),1);
-  final BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId);
+  final BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId,tenantContext);
   Assert.assertEquals(accountBalance,invoiceBalance);
   final InvoiceItem creditInvoiceItem=invoiceUserApi.insertCreditForInvoice(accountId,invoiceId,invoiceBalance,clock.getUTCToday(),accountCurrency,context);
   Assert.assertEquals(creditInvoiceItem.getInvoiceId(),invoiceId);
@@ -10,8 +10,8 @@
   Assert.assertEquals(creditInvoiceItem.getAmount(),invoiceBalance.negate());
   Assert.assertEquals(creditInvoiceItem.getCurrency(),accountCurrency);
   Assert.assertNull(creditInvoiceItem.getLinkedItemId());
-  final BigDecimal adjustedInvoiceBalance=invoiceUserApi.getInvoice(invoiceId).getBalance();
+  final BigDecimal adjustedInvoiceBalance=invoiceUserApi.getInvoice(invoiceId,tenantContext).getBalance();
   Assert.assertEquals(adjustedInvoiceBalance.compareTo(BigDecimal.ZERO),0);
-  final BigDecimal adjustedAccountBalance=invoiceUserApi.getAccountBalance(accountId);
+  final BigDecimal adjustedAccountBalance=invoiceUserApi.getAccountBalance(accountId,tenantContext);
   Assert.assertEquals(adjustedAccountBalance,adjustedInvoiceBalance);
 }

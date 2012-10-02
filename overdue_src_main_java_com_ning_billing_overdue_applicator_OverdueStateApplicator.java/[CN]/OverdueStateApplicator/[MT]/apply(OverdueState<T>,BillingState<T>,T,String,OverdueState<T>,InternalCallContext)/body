@@ -1,0 +1,35 @@
+{
+  try {
+    if (nextOverdueState.isClearState() && firstOverdueState != null && billingState != null) {
+      final LocalDate firstUnpaidInvoice=billingState.getDateOfEarliestUnpaidInvoice();
+      if (firstUnpaidInvoice != null) {
+        final Period reevaluationInterval=firstOverdueState.getReevaluationInterval();
+        createFutureNotification(overdueable,firstUnpaidInvoice.toDateTimeAtCurrentTime().plus(reevaluationInterval),context);
+      }
+    }
+    if (previousOverdueStateName.equals(nextOverdueState.getName())) {
+      return;
+    }
+    storeNewState(overdueable,nextOverdueState,context);
+    cancelSubscriptionsIfRequired(overdueable,nextOverdueState,context);
+    sendEmailIfRequired(billingState,overdueable,nextOverdueState,context);
+    final Period reevaluationInterval=nextOverdueState.getReevaluationInterval();
+    if (!nextOverdueState.isClearState()) {
+      createFutureNotification(overdueable,clock.getUTCNow().plus(reevaluationInterval),context);
+    }
+  }
+ catch (  OverdueApiException e) {
+    if (e.getCode() != ErrorCode.OVERDUE_NO_REEVALUATION_INTERVAL.getCode()) {
+      throw new OverdueException(e);
+    }
+  }
+  if (nextOverdueState.isClearState()) {
+    clear(overdueable,context);
+  }
+  try {
+    bus.post(createOverdueEvent(overdueable,previousOverdueStateName,nextOverdueState.getName()));
+  }
+ catch (  Exception e) {
+    log.error("Error posting overdue change event to bus",e);
+  }
+}

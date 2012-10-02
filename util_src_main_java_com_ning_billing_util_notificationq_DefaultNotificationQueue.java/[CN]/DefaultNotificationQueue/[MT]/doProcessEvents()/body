@@ -1,6 +1,7 @@
 {
+  final InternalCallContext context=createCallContext();
   logDebug("ENTER doProcessEvents");
-  final List<Notification> notifications=getReadyNotifications();
+  final List<Notification> notifications=getReadyNotifications(context);
   if (notifications.size() == 0) {
     logDebug("EXIT doProcessEvents");
     return 0;
@@ -13,7 +14,7 @@
     final NotificationKey key=deserializeEvent(cur.getNotificationKeyClass(),cur.getNotificationKey());
     getHandler().handleReadyNotification(key,cur.getEffectiveDate());
     result++;
-    clearNotification(cur);
+    clearNotification(cur,context);
     logDebug("done handling notification %s, key = %s for time %s",cur.getId(),cur.getNotificationKey(),cur.getEffectiveDate());
   }
   return result;

@@ -1,14 +1,15 @@
 {
   try {
-    final BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId);
-    final Account account=accountUserApi.getAccountById(accountId);
+    final BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId,context);
+    final Account account=accountUserApi.getAccountById(accountId,context);
     List<Invoice> invoices=new ArrayList<Invoice>();
     if (!billingEvents.isAccountAutoInvoiceOff()) {
-      invoices=invoiceDao.getInvoicesByAccount(accountId);
+      invoices=invoiceDao.getInvoicesByAccount(accountId,internalCallContextFactory.createInternalTenantContext(account.getId(),context));
     }
     final Currency targetCurrency=account.getCurrency();
     final LocalDate targetDate=new LocalDate(targetDateTime,account.getTimeZone());
     final Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,account.getTimeZone(),targetCurrency);
+    final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),context);
     if (invoice == null) {
       log.info("Generated null invoice.");
       if (!dryRun) {
@@ -25,7 +26,7 @@
           }
         }
 ).size() > 0;
-        invoiceDao.create(invoice,account.getBillCycleDay().getDayOfMonthUTC(),isRealInvoiceWithItems,context);
+        invoiceDao.create(invoice,account.getBillCycleDay().getDayOfMonthUTC(),isRealInvoiceWithItems,internalCallContext);
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         setChargedThroughDates(account.getBillCycleDay(),account.getTimeZone(),fixedPriceInvoiceItems,recurringInvoiceItems,context);
@@ -35,8 +36,8 @@
         }
       }
     }
-    if (account.isNotifiedForInvoices()) {
-      invoiceNotifier.notify(account,invoice);
+    if (account.isNotifiedForInvoices() && invoice != null && !dryRun) {
+      invoiceNotifier.notify(account,invoiceDao.getById(invoice.getId(),internalCallContext),context);
     }
     return invoice;
   }

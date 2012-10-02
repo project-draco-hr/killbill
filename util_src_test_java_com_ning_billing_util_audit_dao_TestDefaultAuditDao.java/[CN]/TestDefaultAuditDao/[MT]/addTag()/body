@@ -1,9 +1,9 @@
 {
-  final TagDefinition tagDefinition=tagDefinitionDao.create(UUID.randomUUID().toString().substring(0,5),UUID.randomUUID().toString().substring(0,5),context);
-  Assert.assertEquals(tagDefinitionDao.getById(tagDefinition.getId()),tagDefinition);
+  final TagDefinition tagDefinition=tagDefinitionDao.create(UUID.randomUUID().toString().substring(0,5),UUID.randomUUID().toString().substring(0,5),internalCallContext);
+  Assert.assertEquals(tagDefinitionDao.getById(tagDefinition.getId(),internalCallContext),tagDefinition);
   final UUID objectId=UUID.randomUUID();
-  tagDao.insertTag(objectId,ObjectType.ACCOUNT,tagDefinition.getId(),context);
-  final Map<String,Tag> tags=tagDao.loadEntities(objectId,ObjectType.ACCOUNT);
+  tagDao.insertTag(objectId,ObjectType.ACCOUNT,tagDefinition.getId(),internalCallContext);
+  final Map<String,Tag> tags=tagDao.loadEntities(objectId,ObjectType.ACCOUNT,internalCallContext);
   Assert.assertEquals(tags.size(),1);
   final Tag tag=tags.values().iterator().next();
   Assert.assertEquals(tag.getTagDefinitionId(),tagDefinition.getId());

@@ -1,0 +1,10 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  PaymentMethod paymentMethod=paymentApi.getPaymentMethodById(UUID.fromString(paymentMethodId),tenantContext);
+  final Account account=accountApi.getAccountById(paymentMethod.getAccountId(),tenantContext);
+  if (withPluginInfo) {
+    paymentMethod=paymentApi.getPaymentMethod(account,paymentMethod.getId(),true,tenantContext);
+  }
+  final PaymentMethodJson json=PaymentMethodJson.toPaymentMethodJson(account,paymentMethod);
+  return Response.status(Status.OK).entity(json).build();
+}
