@@ -32,7 +32,7 @@
             continue;
           }
           BigDecimal positiveCBAAdjItemAmount=BigDecimal.ZERO;
-          for (          final InvoiceItem cbaUsed : Lists.reverse(invoiceFollowing.getInvoiceItems())) {
+          for (          final InvoiceItem cbaUsed : invoiceFollowing.getInvoiceItems()) {
             if (!InvoiceItemType.CBA_ADJ.equals(cbaUsed.getInvoiceItemType()) || cbaUsed.getAmount().compareTo(BigDecimal.ZERO) >= 0) {
               continue;
             }
@@ -40,7 +40,7 @@
             final BigDecimal positiveNextCBAAdjItemAmount;
             if (positiveCBAUsedAmount.compareTo(positiveRemainderToAdjust) < 0) {
               positiveNextCBAAdjItemAmount=positiveCBAUsedAmount;
-              positiveRemainderToAdjust=positiveRemainderToAdjust.min(positiveNextCBAAdjItemAmount);
+              positiveRemainderToAdjust=positiveRemainderToAdjust.subtract(positiveNextCBAAdjItemAmount);
             }
  else {
               positiveNextCBAAdjItemAmount=positiveRemainderToAdjust;
