@@ -1,4 +1,5 @@
 {
+  tagUserApi.removeTag(invoiceId,ObjectType.INVOICE,ControlTagType.WRITTEN_OFF.getId(),context);
   final Invoice invoice=dao.getById(invoiceId,internalCallContextFactory.createInternalCallContext(context));
-  dao.removeWrittenOff(invoiceId,internalCallContextFactory.createInternalCallContext(invoice.getAccountId(),context));
+  notifyBusOfInvoiceAdjustment(invoiceId,invoice.getAccountId(),context.getUserToken());
 }
