@@ -7,16 +7,16 @@
     Assert.fail("Unable to start the bus or service! " + t);
   }
   Assert.assertNull(accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext));
-  bus.post(accountCreationNotification);
+  bus.post(accountCreationNotification,internalCallContext);
   Thread.sleep(5000);
   Assert.assertNotNull(accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext));
-  bus.post(transition);
+  bus.post(transition,internalCallContext);
   Thread.sleep(5000);
   Assert.assertEquals(accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT),1);
-  bus.post(invoiceCreationNotification);
+  bus.post(invoiceCreationNotification,internalCallContext);
   Thread.sleep(5000);
   Assert.assertEquals(accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT),1);
-  bus.post(paymentInfoNotification);
+  bus.post(paymentInfoNotification,internalCallContext);
   Thread.sleep(5000);
   try {
     bus.stop();
