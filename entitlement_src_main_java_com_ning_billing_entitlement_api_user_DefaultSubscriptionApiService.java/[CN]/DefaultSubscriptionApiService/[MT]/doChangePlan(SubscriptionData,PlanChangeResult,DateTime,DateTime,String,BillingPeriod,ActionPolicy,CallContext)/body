@@ -11,7 +11,7 @@
     changeEvents.add(nextPhaseEvent);
   }
   changeEvents.add(changeEvent);
-  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(context);
+  final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
   dao.changePlan(subscription,changeEvents,internalCallContext);
   subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),catalogService.getFullCatalog());
   return (policy == ActionPolicy.IMMEDIATE);
