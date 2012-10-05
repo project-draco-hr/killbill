@@ -6,10 +6,7 @@
   bus=new InMemoryBus();
   bus.start();
   final NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
-  final TagDefinitionDao tagDefinitionDao=new MockTagDefinitionDao();
-  final TagDao tagDao=new AuditedTagDao(dbi,tagEventBuilder,bus);
-  final TagInternalApi tagUserApi=null;
-  invoiceDao=new AuditedInvoiceDao(dbi,nextBillingDatePoster,tagUserApi,clock,bus);
+  invoiceDao=new AuditedInvoiceDao(dbi,nextBillingDatePoster,clock,bus);
   invoiceDao.test(internalCallContext);
   invoiceItemSqlDao=dbi.onDemand(InvoiceItemSqlDao.class);
   invoicePaymentDao=dbi.onDemand(InvoicePaymentSqlDao.class);

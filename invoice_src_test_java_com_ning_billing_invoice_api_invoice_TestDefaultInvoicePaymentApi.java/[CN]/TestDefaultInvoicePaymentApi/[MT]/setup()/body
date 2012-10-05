@@ -6,10 +6,7 @@
   invoiceItemSqlDao=dbi.onDemand(InvoiceItemSqlDao.class);
   invoiceItemSqlDao.test(internalCallContext);
   final NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
-  final TagDefinitionDao tagDefinitionDao=new MockTagDefinitionDao();
-  final TagDao tagDao=new MockTagDao();
   internalCallContextFactory=new InternalCallContextFactory(dbi,clock);
-  final TagInternalApi tagUserApi=null;
-  final InvoiceDao invoiceDao=new AuditedInvoiceDao(dbi,nextBillingDatePoster,tagUserApi,clock,Mockito.mock(Bus.class));
+  final InvoiceDao invoiceDao=new AuditedInvoiceDao(dbi,nextBillingDatePoster,clock,Mockito.mock(Bus.class));
   invoicePaymentApi=new DefaultInvoicePaymentApi(invoiceDao,internalCallContextFactory);
 }

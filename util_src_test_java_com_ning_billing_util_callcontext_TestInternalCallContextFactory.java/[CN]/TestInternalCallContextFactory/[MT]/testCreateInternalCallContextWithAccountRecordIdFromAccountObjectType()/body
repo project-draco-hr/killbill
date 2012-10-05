@@ -1,0 +1,14 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final Long accountRecordId=19384012L;
+  getMysqlTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
+    @Override public Void withHandle(    final Handle handle) throws Exception {
+      handle.execute("insert into accounts (record_id, id) values (?, ?)",accountRecordId,accountId.toString());
+      return null;
+    }
+  }
+);
+  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(accountId,ObjectType.ACCOUNT,callContext);
+  Assert.assertEquals(context.getAccountRecordId(),accountRecordId);
+  verifyInternalCallContext(context);
+}

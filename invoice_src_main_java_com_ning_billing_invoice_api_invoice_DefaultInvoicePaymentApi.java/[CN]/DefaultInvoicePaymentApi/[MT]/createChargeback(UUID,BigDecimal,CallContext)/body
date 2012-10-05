@@ -1,7 +1,7 @@
 {
   return invoicePaymentWithException.executeAndThrow(new WithInvoiceApiExceptionCallback<InvoicePayment>(){
     @Override public InvoicePayment doHandle() throws InvoiceApiException {
-      final UUID accountId=dao.getAccountIdFromInvoicePaymentId(invoicePaymentId,internalCallContextFactory.createInternalCallContext(context));
+      final UUID accountId=dao.getAccountIdFromInvoicePaymentId(invoicePaymentId,internalCallContextFactory.createInternalTenantContext(context));
       return dao.postChargeback(invoicePaymentId,amount,internalCallContextFactory.createInternalCallContext(accountId,context));
     }
   }
