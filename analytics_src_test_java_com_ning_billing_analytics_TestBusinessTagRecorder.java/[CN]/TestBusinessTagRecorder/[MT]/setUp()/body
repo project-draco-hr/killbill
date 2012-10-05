@@ -5,7 +5,7 @@
   final BusinessInvoicePaymentTagSqlDao invoicePaymentTagSqlDao=dbi.onDemand(BusinessInvoicePaymentTagSqlDao.class);
   subscriptionTransitionTagSqlDao=dbi.onDemand(BusinessSubscriptionTransitionTagSqlDao.class);
   eventBus=new InMemoryBus();
-  final AccountDao accountDao=new AuditedAccountDao(dbi,eventBus);
+  final AccountDao accountDao=new AuditedAccountDao(dbi,eventBus,new InternalCallContextFactory(dbi,new ClockMock()));
   final AccountEmailDao accountEmailDao=new AuditedAccountEmailDao(dbi);
   final DefaultClock clock=new DefaultClock();
   callContextFactory=new DefaultCallContextFactory(clock);
