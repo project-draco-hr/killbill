@@ -9,7 +9,7 @@
       log.info(String.format("Skip retry payment %s in state %s because AUTO_PAY_OFF",payment.getId(),payment.getPaymentStatus()));
       return;
     }
-    final Account account=accountUserApi.getAccountById(payment.getAccountId(),context.toCallContext());
+    final Account account=accountInternalApi.getAccountById(payment.getAccountId(),context);
     final PaymentPluginApi plugin=getPaymentProviderPlugin(account,context);
     voidPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Void>(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
       @Override public Void doOperation() throws PaymentApiException {

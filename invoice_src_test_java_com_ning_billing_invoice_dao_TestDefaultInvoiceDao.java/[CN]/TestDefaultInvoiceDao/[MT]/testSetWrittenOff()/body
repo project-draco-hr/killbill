@@ -1,9 +1,9 @@
 {
   final UUID invoiceId=UUID.randomUUID();
-  final Map<String,Tag> beforeTags=tagUserApi.getTags(invoiceId,ObjectType.INVOICE,callContext);
+  final Map<String,Tag> beforeTags=tagInternalApi.getTags(invoiceId,ObjectType.INVOICE,internalCallContext);
   Assert.assertEquals(beforeTags.keySet().size(),0);
   dao.setWrittenOff(invoiceId,internalCallContext);
-  final Map<String,Tag> afterTags=tagUserApi.getTags(invoiceId,ObjectType.INVOICE,callContext);
+  final Map<String,Tag> afterTags=tagInternalApi.getTags(invoiceId,ObjectType.INVOICE,internalCallContext);
   Assert.assertEquals(afterTags.keySet().size(),1);
   final UUID tagDefinitionId=ControlTagType.WRITTEN_OFF.getId();
   Assert.assertEquals(afterTags.values().iterator().next().getTagDefinitionId(),tagDefinitionId);

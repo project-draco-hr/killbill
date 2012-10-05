@@ -30,9 +30,9 @@
   notificationQueueService=g.getInstance(NotificationQueueService.class);
   final InvoiceDispatcher dispatcher=g.getInstance(InvoiceDispatcher.class);
   final Subscription subscription=Mockito.mock(Subscription.class);
-  final EntitlementUserApi entitlementUserApi=Mockito.mock(EntitlementUserApi.class);
-  Mockito.when(entitlementUserApi.getSubscriptionFromId(Mockito.<UUID>any(),Mockito.<TenantContext>any())).thenReturn(subscription);
+  final EntitlementInternalApi entitlementUserApi=Mockito.mock(EntitlementInternalApi.class);
+  Mockito.when(entitlementUserApi.getSubscriptionFromId(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscription);
   final CallContextFactory factory=new DefaultCallContextFactory(clock);
   listener=new InvoiceListenerMock(factory,dispatcher);
-  notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),entitlementUserApi,listener,new DefaultCallContextFactory(clock));
+  notifier=new DefaultNextBillingDateNotifier(notificationQueueService,g.getInstance(InvoiceConfig.class),entitlementUserApi,listener,new InternalCallContextFactory(null,clock));
 }

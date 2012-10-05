@@ -1,7 +1,7 @@
 {
+  tagInternalApi.removeTag(invoiceId,ObjectType.INVOICE,ControlTagType.WRITTEN_OFF.getId(),context);
   invoiceSqlDao.inTransaction(new Transaction<Void,InvoiceSqlDao>(){
     @Override public Void inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
-      tagUserApi.removeTag(invoiceId,ObjectType.INVOICE,ControlTagType.WRITTEN_OFF.getId(),context.toCallContext());
       final Invoice invoice=transactional.getById(invoiceId.toString(),context);
       notifyBusOfInvoiceAdjustment(transactional,invoiceId,invoice.getAccountId(),context.getUserToken());
       return null;
