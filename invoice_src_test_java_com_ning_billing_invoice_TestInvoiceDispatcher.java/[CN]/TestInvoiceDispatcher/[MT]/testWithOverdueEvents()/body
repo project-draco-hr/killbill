@@ -7,7 +7,7 @@
   events.add(createMockBillingEvent(account,subscription,new DateTime("2012-07-25T00:00:00.000Z"),bicycleTrialEvergreen1USD,new MockPlanPhase(bicycleTrialEvergreen1USD,PhaseType.EVERGREEN),null,new BigDecimal("249.95"),account.getCurrency(),BillingPeriod.MONTHLY,31,31,BillingModeType.IN_ADVANCE,"",1L,SubscriptionTransitionType.END_BILLING_DISABLED));
   final MockPlan jetTrialEvergreen1000USD=MockPlan.createJetTrialEvergreen1000USD();
   events.add(createMockBillingEvent(account,subscription,new DateTime("2012-07-25T00:04:00.000Z"),jetTrialEvergreen1000USD,new MockPlanPhase(jetTrialEvergreen1000USD,PhaseType.EVERGREEN),null,new BigDecimal("1000"),account.getCurrency(),BillingPeriod.MONTHLY,31,31,BillingModeType.IN_ADVANCE,"CHANGE",3L,SubscriptionTransitionType.CHANGE));
-  Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),callContext)).thenReturn(events);
+  Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext)).thenReturn(events);
   final InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
   final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,billingApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock,internalCallContextFactory);
   final Invoice invoice=dispatcher.processAccount(account.getId(),new DateTime("2012-07-30T00:00:00.000Z"),false,callContext);

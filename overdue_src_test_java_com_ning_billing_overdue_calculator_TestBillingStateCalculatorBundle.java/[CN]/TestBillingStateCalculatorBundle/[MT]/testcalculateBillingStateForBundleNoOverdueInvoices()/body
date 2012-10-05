@@ -3,14 +3,14 @@
   now=new LocalDate();
   final List<Invoice> invoices=new ArrayList<Invoice>(5);
   final Clock clock=new ClockMock();
-  final InvoiceUserApi invoiceApi=Mockito.mock(InvoiceUserApi.class);
-  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any(),Mockito.<TenantContext>any())).thenReturn(invoices);
+  final InvoiceInternalApi invoiceApi=Mockito.mock(InvoiceInternalApi.class);
+  Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any(),Mockito.<InternalTenantContext>any())).thenReturn(invoices);
   final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
   Mockito.when(bundle.getId()).thenReturn(thisBundleId);
   Mockito.when(bundle.getAccountId()).thenReturn(UUID.randomUUID());
-  final EntitlementUserApi entitlementApi=Mockito.mock(EntitlementUserApi.class);
+  final EntitlementInternalApi entitlementApi=Mockito.mock(EntitlementInternalApi.class);
   final Subscription subscription=Mockito.mock(Subscription.class);
-  Mockito.when(entitlementApi.getBaseSubscription(Mockito.<UUID>any(),Mockito.<TenantContext>any())).thenReturn(subscription);
+  Mockito.when(entitlementApi.getBaseSubscription(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscription);
   final Plan plan=MockPlan.createBicycleNoTrialEvergreen1USD();
   final PriceList pricelist=new MockPriceList();
   Mockito.when(subscription.getCurrentPlan()).thenReturn(plan);

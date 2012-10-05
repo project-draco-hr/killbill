@@ -7,27 +7,27 @@
   blockingStates.add(new DefaultBlockingState(bunId,DISABLED_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(1)));
   blockingStates.add(new DefaultBlockingState(bunId,CLEAR_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now.plusDays(2)));
   final BlockingCalculator blockingCal=new BlockingCalculator(new BlockingApi(){
-    @Override public <T extends Blockable>void setBlockingState(    final BlockingState state,    final CallContext context){
+    @Override public <T extends Blockable>void setBlockingState(    final BlockingState state,    final InternalCallContext context){
     }
-    @Override public BlockingState getBlockingStateFor(    final UUID overdueableId,    final TenantContext context){
+    @Override public BlockingState getBlockingStateFor(    final UUID overdueableId,    final InternalTenantContext context){
       return null;
     }
-    @Override public BlockingState getBlockingStateFor(    final Blockable overdueable,    final TenantContext context){
+    @Override public BlockingState getBlockingStateFor(    final Blockable overdueable,    final InternalTenantContext context){
       return null;
     }
-    @Override public List<BlockingState> getBlockingHistory(    final UUID overdueableId,    final TenantContext context){
+    @Override public List<BlockingState> getBlockingHistory(    final UUID overdueableId,    final InternalTenantContext context){
       if (overdueableId == bunId) {
         return blockingStates;
       }
       return new ArrayList<BlockingState>();
     }
-    @Override public List<BlockingState> getBlockingHistory(    final Blockable overdueable,    final TenantContext context){
+    @Override public List<BlockingState> getBlockingHistory(    final Blockable overdueable,    final InternalTenantContext context){
       return new ArrayList<BlockingState>();
     }
   }
 );
-  final BillingApi api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi,blockingCal,catalogService,tagApi);
-  final SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),callContext);
+  final BillingInternalApi api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi,blockingCal,catalogService,tagApi);
+  final SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext);
   Assert.assertEquals(events.size(),3);
   final Iterator<BillingEvent> it=events.iterator();
   checkEvent(it.next(),nextPlan,account.getBillCycleDay().getDayOfMonthUTC(),subId,now,nextPhase,SubscriptionTransitionType.CREATE.toString(),nextPhase.getFixedPrice(),nextPhase.getRecurringPrice());
