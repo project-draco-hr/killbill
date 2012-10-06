@@ -1,11 +1,5 @@
 {
-  final Long tenantRecordId;
-  if (context.getTenantId() == null) {
-    tenantRecordId=retrieveTenantRecordIdFromObject(objectId,objectType);
-  }
- else {
-    tenantRecordId=getTenantRecordId(context);
-  }
-  final Long accountRecordId=retrieveAccountRecordIdFromObject(objectId,objectType);
-  return createInternalCallContext(tenantRecordId,accountRecordId,context);
+  final Long tenantRecordIdFromObject=retrieveTenantRecordIdFromObject(objectId,objectType);
+  final Long tenantRecordIdFromContext=getTenantRecordId(context);
+  return createInternalCallContext(objectId,objectType,context.getUserName(),context.getCallOrigin(),context.getUserType(),context.getUserToken());
 }
