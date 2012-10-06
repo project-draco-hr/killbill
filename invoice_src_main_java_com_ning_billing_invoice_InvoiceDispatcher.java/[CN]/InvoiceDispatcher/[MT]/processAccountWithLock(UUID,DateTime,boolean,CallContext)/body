@@ -1,9 +1,8 @@
 {
   try {
-    final InternalCallContext internalCallContextNoAccounrRecordId=internalCallContextFactory.createInternalCallContext(context);
-    final BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId,internalCallContextNoAccounrRecordId);
-    final Account account=accountApi.getAccountById(accountId,internalCallContextNoAccounrRecordId);
-    final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),context);
+    final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(accountId,context);
+    final BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId,internalCallContext);
+    final Account account=accountApi.getAccountById(accountId,internalCallContext);
     List<Invoice> invoices=new ArrayList<Invoice>();
     if (!billingEvents.isAccountAutoInvoiceOff()) {
       invoices=invoiceDao.getInvoicesByAccount(accountId,internalCallContextFactory.createInternalTenantContext(account.getId(),context));

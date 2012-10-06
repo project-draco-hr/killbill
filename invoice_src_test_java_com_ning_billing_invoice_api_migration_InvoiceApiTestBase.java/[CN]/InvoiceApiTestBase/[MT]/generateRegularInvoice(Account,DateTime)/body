@@ -9,9 +9,9 @@
   final Currency currency=Currency.USD;
   final BigDecimal fixedPrice=null;
   events.add(createMockBillingEvent(account,subscription,effectiveDate,plan,planPhase,fixedPrice,BigDecimal.ONE,currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"",1L,SubscriptionTransitionType.CREATE));
-  Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext)).thenReturn(events);
+  Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(Mockito.<UUID>any(),Mockito.<InternalCallContext>any())).thenReturn(events);
   final InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
-  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,null,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock,internalCallContextFactory);
+  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,entitlementApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock,internalCallContextFactory);
   Invoice invoice=dispatcher.processAccount(account.getId(),targetDate,true,callContext);
   Assert.assertNotNull(invoice);
   List<Invoice> invoices=invoiceDao.getInvoicesByAccount(account.getId(),internalCallContext);
