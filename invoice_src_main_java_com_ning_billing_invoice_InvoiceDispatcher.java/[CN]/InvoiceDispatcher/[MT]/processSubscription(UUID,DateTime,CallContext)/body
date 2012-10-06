@@ -4,10 +4,10 @@
       log.error("Failed handling entitlement change.",new InvoiceApiException(ErrorCode.INVOICE_INVALID_TRANSITION));
       return;
     }
-    final UUID accountId=billingApi.getAccountIdFromSubscriptionId(subscriptionId,internalCallContextFactory.createInternalTenantContext(context));
+    final UUID accountId=entitlementApi.getAccountIdFromSubscriptionId(subscriptionId,internalCallContextFactory.createInternalTenantContext(context));
     processAccount(accountId,targetDate,false,context);
   }
- catch (  EntitlementBillingApiException e) {
+ catch (  EntitlementUserApiException e) {
     log.error("Failed handling entitlement change.",new InvoiceApiException(ErrorCode.INVOICE_NO_ACCOUNT_ID_FOR_SUBSCRIPTION_ID,subscriptionId.toString()));
   }
 }

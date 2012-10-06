@@ -17,7 +17,6 @@
   Mockito.when(entitlementApi.getBaseSubscription(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscription);
   tagApi=mock(TagInternalApi.class);
   bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
-  factory=new InternalCallContextFactory(null,clock);
-  api=new DefaultBillingApi(null,factory,accountApi,bcdCalculator,entitlementApi,blockCalculator,catalogService,tagApi);
+  api=new DefaultInternalBillingApi(accountApi,bcdCalculator,entitlementApi,blockCalculator,catalogService,tagApi);
   ((MockCatalog)catalogService.getFullCatalog()).setBillingAlignment(BillingAlignment.ACCOUNT);
 }
