@@ -5,9 +5,10 @@
   if (input == null) {
     return Collections.emptyList();
   }
-  final boolean claimed=(dao.claimBusEvent(hostname,nextAvailable,input.getId(),now,context) == 1);
+  final InternalCallContext rehydratedContext=internalCallContextFactory.createInternalCallContext(input.getTenantRecordId(),input.getAccountRecordId(),context);
+  final boolean claimed=(dao.claimBusEvent(hostname,nextAvailable,input.getId(),now,rehydratedContext) == 1);
   if (claimed) {
-    dao.insertClaimedHistory(hostname,now,input.getId(),context);
+    dao.insertClaimedHistory(hostname,now,input.getId(),rehydratedContext);
     return Collections.singletonList(input);
   }
   return Collections.emptyList();
