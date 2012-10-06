@@ -13,7 +13,7 @@
   final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountUserApi,billingApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock,new InternalCallContextFactory(getMysqlTestingHelper().getDBI(),clock));
   Invoice invoice=dispatcher.processAccount(accountId,target,true,callContext);
   Assert.assertNotNull(invoice);
-  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(accountId,callContext);
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(callContext);
   List<Invoice> invoices=invoiceDao.getInvoicesByAccount(accountId,internalTenantContext);
   Assert.assertEquals(invoices.size(),0);
   invoice=dispatcher.processAccount(accountId,target,true,callContext);

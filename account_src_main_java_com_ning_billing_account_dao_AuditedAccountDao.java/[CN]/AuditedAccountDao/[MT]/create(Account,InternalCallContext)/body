@@ -9,14 +9,15 @@
         }
         transactionalDao.create(account,context);
         final Long recordId=accountSqlDao.getRecordId(account.getId().toString(),context);
+        final InternalCallContext rehydratedContext=internalCallContextFactory.createInternalCallContext(recordId,context);
         final EntityHistory<Account> history=new EntityHistory<Account>(account.getId(),recordId,account,ChangeType.INSERT);
-        accountSqlDao.insertHistoryFromTransaction(history,context);
-        final Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId,context);
+        accountSqlDao.insertHistoryFromTransaction(history,rehydratedContext);
+        final Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId,rehydratedContext);
         final EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
-        accountSqlDao.insertAuditFromTransaction(audit,context);
-        final AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,context.getUserToken());
+        accountSqlDao.insertAuditFromTransaction(audit,rehydratedContext);
+        final AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,rehydratedContext.getUserToken());
         try {
-          eventBus.postFromTransaction(creationEvent,transactionalDao,internalCallContextFactory.createInternalCallContext(recordId,context));
+          eventBus.postFromTransaction(creationEvent,transactionalDao,rehydratedContext);
         }
  catch (        EventBusException e) {
           log.warn("Failed to post account creation event for account " + account.getId(),e);
