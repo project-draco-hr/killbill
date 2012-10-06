@@ -16,7 +16,7 @@
         accountSqlDao.insertAuditFromTransaction(audit,context);
         final AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,context.getUserToken());
         try {
-          eventBus.postFromTransaction(creationEvent,transactionalDao);
+          eventBus.postFromTransaction(creationEvent,transactionalDao,internalCallContextFactory.createInternalCallContext(recordId,context));
         }
  catch (        EventBusException e) {
           log.warn("Failed to post account creation event for account " + account.getId(),e);
