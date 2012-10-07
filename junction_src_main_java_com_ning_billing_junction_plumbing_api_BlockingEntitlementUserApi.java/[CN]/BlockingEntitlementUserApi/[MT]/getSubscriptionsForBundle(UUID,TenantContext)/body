@@ -2,7 +2,7 @@
   final List<Subscription> result=new ArrayList<Subscription>();
   final List<Subscription> subscriptions=entitlementUserApi.getSubscriptionsForBundle(bundleId,context);
   for (  final Subscription subscription : subscriptions) {
-    result.add(new BlockingSubscription(subscription,blockingApi,checker,context,internalCallContextFactory));
+    result.add(new BlockingSubscription(subscription,blockingApi,checker,internalCallContextFactory.createInternalTenantContext(context),internalCallContextFactory));
   }
   return result;
 }

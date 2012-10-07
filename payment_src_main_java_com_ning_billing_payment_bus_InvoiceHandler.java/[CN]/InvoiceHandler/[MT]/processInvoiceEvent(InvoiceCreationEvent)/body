@@ -3,7 +3,8 @@
   final Account account;
   try {
     final CallContext context=new DefaultCallContext(null,"PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken(),clock);
-    account=accountUserApi.getAccountById(event.getAccountId(),context);
+    final InternalTenantContext internalContext=internalCallContextFactory.createInternalCallContext(event.getAccountId(),context);
+    account=accountApi.getAccountById(event.getAccountId(),internalContext);
     paymentProcessor.createPayment(account,event.getInvoiceId(),null,internalCallContextFactory.createInternalCallContext(event.getAccountId(),context),false,false);
   }
  catch (  AccountApiException e) {

@@ -7,9 +7,9 @@
   addDaysAndCheckForCompletion(30,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,6,30),callContext);
-  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(15,NextEvent.PAYMENT_ERROR);
-  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(20,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.PAYMENT_ERROR);
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,7,31),callContext);
@@ -31,7 +31,7 @@
       createPaymentAndCheckForCompletion(account,invoice,NextEvent.PAYMENT);
     }
   }
-  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   checkChangePlanWithOverdueState(baseSubscription,false);
   invoiceChecker.checkRepairedInvoice(account.getId(),3,callContext,new ExpectedItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")),new ExpectedItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-249.95")),new ExpectedItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,25),InvoiceItemType.CBA_ADJ,new BigDecimal("249.95")));
   invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,15),InvoiceItemType.RECURRING,new BigDecimal("124.98")),new ExpectedItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("116.09")),new ExpectedItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,25),InvoiceItemType.CBA_ADJ,new BigDecimal("-241.07")));

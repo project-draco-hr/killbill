@@ -21,7 +21,7 @@
     @Override public Void inTransaction(    final BusinessOverdueStatusSqlDao transactional,    final TransactionStatus status) throws Exception {
       log.info("Started rebuilding overdue statuses for bundle id {}",bundleId);
       transactional.deleteOverdueStatusesForBundle(bundleId.toString(),context);
-      final List<BlockingState> blockingHistory=blockingApi.getBlockingHistory(bundleId,context.toCallContext());
+      final List<BlockingState> blockingHistory=blockingApi.getBlockingHistory(bundleId,context);
       if (blockingHistory != null && blockingHistory.size() > 0) {
         final List<BlockingState> overdueStates=ImmutableList.<BlockingState>copyOf(blockingHistory);
         final List<BlockingState> overdueStatesReversed=Lists.reverse(overdueStates);

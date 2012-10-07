@@ -1,5 +1,6 @@
 {
-  tagUserApi.addTag(invoiceId,ObjectType.INVOICE,ControlTagType.WRITTEN_OFF.getId(),context);
-  final Invoice invoice=dao.getById(invoiceId,internalCallContextFactory.createInternalTenantContext(context));
+  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(context);
+  tagApi.addTag(invoiceId,ObjectType.INVOICE,ControlTagType.WRITTEN_OFF.getId(),internalContext);
+  final Invoice invoice=dao.getById(invoiceId,internalContext);
   notifyBusOfInvoiceAdjustment(invoiceId,invoice.getAccountId(),context.getUserToken(),internalCallContextFactory.createInternalCallContext(invoice.getAccountId(),context));
 }

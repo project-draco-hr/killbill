@@ -8,7 +8,7 @@
   clock.addDays(40);
   assertTrue(testListener.isCompleted(3000));
   final DateTime ctd=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
-  billingApi.setChargedThroughDate(baseSubscription.getId(),ctd.toLocalDate(),callContext);
+  entitlementInternalApi.setChargedThroughDate(baseSubscription.getId(),ctd.toLocalDate(),internalCallContext);
   final DateTime transferRequestedDate=clock.getUTCNow();
   testListener.pushExpectedEvent(NextEvent.TRANSFER);
   transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getKey(),transferRequestedDate,false,false,callContext);
@@ -35,7 +35,7 @@
   assertEquals(newBaseSubscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
   clock.addDays(2);
   final DateTime newCtd=newBaseSubscription.getStartDate().plusYears(1);
-  billingApi.setChargedThroughDate(newBaseSubscription.getId(),newCtd.toLocalDate(),callContext);
+  entitlementInternalApi.setChargedThroughDate(newBaseSubscription.getId(),newCtd.toLocalDate(),internalCallContext);
   final Subscription newBaseSubscriptionWithCtd=entitlementApi.getSubscriptionFromId(newBaseSubscription.getId(),callContext);
   final String newBaseProduct2="Pistol";
   final BillingPeriod newBaseTerm2=BillingPeriod.ANNUAL;

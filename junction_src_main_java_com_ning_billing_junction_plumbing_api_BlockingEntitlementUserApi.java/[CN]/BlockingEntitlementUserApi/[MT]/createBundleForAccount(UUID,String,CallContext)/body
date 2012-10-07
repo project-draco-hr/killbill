@@ -1,7 +1,8 @@
 {
   try {
-    checker.checkBlockedChange(accountId,Blockable.Type.ACCOUNT,internalCallContextFactory.createInternalTenantContext(context));
-    return new BlockingSubscriptionBundle(entitlementUserApi.createBundleForAccount(accountId,bundleKey,context),blockingApi,context);
+    final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(context);
+    checker.checkBlockedChange(accountId,Blockable.Type.ACCOUNT,internalContext);
+    return new BlockingSubscriptionBundle(entitlementUserApi.createBundleForAccount(accountId,bundleKey,context),blockingApi,internalContext);
   }
  catch (  BlockingApiException e) {
     throw new EntitlementUserApiException(e,e.getCode(),e.getMessage());

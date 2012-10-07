@@ -7,9 +7,9 @@
   addDaysAndCheckForCompletion(30,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,6,30),callContext);
-  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(15,NextEvent.PAYMENT_ERROR);
-  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(20,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.PAYMENT_ERROR);
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,7,31),callContext);
@@ -17,13 +17,13 @@
   checkChangePlanWithOverdueState(baseSubscription,true);
   final Invoice firstNonZeroInvoice=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext).iterator().next();
   fullyAdjustInvoiceItemAndCheckForCompletion(account,firstNonZeroInvoice,1,NextEvent.INVOICE_ADJUSTMENT);
-  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   invoiceChecker.checkRepairedInvoice(account.getId(),2,callContext,new ExpectedItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")),new ExpectedItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,5,31),InvoiceItemType.ITEM_ADJ,new BigDecimal("-249.95")));
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,7,31),callContext);
   addDaysAndCheckForCompletion(5);
-  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(10,NextEvent.PAYMENT_ERROR);
-  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(15,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseSubscription,true);
@@ -34,5 +34,5 @@
       fullyAdjustInvoiceAndCheckForCompletion(account,invoice,NextEvent.INVOICE_ADJUSTMENT);
     }
   }
-  checkODState(BlockingApi.CLEAR_STATE_NAME);
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
 }

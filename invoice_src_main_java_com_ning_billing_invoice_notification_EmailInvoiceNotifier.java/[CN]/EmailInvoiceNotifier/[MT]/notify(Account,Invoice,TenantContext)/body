@@ -1,13 +1,14 @@
 {
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(context);
   final List<String> to=new ArrayList<String>();
   to.add(account.getEmail());
-  final List<AccountEmail> accountEmailList=accountUserApi.getEmails(account.getId(),context);
+  final List<AccountEmail> accountEmailList=accountApi.getEmails(account.getId(),internalTenantContext);
   final List<String> cc=new ArrayList<String>();
   for (  final AccountEmail email : accountEmailList) {
     cc.add(email.getEmail());
   }
   boolean manualPay=false;
-  final Map<String,Tag> accountTags=tagUserApi.getTags(account.getId(),ObjectType.ACCOUNT,context);
+  final Map<String,Tag> accountTags=tagUserApi.getTags(account.getId(),ObjectType.ACCOUNT,internalTenantContext);
   for (  final Tag tag : accountTags.values()) {
     if (ControlTagType.MANUAL_PAY.getId().equals(tag.getTagDefinitionId())) {
       manualPay=true;

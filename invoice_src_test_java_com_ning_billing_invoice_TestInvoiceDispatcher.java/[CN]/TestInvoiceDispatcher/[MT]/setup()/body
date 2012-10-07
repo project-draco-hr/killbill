@@ -2,10 +2,9 @@
   notifier.initialize();
   notifier.start();
   busService.getBus().start();
-  accountUserApi=Mockito.mock(AccountUserApi.class);
   account=Mockito.mock(Account.class);
   final UUID accountId=UUID.randomUUID();
-  Mockito.when(accountUserApi.getAccountById(accountId,callContext)).thenReturn(account);
+  Mockito.when(accountInternalApi.getAccountById(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(account);
   Mockito.when(account.getCurrency()).thenReturn(Currency.USD);
   Mockito.when(account.getId()).thenReturn(accountId);
   Mockito.when(account.isNotifiedForInvoices()).thenReturn(true);

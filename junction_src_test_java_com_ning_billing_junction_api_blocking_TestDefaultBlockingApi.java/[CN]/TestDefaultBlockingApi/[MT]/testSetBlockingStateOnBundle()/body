@@ -9,9 +9,10 @@
     }
   }
 );
-  final BlockingState blockingState=new DefaultBlockingState(bundleId,"BLOCKED",Type.SUBSCRIPTION_BUNDLE,"myService",true,true,true,clock.getUTCNow());
-  blockingApi.setBlockingState(blockingState,callContext);
-  Assert.assertEquals(blockingApi.getBlockingStateFor(bundleId,callContext),blockingState);
+  final BlockingState blockingState=new DefaultBlockingState(bundleId,"BLOCKED",Type.SUBSCRIPTION_BUNDLE,"myService",true,true,true,internalCallContext.getCreatedDate());
+  blockingApi.setBlockingState(blockingState,internalCallContext);
+  final BlockingState resultState=blockingApi.getBlockingStateFor(bundleId,internalCallContext);
+  Assert.assertEquals(resultState.getStateName(),blockingState.getStateName());
   getMysqlTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
     @Override public Void withHandle(    final Handle handle) throws Exception {
       final List<Map<String,Object>> values=handle.select("select account_record_id from blocking_states where id = ?",bundleId.toString());

@@ -1,9 +1,9 @@
 {
   loadSystemPropertiesFromClasspath("/resource.properties");
-  bind(Clock.class).to(ClockMock.class).asEagerSingleton();
-  bind(ClockMock.class).asEagerSingleton();
+  final ClockMock clock=new ClockMock();
+  bind(Clock.class).toInstance(clock);
+  bind(ClockMock.class).toInstance(clock);
   bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
-  bind(InternalCallContextFactory.class).asEagerSingleton();
   install(new TagStoreModule());
   install(new CustomFieldModule());
   final MysqlTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getMysqlTestingHelper();
@@ -17,7 +17,11 @@
     final IDBI dbi=helper.getDBI();
     bind(IDBI.class).toInstance(dbi);
   }
+  final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(helper.getDBI(),clock);
+  bind(InternalCallContextFactory.class).toInstance(internalCallContextFactory);
   bind(InvoiceFormatterFactory.class).to(DefaultInvoiceFormatterFactory.class).asEagerSingleton();
+  bind(AccountInternalApi.class).toInstance(Mockito.mock(AccountInternalApi.class));
+  bind(EntitlementInternalApi.class).toInstance(Mockito.mock(EntitlementInternalApi.class));
   install(new EmailModule());
   install(new GlobalLockerModule());
   install(new NotificationQueueModule());

@@ -17,10 +17,13 @@
       bind(TagDao.class).to(AuditedTagDao.class).asEagerSingleton();
       bind(CustomFieldDao.class).to(AuditedCustomFieldDao.class).asEagerSingleton();
       bind(GlobalLocker.class).to(MySqlGlobalLocker.class).asEagerSingleton();
-      bind(ChargeThruApi.class).toInstance(Mockito.mock(ChargeThruApi.class));
       install(new MockJunctionModule());
       install(new EmailModule());
       install(new TemplateModule());
+      final AccountInternalApi accountApi=Mockito.mock(AccountInternalApi.class);
+      bind(AccountInternalApi.class).toInstance(accountApi);
+      final EntitlementInternalApi entitlementApi=Mockito.mock(EntitlementInternalApi.class);
+      bind(EntitlementInternalApi.class).toInstance(entitlementApi);
     }
   }
 );
@@ -28,9 +31,12 @@
   eventBus=g.getInstance(Bus.class);
   notificationQueueService=g.getInstance(NotificationQueueService.class);
   final OverdueProperties properties=g.getInstance(OverdueProperties.class);
+  final Account account=Mockito.mock(Account.class);
+  final AccountInternalApi accountApi=g.getInstance(AccountInternalApi.class);
+  Mockito.when(accountApi.getAccountById(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(account);
   final Subscription subscription=Mockito.mock(Subscription.class);
-  final EntitlementUserApi entitlementUserApi=Mockito.mock(EntitlementUserApi.class);
-  Mockito.when(entitlementUserApi.getSubscriptionFromId(Mockito.<UUID>any(),Mockito.<TenantContext>any())).thenReturn(subscription);
+  final EntitlementInternalApi entitlementApi=g.getInstance(EntitlementInternalApi.class);
+  Mockito.when(entitlementApi.getSubscriptionFromId(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscription);
   listener=new OverdueListenerMock();
   notifier=new DefaultOverdueCheckNotifier(notificationQueueService,properties,listener);
   eventBus.start();

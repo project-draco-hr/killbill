@@ -10,7 +10,7 @@
   }
   try {
     final InternalCallContext context=internalCallContextFactory.createInternalCallContext("RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,null);
-    final Account account=accountUserApi.getAccountById(refundsToBeFixed.iterator().next().getAccountId(),context.toCallContext());
+    final Account account=accountInternalApi.getAccountById(refundsToBeFixed.iterator().next().getAccountId(),context);
     new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
       @Override public Void doOperation() throws PaymentApiException {
         try {
