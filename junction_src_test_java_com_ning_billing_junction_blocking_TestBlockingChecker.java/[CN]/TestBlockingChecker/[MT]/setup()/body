@@ -14,9 +14,12 @@
     @Override protected void configure(){
       bind(BlockingChecker.class).to(DefaultBlockingChecker.class).asEagerSingleton();
       bind(BlockingStateDao.class).toInstance(dao);
+      final EntitlementUserApi entitlementUserApi=Mockito.mock(EntitlementUserApi.class);
+      bind(EntitlementUserApi.class).toInstance(entitlementUserApi);
       final EntitlementInternalApi entitlementInternalApi=Mockito.mock(EntitlementInternalApi.class);
       bind(EntitlementInternalApi.class).toInstance(entitlementInternalApi);
       try {
+        Mockito.when(entitlementUserApi.getBundleFromId(Mockito.<UUID>any(),Mockito.<TenantContext>any())).thenReturn(bundle);
         Mockito.when(entitlementInternalApi.getBundleFromId(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(bundle);
       }
  catch (      EntitlementUserApiException e) {
