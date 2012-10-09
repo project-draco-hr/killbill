@@ -10,6 +10,7 @@
   final DefaultClock clock=new DefaultClock();
   callContextFactory=new DefaultCallContextFactory(clock);
   final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(dbi,clock);
+  accountApi=new DefaultAccountInternalApi(accountDao,accountEmailDao);
   accountUserApi=new DefaultAccountUserApi(callContextFactory,internalCallContextFactory,accountDao,accountEmailDao);
   final CatalogService catalogService=new DefaultCatalogService(Mockito.mock(CatalogConfig.class),Mockito.mock(VersionedCatalogLoader.class));
   final AddonUtils addonUtils=new AddonUtils(catalogService);
@@ -18,7 +19,8 @@
   final PlanAligner planAligner=new PlanAligner(catalogService);
   final DefaultSubscriptionApiService apiService=new DefaultSubscriptionApiService(clock,entitlementDao,catalogService,planAligner,internalCallContextFactory);
   final DefaultSubscriptionFactory subscriptionFactory=new DefaultSubscriptionFactory(apiService,clock,catalogService);
+  entitlementApi=new DefaultEntitlementInternalApi(entitlementDao,subscriptionFactory);
   entitlementUserApi=new DefaultEntitlementUserApi(clock,entitlementDao,catalogService,apiService,subscriptionFactory,addonUtils,internalCallContextFactory);
-  tagDao=new BusinessTagDao(accountTagSqlDao,invoicePaymentTagSqlDao,invoiceTagSqlDao,subscriptionTransitionTagSqlDao,accountUserApi,entitlementUserApi);
+  tagDao=new BusinessTagDao(accountTagSqlDao,invoicePaymentTagSqlDao,invoiceTagSqlDao,subscriptionTransitionTagSqlDao,accountApi,entitlementApi);
   eventBus.start();
 }

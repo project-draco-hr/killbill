@@ -10,7 +10,7 @@
     String paymentMethodType=bac.getPaymentMethod();
     String creditCardType=bac.getCreditCardType();
     String billingAddressCountry=bac.getBillingAddressCountry();
-    final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),context.toTenantContext());
+    final Collection<Invoice> invoices=invoiceApi.getInvoicesByAccountId(account.getId(),context);
     if (invoices != null && invoices.size() > 0) {
       for (      final Invoice invoice : invoices) {
         totalInvoiceBalance=totalInvoiceBalance.add(invoice.getBalance());
@@ -43,7 +43,7 @@
     bac.setBillingAddressCountry(billingAddressCountry);
     bac.setLastInvoiceDate(lastInvoiceDate);
     bac.setTotalInvoiceBalance(totalInvoiceBalance);
-    bac.setBalance(invoiceUserApi.getAccountBalance(account.getId(),context.toTenantContext()));
+    bac.setBalance(invoiceApi.getAccountBalance(account.getId(),context));
   }
  catch (  PaymentApiException ex) {
     log.error(String.format("Failed to handle account update for account %s",account.getId()),ex);
