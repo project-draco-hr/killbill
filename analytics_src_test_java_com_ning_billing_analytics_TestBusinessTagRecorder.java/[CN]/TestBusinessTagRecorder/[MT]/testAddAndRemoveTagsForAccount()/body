@@ -5,8 +5,8 @@
   final Account account=accountUserApi.createAccount(accountData,callContext);
   final UUID accountId=account.getId();
   Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey,internalCallContext).size(),0);
-  tagRecorder.tagAdded(ObjectType.ACCOUNT,accountId,name,internalCallContext);
+  tagDao.tagAdded(ObjectType.ACCOUNT,accountId,name,internalCallContext);
   Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey,internalCallContext).size(),1);
-  tagRecorder.tagRemoved(ObjectType.ACCOUNT,accountId,name,internalCallContext);
+  tagDao.tagRemoved(ObjectType.ACCOUNT,accountId,name,internalCallContext);
   Assert.assertEquals(accountTagSqlDao.getTagsForAccountByKey(accountKey,internalCallContext).size(),0);
 }
