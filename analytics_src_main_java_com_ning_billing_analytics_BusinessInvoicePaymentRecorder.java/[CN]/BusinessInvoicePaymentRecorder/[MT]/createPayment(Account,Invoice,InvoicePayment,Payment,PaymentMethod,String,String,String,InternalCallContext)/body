@@ -1,0 +1,32 @@
+{
+  final PaymentMethodPlugin pluginDetail=paymentMethod.getPluginDetail();
+  final String cardCountry=PaymentMethodUtils.getCardCountry(pluginDetail);
+  final String cardType=PaymentMethodUtils.getCardType(pluginDetail);
+  final String paymentMethodString=PaymentMethodUtils.getPaymentMethodType(pluginDetail);
+  final String invoicePaymentType;
+  final UUID linkedInvoicePaymentId;
+  if (invoicePayment != null) {
+    invoicePaymentType=invoicePayment.getType().toString();
+    linkedInvoicePaymentId=invoicePayment.getLinkedInvoicePaymentId();
+  }
+ else {
+    invoicePaymentType=null;
+    linkedInvoicePaymentId=null;
+  }
+  final BusinessInvoicePayment businessInvoicePayment=new BusinessInvoicePayment(account.getExternalKey(),payment.getAmount(),extFirstPaymentRefId,extSecondPaymentRefId,cardCountry,cardType,clock.getUTCNow(),payment.getCurrency(),payment.getEffectiveDate(),payment.getInvoiceId(),message,payment.getId(),paymentMethodString,"Electronic",paymentMethod.getPluginName(),payment.getPaymentStatus().toString(),payment.getAmount(),clock.getUTCNow(),invoicePaymentType,linkedInvoicePaymentId);
+  invoicePaymentSqlDao.inTransaction(new Transaction<Void,BusinessInvoicePaymentSqlDao>(){
+    @Override public Void inTransaction(    final BusinessInvoicePaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
+      transactional.deleteInvoicePayment(payment.getId().toString(),context);
+      transactional.createInvoicePayment(businessInvoicePayment,context);
+      if (invoice != null) {
+        final BusinessInvoiceSqlDao invoiceSqlDao=transactional.become(BusinessInvoiceSqlDao.class);
+        invoiceDao.rebuildInvoiceInTransaction(account.getExternalKey(),invoice,invoiceSqlDao,context);
+      }
+      final BusinessAccountSqlDao accountSqlDao=transactional.become(BusinessAccountSqlDao.class);
+      accountRecorder.updateAccountInTransaction(account,accountSqlDao,context);
+      log.info("Added payment {}",businessInvoicePayment);
+      return null;
+    }
+  }
+);
+}
