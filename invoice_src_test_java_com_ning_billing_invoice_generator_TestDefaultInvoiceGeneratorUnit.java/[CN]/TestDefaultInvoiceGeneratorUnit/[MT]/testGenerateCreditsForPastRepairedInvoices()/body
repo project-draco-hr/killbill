@@ -5,7 +5,7 @@
   final BigDecimal rate1=new BigDecimal("10.00");
   final BigDecimal amount1=rate1;
   final List<InvoiceItem> existing=new LinkedList<InvoiceItem>();
-  final InvoiceItem item1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount1,rate1,currency,null);
+  final InvoiceItem item1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount1,rate1,currency);
   existing.add(item1);
   final UUID existingInvoiceId=UUID.randomUUID();
   final List<Invoice> existingInvoices=new LinkedList<Invoice>();
@@ -17,7 +17,7 @@
   final BigDecimal amount2=rate2;
   final List<InvoiceItem> proposed=new LinkedList<InvoiceItem>();
   final InvoiceItem reversedItem1=new RepairAdjInvoiceItem(existingInvoiceId,accountId,startDate,nextEndDate,item1.getAmount().negate(),currency,item1.getId());
-  final InvoiceItem newItem1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount2,rate2,currency,null);
+  final InvoiceItem newItem1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount2,rate2,currency);
   proposed.add(reversedItem1);
   proposed.add(newItem1);
   gen.generateCBAForExistingInvoices(accountId,existingInvoices,proposed,currency);
