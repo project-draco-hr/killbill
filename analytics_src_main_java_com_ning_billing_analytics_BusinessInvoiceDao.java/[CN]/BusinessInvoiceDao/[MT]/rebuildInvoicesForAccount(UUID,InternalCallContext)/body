@@ -20,11 +20,12 @@
     }
     businessInvoices.put(businessInvoice,businessInvoiceItems);
   }
+  final BusinessAccount bac=businessAccountDao.createBusinessAccountFromAccount(account,context);
   sqlDao.inTransaction(new Transaction<Void,BusinessInvoiceSqlDao>(){
     @Override public Void inTransaction(    final BusinessInvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
       rebuildInvoicesForAccountInTransaction(account,businessInvoices,transactional,context);
       final BusinessAccountSqlDao accountSqlDao=transactional.become(BusinessAccountSqlDao.class);
-      businessAccountDao.updateAccountInTransaction(account,accountSqlDao,context);
+      businessAccountDao.updateAccountInTransaction(bac,accountSqlDao,context);
       return null;
     }
   }

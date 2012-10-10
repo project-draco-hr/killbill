@@ -7,5 +7,12 @@
     log.warn("Error encountered creating BusinessAccount",e);
     return;
   }
-  updateAccountInTransaction(account,sqlDao,context);
+  final BusinessAccount bac=createBusinessAccountFromAccount(account,context);
+  sqlDao.inTransaction(new Transaction<Void,BusinessAccountSqlDao>(){
+    @Override public Void inTransaction(    final BusinessAccountSqlDao transactional,    final TransactionStatus status) throws Exception {
+      updateAccountInTransaction(bac,transactional,context);
+      return null;
+    }
+  }
+);
 }
