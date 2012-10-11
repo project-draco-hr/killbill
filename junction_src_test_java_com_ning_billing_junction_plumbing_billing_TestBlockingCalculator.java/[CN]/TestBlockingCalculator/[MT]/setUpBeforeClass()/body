@@ -2,7 +2,7 @@
   clock=new ClockMock();
   final Injector i=Guice.createInjector(new AbstractModule(){
     @Override protected void configure(){
-      blockingApi=Mockito.mock(BlockingApi.class);
+      blockingApi=Mockito.mock(BlockingInternalApi.class);
       account=Mockito.mock(Account.class);
       subscription1=Mockito.mock(Subscription.class);
       subscription2=Mockito.mock(Subscription.class);
@@ -18,7 +18,7 @@
       Mockito.when(subscription3.getId()).thenReturn(UUID.randomUUID());
       Mockito.when(subscription4.getId()).thenReturn(UUID.randomUUID());
       bind(BlockingStateDao.class).toInstance(Mockito.mock(BlockingStateDao.class));
-      bind(BlockingApi.class).toInstance(blockingApi);
+      bind(BlockingInternalApi.class).toInstance(blockingApi);
     }
   }
 );
