@@ -1,0 +1,49 @@
+{
+  final BusinessAccount bac=new BusinessAccount(account);
+  try {
+    LocalDate lastInvoiceDate=bac.getLastInvoiceDate();
+    BigDecimal totalInvoiceBalance=bac.getTotalInvoiceBalance();
+    String lastPaymentStatus=bac.getLastPaymentStatus();
+    String paymentMethodType=bac.getPaymentMethod();
+    String creditCardType=bac.getCreditCardType();
+    String billingAddressCountry=bac.getBillingAddressCountry();
+    final Collection<Invoice> invoices=invoiceApi.getInvoicesByAccountId(account.getId(),context);
+    if (invoices != null && invoices.size() > 0) {
+      for (      final Invoice invoice : invoices) {
+        totalInvoiceBalance=totalInvoiceBalance.add(invoice.getBalance());
+        if (lastInvoiceDate == null || invoice.getInvoiceDate().isAfter(lastInvoiceDate)) {
+          lastInvoiceDate=invoice.getInvoiceDate();
+        }
+      }
+      DateTime lastPaymentDate=null;
+      final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),context.toTenantContext());
+      if (payments != null) {
+        for (        final Payment cur : payments) {
+          if (lastPaymentDate == null || cur.getEffectiveDate().isAfter(lastPaymentDate)) {
+            lastPaymentDate=cur.getEffectiveDate();
+            lastPaymentStatus=cur.getPaymentStatus().toString();
+          }
+        }
+      }
+    }
+    for (    final PaymentMethod paymentMethod : paymentApi.getPaymentMethods(account,true,context.toTenantContext())) {
+      if (paymentMethod.getId().equals(account.getPaymentMethodId()) && paymentMethod.getPluginDetail() != null) {
+        paymentMethodType=PaymentMethodUtils.getPaymentMethodType(paymentMethod.getPluginDetail());
+        creditCardType=PaymentMethodUtils.getCardType(paymentMethod.getPluginDetail());
+        billingAddressCountry=PaymentMethodUtils.getCardCountry(paymentMethod.getPluginDetail());
+        break;
+      }
+    }
+    bac.setLastPaymentStatus(lastPaymentStatus);
+    bac.setPaymentMethod(paymentMethodType);
+    bac.setCreditCardType(creditCardType);
+    bac.setBillingAddressCountry(billingAddressCountry);
+    bac.setLastInvoiceDate(lastInvoiceDate);
+    bac.setTotalInvoiceBalance(totalInvoiceBalance);
+    bac.setBalance(invoiceApi.getAccountBalance(account.getId(),context));
+  }
+ catch (  PaymentApiException ex) {
+    log.error(String.format("Failed to handle account update for account %s",account.getId()),ex);
+  }
+  return bac;
+}

@@ -9,9 +9,9 @@
   final UUID firstInvoiceId=UUID.randomUUID();
   final List<InvoiceItem> existing=new LinkedList<InvoiceItem>();
   final BigDecimal pcba1=new BigDecimal("10.00");
-  final InvoiceItem item1=new RecurringInvoiceItem(firstInvoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount1,rate1,currency,null);
+  final InvoiceItem item1=new RecurringInvoiceItem(firstInvoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount1,rate1,currency);
   final InvoiceItem reversedItem1=new RepairAdjInvoiceItem(firstInvoiceId,accountId,startDate,nextEndDate,amount1.negate(),currency,item1.getId());
-  final InvoiceItem newItem1=new RecurringInvoiceItem(firstInvoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount2,rate2,currency,null);
+  final InvoiceItem newItem1=new RecurringInvoiceItem(firstInvoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount2,rate2,currency);
   final InvoiceItem cba1=new CreditBalanceAdjInvoiceItem(firstInvoiceId,accountId,startDate,pcba1,currency);
   existing.add(item1);
   existing.add(reversedItem1);
@@ -20,7 +20,7 @@
   final BigDecimal newRate2=newRate;
   final BigDecimal newAmount2=newRate2;
   final List<InvoiceItem> proposed=new LinkedList<InvoiceItem>();
-  final InvoiceItem item2=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate.plusMonths(1),endDate.plusMonths(1),newAmount2,newRate2,currency,null);
+  final InvoiceItem item2=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate.plusMonths(1),endDate.plusMonths(1),newAmount2,newRate2,currency);
   proposed.add(item2);
   gen.consumeExistingCredit(invoiceId,firstInvoiceId,existing,proposed,currency);
   assertEquals(proposed.size(),2);
