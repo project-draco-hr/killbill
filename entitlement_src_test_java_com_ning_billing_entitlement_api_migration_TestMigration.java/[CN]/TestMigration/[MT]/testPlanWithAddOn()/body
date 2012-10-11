@@ -15,7 +15,7 @@
     final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId(),callContext);
     assertEquals(subscriptions.size(),2);
     final Subscription baseSubscription=(subscriptions.get(0).getCurrentPlan().getProduct().getCategory() == ProductCategory.BASE) ? subscriptions.get(0) : subscriptions.get(1);
-    assertDateWithin(baseSubscription.getStartDate(),beforeMigration,afterMigration);
+    assertTrue(baseSubscription.getStartDate().compareTo(initalBPStart) == 0);
     assertEquals(baseSubscription.getEndDate(),null);
     assertEquals(baseSubscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
     assertEquals(baseSubscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
