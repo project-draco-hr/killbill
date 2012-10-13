@@ -1,0 +1,18 @@
+{
+  final String dump=getDump();
+  Assert.assertEquals(dump,"");
+  final String tableNameA="test_database_export_dao_a";
+  final String tableNameB="test_database_export_dao_b";
+  getMysqlTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
+    @Override public Void withHandle(    final Handle handle) throws Exception {
+      handle.execute("create table " + tableNameA + "(record_id int(11) unsigned not null auto_increment,"+ "a_column char default 'a',"+ "account_record_id int(11) unsigned not null,"+ "tenant_record_id int(11) unsigned default 0,"+ "primary key(record_id)) engine=innodb;");
+      handle.execute("create table " + tableNameB + "(record_id int(11) unsigned not null auto_increment,"+ "b_column char default 'b',"+ "account_record_id int(11) unsigned not null,"+ "tenant_record_id int(11) unsigned default 0,"+ "primary key(record_id)) engine=innodb;");
+      handle.execute("insert into " + tableNameA + " (account_record_id, tenant_record_id) values (?, ?)",internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId());
+      handle.execute("insert into " + tableNameB + " (account_record_id, tenant_record_id) values (?, ?)",internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId());
+      return null;
+    }
+  }
+);
+  final String newDump=getDump();
+  Assert.assertEquals(newDump,"-- " + tableNameA + " record_id,a_column,account_record_id,tenant_record_id\n"+ "1,a,"+ internalCallContext.getAccountRecordId()+ ","+ internalCallContext.getTenantRecordId()+ "\n"+ "-- "+ tableNameB+ " record_id,b_column,account_record_id,tenant_record_id\n"+ "1,b,"+ internalCallContext.getAccountRecordId()+ ","+ internalCallContext.getTenantRecordId()+ "\n");
+}
