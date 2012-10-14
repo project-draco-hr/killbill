@@ -14,11 +14,18 @@
       hasAccountRecordIdColumn=true;
     }
   }
-  if (!hasAccountRecordIdColumn) {
+  final String tableName=columnsForTable.get(0).getTableName();
+  final boolean isAccountTable=TableName.ACCOUNT.getTableName().equals(tableName);
+  if (!isAccountTable && !hasAccountRecordIdColumn) {
     return;
   }
-  final String tableName=columnsForTable.get(0).getTableName();
-  queryBuilder.append(" from ").append(tableName).append(" where account_record_id = :accountRecordId and tenant_record_id = :tenantRecordId");
+  queryBuilder.append(" from ").append(tableName);
+  if (isAccountTable) {
+    queryBuilder.append(" where record_id = :accountRecordId and tenant_record_id = :tenantRecordId");
+  }
+ else {
+    queryBuilder.append(" where account_record_id = :accountRecordId and tenant_record_id = :tenantRecordId");
+  }
   out.newTable(tableName,columnsForTable);
   dbi.withHandle(new HandleCallback<Void>(){
     @Override public Void withHandle(    final Handle handle) throws Exception {
