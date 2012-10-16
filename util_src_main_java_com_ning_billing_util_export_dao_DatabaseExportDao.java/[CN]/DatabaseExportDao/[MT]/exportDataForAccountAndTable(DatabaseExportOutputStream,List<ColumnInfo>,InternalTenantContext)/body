@@ -1,0 +1,46 @@
+{
+  boolean hasAccountRecordIdColumn=false;
+  boolean firstColumn=true;
+  final StringBuilder queryBuilder=new StringBuilder("select ");
+  for (  final ColumnInfo column : columnsForTable) {
+    if (!firstColumn) {
+      queryBuilder.append(", ");
+    }
+ else {
+      firstColumn=false;
+    }
+    queryBuilder.append(column.getColumnName());
+    if (column.getColumnName().equals("account_record_id")) {
+      hasAccountRecordIdColumn=true;
+    }
+  }
+  final String tableName=columnsForTable.get(0).getTableName();
+  final boolean isAccountTable=TableName.ACCOUNT.getTableName().equals(tableName);
+  if (!isAccountTable && !hasAccountRecordIdColumn) {
+    return;
+  }
+  queryBuilder.append(" from ").append(tableName);
+  if (isAccountTable) {
+    queryBuilder.append(" where record_id = :accountRecordId and tenant_record_id = :tenantRecordId");
+  }
+ else {
+    queryBuilder.append(" where account_record_id = :accountRecordId and tenant_record_id = :tenantRecordId");
+  }
+  out.newTable(tableName,columnsForTable);
+  dbi.withHandle(new HandleCallback<Void>(){
+    @Override public Void withHandle(    final Handle handle) throws Exception {
+      final ResultIterator<Map<String,Object>> iterator=handle.createQuery(queryBuilder.toString()).bind("accountRecordId",context.getAccountRecordId()).bind("tenantRecordId",context.getTenantRecordId()).iterator();
+      try {
+        while (iterator.hasNext()) {
+          final Map<String,Object> row=iterator.next();
+          out.write(row);
+        }
+      }
+  finally {
+        iterator.close();
+      }
+      return null;
+    }
+  }
+);
+}

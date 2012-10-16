@@ -1,0 +1,12 @@
+{
+  final byte[] bytes;
+  if (shouldWriteHeader) {
+    write(String.format("-- %s ",currentTableName).getBytes());
+    bytes=mapper.writer(currentCSVSchema.withHeader()).writeValueAsBytes(row);
+    shouldWriteHeader=false;
+  }
+ else {
+    bytes=writer.writeValueAsBytes(row);
+  }
+  write(bytes);
+}

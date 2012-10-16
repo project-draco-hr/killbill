@@ -16,7 +16,7 @@
         recordIdList=transInvoiceItemSqlDao.getRecordIds(invoice.getId().toString(),context);
         audits.addAll(createAudits(TableName.INVOICE_ITEMS,recordIdList));
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
-        notifyOfFutureBillingEvents(transactional,invoice.getAccountId(),billCycleDayUTC,recurringInvoiceItems);
+        notifyOfFutureBillingEvents(transactional,invoice.getAccountId(),recurringInvoiceItems);
         final List<InvoicePayment> invoicePayments=invoice.getPayments();
         final InvoicePaymentSqlDao invoicePaymentSqlDao=transactional.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);

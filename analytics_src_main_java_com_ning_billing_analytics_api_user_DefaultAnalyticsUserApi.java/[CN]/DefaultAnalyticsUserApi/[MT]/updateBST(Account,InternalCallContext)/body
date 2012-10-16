@@ -1,0 +1,31 @@
+{
+  final Collection<UUID> entitlementBundlesId=Collections2.transform(entitlementInternalApi.getBundlesForAccount(account.getId(),internalCallContext),new Function<SubscriptionBundle,UUID>(){
+    @Override public UUID apply(    @Nullable final SubscriptionBundle input){
+      if (input == null) {
+        return null;
+      }
+ else {
+        return input.getId();
+      }
+    }
+  }
+);
+  final Collection<UUID> analyticsBundlesId=Collections2.transform(analyticsDao.getTransitionsForAccount(account.getExternalKey(),internalCallContext),new Function<BusinessSubscriptionTransition,UUID>(){
+    @Override public UUID apply(    @Nullable final BusinessSubscriptionTransition input){
+      if (input == null) {
+        return null;
+      }
+ else {
+        return input.getBundleId();
+      }
+    }
+  }
+);
+  final Set<UUID> bundlesId=new HashSet<UUID>();
+  bundlesId.addAll(entitlementBundlesId);
+  bundlesId.addAll(analyticsBundlesId);
+  for (  final UUID bundleId : bundlesId) {
+    bstDao.rebuildTransitionsForBundle(bundleId,internalCallContext);
+  }
+  return bundlesId;
+}

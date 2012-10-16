@@ -46,7 +46,7 @@
         paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.PLUGIN_COMPLETED,context);
         invoicePaymentApi.createRefund(paymentId,refundAmount,isAdjusted,invoiceItemIdsWithAmounts,refundInfo.getId(),context.toCallContext());
         paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.COMPLETED,context);
-        return new DefaultRefund(refundInfo.getId(),paymentId,refundInfo.getAmount(),account.getCurrency(),isAdjusted,refundInfo.getCreatedDate());
+        return new DefaultRefund(refundInfo.getId(),refundInfo.getCreatedDate(),refundInfo.getUpdatedDate(),paymentId,refundInfo.getAmount(),account.getCurrency(),isAdjusted,refundInfo.getCreatedDate());
       }
  catch (      PaymentPluginApiException e) {
         throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_REFUND,account.getId(),e.getMessage());

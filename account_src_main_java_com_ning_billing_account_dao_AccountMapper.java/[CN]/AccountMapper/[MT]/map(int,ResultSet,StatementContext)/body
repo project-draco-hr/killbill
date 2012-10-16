@@ -22,5 +22,7 @@
   final String phone=result.getString("phone");
   final Boolean isMigrated=result.getBoolean("migrated");
   final Boolean isNotifiedForInvoices=result.getBoolean("is_notified_for_invoices");
-  return new DefaultAccount(id,externalKey,email,name,firstNameLength,currency,new DefaultBillCycleDay(billingCycleDayLocal,billingCycleDayUTC),paymentMethodId,timeZone,locale,address1,address2,companyName,city,stateOrProvince,country,postalCode,phone,isMigrated,isNotifiedForInvoices);
+  final DateTime createdDate=getDateTime(result,"created_date");
+  final DateTime updatedDate=getDateTime(result,"updated_date");
+  return new DefaultAccount(id,createdDate,updatedDate,externalKey,email,name,firstNameLength,currency,new DefaultBillCycleDay(billingCycleDayLocal,billingCycleDayUTC),paymentMethodId,timeZone,locale,address1,address2,companyName,city,stateOrProvince,country,postalCode,phone,isMigrated,isNotifiedForInvoices);
 }

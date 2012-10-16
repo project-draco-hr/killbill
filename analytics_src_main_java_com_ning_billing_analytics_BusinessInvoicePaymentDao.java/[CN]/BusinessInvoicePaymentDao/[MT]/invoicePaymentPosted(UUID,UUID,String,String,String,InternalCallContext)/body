@@ -1,0 +1,40 @@
+{
+  if (paymentId == null) {
+    return;
+  }
+  final Account account;
+  try {
+    account=accountApi.getAccountById(accountId,context);
+  }
+ catch (  AccountApiException e) {
+    log.warn("Ignoring payment {}: account {} does not exist",paymentId,accountId);
+    return;
+  }
+  final Payment payment;
+  try {
+    payment=paymentApi.getPayment(paymentId,context.toCallContext());
+  }
+ catch (  PaymentApiException e) {
+    log.warn("Ignoring payment {}: payment does not exist",paymentId);
+    return;
+  }
+  final PaymentMethod paymentMethod;
+  try {
+    paymentMethod=paymentApi.getPaymentMethod(account,payment.getPaymentMethodId(),true,context.toCallContext());
+  }
+ catch (  PaymentApiException e) {
+    log.warn("Ignoring payment {}: payment method {} does not exist",paymentId,payment.getPaymentMethodId());
+    return;
+  }
+  final InvoicePayment invoicePayment=invoicePaymentApi.getInvoicePaymentForAttempt(paymentId,context.toCallContext());
+  Invoice invoice=null;
+  if (invoicePayment != null) {
+    try {
+      invoice=invoiceApi.getInvoiceById(invoicePayment.getInvoiceId(),context);
+    }
+ catch (    InvoiceApiException e) {
+      log.warn("Unable to find invoice {} for payment {}",invoicePayment.getInvoiceId(),paymentId);
+    }
+  }
+  createPayment(account,invoice,invoicePayment,payment,paymentMethod,extFirstPaymentRefId,extSecondPaymentRefId,message,context);
+}

@@ -1,0 +1,20 @@
+{
+  if (context.getAccountRecordId() == null || context.getTenantRecordId() == null) {
+    return;
+  }
+  final List<DefaultColumnInfo> columns=databaseSchemaDao.getColumnInfoList();
+  if (columns.size() == 0) {
+    return;
+  }
+  final List<ColumnInfo> columnsForTable=new ArrayList<ColumnInfo>();
+  String lastSeenTableName=columns.get(0).getTableName();
+  for (  final ColumnInfo column : columns) {
+    if (!column.getTableName().equals(lastSeenTableName)) {
+      exportDataForAccountAndTable(out,columnsForTable,context);
+      lastSeenTableName=column.getTableName();
+      columnsForTable.clear();
+    }
+    columnsForTable.add(column);
+  }
+  exportDataForAccountAndTable(out,columnsForTable,context);
+}

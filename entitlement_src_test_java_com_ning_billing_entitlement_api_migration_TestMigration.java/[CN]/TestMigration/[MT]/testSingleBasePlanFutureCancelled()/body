@@ -13,7 +13,7 @@
     final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId(),callContext);
     assertEquals(subscriptions.size(),1);
     final Subscription subscription=subscriptions.get(0);
-    assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
+    assertTrue(subscription.getStartDate().compareTo(startDate) == 0);
     assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
     assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
     assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
@@ -23,7 +23,7 @@
     final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusYears(1));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
-    assertDateWithin(subscription.getStartDate(),beforeMigration,afterMigration);
+    assertTrue(subscription.getStartDate().compareTo(startDate) == 0);
     assertNotNull(subscription.getEndDate());
     assertTrue(subscription.getEndDate().isAfterNow());
     assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);

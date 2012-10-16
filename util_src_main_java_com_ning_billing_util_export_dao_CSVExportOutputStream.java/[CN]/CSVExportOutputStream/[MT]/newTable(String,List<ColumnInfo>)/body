@@ -1,0 +1,10 @@
+{
+  currentTableName=tableName;
+  final CsvSchema.Builder builder=CsvSchema.builder();
+  for (  final ColumnInfo columnInfo : columnsForTable) {
+    builder.addColumn(columnInfo.getColumnName(),getColumnTypeFromSqlType(columnInfo.getDataType()));
+  }
+  currentCSVSchema=builder.build();
+  writer=mapper.writer(currentCSVSchema);
+  shouldWriteHeader=true;
+}
