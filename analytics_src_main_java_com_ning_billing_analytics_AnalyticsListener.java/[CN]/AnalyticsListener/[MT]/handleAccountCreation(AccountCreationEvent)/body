@@ -1,3 +1,12 @@
 {
-  bacDao.accountUpdated(event.getId(),createCallContext(event));
+  GlobalLock lock=null;
+  try {
+    lock=locker.lockWithNumberOfTries(LockerType.ACCOUNT_FOR_ANALYTICS,event.getId().toString(),NB_LOCK_TRY);
+    bacDao.accountUpdated(event.getId(),createCallContext(event));
+  }
+  finally {
+    if (lock != null) {
+      lock.release();
+    }
+  }
 }
