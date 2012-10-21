@@ -7,7 +7,7 @@
     }
   }
   Mockito.when(invoicePaymentApi.getInvoice(Mockito.eq(invoice.getId()),Mockito.<TenantContext>any())).thenReturn(invoice);
-  final InvoiceCreationEvent event=new MockInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
+  final InvoiceCreationInternalEvent event=new MockInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
   eventBus.post(event,internalCallContextFactory.createInternalCallContext(account.getId(),context));
   return invoice;
 }

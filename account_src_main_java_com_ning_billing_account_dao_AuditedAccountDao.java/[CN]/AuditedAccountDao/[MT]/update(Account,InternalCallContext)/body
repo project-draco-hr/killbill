@@ -15,7 +15,7 @@
         final Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId,context);
         final EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.UPDATE);
         accountSqlDao.insertAuditFromTransaction(audit,context);
-        final AccountChangeEvent changeEvent=new DefaultAccountChangeEvent(accountId,context.getUserToken(),currentAccount,account);
+        final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(accountId,context.getUserToken(),currentAccount,account);
         if (changeEvent.hasChanges()) {
           try {
             eventBus.postFromTransaction(changeEvent,transactional,context);

@@ -16,7 +16,7 @@
   Mockito.when(account.getExternalKey()).thenReturn(externalKey.toString());
   final AccountInternalApi accountApi=Mockito.mock(AccountInternalApi.class);
   Mockito.when(accountApi.getAccountById(Mockito.eq(bundle.getAccountId()),Mockito.<InternalTenantContext>any())).thenReturn(account);
-  final EffectiveSubscriptionEvent eventEffective=Mockito.mock(EffectiveSubscriptionEvent.class);
+  final EffectiveSubscriptionInternalEvent eventEffective=Mockito.mock(EffectiveSubscriptionInternalEvent.class);
   Mockito.when(eventEffective.getId()).thenReturn(UUID.randomUUID());
   Mockito.when(eventEffective.getTransitionType()).thenReturn(SubscriptionTransitionType.CREATE);
   Mockito.when(eventEffective.getSubscriptionId()).thenReturn(subscriptionId);
@@ -26,7 +26,7 @@
   Mockito.when(eventEffective.getSubscriptionStartDate()).thenReturn(new DateTime(DateTimeZone.UTC));
   final Subscription subscription=Mockito.mock(Subscription.class);
   Mockito.when(subscription.getId()).thenReturn(subscriptionId);
-  Mockito.when(subscription.getAllTransitions()).thenReturn(ImmutableList.<EffectiveSubscriptionEvent>of(eventEffective));
+  Mockito.when(entitlementApi.getAllTransitions(subscription)).thenReturn(ImmutableList.<EffectiveSubscriptionInternalEvent>of(eventEffective));
   Mockito.when(entitlementApi.getSubscriptionsForBundle(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(ImmutableList.<Subscription>of(subscription));
   final BusinessSubscriptionTransitionDao dao=new BusinessSubscriptionTransitionDao(sqlDao,catalogService,entitlementApi,accountApi,new DefaultClock());
   dao.rebuildTransitionsForBundle(bundle.getId(),internalCallContext);

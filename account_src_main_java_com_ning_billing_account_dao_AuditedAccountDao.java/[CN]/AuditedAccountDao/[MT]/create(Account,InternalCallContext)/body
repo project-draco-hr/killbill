@@ -15,7 +15,7 @@
         final Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId,rehydratedContext);
         final EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
         accountSqlDao.insertAuditFromTransaction(audit,rehydratedContext);
-        final AccountCreationEvent creationEvent=new DefaultAccountCreationEvent(account,rehydratedContext.getUserToken());
+        final AccountCreationInternalEvent creationEvent=new DefaultAccountCreationEvent(account,rehydratedContext.getUserToken());
         try {
           eventBus.postFromTransaction(creationEvent,transactionalDao,rehydratedContext);
         }

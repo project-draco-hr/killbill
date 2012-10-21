@@ -13,7 +13,7 @@
     if (invoice == null) {
       log.info("Generated null invoice.");
       if (!dryRun) {
-        final BusEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday(),context.getUserToken());
+        final BusInternalEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday(),context.getUserToken());
         postEvent(event,accountId,internalCallContext);
       }
     }
@@ -30,7 +30,7 @@
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         setChargedThroughDates(account.getBillCycleDay(),account.getTimeZone(),fixedPriceInvoiceItems,recurringInvoiceItems,context);
-        final InvoiceCreationEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getUserToken());
+        final InvoiceCreationInternalEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getUserToken());
         if (isRealInvoiceWithItems) {
           postEvent(event,accountId,internalCallContext);
         }

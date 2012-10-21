@@ -11,8 +11,7 @@ case BUNDLE:
 final Subscription baseSub=entitlementApi.getBaseSubscription(bundle.getId(),context);
 Plan basePlan=baseSub.getCurrentPlan();
 if (basePlan == null) {
-final EffectiveSubscriptionEvent previousTransition=baseSub.getPreviousTransition();
-basePlan=catalog.findPlan(previousTransition.getPreviousPlan(),previousTransition.getEffectiveTransitionTime(),previousTransition.getSubscriptionStartDate());
+basePlan=baseSub.getLastActivePlan();
 }
 result=calculateBcdFromSubscription(baseSub,basePlan,account,catalog);
 break;
