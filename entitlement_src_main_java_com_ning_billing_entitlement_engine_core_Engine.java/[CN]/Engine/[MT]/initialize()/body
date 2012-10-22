@@ -13,7 +13,7 @@
           return;
         }
         final UUID userToken=(event.getType() == EventType.API_USER) ? ((ApiEvent)event).getUserToken() : null;
-        final CallContext context=factory.createCallContext(null,"SubscriptionEventQueue",CallOrigin.INTERNAL,UserType.SYSTEM,userToken);
+        final InternalCallContext context=internalCallContextFactory.createInternalCallContext(tenantRecordId,accountRecordId,"SubscriptionEventQueue",CallOrigin.INTERNAL,UserType.SYSTEM,userToken);
         processEventReady(event,key.getSeqId(),context);
       }
     }

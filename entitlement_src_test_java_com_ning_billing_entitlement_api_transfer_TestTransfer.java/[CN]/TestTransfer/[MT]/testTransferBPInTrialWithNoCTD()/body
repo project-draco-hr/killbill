@@ -4,7 +4,7 @@
   final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
   final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
   final Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
-  final DateTime evergreenPhaseDate=baseSubscription.getPendingTransition().getEffectiveTransitionTime();
+  final DateTime evergreenPhaseDate=((SubscriptionData)baseSubscription).getPendingTransitionData().getEffectiveTransitionTime();
   clock.addDays(20);
   final DateTime beforeTransferDate=clock.getUTCNow();
   final DateTime transferRequestedDate=clock.getUTCNow();
@@ -22,8 +22,8 @@
   assertEquals(subscriptions.size(),1);
   final Subscription newBaseSubscription=subscriptions.get(0);
   assertTrue(((SubscriptionData)newBaseSubscription).getAlignStartDate().compareTo(((SubscriptionData)oldBaseSubscription).getAlignStartDate()) == 0);
-  assertEquals(newBaseSubscription.getAllTransitions().size(),2);
-  assertTrue(newBaseSubscription.getAllTransitions().get(1).getEffectiveTransitionTime().compareTo(evergreenPhaseDate) == 0);
+  assertEquals(entitlementInternalApi.getAllTransitions(newBaseSubscription,internalCallContext).size(),2);
+  assertTrue(entitlementInternalApi.getAllTransitions(newBaseSubscription,internalCallContext).get(1).getEffectiveTransitionTime().compareTo(evergreenPhaseDate) == 0);
   final Plan newPlan=newBaseSubscription.getCurrentPlan();
   assertEquals(newPlan.getProduct().getName(),baseProduct);
   assertEquals(newBaseSubscription.getCurrentPhase().getPhaseType(),PhaseType.TRIAL);

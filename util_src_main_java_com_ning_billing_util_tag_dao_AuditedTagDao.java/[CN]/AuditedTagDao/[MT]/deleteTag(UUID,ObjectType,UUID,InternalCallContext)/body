@@ -20,10 +20,10 @@
         tagSqlDao.insertAuditFromTransaction(entityAudits,context);
         final TagInternalEvent tagEvent;
         if (tagDefinition.isControlTag()) {
-          tagEvent=tagEventBuilder.newControlTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context.getUserToken());
+          tagEvent=tagEventBuilder.newControlTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context);
         }
  else {
-          tagEvent=tagEventBuilder.newUserTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context.getUserToken());
+          tagEvent=tagEventBuilder.newUserTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context);
         }
         try {
           bus.postFromTransaction(tagEvent,tagSqlDao,context);

@@ -13,10 +13,10 @@
         tagDefinitionSqlDao.create(tagDefinition,context);
         final TagDefinitionInternalEvent tagDefinitionEvent;
         if (tagDefinition.isControlTag()) {
-          tagDefinitionEvent=tagEventBuilder.newControlTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context.getUserToken());
+          tagDefinitionEvent=tagEventBuilder.newControlTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context);
         }
  else {
-          tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context.getUserToken());
+          tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context);
         }
         try {
           bus.postFromTransaction(tagDefinitionEvent,tagDefinitionSqlDao,context);

@@ -6,9 +6,9 @@
   final TagDefinition tagDefinition=new DefaultTagDefinition(tagDefinitionId,tagDefinitionName,tagDefinitionDescription,controlTag);
   final UUID userToken=UUID.randomUUID();
   final TagEventBuilder tagEventBuilder=new TagEventBuilder();
-  final TagDefinitionInternalEvent event=tagEventBuilder.newControlTagDefinitionDeletionEvent(tagDefinitionId,tagDefinition,userToken);
+  final TagDefinitionInternalEvent event=tagEventBuilder.newControlTagDefinitionDeletionEvent(tagDefinitionId,tagDefinition,internalCallContext);
   Assert.assertTrue(event instanceof ControlTagDefinitionDeletionInternalEvent);
-  Assert.assertEquals(event,new DefaultControlTagDefinitionDeletionEvent(tagDefinitionId,tagDefinition,userToken));
-  Assert.assertTrue(event.equals(new DefaultControlTagDefinitionDeletionEvent(tagDefinitionId,tagDefinition,userToken)));
+  Assert.assertEquals(event,new DefaultControlTagDefinitionDeletionEvent(tagDefinitionId,tagDefinition,userToken,1L,1L));
+  Assert.assertTrue(event.equals(new DefaultControlTagDefinitionDeletionEvent(tagDefinitionId,tagDefinition,userToken,1L,1L)));
   verifyTagDefinitionEvent(tagDefinitionId,tagDefinitionName,tagDefinitionDescription,tagDefinition,userToken,event);
 }

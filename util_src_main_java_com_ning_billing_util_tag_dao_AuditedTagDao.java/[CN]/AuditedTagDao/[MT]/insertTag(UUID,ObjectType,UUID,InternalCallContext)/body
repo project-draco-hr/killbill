@@ -17,10 +17,10 @@
       tagSqlDao.insertAuditFromTransaction(entityAudits,context);
       final TagInternalEvent tagEvent;
       if (tagDefinition.isControlTag()) {
-        tagEvent=tagEventBuilder.newControlTagCreationEvent(tag.getId(),objectId,objectType,tagDefinition,context.getUserToken());
+        tagEvent=tagEventBuilder.newControlTagCreationEvent(tag.getId(),objectId,objectType,tagDefinition,context);
       }
  else {
-        tagEvent=tagEventBuilder.newUserTagCreationEvent(tag.getId(),objectId,objectType,tagDefinition,context.getUserToken());
+        tagEvent=tagEventBuilder.newUserTagCreationEvent(tag.getId(),objectId,objectType,tagDefinition,context);
       }
       try {
         bus.postFromTransaction(tagEvent,tagSqlDao,context);

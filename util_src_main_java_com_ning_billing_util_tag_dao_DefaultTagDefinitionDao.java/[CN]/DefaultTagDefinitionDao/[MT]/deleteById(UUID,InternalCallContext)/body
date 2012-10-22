@@ -12,10 +12,10 @@
         tagDefinitionSqlDao.deleteTagDefinition(definitionId.toString(),context);
         final TagDefinitionInternalEvent tagDefinitionEvent;
         if (tagDefinition.isControlTag()) {
-          tagDefinitionEvent=tagEventBuilder.newControlTagDefinitionDeletionEvent(tagDefinition.getId(),tagDefinition,context.getUserToken());
+          tagDefinitionEvent=tagEventBuilder.newControlTagDefinitionDeletionEvent(tagDefinition.getId(),tagDefinition,context);
         }
  else {
-          tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionDeletionEvent(tagDefinition.getId(),tagDefinition,context.getUserToken());
+          tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionDeletionEvent(tagDefinition.getId(),tagDefinition,context);
         }
         try {
           bus.postFromTransaction(tagDefinitionEvent,tagDefinitionSqlDao,context);

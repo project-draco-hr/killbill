@@ -21,7 +21,7 @@
   assertEquals(subscriptions.size(),1);
   final Subscription newBaseSubscription=subscriptions.get(0);
   assertTrue(((SubscriptionData)newBaseSubscription).getAlignStartDate().compareTo(((SubscriptionData)baseSubscription).getAlignStartDate()) == 0);
-  assertEquals(newBaseSubscription.getAllTransitions().size(),1);
+  assertEquals(entitlementInternalApi.getAllTransitions(newBaseSubscription,internalCallContext).size(),1);
   Plan newPlan=newBaseSubscription.getCurrentPlan();
   assertEquals(newPlan.getProduct().getName(),baseProduct);
   assertEquals(newBaseSubscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
@@ -44,6 +44,6 @@
   newPlan=newBaseSubscriptionWithCtd.getCurrentPlan();
   assertEquals(newPlan.getProduct().getName(),newBaseProduct1);
   assertEquals(newBaseSubscriptionWithCtd.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
-  assertNotNull(newBaseSubscriptionWithCtd.getPendingTransition());
-  assertEquals(newBaseSubscriptionWithCtd.getPendingTransition().getEffectiveTransitionTime(),newCtd);
+  assertNotNull(((SubscriptionData)newBaseSubscriptionWithCtd).getPendingTransitionData());
+  assertEquals(((SubscriptionData)newBaseSubscriptionWithCtd).getPendingTransitionData().getEffectiveTransitionTime(),newCtd);
 }

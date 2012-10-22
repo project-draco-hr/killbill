@@ -6,7 +6,7 @@
   final Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
   final DateTime ctd=baseSubscription.getStartDate().plusDays(30);
   entitlementInternalApi.setChargedThroughDate(baseSubscription.getId(),ctd.toLocalDate(),internalCallContext);
-  final DateTime evergreenPhaseDate=baseSubscription.getPendingTransition().getEffectiveTransitionTime();
+  final DateTime evergreenPhaseDate=((SubscriptionData)baseSubscription).getPendingTransitionData().getEffectiveTransitionTime();
   clock.addDays(20);
   testListener.pushExpectedEvent(NextEvent.TRANSFER);
   final DateTime transferRequestedDate=clock.getUTCNow();
@@ -20,8 +20,8 @@
   assertEquals(subscriptions.size(),1);
   final Subscription newBaseSubscription=subscriptions.get(0);
   assertTrue(((SubscriptionData)newBaseSubscription).getAlignStartDate().compareTo(((SubscriptionData)oldBaseSubscription).getAlignStartDate()) == 0);
-  assertEquals(newBaseSubscription.getAllTransitions().size(),2);
-  assertTrue(newBaseSubscription.getAllTransitions().get(1).getEffectiveTransitionTime().compareTo(evergreenPhaseDate) == 0);
+  assertEquals(entitlementInternalApi.getAllTransitions(newBaseSubscription,internalCallContext).size(),2);
+  assertTrue(entitlementInternalApi.getAllTransitions(newBaseSubscription,internalCallContext).get(1).getEffectiveTransitionTime().compareTo(evergreenPhaseDate) == 0);
   final Plan newPlan=newBaseSubscription.getCurrentPlan();
   assertEquals(newPlan.getProduct().getName(),baseProduct);
   assertEquals(newBaseSubscription.getCurrentPhase().getPhaseType(),PhaseType.TRIAL);
