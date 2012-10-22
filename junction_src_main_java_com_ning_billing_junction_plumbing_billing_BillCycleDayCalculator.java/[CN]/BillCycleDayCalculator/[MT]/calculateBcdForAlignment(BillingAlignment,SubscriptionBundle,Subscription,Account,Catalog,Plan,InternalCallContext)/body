@@ -4,7 +4,7 @@ switch (alignment) {
 case ACCOUNT:
     result=account.getBillCycleDay();
   if (result == null || result.getDayOfMonthUTC() == 0) {
-    result=calculateBcdFromSubscription(subscription,plan,account,catalog);
+    result=calculateBcdFromSubscription(subscription,plan,account,catalog,context);
   }
 break;
 case BUNDLE:
@@ -13,10 +13,10 @@ Plan basePlan=baseSub.getCurrentPlan();
 if (basePlan == null) {
 basePlan=baseSub.getLastActivePlan();
 }
-result=calculateBcdFromSubscription(baseSub,basePlan,account,catalog);
+result=calculateBcdFromSubscription(baseSub,basePlan,account,catalog,context);
 break;
 case SUBSCRIPTION:
-result=calculateBcdFromSubscription(subscription,plan,account,catalog);
+result=calculateBcdFromSubscription(subscription,plan,account,catalog,context);
 break;
 }
 if (result == null) {

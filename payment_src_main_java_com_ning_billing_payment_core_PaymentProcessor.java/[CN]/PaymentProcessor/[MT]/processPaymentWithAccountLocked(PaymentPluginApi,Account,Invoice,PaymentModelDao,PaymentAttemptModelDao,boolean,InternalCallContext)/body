@@ -17,7 +17,7 @@ case PROCESSED:
   allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId(),context);
 payment=paymentDao.getPayment(paymentInput.getId(),context);
 invoicePaymentApi.notifyOfPayment(invoice.getId(),payment.getAmount(),paymentStatus == PaymentStatus.SUCCESS ? payment.getCurrency() : null,payment.getId(),payment.getEffectiveDate(),context.toCallContext());
-event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,paymentPluginInfo.getExtFirstReferenceId(),paymentPluginInfo.getExtSecondReferenceId(),context.getUserToken(),payment.getEffectiveDate());
+event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,paymentPluginInfo.getExtFirstReferenceId(),paymentPluginInfo.getExtSecondReferenceId(),context.getUserToken(),payment.getEffectiveDate(),context.getAccountRecordId(),context.getTenantRecordId());
 break;
 case ERROR:
 allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId(),context);
@@ -29,7 +29,7 @@ paymentStatus=PaymentStatus.PAYMENT_FAILURE_ABORTED;
 }
 paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,paymentPluginInfo.getGatewayErrorCode(),paymentPluginInfo.getGatewayError(),null,null,attemptInput.getId(),context);
 log.info(String.format("Could not process payment for account %s, invoice %s, error = %s",account.getId(),invoice.getId(),paymentPluginInfo.getGatewayError()));
-event=new DefaultPaymentErrorEvent(account.getId(),invoice.getId(),paymentInput.getId(),paymentPluginInfo.getGatewayError(),context.getUserToken());
+event=new DefaultPaymentErrorEvent(account.getId(),invoice.getId(),paymentInput.getId(),paymentPluginInfo.getGatewayError(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
 throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),paymentPluginInfo.getGatewayError());
 default :
 final String formatError=String.format("Plugin return status %s for payment %s",paymentPluginInfo.getStatus(),paymentInput.getId());
