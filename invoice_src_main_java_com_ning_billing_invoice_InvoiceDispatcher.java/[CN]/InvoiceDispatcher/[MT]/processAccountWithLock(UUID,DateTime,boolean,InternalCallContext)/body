@@ -1,0 +1,47 @@
+{
+  try {
+    final BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId,context);
+    final Account account=accountApi.getAccountById(accountId,context);
+    List<Invoice> invoices=new ArrayList<Invoice>();
+    if (!billingEvents.isAccountAutoInvoiceOff()) {
+      invoices=invoiceDao.getInvoicesByAccount(accountId,context);
+    }
+    final Currency targetCurrency=account.getCurrency();
+    final LocalDate targetDate=new LocalDate(targetDateTime,account.getTimeZone());
+    final Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,account.getTimeZone(),targetCurrency);
+    if (invoice == null) {
+      log.info("Generated null invoice.");
+      if (!dryRun) {
+        final BusInternalEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+        postEvent(event,accountId,context);
+      }
+    }
+ else {
+      log.info("Generated invoice {} with {} items.",invoice.getId().toString(),invoice.getNumberOfItems());
+      if (!dryRun) {
+        final boolean isRealInvoiceWithItems=Collections2.filter(invoice.getInvoiceItems(),new Predicate<InvoiceItem>(){
+          @Override public boolean apply(          InvoiceItem input){
+            return input.getInvoiceId().equals(invoice.getId());
+          }
+        }
+).size() > 0;
+        invoiceDao.create(invoice,account.getBillCycleDay().getDayOfMonthUTC(),isRealInvoiceWithItems,context);
+        final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
+        final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
+        setChargedThroughDates(account.getBillCycleDay(),account.getTimeZone(),fixedPriceInvoiceItems,recurringInvoiceItems,context);
+        final InvoiceCreationInternalEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+        if (isRealInvoiceWithItems) {
+          postEvent(event,accountId,context);
+        }
+      }
+    }
+    if (account.isNotifiedForInvoices() && invoice != null && !dryRun) {
+      invoiceNotifier.notify(account,invoiceDao.getById(invoice.getId(),context),context.toTenantContext());
+    }
+    return invoice;
+  }
+ catch (  AccountApiException e) {
+    log.error("Failed handling entitlement change.",e);
+    return null;
+  }
+}
