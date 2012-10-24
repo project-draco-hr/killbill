@@ -2,7 +2,7 @@
   try {
     final Account account=accountApi.getAccountById(bundle.getAccountId(),context);
     final SortedSet<Invoice> unpaidInvoices=unpaidInvoicesForBundle(bundle.getId(),bundle.getAccountId(),account.getTimeZone(),context);
-    final Subscription basePlan=entitlementApi.getBaseSubscription(bundle.getId(),context);
+    final Subscription basePlan=getBasePlanIfExist(bundle.getId(),context);
     final UUID id=bundle.getId();
     final int numberOfUnpaidInvoices=unpaidInvoices.size();
     final BigDecimal unpaidInvoiceBalance=sumBalance(unpaidInvoices);

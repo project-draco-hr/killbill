@@ -2,6 +2,9 @@
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(sourceAccountId,context);
   try {
     final DateTime effectiveTransferDate=transferDate == null ? clock.getUTCNow() : transferDate;
+    if (effectiveTransferDate.isAfter(clock.getUTCNow())) {
+      throw new EntitlementTransferApiException(ErrorCode.ENT_TRANSFER_INVALID_EFF_DATE,effectiveTransferDate);
+    }
     final SubscriptionBundle bundle=dao.getSubscriptionBundleFromAccountAndKey(sourceAccountId,bundleKey,internalCallContext);
     if (bundle == null) {
       throw new EntitlementTransferApiException(ErrorCode.ENT_CREATE_NO_BUNDLE,bundleKey);
