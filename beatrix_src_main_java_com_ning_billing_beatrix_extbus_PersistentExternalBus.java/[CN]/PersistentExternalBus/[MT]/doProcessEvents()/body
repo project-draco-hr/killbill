@@ -1,0 +1,18 @@
+{
+  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID,null,"ExtPersistentBus",CallOrigin.INTERNAL,UserType.SYSTEM,null);
+  final List<ExtBusEventEntry> events=getNextBusEvent(context);
+  if (events.size() == 0) {
+    return 0;
+  }
+  int result=0;
+  for (  final ExtBusEventEntry cur : events) {
+    final UUID accountId=null;
+    final UUID tenantId=null;
+    final BusEvent event=new DefaultBusEvent(cur.getExtBusType(),cur.getObjectType(),cur.getObjectId(),accountId,tenantId);
+    result++;
+    eventBusDelegate.post(event);
+    final InternalCallContext rehydratedContext=internalCallContextFactory.createInternalCallContext(cur.getTenantRecordId(),cur.getAccountRecordId(),context);
+    dao.clearBusExtEvent(cur.getId(),hostname,rehydratedContext);
+  }
+  return result;
+}

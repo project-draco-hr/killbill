@@ -1,0 +1,29 @@
+{
+switch (event.getBusEventType()) {
+case ACCOUNT_CREATE:
+    break;
+case ACCOUNT_CHANGE:
+  break;
+case SUBSCRIPTION_TRANSITION:
+break;
+case INVOICE_CREATION:
+break;
+case PAYMENT_INFO:
+break;
+case PAYMENT_ERROR:
+break;
+case OVERDUE_CHANGE:
+break;
+default :
+}
+final ExtBusEventEntry externalEvent=computeExtBusEventEntryFromBusInternalEvent(event);
+try {
+if (externalEvent != null) {
+final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(event.getTenantRecordId(),event.getAccountRecordId(),"BeatrixListener",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken());
+((PersistentExternalBus)externalBus).post(externalEvent,internalContext);
+}
+}
+ catch (EventBusException e) {
+log.warn("Failed to post external bus event {} {} ",externalEvent.getExtBusType(),externalEvent.getObjectId());
+}
+}

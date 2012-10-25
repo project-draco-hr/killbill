@@ -1,0 +1,15 @@
+{
+  final Date now=clock.getUTCNow().toDate();
+  final Date nextAvailable=clock.getUTCNow().plus(DELTA_IN_PROCESSING_TIME_MS).toDate();
+  final ExtBusEventEntry input=dao.getNextBusExtEventEntry(MAX_BUS_EVENTS,hostname,now,context);
+  if (input == null) {
+    return Collections.emptyList();
+  }
+  final InternalCallContext rehydratedContext=internalCallContextFactory.createInternalCallContext(input.getTenantRecordId(),input.getAccountRecordId(),context);
+  final boolean claimed=(dao.claimBusExtEvent(hostname,nextAvailable,input.getId(),now,rehydratedContext) == 1);
+  if (claimed) {
+    dao.insertClaimedExtHistory(hostname,now,input.getId(),rehydratedContext);
+    return Collections.singletonList(input);
+  }
+  return Collections.emptyList();
+}

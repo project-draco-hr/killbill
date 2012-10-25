@@ -1,0 +1,47 @@
+{
+  ObjectType objectType=null;
+  UUID objectId=null;
+  ExtBusEventType eventBusType=null;
+switch (event.getBusEventType()) {
+case ACCOUNT_CREATE:
+    AccountCreationInternalEvent realEventACR=(AccountCreationInternalEvent)event;
+  objectType=ObjectType.ACCOUNT;
+objectId=realEventACR.getId();
+eventBusType=ExtBusEventType.ACCOUNT_CREATION;
+break;
+case ACCOUNT_CHANGE:
+AccountChangeInternalEvent realEventACH=(AccountChangeInternalEvent)event;
+objectType=ObjectType.ACCOUNT;
+objectId=realEventACH.getAccountId();
+eventBusType=ExtBusEventType.ACCOUNT_CHANGE;
+break;
+case SUBSCRIPTION_TRANSITION:
+SubscriptionInternalEvent realEventST=(SubscriptionInternalEvent)event;
+objectType=ObjectType.SUBSCRIPTION;
+objectId=realEventST.getSubscriptionId();
+if (realEventST.getTransitionType() == SubscriptionTransitionType.CREATE) {
+eventBusType=ExtBusEventType.SUBSCRIPTION_CREATION;
+}
+ else if (realEventST.getTransitionType() == SubscriptionTransitionType.CANCEL) {
+eventBusType=ExtBusEventType.SUBSCRIPTION_CANCEL;
+}
+ else if (realEventST.getTransitionType() == SubscriptionTransitionType.CHANGE) {
+eventBusType=ExtBusEventType.SUBSCRIPTION_CHANGE;
+}
+break;
+case INVOICE_CREATION:
+break;
+case PAYMENT_INFO:
+break;
+case PAYMENT_ERROR:
+break;
+case OVERDUE_CHANGE:
+OverdueChangeInternalEvent realEventOC=(OverdueChangeInternalEvent)event;
+objectType=ObjectType.BUNDLE;
+objectId=realEventOC.getOverdueObjectId();
+eventBusType=ExtBusEventType.OVERDUE_CHANGE;
+break;
+default :
+}
+return eventBusType != null ? new ExtBusEventEntry(hostname,objectType,objectId,eventBusType,event.getAccountRecordId(),event.getAccountRecordId()) : null;
+}
