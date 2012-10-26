@@ -1,7 +1,16 @@
 {
-  final Collection<String> utilTags=Collections2.transform(tagInternalApi.getTags(account.getId(),ObjectType.ACCOUNT,internalCallContext).keySet(),new Function<String,String>(){
-    @Override public String apply(    @Nullable final String input){
-      return input;
+  final List<TagDefinition> tagDefinitions=tagInternalApi.getTagDefinitions(internalCallContext);
+  final Collection<String> utilTags=Collections2.transform(tagInternalApi.getTags(account.getId(),ObjectType.ACCOUNT,internalCallContext).values(),new Function<Tag,String>(){
+    @Override public String apply(    @Nullable final Tag input){
+      if (input == null) {
+        return "";
+      }
+      for (      final TagDefinition tagDefinition : tagDefinitions) {
+        if (tagDefinition.getId().equals(input.getTagDefinitionId())) {
+          return tagDefinition.getName();
+        }
+      }
+      return "";
     }
   }
 );
