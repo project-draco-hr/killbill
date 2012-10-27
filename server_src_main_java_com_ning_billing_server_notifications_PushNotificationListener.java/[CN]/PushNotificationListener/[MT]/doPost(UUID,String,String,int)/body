@@ -1,0 +1,19 @@
+{
+  final BoundRequestBuilder builder=httpClient.preparePost(url);
+  builder.setBody(body == null ? "{}" : body);
+  Response response=null;
+  try {
+    final ListenableFuture<Response> futureStatus=builder.execute(new AsyncCompletionHandler<Response>(){
+      @Override public Response onCompleted(      final Response response) throws Exception {
+        return response;
+      }
+    }
+);
+    response=futureStatus.get(timeoutSec,TimeUnit.SECONDS);
+  }
+ catch (  final Exception e) {
+    log.warn(String.format("Fail to psh notification {} for the tenant {} ",url,tenantId),e);
+    return false;
+  }
+  return response.getStatusCode() >= 200 && response.getStatusCode() < 300;
+}

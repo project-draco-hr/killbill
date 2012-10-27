@@ -1,5 +1,5 @@
 {
-  if (!isInitialized) {
+  if (!isConfigLoaded) {
     try {
       final URI u=new URI(properties.getConfigURI());
       overdueConfig=XMLLoader.getObjectFromUri(u,OverdueConfig.class);
@@ -7,15 +7,15 @@
         log.warn("Unable to load the overdue config from " + properties.getConfigURI());
         overdueConfig=new OverdueConfig();
       }
-      isInitialized=true;
+      isConfigLoaded=true;
     }
- catch (    URISyntaxException e) {
+ catch (    final URISyntaxException e) {
       overdueConfig=new OverdueConfig();
     }
-catch (    IllegalArgumentException e) {
+catch (    final IllegalArgumentException e) {
       overdueConfig=new OverdueConfig();
     }
-catch (    Exception e) {
+catch (    final Exception e) {
       throw new ServiceException(e);
     }
     factory.setOverdueConfig(overdueConfig);

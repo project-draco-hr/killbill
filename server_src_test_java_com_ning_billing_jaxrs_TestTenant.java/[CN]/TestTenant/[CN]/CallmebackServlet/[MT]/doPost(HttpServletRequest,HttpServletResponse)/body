@@ -1,0 +1,8 @@
+{
+  final int current=receivedCalls.incrementAndGet();
+  final String body=CharStreams.toString(new InputStreamReader(request.getInputStream(),"UTF-8"));
+  log.info("CallmebackServlet received {} calls , current = {}",current,body);
+  response.setContentType("application/json");
+  response.setStatus(HttpServletResponse.SC_OK);
+  stopServerWhenComplete(current);
+}
