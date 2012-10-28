@@ -1,12 +1,21 @@
 {
   final int current=receivedCalls.incrementAndGet();
   final String body=CharStreams.toString(new InputStreamReader(request.getInputStream(),"UTF-8"));
-  log.info("Got body {}",body);
-  final NotificationJson notification=objectMapper.readValue(body,NotificationJson.class);
-  Assert.assertEquals(notification.getEventType(),"ACCOUNT_CREATION");
-  Assert.assertEquals(notification.getObjectType(),"ACCOUNT");
-  log.info("CallmebackServlet received {} calls , current = {}",current,body);
   response.setContentType("application/json");
   response.setStatus(HttpServletResponse.SC_OK);
-  stopServerWhenComplete(current);
+  log.info("Got body {}",body);
+  try {
+    final NotificationJson notification=objectMapper.readValue(body,NotificationJson.class);
+    Assert.assertEquals(notification.getEventType(),"ACCOUNT_CREATION");
+    Assert.assertEquals(notification.getObjectType(),"ACCOUNT");
+    Assert.assertNotNull(notification.getObjectId());
+    Assert.assertNotNull(notification.getAccountId());
+    Assert.assertEquals(notification.getObjectId(),notification.getAccountId());
+    test.retrieveAccountWithAsserts(notification.getObjectId());
+  }
+ catch (  final AssertionError e) {
+    withError=true;
+  }
+  log.info("CallmebackServlet received {} calls , current = {}",current,body);
+  stopServerWhenComplete(current,withError);
 }

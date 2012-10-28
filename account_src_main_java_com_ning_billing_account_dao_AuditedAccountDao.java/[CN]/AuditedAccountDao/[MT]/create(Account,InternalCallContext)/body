@@ -19,7 +19,7 @@
         try {
           eventBus.postFromTransaction(creationEvent,transactionalDao,rehydratedContext);
         }
- catch (        EventBusException e) {
+ catch (        final EventBusException e) {
           log.warn("Failed to post account creation event for account " + account.getId(),e);
         }
         return null;
@@ -27,7 +27,7 @@
     }
 );
   }
- catch (  RuntimeException re) {
+ catch (  final RuntimeException re) {
     if (re.getCause() instanceof EntityPersistenceException) {
       throw (EntityPersistenceException)re.getCause();
     }

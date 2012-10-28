@@ -6,9 +6,8 @@
   }
   int result=0;
   for (  final ExtBusEventEntry cur : events) {
-    final UUID accountId=null;
-    final UUID tenantId=null;
-    final ExtBusEvent event=new DefaultBusEvent(cur.getExtBusType(),cur.getObjectType(),cur.getObjectId(),accountId,tenantId);
+    final UUID accountId=getAccountIdFromRecordId(cur.getAccountRecordId(),context);
+    final ExtBusEvent event=new DefaultBusEvent(cur.getExtBusType(),cur.getObjectType(),cur.getObjectId(),accountId,null);
     result++;
     eventBusDelegate.post(event);
     final InternalCallContext rehydratedContext=internalCallContextFactory.createInternalCallContext(cur.getTenantRecordId(),cur.getAccountRecordId(),context);
