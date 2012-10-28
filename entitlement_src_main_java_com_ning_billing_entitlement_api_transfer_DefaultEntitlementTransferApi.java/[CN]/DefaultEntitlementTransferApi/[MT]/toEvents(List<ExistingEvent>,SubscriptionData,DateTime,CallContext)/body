@@ -1,18 +1,11 @@
 {
   try {
     final List<EntitlementEvent> result=new LinkedList<EntitlementEvent>();
-    EntitlementEvent event;
+    EntitlementEvent event=null;
     ExistingEvent prevEvent=null;
-    EntitlementEvent prevEntitlementEvent=null;
     boolean firstEvent=true;
     for (    ExistingEvent cur : existingEvents) {
       if (cur.getEffectiveDate().isBefore(transferDate)) {
-        if (prevEvent != null) {
-          final EntitlementEvent tmpPrevEntitlementEvent=createEvent(firstEvent,prevEvent,subscription,transferDate,context);
-          if (tmpPrevEntitlementEvent != null) {
-            prevEntitlementEvent=tmpPrevEntitlementEvent;
-          }
-        }
         prevEvent=cur;
         continue;
       }
@@ -35,9 +28,7 @@
       if (event != null) {
         result.add(event);
       }
- else       if (prevEntitlementEvent != null) {
-        result.add(prevEntitlementEvent);
-      }
+      prevEvent=null;
     }
     return result;
   }
