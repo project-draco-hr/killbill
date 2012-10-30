@@ -1,7 +1,7 @@
 {
   final Product currentProduct=subscriptionPlan.getProduct();
-  final List<BusinessSubscriptionTransition> transitions=analyticsUserApi.getTransitionsForBundle(bundle.getKey(),callContext);
-  final BusinessSubscriptionTransition initialTransition=transitions.get(0);
+  final List<BusinessSubscriptionTransitionModelDao> transitions=analyticsUserApi.getTransitionsForBundle(bundle.getKey(),callContext);
+  final BusinessSubscriptionTransitionModelDao initialTransition=transitions.get(0);
   Assert.assertEquals(initialTransition.getBundleId(),bundle.getId());
   Assert.assertEquals(initialTransition.getExternalKey(),bundle.getKey());
   Assert.assertEquals(initialTransition.getAccountId(),account.getId());
@@ -21,7 +21,7 @@
   Assert.assertEquals(initialTransition.getNextSubscription().getSlug(),currentProduct.getName().toLowerCase() + "-monthly-trial");
   Assert.assertEquals(initialTransition.getNextSubscription().getStartDate(),subscription.getStartDate());
   Assert.assertEquals(initialTransition.getNextSubscription().getState(),Subscription.SubscriptionState.ACTIVE);
-  final BusinessSubscriptionTransition futureTransition=transitions.get(1);
+  final BusinessSubscriptionTransitionModelDao futureTransition=transitions.get(1);
   Assert.assertEquals(futureTransition.getExternalKey(),bundle.getKey());
   Assert.assertEquals(futureTransition.getAccountKey(),account.getExternalKey());
   Assert.assertEquals(futureTransition.getEvent().getCategory(),currentProduct.getCategory());

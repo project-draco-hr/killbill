@@ -6,7 +6,7 @@
   final Catalog catalog=Mockito.mock(Catalog.class);
   Mockito.when(catalog.findPlan(Mockito.anyString(),Mockito.<DateTime>any(),Mockito.<DateTime>any())).thenReturn(plan);
   Mockito.when(catalog.findPhase(Mockito.anyString(),Mockito.<DateTime>any(),Mockito.<DateTime>any())).thenReturn(phase);
-  final BusinessSubscriptionTransition transition=new BusinessSubscriptionTransition(3L,UUID.randomUUID(),UUID.randomUUID().toString(),UUID.randomUUID(),UUID.randomUUID().toString(),UUID.randomUUID(),clock.getUTCNow(),BusinessSubscriptionEvent.subscriptionCreated(plan.getName(),catalog,clock.getUTCNow(),clock.getUTCNow()),null,new BusinessSubscription("DEFAULT",plan.getName(),phase.getName(),Currency.USD,clock.getUTCNow(),Subscription.SubscriptionState.ACTIVE,catalog));
+  final BusinessSubscriptionTransitionModelDao transition=new BusinessSubscriptionTransitionModelDao(3L,UUID.randomUUID(),UUID.randomUUID().toString(),UUID.randomUUID(),UUID.randomUUID().toString(),UUID.randomUUID(),clock.getUTCNow(),BusinessSubscriptionEvent.subscriptionCreated(plan.getName(),catalog,clock.getUTCNow(),clock.getUTCNow()),null,new BusinessSubscription("DEFAULT",plan.getName(),phase.getName(),Currency.USD,clock.getUTCNow(),Subscription.SubscriptionState.ACTIVE,catalog));
   subscriptionTransitionSqlDao.createTransition(transition,internalCallContext);
   final TimeSeriesData notFoundData=analyticsUserApi.getSubscriptionsCreatedOverTime(productType,UUID.randomUUID().toString(),tenantContext);
   Assert.assertEquals(notFoundData.getDates().size(),0);
