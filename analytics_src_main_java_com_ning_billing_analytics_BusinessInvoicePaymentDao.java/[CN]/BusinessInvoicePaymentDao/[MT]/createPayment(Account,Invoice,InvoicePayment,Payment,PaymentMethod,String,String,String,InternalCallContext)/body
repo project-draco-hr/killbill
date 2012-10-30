@@ -20,7 +20,7 @@
     updatedDate=createdDate;
   }
   final BusinessInvoicePayment businessInvoicePayment=new BusinessInvoicePayment(account.getExternalKey(),payment.getAmount(),extFirstPaymentRefId,extSecondPaymentRefId,cardCountry,cardType,createdDate,payment.getCurrency(),payment.getEffectiveDate(),payment.getInvoiceId(),message,payment.getId(),paymentMethodString,"Electronic",paymentMethod.getPluginName(),payment.getPaymentStatus().toString(),payment.getAmount(),updatedDate,invoicePaymentType,linkedInvoicePaymentId);
-  final BusinessAccount bac=accountDao.createBusinessAccountFromAccount(account,context);
+  final BusinessAccountModelDao bac=accountDao.createBusinessAccountFromAccount(account,context);
   invoicePaymentSqlDao.inTransaction(new Transaction<Void,BusinessInvoicePaymentSqlDao>(){
     @Override public Void inTransaction(    final BusinessInvoicePaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
       transactional.deleteInvoicePayment(payment.getId().toString(),context);

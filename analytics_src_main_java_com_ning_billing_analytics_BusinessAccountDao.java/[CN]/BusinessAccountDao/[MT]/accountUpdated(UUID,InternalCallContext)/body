@@ -4,10 +4,10 @@
     account=accountApi.getAccountById(accountId,context);
   }
  catch (  AccountApiException e) {
-    log.warn("Error encountered creating BusinessAccount",e);
+    log.warn("Error encountered creating BusinessAccountModelDao",e);
     return;
   }
-  final BusinessAccount bac=createBusinessAccountFromAccount(account,context);
+  final BusinessAccountModelDao bac=createBusinessAccountFromAccount(account,context);
   sqlDao.inTransaction(new Transaction<Void,BusinessAccountSqlDao>(){
     @Override public Void inTransaction(    final BusinessAccountSqlDao transactional,    final TransactionStatus status) throws Exception {
       updateAccountInTransaction(bac,transactional,context);
