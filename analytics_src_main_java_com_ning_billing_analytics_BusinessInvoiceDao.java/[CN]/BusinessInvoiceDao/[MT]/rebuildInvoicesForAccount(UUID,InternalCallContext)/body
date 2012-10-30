@@ -8,12 +8,12 @@
     return;
   }
   final Collection<Invoice> invoices=invoiceApi.getInvoicesByAccountId(account.getId(),context);
-  final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItem>> businessInvoices=new HashMap<BusinessInvoiceModelDao,Collection<BusinessInvoiceItem>>();
+  final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemModelDao>> businessInvoices=new HashMap<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemModelDao>>();
   for (  final Invoice invoice : invoices) {
     final BusinessInvoiceModelDao businessInvoice=new BusinessInvoiceModelDao(account.getExternalKey(),invoice);
-    final List<BusinessInvoiceItem> businessInvoiceItems=new ArrayList<BusinessInvoiceItem>();
+    final List<BusinessInvoiceItemModelDao> businessInvoiceItems=new ArrayList<BusinessInvoiceItemModelDao>();
     for (    final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
-      final BusinessInvoiceItem businessInvoiceItem=createBusinessInvoiceItem(invoiceItem,context);
+      final BusinessInvoiceItemModelDao businessInvoiceItem=createBusinessInvoiceItem(invoiceItem,context);
       if (businessInvoiceItem != null) {
         businessInvoiceItems.add(businessInvoiceItem);
       }
