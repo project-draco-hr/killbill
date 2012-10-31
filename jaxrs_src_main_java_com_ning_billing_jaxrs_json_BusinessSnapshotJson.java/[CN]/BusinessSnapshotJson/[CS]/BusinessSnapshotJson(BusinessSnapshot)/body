@@ -1,4 +1,5 @@
 {
+  final Map<UUID,Integer> invoiceIdToNumber=new HashMap<UUID,Integer>();
   this.businessAccount=new BusinessAccountJson(businessSnapshot.getBusinessAccount());
   this.businessSubscriptionTransitions=ImmutableList.<BusinessSubscriptionTransitionJson>copyOf(Collections2.transform(businessSnapshot.getBusinessSubscriptionTransitions(),new Function<BusinessSubscriptionTransition,BusinessSubscriptionTransitionJson>(){
     @Override public BusinessSubscriptionTransitionJson apply(    @Nullable final BusinessSubscriptionTransition input){
@@ -7,14 +8,15 @@
   }
 ));
   this.businessInvoices=ImmutableList.<BusinessInvoiceJson>copyOf(Collections2.transform(businessSnapshot.getBusinessInvoices(),new Function<BusinessInvoice,BusinessInvoiceJson>(){
-    @Override public BusinessInvoiceJson apply(    @Nullable final BusinessInvoice input){
+    @Override public BusinessInvoiceJson apply(    final BusinessInvoice input){
+      invoiceIdToNumber.put(input.getInvoiceId(),input.getInvoiceNumber());
       return new BusinessInvoiceJson(input);
     }
   }
 ));
   this.businessInvoicePayments=ImmutableList.<BusinessInvoicePaymentJson>copyOf(Collections2.transform(businessSnapshot.getBusinessInvoicePayments(),new Function<BusinessInvoicePayment,BusinessInvoicePaymentJson>(){
-    @Override public BusinessInvoicePaymentJson apply(    @Nullable final BusinessInvoicePayment input){
-      return new BusinessInvoicePaymentJson(input);
+    @Override public BusinessInvoicePaymentJson apply(    final BusinessInvoicePayment input){
+      return new BusinessInvoicePaymentJson(input,invoiceIdToNumber.get(input.getInvoiceId()));
     }
   }
 ));
