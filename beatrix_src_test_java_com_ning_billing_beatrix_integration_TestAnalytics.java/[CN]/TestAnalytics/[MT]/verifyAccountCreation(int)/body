@@ -4,10 +4,10 @@
   final Account account=createAccountWithPaymentMethod(accountData);
   Assert.assertNotNull(account);
   waitALittle();
-  final BusinessAccountModelDao businessAccount=analyticsUserApi.getAccountByKey(account.getExternalKey(),callContext);
+  final BusinessAccount businessAccount=analyticsUserApi.getAccountByKey(account.getExternalKey(),callContext);
   Assert.assertNotNull(businessAccount);
   Assert.assertEquals(businessAccount.getBalance().doubleValue(),Rounder.round(BigDecimal.ZERO));
-  Assert.assertEquals(businessAccount.getKey(),account.getExternalKey());
+  Assert.assertEquals(businessAccount.getExternalKey(),account.getExternalKey());
   Assert.assertNull(businessAccount.getLastInvoiceDate());
   Assert.assertNull(businessAccount.getLastPaymentStatus());
   Assert.assertEquals(businessAccount.getName(),account.getName());

@@ -1,3 +1,10 @@
 {
-  return analyticsDao.getInvoicesByKey(accountKey,internalCallContextFactory.createInternalTenantContext(context));
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(context);
+  final List<BusinessInvoiceModelDao> invoicesByKey=analyticsDao.getInvoicesByKey(accountKey,internalTenantContext);
+  return ImmutableList.<BusinessInvoice>copyOf(Collections2.transform(invoicesByKey,new Function<BusinessInvoiceModelDao,BusinessInvoice>(){
+    @Override public BusinessInvoice apply(    @Nullable final BusinessInvoiceModelDao input){
+      return new DefaultBusinessInvoice(input,input == null ? null : analyticsDao.getInvoiceItemsForInvoice(input.getInvoiceId().toString(),internalTenantContext));
+    }
+  }
+));
 }

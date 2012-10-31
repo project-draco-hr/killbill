@@ -1,3 +1,9 @@
 {
-  return analyticsDao.getTransitionsByKey(externalKey,internalCallContextFactory.createInternalTenantContext(context));
+  final List<BusinessSubscriptionTransitionModelDao> transitionsByKey=analyticsDao.getTransitionsByKey(externalKey,internalCallContextFactory.createInternalTenantContext(context));
+  return ImmutableList.<BusinessSubscriptionTransition>copyOf(Collections2.transform(transitionsByKey,new Function<BusinessSubscriptionTransitionModelDao,BusinessSubscriptionTransition>(){
+    @Override public BusinessSubscriptionTransition apply(    @Nullable final BusinessSubscriptionTransitionModelDao input){
+      return new DefaultBusinessSubscriptionTransition(input);
+    }
+  }
+));
 }
