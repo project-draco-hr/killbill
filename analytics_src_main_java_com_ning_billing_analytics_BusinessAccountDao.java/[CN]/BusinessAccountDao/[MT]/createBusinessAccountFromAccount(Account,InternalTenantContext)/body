@@ -16,7 +16,7 @@
         }
       }
       DateTime lastPaymentDate=null;
-      final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),context.toTenantContext());
+      final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),context);
       if (payments != null) {
         for (        final Payment cur : payments) {
           if (lastPaymentDate == null || cur.getEffectiveDate().isAfter(lastPaymentDate)) {
@@ -26,7 +26,7 @@
         }
       }
     }
-    for (    final PaymentMethod paymentMethod : paymentApi.getPaymentMethods(account,true,context.toTenantContext())) {
+    for (    final PaymentMethod paymentMethod : paymentApi.getPaymentMethods(account,true,context)) {
       if (paymentMethod.getId().equals(account.getPaymentMethodId()) && paymentMethod.getPluginDetail() != null) {
         paymentMethodType=PaymentMethodUtils.getPaymentMethodType(paymentMethod.getPluginDetail());
         creditCardType=PaymentMethodUtils.getCardType(paymentMethod.getPluginDetail());

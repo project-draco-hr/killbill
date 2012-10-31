@@ -1,8 +1,8 @@
 {
-  final InvoicePayment payment=createAndPersistPayment(invoicePaymentApi,clock,invoice.getId(),invoiceAmount,CURRENCY,callContext);
+  final InvoicePayment payment=createAndPersistPayment(invoiceInternalApi,clock,invoice.getId(),invoiceAmount,CURRENCY,internalCallContext);
   final BigDecimal initialInvoiceBalance=invoicePaymentApi.getInvoice(invoice.getId(),callContext).getBalance();
   Assert.assertEquals(initialInvoiceBalance.compareTo(BigDecimal.ZERO),0);
-  final InvoicePayment refund=invoicePaymentApi.createRefund(payment.getPaymentId(),refundAmount,adjusted,invoiceItemIdsWithAmounts,UUID.randomUUID(),callContext);
+  final InvoicePayment refund=invoiceInternalApi.createRefund(payment.getPaymentId(),refundAmount,adjusted,invoiceItemIdsWithAmounts,UUID.randomUUID(),internalCallContext);
   Assert.assertEquals(refund.getAmount().compareTo(refundAmount.negate()),0);
   Assert.assertEquals(refund.getCurrency(),CURRENCY);
   Assert.assertEquals(refund.getInvoiceId(),invoice.getId());

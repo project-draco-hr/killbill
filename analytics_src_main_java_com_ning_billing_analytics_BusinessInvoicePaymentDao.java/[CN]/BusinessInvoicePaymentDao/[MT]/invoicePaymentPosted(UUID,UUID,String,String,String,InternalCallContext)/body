@@ -12,7 +12,7 @@
   }
   final Payment payment;
   try {
-    payment=paymentApi.getPayment(paymentId,context.toCallContext());
+    payment=paymentApi.getPayment(paymentId,context);
   }
  catch (  PaymentApiException e) {
     log.warn("Ignoring payment {}: payment does not exist",paymentId);
@@ -20,21 +20,22 @@
   }
   final PaymentMethod paymentMethod;
   try {
-    paymentMethod=paymentApi.getPaymentMethod(account,payment.getPaymentMethodId(),true,context.toCallContext());
+    paymentMethod=paymentApi.getPaymentMethod(account,payment.getPaymentMethodId(),true,context);
   }
  catch (  PaymentApiException e) {
     log.warn("Ignoring payment {}: payment method {} does not exist",paymentId,payment.getPaymentMethodId());
     return;
   }
-  final InvoicePayment invoicePayment=invoicePaymentApi.getInvoicePaymentForAttempt(paymentId,context.toCallContext());
   Invoice invoice=null;
-  if (invoicePayment != null) {
-    try {
+  InvoicePayment invoicePayment=null;
+  try {
+    invoicePayment=invoiceApi.getInvoicePaymentForAttempt(paymentId,context);
+    if (invoicePayment != null) {
       invoice=invoiceApi.getInvoiceById(invoicePayment.getInvoiceId(),context);
     }
- catch (    InvoiceApiException e) {
-      log.warn("Unable to find invoice {} for payment {}",invoicePayment.getInvoiceId(),paymentId);
-    }
+  }
+ catch (  InvoiceApiException e) {
+    log.warn("Unable to find invoice {} for payment {}",invoicePayment != null ? invoicePayment.getInvoiceId() : "unknown",paymentId);
   }
   createPayment(account,invoice,invoicePayment,payment,paymentMethod,extFirstPaymentRefId,extSecondPaymentRefId,message,context);
 }

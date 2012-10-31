@@ -15,7 +15,7 @@
       @Override public Void doOperation() throws PaymentApiException {
         try {
           for (          final RefundModelDao cur : refundsToBeFixed) {
-            invoicePaymentApi.createRefund(cur.getPaymentId(),cur.getAmount(),cur.isAdjsuted(),ImmutableMap.<UUID,BigDecimal>of(),cur.getId(),context.toCallContext());
+            invoiceApi.createRefund(cur.getPaymentId(),cur.getAmount(),cur.isAdjsuted(),ImmutableMap.<UUID,BigDecimal>of(),cur.getId(),context);
             paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
           }
         }
