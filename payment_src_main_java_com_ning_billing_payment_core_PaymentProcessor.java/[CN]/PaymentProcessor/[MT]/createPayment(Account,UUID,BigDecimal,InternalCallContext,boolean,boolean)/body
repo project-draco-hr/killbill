@@ -20,7 +20,7 @@
     return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
       @Override public Payment doOperation() throws PaymentApiException {
         try {
-          final Invoice invoice=invoicePaymentApi.getInvoice(invoiceId,context.toCallContext());
+          final Invoice invoice=invoiceApi.getInvoiceById(invoiceId,context);
           if (invoice.isMigrationInvoice()) {
             log.error("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
             return null;

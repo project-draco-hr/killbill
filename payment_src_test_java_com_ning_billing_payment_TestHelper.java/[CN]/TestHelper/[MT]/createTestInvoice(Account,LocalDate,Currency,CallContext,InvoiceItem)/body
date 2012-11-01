@@ -6,7 +6,7 @@
       invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),recurringInvoiceItem.getBundleId(),recurringInvoiceItem.getSubscriptionId(),recurringInvoiceItem.getPlanName(),recurringInvoiceItem.getPhaseName(),recurringInvoiceItem.getStartDate(),recurringInvoiceItem.getEndDate(),recurringInvoiceItem.getAmount(),recurringInvoiceItem.getRate(),recurringInvoiceItem.getCurrency()));
     }
   }
-  Mockito.when(invoicePaymentApi.getInvoice(Mockito.eq(invoice.getId()),Mockito.<TenantContext>any())).thenReturn(invoice);
+  Mockito.when(invoiceApi.getInvoiceById(Mockito.eq(invoice.getId()),Mockito.<InternalTenantContext>any())).thenReturn(invoice);
   final InvoiceCreationInternalEvent event=new MockInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),invoice.getInvoiceDate(),context.getUserToken());
   eventBus.post(event,internalCallContextFactory.createInternalCallContext(account.getId(),context));
   return invoice;
