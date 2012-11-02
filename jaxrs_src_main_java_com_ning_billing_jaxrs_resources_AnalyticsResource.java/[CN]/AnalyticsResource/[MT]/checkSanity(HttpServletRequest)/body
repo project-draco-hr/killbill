@@ -1,0 +1,10 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Collection<UUID> checkEntitlement=analyticsSanityApi.checkAnalyticsInSyncWithEntitlement(tenantContext);
+  final Collection<UUID> checkInvoice=analyticsSanityApi.checkAnalyticsInSyncWithInvoice(tenantContext);
+  final Collection<UUID> checkPayment=analyticsSanityApi.checkAnalyticsInSyncWithPayment(tenantContext);
+  final Collection<UUID> checkTag=analyticsSanityApi.checkAnalyticsInSyncWithTag(tenantContext);
+  final Collection<UUID> checkConsistency=analyticsSanityApi.checkAnalyticsConsistency(tenantContext);
+  final AnalyticsSanityJson json=new AnalyticsSanityJson(checkEntitlement,checkInvoice,checkPayment,checkTag,checkConsistency);
+  return Response.status(Status.OK).entity(json).build();
+}

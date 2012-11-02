@@ -1,3 +1,9 @@
 {
-  return analyticsDao.getOverdueStatusesForBundleByKey(externalKey,internalCallContextFactory.createInternalTenantContext(context));
+  final List<BusinessOverdueStatusModelDao> overdueStatusesForBundleByKey=analyticsDao.getOverdueStatusesForBundleByKey(externalKey,internalCallContextFactory.createInternalTenantContext(context));
+  return ImmutableList.<BusinessOverdueStatus>copyOf(Collections2.transform(overdueStatusesForBundleByKey,new Function<BusinessOverdueStatusModelDao,BusinessOverdueStatus>(){
+    @Override public BusinessOverdueStatus apply(    @Nullable final BusinessOverdueStatusModelDao input){
+      return new DefaultBusinessOverdueStatus(input);
+    }
+  }
+));
 }

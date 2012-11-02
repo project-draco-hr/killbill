@@ -1,0 +1,17 @@
+{
+  BusinessSubscriptionTransitionModelDao transition=null;
+  for (  final BusinessSubscriptionTransitionModelDao candidate : transitions) {
+    final BusinessSubscription nextSubscription=candidate.getNextSubscription();
+    if (nextSubscription == null || !nextSubscription.getStartDate().isBefore(event.getEffectiveTransitionTime())) {
+      continue;
+    }
+    if (candidate.getSubscriptionId().equals(event.getSubscriptionId())) {
+      transition=candidate;
+    }
+  }
+  if (transition == null) {
+    log.error("Unable to retrieve the previous transition - THIS SHOULD NEVER HAPPEN");
+    transition=transitions.get(transitions.size() - 1);
+  }
+  return transition;
+}
