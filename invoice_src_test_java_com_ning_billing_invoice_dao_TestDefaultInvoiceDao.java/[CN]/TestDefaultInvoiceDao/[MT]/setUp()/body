@@ -3,7 +3,7 @@
   invoiceSqlDao=Mockito.mock(InvoiceSqlDao.class);
   Mockito.when(idbi.onDemand(InvoiceSqlDao.class)).thenReturn(invoiceSqlDao);
   Mockito.when(invoiceSqlDao.getById(Mockito.anyString(),Mockito.<InternalTenantContext>any())).thenReturn(Mockito.mock(Invoice.class));
-  Mockito.when(invoiceSqlDao.inTransaction(Mockito.<Transaction<Void,InvoiceSqlDao>>any())).thenAnswer(new Answer(){
+  Mockito.when(invoiceSqlDao.inTransaction(Mockito.<Transaction<Void,EntitySqlDao<Invoice>>>any())).thenAnswer(new Answer(){
     @Override public Object answer(    final InvocationOnMock invocation){
       final Object[] args=invocation.getArguments();
       try {

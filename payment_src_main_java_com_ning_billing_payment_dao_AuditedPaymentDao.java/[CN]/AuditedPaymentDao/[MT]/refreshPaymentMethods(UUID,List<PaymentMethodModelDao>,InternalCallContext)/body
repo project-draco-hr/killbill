@@ -1,7 +1,8 @@
 {
-  return paymentMethodSqlDao.inTransaction(new Transaction<List<PaymentMethodModelDao>,PaymentMethodSqlDao>(){
-    @Override public List<PaymentMethodModelDao> inTransaction(    final PaymentMethodSqlDao transactional,    final TransactionStatus status) throws Exception {
-      final List<PaymentMethodModelDao> existingPaymentMethods=getPaymentMethodsInTransaction(transactional,accountId,context);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<PaymentMethodModelDao>>(){
+    @Override public List<PaymentMethodModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final PaymentMethodSqlDao transactional=entitySqlDaoWrapperFactory.become(PaymentMethodSqlDao.class);
+      final List<PaymentMethodModelDao> existingPaymentMethods=transactional.getPaymentMethods(accountId.toString(),context);
       final Set<String> externalPaymentIdProcessed=new HashSet<String>();
       for (      final PaymentMethodModelDao finalPaymentMethod : paymentMethods) {
         boolean isExistingPaymentMethod=false;
@@ -11,22 +12,22 @@
             break;
           }
  else           if (existingPaymentMethod.equalsButActive(finalPaymentMethod)) {
-            undeletedPaymentMethodInTransaction(transactional,existingPaymentMethod.getId(),context);
+            undeletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),context);
             isExistingPaymentMethod=true;
             break;
           }
         }
         if (!isExistingPaymentMethod) {
-          insertPaymentMethodInTransaction(transactional,finalPaymentMethod,context);
+          insertPaymentMethodInTransaction(entitySqlDaoWrapperFactory,finalPaymentMethod,context);
         }
         externalPaymentIdProcessed.add(finalPaymentMethod.getExternalId());
       }
       for (      final PaymentMethodModelDao existingPaymentMethod : existingPaymentMethods) {
         if (!externalPaymentIdProcessed.contains(existingPaymentMethod.getExternalId())) {
-          deletedPaymentMethodInTransaction(transactional,existingPaymentMethod.getId(),context);
+          deletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),context);
         }
       }
-      return getPaymentMethodsInTransaction(transactional,accountId,context);
+      return transactional.getPaymentMethods(accountId.toString(),context);
     }
   }
 );

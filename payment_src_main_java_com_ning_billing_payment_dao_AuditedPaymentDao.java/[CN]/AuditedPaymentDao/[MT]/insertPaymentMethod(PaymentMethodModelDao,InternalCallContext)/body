@@ -1,7 +1,7 @@
 {
-  return paymentMethodSqlDao.inTransaction(new Transaction<PaymentMethodModelDao,PaymentMethodSqlDao>(){
-    @Override public PaymentMethodModelDao inTransaction(    final PaymentMethodSqlDao transactional,    final TransactionStatus status) throws Exception {
-      return insertPaymentMethodInTransaction(transactional,paymentMethod,context);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<PaymentMethodModelDao>(){
+    @Override public PaymentMethodModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      return insertPaymentMethodInTransaction(entitySqlDaoWrapperFactory,paymentMethod,context);
     }
   }
 );

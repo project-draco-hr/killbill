@@ -1,12 +1,10 @@
 {
-  eventsDao.inTransaction(new Transaction<Void,EntitlementEventSqlDao>(){
-    @Override public Void inTransaction(    final EntitlementEventSqlDao transactional,    final TransactionStatus status) throws Exception {
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final EntitlementEventSqlDao transactional=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       final UUID subscriptionId=subscription.getId();
       cancelNextPhaseEventFromTransaction(subscriptionId,transactional,context);
       transactional.insertEvent(nextPhase,context);
-      final Long recordId=transactional.getRecordId(nextPhase.getId().toString(),context);
-      final EntityAudit audit=new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.INSERT);
-      transactional.insertAuditFromTransaction(audit,context);
       recordFutureNotificationFromTransaction(transactional,nextPhase.getEffectiveDate(),new EntitlementNotificationKey(nextPhase.getId()),context);
       notifyBusOfRequestedChange(transactional,subscription,nextPhase,context);
       return null;

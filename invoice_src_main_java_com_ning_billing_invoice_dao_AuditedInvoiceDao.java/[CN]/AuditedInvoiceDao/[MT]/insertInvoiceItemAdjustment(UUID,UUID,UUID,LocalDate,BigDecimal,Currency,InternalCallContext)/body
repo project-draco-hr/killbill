@@ -1,11 +1,10 @@
 {
-  return invoiceSqlDao.inTransaction(new Transaction<InvoiceItem,InvoiceSqlDao>(){
-    @Override public InvoiceItem inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
-      final List<EntityAudit> audits=new ArrayList<EntityAudit>();
-      final InvoiceItem invoiceItemAdjustment=createAdjustmentItem(transactional,invoiceId,invoiceItemId,positiveAdjAmount,currency,effectiveDate,context);
-      insertItemAndAddCBAIfNeeded(transactional,invoiceItemAdjustment,audits,context);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<InvoiceItem>(){
+    @Override public InvoiceItem inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
+      final InvoiceItem invoiceItemAdjustment=createAdjustmentItem(entitySqlDaoWrapperFactory,invoiceId,invoiceItemId,positiveAdjAmount,currency,effectiveDate,context);
+      insertItemAndAddCBAIfNeeded(entitySqlDaoWrapperFactory,invoiceItemAdjustment,context);
       notifyBusOfInvoiceAdjustment(transactional,invoiceId,accountId,context.getUserToken(),context);
-      transactional.insertAuditFromTransaction(audits,context);
       return invoiceItemAdjustment;
     }
   }

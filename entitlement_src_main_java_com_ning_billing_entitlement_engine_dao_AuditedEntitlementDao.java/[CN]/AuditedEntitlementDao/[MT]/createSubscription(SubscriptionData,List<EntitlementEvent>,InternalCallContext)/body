@@ -1,19 +1,13 @@
 {
-  subscriptionsDao.inTransaction(new Transaction<Void,SubscriptionSqlDao>(){
-    @Override public Void inTransaction(    final SubscriptionSqlDao transactional,    final TransactionStatus status) throws Exception {
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final SubscriptionSqlDao transactional=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
       transactional.insertSubscription(subscription,context);
-      final Long subscriptionRecordId=transactional.getRecordId(subscription.getId().toString(),context);
-      final EntityAudit audit=new EntityAudit(TableName.SUBSCRIPTIONS,subscriptionRecordId,ChangeType.INSERT);
-      transactional.insertAuditFromTransaction(audit,context);
-      final EntitlementEventSqlDao eventsDaoFromSameTransaction=transactional.become(EntitlementEventSqlDao.class);
-      final List<EntityAudit> audits=new ArrayList<EntityAudit>();
+      final EntitlementEventSqlDao eventsDaoFromSameTransaction=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       for (      final EntitlementEvent cur : initialEvents) {
         eventsDaoFromSameTransaction.insertEvent(cur,context);
-        final Long recordId=eventsDaoFromSameTransaction.getRecordId(cur.getId().toString(),context);
-        audits.add(new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.INSERT));
         recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
       }
-      eventsDaoFromSameTransaction.insertAuditFromTransaction(audits,context);
       if (initialEvents.size() > 0) {
         notifyBusOfRequestedChange(eventsDaoFromSameTransaction,subscription,initialEvents.get(initialEvents.size() - 1),context);
       }

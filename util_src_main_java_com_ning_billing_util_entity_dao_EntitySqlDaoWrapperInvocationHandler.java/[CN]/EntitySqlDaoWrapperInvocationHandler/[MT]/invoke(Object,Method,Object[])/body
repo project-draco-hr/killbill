@@ -1,0 +1,17 @@
+{
+  try {
+    return invokeSafely(proxy,method,args);
+  }
+ catch (  Throwable t) {
+    if (t.getCause() != null && t.getCause().getCause() != null && DBIException.class.isAssignableFrom(t.getCause().getClass())) {
+      errorDuringTransaction(t.getCause().getCause());
+    }
+ else     if (t.getCause() != null) {
+      errorDuringTransaction(t.getCause());
+    }
+ else {
+      errorDuringTransaction(t);
+    }
+  }
+  return null;
+}

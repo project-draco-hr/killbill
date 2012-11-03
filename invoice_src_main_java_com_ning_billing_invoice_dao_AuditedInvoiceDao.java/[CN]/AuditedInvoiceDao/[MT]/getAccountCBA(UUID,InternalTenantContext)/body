@@ -1,7 +1,8 @@
 {
-  return invoiceSqlDao.inTransaction(new Transaction<BigDecimal,InvoiceSqlDao>(){
-    @Override public BigDecimal inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
-      return getAccountCBAFromTransaction(accountId,transactional,context);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<BigDecimal>(){
+    @Override public BigDecimal inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
+      return getAccountCBAFromTransaction(accountId,entitySqlDaoWrapperFactory,context);
     }
   }
 );

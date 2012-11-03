@@ -1,9 +1,9 @@
 {
-  return invoiceSqlDao.inTransaction(new Transaction<BigDecimal,InvoiceSqlDao>(){
-    @Override public BigDecimal inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<BigDecimal>(){
+    @Override public BigDecimal inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       BigDecimal cba=BigDecimal.ZERO;
       BigDecimal accountBalance=BigDecimal.ZERO;
-      final List<Invoice> invoices=getAllInvoicesByAccountFromTransaction(accountId,transactional,context);
+      final List<Invoice> invoices=getAllInvoicesByAccountFromTransaction(accountId,entitySqlDaoWrapperFactory,context);
       for (      final Invoice cur : invoices) {
         accountBalance=accountBalance.add(cur.getBalance());
         cba=cba.add(cur.getCBAAmount());

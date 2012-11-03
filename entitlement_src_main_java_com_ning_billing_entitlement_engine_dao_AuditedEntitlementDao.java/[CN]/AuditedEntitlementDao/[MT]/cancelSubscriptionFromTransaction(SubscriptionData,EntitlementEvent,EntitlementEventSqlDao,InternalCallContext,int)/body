@@ -2,10 +2,6 @@
   final UUID subscriptionId=subscription.getId();
   cancelFutureEventsFromTransaction(subscriptionId,transactional,context);
   transactional.insertEvent(cancelEvent,context);
-  final String cancelEventId=cancelEvent.getId().toString();
-  final Long recordId=transactional.getRecordId(cancelEventId,context);
-  final EntityAudit audit=new EntityAudit(TableName.SUBSCRIPTION_EVENTS,recordId,ChangeType.INSERT);
-  transactional.insertAuditFromTransaction(audit,context);
   recordFutureNotificationFromTransaction(transactional,cancelEvent.getEffectiveDate(),new EntitlementNotificationKey(cancelEvent.getId(),seqId),context);
   notifyBusOfRequestedChange(transactional,subscription,cancelEvent,context);
 }

@@ -1,11 +1,12 @@
 {
-  return subscriptionsDao.inTransaction(new Transaction<Map<UUID,List<EntitlementEvent>>,SubscriptionSqlDao>(){
-    @Override public Map<UUID,List<EntitlementEvent>> inTransaction(    final SubscriptionSqlDao transactional,    final TransactionStatus status) throws Exception {
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Map<UUID,List<EntitlementEvent>>>(){
+    @Override public Map<UUID,List<EntitlementEvent>> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final SubscriptionSqlDao transactional=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
       final List<Subscription> subscriptions=transactional.getSubscriptionsFromBundleId(bundleId.toString(),context);
       if (subscriptions.size() == 0) {
         return Collections.emptyMap();
       }
-      final EntitlementEventSqlDao eventsDaoFromSameTransaction=transactional.become(EntitlementEventSqlDao.class);
+      final EntitlementEventSqlDao eventsDaoFromSameTransaction=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       final Map<UUID,List<EntitlementEvent>> result=new HashMap<UUID,List<EntitlementEvent>>();
       for (      final Subscription cur : subscriptions) {
         final List<EntitlementEvent> events=eventsDaoFromSameTransaction.getEventsForSubscription(cur.getId().toString(),context);

@@ -1,12 +1,13 @@
 {
   try {
-    return invoiceSqlDao.inTransaction(new Transaction<Invoice,InvoiceSqlDao>(){
-      @Override public Invoice inTransaction(      final InvoiceSqlDao invoiceDao,      final TransactionStatus status) throws Exception {
+    return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Invoice>(){
+      @Override public Invoice inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+        final InvoiceSqlDao invoiceDao=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
         final Invoice invoice=invoiceDao.getById(invoiceId.toString(),context);
         if (invoice == null) {
           throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
         }
-        populateChildren(invoice,invoiceDao,context);
+        populateChildren(invoice,entitySqlDaoWrapperFactory,context);
         return invoice;
       }
     }

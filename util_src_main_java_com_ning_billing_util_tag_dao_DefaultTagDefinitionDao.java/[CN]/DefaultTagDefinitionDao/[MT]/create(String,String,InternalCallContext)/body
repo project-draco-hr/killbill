@@ -3,8 +3,9 @@
     throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_CONFLICTS_WITH_CONTROL_TAG,definitionName);
   }
   try {
-    return tagDefinitionSqlDao.inTransaction(new Transaction<TagDefinition,TagDefinitionSqlDao>(){
-      @Override public TagDefinition inTransaction(      final TagDefinitionSqlDao tagDefinitionSqlDao,      final TransactionStatus status) throws Exception {
+    return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<TagDefinition>(){
+      @Override public TagDefinition inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+        final TagDefinitionSqlDao tagDefinitionSqlDao=entitySqlDaoWrapperFactory.become(TagDefinitionSqlDao.class);
         final TagDefinition existingDefinition=tagDefinitionSqlDao.getByName(definitionName,context);
         if (existingDefinition != null) {
           throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_ALREADY_EXISTS,definitionName);

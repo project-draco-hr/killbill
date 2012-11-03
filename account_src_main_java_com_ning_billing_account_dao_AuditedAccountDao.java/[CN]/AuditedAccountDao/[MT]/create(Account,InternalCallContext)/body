@@ -1,8 +1,9 @@
 {
   final String key=account.getExternalKey();
   try {
-    accountSqlDao.inTransaction(new Transaction<Void,AccountSqlDao>(){
-      @Override public Void inTransaction(      final AccountSqlDao transactionalDao,      final TransactionStatus status) throws AccountApiException, InternalBus.EventBusException {
+    transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+      @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws AccountApiException, InternalBus.EventBusException {
+        final AccountSqlDao transactionalDao=entitySqlDaoWrapperFactory.become(AccountSqlDao.class);
         final Account currentAccount=transactionalDao.getAccountByKey(key,context);
         if (currentAccount != null) {
           throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,key);
@@ -10,11 +11,6 @@
         transactionalDao.create(account,context);
         final Long recordId=accountSqlDao.getRecordId(account.getId().toString(),context);
         final InternalCallContext rehydratedContext=internalCallContextFactory.createInternalCallContext(recordId,context);
-        final EntityHistory<Account> history=new EntityHistory<Account>(account.getId(),recordId,account,ChangeType.INSERT);
-        accountSqlDao.insertHistoryFromTransaction(history,rehydratedContext);
-        final Long historyRecordId=accountSqlDao.getHistoryRecordId(recordId,rehydratedContext);
-        final EntityAudit audit=new EntityAudit(TableName.ACCOUNT_HISTORY,historyRecordId,ChangeType.INSERT);
-        accountSqlDao.insertAuditFromTransaction(audit,rehydratedContext);
         final AccountCreationInternalEvent creationEvent=new DefaultAccountCreationEvent(account,rehydratedContext.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
         try {
           eventBus.postFromTransaction(creationEvent,transactionalDao,rehydratedContext);

@@ -1,9 +1,10 @@
 {
-  return paymentAttemptSqlDao.inTransaction(new Transaction<PaymentAttemptModelDao,PaymentAttemptSqlDao>(){
-    @Override public PaymentAttemptModelDao inTransaction(    final PaymentAttemptSqlDao transactional,    final TransactionStatus status) throws Exception {
-      final PaymentAttemptModelDao savedAttempt=insertPaymentAttemptFromTransaction(attempt,context,transactional);
-      final PaymentSqlDao transPaymentSqlDao=transactional.become(PaymentSqlDao.class);
-      updatePaymentAmountFromTransaction(paymentId,savedAttempt.getRequestedAmount(),context,transPaymentSqlDao);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<PaymentAttemptModelDao>(){
+    @Override public PaymentAttemptModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final PaymentAttemptSqlDao transactional=entitySqlDaoWrapperFactory.become(PaymentAttemptSqlDao.class);
+      transactional.insertPaymentAttempt(attempt,context);
+      final PaymentAttemptModelDao savedAttempt=transactional.getPaymentAttempt(attempt.getId().toString(),context);
+      entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).updatePaymentAmount(paymentId.toString(),savedAttempt.getRequestedAmount(),context);
       return savedAttempt;
     }
   }

@@ -1,10 +1,8 @@
 {
-  return bundlesDao.inTransaction(new Transaction<SubscriptionBundle,BundleSqlDao>(){
-    @Override public SubscriptionBundle inTransaction(    final BundleSqlDao transactional,    final TransactionStatus status){
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<SubscriptionBundle>(){
+    @Override public SubscriptionBundle inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory){
+      final BundleSqlDao bundlesDao=entitySqlDaoWrapperFactory.become(BundleSqlDao.class);
       bundlesDao.insertBundle(bundle,context);
-      final Long recordId=bundlesDao.getRecordId(bundle.getId().toString(),context);
-      final EntityAudit audit=new EntityAudit(TableName.BUNDLES,recordId,ChangeType.INSERT);
-      bundlesDao.insertAuditFromTransaction(audit,context);
       return bundle;
     }
   }

@@ -1,19 +1,16 @@
 {
-  return invoiceSqlDao.inTransaction(new Transaction<InvoiceItem,InvoiceSqlDao>(){
-    @Override public InvoiceItem inTransaction(    final InvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
-      final List<EntityAudit> audits=new ArrayList<EntityAudit>();
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<InvoiceItem>(){
+    @Override public InvoiceItem inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
       UUID invoiceIdForCredit=invoiceId;
       if (invoiceIdForCredit == null) {
         final Invoice invoiceForCredit=new DefaultInvoice(accountId,effectiveDate,effectiveDate,currency);
         transactional.create(invoiceForCredit,context);
-        final Long invoiceForCreditRecordId=transactional.getRecordId(invoiceForCredit.getId().toString(),context);
-        audits.add(new EntityAudit(TableName.INVOICES,invoiceForCreditRecordId,ChangeType.INSERT));
         invoiceIdForCredit=invoiceForCredit.getId();
       }
       final InvoiceItem credit=new CreditAdjInvoiceItem(invoiceIdForCredit,accountId,effectiveDate,positiveCreditAmount.negate(),currency);
-      insertItemAndAddCBAIfNeeded(transactional,credit,audits,context);
+      insertItemAndAddCBAIfNeeded(entitySqlDaoWrapperFactory,credit,context);
       notifyBusOfInvoiceAdjustment(transactional,invoiceId,accountId,context.getUserToken(),context);
-      transactional.insertAuditFromTransaction(audits,context);
       return credit;
     }
   }
