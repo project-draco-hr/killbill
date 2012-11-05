@@ -4,7 +4,7 @@
   final UUID accountId=UUID.randomUUID();
   final List<CustomField> customFields=new ArrayList<CustomField>();
   customFields.add(new StringCustomField(fieldName,fieldValue));
-  final CustomFieldDao customFieldDao=new AuditedCustomFieldDao(dbi);
+  final CustomFieldDao customFieldDao=new AuditedCustomFieldDao(dbi,new DefaultClock());
   customFieldDao.saveEntities(accountId,ObjectType.ACCOUNT,customFields,internalCallContext);
   final Map<String,CustomField> customFieldMap=customFieldDao.loadEntities(accountId,ObjectType.ACCOUNT,internalCallContext);
   assertEquals(customFieldMap.size(),1);

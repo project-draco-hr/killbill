@@ -1,4 +1,5 @@
 {
+  final Clock clock=new ClockMock();
   final IDBI dbi=helper.getDBI();
   accountTagSqlDao=dbi.onDemand(BusinessAccountTagSqlDao.class);
   final BusinessInvoiceTagSqlDao invoiceTagSqlDao=dbi.onDemand(BusinessInvoiceTagSqlDao.class);
@@ -6,8 +7,7 @@
   subscriptionTransitionTagSqlDao=dbi.onDemand(BusinessSubscriptionTransitionTagSqlDao.class);
   eventBus=new InMemoryInternalBus();
   final AccountDao accountDao=new AuditedAccountDao(dbi,eventBus,new InternalCallContextFactory(dbi,new ClockMock()));
-  final AccountEmailDao accountEmailDao=new AuditedAccountEmailDao(dbi);
-  final DefaultClock clock=new DefaultClock();
+  final AccountEmailDao accountEmailDao=new AuditedAccountEmailDao(dbi,clock);
   callContextFactory=new DefaultCallContextFactory(clock);
   final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(dbi,clock);
   accountApi=new DefaultAccountInternalApi(accountDao,accountEmailDao);
