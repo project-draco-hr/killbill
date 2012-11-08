@@ -9,15 +9,8 @@
   final TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName,internalCallContext);
   assertNotNull(tagDefinition);
   final UUID objectId=UUID.randomUUID();
-  final TagStore tagStore=new DefaultTagStore(objectId,ObjectType.ACCOUNT);
-  final Tag tag=new DescriptiveTag(tagDefinition.getId());
-  tagStore.add(tag);
-  tagDao.saveEntities(objectId,ObjectType.ACCOUNT,tagStore.getEntityList(),internalCallContext);
-  final Map<String,Tag> tagMap=tagDao.loadEntities(objectId,ObjectType.ACCOUNT,internalCallContext);
-  assertEquals(tagMap.size(),1);
+  tagDao.insertTag(tagDefinition.getId(),ObjectType.ACCOUNT,objectId,internalCallContext);
   tagDao.deleteTag(objectId,ObjectType.ACCOUNT,tagDefinition.getId(),internalCallContext);
-  final Map<String,Tag> tagMapAfterDeletion=tagDao.loadEntities(objectId,ObjectType.ACCOUNT,internalCallContext);
-  assertEquals(tagMapAfterDeletion.size(),0);
   try {
     tagDefinitionDao.deleteById(tagDefinition.getId(),internalCallContext);
   }

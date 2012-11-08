@@ -1,12 +1,13 @@
 {
   final List<AuditLog> auditLogs=new ArrayList<AuditLog>();
-  final List<Long> targetRecordIds=auditSqlDao.getHistoryRecordIdsForTable(tableName.getHistoryTableName().getTableName().toLowerCase(),objectId.toString(),context);
-  if (targetRecordIds == null) {
+  Long targetRecordId=auditSqlDao.getRecordIdForTable(tableName.getTableName().toLowerCase(),objectId.toString(),context);
+  final List<Long> recordIds=auditSqlDao.getHistoryRecordIdsForTable(tableName.getHistoryTableName().getTableName().toLowerCase(),targetRecordId,context);
+  if (recordIds == null) {
     return auditLogs;
   }
  else {
-    for (    final Long targetRecordId : targetRecordIds) {
-      auditLogs.addAll(getAuditLogsForRecordId(tableName.getHistoryTableName(),targetRecordId,auditLevel,context));
+    for (    final Long recordId : recordIds) {
+      auditLogs.addAll(getAuditLogsForRecordId(tableName.getHistoryTableName(),recordId,auditLevel,context));
     }
     return auditLogs;
   }
