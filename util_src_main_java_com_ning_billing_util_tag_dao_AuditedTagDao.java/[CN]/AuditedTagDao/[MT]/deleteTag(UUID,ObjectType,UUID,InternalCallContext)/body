@@ -1,47 +1,35 @@
 {
-  try {
-    tagSqlDao.inTransaction(new Transaction<Void,TagSqlDao>(){
-      @Override public Void inTransaction(      final TagSqlDao transTagSqlDao,      final TransactionStatus status) throws Exception {
-        final TagDefinition tagDefinition=getTagDefinitionFromTransaction(tagDefinitionId,context);
-        final Tag tag=tagSqlDao.findTag(tagDefinitionId.toString(),objectId.toString(),objectType,context);
-        if (tag == null) {
-          throw new TagApiException(ErrorCode.TAG_DOES_NOT_EXIST,tagDefinition.getName());
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final TagDefinition tagDefinition=getTagDefinitionFromTransaction(tagDefinitionId,entitySqlDaoWrapperFactory,context);
+      final TagSqlDao transactional=entitySqlDaoWrapperFactory.become(TagSqlDao.class);
+      final List<Tag> tags=transactional.getTagsForObject(objectId,objectType,context);
+      Tag tag=null;
+      for (      Tag cur : tags) {
+        if (cur.getTagDefinitionId().equals(tagDefinitionId)) {
+          tag=cur;
+          break;
         }
-        final List<Tag> tagList=Arrays.asList(tag);
-        final List<Mapper<UUID,Long>> recordIds=tagSqlDao.getRecordIds(objectId.toString(),objectType,context);
-        final Map<UUID,Long> recordIdMap=convertToHistoryMap(recordIds,objectType);
-        tagSqlDao.deleteFromTransaction(objectId.toString(),objectType,tagList,context);
-        final List<EntityHistory<Tag>> entityHistories=convertToHistory(tagList,recordIdMap,ChangeType.DELETE);
-        final Long maxHistoryRecordId=tagSqlDao.getMaxHistoryRecordId(context);
-        tagSqlDao.addHistoryFromTransaction(objectId.toString(),objectType,entityHistories,context);
-        final List<Mapper<Long,Long>> historyRecordIds=tagSqlDao.getHistoryRecordIds(maxHistoryRecordId,context);
-        final Map<Long,Long> historyRecordIdMap=convertToAuditMap(historyRecordIds);
-        final List<EntityAudit> entityAudits=convertToAudits(entityHistories,historyRecordIdMap,context);
-        tagSqlDao.insertAuditFromTransaction(entityAudits,context);
-        final TagInternalEvent tagEvent;
-        if (tagDefinition.isControlTag()) {
-          tagEvent=tagEventBuilder.newControlTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context);
-        }
- else {
-          tagEvent=tagEventBuilder.newUserTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context);
-        }
-        try {
-          bus.postFromTransaction(tagEvent,tagSqlDao,context);
-        }
- catch (        InternalBus.EventBusException e) {
-          log.warn("Failed to post tag deletion event for tag " + tag.getId().toString(),e);
-        }
-        return null;
       }
-    }
-);
-  }
- catch (  TransactionFailedException exception) {
-    if (exception.getCause() instanceof TagDefinitionApiException) {
-      throw (TagApiException)exception.getCause();
-    }
+      if (tag == null) {
+        throw new TagApiException(ErrorCode.TAG_DOES_NOT_EXIST,tagDefinition.getName());
+      }
+      transactional.deleteById(tag.getId(),context);
+      final TagInternalEvent tagEvent;
+      if (tagDefinition.isControlTag()) {
+        tagEvent=tagEventBuilder.newControlTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context);
+      }
  else {
-      throw exception;
+        tagEvent=tagEventBuilder.newUserTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context);
+      }
+      try {
+        bus.postFromTransaction(tagEvent,tagSqlDao,context);
+      }
+ catch (      InternalBus.EventBusException e) {
+        log.warn("Failed to post tag deletion event for tag " + tag.getId().toString(),e);
+      }
+      return null;
     }
   }
+);
 }
