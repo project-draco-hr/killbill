@@ -3,6 +3,7 @@
     return invokeSafely(proxy,method,args);
   }
  catch (  Throwable t) {
+    logger.warn("Error during transaction for entity {} and method {}",sqlDao.getClass(),method.getName());
     if (t.getCause() != null && t.getCause().getCause() != null && DBIException.class.isAssignableFrom(t.getCause().getClass())) {
       errorDuringTransaction(t.getCause().getCause());
     }
