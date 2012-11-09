@@ -1,7 +1,8 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<T>(){
     @Override public T inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
-      return (T)entitySqlDaoWrapperFactory.become(EntitySqlDao.class).getById(id.toString(),context);
+      final EntitySqlDao<T> transactional=entitySqlDaoWrapperFactory.become(realSqlDao);
+      return transactional.getById(id.toString(),context);
     }
   }
 );

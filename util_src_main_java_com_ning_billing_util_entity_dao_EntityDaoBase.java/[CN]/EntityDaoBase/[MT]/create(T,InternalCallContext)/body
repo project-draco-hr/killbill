@@ -4,7 +4,7 @@
       if (getById(entity.getId(),context) != null) {
         throw generateAlreadyExistsException(entity,context);
       }
-      final EntitySqlDao<T> transactional=entitySqlDaoWrapperFactory.become(EntitySqlDao.class);
+      final EntitySqlDao<T> transactional=entitySqlDaoWrapperFactory.become(realSqlDao);
       transactional.create(entity,context);
       postBusEventFromTransaction(entity,entity,ChangeType.INSERT,entitySqlDaoWrapperFactory,context);
       return null;
