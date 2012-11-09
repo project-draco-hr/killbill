@@ -4,9 +4,9 @@
     bus=new InMemoryInternalBus();
     final BusService busService=new DefaultBusService(bus);
     ((DefaultBusService)busService).startBus();
-    accountDao=new AuditedAccountDao(dbi,bus,new InternalCallContextFactory(dbi,new ClockMock()));
+    accountDao=new DefaultAccountDao(dbi,bus,new InternalCallContextFactory(dbi,new ClockMock()));
     accountDao.test(internalCallContext);
-    accountEmailDao=new AuditedAccountEmailDao(dbi);
+    accountEmailDao=new DefaultAccountEmailDao(dbi);
     accountEmailDao.test(internalCallContext);
   }
  catch (  Throwable t) {
