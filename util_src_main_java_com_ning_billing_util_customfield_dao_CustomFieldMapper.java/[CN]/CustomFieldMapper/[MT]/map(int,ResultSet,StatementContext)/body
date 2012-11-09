@@ -2,5 +2,8 @@
   final UUID id=UUID.fromString(result.getString("id"));
   final String fieldName=result.getString("field_name");
   final String fieldValue=result.getString("field_value");
-  return new StringCustomField(id,fieldName,fieldValue);
+  final ObjectType objectType=ObjectType.valueOf(result.getString("object_type"));
+  final UUID objectId=getUUID(result,"object_id");
+  final DateTime createdDate=getDateTime(result,"created_date");
+  return new StringCustomField(id,fieldName,fieldValue,objectType,objectId,createdDate);
 }

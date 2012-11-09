@@ -36,12 +36,12 @@
   final NotificationKey notificationKeyBarney=new TestNotificationKey("Barney");
   expectedNotificationsFred.put(notificationKeyFred,Boolean.FALSE);
   expectedNotificationsFred.put(notificationKeyBarney,Boolean.FALSE);
-  dao.inTransaction(new Transaction<Void,DummySqlTest>(){
-    @Override public Void inTransaction(    final DummySqlTest transactional,    final TransactionStatus status) throws Exception {
-      transactional.insertDummy(obj);
-      queueFred.recordFutureNotificationFromTransaction(transactional,readyTime,accountId,notificationKeyFred,internalCallContext);
+  entitySqlDaoTransactionalJdbiWrapper.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      entitySqlDaoWrapperFactory.transmogrify(DummySqlTest.class).insertDummy(obj);
+      queueFred.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,readyTime,accountId,notificationKeyFred,internalCallContext);
       log.info("posted key: " + notificationKeyFred.toString());
-      queueBarney.recordFutureNotificationFromTransaction(transactional,readyTime,accountId,notificationKeyBarney,internalCallContext);
+      queueBarney.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,readyTime,accountId,notificationKeyBarney,internalCallContext);
       log.info("posted key: " + notificationKeyBarney.toString());
       return null;
     }

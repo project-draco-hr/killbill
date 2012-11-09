@@ -18,7 +18,7 @@
         final InvoicePayment chargeBack=new DefaultInvoicePayment(UUID.randomUUID(),InvoicePaymentType.CHARGED_BACK,payment.getPaymentId(),payment.getInvoiceId(),context.getCreatedDate(),requestedChargedBackAmout.negate(),payment.getCurrency(),null,payment.getId());
         transactional.create(chargeBack,context);
         final UUID accountId=transactional.getAccountIdFromInvoicePaymentId(chargeBack.getId().toString(),context);
-        notifyBusOfInvoiceAdjustment(transactional,payment.getInvoiceId(),accountId,context.getUserToken(),context);
+        notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,payment.getInvoiceId(),accountId,context.getUserToken(),context);
         return chargeBack;
       }
     }

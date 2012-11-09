@@ -6,10 +6,10 @@
       final EntitlementEventSqlDao eventsDaoFromSameTransaction=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       for (      final EntitlementEvent cur : initialEvents) {
         eventsDaoFromSameTransaction.insertEvent(cur,context);
-        recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
+        recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
       }
       if (initialEvents.size() > 0) {
-        notifyBusOfRequestedChange(eventsDaoFromSameTransaction,subscription,initialEvents.get(initialEvents.size() - 1),context);
+        notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,initialEvents.get(initialEvents.size() - 1),context);
       }
       return null;
     }

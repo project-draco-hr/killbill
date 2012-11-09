@@ -6,8 +6,8 @@
   final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(context);
   final Account account=accountUserApi.getAccountById(invoice.getAccountId(),internalContext);
   boolean manualPay=false;
-  final Map<String,Tag> accountTags=tagApi.getTags(account.getId(),ObjectType.ACCOUNT,internalContext);
-  for (  final Tag tag : accountTags.values()) {
+  final List<Tag> accountTags=tagApi.getTags(account.getId(),ObjectType.ACCOUNT,internalContext);
+  for (  final Tag tag : accountTags) {
     if (ControlTagType.MANUAL_PAY.getId().equals(tag.getTagDefinitionId())) {
       manualPay=true;
       break;

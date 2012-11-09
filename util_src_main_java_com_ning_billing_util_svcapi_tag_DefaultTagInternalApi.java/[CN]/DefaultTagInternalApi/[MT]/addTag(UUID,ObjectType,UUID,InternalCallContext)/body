@@ -1,3 +1,5 @@
 {
-  tagDao.insertTag(objectId,objectType,tagDefinitionId,context);
+  final TagDefinition tagDefinition=tagDefinitionDao.getById(tagDefinitionId,context);
+  final Tag tag=tagDefinition.isControlTag() ? new DefaultControlTag(ControlTagType.getTypeFromId(tagDefinition.getId()),ObjectType.ACCOUNT,objectId,context.getCreatedDate()) : new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,objectId,context.getCreatedDate());
+  tagDao.create(tag,context);
 }

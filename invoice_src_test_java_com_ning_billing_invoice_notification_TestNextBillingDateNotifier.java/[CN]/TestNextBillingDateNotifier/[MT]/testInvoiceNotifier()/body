@@ -7,9 +7,9 @@
   eventBus.start();
   notifier.initialize();
   notifier.start();
-  dao.inTransaction(new Transaction<Void,DummySqlTest>(){
-    @Override public Void inTransaction(    final DummySqlTest transactional,    final TransactionStatus status) throws Exception {
-      poster.insertNextBillingNotification(transactional,accountId,subscriptionId,readyTime);
+  entitySqlDaoTransactionalJdbiWrapper.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      poster.insertNextBillingNotification(entitySqlDaoWrapperFactory,accountId,subscriptionId,readyTime);
       return null;
     }
   }

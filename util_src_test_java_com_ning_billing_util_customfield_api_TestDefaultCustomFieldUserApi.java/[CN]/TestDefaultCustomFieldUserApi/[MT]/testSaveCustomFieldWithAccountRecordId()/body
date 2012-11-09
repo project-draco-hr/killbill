@@ -8,11 +8,11 @@
     }
   }
 );
-  final CustomField customField=new StringCustomField(UUID.randomUUID().toString().substring(1,4),UUID.randomUUID().toString().substring(1,4));
-  customFieldUserApi.saveCustomFields(accountId,ObjectType.ACCOUNT,ImmutableList.<CustomField>of(customField),callContext);
-  final Map<String,CustomField> customFields=customFieldUserApi.getCustomFields(accountId,ObjectType.ACCOUNT,callContext);
-  Assert.assertEquals(customFields.keySet().size(),1);
-  Assert.assertEquals(customFields.get(customField.getName()),customField);
+  final CustomField customField=new StringCustomField(UUID.randomUUID().toString().substring(1,4),UUID.randomUUID().toString().substring(1,4),ObjectType.ACCOUNT,accountId,callContext.getCreatedDate());
+  customFieldUserApi.addCustomFields(ImmutableList.<CustomField>of(customField),callContext);
+  final List<CustomField> customFields=customFieldUserApi.getCustomFields(accountId,ObjectType.ACCOUNT,callContext);
+  Assert.assertEquals(customFields.size(),1);
+  Assert.assertEquals(customFields.get(0),customField);
   getMysqlTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
     @Override public Void withHandle(    final Handle handle) throws Exception {
       final List<Map<String,Object>> values=handle.select("select account_record_id from custom_fields where object_id = ?",accountId.toString());

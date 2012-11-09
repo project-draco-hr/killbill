@@ -1,0 +1,14 @@
+{
+  EntitlementEvent futureEvent=null;
+  final Date now=clock.getUTCNow().toDate();
+  final List<EntitlementEvent> events=dao.become(EntitlementEventSqlDao.class).getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
+  for (  final EntitlementEvent cur : events) {
+    if (cur.getType() == type && (apiType == null || apiType == ((ApiEvent)cur).getEventType())) {
+      if (futureEvent != null) {
+        throw new EntitlementError(String.format("Found multiple future events for type %s for subscriptions %s",type,subscriptionId.toString()));
+      }
+      futureEvent=cur;
+    }
+  }
+  unactivateEventFromTransaction(futureEvent,dao,context);
+}
