@@ -1,10 +1,8 @@
 {
+  if (getIdFromKey(data.getExternalKey(),context) != null) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,data.getExternalKey());
+  }
   final Account account=new DefaultAccount(data);
-  try {
-    accountDao.create(account,internalCallContextFactory.createInternalCallContext(account.getId(),context));
-  }
- catch (  AccountApiException e) {
-    throw new AccountApiException(e,ErrorCode.ACCOUNT_CREATION_FAILED);
-  }
+  accountDao.create(account,internalCallContextFactory.createInternalCallContext(account.getId(),context));
   return account;
 }

@@ -1,2 +1,9 @@
 {
+  final Account currentAccount=getById(accountId,context);
+  if (currentAccount == null) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
+  }
+  final DefaultMutableAccountData updatedAccount=new DefaultMutableAccountData(currentAccount);
+  updatedAccount.setPaymentMethodId(paymentMethodId);
+  update(new DefaultAccount(updatedAccount),context);
 }

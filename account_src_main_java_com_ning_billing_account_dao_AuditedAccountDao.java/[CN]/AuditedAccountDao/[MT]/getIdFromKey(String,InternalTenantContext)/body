@@ -2,5 +2,10 @@
   if (externalKey == null) {
     throw new AccountApiException(ErrorCode.ACCOUNT_CANNOT_MAP_NULL_KEY,"");
   }
-  return accountSqlDao.getIdFromKey(externalKey,context);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<UUID>(){
+    @Override public UUID inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      return entitySqlDaoWrapperFactory.become(AccountSqlDao.class).getIdFromKey(externalKey,context);
+    }
+  }
+);
 }

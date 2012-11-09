@@ -1,11 +1,11 @@
 {
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
-    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws EntityPersistenceException, InternalBus.EventBusException {
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws InternalBus.EventBusException, AccountApiException {
       final AccountSqlDao transactional=entitySqlDaoWrapperFactory.become(AccountSqlDao.class);
       final UUID accountId=specifiedAccount.getId();
       final Account currentAccount=transactional.getById(accountId.toString(),context);
       if (currentAccount == null) {
-        throw new EntityPersistenceException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
+        throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
       }
       final Account account=specifiedAccount.mergeWithDelegate(currentAccount);
       transactional.update(account,context);
