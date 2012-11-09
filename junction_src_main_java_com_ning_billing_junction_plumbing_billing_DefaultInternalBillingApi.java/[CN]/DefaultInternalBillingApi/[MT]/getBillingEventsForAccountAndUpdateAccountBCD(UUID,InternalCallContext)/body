@@ -3,8 +3,8 @@
   final DefaultBillingEventSet result=new DefaultBillingEventSet();
   try {
     final Account account=accountApi.getAccountById(accountId,context);
-    final Map<String,Tag> accountTags=tagApi.getTags(accountId,ObjectType.ACCOUNT,context);
-    for (    final Tag cur : accountTags.values()) {
+    final List<Tag> accountTags=tagApi.getTags(accountId,ObjectType.ACCOUNT,context);
+    for (    final Tag cur : accountTags) {
       if (ControlTagType.AUTO_INVOICING_OFF.getId().equals(cur.getTagDefinitionId())) {
         result.setAccountAutoInvoiceIsOff(true);
         return result;

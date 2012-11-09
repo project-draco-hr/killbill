@@ -4,9 +4,9 @@
       final EntitlementEventSqlDao transactional=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       for (      final EntitlementEvent cur : recreateEvents) {
         transactional.insertEvent(cur,context);
-        recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
+        recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
       }
-      notifyBusOfRequestedChange(transactional,subscription,recreateEvents.get(recreateEvents.size() - 1),context);
+      notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,recreateEvents.get(recreateEvents.size() - 1),context);
       return null;
     }
   }

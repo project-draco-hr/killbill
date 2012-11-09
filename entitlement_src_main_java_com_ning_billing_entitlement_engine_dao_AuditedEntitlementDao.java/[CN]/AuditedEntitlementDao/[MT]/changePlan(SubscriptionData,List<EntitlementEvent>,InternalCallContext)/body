@@ -3,13 +3,13 @@
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final EntitlementEventSqlDao transactional=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       final UUID subscriptionId=subscription.getId();
-      cancelFutureEventsFromTransaction(subscriptionId,transactional,context);
+      cancelFutureEventsFromTransaction(subscriptionId,entitySqlDaoWrapperFactory,context);
       for (      final EntitlementEvent cur : changeEvents) {
         transactional.insertEvent(cur,context);
-        recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
+        recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
       }
       final EntitlementEvent finalEvent=changeEvents.get(changeEvents.size() - 1);
-      notifyBusOfRequestedChange(transactional,subscription,finalEvent,context);
+      notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,finalEvent,context);
       return null;
     }
   }

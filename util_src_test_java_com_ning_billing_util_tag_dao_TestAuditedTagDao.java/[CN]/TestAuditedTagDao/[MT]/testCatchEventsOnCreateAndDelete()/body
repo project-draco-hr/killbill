@@ -8,10 +8,11 @@
   final TagDefinition createdTagDefinition=tagDefinitionDao.create(definitionName,description,internalCallContext);
   Assert.assertEquals(createdTagDefinition.getName(),definitionName);
   Assert.assertEquals(createdTagDefinition.getDescription(),description);
-  tagDao.insertTag(objectId,objectType,createdTagDefinition.getId(),internalCallContext);
-  final Map<String,Tag> foundTags=tagDao.getTags(objectId,objectType,internalCallContext);
-  Assert.assertEquals(foundTags.keySet().size(),1);
-  Assert.assertEquals(foundTags.values().iterator().next().getTagDefinitionId(),createdTagDefinition.getId());
+  final Tag tag=createdTagDefinition.isControlTag() ? new DefaultControlTag(ControlTagType.getTypeFromId(createdTagDefinition.getId()),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate()) : new DescriptiveTag(createdTagDefinition.getId(),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate());
+  tagDao.create(tag,internalCallContext);
+  final List<Tag> foundTags=tagDao.getTags(objectId,objectType,internalCallContext);
+  Assert.assertEquals(foundTags.size(),1);
+  Assert.assertEquals(foundTags.get(0).getTagDefinitionId(),createdTagDefinition.getId());
   Assert.assertEquals(eventsListener.getEvents().size(),2);
   Assert.assertEquals(eventsListener.getTagEvents().size(),1);
   final TagInternalEvent tagFirstEventReceived=eventsListener.getTagEvents().get(0);
@@ -23,7 +24,7 @@
   Assert.assertEquals(tagFirstEventReceived.getBusEventType(),BusInternalEvent.BusInternalEventType.USER_TAG_CREATION);
   Assert.assertEquals(tagFirstEventReceived.getUserToken(),internalCallContext.getUserToken());
   tagDao.deleteTag(objectId,objectType,createdTagDefinition.getId(),internalCallContext);
-  Assert.assertEquals(tagDao.getTags(objectId,objectType,internalCallContext).keySet().size(),0);
+  Assert.assertEquals(tagDao.getTags(objectId,objectType,internalCallContext).size(),0);
   Assert.assertEquals(eventsListener.getEvents().size(),3);
   Assert.assertEquals(eventsListener.getTagEvents().size(),2);
   final TagInternalEvent tagSecondEventReceived=eventsListener.getTagEvents().get(1);

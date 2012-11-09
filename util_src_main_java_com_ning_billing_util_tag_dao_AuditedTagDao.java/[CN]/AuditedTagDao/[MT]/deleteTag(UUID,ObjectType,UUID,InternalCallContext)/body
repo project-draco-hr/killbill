@@ -15,19 +15,7 @@
         throw new TagApiException(ErrorCode.TAG_DOES_NOT_EXIST,tagDefinition.getName());
       }
       transactional.deleteById(tag.getId(),context);
-      final TagInternalEvent tagEvent;
-      if (tagDefinition.isControlTag()) {
-        tagEvent=tagEventBuilder.newControlTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context);
-      }
- else {
-        tagEvent=tagEventBuilder.newUserTagDeletionEvent(tag.getId(),objectId,objectType,tagDefinition,context);
-      }
-      try {
-        bus.postFromTransaction(tagEvent,tagSqlDao,context);
-      }
- catch (      InternalBus.EventBusException e) {
-        log.warn("Failed to post tag deletion event for tag " + tag.getId().toString(),e);
-      }
+      postBusEventFromTransaction(tag,tag,ChangeType.DELETE,entitySqlDaoWrapperFactory,context);
       return null;
     }
   }

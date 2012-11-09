@@ -19,9 +19,9 @@
         transactional.unactiveEvent(cancelledEventId,context);
         for (        final EntitlementEvent cur : uncancelEvents) {
           transactional.insertEvent(cur,context);
-          recordFutureNotificationFromTransaction(transactional,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
+          recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
         }
-        notifyBusOfRequestedChange(transactional,subscription,uncancelEvents.get(uncancelEvents.size() - 1),context);
+        notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,uncancelEvents.get(uncancelEvents.size() - 1),context);
       }
       return null;
     }

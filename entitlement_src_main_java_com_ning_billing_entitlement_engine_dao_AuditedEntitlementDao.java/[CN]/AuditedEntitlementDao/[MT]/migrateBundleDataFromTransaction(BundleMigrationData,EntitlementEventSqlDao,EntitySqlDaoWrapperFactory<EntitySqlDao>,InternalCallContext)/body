@@ -11,11 +11,11 @@
     final SubscriptionData subData=curSubscription.getData();
     for (    final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
       transactional.insertEvent(curEvent,context);
-      recordFutureNotificationFromTransaction(transactional,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()),context);
+      recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()),context);
     }
     transSubDao.insertSubscription(subData,context);
     final EntitlementEvent finalEvent=curSubscription.getInitialEvents().get(curSubscription.getInitialEvents().size() - 1);
-    notifyBusOfRequestedChange(transactional,subData,finalEvent,context);
+    notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subData,finalEvent,context);
   }
   transBundleDao.insertBundle(bundleData,context);
 }

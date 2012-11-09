@@ -1,0 +1,19 @@
+{
+  final TagDefinitionInternalEvent tagDefinitionEvent;
+switch (changeType) {
+case INSERT:
+    tagDefinitionEvent=(tagDefinition.isControlTag()) ? tagEventBuilder.newControlTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context) : tagEventBuilder.newUserTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context);
+  break;
+case DELETE:
+tagDefinitionEvent=(tagDefinition.isControlTag()) ? tagEventBuilder.newControlTagDefinitionDeletionEvent(tagDefinition.getId(),tagDefinition,context) : tagEventBuilder.newUserTagDefinitionDeletionEvent(tagDefinition.getId(),tagDefinition,context);
+break;
+default :
+return;
+}
+try {
+bus.postFromTransaction(tagDefinitionEvent,entitySqlDaoWrapperFactory,context);
+}
+ catch (InternalBus.EventBusException e) {
+log.warn("Failed to post tag definition event for tag " + tagDefinition.getId().toString(),e);
+}
+}

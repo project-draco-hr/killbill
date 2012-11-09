@@ -1,0 +1,7 @@
+{
+  final UUID subscriptionId=subscription.getId();
+  cancelFutureEventsFromTransaction(subscriptionId,entitySqlDaoWrapperFactory,context);
+  entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class).insertEvent(cancelEvent,context);
+  recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cancelEvent.getEffectiveDate(),new EntitlementNotificationKey(cancelEvent.getId(),seqId),context);
+  notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,cancelEvent,context);
+}

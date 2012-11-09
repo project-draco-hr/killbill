@@ -11,7 +11,7 @@
         final InvoiceItemSqlDao transInvoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
         transInvoiceItemSqlDao.batchCreateFromTransaction(invoiceItems,context);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
-        notifyOfFutureBillingEvents(transactional,invoice.getAccountId(),recurringInvoiceItems);
+        notifyOfFutureBillingEvents(entitySqlDaoWrapperFactory,invoice.getAccountId(),recurringInvoiceItems);
         final List<InvoicePayment> invoicePayments=invoice.getPayments();
         final InvoicePaymentSqlDao invoicePaymentSqlDao=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);

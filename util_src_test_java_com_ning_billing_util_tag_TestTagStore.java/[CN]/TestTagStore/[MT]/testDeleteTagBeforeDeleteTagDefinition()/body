@@ -9,7 +9,8 @@
   final TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName,internalCallContext);
   assertNotNull(tagDefinition);
   final UUID objectId=UUID.randomUUID();
-  tagDao.insertTag(tagDefinition.getId(),ObjectType.ACCOUNT,objectId,internalCallContext);
+  final Tag tag=tagDefinition.isControlTag() ? new DefaultControlTag(ControlTagType.getTypeFromId(tagDefinition.getId()),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate()) : new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate());
+  tagDao.create(tag,internalCallContext);
   tagDao.deleteTag(objectId,ObjectType.ACCOUNT,tagDefinition.getId(),internalCallContext);
   try {
     tagDefinitionDao.deleteById(tagDefinition.getId(),internalCallContext);

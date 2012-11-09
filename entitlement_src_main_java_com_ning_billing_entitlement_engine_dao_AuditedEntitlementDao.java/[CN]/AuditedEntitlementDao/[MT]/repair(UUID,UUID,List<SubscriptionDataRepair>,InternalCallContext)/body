@@ -11,13 +11,13 @@
         for (        final EntitlementEvent event : cur.getNewEvents()) {
           transEventDao.insertEvent(event,context);
           if (event.getEffectiveDate().isAfter(clock.getUTCNow())) {
-            recordFutureNotificationFromTransaction(transactional,event.getEffectiveDate(),new EntitlementNotificationKey(event.getId()),context);
+            recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,event.getEffectiveDate(),new EntitlementNotificationKey(event.getId()),context);
           }
         }
       }
       try {
         final RepairEntitlementInternalEvent busEvent=new DefaultRepairEntitlementEvent(context.getUserToken(),accountId,bundleId,clock.getUTCNow(),context.getAccountRecordId(),context.getTenantRecordId());
-        eventBus.postFromTransaction(busEvent,transactional,context);
+        eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory,context);
       }
  catch (      EventBusException e) {
         log.warn("Failed to post repair entitlement event for bundle " + bundleId,e);
