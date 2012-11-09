@@ -1,3 +1,8 @@
 {
-  return paymentSqlDao.getLastPaymentForAccountAndPaymentMethod(accountId.toString(),paymentMethodId.toString(),context);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<PaymentModelDao>(){
+    @Override public PaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      return entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).getLastPaymentForAccountAndPaymentMethod(accountId.toString(),paymentMethodId.toString(),context);
+    }
+  }
+);
 }

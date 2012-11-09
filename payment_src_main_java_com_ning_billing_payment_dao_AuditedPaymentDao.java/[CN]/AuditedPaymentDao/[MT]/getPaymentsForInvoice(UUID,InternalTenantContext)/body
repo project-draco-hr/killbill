@@ -1,3 +1,8 @@
 {
-  return paymentSqlDao.getPaymentsForInvoice(invoiceId.toString(),context);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<PaymentModelDao>>(){
+    @Override public List<PaymentModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      return entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).getPaymentsForInvoice(invoiceId.toString(),context);
+    }
+  }
+);
 }
