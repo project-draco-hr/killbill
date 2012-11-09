@@ -1,7 +1,9 @@
 {
   super.create(account,context);
   try {
-    eventBus.post(new DefaultAccountCreationEvent(account,null,getRecordId(account.getId(),context),context.getTenantRecordId()),context);
+    final Long accountRecordId=getRecordId(account.getId(),context);
+    final long tenantRecordId=context == null ? InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID : context.getTenantRecordId();
+    eventBus.post(new DefaultAccountCreationEvent(account,null,accountRecordId,tenantRecordId),context);
   }
  catch (  final EventBusException ex) {
     throw new RuntimeException(ex);
