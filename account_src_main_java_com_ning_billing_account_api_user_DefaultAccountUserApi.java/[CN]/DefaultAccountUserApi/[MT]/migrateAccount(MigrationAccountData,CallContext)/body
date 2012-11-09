@@ -3,14 +3,9 @@
   final DateTime updatedDate=data.getUpdatedDate() == null ? context.getUpdatedDate() : data.getUpdatedDate();
   final CallContext migrationContext=callContextFactory.toMigrationCallContext(context,createdDate,updatedDate);
   final Account account=new DefaultAccount(data);
-  try {
-    accountDao.create(account,internalCallContextFactory.createInternalCallContext(account.getId(),migrationContext));
-    for (    final String cur : data.getAdditionalContactEmails()) {
-      addEmail(account.getId(),new DefaultAccountEmail(account.getId(),cur),migrationContext);
-    }
-  }
- catch (  AccountApiException e) {
-    throw new AccountApiException(e,ErrorCode.ACCOUNT_CREATION_FAILED);
+  createAccount(account,migrationContext);
+  for (  final String cur : data.getAdditionalContactEmails()) {
+    addEmail(account.getId(),new DefaultAccountEmail(account.getId(),cur),migrationContext);
   }
   return account;
 }

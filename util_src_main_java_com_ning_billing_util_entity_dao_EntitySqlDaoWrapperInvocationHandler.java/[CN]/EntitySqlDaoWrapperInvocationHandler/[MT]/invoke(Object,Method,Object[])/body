@@ -4,13 +4,21 @@
   }
  catch (  Throwable t) {
     if (t.getCause() != null && t.getCause().getCause() != null && DBIException.class.isAssignableFrom(t.getCause().getClass())) {
-      errorDuringTransaction(t.getCause().getCause());
+      if (t.getCause() instanceof StatementException) {
+        final StatementContext statementContext=((StatementException)t.getCause()).getStatementContext();
+        if (statementContext != null) {
+          final PreparedStatement statement=statementContext.getStatement();
+          errorDuringTransaction(t.getCause().getCause(),method,statement.toString());
+          return null;
+        }
+      }
+      errorDuringTransaction(t.getCause().getCause(),method);
     }
  else     if (t.getCause() != null) {
-      errorDuringTransaction(t.getCause());
+      errorDuringTransaction(t.getCause(),method);
     }
  else {
-      errorDuringTransaction(t);
+      errorDuringTransaction(t,method);
     }
   }
   return null;

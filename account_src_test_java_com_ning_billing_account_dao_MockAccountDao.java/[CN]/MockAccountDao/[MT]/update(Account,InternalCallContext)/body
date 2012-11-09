@@ -1,6 +1,7 @@
 {
-  final Account currentAccount=accounts.put(account.getId(),account);
-  final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(account.getId(),null,currentAccount,account,1L,1L);
+  final Account currentAccount=getById(account.getId(),context);
+  super.update(account,context);
+  final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(account.getId(),null,currentAccount,account,getRecordId(account.getId(),context),context.getTenantRecordId());
   if (changeEvent.hasChanges()) {
     try {
       eventBus.post(changeEvent,context);

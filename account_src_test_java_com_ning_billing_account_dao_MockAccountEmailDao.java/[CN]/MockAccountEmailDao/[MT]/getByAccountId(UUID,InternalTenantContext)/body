@@ -1,9 +1,10 @@
 {
-  final Set<AccountEmail> accountEmails=emails.get(accountId);
-  if (accountEmails == null) {
-    return ImmutableList.<AccountEmail>of();
+  final List<AccountEmail> accountEmails=new ArrayList<AccountEmail>();
+  for (  final Map<Long,AccountEmail> accountEmail : entities.values()) {
+    final AccountEmail email=accountEmail.values().iterator().next();
+    if (email.getAccountId().equals(accountId)) {
+      accountEmails.add(email);
+    }
   }
- else {
-    return ImmutableList.<AccountEmail>copyOf(accountEmails.iterator());
-  }
+  return accountEmails;
 }
