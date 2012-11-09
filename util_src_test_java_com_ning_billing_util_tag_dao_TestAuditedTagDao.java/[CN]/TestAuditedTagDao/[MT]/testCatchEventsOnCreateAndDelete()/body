@@ -8,7 +8,7 @@
   final TagDefinition createdTagDefinition=tagDefinitionDao.create(definitionName,description,internalCallContext);
   Assert.assertEquals(createdTagDefinition.getName(),definitionName);
   Assert.assertEquals(createdTagDefinition.getDescription(),description);
-  final Tag tag=createdTagDefinition.isControlTag() ? new DefaultControlTag(ControlTagType.getTypeFromId(createdTagDefinition.getId()),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate()) : new DescriptiveTag(createdTagDefinition.getId(),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate());
+  final Tag tag=createdTagDefinition.isControlTag() ? new DefaultControlTag(ControlTagType.getTypeFromId(createdTagDefinition.getId()),objectType,objectId,internalCallContext.getCreatedDate()) : new DescriptiveTag(createdTagDefinition.getId(),objectType,objectId,internalCallContext.getCreatedDate());
   tagDao.create(tag,internalCallContext);
   final List<Tag> foundTags=tagDao.getTags(objectId,objectType,internalCallContext);
   Assert.assertEquals(foundTags.size(),1);
