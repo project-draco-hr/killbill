@@ -1,25 +1,24 @@
 {
   final LocalDate effectiveDate=new LocalDate(2010,1,1);
-  final InvoiceItem adjustedInvoiceItem=invoiceDao.insertInvoiceItemAdjustment(invoice.getAccountId(),invoice.getId(),invoiceItem.getId(),effectiveDate,amount,null,internalCallContext);
+  final InvoiceItemModelDao adjustedInvoiceItem=invoiceDao.insertInvoiceItemAdjustment(invoice.getAccountId(),invoice.getId(),invoiceItem.getId(),effectiveDate,amount,null,internalCallContext);
   Assert.assertEquals(adjustedInvoiceItem.getAccountId(),invoiceItem.getAccountId());
   Assert.assertNull(adjustedInvoiceItem.getBundleId());
   Assert.assertEquals(adjustedInvoiceItem.getCurrency(),invoiceItem.getCurrency());
-  Assert.assertEquals(adjustedInvoiceItem.getDescription(),"Invoice item adjustment");
   Assert.assertEquals(adjustedInvoiceItem.getEndDate(),effectiveDate);
   Assert.assertEquals(adjustedInvoiceItem.getInvoiceId(),invoiceItem.getInvoiceId());
-  Assert.assertEquals(adjustedInvoiceItem.getInvoiceItemType(),InvoiceItemType.ITEM_ADJ);
+  Assert.assertEquals(adjustedInvoiceItem.getType(),InvoiceItemType.ITEM_ADJ);
   Assert.assertEquals(adjustedInvoiceItem.getLinkedItemId(),invoiceItem.getId());
   Assert.assertNull(adjustedInvoiceItem.getPhaseName());
   Assert.assertNull(adjustedInvoiceItem.getPlanName());
   Assert.assertNull(adjustedInvoiceItem.getRate());
   Assert.assertEquals(adjustedInvoiceItem.getStartDate(),effectiveDate);
   Assert.assertNull(adjustedInvoiceItem.getSubscriptionId());
-  final InvoiceItem retrievedInvoiceItem=invoiceItemSqlDao.getById(adjustedInvoiceItem.getId().toString(),internalCallContext);
+  final InvoiceItemModelDao retrievedInvoiceItem=invoiceItemSqlDao.getById(adjustedInvoiceItem.getId().toString(),internalCallContext);
   Assert.assertEquals(retrievedInvoiceItem,adjustedInvoiceItem);
-  final Invoice retrievedInvoice=invoiceDao.getById(adjustedInvoiceItem.getInvoiceId(),internalCallContext);
-  final List<InvoiceItem> invoiceItems=retrievedInvoice.getInvoiceItems();
+  final InvoiceModelDao retrievedInvoice=invoiceDao.getById(adjustedInvoiceItem.getInvoiceId(),internalCallContext);
+  final List<InvoiceItemModelDao> invoiceItems=retrievedInvoice.getInvoiceItems();
   Assert.assertEquals(invoiceItems.size(),2);
-  final InvoiceItem retrievedByInvoiceInvoiceItem;
+  final InvoiceItemModelDao retrievedByInvoiceInvoiceItem;
   if (invoiceItems.get(0).getId().equals(adjustedInvoiceItem.getId())) {
     retrievedByInvoiceInvoiceItem=invoiceItems.get(0);
   }
@@ -28,10 +27,10 @@
   }
   Assert.assertEquals(retrievedByInvoiceInvoiceItem,adjustedInvoiceItem);
   if (amount == null) {
-    Assert.assertEquals(retrievedInvoice.getBalance().compareTo(BigDecimal.ZERO),0);
+    Assert.assertEquals(InvoiceModelDaoHelper.getBalance(retrievedInvoice).compareTo(BigDecimal.ZERO),0);
   }
  else {
-    Assert.assertEquals(retrievedInvoice.getBalance().compareTo(INVOICE_ITEM_AMOUNT.add(amount.negate())),0);
+    Assert.assertEquals(InvoiceModelDaoHelper.getBalance(retrievedInvoice).compareTo(INVOICE_ITEM_AMOUNT.add(amount.negate())),0);
   }
   return adjustedInvoiceItem;
 }

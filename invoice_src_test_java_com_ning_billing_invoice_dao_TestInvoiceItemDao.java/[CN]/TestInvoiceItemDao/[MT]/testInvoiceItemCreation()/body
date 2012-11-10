@@ -7,8 +7,8 @@
   final LocalDate endDate=new LocalDate(2011,11,1);
   final BigDecimal rate=new BigDecimal("20.00");
   final RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate,endDate,rate,rate,Currency.USD);
-  invoiceItemSqlDao.create(item,internalCallContext);
-  final RecurringInvoiceItem thisItem=(RecurringInvoiceItem)invoiceItemSqlDao.getById(item.getId().toString(),internalCallContext);
+  createInvoiceItem(item,internalCallContext);
+  final InvoiceItemModelDao thisItem=invoiceItemSqlDao.getById(item.getId().toString(),internalCallContext);
   assertNotNull(thisItem);
   assertEquals(thisItem.getId(),item.getId());
   assertEquals(thisItem.getInvoiceId(),item.getInvoiceId());

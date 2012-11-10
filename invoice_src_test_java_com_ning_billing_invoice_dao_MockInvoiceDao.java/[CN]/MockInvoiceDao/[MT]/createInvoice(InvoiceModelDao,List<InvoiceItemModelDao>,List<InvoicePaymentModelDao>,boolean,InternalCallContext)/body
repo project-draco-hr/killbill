@@ -1,0 +1,17 @@
+{
+synchronized (monitor) {
+    invoices.put(invoice.getId(),invoice);
+    for (    final InvoiceItemModelDao invoiceItemModelDao : invoiceItems) {
+      items.put(invoiceItemModelDao.getId(),invoiceItemModelDao);
+    }
+    for (    final InvoicePaymentModelDao paymentModelDao : invoicePayments) {
+      payments.put(paymentModelDao.getId(),paymentModelDao);
+    }
+  }
+  try {
+    eventBus.post(new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),InvoiceModelDaoHelper.getBalance(invoice),invoice.getCurrency(),null,1L,1L),context);
+  }
+ catch (  InternalBus.EventBusException ex) {
+    throw new RuntimeException(ex);
+  }
+}

@@ -1,7 +1,7 @@
 {
-  final Invoice migrationInvoice=invoiceDao.getById(migrationInvoiceId,internalCallContext);
-  final Invoice regularInvoice=invoiceDao.getById(regularInvoiceId,internalCallContext);
-  final BigDecimal balanceOfAllInvoices=migrationInvoice.getBalance().add(regularInvoice.getBalance());
+  final InvoiceModelDao migrationInvoice=invoiceDao.getById(migrationInvoiceId,internalCallContext);
+  final InvoiceModelDao regularInvoice=invoiceDao.getById(regularInvoiceId,internalCallContext);
+  final BigDecimal balanceOfAllInvoices=InvoiceModelDaoHelper.getBalance(migrationInvoice).add(InvoiceModelDaoHelper.getBalance(regularInvoice));
   final BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId,callContext);
   log.info("ACCOUNT balance: " + accountBalance + " should equal the Balance Of All Invoices: "+ balanceOfAllInvoices);
   Assert.assertEquals(accountBalance.compareTo(balanceOfAllInvoices),0);

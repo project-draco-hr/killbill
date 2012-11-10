@@ -3,16 +3,16 @@
   final UUID bundleId=UUID.randomUUID();
   final LocalDate targetDate1=new LocalDate(2011,10,6);
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1,Currency.USD);
-  invoiceDao.create(invoice1,invoice1.getTargetDate().getDayOfMonth(),true,internalCallContext);
+  createInvoice(invoice1,true,internalCallContext);
   final CreditBalanceAdjInvoiceItem cbaItem=new CreditBalanceAdjInvoiceItem(invoice1.getId(),accountId,new LocalDate(),new BigDecimal("20.0"),Currency.USD);
-  invoiceItemSqlDao.create(cbaItem,internalCallContext);
-  final InvoiceItem charge=invoiceDao.insertExternalCharge(accountId,null,bundleId,"bla",new BigDecimal("15.0"),clock.getUTCNow().toLocalDate(),Currency.USD,internalCallContext);
-  final Invoice newInvoice=invoiceDao.getById(charge.getInvoiceId(),internalCallContext);
-  List<InvoiceItem> items=newInvoice.getInvoiceItems();
+  createInvoiceItem(cbaItem,internalCallContext);
+  final InvoiceItemModelDao charge=invoiceDao.insertExternalCharge(accountId,null,bundleId,"bla",new BigDecimal("15.0"),clock.getUTCNow().toLocalDate(),Currency.USD,internalCallContext);
+  final InvoiceModelDao newInvoice=invoiceDao.getById(charge.getInvoiceId(),internalCallContext);
+  List<InvoiceItemModelDao> items=newInvoice.getInvoiceItems();
   assertEquals(items.size(),2);
-  for (  InvoiceItem cur : items) {
+  for (  InvoiceItemModelDao cur : items) {
     if (!cur.getId().equals(charge.getId())) {
-      assertEquals(cur.getInvoiceItemType(),InvoiceItemType.CBA_ADJ);
+      assertEquals(cur.getType(),InvoiceItemType.CBA_ADJ);
       assertTrue(cur.getAmount().compareTo(new BigDecimal("-15.00")) == 0);
       break;
     }

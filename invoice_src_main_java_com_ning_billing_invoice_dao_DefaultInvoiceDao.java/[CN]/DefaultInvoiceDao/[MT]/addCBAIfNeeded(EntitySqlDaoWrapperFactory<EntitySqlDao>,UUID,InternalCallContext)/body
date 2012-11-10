@@ -1,0 +1,15 @@
+{
+  final InvoiceModelDao invoice=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class).getById(invoiceId.toString(),context);
+  if (invoice != null) {
+    populateChildren(invoice,entitySqlDaoWrapperFactory,context);
+  }
+ else {
+    throw new IllegalStateException("Invoice shouldn't be null for this item at this stage " + invoiceId);
+  }
+  final BigDecimal balance=InvoiceModelDaoHelper.getBalance(invoice);
+  if (balance.compareTo(BigDecimal.ZERO) < 0) {
+    final InvoiceItemSqlDao transInvoiceItemDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
+    final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(InvoiceItemType.CBA_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,balance.negate(),null,invoice.getCurrency(),null);
+    transInvoiceItemDao.create(cbaAdjItem,context);
+  }
+}

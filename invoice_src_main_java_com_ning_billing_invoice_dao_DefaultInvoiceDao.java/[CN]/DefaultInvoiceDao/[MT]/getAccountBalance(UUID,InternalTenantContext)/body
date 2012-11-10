@@ -1,0 +1,15 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<BigDecimal>(){
+    @Override public BigDecimal inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      BigDecimal cba=BigDecimal.ZERO;
+      BigDecimal accountBalance=BigDecimal.ZERO;
+      final List<InvoiceModelDao> invoices=getAllInvoicesByAccountFromTransaction(accountId,entitySqlDaoWrapperFactory,context);
+      for (      final InvoiceModelDao cur : invoices) {
+        accountBalance=accountBalance.add(InvoiceModelDaoHelper.getBalance(cur));
+        cba=cba.add(InvoiceModelDaoHelper.getCBAAmount(cur));
+      }
+      return accountBalance.subtract(cba);
+    }
+  }
+);
+}

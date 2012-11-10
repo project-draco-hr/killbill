@@ -1,0 +1,21 @@
+{
+  final Builder<UUID,BigDecimal> invoiceItemIdsWithAmountsBuilder=new Builder<UUID,BigDecimal>();
+  if (invoiceItemIdsWithNullAmounts.size() == 0) {
+    return invoiceItemIdsWithAmountsBuilder.build();
+  }
+  final InvoiceModelDao invoice=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class).getById(invoiceId,context);
+  if (invoice != null) {
+    populateChildren(invoice,entitySqlDaoWrapperFactory,context);
+  }
+ else {
+    throw new IllegalStateException("Invoice shouldn't be null for id " + invoiceId);
+  }
+  for (  final UUID invoiceItemId : invoiceItemIdsWithNullAmounts.keySet()) {
+    final BigDecimal adjAmount=Objects.firstNonNull(invoiceItemIdsWithNullAmounts.get(invoiceItemId),getInvoiceItemAmountForId(invoice,invoiceItemId));
+    final BigDecimal adjAmountRemainingAfterRepair=computeItemAdjustmentAmount(invoiceItemId,adjAmount,invoice.getInvoiceItems());
+    if (adjAmountRemainingAfterRepair.compareTo(BigDecimal.ZERO) > 0) {
+      invoiceItemIdsWithAmountsBuilder.put(invoiceItemId,adjAmountRemainingAfterRepair);
+    }
+  }
+  return invoiceItemIdsWithAmountsBuilder.build();
+}

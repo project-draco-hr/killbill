@@ -1,3 +1,8 @@
 {
-  return dao.getUnpaidInvoicesByAccountId(accountId,upToDate,context);
+  return Collections2.transform(dao.getUnpaidInvoicesByAccountId(accountId,upToDate,context),new Function<InvoiceModelDao,Invoice>(){
+    @Override public Invoice apply(    final InvoiceModelDao input){
+      return new DefaultInvoice(input);
+    }
+  }
+);
 }

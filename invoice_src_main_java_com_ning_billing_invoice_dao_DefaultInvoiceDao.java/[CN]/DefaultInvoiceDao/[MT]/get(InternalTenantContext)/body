@@ -1,0 +1,11 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<InvoiceModelDao>>(){
+    @Override public List<InvoiceModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceSqlDao invoiceDao=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
+      final List<InvoiceModelDao> invoices=invoiceDao.get(context);
+      populateChildren(invoices,entitySqlDaoWrapperFactory,context);
+      return invoices;
+    }
+  }
+);
+}

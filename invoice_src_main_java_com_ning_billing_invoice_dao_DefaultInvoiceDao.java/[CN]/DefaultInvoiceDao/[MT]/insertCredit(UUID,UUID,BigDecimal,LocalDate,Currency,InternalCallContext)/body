@@ -1,0 +1,18 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<InvoiceItemModelDao>(){
+    @Override public InvoiceItemModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
+      UUID invoiceIdForCredit=invoiceId;
+      if (invoiceIdForCredit == null) {
+        final InvoiceModelDao invoiceForCredit=new InvoiceModelDao(accountId,effectiveDate,effectiveDate,currency);
+        transactional.create(invoiceForCredit,context);
+        invoiceIdForCredit=invoiceForCredit.getId();
+      }
+      final InvoiceItemModelDao credit=new InvoiceItemModelDao(InvoiceItemType.CREDIT_ADJ,invoiceIdForCredit,accountId,null,null,null,null,effectiveDate,null,positiveCreditAmount.negate(),null,currency,null);
+      insertItemAndAddCBAIfNeeded(entitySqlDaoWrapperFactory,credit,context);
+      notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,invoiceId,accountId,context.getUserToken(),context);
+      return credit;
+    }
+  }
+);
+}
