@@ -1,4 +1,10 @@
 {
-  invoiceDao.getById(UUID.randomUUID(),internalCallContext);
-  Assert.fail();
+  try {
+    invoiceDao.getById(UUID.randomUUID(),internalCallContext);
+    Assert.fail();
+  }
+ catch (  TransactionFailedException e) {
+    Assert.assertTrue(e.getCause() instanceof InvoiceApiException);
+    Assert.assertEquals(((InvoiceApiException)e.getCause()).getCode(),ErrorCode.INVOICE_NOT_FOUND.getCode());
+  }
 }

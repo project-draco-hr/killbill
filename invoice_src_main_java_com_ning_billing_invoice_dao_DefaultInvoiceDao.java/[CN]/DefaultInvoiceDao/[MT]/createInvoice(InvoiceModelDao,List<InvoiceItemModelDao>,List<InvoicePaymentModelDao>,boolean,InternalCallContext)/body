@@ -8,7 +8,9 @@
           transactional.create(invoice,context);
         }
         final InvoiceItemSqlDao transInvoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
-        transInvoiceItemSqlDao.batchCreateFromTransaction(invoiceItems,context);
+        for (        final InvoiceItemModelDao invoiceItemModelDao : invoiceItems) {
+          transInvoiceItemSqlDao.create(invoiceItemModelDao,context);
+        }
         final List<InvoiceItemModelDao> recurringInvoiceItems=ImmutableList.<InvoiceItemModelDao>copyOf(Collections2.filter(invoiceItems,new Predicate<InvoiceItemModelDao>(){
           @Override public boolean apply(          @Nullable final InvoiceItemModelDao item){
             return RecurringInvoiceItem.class.isInstance(item);
