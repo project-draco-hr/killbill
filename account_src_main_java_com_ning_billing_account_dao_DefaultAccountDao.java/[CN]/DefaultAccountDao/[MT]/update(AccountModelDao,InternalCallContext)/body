@@ -1,0 +1,24 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws EventBusException, AccountApiException {
+      final AccountSqlDao transactional=entitySqlDaoWrapperFactory.become(AccountSqlDao.class);
+      final UUID accountId=specifiedAccount.getId();
+      final AccountModelDao currentAccount=transactional.getById(accountId.toString(),context);
+      if (currentAccount == null) {
+        throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
+      }
+      transactional.update(specifiedAccount,context);
+      final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(accountId,context.getUserToken(),currentAccount,specifiedAccount,context.getAccountRecordId(),context.getTenantRecordId());
+      if (changeEvent.hasChanges()) {
+        try {
+          eventBus.postFromTransaction(changeEvent,entitySqlDaoWrapperFactory,context);
+        }
+ catch (        final EventBusException e) {
+          log.warn("Failed to post account change event for account " + accountId,e);
+        }
+      }
+      return null;
+    }
+  }
+);
+}

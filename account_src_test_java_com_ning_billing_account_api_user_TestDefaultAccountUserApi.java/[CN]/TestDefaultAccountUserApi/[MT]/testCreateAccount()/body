@@ -21,13 +21,14 @@
   final Boolean isNotifiedForInvoices=false;
   final AccountData data=new DefaultAccount(id,externalKey,email,name,firstNameLength,currency,billCycleDay,paymentMethodId,timeZone,locale,address1,address2,companyName,city,stateOrProvince,country,postalCode,phone,isMigrated,isNotifiedForInvoices);
   accountUserApi.createAccount(data,callContext);
-  final Account account=accountDao.getAccountByKey(externalKey,tenantContext);
+  final AccountModelDao account=accountDao.getAccountByKey(externalKey,tenantContext);
   Assert.assertEquals(account.getExternalKey(),externalKey);
   Assert.assertEquals(account.getEmail(),email);
   Assert.assertEquals(account.getName(),name);
   Assert.assertEquals(account.getFirstNameLength(),firstNameLength);
   Assert.assertEquals(account.getCurrency(),currency);
-  Assert.assertEquals(account.getBillCycleDay(),billCycleDay);
+  Assert.assertEquals(account.getBillingCycleDayLocal(),billCycleDay.getDayOfMonthLocal());
+  Assert.assertEquals(account.getBillingCycleDayUTC(),billCycleDay.getDayOfMonthUTC());
   Assert.assertEquals(account.getPaymentMethodId(),paymentMethodId);
   Assert.assertEquals(account.getTimeZone(),timeZone);
   Assert.assertEquals(account.getLocale(),locale);
@@ -39,6 +40,6 @@
   Assert.assertEquals(account.getCountry(),country);
   Assert.assertEquals(account.getPostalCode(),postalCode);
   Assert.assertEquals(account.getPhone(),phone);
-  Assert.assertEquals(account.isMigrated(),isMigrated);
-  Assert.assertEquals(account.isNotifiedForInvoices(),isNotifiedForInvoices);
+  Assert.assertEquals(account.getMigrated(),isMigrated);
+  Assert.assertEquals(account.getIsNotifiedForInvoices(),isNotifiedForInvoices);
 }

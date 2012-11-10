@@ -1,21 +1,14 @@
 {
-  List<AccountEmail> emails=new ArrayList<AccountEmail>();
+  List<AccountEmail> emails;
   final UUID accountId=UUID.randomUUID();
   final AccountEmail email=new DefaultAccountEmail(accountId,"test@gmail.com");
   accountEmailDao.create(email,internalCallContext);
   emails=accountEmailDao.getByAccountId(accountId,internalCallContext);
   assertEquals(emails.size(),1);
-  verifyAccountEmailAuditAndHistoryCount(accountId,1);
-  final AccountEmail updatedEmail=new DefaultAccountEmail(email,"test2@gmail.com");
-  emails.clear();
-  emails.add(updatedEmail);
-  accountEmailDao.create(updatedEmail,internalCallContext);
-  emails=accountEmailDao.getByAccountId(accountId,internalCallContext);
-  assertEquals(emails.size(),1);
-  verifyAccountEmailAuditAndHistoryCount(accountId,3);
+  final AuditDao audit=new DefaultAuditDao(dbi);
+  final List<AuditLog> auditLogs=audit.getAuditLogsForId(TableName.ACCOUNT_EMAIL,email.getId(),AuditLevel.FULL,internalCallContext);
+  assertEquals(auditLogs.size(),1);
   accountEmailDao.delete(email,internalCallContext);
-  accountEmailDao.delete(updatedEmail,internalCallContext);
   emails=accountEmailDao.getByAccountId(accountId,internalCallContext);
   assertEquals(emails.size(),0);
-  verifyAccountEmailAuditAndHistoryCount(accountId,4);
 }

@@ -1,9 +1,10 @@
 {
-  final Account currentAccount=getById(accountId,context);
-  if (currentAccount == null) {
+  final AccountModelDao currentAccountModelDao=getById(accountId,context);
+  if (currentAccountModelDao == null) {
     throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
   }
+  final DefaultAccount currentAccount=new DefaultAccount(currentAccountModelDao);
   final DefaultMutableAccountData updatedAccount=new DefaultMutableAccountData(currentAccount);
   updatedAccount.setPaymentMethodId(paymentMethodId);
-  update(new DefaultAccount(updatedAccount),context);
+  update(new AccountModelDao(accountId,updatedAccount),context);
 }

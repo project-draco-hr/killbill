@@ -1,4 +1,7 @@
 {
-  final Account account=new DefaultAccount(accountId,accountData);
-  updateAccount(account,context);
+  final Account currentAccount=getAccountById(accountId,context);
+  if (currentAccount == null) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
+  }
+  updateAccount(currentAccount,accountData,context);
 }

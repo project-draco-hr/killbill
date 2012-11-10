@@ -1,10 +1,12 @@
 {
-  final Account account=createTestAccount(0);
+  final AccountModelDao account=createTestAccount(0);
   accountDao.create(account,internalCallContext);
-  final Account fetchedAccount=accountDao.getById(account.getId(),internalCallContext);
-  final MutableAccountData otherAccount=account.toMutableAccountData();
+  final AccountModelDao fetchedAccount=accountDao.getById(account.getId(),internalCallContext);
+  final MutableAccountData otherAccount=new DefaultAccount(fetchedAccount).toMutableAccountData();
   otherAccount.setBillCycleDay(null);
-  final DefaultAccount newAccount=new DefaultAccount(account.getId(),otherAccount);
+  final AccountModelDao newAccount=new AccountModelDao(account.getId(),otherAccount);
   accountDao.update(newAccount,internalCallContext);
-  Assert.assertEquals(accountDao.getById(account.getId(),internalCallContext),fetchedAccount);
+  final AccountModelDao retrievedAccount=accountDao.getById(account.getId(),internalCallContext);
+  Assert.assertEquals(retrievedAccount.getBillingCycleDayUTC(),fetchedAccount.getBillingCycleDayUTC());
+  Assert.assertEquals(retrievedAccount.getBillingCycleDayLocal(),fetchedAccount.getBillingCycleDayLocal());
 }
