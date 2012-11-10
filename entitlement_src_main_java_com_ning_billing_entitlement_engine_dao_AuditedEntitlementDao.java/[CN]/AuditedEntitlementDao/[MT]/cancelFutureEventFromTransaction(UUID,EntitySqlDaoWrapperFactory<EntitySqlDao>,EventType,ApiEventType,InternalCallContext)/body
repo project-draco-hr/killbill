@@ -1,9 +1,9 @@
 {
-  EntitlementEvent futureEvent=null;
+  EntitlementEventModelDao futureEvent=null;
   final Date now=clock.getUTCNow().toDate();
-  final List<EntitlementEvent> events=dao.become(EntitlementEventSqlDao.class).getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
-  for (  final EntitlementEvent cur : events) {
-    if (cur.getType() == type && (apiType == null || apiType == ((ApiEvent)cur).getEventType())) {
+  final List<EntitlementEventModelDao> eventModels=dao.become(EntitlementEventSqlDao.class).getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
+  for (  final EntitlementEventModelDao cur : eventModels) {
+    if (cur.getEventType() == type && (apiType == null || apiType == cur.getUserType())) {
       if (futureEvent != null) {
         throw new EntitlementError(String.format("Found multiple future events for type %s for subscriptions %s",type,subscriptionId.toString()));
       }

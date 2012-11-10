@@ -2,20 +2,20 @@
   final SubscriptionSqlDao transSubDao=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
   final BundleSqlDao transBundleDao=entitySqlDaoWrapperFactory.become(BundleSqlDao.class);
   final SubscriptionBundleData bundleData=bundleTransferData.getData();
-  final SubscriptionBundle existingBundle=transBundleDao.getBundleFromAccountAndKey(bundleData.getAccountId().toString(),bundleData.getKey(),context);
-  if (existingBundle != null) {
-    log.error(String.format("Attempted to create a bundle for account %s and key %s that already existed, skip...",bundleData.getAccountId().toString(),bundleData.getKey()));
+  final SubscriptionBundleModelDao existingBundleModel=transBundleDao.getBundleFromAccountAndKey(bundleData.getAccountId().toString(),bundleData.getExternalKey(),context);
+  if (existingBundleModel != null) {
+    log.error(String.format("Attempted to create a bundle for account %s and key %s that already existed, skip...",bundleData.getAccountId().toString(),bundleData.getExternalKey()));
     return;
   }
   for (  final SubscriptionMigrationData curSubscription : bundleTransferData.getSubscriptions()) {
     final SubscriptionData subData=curSubscription.getData();
     for (    final EntitlementEvent curEvent : curSubscription.getInitialEvents()) {
-      transactional.insertEvent(curEvent,context);
+      transactional.create(new EntitlementEventModelDao(curEvent),context);
       recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,curEvent.getEffectiveDate(),new EntitlementNotificationKey(curEvent.getId()),context);
     }
-    transSubDao.insertSubscription(subData,context);
+    transSubDao.create(new SubscriptionModelDao(subData),context);
     final EntitlementEvent finalEvent=curSubscription.getInitialEvents().get(curSubscription.getInitialEvents().size() - 1);
     notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subData,finalEvent,context);
   }
-  transBundleDao.insertBundle(bundleData,context);
+  transBundleDao.create(new SubscriptionBundleModelDao(bundleData),context);
 }

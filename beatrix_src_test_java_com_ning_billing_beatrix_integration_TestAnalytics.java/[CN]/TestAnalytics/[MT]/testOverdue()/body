@@ -7,7 +7,7 @@
   Assert.assertEquals(analyticsUserApi.getInvoicePaymentsForAccount(account.getExternalKey(),callContext).size(),0);
   Assert.assertEquals(analyticsUserApi.getAccountByKey(account.getExternalKey(),callContext).getBalance().doubleValue(),Rounder.round(BigDecimal.ZERO));
   Assert.assertNull(analyticsUserApi.getAccountByKey(account.getExternalKey(),callContext).getLastPaymentStatus());
-  Assert.assertEquals(analyticsUserApi.getOverdueStatusesForBundle(bundle.getKey(),callContext).size(),0);
+  Assert.assertEquals(analyticsUserApi.getOverdueStatusesForBundle(bundle.getExternalKey(),callContext).size(),0);
   busHandler.pushExpectedEvents(TestApiListener.NextEvent.PHASE,TestApiListener.NextEvent.INVOICE,TestApiListener.NextEvent.PAYMENT_ERROR);
   clock.addDays(30);
   Assert.assertTrue(busHandler.isCompleted(DELAY));
@@ -25,16 +25,16 @@
   Assert.assertEquals(analyticsUserApi.getAccountByKey(account.getExternalKey(),callContext).getBalance(),invoicePaymentsForAccount.get(0).getAmount());
   Assert.assertTrue(analyticsUserApi.getInvoicesForAccount(account.getExternalKey(),callContext).get(1).getBalance().compareTo(BigDecimal.ZERO) > 0);
   Assert.assertEquals(analyticsUserApi.getInvoicesForAccount(account.getExternalKey(),callContext).get(1).getBalance(),invoicePaymentsForAccount.get(0).getAmount());
-  Assert.assertEquals(analyticsUserApi.getOverdueStatusesForBundle(bundle.getKey(),callContext).size(),0);
+  Assert.assertEquals(analyticsUserApi.getOverdueStatusesForBundle(bundle.getExternalKey(),callContext).size(),0);
   clock.addDays(15);
   assertTrue(busHandler.isCompleted(DELAY));
   verifyBSTWithTrialAndEvergreenPhases(account,bundle,subscription);
-  Assert.assertEquals(analyticsUserApi.getOverdueStatusesForBundle(bundle.getKey(),callContext).size(),0);
+  Assert.assertEquals(analyticsUserApi.getOverdueStatusesForBundle(bundle.getExternalKey(),callContext).size(),0);
   busHandler.pushExpectedEvents(TestApiListener.NextEvent.INVOICE,TestApiListener.NextEvent.PAYMENT_ERROR);
   clock.addDays(20);
   assertTrue(busHandler.isCompleted(DELAY));
   waitALittle();
-  final List<BusinessOverdueStatus> od1Bundle=analyticsUserApi.getOverdueStatusesForBundle(bundle.getKey(),callContext);
+  final List<BusinessOverdueStatus> od1Bundle=analyticsUserApi.getOverdueStatusesForBundle(bundle.getExternalKey(),callContext);
   Assert.assertEquals(od1Bundle.size(),1);
   Assert.assertEquals(od1Bundle.get(0).getStatus(),"OD1");
   Assert.assertEquals(od1Bundle.get(0).getId(),bundle.getId());
@@ -42,7 +42,7 @@
   clock.addDays(2);
   assertTrue(busHandler.isCompleted(DELAY));
   waitALittle();
-  final List<BusinessOverdueStatus> stillOd1Bundle=analyticsUserApi.getOverdueStatusesForBundle(bundle.getKey(),callContext);
+  final List<BusinessOverdueStatus> stillOd1Bundle=analyticsUserApi.getOverdueStatusesForBundle(bundle.getExternalKey(),callContext);
   Assert.assertEquals(stillOd1Bundle.size(),1);
   Assert.assertEquals(stillOd1Bundle.get(0).getStatus(),"OD1");
   Assert.assertEquals(stillOd1Bundle.get(0).getId(),bundle.getId());
@@ -50,7 +50,7 @@
   clock.addDays(8);
   assertTrue(busHandler.isCompleted(DELAY));
   waitALittle();
-  final List<BusinessOverdueStatus> od2Bundle=analyticsUserApi.getOverdueStatusesForBundle(bundle.getKey(),callContext);
+  final List<BusinessOverdueStatus> od2Bundle=analyticsUserApi.getOverdueStatusesForBundle(bundle.getExternalKey(),callContext);
   Assert.assertEquals(od2Bundle.size(),2);
   Assert.assertEquals(od2Bundle.get(0).getStatus(),"OD1");
   Assert.assertEquals(od2Bundle.get(1).getStatus(),"OD2");
@@ -62,7 +62,7 @@
   clock.addDays(10);
   assertTrue(busHandler.isCompleted(DELAY));
   waitALittle();
-  final List<BusinessOverdueStatus> od3Bundle=analyticsUserApi.getOverdueStatusesForBundle(bundle.getKey(),callContext);
+  final List<BusinessOverdueStatus> od3Bundle=analyticsUserApi.getOverdueStatusesForBundle(bundle.getExternalKey(),callContext);
   Assert.assertEquals(od3Bundle.size(),3);
   Assert.assertEquals(od3Bundle.get(0).getStatus(),"OD1");
   Assert.assertEquals(od3Bundle.get(1).getStatus(),"OD2");

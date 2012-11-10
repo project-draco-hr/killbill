@@ -1,3 +1,9 @@
 {
-  return eventsDao.getEventById(eventId.toString(),context);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<EntitlementEvent>(){
+    @Override public EntitlementEvent inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      EntitlementEventModelDao model=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class).getById(eventId.toString(),context);
+      return EntitlementEventModelDao.toEntitlementEvent(model);
+    }
+  }
+);
 }
