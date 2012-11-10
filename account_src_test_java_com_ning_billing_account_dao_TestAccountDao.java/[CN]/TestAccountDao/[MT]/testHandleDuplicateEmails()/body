@@ -4,6 +4,12 @@
   Assert.assertEquals(accountEmailDao.getByAccountId(accountId,internalCallContext).size(),0);
   accountEmailDao.create(email,internalCallContext);
   Assert.assertEquals(accountEmailDao.getByAccountId(accountId,internalCallContext).size(),1);
-  accountEmailDao.create(email,internalCallContext);
-  Assert.assertEquals(accountEmailDao.getByAccountId(accountId,internalCallContext).size(),1);
+  try {
+    accountEmailDao.create(email,internalCallContext);
+    Assert.fail();
+  }
+ catch (  TransactionFailedException e) {
+    Assert.assertTrue(e.getCause() instanceof AccountApiException);
+    Assert.assertEquals(((AccountApiException)e.getCause()).getCode(),ErrorCode.ACCOUNT_EMAIL_ALREADY_EXISTS.getCode());
+  }
 }

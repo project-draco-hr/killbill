@@ -8,8 +8,10 @@
         final StatementContext statementContext=((StatementException)t.getCause()).getStatementContext();
         if (statementContext != null) {
           final PreparedStatement statement=statementContext.getStatement();
-          errorDuringTransaction(t.getCause().getCause(),method,statement.toString());
-          return null;
+          if (statement != null) {
+            errorDuringTransaction(t.getCause().getCause(),method,statement.toString());
+            return null;
+          }
         }
       }
       errorDuringTransaction(t.getCause().getCause(),method);

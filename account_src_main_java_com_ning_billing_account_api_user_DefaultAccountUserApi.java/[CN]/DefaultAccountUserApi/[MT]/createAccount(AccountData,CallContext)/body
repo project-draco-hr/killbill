@@ -2,7 +2,7 @@
   if (getIdFromKey(data.getExternalKey(),context) != null) {
     throw new AccountApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS,data.getExternalKey());
   }
-  final Account account=new DefaultAccount(data);
+  final AccountModelDao account=new AccountModelDao(data);
   accountDao.create(account,internalCallContextFactory.createInternalCallContext(account.getId(),context));
-  return account;
+  return new DefaultAccount(account);
 }

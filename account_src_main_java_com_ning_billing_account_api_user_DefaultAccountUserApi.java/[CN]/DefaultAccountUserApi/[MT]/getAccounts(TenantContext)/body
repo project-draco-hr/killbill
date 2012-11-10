@@ -1,3 +1,9 @@
 {
-  return accountDao.get(internalCallContextFactory.createInternalTenantContext(context));
+  final List<AccountModelDao> accountModelDaos=accountDao.get(internalCallContextFactory.createInternalTenantContext(context));
+  return ImmutableList.<Account>copyOf(Collections2.transform(accountModelDaos,new Function<AccountModelDao,Account>(){
+    @Override public Account apply(    @Nullable final AccountModelDao input){
+      return new DefaultAccount(input);
+    }
+  }
+));
 }

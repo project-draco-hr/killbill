@@ -4,7 +4,8 @@
     bus=new InMemoryInternalBus();
     final BusService busService=new DefaultBusService(bus);
     ((DefaultBusService)busService).startBus();
-    accountDao=new DefaultAccountDao(dbi,bus,new InternalCallContextFactory(dbi,new ClockMock()));
+    internalCallContextFactory=new InternalCallContextFactory(dbi,clock);
+    accountDao=new DefaultAccountDao(dbi,bus,internalCallContextFactory);
     accountDao.test(internalCallContext);
     accountEmailDao=new DefaultAccountEmailDao(dbi);
     accountEmailDao.test(internalCallContext);
