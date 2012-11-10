@@ -9,7 +9,7 @@
     if (subscriptions.size() == 0) {
       throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_NO_ACTIVE_SUBSCRIPTIONS,input.getId());
     }
-    final String viewId=getViewId(((SubscriptionBundleData)bundle).getLastSysUpdateTime(),subscriptions);
+    final String viewId=getViewId(((SubscriptionBundleData)bundle).getLastSysUpdateDate(),subscriptions);
     if (!viewId.equals(input.getViewId())) {
       throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_VIEW_CHANGED,input.getId(),input.getViewId(),viewId);
     }
@@ -92,7 +92,7 @@ curDataRepair.addNewRepairEvent(cur,baseSubscriptionRepair,addOnSubscriptionInRe
 if (dryRun) {
 baseSubscriptionRepair.addFutureAddonCancellation(addOnSubscriptionInRepair,context);
 final List<SubscriptionTimeline> repairs=createGetSubscriptionRepairList(subscriptions,convertDataRepair(inRepair));
-return createGetBundleRepair(input.getId(),bundle.getKey(),input.getViewId(),repairs);
+return createGetBundleRepair(input.getId(),bundle.getExternalKey(),input.getViewId(),repairs);
 }
  else {
 dao.repair(bundle.getAccountId(),input.getId(),inRepair,internalCallContextFactory.createInternalCallContext(bundle.getAccountId(),context));

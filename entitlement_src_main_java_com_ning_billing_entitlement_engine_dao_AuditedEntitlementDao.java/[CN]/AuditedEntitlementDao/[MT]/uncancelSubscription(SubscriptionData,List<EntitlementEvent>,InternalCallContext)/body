@@ -3,11 +3,11 @@
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final EntitlementEventSqlDao transactional=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       final UUID subscriptionId=subscription.getId();
-      EntitlementEvent cancelledEvent=null;
+      EntitlementEventModelDao cancelledEvent=null;
       final Date now=clock.getUTCNow().toDate();
-      final List<EntitlementEvent> events=transactional.getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
-      for (      final EntitlementEvent cur : events) {
-        if (cur.getType() == EventType.API_USER && ((ApiEvent)cur).getEventType() == ApiEventType.CANCEL) {
+      final List<EntitlementEventModelDao> eventModels=transactional.getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
+      for (      final EntitlementEventModelDao cur : eventModels) {
+        if (cur.getUserType() == ApiEventType.CANCEL) {
           if (cancelledEvent != null) {
             throw new EntitlementError(String.format("Found multiple cancel active events for subscriptions %s",subscriptionId.toString()));
           }
@@ -18,7 +18,7 @@
         final String cancelledEventId=cancelledEvent.getId().toString();
         transactional.unactiveEvent(cancelledEventId,context);
         for (        final EntitlementEvent cur : uncancelEvents) {
-          transactional.insertEvent(cur,context);
+          transactional.create(new EntitlementEventModelDao(cur),context);
           recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
         }
         notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,uncancelEvents.get(uncancelEvents.size() - 1),context);

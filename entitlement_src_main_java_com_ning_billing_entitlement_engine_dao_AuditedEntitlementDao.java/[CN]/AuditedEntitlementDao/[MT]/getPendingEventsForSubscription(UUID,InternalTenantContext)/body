@@ -1,4 +1,16 @@
 {
   final Date now=clock.getUTCNow().toDate();
-  return eventsDao.getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<EntitlementEvent>>(){
+    @Override public List<EntitlementEvent> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final List<EntitlementEventModelDao> eventModels=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class).getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
+      final List<EntitlementEvent> events=ImmutableList.<EntitlementEvent>copyOf(Collections2.transform(eventModels,new Function<EntitlementEventModelDao,EntitlementEvent>(){
+        @Override public EntitlementEvent apply(        @Nullable final EntitlementEventModelDao input){
+          return EntitlementEventModelDao.toEntitlementEvent(input);
+        }
+      }
+));
+      return events;
+    }
+  }
+);
 }

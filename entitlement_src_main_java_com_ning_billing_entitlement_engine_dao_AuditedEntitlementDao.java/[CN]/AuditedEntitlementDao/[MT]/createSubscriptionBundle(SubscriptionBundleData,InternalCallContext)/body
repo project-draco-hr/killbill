@@ -1,8 +1,8 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<SubscriptionBundle>(){
-    @Override public SubscriptionBundle inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory){
-      final BundleSqlDao bundlesDao=entitySqlDaoWrapperFactory.become(BundleSqlDao.class);
-      bundlesDao.insertBundle(bundle,context);
+    @Override public SubscriptionBundle inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws EntityPersistenceException {
+      final SubscriptionBundleModelDao model=new SubscriptionBundleModelDao(bundle);
+      entitySqlDaoWrapperFactory.become(BundleSqlDao.class).create(model,context);
       return bundle;
     }
   }

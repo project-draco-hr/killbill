@@ -2,10 +2,10 @@
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final SubscriptionSqlDao transactional=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
-      transactional.insertSubscription(subscription,context);
+      transactional.create(new SubscriptionModelDao(subscription),context);
       final EntitlementEventSqlDao eventsDaoFromSameTransaction=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       for (      final EntitlementEvent cur : initialEvents) {
-        eventsDaoFromSameTransaction.insertEvent(cur,context);
+        eventsDaoFromSameTransaction.create(new EntitlementEventModelDao(cur),context);
         recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
       }
       if (initialEvents.size() > 0) {

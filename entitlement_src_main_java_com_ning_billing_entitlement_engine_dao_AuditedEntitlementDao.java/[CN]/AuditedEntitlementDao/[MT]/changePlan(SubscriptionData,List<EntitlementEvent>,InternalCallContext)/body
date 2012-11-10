@@ -5,7 +5,7 @@
       final UUID subscriptionId=subscription.getId();
       cancelFutureEventsFromTransaction(subscriptionId,entitySqlDaoWrapperFactory,context);
       for (      final EntitlementEvent cur : changeEvents) {
-        transactional.insertEvent(cur,context);
+        transactional.create(new EntitlementEventModelDao(cur),context);
         recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
       }
       final EntitlementEvent finalEvent=changeEvents.get(changeEvents.size() - 1);
