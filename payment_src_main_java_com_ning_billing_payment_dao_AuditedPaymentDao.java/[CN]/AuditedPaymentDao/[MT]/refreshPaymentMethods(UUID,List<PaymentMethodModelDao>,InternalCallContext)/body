@@ -2,7 +2,7 @@
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<PaymentMethodModelDao>>(){
     @Override public List<PaymentMethodModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final PaymentMethodSqlDao transactional=entitySqlDaoWrapperFactory.become(PaymentMethodSqlDao.class);
-      final List<PaymentMethodModelDao> existingPaymentMethods=transactional.getPaymentMethods(accountId.toString(),context);
+      final List<PaymentMethodModelDao> existingPaymentMethods=transactional.getByAccountId(accountId.toString(),context);
       final Set<String> externalPaymentIdProcessed=new HashSet<String>();
       for (      final PaymentMethodModelDao finalPaymentMethod : paymentMethods) {
         boolean isExistingPaymentMethod=false;
@@ -27,7 +27,7 @@
           deletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),context);
         }
       }
-      return transactional.getPaymentMethods(accountId.toString(),context);
+      return transactional.getByAccountId(accountId.toString(),context);
     }
   }
 );
