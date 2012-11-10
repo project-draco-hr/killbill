@@ -8,7 +8,7 @@
         transactional.create(invoiceForExternalCharge,context);
         invoiceIdForExternalCharge=invoiceForExternalCharge.getId();
       }
-      final InvoiceItemModelDao externalCharge=new InvoiceItemModelDao(InvoiceItemType.EXTERNAL_CHARGE,invoiceIdForExternalCharge,accountId,bundleId,null,description,null,effectiveDate,null,amount,null,currency,null);
+      final InvoiceItemModelDao externalCharge=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.EXTERNAL_CHARGE,invoiceIdForExternalCharge,accountId,bundleId,null,description,null,effectiveDate,null,amount,null,currency,null);
       final InvoiceItemSqlDao transInvoiceItemDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
       transInvoiceItemDao.create(externalCharge,context);
       final InvoiceModelDao invoice=transactional.getById(invoiceIdForExternalCharge.toString(),context);
@@ -20,7 +20,7 @@
       final BigDecimal balance=InvoiceModelDaoHelper.getBalance(invoice);
       if (accountCbaAvailable.compareTo(BigDecimal.ZERO) > 0 && balance.compareTo(BigDecimal.ZERO) > 0) {
         final BigDecimal cbaAmountToConsume=accountCbaAvailable.compareTo(balance) > 0 ? balance.negate() : accountCbaAvailable.negate();
-        final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(InvoiceItemType.CBA_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,cbaAmountToConsume,null,invoice.getCurrency(),null);
+        final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.CBA_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,cbaAmountToConsume,null,invoice.getCurrency(),null);
         transInvoiceItemDao.create(cbaAdjItem,context);
       }
       notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,invoiceId,accountId,context.getUserToken(),context);

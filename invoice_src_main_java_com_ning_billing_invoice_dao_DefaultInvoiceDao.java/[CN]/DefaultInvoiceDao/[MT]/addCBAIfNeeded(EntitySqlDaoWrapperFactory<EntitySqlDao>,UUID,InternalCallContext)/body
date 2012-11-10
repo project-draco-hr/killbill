@@ -9,7 +9,7 @@
   final BigDecimal balance=InvoiceModelDaoHelper.getBalance(invoice);
   if (balance.compareTo(BigDecimal.ZERO) < 0) {
     final InvoiceItemSqlDao transInvoiceItemDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
-    final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(InvoiceItemType.CBA_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,balance.negate(),null,invoice.getCurrency(),null);
+    final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.CBA_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,balance.negate(),null,invoice.getCurrency(),null);
     transInvoiceItemDao.create(cbaAdjItem,context);
   }
 }
