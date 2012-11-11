@@ -2,10 +2,11 @@
   final UUID accountId=UUID.randomUUID();
   final AccountEmail email=new DefaultAccountEmail(accountId,"test@gmail.com");
   Assert.assertEquals(accountEmailDao.getByAccountId(accountId,internalCallContext).size(),0);
-  accountEmailDao.create(email,internalCallContext);
+  final AccountEmailModelDao accountEmailModelDao=new AccountEmailModelDao(email);
+  accountEmailDao.create(accountEmailModelDao,internalCallContext);
   Assert.assertEquals(accountEmailDao.getByAccountId(accountId,internalCallContext).size(),1);
   try {
-    accountEmailDao.create(email,internalCallContext);
+    accountEmailDao.create(accountEmailModelDao,internalCallContext);
     Assert.fail();
   }
  catch (  TransactionFailedException e) {

@@ -1,3 +1,8 @@
 {
-  return accountEmailDao.getByAccountId(accountId,context);
+  return ImmutableList.<AccountEmail>copyOf(Collections2.transform(accountEmailDao.getByAccountId(accountId,context),new Function<AccountEmailModelDao,AccountEmail>(){
+    @Override public AccountEmail apply(    final AccountEmailModelDao input){
+      return new DefaultAccountEmail(input);
+    }
+  }
+));
 }
