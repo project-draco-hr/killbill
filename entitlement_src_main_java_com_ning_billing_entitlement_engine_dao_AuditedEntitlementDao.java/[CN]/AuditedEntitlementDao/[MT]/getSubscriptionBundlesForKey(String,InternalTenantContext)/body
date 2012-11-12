@@ -2,7 +2,7 @@
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<SubscriptionBundle>>(){
     @Override public List<SubscriptionBundle> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final List<SubscriptionBundleModelDao> models=entitySqlDaoWrapperFactory.become(BundleSqlDao.class).getBundlesForKey(bundleKey,context);
-      return ImmutableList.<SubscriptionBundle>copyOf(Collections2.transform(models,new Function<SubscriptionBundleModelDao,SubscriptionBundle>(){
+      return new ArrayList<SubscriptionBundle>(Collections2.transform(models,new Function<SubscriptionBundleModelDao,SubscriptionBundle>(){
         @Override public SubscriptionBundle apply(        @Nullable final SubscriptionBundleModelDao input){
           return SubscriptionBundleModelDao.toSubscriptionbundle(input);
         }

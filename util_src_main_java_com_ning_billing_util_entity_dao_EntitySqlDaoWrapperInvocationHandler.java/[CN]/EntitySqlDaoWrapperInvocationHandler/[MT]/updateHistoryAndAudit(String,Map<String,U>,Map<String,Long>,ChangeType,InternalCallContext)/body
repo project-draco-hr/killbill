@@ -4,6 +4,9 @@
   final U entity=Objects.firstNonNull(reHydratedEntity,entities.get(entityId));
   final Long entityRecordId=Objects.firstNonNull(reHydratedEntityRecordId,entityRecordIds.get(entityId));
   final TableName tableName=retrieveTableNameFromEntity(entity);
+  if (tableName == TableName.SUBSCRIPTION_EVENTS) {
+    return;
+  }
   final Long historyRecordId;
   if (tableName.getHistoryTableName() != null) {
     historyRecordId=insertHistory(entityRecordId,entity,changeType,context);

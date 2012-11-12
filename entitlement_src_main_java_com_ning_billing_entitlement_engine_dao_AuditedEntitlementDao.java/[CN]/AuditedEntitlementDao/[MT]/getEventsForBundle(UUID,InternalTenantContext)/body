@@ -10,7 +10,7 @@
       final Map<UUID,List<EntitlementEvent>> result=new HashMap<UUID,List<EntitlementEvent>>();
       for (      final SubscriptionModelDao cur : subscriptionModels) {
         final List<EntitlementEventModelDao> eventModels=eventsDaoFromSameTransaction.getEventsForSubscription(cur.getId().toString(),context);
-        final List<EntitlementEvent> events=ImmutableList.<EntitlementEvent>copyOf(Collections2.transform(eventModels,new Function<EntitlementEventModelDao,EntitlementEvent>(){
+        final List<EntitlementEvent> events=new ArrayList<EntitlementEvent>(Collections2.transform(eventModels,new Function<EntitlementEventModelDao,EntitlementEvent>(){
           @Override public EntitlementEvent apply(          @Nullable final EntitlementEventModelDao input){
             return EntitlementEventModelDao.toEntitlementEvent(input);
           }
