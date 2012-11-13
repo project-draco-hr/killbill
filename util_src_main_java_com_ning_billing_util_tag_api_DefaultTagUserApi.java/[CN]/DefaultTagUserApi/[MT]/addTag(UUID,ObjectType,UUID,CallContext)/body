@@ -1,6 +1,5 @@
 {
   final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(objectId,objectType,context);
-  final TagDefinition tagDefinition=tagDefinitionDao.getById(tagDefinitionId,internalContext);
-  final Tag tag=tagDefinition.isControlTag() ? new DefaultControlTag(ControlTagType.getTypeFromId(tagDefinition.getId()),objectType,objectId,context.getCreatedDate()) : new DescriptiveTag(tagDefinition.getId(),objectType,objectId,context.getCreatedDate());
+  final TagModelDao tag=new TagModelDao(context.getCreatedDate(),tagDefinitionId,objectId,objectType);
   tagDao.create(tag,internalContext);
 }

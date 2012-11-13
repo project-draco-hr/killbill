@@ -3,11 +3,11 @@
   final String fieldValue="testField1_value";
   final UUID accountId=UUID.randomUUID();
   CustomField field=new StringCustomField(fieldName,fieldValue,ObjectType.ACCOUNT,accountId,internalCallContext.getCreatedDate());
-  final CustomFieldDao customFieldDao=new AuditedCustomFieldDao(dbi);
-  customFieldDao.create(field,internalCallContext);
-  final List<CustomField> customFieldMap=customFieldDao.getCustomFields(accountId,ObjectType.ACCOUNT,internalCallContext);
+  final CustomFieldDao customFieldDao=new DefaultCustomFieldDao(dbi);
+  customFieldDao.create(new CustomFieldModelDao(field),internalCallContext);
+  final List<CustomFieldModelDao> customFieldMap=customFieldDao.getCustomFields(accountId,ObjectType.ACCOUNT,internalCallContext);
   assertEquals(customFieldMap.size(),1);
-  final CustomField customField=customFieldMap.get(0);
+  final CustomFieldModelDao customField=customFieldMap.get(0);
   assertEquals(customField.getFieldName(),fieldName);
   assertEquals(customField.getFieldValue(),fieldValue);
 }

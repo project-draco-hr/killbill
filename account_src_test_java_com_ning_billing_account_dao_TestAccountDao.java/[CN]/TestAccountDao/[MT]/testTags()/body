@@ -2,12 +2,12 @@
   final AccountModelDao account=createTestAccount(1);
   final TagDefinition definition=new DefaultTagDefinition("Test Tag","For testing only",false);
   final TagDefinitionSqlDao tagDefinitionDao=dbi.onDemand(TagDefinitionSqlDao.class);
-  tagDefinitionDao.create(definition,internalCallContext);
-  final TagDao tagDao=new AuditedTagDao(dbi,tagEventBuilder,bus,new DefaultClock());
-  final TagDefinition tagDefinition=tagDefinitionDao.getById(definition.getId().toString(),internalCallContext);
-  final Tag tag=tagDefinition.isControlTag() ? new DefaultControlTag(ControlTagType.getTypeFromId(tagDefinition.getId()),ObjectType.ACCOUNT,account.getId(),internalCallContext.getCreatedDate()) : new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,account.getId(),internalCallContext.getCreatedDate());
-  tagDao.create(tag,internalCallContext);
-  final List<Tag> tags=tagDao.getTags(account.getId(),ObjectType.ACCOUNT,internalCallContext);
+  tagDefinitionDao.create(new TagDefinitionModelDao(definition),internalCallContext);
+  final TagDao tagDao=new DefaultTagDao(dbi,tagEventBuilder,bus);
+  final TagDefinitionModelDao tagDefinition=tagDefinitionDao.getById(definition.getId().toString(),internalCallContext);
+  final Tag tag=new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,account.getId(),internalCallContext.getCreatedDate());
+  tagDao.create(new TagModelDao(tag),internalCallContext);
+  final List<TagModelDao> tags=tagDao.getTags(account.getId(),ObjectType.ACCOUNT,internalCallContext);
   assertEquals(tags.size(),1);
   assertEquals(tags.get(0).getTagDefinitionId(),definition.getId());
 }

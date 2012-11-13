@@ -1,8 +1,8 @@
 {
   final UUID accountId=UUID.randomUUID();
   final ControlTag tag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF,ObjectType.ACCOUNT,accountId,clock.getUTCNow());
-  tagDao.create(tag,internalCallContext);
-  final Tag savedTag=tagDao.getById(tag.getId(),internalCallContext);
+  tagDao.create(new TagModelDao(tag),internalCallContext);
+  final TagModelDao savedTag=tagDao.getById(tag.getId(),internalCallContext);
   assertEquals(savedTag.getTagDefinitionId(),tag.getTagDefinitionId());
   assertEquals(savedTag.getId(),tag.getId());
 }

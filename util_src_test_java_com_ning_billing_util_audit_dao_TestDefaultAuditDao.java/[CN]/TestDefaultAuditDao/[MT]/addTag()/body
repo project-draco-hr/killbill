@@ -1,12 +1,12 @@
 {
-  final TagDefinition tagDefinition=tagDefinitionDao.create(UUID.randomUUID().toString().substring(0,5),UUID.randomUUID().toString().substring(0,5),internalCallContext);
+  final TagDefinitionModelDao tagDefinition=tagDefinitionDao.create(UUID.randomUUID().toString().substring(0,5),UUID.randomUUID().toString().substring(0,5),internalCallContext);
   Assert.assertEquals(tagDefinitionDao.getById(tagDefinition.getId(),internalCallContext),tagDefinition);
   final UUID objectId=UUID.randomUUID();
-  final Tag tag=tagDefinition.isControlTag() ? new DefaultControlTag(ControlTagType.getTypeFromId(tagDefinition.getId()),ObjectType.ACCOUNT,objectId,clock.getUTCNow()) : new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,objectId,clock.getUTCNow());
-  tagDao.create(tag,internalCallContext);
-  final List<Tag> tags=tagDao.getTags(objectId,ObjectType.ACCOUNT,internalCallContext);
+  final Tag tag=new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,objectId,clock.getUTCNow());
+  tagDao.create(new TagModelDao(tag),internalCallContext);
+  final List<TagModelDao> tags=tagDao.getTags(objectId,ObjectType.ACCOUNT,internalCallContext);
   Assert.assertEquals(tags.size(),1);
-  final Tag savedTag=tags.get(0);
+  final TagModelDao savedTag=tags.get(0);
   Assert.assertEquals(savedTag.getTagDefinitionId(),tagDefinition.getId());
   tagId=savedTag.getId();
 }

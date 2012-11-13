@@ -1,10 +1,10 @@
 {
   final String definitionName="TestTag12345";
   tagDefinitionDao.create(definitionName,"Some test tag",internalCallContext);
-  final TagDefinition tagDefinition=tagDefinitionDao.getByName(definitionName,internalCallContext);
+  final TagDefinitionModelDao tagDefinition=tagDefinitionDao.getByName(definitionName,internalCallContext);
   assertNotNull(tagDefinition);
   final UUID objectId=UUID.randomUUID();
-  final Tag tag=tagDefinition.isControlTag() ? new DefaultControlTag(ControlTagType.getTypeFromId(tagDefinition.getId()),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate()) : new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate());
-  tagDao.create(tag,internalCallContext);
+  final Tag tag=new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate());
+  tagDao.create(new TagModelDao(tag),internalCallContext);
   tagDefinitionDao.deleteById(tagDefinition.getId(),internalCallContext);
 }

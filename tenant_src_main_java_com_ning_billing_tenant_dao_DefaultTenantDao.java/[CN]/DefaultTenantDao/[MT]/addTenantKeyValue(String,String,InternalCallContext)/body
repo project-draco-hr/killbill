@@ -1,3 +1,9 @@
 {
-  tenantKVSqlDao.insertTenantKeyValue(UUID.randomUUID().toString(),key,value,context.getTenantRecordId(),context);
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      entitySqlDaoWrapperFactory.become(TenantKVSqlDao.class).insertTenantKeyValue(UUID.randomUUID().toString(),key,value,context.getTenantRecordId(),context);
+      return null;
+    }
+  }
+);
 }

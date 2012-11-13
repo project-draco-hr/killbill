@@ -1,3 +1,9 @@
 {
-  tenantKVSqlDao.deleteTenantKey(key,context.getTenantRecordId());
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      entitySqlDaoWrapperFactory.become(TenantKVSqlDao.class).deleteTenantKey(key,context.getTenantRecordId());
+      return null;
+    }
+  }
+);
 }
