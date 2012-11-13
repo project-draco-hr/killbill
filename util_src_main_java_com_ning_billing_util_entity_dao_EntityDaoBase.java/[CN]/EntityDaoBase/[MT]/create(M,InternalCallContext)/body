@@ -1,0 +1,14 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      if (getById(entity.getId(),context) != null) {
+        throw generateAlreadyExistsException(entity,context);
+      }
+      final EntitySqlDao<M,E> transactional=entitySqlDaoWrapperFactory.become(realSqlDao);
+      transactional.create(entity,context);
+      postBusEventFromTransaction(entity,entity,ChangeType.INSERT,entitySqlDaoWrapperFactory,context);
+      return null;
+    }
+  }
+);
+}
