@@ -7,11 +7,15 @@
       if (t.getCause() instanceof StatementException) {
         final StatementContext statementContext=((StatementException)t.getCause()).getStatementContext();
         if (statementContext != null) {
+          final Binding binding=statementContext.getBinding();
           final PreparedStatement statement=statementContext.getStatement();
           if (statement != null) {
-            errorDuringTransaction(t.getCause().getCause(),method,statement.toString());
-            return null;
+            errorDuringTransaction(t.getCause().getCause(),method,statement.toString() + "\n" + binding.toString());
           }
+ else {
+            errorDuringTransaction(t.getCause().getCause(),method,binding.toString());
+          }
+          return null;
         }
       }
       errorDuringTransaction(t.getCause().getCause(),method);
