@@ -7,7 +7,7 @@
       final Date now=clock.getUTCNow().toDate();
       final List<EntitlementEventModelDao> eventModels=transactional.getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
       for (      final EntitlementEventModelDao cur : eventModels) {
-        if (cur.getUserTypeX() == ApiEventType.CANCEL) {
+        if (cur.getUserType() == ApiEventType.CANCEL) {
           if (cancelledEvent != null) {
             throw new EntitlementError(String.format("Found multiple cancel active events for subscriptions %s",subscriptionId.toString()));
           }
