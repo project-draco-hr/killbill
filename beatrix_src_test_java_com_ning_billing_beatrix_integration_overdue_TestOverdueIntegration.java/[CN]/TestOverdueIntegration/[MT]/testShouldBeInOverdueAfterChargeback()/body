@@ -13,7 +13,7 @@
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,7,31),callContext);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
-  final InvoicePayment payment=invoicePaymentApi.getInvoicePayments(invoiceApi.getInvoicesByAccount(account.getId(),callContext).get(1).getPayments().get(0).getPaymentId(),callContext).get(0);
+  final InvoicePayment payment=invoicePaymentApi.getInvoicePayments(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).get(1).getPayments().get(0).getPaymentId(),callContext).get(0);
   createChargeBackAndCheckForCompletion(payment,NextEvent.INVOICE_ADJUSTMENT);
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseSubscription,true);

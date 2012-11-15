@@ -25,7 +25,7 @@
   checkODState("OD3");
   checkChangePlanWithOverdueState(baseSubscription,true);
   paymentApi.addPaymentMethod(BeatrixModule.PLUGIN_NAME,account,true,paymentMethodPlugin,callContext);
-  final Collection<Invoice> invoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
+  final Collection<Invoice> invoices=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
   for (  final Invoice invoice : invoices) {
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
       createPaymentAndCheckForCompletion(account,invoice,NextEvent.PAYMENT);

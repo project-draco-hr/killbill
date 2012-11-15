@@ -31,7 +31,7 @@
   addDaysAndCheckForCompletion(5);
   checkODState("OD3");
   paymentPlugin.makeAllInvoicesFailWithError(false);
-  final Collection<Invoice> invoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
+  final Collection<Invoice> invoices=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
   for (  final Invoice invoice : invoices) {
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
       createPaymentAndCheckForCompletion(account,invoice,NextEvent.PAYMENT);
