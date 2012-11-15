@@ -14,7 +14,7 @@
       if (tag == null) {
         throw new TagApiException(ErrorCode.TAG_DOES_NOT_EXIST,tagDefinition.getName());
       }
-      transactional.deleteById(tag.getId(),context);
+      transactional.markTagAsDeleted(tag.getId().toString(),context);
       postBusEventFromTransaction(tag,tag,ChangeType.DELETE,entitySqlDaoWrapperFactory,context);
       return null;
     }
