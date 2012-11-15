@@ -10,7 +10,7 @@
         if (tagDefinitionSqlDao.tagDefinitionUsageCount(definitionId.toString(),context) > 0) {
           throw new TagDefinitionApiException(ErrorCode.TAG_DEFINITION_IN_USE,definitionId);
         }
-        tagDefinitionSqlDao.deleteTagDefinition(definitionId.toString(),context);
+        tagDefinitionSqlDao.markTagDefinitionAsDeleted(definitionId.toString(),context);
         postBusEventFromTransaction(tagDefinition,tagDefinition,ChangeType.DELETE,entitySqlDaoWrapperFactory,context);
         return null;
       }
