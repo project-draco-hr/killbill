@@ -2,11 +2,11 @@
   List<AccountEmailModelDao> emails;
   final UUID accountId=UUID.randomUUID();
   final AccountEmail email=new DefaultAccountEmail(accountId,"test@gmail.com");
-  accountEmailDao.create(new AccountEmailModelDao(email),internalCallContext);
-  emails=accountEmailDao.getByAccountId(accountId,internalCallContext);
+  accountDao.addEmail(new AccountEmailModelDao(email),internalCallContext);
+  emails=accountDao.getEmailsByAccountId(accountId,internalCallContext);
   assertEquals(emails.size(),1);
   final AuditDao audit=new DefaultAuditDao(dbi);
-  accountEmailDao.delete(new AccountEmailModelDao(email),internalCallContext);
-  emails=accountEmailDao.getByAccountId(accountId,internalCallContext);
+  accountDao.removeEmail(new AccountEmailModelDao(email),internalCallContext);
+  emails=accountDao.getEmailsByAccountId(accountId,internalCallContext);
   assertEquals(emails.size(),0);
 }

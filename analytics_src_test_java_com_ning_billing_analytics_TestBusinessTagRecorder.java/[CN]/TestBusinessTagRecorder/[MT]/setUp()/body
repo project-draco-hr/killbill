@@ -7,11 +7,10 @@
   subscriptionTransitionTagSqlDao=dbi.onDemand(BusinessSubscriptionTransitionTagSqlDao.class);
   eventBus=new InMemoryInternalBus();
   final AccountDao accountDao=new DefaultAccountDao(dbi,eventBus,new InternalCallContextFactory(dbi,new ClockMock()));
-  final AccountEmailDao accountEmailDao=new DefaultAccountEmailDao(dbi);
   callContextFactory=new DefaultCallContextFactory(clock);
   final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(dbi,clock);
-  accountApi=new DefaultAccountInternalApi(accountDao,accountEmailDao);
-  accountUserApi=new DefaultAccountUserApi(callContextFactory,internalCallContextFactory,accountDao,accountEmailDao);
+  accountApi=new DefaultAccountInternalApi(accountDao);
+  accountUserApi=new DefaultAccountUserApi(callContextFactory,internalCallContextFactory,accountDao);
   final CatalogService catalogService=new DefaultCatalogService(Mockito.mock(CatalogConfig.class),Mockito.mock(VersionedCatalogLoader.class));
   final AddonUtils addonUtils=new AddonUtils(catalogService);
   final DefaultNotificationQueueService notificationQueueService=new DefaultNotificationQueueService(dbi,clock,internalCallContextFactory);
