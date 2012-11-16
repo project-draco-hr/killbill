@@ -16,8 +16,7 @@
   final AccountModelDao newAccount=new AccountModelDao(account.getId(),otherAccount);
   accountDao.update(newAccount,internalCallContext);
   final AccountModelDao newFetchedAccount=accountDao.getById(account.getId(),internalCallContext);
-  Assert.assertEquals(newFetchedAccount.getAddress1(),newAccount.getAddress1());
-  Assert.assertEquals(newFetchedAccount.getEmail(),newAccount.getEmail());
+  checkAccountsEqual(newFetchedAccount,newAccount);
   Assert.assertEquals(newFetchedAccount.getBillingCycleDayUtc(),account.getBillingCycleDayUtc());
   Assert.assertEquals(newFetchedAccount.getBillingCycleDayLocal(),account.getBillingCycleDayLocal());
 }
