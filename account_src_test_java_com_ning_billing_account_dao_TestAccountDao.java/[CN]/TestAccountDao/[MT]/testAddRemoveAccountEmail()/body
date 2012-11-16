@@ -1,0 +1,14 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final AccountEmail email=new DefaultAccountEmail(accountId,"test@gmail.com");
+  accountDao.addEmail(new AccountEmailModelDao(email),internalCallContext);
+  final List<AccountEmailModelDao> accountEmails=accountDao.getEmailsByAccountId(accountId,internalCallContext);
+  Assert.assertEquals(accountEmails.size(),1);
+  Assert.assertEquals(accountEmails.get(0).getAccountId(),accountId);
+  Assert.assertEquals(accountEmails.get(0).getEmail(),email.getEmail());
+  final List<AuditLog> auditLogsForAccountEmail=auditDao.getAuditLogsForId(TableName.ACCOUNT_EMAIL,email.getId(),AuditLevel.FULL,internalCallContext);
+  Assert.assertEquals(auditLogsForAccountEmail.size(),1);
+  Assert.assertEquals(auditLogsForAccountEmail.get(0).getChangeType(),ChangeType.INSERT);
+  accountDao.removeEmail(new AccountEmailModelDao(email),internalCallContext);
+  Assert.assertEquals(accountDao.getEmailsByAccountId(accountId,internalCallContext).size(),0);
+}

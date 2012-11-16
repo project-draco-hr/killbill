@@ -1,0 +1,19 @@
+{
+  try {
+    final IDBI dbi=getMysqlTestingHelper().getDBI();
+    final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(dbi,clock);
+    accountDao=new DefaultAccountDao(dbi,bus,internalCallContextFactory);
+    auditDao=new DefaultAuditDao(dbi);
+    customFieldDao=new DefaultCustomFieldDao(dbi);
+    tagDefinitionDao=new DefaultTagDefinitionDao(dbi,tagEventBuilder,bus);
+    tagDao=new DefaultTagDao(dbi,tagEventBuilder,bus);
+    accountDao.test(internalCallContext);
+    final BusService busService=new DefaultBusService(bus);
+    ((DefaultBusService)busService).startBus();
+    final DefaultCallContextFactory callContextFactory=new DefaultCallContextFactory(clock);
+    accountUserApi=new DefaultAccountUserApi(callContextFactory,internalCallContextFactory,accountDao);
+  }
+ catch (  Throwable t) {
+    fail(t.toString());
+  }
+}

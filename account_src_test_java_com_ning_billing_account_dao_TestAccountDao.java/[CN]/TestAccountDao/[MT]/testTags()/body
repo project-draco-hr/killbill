@@ -1,13 +1,11 @@
 {
-  final AccountModelDao account=createTestAccount(1);
-  final TagDefinition definition=new DefaultTagDefinition("Test Tag","For testing only",false);
-  final TagDefinitionSqlDao tagDefinitionDao=dbi.onDemand(TagDefinitionSqlDao.class);
-  tagDefinitionDao.create(new TagDefinitionModelDao(definition),internalCallContext);
-  final TagDao tagDao=new DefaultTagDao(dbi,tagEventBuilder,bus);
-  final TagDefinitionModelDao tagDefinition=tagDefinitionDao.getById(definition.getId().toString(),internalCallContext);
+  final AccountModelDao account=createTestAccount();
+  final TagDefinitionModelDao tagDefinition=tagDefinitionDao.create(UUID.randomUUID().toString().substring(0,4),UUID.randomUUID().toString(),internalCallContext);
   final Tag tag=new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,account.getId(),internalCallContext.getCreatedDate());
   tagDao.create(new TagModelDao(tag),internalCallContext);
   final List<TagModelDao> tags=tagDao.getTags(account.getId(),ObjectType.ACCOUNT,internalCallContext);
-  assertEquals(tags.size(),1);
-  assertEquals(tags.get(0).getTagDefinitionId(),definition.getId());
+  Assert.assertEquals(tags.size(),1);
+  Assert.assertEquals(tags.get(0).getTagDefinitionId(),tagDefinition.getId());
+  Assert.assertEquals(tags.get(0).getObjectId(),account.getId());
+  Assert.assertEquals(tags.get(0).getObjectType(),ObjectType.ACCOUNT);
 }
