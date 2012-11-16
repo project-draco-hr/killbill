@@ -1,7 +1,12 @@
 {
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
-      entitySqlDaoWrapperFactory.become(TenantKVSqlDao.class).markTenantKeyAsDeleted(key,context);
+      final List<TenantKVModelDao> tenantKVs=entitySqlDaoWrapperFactory.become(TenantKVSqlDao.class).getTenantValueForKey(key,context);
+      for (      TenantKVModelDao cur : tenantKVs) {
+        if (cur.getTenantKey().equals(key)) {
+          entitySqlDaoWrapperFactory.become(TenantKVSqlDao.class).markTenantKeyAsDeleted(cur.getId().toString(),context);
+        }
+      }
       return null;
     }
   }
