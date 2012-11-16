@@ -1,3 +1,11 @@
 {
-  throw new UnsupportedOperationException();
+  if (tagStore.get(objectId) == null) {
+    return ImmutableList.<TagModelDao>of();
+  }
+  return ImmutableList.<TagModelDao>copyOf(Collections2.filter(tagStore.get(objectId),new Predicate<TagModelDao>(){
+    @Override public boolean apply(    final TagModelDao input){
+      return objectType.equals(input.getObjectType());
+    }
+  }
+));
 }
