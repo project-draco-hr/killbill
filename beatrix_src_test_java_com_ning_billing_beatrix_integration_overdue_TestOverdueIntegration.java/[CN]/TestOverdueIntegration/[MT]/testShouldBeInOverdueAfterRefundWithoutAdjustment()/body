@@ -1,16 +1,16 @@
 {
   clock.setTime(new DateTime(2012,5,1,0,3,42,0));
   final Subscription baseSubscription=createSubscriptionAndCheckForCompletion(bundle.getId(),productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
-  invoiceChecker.checkInvoice(account.getId(),1,callContext,new ExpectedItemCheck(new LocalDate(2012,5,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
+  invoiceChecker.checkInvoice(account.getId(),1,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,5,1),callContext);
   addDaysAndCheckForCompletion(30,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
-  invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
+  invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,6,30),callContext);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(15);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(20,NextEvent.INVOICE,NextEvent.PAYMENT);
-  invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
+  invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,7,31),callContext);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   final Payment payment=paymentApi.getPayment(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).get(1).getPayments().get(0).getPaymentId(),callContext);
