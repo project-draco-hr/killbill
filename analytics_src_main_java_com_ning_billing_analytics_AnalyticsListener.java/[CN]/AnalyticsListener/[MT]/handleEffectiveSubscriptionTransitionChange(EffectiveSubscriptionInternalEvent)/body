@@ -1,3 +1,9 @@
 {
-  bstDao.rebuildTransitionsForBundle(eventEffective.getBundleId(),createCallContext(eventEffective));
+  updateWithAccountLock(eventEffective.getAccountRecordId(),new Callable<Void>(){
+    @Override public Void call() throws Exception {
+      bstDao.rebuildTransitionsForBundle(eventEffective.getBundleId(),createCallContext(eventEffective));
+      return null;
+    }
+  }
+);
 }
