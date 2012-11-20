@@ -1,0 +1,25 @@
+{
+  final Annotation[][] parameterAnnotations=method.getParameterAnnotations();
+  int i=-1;
+  for (  final Object arg : args) {
+    i++;
+    if (arg instanceof Entity) {
+      return ImmutableList.<String>of(((Entity)arg).getId().toString());
+    }
+    if (arg instanceof Iterable) {
+      final Builder<String> entityIds=extractEntityIdsFromBatchArgument((Iterable)arg);
+      if (entityIds != null) {
+        return entityIds.build();
+      }
+    }
+    if (!(arg instanceof String)) {
+      continue;
+    }
+    for (    final Annotation annotation : parameterAnnotations[i]) {
+      if (Bind.class.equals(annotation.annotationType()) && ("id").equals(((Bind)annotation).value())) {
+        return ImmutableList.<String>of((String)arg);
+      }
+    }
+  }
+  return null;
+}

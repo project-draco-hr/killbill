@@ -1,10 +1,10 @@
 {
-  final List<InvoicePayment> invoicePayments=dao.getInvoicePayments(paymentId,internalCallContextFactory.createInternalTenantContext(context));
+  final List<InvoicePayment> invoicePayments=getInvoicePayments(paymentId,context);
   if (invoicePayments.size() == 0) {
     return null;
   }
   return Collections2.filter(invoicePayments,new Predicate<InvoicePayment>(){
-    @Override public boolean apply(    InvoicePayment input){
+    @Override public boolean apply(    final InvoicePayment input){
       return input.getType() == InvoicePaymentType.ATTEMPT;
     }
   }

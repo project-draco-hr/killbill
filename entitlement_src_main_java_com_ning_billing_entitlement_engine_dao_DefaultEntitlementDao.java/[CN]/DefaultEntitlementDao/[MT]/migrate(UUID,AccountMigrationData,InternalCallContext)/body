@@ -1,0 +1,12 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final EntitlementEventSqlDao transactional=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
+      for (      final BundleMigrationData curBundle : accountData.getData()) {
+        migrateBundleDataFromTransaction(curBundle,transactional,entitySqlDaoWrapperFactory,context);
+      }
+      return null;
+    }
+  }
+);
+}

@@ -1,10 +1,9 @@
 {
-  try {
-    final Account account=getAccountByKey(externalKey,context);
-    final Account updatedAccount=new DefaultAccount(account.getId(),accountData);
-    accountDao.update(updatedAccount,context);
+  final Account currentAccount=getAccountByKey(externalKey,context);
+  if (currentAccount == null) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_KEY,externalKey);
   }
- catch (  EntityPersistenceException e) {
-    throw new AccountApiException(e,ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID);
-  }
+  final Account updatedAccount=new DefaultAccount(currentAccount.getId(),accountData);
+  final AccountModelDao accountToUpdate=new AccountModelDao(currentAccount.getId(),updatedAccount.mergeWithDelegate(currentAccount));
+  accountDao.update(accountToUpdate,context);
 }

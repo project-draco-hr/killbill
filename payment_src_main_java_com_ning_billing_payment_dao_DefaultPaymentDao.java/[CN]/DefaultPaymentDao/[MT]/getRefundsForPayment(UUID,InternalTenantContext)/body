@@ -1,0 +1,8 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<RefundModelDao>>(){
+    @Override public List<RefundModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      return entitySqlDaoWrapperFactory.become(RefundSqlDao.class).getRefundsForPayment(paymentId.toString(),context);
+    }
+  }
+);
+}

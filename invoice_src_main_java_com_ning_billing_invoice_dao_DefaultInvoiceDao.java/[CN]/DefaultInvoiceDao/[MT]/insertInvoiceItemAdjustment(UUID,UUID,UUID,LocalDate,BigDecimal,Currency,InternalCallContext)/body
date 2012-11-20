@@ -1,0 +1,11 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<InvoiceItemModelDao>(){
+    @Override public InvoiceItemModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceItemModelDao invoiceItemAdjustment=createAdjustmentItem(entitySqlDaoWrapperFactory,invoiceId,invoiceItemId,positiveAdjAmount,currency,effectiveDate,context);
+      insertItemAndAddCBAIfNeeded(entitySqlDaoWrapperFactory,invoiceItemAdjustment,context);
+      notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,invoiceId,accountId,context.getUserToken(),context);
+      return invoiceItemAdjustment;
+    }
+  }
+);
+}

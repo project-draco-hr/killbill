@@ -1,4 +1,7 @@
 {
-  final String dbiString=getJdbcConnectionString() + "?createDatabaseIfNotExist=true&allowMultiQueries=true";
-  return new DBI(dbiString,USERNAME,PASSWORD);
+  if (dbiInstance == null) {
+    final String dbiString=getJdbcConnectionString() + "?createDatabaseIfNotExist=true&allowMultiQueries=true";
+    dbiInstance=new DBIProvider(dbiString,USERNAME,PASSWORD).get();
+  }
+  return dbiInstance;
 }

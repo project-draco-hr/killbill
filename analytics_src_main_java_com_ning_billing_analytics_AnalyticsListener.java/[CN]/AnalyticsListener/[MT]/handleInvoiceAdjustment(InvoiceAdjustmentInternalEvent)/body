@@ -1,3 +1,9 @@
 {
-  invoiceDao.rebuildInvoicesForAccount(event.getAccountId(),createCallContext(event));
+  updateWithAccountLock(event.getAccountRecordId(),new Callable<Void>(){
+    @Override public Void call() throws Exception {
+      invoiceDao.rebuildInvoicesForAccount(event.getAccountId(),createCallContext(event));
+      return null;
+    }
+  }
+);
 }

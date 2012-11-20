@@ -1,0 +1,63 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
+      final InvoiceModelDao invoice=transactional.getById(invoiceId.toString(),context);
+      if (invoice == null || !invoice.getAccountId().equals(accountId)) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
+      }
+      final InvoiceItemSqlDao invoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
+      final InvoiceItemModelDao cbaItem=invoiceItemSqlDao.getById(invoiceItemId.toString(),context);
+      if (cbaItem == null || !cbaItem.getInvoiceId().equals(invoice.getId())) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_NOT_FOUND,invoiceItemId);
+      }
+      final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.CBA_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,cbaItem.getAmount().negate(),null,cbaItem.getCurrency(),cbaItem.getId());
+      invoiceItemSqlDao.create(cbaAdjItem,context);
+      populateChildren(invoice,entitySqlDaoWrapperFactory,context);
+      if (InvoiceModelDaoHelper.getBalance(invoice).compareTo(BigDecimal.ZERO) < 0) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_WOULD_BE_NEGATIVE);
+      }
+      final BigDecimal accountCBA=getAccountCBAFromTransaction(accountId,entitySqlDaoWrapperFactory,context);
+      if (accountCBA.compareTo(BigDecimal.ZERO) < 0) {
+        if (accountCBA.compareTo(cbaItem.getAmount().negate()) < 0) {
+          throw new IllegalStateException("The account balance can't be lower than the amount adjusted");
+        }
+        final List<InvoiceModelDao> invoicesFollowing=transactional.getInvoicesByAccountAfterDate(accountId.toString(),invoice.getInvoiceDate().toDateTimeAtStartOfDay().toDate(),context);
+        populateChildren(invoicesFollowing,entitySqlDaoWrapperFactory,context);
+        BigDecimal positiveRemainderToAdjust=accountCBA.negate();
+        for (        final InvoiceModelDao invoiceFollowing : invoicesFollowing) {
+          if (invoiceFollowing.getId().equals(invoice.getId())) {
+            continue;
+          }
+          BigDecimal positiveCBAAdjItemAmount=BigDecimal.ZERO;
+          for (          final InvoiceItemModelDao cbaUsed : invoiceFollowing.getInvoiceItems()) {
+            if (!InvoiceItemType.CBA_ADJ.equals(cbaUsed.getType()) || cbaUsed.getAmount().compareTo(BigDecimal.ZERO) >= 0) {
+              continue;
+            }
+            final BigDecimal positiveCBAUsedAmount=cbaUsed.getAmount().negate();
+            final BigDecimal positiveNextCBAAdjItemAmount;
+            if (positiveCBAUsedAmount.compareTo(positiveRemainderToAdjust) < 0) {
+              positiveNextCBAAdjItemAmount=positiveCBAUsedAmount;
+              positiveRemainderToAdjust=positiveRemainderToAdjust.subtract(positiveNextCBAAdjItemAmount);
+            }
+ else {
+              positiveNextCBAAdjItemAmount=positiveRemainderToAdjust;
+              positiveRemainderToAdjust=BigDecimal.ZERO;
+            }
+            positiveCBAAdjItemAmount=positiveCBAAdjItemAmount.add(positiveNextCBAAdjItemAmount);
+            if (positiveRemainderToAdjust.compareTo(BigDecimal.ZERO) == 0) {
+              break;
+            }
+          }
+          final InvoiceItemModelDao nextCBAAdjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.CBA_ADJ,invoiceFollowing.getId(),invoice.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,positiveCBAAdjItemAmount,null,cbaItem.getCurrency(),cbaItem.getId());
+          invoiceItemSqlDao.create(nextCBAAdjItem,context);
+          if (positiveRemainderToAdjust.compareTo(BigDecimal.ZERO) == 0) {
+            break;
+          }
+        }
+      }
+      return null;
+    }
+  }
+);
+}

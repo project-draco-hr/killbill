@@ -1,11 +1,11 @@
 {
   try {
-    if (nextOverdueState.isClearState() && firstOverdueState != null && billingState != null) {
-      final LocalDate firstUnpaidInvoice=billingState.getDateOfEarliestUnpaidInvoice();
-      if (firstUnpaidInvoice != null) {
-        final Period reevaluationInterval=firstOverdueState.getReevaluationInterval();
-        createFutureNotification(overdueable,firstUnpaidInvoice.toDateTimeAtCurrentTime().plus(reevaluationInterval),context);
-      }
+    log.debug("OverdueStateApplicator <enter> : time = " + clock.getUTCNow() + ", previousState = "+ previousOverdueStateName+ ", nextState = "+ nextOverdueState);
+    final boolean conditionForNextNotfication=!nextOverdueState.isClearState() || (firstOverdueState != null && billingState != null && billingState.getDateOfEarliestUnpaidInvoice() != null);
+    if (conditionForNextNotfication) {
+      final Period reevaluationInterval=nextOverdueState.isClearState() ? firstOverdueState.getReevaluationInterval() : nextOverdueState.getReevaluationInterval();
+      createFutureNotification(overdueable,clock.getUTCNow().plus(reevaluationInterval),context);
+      log.debug("OverdueStateApplicator <notificationQ> : inserting notification for time = " + clock.getUTCNow().plus(reevaluationInterval));
     }
     if (previousOverdueStateName.equals(nextOverdueState.getName())) {
       return;
@@ -13,10 +13,6 @@
     storeNewState(overdueable,nextOverdueState,context);
     cancelSubscriptionsIfRequired(overdueable,nextOverdueState,context);
     sendEmailIfRequired(billingState,overdueable,nextOverdueState,context);
-    final Period reevaluationInterval=nextOverdueState.getReevaluationInterval();
-    if (!nextOverdueState.isClearState()) {
-      createFutureNotification(overdueable,clock.getUTCNow().plus(reevaluationInterval),context);
-    }
   }
  catch (  OverdueApiException e) {
     if (e.getCode() != ErrorCode.OVERDUE_NO_REEVALUATION_INTERVAL.getCode()) {

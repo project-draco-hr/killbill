@@ -1,3 +1,9 @@
 {
-  return createAndPersistInvoice(invoiceSqlDao,invoiceItemSqlDao,clock,ImmutableList.<BigDecimal>of(amount),currency,callContext,internalCallContextFactory);
+  try {
+    return createAndPersistInvoice(invoiceSqlDao,invoiceItemSqlDao,clock,ImmutableList.<BigDecimal>of(amount),currency,callContext,internalCallContextFactory);
+  }
+ catch (  EntityPersistenceException e) {
+    Assert.fail(e.getMessage());
+    return null;
+  }
 }

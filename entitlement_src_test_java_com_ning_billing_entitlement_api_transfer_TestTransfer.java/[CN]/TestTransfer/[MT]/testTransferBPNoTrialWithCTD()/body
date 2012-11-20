@@ -11,12 +11,12 @@
   entitlementInternalApi.setChargedThroughDate(baseSubscription.getId(),ctd.toLocalDate(),internalCallContext);
   final DateTime transferRequestedDate=clock.getUTCNow();
   testListener.pushExpectedEvent(NextEvent.TRANSFER);
-  transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getKey(),transferRequestedDate,false,false,callContext);
+  transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getExternalKey(),transferRequestedDate,false,false,callContext);
   assertTrue(testListener.isCompleted(3000));
   final Subscription oldBaseSubscription=entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertNotNull(oldBaseSubscription.getFutureEndDate());
   assertTrue(oldBaseSubscription.getFutureEndDate().compareTo(ctd) == 0);
-  final SubscriptionBundle newBundle=entitlementApi.getBundleForAccountAndKey(newAccountId,bundle.getKey(),callContext);
+  final SubscriptionBundle newBundle=entitlementApi.getBundleForAccountAndKey(newAccountId,bundle.getExternalKey(),callContext);
   final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(newBundle.getId(),callContext);
   assertEquals(subscriptions.size(),1);
   final Subscription newBaseSubscription=subscriptions.get(0);

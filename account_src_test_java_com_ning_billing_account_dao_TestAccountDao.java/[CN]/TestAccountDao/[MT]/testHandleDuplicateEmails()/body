@@ -1,9 +1,16 @@
 {
   final UUID accountId=UUID.randomUUID();
   final AccountEmail email=new DefaultAccountEmail(accountId,"test@gmail.com");
-  Assert.assertEquals(accountEmailDao.getEmails(accountId,internalCallContext).size(),0);
-  accountEmailDao.addEmail(accountId,email,internalCallContext);
-  Assert.assertEquals(accountEmailDao.getEmails(accountId,internalCallContext).size(),1);
-  accountEmailDao.addEmail(accountId,email,internalCallContext);
-  Assert.assertEquals(accountEmailDao.getEmails(accountId,internalCallContext).size(),1);
+  Assert.assertEquals(accountDao.getEmailsByAccountId(accountId,internalCallContext).size(),0);
+  final AccountEmailModelDao accountEmailModelDao=new AccountEmailModelDao(email);
+  accountDao.addEmail(accountEmailModelDao,internalCallContext);
+  Assert.assertEquals(accountDao.getEmailsByAccountId(accountId,internalCallContext).size(),1);
+  try {
+    accountDao.addEmail(accountEmailModelDao,internalCallContext);
+    Assert.fail();
+  }
+ catch (  TransactionFailedException e) {
+    Assert.assertTrue(e.getCause() instanceof AccountApiException);
+    Assert.assertEquals(((AccountApiException)e.getCause()).getCode(),ErrorCode.ACCOUNT_EMAIL_ALREADY_EXISTS.getCode());
+  }
 }

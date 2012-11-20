@@ -1,14 +1,8 @@
 {
   final UUID accountId=UUID.randomUUID();
-  final TagStore tagStore=new DefaultTagStore(accountId,ObjectType.ACCOUNT);
-  final ControlTag tag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF);
-  tagStore.add(tag);
-  assertEquals(tagStore.generateInvoice(),false);
-  final List<Tag> tagList=tagStore.getEntityList();
-  tagDao.saveEntities(accountId,ObjectType.ACCOUNT,tagList,internalCallContext);
-  tagStore.clear();
-  assertEquals(tagStore.getEntityList().size(),0);
-  final Map<String,Tag> tagMap=tagDao.loadEntities(accountId,ObjectType.ACCOUNT,internalCallContext);
-  assertEquals(tagMap.size(),1);
-  assertEquals(tagMap.values().iterator().next().getTagDefinitionId(),ControlTagType.AUTO_INVOICING_OFF.getId());
+  final ControlTag tag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF,ObjectType.ACCOUNT,accountId,clock.getUTCNow());
+  tagDao.create(new TagModelDao(tag),internalCallContext);
+  final TagModelDao savedTag=tagDao.getById(tag.getId(),internalCallContext);
+  assertEquals(savedTag.getTagDefinitionId(),tag.getTagDefinitionId());
+  assertEquals(savedTag.getId(),tag.getId());
 }

@@ -20,6 +20,7 @@ invoiceApi.notifyOfPayment(invoice.getId(),payment.getAmount(),paymentStatus == 
 event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,paymentPluginInfo.getExtFirstReferenceId(),paymentPluginInfo.getExtSecondReferenceId(),context.getUserToken(),payment.getEffectiveDate(),context.getAccountRecordId(),context.getTenantRecordId());
 break;
 case ERROR:
+log.info("STEPH payment failure...");
 allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId(),context);
 if (!isInstantPayment) {
 paymentStatus=scheduleRetryOnPaymentFailure(paymentInput.getId(),context);

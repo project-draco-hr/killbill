@@ -1,0 +1,23 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final TagDefinitionModelDao tagDefinition=getTagDefinitionFromTransaction(tagDefinitionId,entitySqlDaoWrapperFactory,context);
+      final TagSqlDao transactional=entitySqlDaoWrapperFactory.become(TagSqlDao.class);
+      final List<TagModelDao> tags=transactional.getTagsForObject(objectId,objectType,context);
+      TagModelDao tag=null;
+      for (      final TagModelDao cur : tags) {
+        if (cur.getTagDefinitionId().equals(tagDefinitionId)) {
+          tag=cur;
+          break;
+        }
+      }
+      if (tag == null) {
+        throw new TagApiException(ErrorCode.TAG_DOES_NOT_EXIST,tagDefinition.getName());
+      }
+      transactional.markTagAsDeleted(tag.getId().toString(),context);
+      postBusEventFromTransaction(tag,tag,ChangeType.DELETE,entitySqlDaoWrapperFactory,context);
+      return null;
+    }
+  }
+);
+}

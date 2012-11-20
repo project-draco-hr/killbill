@@ -1,0 +1,16 @@
+{
+  final InvoiceModelDao invoiceModelDao=new InvoiceModelDao(invoice);
+  final List<InvoiceItemModelDao> invoiceItemModelDaos=ImmutableList.<InvoiceItemModelDao>copyOf(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,InvoiceItemModelDao>(){
+    @Override public InvoiceItemModelDao apply(    final InvoiceItem input){
+      return new InvoiceItemModelDao(input);
+    }
+  }
+));
+  final List<InvoicePaymentModelDao> invoicePaymentModelDaos=ImmutableList.<InvoicePaymentModelDao>copyOf(Collections2.transform(invoice.getPayments(),new Function<InvoicePayment,InvoicePaymentModelDao>(){
+    @Override public InvoicePaymentModelDao apply(    final InvoicePayment input){
+      return new InvoicePaymentModelDao(input);
+    }
+  }
+));
+  invoiceDao.createInvoice(invoiceModelDao,invoiceItemModelDaos,invoicePaymentModelDaos,isRealInvoiceWithItems,internalCallContext);
+}

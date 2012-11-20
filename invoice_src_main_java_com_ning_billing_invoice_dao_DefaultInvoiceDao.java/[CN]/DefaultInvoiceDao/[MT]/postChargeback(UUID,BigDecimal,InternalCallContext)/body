@@ -1,0 +1,27 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<InvoicePaymentModelDao>(){
+    @Override public InvoicePaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoicePaymentSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
+      final BigDecimal maxChargedBackAmount=getRemainingAmountPaidFromTransaction(invoicePaymentId,entitySqlDaoWrapperFactory,context);
+      final BigDecimal requestedChargedBackAmout=(amount == null) ? maxChargedBackAmount : amount;
+      if (requestedChargedBackAmout.compareTo(BigDecimal.ZERO) <= 0) {
+        throw new InvoiceApiException(ErrorCode.CHARGE_BACK_AMOUNT_IS_NEGATIVE);
+      }
+      if (requestedChargedBackAmout.compareTo(maxChargedBackAmount) > 0) {
+        throw new InvoiceApiException(ErrorCode.CHARGE_BACK_AMOUNT_TOO_HIGH,requestedChargedBackAmout,maxChargedBackAmount);
+      }
+      final InvoicePaymentModelDao payment=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class).getById(invoicePaymentId.toString(),context);
+      if (payment == null) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_PAYMENT_NOT_FOUND,invoicePaymentId.toString());
+      }
+ else {
+        final InvoicePaymentModelDao chargeBack=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.CHARGED_BACK,payment.getInvoiceId(),payment.getPaymentId(),context.getCreatedDate(),requestedChargedBackAmout.negate(),payment.getCurrency(),null,payment.getId());
+        transactional.create(chargeBack,context);
+        final UUID accountId=transactional.getAccountIdFromInvoicePaymentId(chargeBack.getId().toString(),context);
+        notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,payment.getInvoiceId(),accountId,context.getUserToken(),context);
+        return chargeBack;
+      }
+    }
+  }
+);
+}

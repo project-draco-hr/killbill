@@ -1,4 +1,10 @@
 {
-  final Account account=createTestAccount(1,"12345678901234567890123456");
-  accountDao.create(account,internalCallContext);
+  final AccountModelDao account=createTestAccount("12345678901234567890123456");
+  try {
+    accountDao.create(account,internalCallContext);
+    Assert.fail();
+  }
+ catch (  RuntimeException e) {
+    Assert.assertTrue(e.getCause() instanceof SQLException);
+  }
 }

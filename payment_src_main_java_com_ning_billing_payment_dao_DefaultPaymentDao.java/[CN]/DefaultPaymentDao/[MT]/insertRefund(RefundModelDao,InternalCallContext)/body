@@ -1,0 +1,10 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<RefundModelDao>(){
+    @Override public RefundModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final RefundSqlDao transactional=entitySqlDaoWrapperFactory.become(RefundSqlDao.class);
+      transactional.create(refundInfo,context);
+      return transactional.getById(refundInfo.getId().toString(),context);
+    }
+  }
+);
+}

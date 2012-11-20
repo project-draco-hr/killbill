@@ -1,0 +1,18 @@
+{
+  final List<UUID> uuids=new ArrayList<UUID>();
+  List<TagDefinitionModelDao> result=tagDefinitionDao.getByIds(uuids,internalCallContext);
+  assertEquals(result.size(),0);
+  final TagDefinitionModelDao defYo=tagDefinitionDao.create("yo","defintion yo",internalCallContext);
+  uuids.add(defYo.getId());
+  final TagDefinitionModelDao defBah=tagDefinitionDao.create("bah","defintion bah",internalCallContext);
+  uuids.add(defBah.getId());
+  final TagDefinitionModelDao defZoo=tagDefinitionDao.create("zoo","defintion zoo",internalCallContext);
+  uuids.add(defZoo.getId());
+  result=tagDefinitionDao.getByIds(uuids,internalCallContext);
+  assertEquals(result.size(),3);
+  uuids.add(ControlTagType.AUTO_PAY_OFF.getId());
+  result=tagDefinitionDao.getByIds(uuids,internalCallContext);
+  assertEquals(result.size(),4);
+  result=tagDefinitionDao.getTagDefinitions(internalCallContext);
+  assertEquals(result.size(),3 + ControlTagType.values().length);
+}

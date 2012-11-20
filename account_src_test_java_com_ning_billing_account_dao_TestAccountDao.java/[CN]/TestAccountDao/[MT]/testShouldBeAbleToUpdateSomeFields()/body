@@ -1,10 +1,11 @@
 {
-  final Account account=createTestAccount();
+  final AccountModelDao account=createTestAccount();
   accountDao.create(account,internalCallContext);
-  final MutableAccountData otherAccount=account.toMutableAccountData();
+  final MutableAccountData otherAccount=new DefaultAccount(account).toMutableAccountData();
   otherAccount.setAddress1(UUID.randomUUID().toString());
   otherAccount.setEmail(UUID.randomUUID().toString());
-  final DefaultAccount newAccount=new DefaultAccount(account.getId(),otherAccount);
+  final AccountModelDao newAccount=new AccountModelDao(account.getId(),otherAccount);
   accountDao.update(newAccount,internalCallContext);
-  Assert.assertEquals(accountDao.getById(account.getId(),internalCallContext),newAccount);
+  final AccountModelDao retrievedAccount=accountDao.getById(account.getId(),internalCallContext);
+  checkAccountsEqual(retrievedAccount,newAccount);
 }

@@ -1,0 +1,9 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<M>>(){
+    @Override public List<M> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final EntitySqlDao<M,E> transactional=entitySqlDaoWrapperFactory.become(realSqlDao);
+      return transactional.get(context);
+    }
+  }
+);
+}
