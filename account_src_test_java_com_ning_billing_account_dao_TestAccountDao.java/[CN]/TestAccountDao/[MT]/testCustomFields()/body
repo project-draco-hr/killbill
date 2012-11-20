@@ -1,14 +1,12 @@
 {
-  final String fieldName="testField1";
-  final String fieldValue="testField1_value";
   final UUID accountId=UUID.randomUUID();
-  final List<CustomField> customFields=new ArrayList<CustomField>();
-  customFields.add(new StringCustomField(fieldName,fieldValue));
-  final CustomFieldDao customFieldDao=new AuditedCustomFieldDao(dbi);
-  customFieldDao.saveEntities(accountId,ObjectType.ACCOUNT,customFields,internalCallContext);
-  final Map<String,CustomField> customFieldMap=customFieldDao.loadEntities(accountId,ObjectType.ACCOUNT,internalCallContext);
-  assertEquals(customFieldMap.size(),1);
-  final CustomField customField=customFieldMap.get(fieldName);
-  assertEquals(customField.getName(),fieldName);
-  assertEquals(customField.getValue(),fieldValue);
+  final String fieldName=UUID.randomUUID().toString().substring(0,4);
+  final String fieldValue=UUID.randomUUID().toString();
+  final CustomField field=new StringCustomField(fieldName,fieldValue,ObjectType.ACCOUNT,accountId,internalCallContext.getCreatedDate());
+  customFieldDao.create(new CustomFieldModelDao(field),internalCallContext);
+  final List<CustomFieldModelDao> customFieldMap=customFieldDao.getCustomFields(accountId,ObjectType.ACCOUNT,internalCallContext);
+  Assert.assertEquals(customFieldMap.size(),1);
+  final CustomFieldModelDao customField=customFieldMap.get(0);
+  Assert.assertEquals(customField.getFieldName(),fieldName);
+  Assert.assertEquals(customField.getFieldValue(),fieldValue);
 }

@@ -1,0 +1,41 @@
+{
+  loadSystemPropertiesFromClasspath("/resource.properties");
+  bind(Clock.class).to(ClockMock.class).asEagerSingleton();
+  bind(ClockMock.class).asEagerSingleton();
+  bind(Lifecycle.class).to(SubsetDefaultLifecycle.class).asEagerSingleton();
+  final MysqlTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getMysqlTestingHelper();
+  bind(MysqlTestingHelper.class).toInstance(helper);
+  final IDBI dbi;
+  if (helper.isUsingLocalInstance()) {
+    final DbiConfig config=new ConfigurationObjectFactory(System.getProperties()).build(DbiConfig.class);
+    final DBIProvider provider=new DBIProvider(config);
+    dbi=provider.get();
+  }
+ else {
+    dbi=helper.getDBI();
+  }
+  bind(IDBI.class).toInstance(dbi);
+  install(new EmailModule());
+  install(new CallContextModule());
+  install(new GlobalLockerModule());
+  install(new BusModule());
+  install(new NotificationQueueModule());
+  install(new TagStoreModule());
+  install(new CustomFieldModule());
+  install(new DefaultAccountModule());
+  install(new AnalyticsModule());
+  install(new CatalogModule());
+  install(new DefaultEntitlementModule());
+  install(new DefaultInvoiceModule());
+  install(new TemplateModule());
+  install(new PaymentPluginMockModule());
+  install(new DefaultJunctionModule());
+  install(new IntegrationTestOverdueModule());
+  install(new AuditModule());
+  bind(AccountChecker.class).asEagerSingleton();
+  bind(EntitlementChecker.class).asEagerSingleton();
+  bind(InvoiceChecker.class).asEagerSingleton();
+  bind(PaymentChecker.class).asEagerSingleton();
+  bind(AuditChecker.class).asEagerSingleton();
+  installPublicBus();
+}

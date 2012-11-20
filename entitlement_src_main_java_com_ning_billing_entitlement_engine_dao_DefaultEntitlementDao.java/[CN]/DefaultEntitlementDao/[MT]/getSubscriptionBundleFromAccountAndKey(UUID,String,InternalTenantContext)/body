@@ -1,0 +1,9 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<SubscriptionBundle>(){
+    @Override public SubscriptionBundle inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final SubscriptionBundleModelDao bundle=entitySqlDaoWrapperFactory.become(BundleSqlDao.class).getBundleFromAccountAndKey(accountId.toString(),bundleKey,context);
+      return SubscriptionBundleModelDao.toSubscriptionbundle(bundle);
+    }
+  }
+);
+}

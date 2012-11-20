@@ -1,8 +1,13 @@
 {
-  for (  final ControlTagType controlTag : ControlTagType.values()) {
-    if (controlTag.getId().equals(definitionId)) {
-      return new DefaultTagDefinition(controlTag);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<TagDefinitionModelDao>(){
+    @Override public TagDefinitionModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      for (      final ControlTagType controlTag : ControlTagType.values()) {
+        if (controlTag.getId().equals(definitionId)) {
+          return new TagDefinitionModelDao(controlTag);
+        }
+      }
+      return entitySqlDaoWrapperFactory.become(TagDefinitionSqlDao.class).getById(definitionId.toString(),context);
     }
   }
-  return tagDefinitionSqlDao.getById(definitionId.toString(),context);
+);
 }

@@ -1,0 +1,17 @@
+{
+switch (changeType) {
+case INSERT:
+    break;
+default :
+  return;
+}
+final Long recordId=entitySqlDaoWrapperFactory.become(AccountSqlDao.class).getRecordId(savedAccount.getId().toString(),context);
+final InternalCallContext rehydratedContext=internalCallContextFactory.createInternalCallContext(recordId,context);
+final AccountCreationInternalEvent creationEvent=new DefaultAccountCreationEvent(savedAccount,rehydratedContext.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+try {
+eventBus.postFromTransaction(creationEvent,entitySqlDaoWrapperFactory,rehydratedContext);
+}
+ catch (final EventBusException e) {
+log.warn("Failed to post account creation event for account " + savedAccount.getId(),e);
+}
+}

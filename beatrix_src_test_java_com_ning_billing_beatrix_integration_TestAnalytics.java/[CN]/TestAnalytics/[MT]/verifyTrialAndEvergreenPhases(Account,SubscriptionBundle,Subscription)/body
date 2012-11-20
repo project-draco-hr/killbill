@@ -1,9 +1,9 @@
 {
   final Product currentProduct=subscriptionPlan.getProduct();
-  final List<BusinessSubscriptionTransition> transitions=analyticsUserApi.getTransitionsForBundle(bundle.getKey(),callContext);
+  final List<BusinessSubscriptionTransition> transitions=analyticsUserApi.getTransitionsForBundle(bundle.getExternalKey(),callContext);
   final BusinessSubscriptionTransition initialTransition=transitions.get(0);
   Assert.assertEquals(initialTransition.getBundleId(),bundle.getId());
-  Assert.assertEquals(initialTransition.getExternalKey(),bundle.getKey());
+  Assert.assertEquals(initialTransition.getExternalKey(),bundle.getExternalKey());
   Assert.assertEquals(initialTransition.getAccountId(),account.getId());
   Assert.assertEquals(initialTransition.getAccountKey(),account.getExternalKey());
   Assert.assertEquals(initialTransition.getSubscriptionId(),subscription.getId());
@@ -22,7 +22,7 @@
   Assert.assertEquals(initialTransition.getNextStartDate(),subscription.getStartDate());
   Assert.assertEquals(initialTransition.getNextState(),Subscription.SubscriptionState.ACTIVE.toString());
   final BusinessSubscriptionTransition futureTransition=transitions.get(1);
-  Assert.assertEquals(futureTransition.getExternalKey(),bundle.getKey());
+  Assert.assertEquals(futureTransition.getExternalKey(),bundle.getExternalKey());
   Assert.assertEquals(futureTransition.getAccountKey(),account.getExternalKey());
   Assert.assertEquals(futureTransition.getCategory(),currentProduct.getCategory().toString());
   Assert.assertEquals(futureTransition.getEventType(),BusinessSubscriptionEvent.EventType.SYSTEM_CHANGE.toString());

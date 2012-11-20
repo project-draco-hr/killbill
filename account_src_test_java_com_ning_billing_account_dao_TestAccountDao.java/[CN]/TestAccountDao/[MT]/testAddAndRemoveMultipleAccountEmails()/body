@@ -1,0 +1,32 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final String email1=UUID.randomUUID().toString();
+  final String email2=UUID.randomUUID().toString();
+  Assert.assertEquals(accountDao.getEmailsByAccountId(accountId,internalCallContext).size(),0);
+  final AccountEmail accountEmail1=new DefaultAccountEmail(accountId,email1);
+  accountDao.addEmail(new AccountEmailModelDao(accountEmail1),internalCallContext);
+  final List<AccountEmailModelDao> firstEmails=accountDao.getEmailsByAccountId(accountId,internalCallContext);
+  Assert.assertEquals(firstEmails.size(),1);
+  Assert.assertEquals(firstEmails.get(0).getAccountId(),accountId);
+  Assert.assertEquals(firstEmails.get(0).getEmail(),email1);
+  final AccountEmail accountEmail2=new DefaultAccountEmail(accountId,email2);
+  accountDao.addEmail(new AccountEmailModelDao(accountEmail2),internalCallContext);
+  final List<AccountEmailModelDao> secondEmails=accountDao.getEmailsByAccountId(accountId,internalCallContext);
+  Assert.assertEquals(secondEmails.size(),2);
+  Assert.assertTrue(secondEmails.get(0).getAccountId().equals(accountId));
+  Assert.assertTrue(secondEmails.get(1).getAccountId().equals(accountId));
+  Assert.assertTrue(secondEmails.get(0).getEmail().equals(email1) || secondEmails.get(0).getEmail().equals(email2));
+  Assert.assertTrue(secondEmails.get(1).getEmail().equals(email1) || secondEmails.get(1).getEmail().equals(email2));
+  accountDao.removeEmail(new AccountEmailModelDao(accountEmail1),internalCallContext);
+  final List<AccountEmailModelDao> thirdEmails=accountDao.getEmailsByAccountId(accountId,internalCallContext);
+  Assert.assertEquals(thirdEmails.size(),1);
+  Assert.assertEquals(thirdEmails.get(0).getAccountId(),accountId);
+  Assert.assertEquals(thirdEmails.get(0).getEmail(),email2);
+  final List<AuditLog> auditLogsForAccountEmail1=auditDao.getAuditLogsForId(TableName.ACCOUNT_EMAIL,accountEmail1.getId(),AuditLevel.FULL,internalCallContext);
+  Assert.assertEquals(auditLogsForAccountEmail1.size(),2);
+  Assert.assertEquals(auditLogsForAccountEmail1.get(0).getChangeType(),ChangeType.INSERT);
+  Assert.assertEquals(auditLogsForAccountEmail1.get(1).getChangeType(),ChangeType.DELETE);
+  final List<AuditLog> auditLogsForAccountEmail2=auditDao.getAuditLogsForId(TableName.ACCOUNT_EMAIL,accountEmail2.getId(),AuditLevel.FULL,internalCallContext);
+  Assert.assertEquals(auditLogsForAccountEmail2.size(),1);
+  Assert.assertEquals(auditLogsForAccountEmail2.get(0).getChangeType(),ChangeType.INSERT);
+}

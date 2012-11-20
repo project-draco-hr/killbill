@@ -1,12 +1,7 @@
 {
-  try {
-    final Account account=new DefaultAccount(accountId,accountData);
-    accountDao.update(account,internalCallContextFactory.createInternalCallContext(account.getId(),context));
+  final Account currentAccount=getAccountById(accountId,context);
+  if (currentAccount == null) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
   }
- catch (  EntityPersistenceException e) {
-    throw new AccountApiException(e,ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID);
-  }
-catch (  RuntimeException e) {
-    throw new AccountApiException(e,ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
-  }
+  updateAccount(currentAccount,accountData,context);
 }

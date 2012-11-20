@@ -4,9 +4,13 @@
       if (amount.compareTo(BigDecimal.ZERO) <= 0) {
         throw new InvoiceApiException(ErrorCode.PAYMENT_REFUND_AMOUNT_NEGATIVE_OR_NULL);
       }
-      final List<InvoicePayment> invoicePayments=dao.getInvoicePayments(paymentId,context);
-      final UUID accountId=dao.getAccountIdFromInvoicePaymentId(invoicePayments.get(0).getId(),context);
-      return dao.createRefund(paymentId,amount,isInvoiceAdjusted,invoiceItemIdsWithAmounts,paymentCookieId,context);
+      final Collection<InvoicePayment> invoicePayments=Collections2.transform(dao.getInvoicePayments(paymentId,context),new Function<InvoicePaymentModelDao,InvoicePayment>(){
+        @Override public InvoicePayment apply(        final InvoicePaymentModelDao input){
+          return new DefaultInvoicePayment(input);
+        }
+      }
+);
+      return new DefaultInvoicePayment(dao.createRefund(paymentId,amount,isInvoiceAdjusted,invoiceItemIdsWithAmounts,paymentCookieId,context));
     }
   }
 );

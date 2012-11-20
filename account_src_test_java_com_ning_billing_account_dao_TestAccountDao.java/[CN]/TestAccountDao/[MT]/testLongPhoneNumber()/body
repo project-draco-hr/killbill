@@ -1,6 +1,6 @@
 {
-  final Account account=createTestAccount(1,"123456789012345678901234");
+  final AccountModelDao account=createTestAccount("123456789012345678901234");
   accountDao.create(account,internalCallContext);
-  final Account saved=accountDao.getAccountByKey(account.getExternalKey(),internalCallContext);
-  assertNotNull(saved);
+  final AccountModelDao retrievedAccount=accountDao.getAccountByKey(account.getExternalKey(),internalCallContext);
+  checkAccountsEqual(retrievedAccount,account);
 }

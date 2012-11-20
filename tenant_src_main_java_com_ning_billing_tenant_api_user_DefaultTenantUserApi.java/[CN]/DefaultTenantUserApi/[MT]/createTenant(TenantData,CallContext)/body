@@ -1,9 +1,9 @@
 {
   final Tenant tenant=new DefaultTenant(data);
   try {
-    tenantDao.create(tenant,internalCallContextFactory.createInternalCallContext(context));
+    tenantDao.create(new TenantModelDao(tenant),internalCallContextFactory.createInternalCallContext(context));
   }
- catch (  final EntityPersistenceException e) {
+ catch (  final TenantApiException e) {
     throw new TenantApiException(e,ErrorCode.TENANT_CREATION_FAILED);
   }
   return tenant;

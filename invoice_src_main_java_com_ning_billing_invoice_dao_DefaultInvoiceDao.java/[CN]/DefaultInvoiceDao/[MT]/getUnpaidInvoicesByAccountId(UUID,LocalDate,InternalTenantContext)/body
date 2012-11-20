@@ -1,0 +1,15 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<InvoiceModelDao>>(){
+    @Override public List<InvoiceModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final List<InvoiceModelDao> invoices=getAllInvoicesByAccountFromTransaction(accountId,entitySqlDaoWrapperFactory,context);
+      final Collection<InvoiceModelDao> unpaidInvoices=Collections2.filter(invoices,new Predicate<InvoiceModelDao>(){
+        @Override public boolean apply(        final InvoiceModelDao in){
+          return (InvoiceModelDaoHelper.getBalance(in).compareTo(BigDecimal.ZERO) >= 1) && (upToDate == null || !in.getTargetDate().isAfter(upToDate));
+        }
+      }
+);
+      return new ArrayList<InvoiceModelDao>(unpaidInvoices);
+    }
+  }
+);
+}

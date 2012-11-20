@@ -1,3 +1,4 @@
 {
-  return tagDefinitionDao.getById(tagDefinitionId,internalCallContextFactory.createInternalTenantContext(context));
+  final TagDefinitionModelDao tagDefinitionModelDao=tagDefinitionDao.getById(tagDefinitionId,internalCallContextFactory.createInternalTenantContext(context));
+  return new DefaultTagDefinition(tagDefinitionModelDao,TagModelDaoHelper.isControlTag(tagDefinitionModelDao.getName()));
 }

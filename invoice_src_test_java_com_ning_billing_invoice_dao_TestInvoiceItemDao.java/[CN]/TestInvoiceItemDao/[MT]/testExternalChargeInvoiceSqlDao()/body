@@ -5,7 +5,7 @@
   final String description=UUID.randomUUID().toString();
   final LocalDate startDate=new LocalDate(2012,4,1);
   final InvoiceItem externalChargeInvoiceItem=new ExternalChargeInvoiceItem(invoiceId,accountId,bundleId,description,startDate,TEN,Currency.USD);
-  invoiceItemSqlDao.create(externalChargeInvoiceItem,internalCallContext);
-  final InvoiceItem savedItem=invoiceItemSqlDao.getById(externalChargeInvoiceItem.getId().toString(),internalCallContext);
-  assertEquals(savedItem,externalChargeInvoiceItem);
+  createInvoiceItem(externalChargeInvoiceItem,internalCallContext);
+  final InvoiceItemModelDao savedItem=invoiceItemSqlDao.getById(externalChargeInvoiceItem.getId().toString(),internalCallContext);
+  assertEquals(InvoiceItemFactory.fromModelDao(savedItem),externalChargeInvoiceItem);
 }

@@ -7,8 +7,8 @@
   for (int i=0; i < 3; i++) {
     final UUID invoiceId=UUID.randomUUID();
     final RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate.plusMonths(i),startDate.plusMonths(i + 1),rate,rate,Currency.USD);
-    invoiceItemSqlDao.create(item,internalCallContext);
+    createInvoiceItem(item,internalCallContext);
   }
-  final List<InvoiceItem> items=invoiceItemSqlDao.getInvoiceItemsBySubscription(subscriptionId.toString(),internalCallContext);
+  final List<InvoiceItemModelDao> items=invoiceItemSqlDao.getInvoiceItemsBySubscription(subscriptionId.toString(),internalCallContext);
   assertEquals(items.size(),3);
 }

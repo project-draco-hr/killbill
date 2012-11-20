@@ -1,3 +1,8 @@
 {
-  return dao.getUnpaidInvoicesByAccountId(accountId,upToDate,internalCallContextFactory.createInternalTenantContext(context));
+  return ImmutableList.<Invoice>copyOf(Collections2.transform(dao.getUnpaidInvoicesByAccountId(accountId,upToDate,internalCallContextFactory.createInternalTenantContext(context)),new Function<InvoiceModelDao,Invoice>(){
+    @Override public Invoice apply(    final InvoiceModelDao input){
+      return new DefaultInvoice(input);
+    }
+  }
+));
 }

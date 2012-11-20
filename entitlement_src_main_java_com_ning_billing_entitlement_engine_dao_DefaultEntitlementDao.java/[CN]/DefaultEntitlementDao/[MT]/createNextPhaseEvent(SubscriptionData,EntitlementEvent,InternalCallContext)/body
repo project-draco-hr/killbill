@@ -1,0 +1,14 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final EntitlementEventSqlDao transactional=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
+      final UUID subscriptionId=subscription.getId();
+      cancelNextPhaseEventFromTransaction(subscriptionId,entitySqlDaoWrapperFactory,context);
+      transactional.create(new EntitlementEventModelDao(nextPhase),context);
+      recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,nextPhase.getEffectiveDate(),new EntitlementNotificationKey(nextPhase.getId()),context);
+      notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,nextPhase,context);
+      return null;
+    }
+  }
+);
+}

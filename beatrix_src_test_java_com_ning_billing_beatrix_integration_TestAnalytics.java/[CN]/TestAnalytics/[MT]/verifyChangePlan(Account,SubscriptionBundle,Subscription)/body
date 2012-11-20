@@ -5,12 +5,12 @@
   final DateTime requestedDate=clock.getUTCNow();
   Assert.assertTrue(subscription.changePlan(newProductName,newTerm,newPlanSetName,requestedDate,callContext));
   waitALittle();
-  final List<BusinessSubscriptionTransition> transitions=analyticsUserApi.getTransitionsForBundle(bundle.getKey(),callContext);
+  final List<BusinessSubscriptionTransition> transitions=analyticsUserApi.getTransitionsForBundle(bundle.getExternalKey(),callContext);
   Assert.assertEquals(transitions.size(),3);
   final BusinessSubscriptionTransition previousTransition=transitions.get(0);
   final BusinessSubscriptionTransition transition=transitions.get(1);
   Assert.assertEquals(transition.getBundleId(),bundle.getId());
-  Assert.assertEquals(transition.getExternalKey(),bundle.getKey());
+  Assert.assertEquals(transition.getExternalKey(),bundle.getExternalKey());
   Assert.assertEquals(transition.getAccountId(),account.getId());
   Assert.assertEquals(transition.getAccountKey(),account.getExternalKey());
   Assert.assertEquals(transition.getSubscriptionId(),subscription.getId());

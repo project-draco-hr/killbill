@@ -3,20 +3,20 @@
   final LocalDate effectiveDate=new LocalDate(2011,3,1);
   final BigDecimal creditAmount=new BigDecimal("5.0");
   invoiceDao.insertCredit(accountId,null,creditAmount,effectiveDate,Currency.USD,internalCallContext);
-  final List<Invoice> invoices=invoiceDao.getAllInvoicesByAccount(accountId,internalCallContext);
+  final List<InvoiceModelDao> invoices=invoiceDao.getAllInvoicesByAccount(accountId,internalCallContext);
   assertEquals(invoices.size(),1);
-  final Invoice invoice=invoices.get(0);
-  assertTrue(invoice.getBalance().compareTo(BigDecimal.ZERO) == 0);
-  final List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();
+  final InvoiceModelDao invoice=invoices.get(0);
+  assertTrue(InvoiceModelDaoHelper.getBalance(invoice).compareTo(BigDecimal.ZERO) == 0);
+  final List<InvoiceItemModelDao> invoiceItems=invoice.getInvoiceItems();
   assertEquals(invoiceItems.size(),2);
   boolean foundCredit=false;
   boolean foundCBA=false;
-  for (  final InvoiceItem cur : invoiceItems) {
-    if (cur.getInvoiceItemType() == InvoiceItemType.CREDIT_ADJ) {
+  for (  final InvoiceItemModelDao cur : invoiceItems) {
+    if (cur.getType() == InvoiceItemType.CREDIT_ADJ) {
       foundCredit=true;
       assertTrue(cur.getAmount().compareTo(creditAmount.negate()) == 0);
     }
- else     if (cur.getInvoiceItemType() == InvoiceItemType.CBA_ADJ) {
+ else     if (cur.getType() == InvoiceItemType.CBA_ADJ) {
       foundCBA=true;
       assertTrue(cur.getAmount().compareTo(creditAmount) == 0);
     }

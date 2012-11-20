@@ -1,0 +1,31 @@
+{
+  try {
+    return invokeSafely(proxy,method,args);
+  }
+ catch (  Throwable t) {
+    if (t.getCause() != null && t.getCause().getCause() != null && DBIException.class.isAssignableFrom(t.getCause().getClass())) {
+      if (t.getCause() instanceof StatementException) {
+        final StatementContext statementContext=((StatementException)t.getCause()).getStatementContext();
+        if (statementContext != null) {
+          final Binding binding=statementContext.getBinding();
+          final PreparedStatement statement=statementContext.getStatement();
+          if (statement != null) {
+            errorDuringTransaction(t.getCause().getCause(),method,statement.toString() + "\n" + binding.toString());
+          }
+ else {
+            errorDuringTransaction(t.getCause().getCause(),method,binding.toString());
+          }
+          return null;
+        }
+      }
+      errorDuringTransaction(t.getCause().getCause(),method);
+    }
+ else     if (t.getCause() != null) {
+      errorDuringTransaction(t.getCause(),method);
+    }
+ else {
+      errorDuringTransaction(t,method);
+    }
+  }
+  return null;
+}

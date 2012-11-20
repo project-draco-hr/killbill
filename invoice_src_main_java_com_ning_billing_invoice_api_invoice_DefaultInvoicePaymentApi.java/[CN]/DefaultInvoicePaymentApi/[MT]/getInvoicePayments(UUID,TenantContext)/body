@@ -1,3 +1,8 @@
 {
-  return dao.getInvoicePayments(paymentId,internalCallContextFactory.createInternalTenantContext(context));
+  return ImmutableList.<InvoicePayment>copyOf(Collections2.transform(dao.getInvoicePayments(paymentId,internalCallContextFactory.createInternalTenantContext(context)),new Function<InvoicePaymentModelDao,InvoicePayment>(){
+    @Override public InvoicePayment apply(    final InvoicePaymentModelDao input){
+      return new DefaultInvoicePayment(input);
+    }
+  }
+));
 }

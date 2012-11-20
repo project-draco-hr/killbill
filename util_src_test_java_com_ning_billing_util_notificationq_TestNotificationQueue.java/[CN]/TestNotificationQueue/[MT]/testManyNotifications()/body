@@ -20,10 +20,10 @@ synchronized (expectedNotifications) {
     final int currentIteration=i;
     final NotificationKey notificationKey=new TestNotificationKey(new Integer(i).toString());
     expectedNotifications.put(notificationKey,Boolean.FALSE);
-    dao.inTransaction(new Transaction<Void,DummySqlTest>(){
-      @Override public Void inTransaction(      final DummySqlTest transactional,      final TransactionStatus status) throws Exception {
-        transactional.insertDummy(obj);
-        queue.recordFutureNotificationFromTransaction(transactional,now.plus((currentIteration + 1) * nextReadyTimeIncrementMs),accountId,notificationKey,internalCallContext);
+    entitySqlDaoTransactionalJdbiWrapper.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+      @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+        entitySqlDaoWrapperFactory.transmogrify(DummySqlTest.class).insertDummy(obj);
+        queue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,now.plus((currentIteration + 1) * nextReadyTimeIncrementMs),accountId,notificationKey,internalCallContext);
         return null;
       }
     }

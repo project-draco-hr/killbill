@@ -1,0 +1,28 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
+      final InvoiceModelDao currentInvoice=transactional.getById(invoice.getId().toString(),context);
+      if (currentInvoice == null) {
+        if (isRealInvoice) {
+          transactional.create(invoice,context);
+        }
+        final InvoiceItemSqlDao transInvoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
+        for (        final InvoiceItemModelDao invoiceItemModelDao : invoiceItems) {
+          transInvoiceItemSqlDao.create(invoiceItemModelDao,context);
+        }
+        final List<InvoiceItemModelDao> recurringInvoiceItems=ImmutableList.<InvoiceItemModelDao>copyOf(Collections2.filter(invoiceItems,new Predicate<InvoiceItemModelDao>(){
+          @Override public boolean apply(          @Nullable final InvoiceItemModelDao item){
+            return item.getType() == InvoiceItemType.RECURRING;
+          }
+        }
+));
+        notifyOfFutureBillingEvents(entitySqlDaoWrapperFactory,invoice.getAccountId(),recurringInvoiceItems);
+        final InvoicePaymentSqlDao invoicePaymentSqlDao=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
+        invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);
+      }
+      return null;
+    }
+  }
+);
+}
