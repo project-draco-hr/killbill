@@ -1,3 +1,17 @@
 {
-  return getByRecordId(number.longValue(),context);
+  if (number == null) {
+    throw new InvoiceApiException(ErrorCode.INVOICE_INVALID_NUMBER,"(null)");
+  }
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<InvoiceModelDao>(){
+    @Override public InvoiceModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceSqlDao invoiceDao=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
+      final InvoiceModelDao invoice=invoiceDao.getByRecordId(number.longValue(),context);
+      if (invoice == null) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_NUMBER_NOT_FOUND,number.longValue());
+      }
+      populateChildren(invoice,entitySqlDaoWrapperFactory,context);
+      return invoice;
+    }
+  }
+);
 }
