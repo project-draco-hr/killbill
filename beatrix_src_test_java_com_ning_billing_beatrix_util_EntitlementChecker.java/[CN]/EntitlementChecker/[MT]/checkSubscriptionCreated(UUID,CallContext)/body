@@ -1,0 +1,10 @@
+{
+  final Subscription subscription=entitlementApi.getSubscriptionFromId(subscriptionId,context);
+  Assert.assertNotNull(subscription);
+  auditChecker.checkSubscriptionCreated(subscription.getBundleId(),subscriptionId,context);
+  List<SubscriptionTransitionData> subscriptionEvents=getSubscriptionEvents(subscription);
+  Assert.assertTrue(subscriptionEvents.size() >= 1);
+  auditChecker.checkSubscriptionEventCreated(subscription.getBundleId(),subscriptionEvents.get(0).getId(),context);
+  auditChecker.checkBundleCreated(subscription.getBundleId(),context);
+  return subscription;
+}
