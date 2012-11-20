@@ -1,23 +1,22 @@
 {
   final Map<NotificationKey,Boolean> expectedNotificationsFred=new TreeMap<NotificationKey,Boolean>();
   final Map<NotificationKey,Boolean> expectedNotificationsBarney=new TreeMap<NotificationKey,Boolean>();
-  final NotificationQueueService notificationQueueService=new DefaultNotificationQueueService(dbi,clock,config,new InternalCallContextFactory(dbi,clock));
-  final NotificationQueue queueFred=notificationQueueService.createNotificationQueue("UtilTest","Fred",new NotificationQueueHandler(){
+  final NotificationQueue queueFred=queueService.createNotificationQueue("UtilTest","Fred",new NotificationQueueHandler(){
     @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final Long accountRecordId,    final Long tenantRecordId){
       log.info("Fred received key: " + notificationKey);
       expectedNotificationsFred.put(notificationKey,Boolean.TRUE);
       eventsReceived++;
     }
   }
-,config);
-  final NotificationQueue queueBarney=notificationQueueService.createNotificationQueue("UtilTest","Barney",new NotificationQueueHandler(){
+);
+  final NotificationQueue queueBarney=queueService.createNotificationQueue("UtilTest","Barney",new NotificationQueueHandler(){
     @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final Long accountRecordId,    final Long tenantRecordId){
       log.info("Barney received key: " + notificationKey);
       expectedNotificationsBarney.put(notificationKey,Boolean.TRUE);
       eventsReceived++;
     }
   }
-,config);
+);
   queueFred.startQueue();
   final UUID key=UUID.randomUUID();
   final DummyObject obj=new DummyObject("foo",key);
