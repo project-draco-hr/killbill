@@ -4,7 +4,10 @@
   final DateTime effectiveDate=existingEvent.getEffectiveDate().isBefore(transferDate) ? transferDate : existingEvent.getEffectiveDate();
   final PlanPhaseSpecifier spec=existingEvent.getPlanPhaseSpecifier();
   final PlanPhase currentPhase=existingEvent.getPlanPhaseName() != null ? catalog.findPhase(existingEvent.getPlanPhaseName(),effectiveDate,subscription.getAlignStartDate()) : null;
-  final ApiEventBuilder apiBuilder=currentPhase != null ? new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(currentPhase.getPlan().getName()).setEventPlanPhase(currentPhase.getName()).setEventPriceList(spec.getPriceListName()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(clock.getUTCNow()).setEffectiveDate(effectiveDate).setRequestedDate(effectiveDate).setUserToken(context.getUserToken()).setFromDisk(true) : null;
+  if (spec == null || currentPhase == null) {
+    return null;
+  }
+  final ApiEventBuilder apiBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(currentPhase.getPlan().getName()).setEventPlanPhase(currentPhase.getName()).setEventPriceList(spec.getPriceListName()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(clock.getUTCNow()).setEffectiveDate(effectiveDate).setRequestedDate(effectiveDate).setUserToken(context.getUserToken()).setFromDisk(true);
 switch (existingEvent.getSubscriptionTransitionType()) {
 case TRANSFER:
 case MIGRATE_ENTITLEMENT:
@@ -18,15 +21,16 @@ break;
 case PHASE:
 newEvent=firstEvent ? new ApiEventTransfer(apiBuilder) : PhaseEventData.createNextPhaseEvent(currentPhase.getName(),subscription,clock.getUTCNow(),effectiveDate);
 break;
-case CANCEL:
-case UNCANCEL:
 case MIGRATE_BILLING:
 if (firstEvent) {
 newEvent=new ApiEventTransfer(apiBuilder);
 }
 break;
+case CANCEL:
+case UNCANCEL:
+break;
 default :
-throw new EntitlementError(String.format("Unepxected transitionType %s",existingEvent.getSubscriptionTransitionType()));
+throw new EntitlementError(String.format("Unexpected transitionType %s",existingEvent.getSubscriptionTransitionType()));
 }
 return newEvent;
 }

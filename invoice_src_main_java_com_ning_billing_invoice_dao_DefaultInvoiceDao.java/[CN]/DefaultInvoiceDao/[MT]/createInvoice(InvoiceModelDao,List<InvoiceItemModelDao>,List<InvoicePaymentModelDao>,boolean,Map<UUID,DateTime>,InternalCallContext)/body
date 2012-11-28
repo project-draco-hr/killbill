@@ -11,13 +11,7 @@
         for (        final InvoiceItemModelDao invoiceItemModelDao : invoiceItems) {
           transInvoiceItemSqlDao.create(invoiceItemModelDao,context);
         }
-        final List<InvoiceItemModelDao> recurringInvoiceItems=ImmutableList.<InvoiceItemModelDao>copyOf(Collections2.filter(invoiceItems,new Predicate<InvoiceItemModelDao>(){
-          @Override public boolean apply(          @Nullable final InvoiceItemModelDao item){
-            return item.getType() == InvoiceItemType.RECURRING;
-          }
-        }
-));
-        notifyOfFutureBillingEvents(entitySqlDaoWrapperFactory,invoice.getAccountId(),recurringInvoiceItems);
+        notifyOfFutureBillingEvents(entitySqlDaoWrapperFactory,invoice.getAccountId(),callbackDateTimePerSubscriptions);
         final InvoicePaymentSqlDao invoicePaymentSqlDao=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);
       }
