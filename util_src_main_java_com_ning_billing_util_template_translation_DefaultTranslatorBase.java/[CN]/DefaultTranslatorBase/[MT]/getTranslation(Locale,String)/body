@@ -6,7 +6,7 @@
   }
  else {
     if (config.getDefaultLocale() == null) {
-      log.warn(String.format(ErrorCode.MISSING_DEFAULT_TRANSLATION_RESOURCE.toString(),getTranslationType()));
+      log.debug("No default locale configured, returning original text");
       return originalText;
     }
     final Locale defaultLocale=LocaleUtils.toLocale(config.getDefaultLocale());
@@ -20,7 +20,7 @@
       }
     }
  catch (    MissingResourceException mrex) {
-      log.warn(String.format(ErrorCode.MISSING_TRANSLATION_RESOURCE.toString(),getTranslationType()));
+      log.warn("Missing translation bundle for locale {}",defaultLocale);
       return originalText;
     }
   }

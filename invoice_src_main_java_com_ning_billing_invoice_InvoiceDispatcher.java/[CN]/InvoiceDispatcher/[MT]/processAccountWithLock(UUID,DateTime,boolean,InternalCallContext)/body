@@ -15,14 +15,14 @@
     final LocalDate targetDate=new LocalDate(targetDateTime,account.getTimeZone());
     final Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,account.getTimeZone(),targetCurrency);
     if (invoice == null) {
-      log.info("Generated null invoice.");
+      log.info("Generated null invoice for accountId {} and targetDate {} (targetDateTime {})",new Object[]{accountId,targetDate,targetDateTime});
       if (!dryRun) {
         final BusInternalEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
         postEvent(event,accountId,context);
       }
     }
  else {
-      log.info("Generated invoice {} with {} items.",invoice.getId().toString(),invoice.getNumberOfItems());
+      log.info("Generated invoice {} with {} items for accountId {} and targetDate {} (targetDateTime {})",new Object[]{invoice.getId(),invoice.getNumberOfItems(),accountId,targetDate,targetDateTime});
       if (!dryRun) {
         final boolean isRealInvoiceWithItems=Collections2.filter(invoice.getInvoiceItems(),new Predicate<InvoiceItem>(){
           @Override public boolean apply(          final InvoiceItem input){
