@@ -6,17 +6,20 @@
   String prevPlan=null;
   String prevPhase=null;
   String prevPriceList=null;
+  String curPlan=null;
+  String curPhase=null;
+  String curPriceList=null;
   for (  EntitlementEvent cur : changeEvents) {
 switch (cur.getType()) {
 case API_USER:
       final ApiEvent apiEvent=(ApiEvent)cur;
-    prevPlan=apiEvent.getEventPlan();
-  prevPhase=apiEvent.getEventPlanPhase();
-prevPriceList=apiEvent.getPriceList();
+    curPlan=apiEvent.getEventPlan();
+  curPhase=apiEvent.getEventPlanPhase();
+curPriceList=apiEvent.getPriceList();
 break;
 case PHASE:
 final PhaseEvent phaseEvent=(PhaseEvent)cur;
-prevPhase=phaseEvent.getPhase();
+curPhase=phaseEvent.getPhase();
 break;
 default :
 throw new EntitlementError("Unknown event type " + cur.getType());
@@ -27,6 +30,9 @@ return changeEvents;
 }
 break;
 }
+prevPlan=curPlan;
+prevPhase=curPhase;
+prevPriceList=curPriceList;
 }
 if (prevPlan != null) {
 final DateTime now=clock.getUTCNow();
