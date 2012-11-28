@@ -1,0 +1,14 @@
+{
+  final Map<UUID,DateTime> result=new HashMap<UUID,DateTime>();
+  for (  final InvoiceItemModelDao item : invoiceItems) {
+    if (item.getType() == InvoiceItemType.RECURRING) {
+      if ((item.getEndDate() != null) && (item.getAmount() == null || item.getAmount().compareTo(BigDecimal.ZERO) >= 0)) {
+        int deltaMs=accountTimeZone.getOffset(clock.getUTCNow());
+        int negativeDeltaMs=-1 * deltaMs;
+        final LocalTime localTime=clock.getUTCNow().toLocalTime();
+        result.put(item.getSubscriptionId(),item.getEndDate().toDateTime(localTime,DateTimeZone.UTC).plusMillis(negativeDeltaMs));
+      }
+    }
+  }
+  return result;
+}

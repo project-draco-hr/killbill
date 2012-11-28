@@ -43,7 +43,8 @@
           }
         }
 ));
-        invoiceDao.createInvoice(invoiceModelDao,invoiceItemModelDaos,invoicePaymentModelDaos,isRealInvoiceWithItems,context);
+        final Map<UUID,DateTime> callbackDateTimePerSubscriptions=createNextFutureNotificationDate(invoiceItemModelDaos,account.getTimeZone());
+        invoiceDao.createInvoice(invoiceModelDao,invoiceItemModelDaos,invoicePaymentModelDaos,isRealInvoiceWithItems,callbackDateTimePerSubscriptions,context);
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         setChargedThroughDates(account.getBillCycleDay(),account.getTimeZone(),fixedPriceInvoiceItems,recurringInvoiceItems,context);
