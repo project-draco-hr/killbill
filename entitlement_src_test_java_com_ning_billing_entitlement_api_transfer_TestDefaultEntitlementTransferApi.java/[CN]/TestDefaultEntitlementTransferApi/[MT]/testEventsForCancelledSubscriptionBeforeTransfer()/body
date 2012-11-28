@@ -1,0 +1,10 @@
+{
+  final DateTime subscriptionStartTime=clock.getUTCNow();
+  final DateTime subscriptionCancelTime=subscriptionStartTime.plusDays(1);
+  final ImmutableList<ExistingEvent> existingEvents=ImmutableList.<ExistingEvent>of(createEvent(subscriptionStartTime,SubscriptionTransitionType.CREATE),createEvent(subscriptionCancelTime,SubscriptionTransitionType.CANCEL));
+  final SubscriptionBuilder subscriptionBuilder=new SubscriptionBuilder();
+  final SubscriptionData subscription=new SubscriptionData(subscriptionBuilder);
+  final DateTime transferDate=subscriptionStartTime.plusDays(10);
+  final List<EntitlementEvent> events=transferApi.toEvents(existingEvents,subscription,transferDate,callContext);
+  Assert.assertEquals(events.size(),0);
+}
