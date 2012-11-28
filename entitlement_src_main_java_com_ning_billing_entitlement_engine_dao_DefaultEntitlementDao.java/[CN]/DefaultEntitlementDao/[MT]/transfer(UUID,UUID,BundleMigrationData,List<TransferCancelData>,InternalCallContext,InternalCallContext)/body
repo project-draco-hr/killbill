@@ -3,9 +3,9 @@
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final EntitlementEventSqlDao transactional=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       for (      final TransferCancelData cancel : transferCancelData) {
-        cancelSubscriptionFromTransaction(cancel.getSubscription(),cancel.getCancelEvent(),entitySqlDaoWrapperFactory,context,0);
+        cancelSubscriptionFromTransaction(cancel.getSubscription(),cancel.getCancelEvent(),entitySqlDaoWrapperFactory,fromContext,0);
       }
-      migrateBundleDataFromTransaction(bundleTransferData,transactional,entitySqlDaoWrapperFactory,context);
+      migrateBundleDataFromTransaction(bundleTransferData,transactional,entitySqlDaoWrapperFactory,toContext);
       return null;
     }
   }
