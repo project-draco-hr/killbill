@@ -12,5 +12,7 @@
       cur.setActiveVersion(builder.getActiveVersion());
     }
   }
-  return (SubscriptionDataRepair)factory.createSubscription(builder,initialEvents);
+  final SubscriptionDataRepair subscriptiondataRepair=new SubscriptionDataRepair(builder,curData.getEvents(),repairApiService,(EntitlementDao)repairDao,clock,addonUtils,catalogService,internalCallContextFactory);
+  subscriptiondataRepair.rebuildTransitions(curData.getEvents(),catalogService.getFullCatalog());
+  return subscriptiondataRepair;
 }
