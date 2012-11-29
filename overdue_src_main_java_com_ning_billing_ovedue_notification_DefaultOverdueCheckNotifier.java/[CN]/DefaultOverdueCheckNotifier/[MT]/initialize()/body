@@ -9,14 +9,14 @@
   }
 ;
   final NotificationQueueHandler notificationQueueHandler=new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDate,    final Long accountRecordId,    final Long tenantRecordId){
+    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDate,    final UUID userToken,    final Long accountRecordId,    final Long tenantRecordId){
       try {
         if (!(notificationKey instanceof OverdueCheckNotificationKey)) {
           log.error("Overdue service received Unexpected notificationKey {}",notificationKey.getClass().getName());
           return;
         }
         final OverdueCheckNotificationKey key=(OverdueCheckNotificationKey)notificationKey;
-        listener.handleNextOverdueCheck(key,accountRecordId,tenantRecordId);
+        listener.handleNextOverdueCheck(key,userToken,accountRecordId,tenantRecordId);
       }
  catch (      IllegalArgumentException e) {
         log.error("The key returned from the NextBillingNotificationQueue is not a valid UUID",e);

@@ -1,7 +1,7 @@
 {
   final Map<NotificationKey,Boolean> expectedNotifications=new TreeMap<NotificationKey,Boolean>();
   final DefaultNotificationQueue queue=new DefaultNotificationQueue(dbi,clock,"test-svc","foo",new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final Long accountRecordId,    final Long tenantRecordId){
+    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final UUID userToken,    final Long accountRecordId,    final Long tenantRecordId){
 synchronized (expectedNotifications) {
         log.info("Handler received key: " + notificationKey);
         expectedNotifications.put(notificationKey,Boolean.TRUE);
@@ -20,7 +20,7 @@ synchronized (expectedNotifications) {
   entitySqlDaoTransactionalJdbiWrapper.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       entitySqlDaoWrapperFactory.transmogrify(DummySqlTest.class).insertDummy(obj);
-      queue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,readyTime,accountId,notificationKey,internalCallContext);
+      queue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,readyTime,notificationKey,internalCallContext);
       log.info("Posted key: " + notificationKey);
       return null;
     }

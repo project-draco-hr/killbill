@@ -12,7 +12,7 @@
   }
 ;
   final NotificationQueue queueFred=notificationQueueService.createNotificationQueue("UtilTest","Fred",new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final Long accountRecordId,    final Long tenantRecordId){
+    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final UUID userToken,    final Long accountRecordId,    final Long tenantRecordId){
       log.info("Fred received key: " + notificationKey);
       expectedNotificationsFred.put(notificationKey,Boolean.TRUE);
       eventsReceived++;
@@ -20,7 +20,7 @@
   }
 ,config);
   final NotificationQueue queueBarney=notificationQueueService.createNotificationQueue("UtilTest","Barney",new NotificationQueueHandler(){
-    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final Long accountRecordId,    final Long tenantRecordId){
+    @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final UUID userToken,    final Long accountRecordId,    final Long tenantRecordId){
       log.info("Barney received key: " + notificationKey);
       expectedNotificationsBarney.put(notificationKey,Boolean.TRUE);
       eventsReceived++;
@@ -39,9 +39,9 @@
   entitySqlDaoTransactionalJdbiWrapper.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       entitySqlDaoWrapperFactory.transmogrify(DummySqlTest.class).insertDummy(obj);
-      queueFred.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,readyTime,accountId,notificationKeyFred,internalCallContext);
+      queueFred.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,readyTime,notificationKeyFred,internalCallContext);
       log.info("posted key: " + notificationKeyFred.toString());
-      queueBarney.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,readyTime,accountId,notificationKeyBarney,internalCallContext);
+      queueBarney.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,readyTime,notificationKeyBarney,internalCallContext);
       log.info("posted key: " + notificationKeyBarney.toString());
       return null;
     }
