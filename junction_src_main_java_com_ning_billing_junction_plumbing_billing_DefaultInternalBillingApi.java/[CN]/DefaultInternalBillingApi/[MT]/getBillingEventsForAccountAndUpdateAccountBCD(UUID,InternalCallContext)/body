@@ -15,8 +15,10 @@
  catch (  AccountApiException e) {
     log.warn("Failed while getting BillingEvent",e);
   }
-  debugLog(result,"********* Billing Events Raw");
+  final StringBuilder logStringBuilder=new StringBuilder("Computed billing events for accountId ").append(accountId);
+  eventsToString(logStringBuilder,result,"\nBilling Events Raw");
   blockCalculator.insertBlockingEvents(result,context);
-  debugLog(result,"*********  Billing Events After Blocking");
+  eventsToString(logStringBuilder,result,"\nBilling Events After Blocking");
+  log.info(logStringBuilder.toString());
   return result;
 }
