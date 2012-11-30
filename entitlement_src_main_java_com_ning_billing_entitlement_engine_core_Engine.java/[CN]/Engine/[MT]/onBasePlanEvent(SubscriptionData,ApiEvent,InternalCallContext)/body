@@ -1,26 +1,3 @@
 {
-  final DateTime now=clock.getUTCNow();
-  final Product baseProduct=(baseSubscription.getState() == SubscriptionState.CANCELLED) ? null : baseSubscription.getCurrentPlan().getProduct();
-  final List<Subscription> subscriptions=dao.getSubscriptions(baseSubscription.getBundleId(),context);
-  final Map<UUID,EntitlementEvent> addOnCancellations=new HashMap<UUID,EntitlementEvent>();
-  final Map<UUID,SubscriptionData> addOnCancellationSubscriptions=new HashMap<UUID,SubscriptionData>();
-  for (  final Subscription subscription : subscriptions) {
-    final SubscriptionData cur=(SubscriptionData)subscription;
-    if (cur.getState() == SubscriptionState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
-      continue;
-    }
-    final Plan addonCurrentPlan=cur.getCurrentPlan();
-    if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
-      final EntitlementEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(event.getEffectiveDate()).setRequestedDate(now).setUserToken(context.getUserToken()).setFromDisk(true));
-      addOnCancellations.put(cur.getId(),cancelEvent);
-      addOnCancellationSubscriptions.put(cur.getId(),cur);
-    }
-  }
-  final int addOnSize=addOnCancellations.size();
-  int cancelSeq=addOnSize - 1;
-  for (  final UUID key : addOnCancellations.keySet()) {
-    dao.cancelSubscription(addOnCancellationSubscriptions.get(key),addOnCancellations.get(key),context,cancelSeq);
-    cancelSeq--;
-  }
-  return addOnSize;
+  return apiService.cancelAddOnsIfRequired(baseSubscription,event.getEffectiveDate(),context);
 }

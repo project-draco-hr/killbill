@@ -7,7 +7,8 @@
       cancelFutureEventsFromTransaction(subscriptionId,entitySqlDaoWrapperFactory,context);
       for (      final EntitlementEvent cur : changeEventsTweakedWithMigrateBilling) {
         transactional.create(new EntitlementEventModelDao(cur),context);
-        recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
+        final boolean isBusEvent=cur.getEffectiveDate().compareTo(clock.getUTCNow()) <= 0 && (cur.getType() == EventType.API_USER);
+        recordBusOrFutureNotificationFromTransaction(subscription,cur,entitySqlDaoWrapperFactory,isBusEvent,0,context);
       }
       final EntitlementEvent finalEvent=changeEventsTweakedWithMigrateBilling.get(changeEvents.size() - 1);
       notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,finalEvent,context);
