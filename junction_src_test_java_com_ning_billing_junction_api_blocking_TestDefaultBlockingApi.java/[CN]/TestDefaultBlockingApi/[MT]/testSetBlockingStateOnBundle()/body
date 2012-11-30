@@ -1,7 +1,7 @@
 {
   final UUID bundleId=UUID.randomUUID();
   final Long accountRecordId=123049714L;
-  getMysqlTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
+  getDBI().withHandle(new HandleCallback<Void>(){
     @Override public Void withHandle(    final Handle handle) throws Exception {
       handle.execute("DROP TABLE IF EXISTS bundles;\n" + "CREATE TABLE bundles (\n" + "    record_id int(11) unsigned NOT NULL AUTO_INCREMENT,\n"+ "    id char(36) NOT NULL,\n"+ "    external_key varchar(64) NOT NULL,\n"+ "    account_id char(36) NOT NULL,\n"+ "    last_sys_update_date datetime,\n"+ "    account_record_id int(11) unsigned default null,\n"+ "    tenant_record_id int(11) unsigned default null,\n"+ "    PRIMARY KEY(record_id)\n"+ ") ENGINE=innodb;");
       handle.execute("insert into bundles (id, external_key, account_id, account_record_id) values (?, 'foo', ?, ?)",bundleId.toString(),UUID.randomUUID().toString(),accountRecordId);
@@ -13,7 +13,7 @@
   blockingApi.setBlockingState(blockingState,internalCallContext);
   final BlockingState resultState=blockingApi.getBlockingStateFor(bundleId,internalCallContext);
   Assert.assertEquals(resultState.getStateName(),blockingState.getStateName());
-  getMysqlTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
+  getDBI().withHandle(new HandleCallback<Void>(){
     @Override public Void withHandle(    final Handle handle) throws Exception {
       final List<Map<String,Object>> values=handle.select("select account_record_id from blocking_states where id = ?",bundleId.toString());
       Assert.assertEquals(values.size(),1);

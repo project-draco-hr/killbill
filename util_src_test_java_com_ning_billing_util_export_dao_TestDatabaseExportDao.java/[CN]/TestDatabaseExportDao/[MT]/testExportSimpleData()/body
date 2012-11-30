@@ -12,12 +12,12 @@
   final String updatedBy=UUID.randomUUID().toString().substring(0,4);
   final String tableNameA="test_database_export_dao_a";
   final String tableNameB="test_database_export_dao_b";
-  getMysqlTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
+  getDBTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
     @Override public Void withHandle(    final Handle handle) throws Exception {
       handle.execute("drop table if exists " + tableNameA);
-      handle.execute("create table " + tableNameA + "(record_id int(11) unsigned not null auto_increment,"+ "a_column char default 'a',"+ "account_record_id int(11) unsigned not null,"+ "tenant_record_id int(11) unsigned default 0,"+ "primary key(record_id)) engine=innodb;");
+      handle.execute("create table " + tableNameA + "(record_id int(11) unsigned not null auto_increment,"+ "a_column char default 'a',"+ "account_record_id int(11) unsigned not null,"+ "tenant_record_id int(11) unsigned default 0,"+ "primary key(record_id));");
       handle.execute("drop table if exists " + tableNameB);
-      handle.execute("create table " + tableNameB + "(record_id int(11) unsigned not null auto_increment,"+ "b_column char default 'b',"+ "account_record_id int(11) unsigned not null,"+ "tenant_record_id int(11) unsigned default 0,"+ "primary key(record_id)) engine=innodb;");
+      handle.execute("create table " + tableNameB + "(record_id int(11) unsigned not null auto_increment,"+ "b_column char default 'b',"+ "account_record_id int(11) unsigned not null,"+ "tenant_record_id int(11) unsigned default 0,"+ "primary key(record_id));");
       handle.execute("insert into " + tableNameA + " (account_record_id, tenant_record_id) values (?, ?)",internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId());
       handle.execute("insert into " + tableNameB + " (account_record_id, tenant_record_id) values (?, ?)",internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId());
       handle.execute("insert into accounts (record_id, id, email, name, first_name_length, is_notified_for_invoices, created_date, created_by, updated_date, updated_by, tenant_record_id) " + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",internalCallContext.getAccountRecordId(),accountId,accountEmail,accountName,firstNameLength,isNotifiedForInvoices,createdDate,createdBy,updatedDate,updatedBy,internalCallContext.getTenantRecordId());

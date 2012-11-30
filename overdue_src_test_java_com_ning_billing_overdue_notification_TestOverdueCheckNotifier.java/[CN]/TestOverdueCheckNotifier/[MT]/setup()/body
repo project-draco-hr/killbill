@@ -10,9 +10,7 @@
       final CatalogConfig catalogConfig=new ConfigurationObjectFactory(System.getProperties()).build(CatalogConfig.class);
       bind(CatalogConfig.class).toInstance(catalogConfig);
       bind(CatalogService.class).to(DefaultCatalogService.class).asEagerSingleton();
-      final MysqlTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getMysqlTestingHelper();
-      bind(MysqlTestingHelper.class).toInstance(helper);
-      final IDBI dbi=helper.getDBI();
+      final IDBI dbi=getDBI();
       bind(IDBI.class).toInstance(dbi);
       bind(TagDao.class).to(DefaultTagDao.class).asEagerSingleton();
       bind(CustomFieldDao.class).to(DefaultCustomFieldDao.class).asEagerSingleton();

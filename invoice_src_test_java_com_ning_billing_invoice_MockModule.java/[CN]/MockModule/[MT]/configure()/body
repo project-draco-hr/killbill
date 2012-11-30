@@ -6,8 +6,7 @@
   bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
   install(new TagStoreModule());
   install(new CustomFieldModule());
-  final MysqlTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getMysqlTestingHelper();
-  bind(MysqlTestingHelper.class).toInstance(helper);
+  final DBTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getDBTestingHelper();
   if (helper.isUsingLocalInstance()) {
     bind(IDBI.class).toProvider(DBIProvider.class).asEagerSingleton();
     final DbiConfig config=new ConfigurationObjectFactory(System.getProperties()).build(DbiConfig.class);

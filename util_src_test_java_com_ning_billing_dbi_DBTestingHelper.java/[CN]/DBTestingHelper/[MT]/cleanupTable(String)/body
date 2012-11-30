@@ -1,0 +1,11 @@
+{
+  log.debug("Deleting table: " + table);
+  final IDBI dbi=getDBI();
+  dbi.withHandle(new HandleCallback<Void>(){
+    @Override public Void withHandle(    final Handle handle) throws Exception {
+      handle.execute("truncate table " + table);
+      return null;
+    }
+  }
+);
+}

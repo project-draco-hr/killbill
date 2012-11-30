@@ -1,9 +1,7 @@
 {
   bind(Clock.class).to(ClockMock.class);
-  final MysqlTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getMysqlTestingHelper();
-  bind(MysqlTestingHelper.class).toInstance(helper);
-  final IDBI dbi=helper.getDBI();
+  final IDBI dbi=getDBI();
   bind(IDBI.class).toInstance(dbi);
-  final IDBI otherDbi=helper.getDBI();
+  final IDBI otherDbi=getDBI();
   bind(IDBI.class).annotatedWith(Names.named("global-lock")).toInstance(otherDbi);
 }

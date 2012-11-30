@@ -1,7 +1,7 @@
 {
   final UUID accountId=UUID.randomUUID();
   final Long accountRecordId=19384012L;
-  getMysqlTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
+  getDBI().withHandle(new HandleCallback<Void>(){
     @Override public Void withHandle(    final Handle handle) throws Exception {
       handle.execute("insert into accounts (record_id, id, email, name, first_name_length, is_notified_for_invoices, created_date, created_by, updated_date, updated_by) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",accountRecordId,accountId.toString(),"yo@t.com","toto",4,false,new Date(),"i",new Date(),"j");
       return null;
@@ -13,7 +13,7 @@
   final List<CustomField> customFields=customFieldUserApi.getCustomFields(accountId,ObjectType.ACCOUNT,callContext);
   Assert.assertEquals(customFields.size(),1);
   Assert.assertEquals(customFields.get(0),customField);
-  getMysqlTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
+  getDBTestingHelper().getDBI().withHandle(new HandleCallback<Void>(){
     @Override public Void withHandle(    final Handle handle) throws Exception {
       final List<Map<String,Object>> values=handle.select("select account_record_id from custom_fields where object_id = ?",accountId.toString());
       Assert.assertEquals(values.size(),1);
