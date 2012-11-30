@@ -4,7 +4,7 @@
       handle.setStatementLocator(new StringTemplate3StatementLocator(TimelineSqlDao.class));
       ResultIterator<TimelineChunk> iterator=null;
       try {
-        final Query<Map<String,Object>> query=handle.createQuery("getSamplesBySourceIdsAndMetricIds").bind("startTime",DateTimeUtils.unixSeconds(startTime)).bind("endTime",DateTimeUtils.unixSeconds(endTime)).define("sourceIds",JOINER.join(sourceIdList));
+        final Query<Map<String,Object>> query=handle.createQuery("getSamplesBySourceRecordIdsAndMetricRecordIds").bind("startTime",DateTimeUtils.unixSeconds(startTime)).bind("endTime",DateTimeUtils.unixSeconds(endTime)).bind("tenantRecordId",context.getTenantRecordId()).define("sourceIds",JOINER.join(sourceIdList));
         if (metricIdList != null && !metricIdList.isEmpty()) {
           query.define("metricIds",JOINER.join(metricIdList));
         }
