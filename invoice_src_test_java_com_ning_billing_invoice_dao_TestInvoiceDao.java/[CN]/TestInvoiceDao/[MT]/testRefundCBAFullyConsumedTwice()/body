@@ -8,6 +8,10 @@
   createInvoiceItem(fixedItem1,internalCallContext);
   createInvoiceItem(repairAdjInvoiceItem,internalCallContext);
   createInvoiceItem(creditBalanceAdjInvoiceItem1,internalCallContext);
+  final BigDecimal paymentAmount=new BigDecimal("10.00");
+  final UUID paymentId=UUID.randomUUID();
+  final DefaultInvoicePayment defaultInvoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice1.getId(),clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD);
+  invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment),internalCallContext);
   final DefaultInvoice invoice2=new DefaultInvoice(accountId,clock.getUTCToday(),clock.getUTCToday(),Currency.USD);
   final InvoiceItem fixedItem2=new FixedPriceInvoiceItem(invoice2.getId(),invoice1.getAccountId(),null,null,UUID.randomUUID().toString(),UUID.randomUUID().toString(),clock.getUTCToday(),new BigDecimal("5"),Currency.USD);
   final CreditBalanceAdjInvoiceItem creditBalanceAdjInvoiceItem2=new CreditBalanceAdjInvoiceItem(fixedItem2.getInvoiceId(),fixedItem2.getAccountId(),fixedItem2.getStartDate(),fixedItem2.getAmount().negate(),fixedItem2.getCurrency());
@@ -21,12 +25,12 @@
   createInvoiceItem(fixedItem3,internalCallContext);
   createInvoiceItem(creditBalanceAdjInvoiceItem3,internalCallContext);
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,internalCallContext).doubleValue(),0.00);
+  verifyInvoice(invoice1.getId(),0.00,10.00);
+  verifyInvoice(invoice2.getId(),0.00,-5.00);
+  verifyInvoice(invoice3.getId(),0.00,-5.00);
+  invoiceDao.createRefund(paymentId,paymentAmount,false,ImmutableMap.<UUID,BigDecimal>of(),UUID.randomUUID(),internalCallContext);
+  Assert.assertEquals(invoiceDao.getAccountCBA(accountId,internalCallContext).doubleValue(),0.00);
   verifyInvoice(invoice1.getId(),10.00,10.00);
   verifyInvoice(invoice2.getId(),0.00,-5.00);
   verifyInvoice(invoice3.getId(),0.00,-5.00);
-  invoiceDao.deleteCBA(accountId,invoice1.getId(),creditBalanceAdjInvoiceItem1.getId(),internalCallContext);
-  Assert.assertEquals(invoiceDao.getAccountCBA(accountId,internalCallContext).doubleValue(),0.00);
-  verifyInvoice(invoice1.getId(),0.00,0.00);
-  verifyInvoice(invoice2.getId(),5.00,0.00);
-  verifyInvoice(invoice3.getId(),5.00,0.00);
 }
