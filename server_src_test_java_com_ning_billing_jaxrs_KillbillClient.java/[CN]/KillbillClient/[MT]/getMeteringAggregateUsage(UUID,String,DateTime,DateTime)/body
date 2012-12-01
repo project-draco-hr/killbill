@@ -1,0 +1,8 @@
+{
+  final String meterURI=JaxrsResource.METER_PATH + "/" + bundleId.toString();
+  final Response meterResponse=doGet(meterURI,ImmutableMap.<String,String>of(JaxrsResource.QUERY_METER_CATEGORY,category,JaxrsResource.QUERY_METER_FROM,from.toString(),JaxrsResource.QUERY_METER_TO,to.toString(),JaxrsResource.QUERY_METER_WITH_AGGREGATE,"true"),DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(meterResponse.getStatusCode(),Status.OK.getStatusCode());
+  return mapper.readValue(meterResponse.getResponseBody(),new TypeReference<List<Map<String,Object>>>(){
+  }
+);
+}

@@ -1,0 +1,18 @@
+{
+  for (  final TimelineChunk chunk : chunksForHostAndSampleKind) {
+    if (decodeSamples) {
+      writer.writeValue(generator,new TimelineChunkDecoded(chunk,sampleCoder));
+    }
+ else {
+      final String hostName=timelineDao.getSource(chunk.getSourceId(),context);
+      final CategoryRecordIdAndMetric categoryIdAndSampleKind=timelineDao.getCategoryIdAndMetric(chunk.getMetricId(),context);
+      final String eventCategory=timelineDao.getEventCategory(categoryIdAndSampleKind.getEventCategoryId(),context);
+      final String sampleKind=categoryIdAndSampleKind.getMetric();
+      final DecimatingSampleFilter filter=filters.get(chunk.getSourceId()).get(chunk.getMetricId());
+      final String samples=filter == null ? CSVConsumer.getSamplesAsCSV(sampleCoder,chunk) : CSVConsumer.getSamplesAsCSV(sampleCoder,chunk,filter);
+      if (!Strings.isNullOrEmpty(samples)) {
+        generator.writeObject(new SamplesForMetricAndSource(hostName,eventCategory,sampleKind,samples));
+      }
+    }
+  }
+}

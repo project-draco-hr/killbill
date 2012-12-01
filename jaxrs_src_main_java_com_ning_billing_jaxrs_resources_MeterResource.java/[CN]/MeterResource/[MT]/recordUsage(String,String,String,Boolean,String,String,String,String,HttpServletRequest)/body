@@ -1,0 +1,18 @@
+{
+  final UUID bundleId=UUID.fromString(bundleIdString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final DateTime timestamp;
+  if (timestampString == null) {
+    timestamp=clock.getUTCNow();
+  }
+ else {
+    timestamp=DATE_TIME_FORMATTER.parseDateTime(timestampString);
+  }
+  if (withAggregate) {
+    meterApi.incrementUsageAndAggregate(bundleId,categoryName,metricName,timestamp,callContext);
+  }
+ else {
+    meterApi.incrementUsage(bundleId,categoryName,metricName,timestamp,callContext);
+  }
+  return Response.ok().build();
+}
