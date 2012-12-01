@@ -1,5 +1,7 @@
 {
   timelineDao=new DefaultTimelineDao(getDBI());
-  final MeterConfig config=new ConfigurationObjectFactory(System.getProperties()).build(MeterConfig.class);
+  final Properties properties=System.getProperties();
+  properties.put("killbill.usage.timelines.chunksToAggregate","2,2");
+  final MeterConfig config=new ConfigurationObjectFactory(properties).build(MeterConfig.class);
   aggregator=new TimelineAggregator(getDBI(),timelineDao,timelineCoder,sampleCoder,config,internalCallContextFactory);
 }
