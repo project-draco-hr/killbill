@@ -12,7 +12,7 @@
           transInvoiceItemSqlDao.create(invoiceItemModelDao,context);
         }
         useExistingCBAFromTransaction(invoice.getAccountId(),entitySqlDaoWrapperFactory,context);
-        notifyOfFutureBillingEvents(entitySqlDaoWrapperFactory,invoice.getAccountId(),callbackDateTimePerSubscriptions);
+        notifyOfFutureBillingEvents(entitySqlDaoWrapperFactory,invoice.getAccountId(),callbackDateTimePerSubscriptions,context.getUserToken());
         final InvoicePaymentSqlDao invoicePaymentSqlDao=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
         invoicePaymentSqlDao.batchCreateFromTransaction(invoicePayments,context);
       }

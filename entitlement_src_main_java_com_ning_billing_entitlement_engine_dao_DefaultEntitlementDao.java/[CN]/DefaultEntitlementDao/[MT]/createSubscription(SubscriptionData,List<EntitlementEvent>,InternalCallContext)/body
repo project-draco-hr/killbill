@@ -6,7 +6,8 @@
       final EntitlementEventSqlDao eventsDaoFromSameTransaction=entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class);
       for (      final EntitlementEvent cur : initialEvents) {
         eventsDaoFromSameTransaction.create(new EntitlementEventModelDao(cur),context);
-        recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cur.getEffectiveDate(),new EntitlementNotificationKey(cur.getId()),context);
+        final boolean isBusEvent=cur.getEffectiveDate().compareTo(clock.getUTCNow()) <= 0 && (cur.getType() == EventType.API_USER);
+        recordBusOrFutureNotificationFromTransaction(subscription,cur,entitySqlDaoWrapperFactory,isBusEvent,0,context);
       }
       if (initialEvents.size() > 0) {
         notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,initialEvents.get(initialEvents.size() - 1),context);

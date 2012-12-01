@@ -2,6 +2,7 @@
   final UUID subscriptionId=subscription.getId();
   cancelFutureEventsFromTransaction(subscriptionId,entitySqlDaoWrapperFactory,context);
   entitySqlDaoWrapperFactory.become(EntitlementEventSqlDao.class).create(new EntitlementEventModelDao(cancelEvent),context);
-  recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,cancelEvent.getEffectiveDate(),new EntitlementNotificationKey(cancelEvent.getId(),seqId),context);
+  final boolean isBusEvent=cancelEvent.getEffectiveDate().compareTo(clock.getUTCNow()) <= 0;
+  recordBusOrFutureNotificationFromTransaction(subscription,cancelEvent,entitySqlDaoWrapperFactory,isBusEvent,seqId,context);
   notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,cancelEvent,context);
 }
