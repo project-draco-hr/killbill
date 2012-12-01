@@ -11,8 +11,8 @@
   if (endTime == null) {
     endTime=timestamp;
   }
- else   if (!timestamp.isAfter(endTime)) {
-    log.warn("Adding samples for host {}, timestamp {} is not after the end time {}; ignored",new Object[]{sourceId,dateFormatter.print(timestamp),dateFormatter.print(endTime)});
+ else   if (timestamp.isBefore(endTime)) {
+    log.warn("Adding samples for host {}, timestamp {} is before the end time {}; ignored",new Object[]{sourceId,dateFormatter.print(timestamp),dateFormatter.print(endTime)});
     return;
   }
   sampleSequenceNumber++;

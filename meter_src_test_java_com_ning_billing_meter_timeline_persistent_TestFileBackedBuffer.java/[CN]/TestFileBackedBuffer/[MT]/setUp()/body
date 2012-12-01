@@ -1,0 +1,8 @@
+{
+  Assert.assertTrue(basePath.mkdir());
+  System.setProperty("killbill.usage.timelines.spoolDir",basePath.getAbsolutePath());
+  System.setProperty("killbill.usage.timelines.length","60s");
+  final MeterConfig config=new ConfigurationObjectFactory(System.getProperties()).build(MeterConfig.class);
+  timelineEventHandler=new TimelineEventHandler(config,dao,timelineCoder,sampleCoder,new BackgroundDBChunkWriter(dao,config,internalCallContextFactory),new FileBackedBuffer(config.getSpoolDir(),"TimelineEventHandler",1024 * 1024,10));
+  dao.getOrAddSource(HOST_UUID.toString(),internalCallContext);
+}

@@ -1,0 +1,12 @@
+{
+  final AtomicLong timelineChunkSeen=new AtomicLong(0);
+  timelineDao.getSamplesBySourceIdsAndMetricIds(ImmutableList.<Integer>of(hostId),ImmutableList.<Integer>of(minHeapUsedKindId,maxHeapUsedKindId),START_TIME.minusMinutes(startTimeMinutesAgo),START_TIME.minusMinutes(endTimeMinutesAgo),new TimelineChunkConsumer(){
+    @Override public void processTimelineChunk(    final TimelineChunk chunk){
+      Assert.assertEquals((Integer)chunk.getSourceId(),hostId);
+      Assert.assertTrue(chunk.getMetricId() == minHeapUsedKindId || chunk.getMetricId() == maxHeapUsedKindId);
+      timelineChunkSeen.incrementAndGet();
+    }
+  }
+,internalCallContext);
+  Assert.assertEquals(timelineChunkSeen.get(),expectedChunks);
+}

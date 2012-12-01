@@ -1,0 +1,26 @@
+{
+  final FileBackedBuffer fileBackedBuffer=new FileBackedBuffer(basePath.toString(),"test",765,1);
+  final Map<Integer,ScalarSample> eventMap=new HashMap<Integer,ScalarSample>();
+  eventMap.putAll(ImmutableMap.<Integer,ScalarSample>of(1,new ScalarSample(SampleOpcode.BYTE,(byte)0),2,new ScalarSample(SampleOpcode.SHORT,(short)1),3,new ScalarSample(SampleOpcode.INT,1000),4,new ScalarSample(SampleOpcode.LONG,12345678901L),5,new ScalarSample(SampleOpcode.DOUBLE,Double.MAX_VALUE)));
+  eventMap.putAll(ImmutableMap.<Integer,ScalarSample>of(6,new ScalarSample(SampleOpcode.FLOAT,Float.NEGATIVE_INFINITY),7,new ScalarSample(SampleOpcode.STRING,"pwet")));
+  final DateTime firstTime=new DateTime(DateTimeZone.UTC).minusSeconds(NB_EVENTS * 30);
+  for (int i=0; i < NB_EVENTS; i++) {
+    final SourceSamplesForTimestamp samples=new SourceSamplesForTimestamp(HOST_ID,"something",firstTime.plusSeconds(30 * i),eventMap);
+    fileBackedBuffer.append(samples);
+  }
+  final Replayer replayer=new Replayer(new File(basePath.toString()).getAbsolutePath());
+  final List<SourceSamplesForTimestamp> hostSamples=replayer.readAll();
+  Assert.assertEquals(hostSamples.size(),EVENTS_ON_DISK);
+  final MockTimelineDao dao=new MockTimelineDao();
+  final TimelineSourceEventAccumulator accumulator=new TimelineSourceEventAccumulator(dao,timelineCoder,sampleCoder,HOST_ID,EVENT_CATEGORY_ID,hostSamples.get(0).getTimestamp(),internalCallContextFactory);
+  for (  final SourceSamplesForTimestamp samplesFound : hostSamples) {
+    accumulator.addSourceSamples(samplesFound);
+  }
+  Assert.assertTrue(accumulator.checkSampleCounts(EVENTS_ON_DISK));
+  accumulator.extractAndQueueTimelineChunks();
+  Assert.assertEquals(dao.getTimelineChunks().keySet().size(),7);
+  for (  final TimelineChunk chunk : dao.getTimelineChunks().values()) {
+    Assert.assertEquals(chunk.getSourceId(),HOST_ID);
+    Assert.assertEquals(chunk.getSampleCount(),EVENTS_ON_DISK);
+  }
+}

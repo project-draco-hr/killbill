@@ -1,0 +1,32 @@
+{
+  log.info("Writing files to " + basePath);
+  final List<File> binFiles=new ArrayList<File>();
+  final List<DateTime> timestampsRecorded=new ArrayList<DateTime>();
+  final List<String> categoriesRecorded=new ArrayList<String>();
+  Assert.assertEquals(timelineEventHandler.getBackingBuffer().getFilesCreated(),0);
+  findBinFiles(binFiles,basePath);
+  Assert.assertEquals(binFiles.size(),0);
+  final DateTime startTime=new DateTime(DateTimeZone.UTC);
+  for (int i=0; i < NB_EVENTS; i++) {
+    final String category=UUID.randomUUID().toString();
+    final DateTime eventTimestamp=startTime.plusSeconds(i);
+    timelineEventHandler.record(HOST_UUID.toString(),category,eventTimestamp,EVENT,internalCallContext);
+    timestampsRecorded.add(eventTimestamp);
+    categoriesRecorded.add(category);
+  }
+  final long bytesOnDisk=timelineEventHandler.getBackingBuffer().getBytesOnDisk();
+  Assert.assertTrue(timelineEventHandler.getBackingBuffer().getFilesCreated() > 0);
+  binFiles.clear();
+  findBinFiles(binFiles,basePath);
+  Assert.assertTrue(binFiles.size() > 0);
+  log.info("Sent {} events and wrote {} bytes on disk ({} bytes/event)",new Object[]{NB_EVENTS,bytesOnDisk,bytesOnDisk / NB_EVENTS});
+  final Replayer replayer=new Replayer(basePath.getAbsolutePath());
+  final List<SourceSamplesForTimestamp> eventsReplayed=replayer.readAll();
+  for (int i=0; i < eventsReplayed.size(); i++) {
+    Assert.assertEquals(eventsReplayed.get(i).getTimestamp().toDateTime(DateTimeZone.UTC),timestampsRecorded.get(i));
+    Assert.assertEquals(eventsReplayed.get(i).getCategory(),categoriesRecorded.get(i));
+  }
+  binFiles.clear();
+  findBinFiles(binFiles,basePath);
+  Assert.assertEquals(binFiles.size(),0);
+}

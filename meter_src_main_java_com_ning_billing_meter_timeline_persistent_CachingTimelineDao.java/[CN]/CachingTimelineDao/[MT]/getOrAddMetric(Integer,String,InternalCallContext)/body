@@ -1,0 +1,9 @@
+{
+  final CategoryRecordIdAndMetric categoryRecordIdAndMetric=new CategoryRecordIdAndMetric(eventCategoryId,metric);
+  Integer metricId=metricsCache.inverse().get(categoryRecordIdAndMetric);
+  if (metricId == null) {
+    metricId=delegate.getOrAddMetric(eventCategoryId,metric,context);
+    metricsCache.put(metricId,categoryRecordIdAndMetric);
+  }
+  return metricId;
+}

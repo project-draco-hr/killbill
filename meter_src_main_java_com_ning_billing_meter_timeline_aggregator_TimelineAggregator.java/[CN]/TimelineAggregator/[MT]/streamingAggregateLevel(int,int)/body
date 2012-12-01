@@ -25,7 +25,7 @@
   try {
     dbi.withHandle(new HandleCallback<Void>(){
       @Override public Void withHandle(      final Handle handle) throws Exception {
-        final Query<Map<String,Object>> query=handle.createQuery("getStreamingAggregationCandidates").setFetchSize(Integer.MIN_VALUE).bind("aggregationLevel",aggregationLevel);
+        final Query<Map<String,Object>> query=handle.createQuery("getStreamingAggregationCandidates").setFetchSize(Integer.MIN_VALUE).bind("aggregationLevel",aggregationLevel).bind("tenantRecordId",createCallContext().getTenantRecordId());
         query.setStatementLocator(new StringTemplate3StatementLocator(TimelineAggregatorSqlDao.class));
         ResultIterator<TimelineChunk> iterator=null;
         try {

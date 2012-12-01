@@ -1,0 +1,19 @@
+{
+  for (  final Integer hostId : samplesPerHostAndSampleKind.keySet()) {
+    if (hostIds.indexOf(hostId) == -1) {
+      continue;
+    }
+    final Map<Integer,List<TimelineChunk>> samplesPerSampleKind=samplesPerHostAndSampleKind.get(hostId);
+    for (    final Integer sampleKindId : samplesPerSampleKind.keySet()) {
+      if (sampleKindIds != null && sampleKindIds.indexOf(sampleKindId) == -1) {
+        continue;
+      }
+      for (      final TimelineChunk chunk : samplesPerSampleKind.get(sampleKindId)) {
+        if (chunk.getStartTime().isAfter(endTime) || chunk.getEndTime().isBefore(startTime)) {
+          continue;
+        }
+        chunkConsumer.processTimelineChunk(chunk);
+      }
+    }
+  }
+}

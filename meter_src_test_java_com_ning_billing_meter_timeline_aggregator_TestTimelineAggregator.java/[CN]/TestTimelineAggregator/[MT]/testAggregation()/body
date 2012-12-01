@@ -1,0 +1,31 @@
+{
+  hostId=timelineDao.getOrAddSource(HOST_NAME,internalCallContext);
+  Assert.assertNotNull(hostId);
+  Assert.assertEquals(timelineDao.getSources(internalCallContext).values().size(),1);
+  minHeapUsedKindId=timelineDao.getOrAddMetric(EVENT_TYPE_ID,MIN_HEAPUSED_KIND,internalCallContext);
+  Assert.assertNotNull(minHeapUsedKindId);
+  maxHeapUsedKindId=timelineDao.getOrAddMetric(EVENT_TYPE_ID,MAX_HEAPUSED_KIND,internalCallContext);
+  Assert.assertNotNull(maxHeapUsedKindId);
+  Assert.assertEquals(timelineDao.getMetrics(internalCallContext).values().size(),2);
+  createAOneHourTimelineChunk(125);
+  createAOneHourTimelineChunk(60);
+  checkSamplesForATimeline(185,126,0);
+  checkSamplesForATimeline(185,125,2);
+  checkSamplesForATimeline(64,61,0);
+  checkSamplesForATimeline(125,65,2);
+  checkSamplesForATimeline(60,0,2);
+  checkSamplesForATimeline(125,0,4);
+  checkSamplesForATimeline(124,0,4);
+  checkSamplesForATimeline(124,66,2);
+  aggregator.getAndProcessTimelineAggregationCandidates();
+  Assert.assertEquals(timelineDao.getSources(internalCallContext).values().size(),1);
+  Assert.assertEquals(timelineDao.getMetrics(internalCallContext).values().size(),2);
+  checkSamplesForATimeline(185,126,0);
+  checkSamplesForATimeline(185,125,2);
+  checkSamplesForATimeline(64,61,2);
+  checkSamplesForATimeline(125,65,2);
+  checkSamplesForATimeline(60,0,2);
+  checkSamplesForATimeline(125,0,2);
+  checkSamplesForATimeline(124,0,2);
+  checkSamplesForATimeline(124,66,2);
+}

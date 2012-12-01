@@ -1,0 +1,27 @@
+{
+  final List<TimelineChunk> timelineChunkList=new ArrayList<TimelineChunk>();
+  DateTime startTime=new DateTime().minusDays(1);
+  DateTime endTime=startTime.plusHours(1);
+  final int sampleCount=120;
+  for (int i=0; i < 12; i++) {
+    for (    final int hostId : hostIds) {
+      for (      final int categoryId : categoriesForHostId.get(hostId)) {
+        final List<DateTime> dateTimes=new ArrayList<DateTime>(sampleCount);
+        for (int sc=0; sc < sampleCount; sc++) {
+          dateTimes.add(startTime.plusSeconds(sc * 30));
+        }
+        final byte[] timeBytes=timelineCoder.compressDateTimes(dateTimes);
+        for (        final int sampleKindId : categorySampleKindIds.get(categoryId)) {
+          final TimelineChunk timelineChunk=makeTimelineChunk(hostId,sampleKindId,startTime,endTime,timeBytes,sampleCount);
+          addChunkAndMaybeSave(timelineChunkList,timelineChunk);
+        }
+      }
+    }
+    if (timelineChunkList.size() > 0) {
+      defaultTimelineDAO.bulkInsertTimelineChunks(timelineChunkList,internalCallContext);
+    }
+    log.info("After hour %d, inserted %d TimelineChunk rows",i,timelineChunkIdCounter.get());
+    startTime=endTime;
+    endTime=endTime.plusHours(1);
+  }
+}

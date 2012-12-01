@@ -1,0 +1,25 @@
+{
+  final DateTime startTime=new DateTime(DateTimeZone.UTC);
+  final TimelineSourceEventAccumulator accumulator=new TimelineSourceEventAccumulator(dao,timelineCoder,sampleCoder,HOST_ID,EVENT_CATEGORY_ID,startTime,internalCallContextFactory);
+  final int sampleCount=5;
+  final int sampleKindId=1;
+  sendData(accumulator,startTime,sampleCount,sampleKindId);
+  Assert.assertEquals(accumulator.getStartTime(),startTime);
+  Assert.assertEquals(accumulator.getEndTime(),startTime.plusSeconds(sampleCount - 1));
+  Assert.assertEquals(accumulator.getSourceId(),HOST_ID);
+  Assert.assertEquals(accumulator.getTimelines().size(),1);
+  Assert.assertEquals(accumulator.getTimelines().get(sampleKindId).getSampleCount(),sampleCount);
+  Assert.assertEquals(accumulator.getTimelines().get(sampleKindId).getMetricId(),sampleKindId);
+  final DateTime secondStartTime=startTime.plusSeconds(sampleCount + 1);
+  final int secondSampleCount=15;
+  final int secondSampleKindId=2;
+  sendData(accumulator,secondStartTime,secondSampleCount,secondSampleKindId);
+  Assert.assertEquals(accumulator.getStartTime(),startTime);
+  Assert.assertEquals(accumulator.getEndTime(),secondStartTime.plusSeconds(secondSampleCount - 1));
+  Assert.assertEquals(accumulator.getSourceId(),HOST_ID);
+  Assert.assertEquals(accumulator.getTimelines().size(),2);
+  Assert.assertEquals(accumulator.getTimelines().get(sampleKindId).getSampleCount(),sampleCount + secondSampleCount);
+  Assert.assertEquals(accumulator.getTimelines().get(sampleKindId).getMetricId(),sampleKindId);
+  Assert.assertEquals(accumulator.getTimelines().get(secondSampleKindId).getSampleCount(),sampleCount + secondSampleCount);
+  Assert.assertEquals(accumulator.getTimelines().get(secondSampleKindId).getMetricId(),secondSampleKindId);
+}

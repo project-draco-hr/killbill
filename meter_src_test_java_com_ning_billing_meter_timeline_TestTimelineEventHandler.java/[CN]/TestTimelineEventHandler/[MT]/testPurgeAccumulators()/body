@@ -1,0 +1,15 @@
+{
+  System.setProperty("arecibo.collector.timelines.spoolDir",basePath.getAbsolutePath());
+  final MeterConfig config=new ConfigurationObjectFactory(System.getProperties()).build(MeterConfig.class);
+  final TimelineEventHandler handler=new TimelineEventHandler(config,dao,timelineCoder,sampleCoder,new BackgroundDBChunkWriter(dao,config,internalCallContextFactory),new MockFileBackedBuffer());
+  Assert.assertEquals(handler.getAccumulators().size(),0);
+  processOneEvent(handler,1,"eventType1","sampleKind1",new DateTime());
+  sleep(20);
+  final DateTime purgeBeforeTime=new DateTime();
+  sleep(20);
+  processOneEvent(handler,1,"eventType2","sampleKind2",new DateTime());
+  Assert.assertEquals(handler.getAccumulators().size(),2);
+  handler.purgeOldSourcesAndAccumulators(purgeBeforeTime);
+  final Collection<TimelineSourceEventAccumulator> accumulators=handler.getAccumulators();
+  Assert.assertEquals(accumulators.size(),1);
+}

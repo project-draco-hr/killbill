@@ -1,0 +1,26 @@
+{
+  final DateTime startTime=new DateTime(DateTimeZone.UTC);
+  for (int i=0; i < NB_EVENTS; i++) {
+    timelineEventHandler.record(HOST_UUID.toString(),EVENT_TYPE,startTime,EVENT,internalCallContext);
+  }
+  final DateTime endTime=new DateTime(DateTimeZone.UTC);
+  final Integer hostId=dao.getSourceId(HOST_UUID.toString(),internalCallContext);
+  Assert.assertNotNull(hostId);
+  final Integer sampleKindAId=dao.getMetricId(eventTypeId,SAMPLE_KIND_A,internalCallContext);
+  Assert.assertNotNull(sampleKindAId);
+  final Integer sampleKindBId=dao.getMetricId(eventTypeId,SAMPLE_KIND_B,internalCallContext);
+  Assert.assertNotNull(sampleKindBId);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,null,null,internalCallContext).size(),2);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,startTime,null,internalCallContext).size(),2);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,null,endTime,internalCallContext).size(),2);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,startTime,endTime,internalCallContext).size(),2);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,sampleKindAId,startTime,endTime,internalCallContext).size(),1);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,sampleKindBId,startTime,endTime,internalCallContext).size(),1);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,sampleKindBId,startTime.minusSeconds(1),endTime,internalCallContext).size(),1);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,sampleKindBId,startTime,endTime.plusSeconds(1),internalCallContext).size(),1);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,sampleKindBId,startTime.minusSeconds(1),endTime.plusSeconds(1),internalCallContext).size(),1);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,Integer.MAX_VALUE,startTime,endTime,internalCallContext).size(),0);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,startTime.plusMinutes(1),endTime,internalCallContext).size(),0);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(hostId,startTime,endTime.minusMinutes(1),internalCallContext).size(),0);
+  Assert.assertEquals(timelineEventHandler.getInMemoryTimelineChunks(Integer.MAX_VALUE,startTime,endTime,internalCallContext).size(),0);
+}
