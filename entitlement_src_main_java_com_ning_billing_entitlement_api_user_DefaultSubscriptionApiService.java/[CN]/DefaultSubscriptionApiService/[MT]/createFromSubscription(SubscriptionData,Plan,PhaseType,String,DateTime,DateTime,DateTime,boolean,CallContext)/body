@@ -2,7 +2,7 @@
   final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
   try {
     final TimedPhase[] curAndNextPhases=planAligner.getCurrentAndNextTimedPhaseOnCreate(subscription,plan,initialPhase,realPriceList,requestedDate,effectiveDate);
-    final ApiEventBuilder createBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(plan.getName()).setEventPlanPhase(curAndNextPhases[0].getPhase().getName()).setEventPriceList(realPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(processedDate).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setUserToken(context.getUserToken()).setFromDisk(true);
+    final ApiEventBuilder createBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(plan.getName()).setEventPlanPhase(curAndNextPhases[0].getPhase().getName()).setEventPriceList(realPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(processedDate).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true);
     final ApiEvent creationEvent=(reCreate) ? new ApiEventReCreate(createBuilder) : new ApiEventCreate(createBuilder);
     final TimedPhase nextTimedPhase=curAndNextPhases[1];
     final PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,processedDate,nextTimedPhase.getStartPhase()) : null;
