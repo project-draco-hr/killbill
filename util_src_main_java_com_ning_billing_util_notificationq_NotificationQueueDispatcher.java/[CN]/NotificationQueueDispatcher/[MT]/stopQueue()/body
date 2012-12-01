@@ -1,0 +1,18 @@
+{
+  if (config.isNotificationProcessingOff()) {
+    return;
+  }
+  if (isStarted.get()) {
+    int nbQueueStarted=0;
+synchronized (queues) {
+      for (      NotificationQueue cur : queues.values()) {
+        if (cur.isStarted()) {
+          nbQueueStarted++;
+        }
+      }
+    }
+    if (nbQueueStarted == 0 && (isStarted.compareAndSet(true,false))) {
+      super.stopQueue();
+    }
+  }
+}

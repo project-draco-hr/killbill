@@ -1,14 +1,15 @@
 {
   final Map<NotificationKey,Boolean> expectedNotifications=new TreeMap<NotificationKey,Boolean>();
-  final DefaultNotificationQueue queue=new DefaultNotificationQueue(dbi,clock,"test-svc","many",new NotificationQueueHandler(){
+  final NotificationQueue queue=queueService.createNotificationQueue("test-svc","many",new NotificationQueueHandler(){
     @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final UUID userToken,    final Long accountRecordId,    final Long tenantRecordId){
 synchronized (expectedNotifications) {
+        log.info("Handler received key: " + notificationKey.toString());
         expectedNotifications.put(notificationKey,Boolean.TRUE);
         expectedNotifications.notify();
       }
     }
   }
-,getNotificationConfig(false,100,10,10000),new InternalCallContextFactory(dbi,clock));
+);
   queue.startQueue();
   final DateTime now=clock.getUTCNow();
   final int MAX_NOTIFICATIONS=100;
@@ -17,7 +18,7 @@ synchronized (expectedNotifications) {
     final UUID key=UUID.randomUUID();
     final DummyObject obj=new DummyObject("foo",key);
     final int currentIteration=i;
-    final NotificationKey notificationKey=new TestNotificationKey(key.toString());
+    final NotificationKey notificationKey=new TestNotificationKey(new Integer(i).toString());
     expectedNotifications.put(notificationKey,Boolean.FALSE);
     entitySqlDaoTransactionalJdbiWrapper.execute(new EntitySqlDaoTransactionWrapper<Void>(){
       @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
@@ -48,6 +49,7 @@ synchronized (expectedNotifications) {
         success=true;
         break;
       }
+      log.info(String.format("BEFORE WAIT : Got %d notifications at time %s (real time %s)",completed.size(),clock.getUTCNow(),new DateTime()));
       expectedNotifications.wait(1000);
     }
   }

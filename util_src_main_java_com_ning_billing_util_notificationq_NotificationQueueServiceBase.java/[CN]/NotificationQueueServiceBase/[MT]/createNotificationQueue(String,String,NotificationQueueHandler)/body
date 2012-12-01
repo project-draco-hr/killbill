@@ -1,0 +1,16 @@
+{
+  if (svcName == null || queueName == null || handler == null) {
+    throw new RuntimeException("Need to specify all parameters");
+  }
+  final String compositeName=getCompositeName(svcName,queueName);
+  NotificationQueue result=null;
+synchronized (queues) {
+    result=queues.get(compositeName);
+    if (result != null) {
+      throw new NotificationQueueAlreadyExists(String.format("Queue for svc %s and name %s already exist",svcName,queueName));
+    }
+    result=createNotificationQueueInternal(svcName,queueName,handler);
+    queues.put(compositeName,result);
+  }
+  return result;
+}

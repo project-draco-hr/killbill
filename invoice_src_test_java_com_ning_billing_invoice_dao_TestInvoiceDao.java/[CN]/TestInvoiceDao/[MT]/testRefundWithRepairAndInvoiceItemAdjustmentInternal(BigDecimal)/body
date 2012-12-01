@@ -28,13 +28,14 @@
   final boolean partialRefund=refundAmount.compareTo(amount) < 0;
   final BigDecimal cba=invoiceDao.getAccountCBA(accountId,internalCallContext);
   final InvoiceModelDao savedInvoice=invoiceDao.getById(invoice.getId(),internalCallContext);
-  assertEquals(cba.compareTo(new BigDecimal("20.0")),0);
+  final BigDecimal expectedCba=balance.compareTo(BigDecimal.ZERO) < 0 ? balance.negate() : BigDecimal.ZERO;
+  assertEquals(cba.compareTo(expectedCba),0);
   if (partialRefund) {
     assertEquals(balance.compareTo(new BigDecimal("-13.0")),0);
-    assertEquals(savedInvoice.getInvoiceItems().size(),3);
+    assertEquals(savedInvoice.getInvoiceItems().size(),4);
   }
  else {
     assertEquals(balance.compareTo(new BigDecimal("0.0")),0);
-    assertEquals(savedInvoice.getInvoiceItems().size(),3);
+    assertEquals(savedInvoice.getInvoiceItems().size(),4);
   }
 }

@@ -39,5 +39,6 @@
   balance=invoiceDao.getAccountBalance(accountId,internalCallContext);
   assertEquals(balance.compareTo(expectedFinalBalance),0);
   cba=invoiceDao.getAccountCBA(accountId,internalCallContext);
-  assertEquals(cba.compareTo(new BigDecimal("10.00")),0);
+  final BigDecimal expectedCba=balance.compareTo(BigDecimal.ZERO) < 0 ? balance.negate() : BigDecimal.ZERO;
+  assertEquals(cba.compareTo(expectedCba),0);
 }

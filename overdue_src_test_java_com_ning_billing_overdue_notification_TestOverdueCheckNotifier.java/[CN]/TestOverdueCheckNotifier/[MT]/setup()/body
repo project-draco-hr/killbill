@@ -4,7 +4,6 @@
       super.configure();
       bind(Clock.class).to(ClockMock.class).asEagerSingleton();
       bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
-      bind(NotificationQueueService.class).to(DefaultNotificationQueueService.class).asEagerSingleton();
       final InvoiceConfig invoiceConfig=new ConfigurationObjectFactory(System.getProperties()).build(InvoiceConfig.class);
       bind(InvoiceConfig.class).toInstance(invoiceConfig);
       final CatalogConfig catalogConfig=new ConfigurationObjectFactory(System.getProperties()).build(CatalogConfig.class);
@@ -20,6 +19,7 @@
       install(new MockJunctionModule());
       install(new EmailModule());
       install(new TemplateModule());
+      install(new NotificationQueueModule());
       final AccountInternalApi accountApi=Mockito.mock(AccountInternalApi.class);
       bind(AccountInternalApi.class).toInstance(accountApi);
       final EntitlementInternalApi entitlementApi=Mockito.mock(EntitlementInternalApi.class);

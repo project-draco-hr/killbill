@@ -3,7 +3,7 @@
   final NotificationKey notificationKey=new TestNotificationKey(key.toString());
   final UUID key2=UUID.randomUUID();
   final NotificationKey notificationKey2=new TestNotificationKey(key2.toString());
-  final DefaultNotificationQueue queue=new DefaultNotificationQueue(dbi,clock,"test-svc","many",new NotificationQueueHandler(){
+  final NotificationQueue queue=queueService.createNotificationQueue("test-svc","remove",new NotificationQueueHandler(){
     @Override public void handleReadyNotification(    final NotificationKey inputKey,    final DateTime eventDateTime,    final UUID userToken,    final Long accountRecordId,    final Long tenantRecordId){
       if (inputKey.equals(notificationKey) || inputKey.equals(notificationKey2)) {
         log.info("Received notification with key: " + notificationKey);
@@ -11,7 +11,7 @@
       }
     }
   }
-,getNotificationConfig(false,100,10,10000),new InternalCallContextFactory(dbi,clock));
+);
   queue.startQueue();
   final DateTime start=clock.getUTCNow().plusHours(1);
   final int nextReadyTimeIncrementMs=1000;

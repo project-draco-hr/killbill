@@ -1,0 +1,25 @@
+{
+  final Date now=getClock().getUTCNow().toDate();
+  final Date nextAvailable=getClock().getUTCNow().plus(CLAIM_TIME_MS).toDate();
+  final List<Notification> input=dao.getReadyNotifications(now,getHostname(),getMaxNotifications(),context);
+  final List<Notification> claimedNotifications=new ArrayList<Notification>();
+  for (  final Notification cur : input) {
+    final NotificationQueue queue=queues.get(cur.getQueueName());
+    if (queue == null || !queue.isStarted()) {
+      continue;
+    }
+    logDebug("about to claim notification %s,  key = %s for time %s",cur.getId(),cur.getNotificationKey(),cur.getEffectiveDate());
+    final boolean claimed=(dao.claimNotification(getHostname(),nextAvailable,cur.getId().toString(),now,context) == 1);
+    logDebug("claimed notification %s, key = %s for time %s result = %s",cur.getId(),cur.getNotificationKey(),cur.getEffectiveDate(),claimed);
+    if (claimed) {
+      claimedNotifications.add(cur);
+      dao.insertClaimedHistory(getHostname(),now,cur.getId().toString(),context);
+    }
+  }
+  for (  final Notification cur : claimedNotifications) {
+    if (cur.getOwner() != null && !cur.getOwner().equals(getHostname())) {
+      log.warn("NotificationQueue stealing notification {} from {}",new Object[]{cur,cur.getOwner()});
+    }
+  }
+  return claimedNotifications;
+}

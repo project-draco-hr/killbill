@@ -1,6 +1,6 @@
 {
   final Map<NotificationKey,Boolean> expectedNotifications=new TreeMap<NotificationKey,Boolean>();
-  final DefaultNotificationQueue queue=new DefaultNotificationQueue(dbi,clock,"test-svc","foo",new NotificationQueueHandler(){
+  final NotificationQueue queue=queueService.createNotificationQueue("test-svc","foo",new NotificationQueueHandler(){
     @Override public void handleReadyNotification(    final NotificationKey notificationKey,    final DateTime eventDateTime,    final UUID userToken,    final Long accountRecordId,    final Long tenantRecordId){
 synchronized (expectedNotifications) {
         log.info("Handler received key: " + notificationKey);
@@ -9,7 +9,7 @@ synchronized (expectedNotifications) {
       }
     }
   }
-,getNotificationConfig(false,100,1,10000),new InternalCallContextFactory(dbi,clock));
+);
   queue.startQueue();
   final UUID key=UUID.randomUUID();
   final DummyObject obj=new DummyObject("foo",key);

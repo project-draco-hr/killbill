@@ -1,0 +1,29 @@
+{
+  logDebug("ENTER doProcessEvents");
+  final List<Notification> notifications=getReadyNotifications(createCallContext(null,null));
+  if (notifications.size() == 0) {
+    logDebug("EXIT doProcessEvents");
+    return 0;
+  }
+  logDebug("doProcessEventsWithLimit date = %s, got %s",getClock().getUTCNow().toDate(),notifications.size());
+  if (limit > 0) {
+    while (notifications.size() > limit) {
+      notifications.remove(notifications.size() - 1);
+    }
+  }
+  logDebug("START processing %d events at time %s",notifications.size(),getClock().getUTCNow().toDate());
+  int result=0;
+  for (  final Notification cur : notifications) {
+    getNbProcessedEvents().incrementAndGet();
+    final NotificationKey key=deserializeEvent(cur.getNotificationKeyClass(),cur.getNotificationKey());
+    NotificationQueueHandler handler=getHandlerForActiveQueue(cur.getQueueName());
+    if (handler == null) {
+      continue;
+    }
+    handler.handleReadyNotification(key,cur.getEffectiveDate(),cur.getFutureUserToken(),cur.getAccountRecordId(),cur.getTenantRecordId());
+    result++;
+    clearNotification(cur,createCallContext(cur.getTenantRecordId(),cur.getAccountRecordId()));
+    logDebug("done handling notification %s, key = %s for time %s",cur.getId(),cur.getNotificationKey(),cur.getEffectiveDate());
+  }
+  return result;
+}
