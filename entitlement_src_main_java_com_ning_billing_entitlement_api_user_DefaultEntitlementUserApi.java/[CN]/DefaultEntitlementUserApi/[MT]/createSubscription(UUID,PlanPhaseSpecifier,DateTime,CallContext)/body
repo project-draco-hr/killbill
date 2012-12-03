@@ -26,8 +26,9 @@ case BASE:
           throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_BP_EXISTS,bundleId);
         }
  else {
-          baseSubscription.recreate(spec,requestedDate,context);
-          return baseSubscription;
+          final Subscription recreatedSubscriptionForApiUse=createSubscriptionForApiUse(baseSubscription);
+          recreatedSubscriptionForApiUse.recreate(spec,requestedDate,context);
+          return recreatedSubscriptionForApiUse;
         }
       }
     bundleStartDate=requestedDate;
