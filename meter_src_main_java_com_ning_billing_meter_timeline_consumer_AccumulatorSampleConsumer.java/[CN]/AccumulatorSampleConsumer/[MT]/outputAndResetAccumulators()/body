@@ -1,0 +1,11 @@
+{
+  if (aggregatedSampleNumber != 0) {
+    builder.append(",");
+  }
+  for (  final SampleOpcode opcode : accumulators.keySet()) {
+    aggregatedSampleNumber++;
+    sampleConsumer.consumeSample(aggregatedSampleNumber,opcode,accumulators.get(opcode),lastRoundedTime);
+  }
+  builder.append(sampleConsumer.toString());
+  accumulators.clear();
+}
