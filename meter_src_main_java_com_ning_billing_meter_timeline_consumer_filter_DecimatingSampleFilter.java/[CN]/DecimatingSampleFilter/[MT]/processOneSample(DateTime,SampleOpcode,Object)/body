@@ -1,0 +1,73 @@
+{
+  if (!initialized) {
+    final long adjustedEndMillis=Math.min(getEndTime().getMillis(),System.currentTimeMillis());
+    final long millisTilEnd=adjustedEndMillis - time.getMillis();
+    final int sampleCount=Math.max(outputCount,(int)(millisTilEnd / pollingInterval.getMillis()));
+    initializeFilterHistory(sampleCount);
+  }
+  sampleNumber++;
+  final SampleState sampleState=new SampleState(opcode,value,ScalarSample.getDoubleValue(opcode,value),time);
+  final int historyIndex=sampleNumber % filterHistory.length;
+  filterHistory[historyIndex]=sampleState;
+  runningSum+=outputsPerSample;
+  if (runningSum >= 1.0) {
+    runningSum-=1.0;
+    if (opcode == SampleOpcode.STRING) {
+      sampleProcessor.processOneSample(time,opcode,value);
+    }
+ else {
+      final int samplesInAverage=ceilSamplesPerOutput > 5 ? ceilSamplesPerOutput * 2 / 3 : Math.max(1,ceilSamplesPerOutput - 1);
+      final int samplesLeftOut=ceilSamplesPerOutput - samplesInAverage;
+      double max=Double.MIN_VALUE;
+      int maxIndex=0;
+      int minIndex=0;
+      double min=Double.MAX_VALUE;
+      double sum=0.0;
+      double firstSum=0.0;
+      double lastSum=0.0;
+      for (int i=0; i < ceilSamplesPerOutput; i++) {
+        final int index=(sampleNumber + ceilSamplesPerOutput - i) % ceilSamplesPerOutput;
+        final SampleState sample=filterHistory[index];
+        if (sample != null) {
+          final double doubleValue=sample.getDoubleValue();
+          sum+=doubleValue;
+          if (doubleValue > max) {
+            max=doubleValue;
+            maxIndex=index;
+          }
+          if (doubleValue < min) {
+            min=doubleValue;
+            minIndex=index;
+          }
+          if (i < samplesInAverage) {
+            lastSum+=doubleValue;
+          }
+          if (i >= samplesLeftOut) {
+            firstSum+=doubleValue;
+          }
+        }
+      }
+      final SampleState firstSample=filterHistory[(sampleNumber + ceilSamplesPerOutput - (ceilSamplesPerOutput - 1)) % ceilSamplesPerOutput];
+      final SampleState lastSample=filterHistory[sampleNumber % ceilSamplesPerOutput];
+      final DateTime centerTime=firstSample != null ? new DateTime((firstSample.getTime().getMillis() + lastSample.getTime().getMillis()) >> 1) : lastSample.getTime();
+switch (decimationMode) {
+case PEAK_PICK:
+        if (firstSum > lastSum) {
+          final SampleState minSample=filterHistory[minIndex];
+          sampleProcessor.processOneSample(centerTime,minSample.getSampleOpcode(),minSample.getValue());
+        }
+ else {
+          final SampleState maxSample=filterHistory[maxIndex];
+          sampleProcessor.processOneSample(centerTime,maxSample.getSampleOpcode(),maxSample.getValue());
+        }
+      break;
+case AVERAGE:
+    final double average=sum / ceilSamplesPerOutput;
+  sampleProcessor.processOneSample(centerTime,SampleOpcode.DOUBLE,average);
+break;
+default :
+throw new IllegalStateException(String.format("The decimation filter mode %s is not recognized",decimationMode));
+}
+}
+}
+}
