@@ -2,10 +2,10 @@
   final DateTime start=clock.getUTCNow();
   final List<DateTime> visits=generatePageViews(nbVisits,start);
   final DateTime end=dateTimeOrdering.max(visits);
-  final List<Map<String,Object>> meteringAggregateUsage=getMeteringAggregateUsage(bundleId,category,start,end);
+  final List<Map<String,Object>> meteringAggregateUsage=getMeteringAggregateUsage(source,category,start,end);
   final List<DateTime> visitsFound=new ArrayList<DateTime>();
   for (  final Map<String,Object> oneUsage : meteringAggregateUsage) {
-    Assert.assertEquals(oneUsage.get("sourceName"),bundleId.toString());
+    Assert.assertEquals(oneUsage.get("sourceName"),source);
     Assert.assertEquals(oneUsage.get("eventCategory"),category);
     Assert.assertEquals(oneUsage.get("metric"),"__AGGREGATE__");
     final ImmutableList<String> samples=ImmutableList.<String>copyOf(Splitter.on(",").split((String)oneUsage.get("samples")));
