@@ -1,3 +1,14 @@
 {
-  return metricsCache.inverse().get(new CategoryRecordIdAndMetric(eventCategoryId,metric));
+  Integer result=metricsCache.inverse().get(new CategoryRecordIdAndMetric(eventCategoryId,metric));
+  if (result == null) {
+    result=delegate.getMetricId(eventCategoryId,metric,context);
+    if (result != null) {
+synchronized (metricsCache) {
+        if (metricsCache.get(result) == null) {
+          metricsCache.put(result,new CategoryRecordIdAndMetric(eventCategoryId,metric));
+        }
+      }
+    }
+  }
+  return result;
 }

@@ -2,7 +2,11 @@
   Integer eventCategoryId=eventCategoriesCache.inverse().get(eventCategory);
   if (eventCategoryId == null) {
     eventCategoryId=delegate.getOrAddEventCategory(eventCategory,context);
-    eventCategoriesCache.put(eventCategoryId,eventCategory);
+synchronized (eventCategoriesCache) {
+      if (eventCategoriesCache.get(eventCategoryId) == null) {
+        eventCategoriesCache.put(eventCategoryId,eventCategory);
+      }
+    }
   }
   return eventCategoryId;
 }

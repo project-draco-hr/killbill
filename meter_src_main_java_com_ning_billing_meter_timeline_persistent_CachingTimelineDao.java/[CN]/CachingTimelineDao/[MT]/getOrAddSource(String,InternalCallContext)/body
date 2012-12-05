@@ -2,7 +2,11 @@
   Integer sourceId=sourcesCache.inverse().get(source);
   if (sourceId == null) {
     sourceId=delegate.getOrAddSource(source,context);
-    sourcesCache.put(sourceId,source);
+synchronized (sourcesCache) {
+      if (sourcesCache.get(sourceId) == null) {
+        sourcesCache.put(sourceId,source);
+      }
+    }
   }
   return sourceId;
 }

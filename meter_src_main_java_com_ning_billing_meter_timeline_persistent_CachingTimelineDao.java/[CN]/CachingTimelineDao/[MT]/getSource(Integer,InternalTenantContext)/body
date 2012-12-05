@@ -1,3 +1,14 @@
 {
-  return sourcesCache.get(sourceId);
+  String result=sourcesCache.get(sourceId);
+  if (result == null) {
+    result=delegate.getSource(sourceId,context);
+    if (result != null) {
+synchronized (sourcesCache) {
+        if (sourcesCache.get(sourceId) == null) {
+          sourcesCache.put(sourceId,result);
+        }
+      }
+    }
+  }
+  return result;
 }
