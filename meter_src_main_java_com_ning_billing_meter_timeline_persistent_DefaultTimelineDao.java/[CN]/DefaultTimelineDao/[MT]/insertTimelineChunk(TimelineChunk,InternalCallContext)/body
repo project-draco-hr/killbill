@@ -1,7 +1,11 @@
 {
-  delegate.begin();
-  delegate.insertTimelineChunk(timelineChunk,context);
-  final long timelineChunkId=delegate.getLastInsertedRecordId(context);
-  delegate.commit();
-  return timelineChunkId;
+  final Long result=delegate.inTransaction(new Transaction<Long,TimelineSqlDao>(){
+    @Override public Long inTransaction(    final TimelineSqlDao transactional,    final TransactionStatus status) throws Exception {
+      transactional.insertTimelineChunk(timelineChunk,context);
+      final long timelineChunkId=transactional.getLastInsertedRecordId(context);
+      return timelineChunkId;
+    }
+  }
+);
+  return result;
 }

@@ -1,7 +1,19 @@
 {
-  delegate.begin();
-  delegate.addSource(source,context);
-  final Integer sourceId=delegate.getSourceRecordId(source,context);
-  delegate.commit();
-  return sourceId;
+  final Integer result=delegate.inTransaction(new Transaction<Integer,TimelineSqlDao>(){
+    @Override public Integer inTransaction(    final TimelineSqlDao transactional,    final TransactionStatus status) throws Exception {
+      return getOrAddWithRetry(new Callable<Integer>(){
+        @Override public Integer call() throws Exception {
+          Integer sourceId=transactional.getSourceRecordId(source,context);
+          if (sourceId == null) {
+            transactional.addSource(source,context);
+            sourceId=transactional.getSourceRecordId(source,context);
+          }
+          return sourceId;
+        }
+      }
+);
+    }
+  }
+);
+  return result;
 }
