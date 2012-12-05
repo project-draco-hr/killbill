@@ -1,7 +1,11 @@
 {
   final List<Integer> hostIds=new ArrayList<Integer>(sources.size());
   for (  final String source : sources) {
-    hostIds.add(timelineDao.getSourceId(source,context));
+    final Integer sourceId=timelineDao.getSourceId(source,context);
+    if (sourceId == null) {
+      continue;
+    }
+    hostIds.add(sourceId);
   }
   return hostIds;
 }
