@@ -1,0 +1,28 @@
+{
+  final List<Double> outputs=new ArrayList<Double>();
+  final long millisStart=System.currentTimeMillis() - 2000 * 21;
+  final DecimatingSampleFilter filter=new DecimatingSampleFilter(new DateTime(millisStart),new DateTime(millisStart + 2000 * 21),6,21,new TimeSpan("2s"),DecimationMode.PEAK_PICK,new TimeRangeSampleProcessor(){
+    @Override public void processOneSample(    final DateTime time,    final SampleOpcode opcode,    final Object value){
+      outputs.add((double)((Double)value));
+    }
+  }
+);
+  for (int i=0; i < 21; i++) {
+    final int index=(i % 6) + 1;
+    double value=0;
+    if (index <= 3) {
+      value=10.0 * index;
+    }
+ else {
+      value=(6 - (index - 1)) * 10;
+    }
+    filter.processOneSample(new DateTime(millisStart + 2000 * i),SampleOpcode.DOUBLE,value);
+  }
+  Assert.assertEquals(outputs.size(),5);
+  final double[] expectedValues=new double[]{30.0,20.0,30.0,30.0,10.0};
+  for (int i=0; i < 5; i++) {
+    final double value=outputs.get(i);
+    final double expectedValue=expectedValues[i];
+    Assert.assertEquals(value,expectedValue);
+  }
+}

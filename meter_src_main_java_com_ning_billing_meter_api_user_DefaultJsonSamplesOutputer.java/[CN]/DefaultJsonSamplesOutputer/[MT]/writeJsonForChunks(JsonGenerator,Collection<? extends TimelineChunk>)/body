@@ -1,0 +1,12 @@
+{
+  for (  final TimelineChunk chunk : chunksForSourceAndMetric) {
+    final String source=timelineDao.getSource(chunk.getSourceId(),context);
+    final CategoryRecordIdAndMetric categoryIdAndMetric=timelineDao.getCategoryIdAndMetric(chunk.getMetricId(),context);
+    final String eventCategory=timelineDao.getEventCategory(categoryIdAndMetric.getEventCategoryId(),context);
+    final String metric=categoryIdAndMetric.getMetric();
+    final String samples=CSVConsumer.getSamplesAsCSV(sampleCoder,chunk);
+    if (!Strings.isNullOrEmpty(samples)) {
+      generator.writeObject(new SamplesForMetricAndSource(source,eventCategory,metric,samples));
+    }
+  }
+}
