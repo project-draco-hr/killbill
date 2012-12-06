@@ -1,3 +1,14 @@
 {
-  return eventCategoriesCache.inverse().get(eventCategory);
+  Integer result=eventCategoriesCache.inverse().get(eventCategory);
+  if (result == null) {
+    result=delegate.getEventCategoryId(eventCategory,context);
+    if (result != null) {
+synchronized (eventCategoriesCache) {
+        if (eventCategoriesCache.get(result) == null) {
+          eventCategoriesCache.put(result,eventCategory);
+        }
+      }
+    }
+  }
+  return result;
 }

@@ -1,3 +1,14 @@
 {
-  return sourcesCache.inverse().get(source);
+  Integer result=sourcesCache.inverse().get(source);
+  if (result == null) {
+    result=delegate.getSourceId(source,context);
+    if (result != null) {
+synchronized (sourcesCache) {
+        if (sourcesCache.get(result) == null) {
+          sourcesCache.put(result,source);
+        }
+      }
+    }
+  }
+  return result;
 }

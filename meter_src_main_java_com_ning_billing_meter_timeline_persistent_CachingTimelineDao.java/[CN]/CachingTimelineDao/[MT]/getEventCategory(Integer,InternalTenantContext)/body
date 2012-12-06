@@ -1,3 +1,14 @@
 {
-  return eventCategoriesCache.get(eventCategoryId);
+  String result=eventCategoriesCache.get(eventCategoryId);
+  if (result == null) {
+    result=delegate.getEventCategory(eventCategoryId,context);
+    if (result != null) {
+synchronized (eventCategoriesCache) {
+        if (eventCategoriesCache.get(eventCategoryId) == null) {
+          eventCategoriesCache.put(eventCategoryId,result);
+        }
+      }
+    }
+  }
+  return result;
 }
