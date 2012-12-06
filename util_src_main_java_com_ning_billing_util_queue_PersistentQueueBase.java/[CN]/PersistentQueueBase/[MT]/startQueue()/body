@@ -1,4 +1,7 @@
 {
+  if (config.isProcessingOff() || !isStarted.compareAndSet(false,true)) {
+    return;
+  }
   isProcessingEvents=true;
   curActiveThreads=0;
   final PersistentQueueBase thePersistentQ=this;
@@ -43,7 +46,7 @@ synchronized (thePersistentQ) {
         }
       }
       private void sleepALittle() throws InterruptedException {
-        Thread.sleep(sleepTimeMs);
+        Thread.sleep(config.getSleepTimeMs());
       }
     }
 );
