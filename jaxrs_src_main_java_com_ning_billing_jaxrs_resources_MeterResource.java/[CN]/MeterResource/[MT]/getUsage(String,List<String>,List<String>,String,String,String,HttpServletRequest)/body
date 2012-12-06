@@ -1,7 +1,19 @@
 {
-  final DateTime fromTimestamp=DATE_TIME_FORMATTER.parseDateTime(fromTimestampString);
-  final DateTime toTimestamp=DATE_TIME_FORMATTER.parseDateTime(toTimestampString);
   final TenantContext tenantContext=context.createContext(request);
+  final DateTime fromTimestamp;
+  if (fromTimestampString != null) {
+    fromTimestamp=DATE_TIME_FORMATTER.parseDateTime(fromTimestampString);
+  }
+ else {
+    fromTimestamp=clock.getUTCNow().minusMonths(3);
+  }
+  final DateTime toTimestamp;
+  if (toTimestampString != null) {
+    toTimestamp=DATE_TIME_FORMATTER.parseDateTime(toTimestampString);
+  }
+ else {
+    toTimestamp=clock.getUTCNow();
+  }
   return new StreamingOutput(){
     @Override public void write(    final OutputStream output) throws IOException, WebApplicationException {
       if (categories != null && categories.size() > 0) {
