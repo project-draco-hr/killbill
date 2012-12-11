@@ -34,7 +34,7 @@
           transactional.createTransition(transition,context);
           transitions.add(transition);
           log.info("Adding transition {}",transition);
-          if (SubscriptionTransitionType.CANCEL.equals(event.getTransitionType()) && clock.getUTCNow().isAfter(event.getEffectiveTransitionTime())) {
+          if (SubscriptionTransitionType.CANCEL.equals(event.getTransitionType())) {
             final BusinessSubscriptionTransitionModelDao systemCancelTransition=new BusinessSubscriptionTransitionModelDao(event.getTotalOrdering(),bundleId,bundle.getExternalKey(),bundle.getAccountId(),account.getExternalKey(),subscription.getId(),event.getEffectiveTransitionTime(),new BusinessSubscriptionEvent(BusinessSubscriptionEvent.EventType.SYSTEM_CANCEL,businessEvent.getCategory()),prevSubscription,nextSubscription);
             transactional.createTransition(systemCancelTransition,context);
             transitions.add(systemCancelTransition);
