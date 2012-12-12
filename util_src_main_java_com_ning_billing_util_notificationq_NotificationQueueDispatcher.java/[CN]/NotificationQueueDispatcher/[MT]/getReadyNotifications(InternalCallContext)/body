@@ -1,7 +1,7 @@
 {
   final Date now=getClock().getUTCNow().toDate();
   final Date nextAvailable=getClock().getUTCNow().plus(CLAIM_TIME_MS).toDate();
-  final List<Notification> input=dao.getReadyNotifications(now,getHostname(),getMaxNotifications(),context);
+  final List<Notification> input=dao.getReadyNotifications(now,getHostname(),config.getPrefetchAmount(),context);
   final List<Notification> claimedNotifications=new ArrayList<Notification>();
   for (  final Notification cur : input) {
     final NotificationQueue queue=queues.get(cur.getQueueName());
