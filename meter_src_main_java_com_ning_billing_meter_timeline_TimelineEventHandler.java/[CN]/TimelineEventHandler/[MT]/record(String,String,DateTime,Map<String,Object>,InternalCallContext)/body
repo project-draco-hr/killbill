@@ -13,7 +13,7 @@
       return;
     }
     final SourceSamplesForTimestamp sourceSamples=new SourceSamplesForTimestamp(sourceId,eventType,eventTimestamp,scalarSamples);
-    if (!replaying.get()) {
+    if (!replaying.get() && config.storeSamplesLocallyTemporary()) {
       backingBuffer.append(sourceSamples);
     }
     processSamples(sourceSamples,context);
