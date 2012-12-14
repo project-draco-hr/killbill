@@ -24,7 +24,9 @@ synchronized (thePersistentQ) {
               }
             }
             try {
-              doProcessEvents();
+              if (!isProcessingSuspended.get()) {
+                doProcessEvents();
+              }
             }
  catch (            Exception e) {
               log.warn(String.format("%s: Thread  %s  [%d] got an exception, catching and moving on...",svcQName,Thread.currentThread().getName(),Thread.currentThread().getId()),e);

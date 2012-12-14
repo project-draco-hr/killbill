@@ -20,4 +20,12 @@
   this.hostname=Hostname.get();
   this.nbProcessedEvents=new AtomicLong();
   this.queues=new TreeMap<String,NotificationQueue>();
+  this.pendingNotifications=Metrics.newGauge(NotificationQueueDispatcher.class,"pending-notifications",new Gauge<Integer>(){
+    @Override public Integer value(){
+      return dao != null ? dao.getPendingCountNotifications(clock.getUTCNow().toDate(),createCallContext(null,null)) : 0;
+    }
+  }
+);
+  this.processedNotificationsSinceStart=Metrics.newCounter(NotificationQueueDispatcher.class,"processed-notifications-since-start");
+  this.perQueueProcessingTime=new HashMap<String,Histogram>();
 }
