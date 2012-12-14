@@ -1,0 +1,11 @@
+{
+  if (allTables == null) {
+    allTables=dbiInstance.withHandle(new HandleCallback<List<String>>(){
+      @Override public List<String> withHandle(      final Handle h) throws Exception {
+        return h.createQuery("select table_name from information_schema.tables where table_catalog = :table_catalog and table_type = 'TABLE';").bind("table_catalog",DB_NAME).map(new StringMapper()).list();
+      }
+    }
+);
+  }
+  return allTables;
+}
