@@ -1,0 +1,17 @@
+{
+  if (!isFree(lockName)) {
+    return null;
+  }
+  if (locks.get(lockName) == null) {
+    locks.put(lockName,new AtomicBoolean(true));
+  }
+ else {
+    locks.get(lockName).set(true);
+  }
+  return new GlobalLock(){
+    @Override public void release(){
+      locks.get(lockName).set(false);
+    }
+  }
+;
+}
