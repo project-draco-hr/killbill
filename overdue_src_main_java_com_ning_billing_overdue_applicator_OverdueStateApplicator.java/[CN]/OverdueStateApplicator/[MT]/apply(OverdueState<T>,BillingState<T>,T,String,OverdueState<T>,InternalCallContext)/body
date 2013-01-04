@@ -1,6 +1,10 @@
 {
   try {
-    log.debug("OverdueStateApplicator <enter> : time = " + clock.getUTCNow() + ", previousState = "+ previousOverdueStateName+ ", nextState = "+ nextOverdueState);
+    if (isAccountTaggedWith_OVERDUE_ENFORCEMENT_OFF(context)) {
+      log.debug("OverdueStateApplicator:apply returns because account (recordId = " + context.getAccountRecordId() + ") is set with OVERDUE_ENFORCEMENT_OFF ");
+      return;
+    }
+    log.debug("OverdueStateApplicator:apply <enter> : time = " + clock.getUTCNow() + ", previousState = "+ previousOverdueStateName+ ", nextState = "+ nextOverdueState);
     final boolean conditionForNextNotfication=!nextOverdueState.isClearState() || (firstOverdueState != null && billingState != null && billingState.getDateOfEarliestUnpaidInvoice() != null);
     if (conditionForNextNotfication) {
       final Period reevaluationInterval=nextOverdueState.isClearState() ? firstOverdueState.getReevaluationInterval() : nextOverdueState.getReevaluationInterval();
@@ -20,7 +24,7 @@
     }
   }
   if (nextOverdueState.isClearState()) {
-    clear(overdueable,context);
+    clearFutureNotification(overdueable,context);
   }
   try {
     bus.post(createOverdueEvent(overdueable,previousOverdueStateName,nextOverdueState.getName(),context),context);

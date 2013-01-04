@@ -1,0 +1,15 @@
+{
+  try {
+    final UUID accountId=accountApi.getByRecordId(context.getAccountRecordId(),context);
+    final List<Tag> accountTags=tagApi.getTags(accountId,ObjectType.ACCOUNT,context);
+    for (    Tag cur : accountTags) {
+      if (cur.getTagDefinitionId().equals(ControlTagType.OVERDUE_ENFORCEMENT_OFF.getId())) {
+        return true;
+      }
+    }
+    return false;
+  }
+ catch (  AccountApiException e) {
+    throw new OverdueException(e);
+  }
+}
