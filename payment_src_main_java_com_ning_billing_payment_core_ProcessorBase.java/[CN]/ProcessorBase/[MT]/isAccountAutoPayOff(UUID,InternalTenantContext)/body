@@ -1,9 +1,9 @@
 {
   final List<Tag> accountTags=tagInternalApi.getTags(accountId,ObjectType.ACCOUNT,context);
-  for (  final Tag cur : accountTags) {
-    if (ControlTagType.AUTO_PAY_OFF.getId().equals(cur.getTagDefinitionId())) {
-      return true;
+  return ControlTagType.isAutoPayOff(Collections2.transform(accountTags,new Function<Tag,UUID>(){
+    @Nullable @Override public UUID apply(    @Nullable final Tag tag){
+      return tag.getTagDefinitionId();
     }
   }
-  return false;
+));
 }
