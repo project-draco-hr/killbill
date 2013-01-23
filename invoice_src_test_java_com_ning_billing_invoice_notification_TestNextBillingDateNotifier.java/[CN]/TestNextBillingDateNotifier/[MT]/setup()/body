@@ -11,6 +11,8 @@
       install(new NotificationQueueModule());
       install(new TemplateModule());
       install(new TagStoreModule());
+      install(new CacheModule());
+      install(new NonEntityDaoModule());
       final DBTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getDBTestingHelper();
       if (helper.isUsingLocalInstance()) {
         bind(IDBI.class).toProvider(DBIProvider.class).asEagerSingleton();
@@ -21,8 +23,6 @@
         final IDBI dbi=helper.getDBI();
         bind(IDBI.class).toInstance(dbi);
       }
-      final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(helper.getDBI(),clock);
-      bind(InternalCallContextFactory.class).toInstance(internalCallContextFactory);
       bind(InvoiceFormatterFactory.class).to(DefaultInvoiceFormatterFactory.class).asEagerSingleton();
       bind(AccountInternalApi.class).toInstance(Mockito.mock(AccountInternalApi.class));
       bind(EntitlementInternalApi.class).toInstance(Mockito.mock(EntitlementInternalApi.class));
@@ -31,7 +31,9 @@
 );
   clock=g.getInstance(Clock.class);
   final IDBI dbi=g.getInstance(IDBI.class);
-  entitySqlDaoTransactionalJdbiWrapper=new EntitySqlDaoTransactionalJdbiWrapper(dbi);
+  nonEntityDao=g.getInstance(NonEntityDao.class);
+  controllerDispatcher=g.getInstance(CacheControllerDispatcher.class);
+  entitySqlDaoTransactionalJdbiWrapper=new EntitySqlDaoTransactionalJdbiWrapper(dbi,clock,controllerDispatcher,nonEntityDao);
   eventBus=g.getInstance(InternalBus.class);
   notificationQueueService=g.getInstance(NotificationQueueService.class);
   final InvoiceDispatcher dispatcher=g.getInstance(InvoiceDispatcher.class);

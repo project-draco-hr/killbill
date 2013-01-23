@@ -1,12 +1,14 @@
 {
   try {
     final IDBI dbi=getDBI();
-    final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(dbi,clock);
-    accountDao=new DefaultAccountDao(dbi,bus,internalCallContextFactory);
+    controllerDispatcher=new CacheControllerDispatcher();
+    nonEntityDao=new DefaultNonEntityDao(dbi);
+    final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(clock,nonEntityDao,controllerDispatcher);
+    accountDao=new DefaultAccountDao(dbi,bus,clock,controllerDispatcher,internalCallContextFactory,nonEntityDao);
     auditDao=new DefaultAuditDao(dbi);
-    customFieldDao=new DefaultCustomFieldDao(dbi);
-    tagDefinitionDao=new DefaultTagDefinitionDao(dbi,tagEventBuilder,bus);
-    tagDao=new DefaultTagDao(dbi,tagEventBuilder,bus);
+    customFieldDao=new DefaultCustomFieldDao(dbi,clock,controllerDispatcher,nonEntityDao);
+    tagDefinitionDao=new DefaultTagDefinitionDao(dbi,tagEventBuilder,bus,clock,controllerDispatcher,nonEntityDao);
+    tagDao=new DefaultTagDao(dbi,tagEventBuilder,bus,clock,controllerDispatcher,nonEntityDao);
     accountDao.test(internalCallContext);
     final BusService busService=new DefaultBusService(bus);
     ((DefaultBusService)busService).startBus();

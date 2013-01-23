@@ -1,16 +1,5 @@
 {
-  final Long accountRecordId=dbi.withHandle(new HandleCallback<Long>(){
-    @Override public Long withHandle(    final Handle handle) throws Exception {
-      final List<Map<String,Object>> values=handle.select("select record_id from accounts where id = " + accountId.toString());
-      if (values.size() == 0) {
-        return null;
-      }
- else {
-        return (Long)values.get(0).get("record_id");
-      }
-    }
-  }
-);
+  final Long accountRecordId=nonEntityDao.retrieveRecordIdFromObject(accountId,ObjectType.ACCOUNT,cacheControllerDispatcher.getCacheController(CacheType.RECORD_ID));
   if (accountId == null) {
     return ImmutableList.<Notification>of();
   }

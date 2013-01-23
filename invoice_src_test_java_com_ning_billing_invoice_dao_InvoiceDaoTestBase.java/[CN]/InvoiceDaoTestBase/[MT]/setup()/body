@@ -5,7 +5,8 @@
   bus=new InMemoryInternalBus();
   bus.start();
   final NextBillingDatePoster nextBillingDatePoster=new MockNextBillingDatePoster();
-  invoiceDao=new DefaultInvoiceDao(dbi,nextBillingDatePoster,bus);
+  controllerDispatcher=new CacheControllerDispatcher();
+  invoiceDao=new DefaultInvoiceDao(dbi,nextBillingDatePoster,bus,clock,controllerDispatcher,new DefaultNonEntityDao(dbi));
   invoiceDao.test(internalCallContext);
   invoiceItemSqlDao=dbi.onDemand(InvoiceItemSqlDao.class);
   invoicePaymentDao=dbi.onDemand(InvoicePaymentSqlDao.class);

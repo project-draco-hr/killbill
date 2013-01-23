@@ -1,7 +1,8 @@
 {
   try {
     final IDBI dbi=getDBI();
-    customFieldDao=new DefaultCustomFieldDao(dbi);
+    final NonEntityDao nonEntityDao=new DefaultNonEntityDao(dbi);
+    customFieldDao=new DefaultCustomFieldDao(dbi,clock,controllerDispatcher,nonEntityDao);
   }
  catch (  Throwable t) {
     log.error("Setup failed",t);

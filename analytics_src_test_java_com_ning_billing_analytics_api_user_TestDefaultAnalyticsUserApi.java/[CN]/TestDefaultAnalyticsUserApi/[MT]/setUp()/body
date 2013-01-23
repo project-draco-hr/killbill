@@ -1,5 +1,6 @@
 {
   final IDBI dbi=helper.getDBI();
+  final NonEntityDao nonEntityDao=new DefaultNonEntityDao(dbi);
   accountSqlDao=dbi.onDemand(BusinessAccountSqlDao.class);
   subscriptionTransitionSqlDao=dbi.onDemand(BusinessSubscriptionTransitionSqlDao.class);
   invoiceSqlDao=dbi.onDemand(BusinessInvoiceSqlDao.class);
@@ -8,5 +9,5 @@
   overdueStatusSqlDao=dbi.onDemand(BusinessOverdueStatusSqlDao.class);
   invoicePaymentSqlDao=dbi.onDemand(BusinessInvoicePaymentSqlDao.class);
   final AnalyticsDao analyticsDao=new DefaultAnalyticsDao(accountSqlDao,subscriptionTransitionSqlDao,invoiceSqlDao,invoiceItemSqlDao,accountTagSqlDao,overdueStatusSqlDao,invoicePaymentSqlDao);
-  analyticsUserApi=new DefaultAnalyticsUserApi(analyticsDao,Mockito.mock(BusinessSubscriptionTransitionDao.class),Mockito.mock(BusinessAccountDao.class),Mockito.mock(BusinessInvoiceDao.class),Mockito.mock(BusinessOverdueStatusDao.class),Mockito.mock(BusinessInvoicePaymentDao.class),Mockito.mock(BusinessTagDao.class),Mockito.mock(EntitlementInternalApi.class),Mockito.mock(PaymentInternalApi.class),Mockito.mock(TagInternalApi.class),new InternalCallContextFactory(dbi,clock));
+  analyticsUserApi=new DefaultAnalyticsUserApi(analyticsDao,Mockito.mock(BusinessSubscriptionTransitionDao.class),Mockito.mock(BusinessAccountDao.class),Mockito.mock(BusinessInvoiceDao.class),Mockito.mock(BusinessOverdueStatusDao.class),Mockito.mock(BusinessInvoicePaymentDao.class),Mockito.mock(BusinessTagDao.class),Mockito.mock(EntitlementInternalApi.class),Mockito.mock(PaymentInternalApi.class),Mockito.mock(TagInternalApi.class),new InternalCallContextFactory(clock,nonEntityDao,new CacheControllerDispatcher()));
 }

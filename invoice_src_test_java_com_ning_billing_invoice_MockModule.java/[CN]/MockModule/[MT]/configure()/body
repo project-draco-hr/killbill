@@ -6,6 +6,8 @@
   bind(CallContextFactory.class).to(DefaultCallContextFactory.class).asEagerSingleton();
   install(new TagStoreModule());
   install(new CustomFieldModule());
+  install(new CacheModule());
+  install(new NonEntityDaoModule());
   final DBTestingHelper helper=KillbillTestSuiteWithEmbeddedDB.getDBTestingHelper();
   if (helper.isUsingLocalInstance()) {
     bind(IDBI.class).toProvider(DBIProvider.class).asEagerSingleton();
@@ -16,8 +18,6 @@
     final IDBI dbi=helper.getDBI();
     bind(IDBI.class).toInstance(dbi);
   }
-  final InternalCallContextFactory internalCallContextFactory=new InternalCallContextFactory(helper.getDBI(),clock);
-  bind(InternalCallContextFactory.class).toInstance(internalCallContextFactory);
   bind(InvoiceFormatterFactory.class).to(DefaultInvoiceFormatterFactory.class).asEagerSingleton();
   bind(AccountInternalApi.class).toInstance(Mockito.mock(AccountInternalApi.class));
   bind(EntitlementInternalApi.class).toInstance(Mockito.mock(EntitlementInternalApi.class));

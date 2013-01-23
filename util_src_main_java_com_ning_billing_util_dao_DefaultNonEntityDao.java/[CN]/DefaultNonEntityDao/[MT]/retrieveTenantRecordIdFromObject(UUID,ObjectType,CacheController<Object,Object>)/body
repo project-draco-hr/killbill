@@ -1,0 +1,14 @@
+{
+  return containedCall.withCaching(new OperationRetrieval<Long>(){
+    @Override public Long doRetrieve(    final UUID objectId,    final ObjectType objectType){
+      final TableName tableName=TableName.fromObjectType(objectType);
+switch (tableName) {
+case TENANT:
+        return nonEntitySqlDao.getTenantRecordIdFromTenant(objectId.toString());
+default :
+      return nonEntitySqlDao.getTenantRecordIdFromObjectOtherThanTenant(objectId.toString(),tableName.getTableName());
+  }
+}
+}
+,objectId,objectType,cache);
+}

@@ -1,23 +1,13 @@
 {
-  final Audited annotation=method.getAnnotation(Audited.class);
-  InternalCallContext context=null;
-  List<String> entityIds=null;
-  final Map<String,M> entities=new HashMap<String,M>();
-  final Map<String,Long> entityRecordIds=new HashMap<String,Long>();
-  if (annotation != null) {
-    context=retrieveContextFromArguments(args);
-    entityIds=retrieveEntityIdsFromArguments(method,args);
-    for (    final String entityId : entityIds) {
-      entities.put(entityId,sqlDao.getById(entityId,context));
-      entityRecordIds.put(entityId,sqlDao.getRecordId(entityId,context));
-    }
+  final Audited auditedAnnotation=method.getAnnotation(Audited.class);
+  final Cachable cachableAnnotation=method.getAnnotation(Cachable.class);
+  if (auditedAnnotation != null) {
+    return invokeWithAuditAndHistory(auditedAnnotation,method,args);
   }
-  final Object obj=method.invoke(sqlDao,args);
-  if (annotation != null) {
-    final ChangeType changeType=annotation.value();
-    for (    final String entityId : entityIds) {
-      updateHistoryAndAudit(entityId,entities,entityRecordIds,changeType,context);
-    }
+ else   if (cachableAnnotation != null) {
+    return invokeWithCaching(cachableAnnotation,method,args);
   }
-  return obj;
+ else {
+    return method.invoke(sqlDao,args);
+  }
 }

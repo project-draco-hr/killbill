@@ -1,0 +1,13 @@
+{
+  final ObjectType objectType=getObjectType();
+  final CacheType cacheType=cachableAnnotation.value();
+  final CacheController<Object,Object> cache=cacheControllerDispatcher.getCacheController(cacheType);
+  Object result=null;
+  if (cache != null) {
+    result=cache.get(args[0],objectType);
+  }
+  if (result == null) {
+    result=method.invoke(sqlDao,args);
+  }
+  return result;
+}

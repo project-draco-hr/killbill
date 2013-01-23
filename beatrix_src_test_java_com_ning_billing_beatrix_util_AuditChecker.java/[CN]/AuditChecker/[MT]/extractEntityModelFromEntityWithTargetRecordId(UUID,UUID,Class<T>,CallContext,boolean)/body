@@ -1,0 +1,15 @@
+{
+  final M modelDaoThatGivesMeTableName=dbi.onDemand(sqlDao).getById(entityId.toString(),callContextFactory.createInternalCallContext(context));
+  Integer targetRecordId=dbi.withHandle(new HandleCallback<Integer>(){
+    @Override public Integer withHandle(    final Handle handle) throws Exception {
+      List<Map<String,Object>> res=handle.select("select target_record_id from audit_log where id = '" + auditLogId.toString() + "';");
+      return (Integer)res.get(0).get("target_record_id");
+    }
+  }
+);
+  if (useHistory) {
+    Long entityRecordId=nonEntityDao.retrieveHistoryTargetRecordId(Long.valueOf(targetRecordId),modelDaoThatGivesMeTableName.getHistoryTableName());
+    targetRecordId=new Integer(entityRecordId.intValue());
+  }
+  return dbi.onDemand(sqlDao).getByRecordId(Long.valueOf(targetRecordId),callContextFactory.createInternalCallContext(context));
+}

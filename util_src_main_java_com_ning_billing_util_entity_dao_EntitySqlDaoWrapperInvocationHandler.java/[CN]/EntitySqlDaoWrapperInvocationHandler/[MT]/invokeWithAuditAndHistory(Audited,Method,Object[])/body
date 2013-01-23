@@ -1,0 +1,20 @@
+{
+  InternalCallContext context=null;
+  List<String> entityIds=null;
+  final Map<String,M> entities=new HashMap<String,M>();
+  final Map<String,Long> entityRecordIds=new HashMap<String,Long>();
+  if (auditedAnnotation != null) {
+    context=retrieveContextFromArguments(args);
+    entityIds=retrieveEntityIdsFromArguments(method,args);
+    for (    final String entityId : entityIds) {
+      entities.put(entityId,sqlDao.getById(entityId,context));
+      entityRecordIds.put(entityId,sqlDao.getRecordId(entityId,context));
+    }
+  }
+  final Object obj=method.invoke(sqlDao,args);
+  final ChangeType changeType=auditedAnnotation.value();
+  for (  final String entityId : entityIds) {
+    updateHistoryAndAudit(entityId,entities,entityRecordIds,changeType,context);
+  }
+  return obj;
+}
