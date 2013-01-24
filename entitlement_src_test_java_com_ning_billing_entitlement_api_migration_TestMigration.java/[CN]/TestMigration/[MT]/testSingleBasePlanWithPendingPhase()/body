@@ -19,6 +19,7 @@
     assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-monthly");
     assertEquals(subscription.getChargedThroughDate(),trialDate.plusDays(30));
     testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_BILLING);
     final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
