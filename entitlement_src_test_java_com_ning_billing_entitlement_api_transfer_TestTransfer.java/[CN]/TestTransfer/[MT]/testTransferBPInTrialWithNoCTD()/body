@@ -3,7 +3,7 @@
   final String baseProduct="Shotgun";
   final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
   final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  final Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+  final Subscription baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
   final DateTime evergreenPhaseDate=((SubscriptionData)baseSubscription).getPendingTransition().getEffectiveTransitionTime();
   clock.addDays(20);
   final DateTime beforeTransferDate=clock.getUTCNow();
@@ -15,7 +15,7 @@
   final DateTime afterTransferDate=clock.getUTCNow();
   final Subscription oldBaseSubscription=entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertNotNull(oldBaseSubscription.getEndDate());
-  assertDateWithin(oldBaseSubscription.getEndDate(),beforeTransferDate,afterTransferDate);
+  testUtil.assertDateWithin(oldBaseSubscription.getEndDate(),beforeTransferDate,afterTransferDate);
   assertTrue(oldBaseSubscription.getEndDate().compareTo(transferRequestedDate) == 0);
   final SubscriptionBundle newBundle=entitlementApi.getBundleForAccountAndKey(newAccountId,bundle.getExternalKey(),callContext);
   final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(newBundle.getId(),callContext);

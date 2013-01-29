@@ -2,11 +2,11 @@
   final String baseProduct="Shotgun";
   final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
   final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  final Subscription baseSubscription=createSubscription(baseProduct,baseTerm,basePriceList);
+  final Subscription baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
   final String aoProduct="Telescopic-Scope";
   final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
   final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  final SubscriptionData aoSubscription=createSubscription(aoProduct,aoTerm,aoPriceList);
+  final SubscriptionData aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
   final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
   final List<SubscriptionTimeline> subscriptionRepair=bundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),2);
@@ -15,7 +15,7 @@
     assertNull(cur.getNewEvents());
     final List<ExistingEvent> events=cur.getExistingEvents();
     assertEquals(events.size(),2);
-    sortExistingEvent(events);
+    testUtil.sortExistingEvent(events);
     assertEquals(events.get(0).getSubscriptionTransitionType(),SubscriptionTransitionType.CREATE);
     assertEquals(events.get(1).getSubscriptionTransitionType(),SubscriptionTransitionType.PHASE);
     final boolean isBP=cur.getId().equals(baseSubscription.getId());

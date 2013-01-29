@@ -3,20 +3,20 @@
     @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
       Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
       clock.addDeltaFromReality(it.toDurationMillis());
-      final SubscriptionData aoSubscription=createSubscription("Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+      final SubscriptionData aoSubscription=testUtil.createSubscription(bundle,"Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
       it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
       clock.addDeltaFromReality(it.toDurationMillis());
       BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
-      sortEventsOnBundle(bundleRepair);
-      final SubscriptionTimeline bpRepair=getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
+      testUtil.sortEventsOnBundle(bundleRepair);
+      final SubscriptionTimeline bpRepair=testUtil.getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
       assertEquals(bpRepair.getExistingEvents().size(),2);
-      final SubscriptionTimeline aoRepair=getSubscriptionRepair(aoSubscription.getId(),bundleRepair);
+      final SubscriptionTimeline aoRepair=testUtil.getSubscriptionRepair(aoSubscription.getId(),bundleRepair);
       assertEquals(aoRepair.getExistingEvents().size(),2);
       final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
       final DateTime aoCancelDate=aoSubscription.getStartDate().plusDays(10);
-      final NewEvent ne=createNewEvent(SubscriptionTransitionType.CANCEL,aoCancelDate,null);
-      final SubscriptionTimeline saoRepair=createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
-      bundleRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
+      final NewEvent ne=testUtil.createNewEvent(SubscriptionTransitionType.CANCEL,aoCancelDate,null);
+      final SubscriptionTimeline saoRepair=testUtil.createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
+      bundleRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
       final boolean dryRun=true;
       repairApi.repairBundle(bundleRepair,dryRun,callContext);
     }

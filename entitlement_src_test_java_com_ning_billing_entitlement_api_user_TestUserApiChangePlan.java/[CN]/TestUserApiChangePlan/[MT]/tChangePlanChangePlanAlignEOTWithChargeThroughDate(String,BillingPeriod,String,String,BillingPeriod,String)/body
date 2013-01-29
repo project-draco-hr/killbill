@@ -1,7 +1,7 @@
 {
   try {
     DateTime currentTime=clock.getUTCNow();
-    SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
+    SubscriptionData subscription=testUtil.createSubscription(bundle,fromProd,fromTerm,fromPlanSet);
     final PlanPhase trialPhase=subscription.getCurrentPhase();
     final DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
@@ -11,7 +11,7 @@
     clock.addDeltaFromReality(it.toDurationMillis());
     currentTime=clock.getUTCNow();
     assertTrue(testListener.isCompleted(5000));
-    final Duration ctd=getDurationMonth(1);
+    final Duration ctd=testUtil.getDurationMonth(1);
     final DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     entitlementInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate.toLocalDate(),internalCallContext);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId(),callContext);
@@ -44,7 +44,7 @@
     assertFalse(testListener.isCompleted(3000));
     testListener.reset();
     final DateTime nextExpectedPhaseChange=DefaultClock.addDuration(newChargedThroughDate,currentPhase.getDuration());
-    checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
+    testUtil.checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
     clock.addDeltaFromReality(it.toDurationMillis());

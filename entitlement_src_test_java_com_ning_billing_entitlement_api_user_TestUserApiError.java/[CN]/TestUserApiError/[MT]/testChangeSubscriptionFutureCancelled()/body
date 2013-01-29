@@ -1,6 +1,6 @@
 {
   try {
-    Subscription subscription=createSubscription("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+    Subscription subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
     final PlanPhase trialPhase=subscription.getCurrentPhase();
     final PlanPhase currentPhase=subscription.getCurrentPhase();
     testListener.pushExpectedEvent(NextEvent.PHASE);
@@ -8,7 +8,7 @@
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     final DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
-    final Duration ctd=getDurationMonth(1);
+    final Duration ctd=testUtil.getDurationMonth(1);
     final DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
     entitlementInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate.toLocalDate(),internalCallContext);
     subscription=entitlementApi.getSubscriptionFromId(subscription.getId(),tenantContext);

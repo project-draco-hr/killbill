@@ -6,13 +6,13 @@
       clock.addDeltaFromReality(it.toDurationMillis());
       assertTrue(testListener.isCompleted(5000));
       final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
-      sortEventsOnBundle(bundleRepair);
+      testUtil.sortEventsOnBundle(bundleRepair);
       final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
-      final NewEvent ne=createNewEvent(SubscriptionTransitionType.CREATE,baseSubscription.getStartDate().plusDays(10),spec);
+      final NewEvent ne=testUtil.createNewEvent(SubscriptionTransitionType.CREATE,baseSubscription.getStartDate().plusDays(10),spec);
       final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
-      des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
-      final SubscriptionTimeline sRepair=createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
-      final BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      des.add(testUtil.createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
+      final SubscriptionTimeline sRepair=testUtil.createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
+      final BundleTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
       repairApi.repairBundle(bRepair,true,callContext);
     }
   }

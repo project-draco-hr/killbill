@@ -3,7 +3,7 @@
   try {
     final DateTime startDate=clock.getUTCNow().minusMonths(2);
     final DateTime beforeMigration=clock.getUTCNow();
-    final EntitlementAccountMigration toBeMigrated=createAccountForMigrationWithRegularBasePlan(startDate);
+    final EntitlementAccountMigration toBeMigrated=testUtil.createAccountForMigrationWithRegularBasePlan(startDate);
     final DateTime afterMigration=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated,callContext);
@@ -14,7 +14,7 @@
     final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId(),callContext);
     assertEquals(subscriptions.size(),1);
     final Subscription subscription=subscriptions.get(0);
-    assertDateWithin(subscription.getStartDate(),beforeMigration.minusMonths(2),afterMigration.minusMonths(2));
+    testUtil.assertDateWithin(subscription.getStartDate(),beforeMigration.minusMonths(2),afterMigration.minusMonths(2));
     assertEquals(subscription.getEndDate(),null);
     assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
     assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);

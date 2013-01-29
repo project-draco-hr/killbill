@@ -4,7 +4,7 @@
     final String prod="Shotgun";
     final BillingPeriod term=BillingPeriod.MONTHLY;
     final String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
-    final SubscriptionData subscription=createSubscription(prod,term,planSet);
+    final SubscriptionData subscription=testUtil.createSubscription(bundle,prod,term,planSet);
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
     final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
@@ -23,7 +23,7 @@
     assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
     assertEquals(subscription.getLastActiveCategoryName(),"BASE");
     assertNull(currentPhase);
-    checkNextPhaseChange(subscription,0,null);
+    testUtil.checkNextPhaseChange(subscription,0,null);
     assertListenerStatus();
   }
  catch (  EntitlementUserApiException e) {

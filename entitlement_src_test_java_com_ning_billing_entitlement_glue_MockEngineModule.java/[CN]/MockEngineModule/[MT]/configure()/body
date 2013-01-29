@@ -1,8 +1,11 @@
 {
   super.configure();
   install(new CatalogModule());
-  bind(AccountUserApi.class).toInstance(Mockito.mock(AccountUserApi.class));
-  install(new MockClockModule());
   install(new CallContextModule());
   install(new CacheModule());
+  bind(AccountUserApi.class).toInstance(Mockito.mock(AccountUserApi.class));
+  bind(TestUtil.class).asEagerSingleton();
+  bind(TestListenerStatus.class).to(EntitlementTestListenerStatus.class).asEagerSingleton();
+  bind(TestApiListener.class).asEagerSingleton();
+  bind(EntitlementTestInitializer.class).to(DefaultEntitlementTestInitializer.class).asEagerSingleton();
 }

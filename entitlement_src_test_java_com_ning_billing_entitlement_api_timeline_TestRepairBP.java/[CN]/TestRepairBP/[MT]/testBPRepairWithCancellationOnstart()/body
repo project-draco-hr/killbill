@@ -1,19 +1,19 @@
 {
   final String baseProduct="Shotgun";
   final DateTime startDate=clock.getUTCNow();
-  final Subscription baseSubscription=createSubscription(baseProduct,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
+  final Subscription baseSubscription=testUtil.createSubscription(bundle,baseProduct,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
   final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(10));
   clock.addDeltaFromReality(it.toDurationMillis());
   final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
-  sortEventsOnBundle(bundleRepair);
+  testUtil.sortEventsOnBundle(bundleRepair);
   final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
-  des.add(createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
-  final NewEvent ne=createNewEvent(SubscriptionTransitionType.CANCEL,baseSubscription.getStartDate(),null);
-  final SubscriptionTimeline sRepair=createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
-  final BundleTimeline bRepair=createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+  des.add(testUtil.createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
+  final NewEvent ne=testUtil.createNewEvent(SubscriptionTransitionType.CANCEL,baseSubscription.getStartDate(),null);
+  final SubscriptionTimeline sRepair=testUtil.createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
+  final BundleTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
   boolean dryRun=true;
   final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,callContext);
-  sortEventsOnBundle(dryRunBundleRepair);
+  testUtil.sortEventsOnBundle(dryRunBundleRepair);
   List<SubscriptionTimeline> subscriptionRepair=dryRunBundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),1);
   SubscriptionTimeline cur=subscriptionRepair.get(0);
@@ -21,10 +21,10 @@
   final List<ExistingEvent> events=subscriptionRepair.get(0).getExistingEvents();
   assertEquals(events.size(),2);
   final List<ExistingEvent> expected=new LinkedList<SubscriptionTimeline.ExistingEvent>();
-  expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CREATE,baseProduct,PhaseType.TRIAL,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.NO_BILLING_PERIOD,baseSubscription.getStartDate()));
-  expected.add(createExistingEventForAssertion(SubscriptionTransitionType.CANCEL,baseProduct,PhaseType.TRIAL,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.NO_BILLING_PERIOD,baseSubscription.getStartDate()));
+  expected.add(testUtil.createExistingEventForAssertion(SubscriptionTransitionType.CREATE,baseProduct,PhaseType.TRIAL,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.NO_BILLING_PERIOD,baseSubscription.getStartDate()));
+  expected.add(testUtil.createExistingEventForAssertion(SubscriptionTransitionType.CANCEL,baseProduct,PhaseType.TRIAL,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.NO_BILLING_PERIOD,baseSubscription.getStartDate()));
   for (  final ExistingEvent e : expected) {
-    validateExistingEventForAssertion(e,events.get(index++));
+    testUtil.validateExistingEventForAssertion(e,events.get(index++));
   }
   final SubscriptionData dryRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(dryRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
@@ -48,7 +48,7 @@
   assertEquals(cur.getId(),baseSubscription.getId());
   index=0;
   for (  final ExistingEvent e : expected) {
-    validateExistingEventForAssertion(e,events.get(index++));
+    testUtil.validateExistingEventForAssertion(e,events.get(index++));
   }
   final SubscriptionData realRunBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(realRunBaseSubscription.getAllTransitions().size(),2);

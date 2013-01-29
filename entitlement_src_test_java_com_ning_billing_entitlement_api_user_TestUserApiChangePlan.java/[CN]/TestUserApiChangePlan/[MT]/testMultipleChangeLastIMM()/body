@@ -1,6 +1,6 @@
 {
   try {
-    SubscriptionData subscription=createSubscription("Assault-Rifle",BillingPeriod.MONTHLY,"gunclubDiscount");
+    SubscriptionData subscription=testUtil.createSubscription(bundle,"Assault-Rifle",BillingPeriod.MONTHLY,"gunclubDiscount");
     final PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
@@ -10,7 +10,7 @@
     final List<Duration> durationList=new ArrayList<Duration>();
     durationList.add(trialPhase.getDuration());
     final DateTime startDiscountPhase=DefaultClock.addDuration(subscription.getStartDate(),durationList);
-    final Duration ctd=getDurationMonth(1);
+    final Duration ctd=testUtil.getDurationMonth(1);
     final DateTime newChargedThroughDate=DefaultClock.addDuration(startDiscountPhase,ctd);
     entitlementInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate.toLocalDate(),internalCallContext);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId(),callContext);

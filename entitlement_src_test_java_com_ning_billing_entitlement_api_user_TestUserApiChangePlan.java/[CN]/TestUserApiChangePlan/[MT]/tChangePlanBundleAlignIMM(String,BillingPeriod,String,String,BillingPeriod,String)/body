@@ -1,6 +1,6 @@
 {
   try {
-    final SubscriptionData subscription=createSubscription(fromProd,fromTerm,fromPlanSet);
+    final SubscriptionData subscription=testUtil.createSubscription(bundle,fromProd,fromTerm,fromPlanSet);
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
     clock.addDeltaFromReality(it.toDurationMillis());
@@ -9,7 +9,7 @@
     assertTrue(testListener.isCompleted(5000));
     final PlanPhase currentPhase=subscription.getCurrentPhase();
     final DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
-    checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
+    testUtil.checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
     clock.addDeltaFromReality(it.toDurationMillis());

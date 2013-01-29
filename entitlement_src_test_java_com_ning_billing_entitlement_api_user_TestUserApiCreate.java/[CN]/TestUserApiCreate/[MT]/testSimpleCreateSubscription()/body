@@ -5,12 +5,12 @@
     final BillingPeriod term=BillingPeriod.MONTHLY;
     final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
     testListener.pushExpectedEvent(NextEvent.CREATE);
-    final SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),callContext);
+    final SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),callContext);
     assertNotNull(subscription);
     assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
     assertEquals(subscription.getBundleId(),bundle.getId());
-    assertDateWithin(subscription.getStartDate(),init,clock.getUTCNow());
-    assertDateWithin(subscription.getBundleStartDate(),init,clock.getUTCNow());
+    testUtil.assertDateWithin(subscription.getStartDate(),init,clock.getUTCNow());
+    testUtil.assertDateWithin(subscription.getBundleStartDate(),init,clock.getUTCNow());
     final Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),productName);
@@ -22,7 +22,7 @@
     assertTrue(testListener.isCompleted(5000));
     final List<EntitlementEvent> events=dao.getPendingEventsForSubscription(subscription.getId(),internalCallContext);
     assertNotNull(events);
-    printEvents(events);
+    testUtil.printEvents(events);
     assertTrue(events.size() == 1);
     assertTrue(events.get(0) instanceof PhaseEvent);
     final DateTime nextPhaseChange=((PhaseEvent)events.get(0)).getEffectiveDate();
