@@ -1,0 +1,16 @@
+{
+  super.startPlugin(context);
+  @SuppressWarnings("unchecked") final ServiceReference<ExternalBus> externalBusReference=(ServiceReference<ExternalBus>)context.getServiceReference(ExternalBus.class.getName());
+  try {
+    final ExternalBus externalBus=context.getService(externalBusReference);
+    externalBus.register(this);
+  }
+ catch (  Exception e) {
+    log(LogService.LOG_WARNING,"Error registering notification plugin service",e);
+  }
+ finally {
+    if (externalBusReference != null) {
+      context.ungetService(externalBusReference);
+    }
+  }
+}

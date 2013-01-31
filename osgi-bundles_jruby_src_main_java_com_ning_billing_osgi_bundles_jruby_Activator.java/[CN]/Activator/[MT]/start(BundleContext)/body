@@ -1,0 +1,17 @@
+{
+  logger=retrieveApi(context,LogService.class);
+  log(LogService.LOG_INFO,"JRuby bundle activated");
+  doMagicToMakeJRubyAndFelixHappy();
+  final PluginRubyConfig rubyConfig=retrievePluginRubyConfig(context);
+  final ScriptingContainer scriptingContainer=setupScriptingContainer(rubyConfig);
+  if (PluginType.NOTIFICATION.equals(rubyConfig.getPluginType())) {
+    plugin=new JRubyNotificationPlugin(rubyConfig,scriptingContainer,logger);
+  }
+ else   if (PluginType.PAYMENT.equals(rubyConfig.getPluginType())) {
+    plugin=new JRubyPaymentPlugin(rubyConfig,scriptingContainer,logger);
+  }
+  final Map<String,Object> killbillApis=retrieveKillbillApis(context);
+  plugin.instantiatePlugin(killbillApis);
+  log(LogService.LOG_INFO,"Starting JRuby plugin " + plugin.getPluginMainClass());
+  plugin.startPlugin(context);
+}

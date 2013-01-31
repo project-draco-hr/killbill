@@ -1,6 +1,8 @@
 {
   timelineEventHandler.replay(config.getSpoolDir(),internalCallContext);
-  timelineAggregator.runAggregationThread();
+  if (config.getTimelineAggregationEnabled()) {
+    timelineAggregator.runAggregationThread();
+  }
   backgroundDBChunkWriter.runBackgroundWriteThread();
   timelineEventHandler.startPurgeThread();
 }

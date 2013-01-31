@@ -1,0 +1,13 @@
+{
+  if (cachedRequireLine == null) {
+    final StringBuilder builder=new StringBuilder();
+    builder.append("ENV[\"GEM_HOME\"] = \"").append(pluginLibdir).append("\"").append("\n");
+    builder.append("ENV[\"GEM_PATH\"] = ENV[\"GEM_HOME\"]\n");
+    builder.append("gem 'killbill'\n");
+    builder.append("require 'killbill'\n");
+    builder.append("begin\n").append("gem '").append(pluginGemName).append("'\n").append("require '").append(pluginGemName).append("' rescue warn \"WARN: unable to load ").append(pluginGemName).append("\"\n").append("rescue Gem::LoadError\n").append("warn \"WARN: unable to load gem ").append(pluginGemName).append("\"\n").append("end\n");
+    builder.append("Dir.glob(ENV[\"GEM_HOME\"] + \"/*.rb\").each {|x| require x rescue warn \"WARN: unable to load #{x}\"}\n");
+    cachedRequireLine=builder.toString();
+  }
+  return cachedRequireLine;
+}

@@ -1,0 +1,10 @@
+{
+  checkValidPaymentPlugin();
+  checkPluginIsRunning();
+  final Ruby runtime=getRuntime();
+  pluginInstance.callMethod("add_payment_method",JavaEmbedUtils.javaToRuby(runtime,accountKey),JavaEmbedUtils.javaToRuby(runtime,paymentMethodProps));
+  if (setDefault) {
+    setDefaultPaymentMethod(accountKey,paymentMethodProps.getExternalPaymentMethodId(),context);
+  }
+  return null;
+}

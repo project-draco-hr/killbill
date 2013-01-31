@@ -1,0 +1,34 @@
+{
+  final TenantContext tenantContext=new TenantContext(){
+    @Override public UUID getTenantId(){
+      return new UUID(12,42);
+    }
+  }
+;
+  final Thread th=new Thread(new Runnable(){
+    @Override public void run(){
+      while (isRunning) {
+        @SuppressWarnings("unchecked") final ServiceReference<AccountUserApi> accountUserApiReference=(ServiceReference<AccountUserApi>)context.getServiceReference(AccountUserApi.class.getName());
+        final AccountUserApi accountUserApi=context.getService(accountUserApiReference);
+        try {
+          final List<Account> accounts=accountUserApi.getAccounts(tenantContext);
+          System.out.println("Found " + accounts.size() + " accounts");
+          Thread.sleep(1000);
+        }
+ catch (        InterruptedException e) {
+          System.err.println("Interrupted in HelloActivator");
+        }
+catch (        Exception e) {
+          System.err.println("Error in HelloActivator: " + e.getLocalizedMessage());
+        }
+ finally {
+          if (accountUserApiReference != null) {
+            context.ungetService(accountUserApiReference);
+          }
+        }
+      }
+    }
+  }
+);
+  th.start();
+}

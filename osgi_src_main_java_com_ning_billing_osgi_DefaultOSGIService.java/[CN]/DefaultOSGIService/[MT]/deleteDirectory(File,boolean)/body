@@ -1,0 +1,23 @@
+{
+  if (path == null) {
+    return;
+  }
+  if (path.exists()) {
+    final File[] files=path.listFiles();
+    if (files != null) {
+      for (      final File f : files) {
+        if (f.isDirectory()) {
+          deleteDirectory(f,true);
+        }
+        if (!f.delete()) {
+          logger.warn("Unable to delete {}",f.getAbsolutePath());
+        }
+      }
+    }
+    if (deleteParent) {
+      if (!path.delete()) {
+        logger.warn("Unable to delete {}",path.getAbsolutePath());
+      }
+    }
+  }
+}
