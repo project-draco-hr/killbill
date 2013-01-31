@@ -1,0 +1,60 @@
+{
+  if (endDate != null && endDate.isBefore(startDate)) {
+    throw new InvalidDateSequenceException();
+  }
+  if (targetDate.isBefore(startDate)) {
+    throw new InvalidDateSequenceException();
+  }
+  final List<RecurringInvoiceItemData> results=new ArrayList<RecurringInvoiceItemData>();
+  final LocalDate firstBillingCycleDate=calculateBillingCycleDateOnOrAfter(startDate,billingCycleDayLocal);
+  if (endDate != null && endDate.equals(startDate)) {
+    return results;
+  }
+  if (endDate != null && !endDate.isAfter(firstBillingCycleDate)) {
+    final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,endDate,billingPeriod);
+    final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(startDate,endDate,leadingProRationPeriods);
+    results.add(itemData);
+    return results;
+  }
+  if (firstBillingCycleDate.isAfter(startDate)) {
+    final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,firstBillingCycleDate,billingPeriod);
+    if (leadingProRationPeriods != null && leadingProRationPeriods.compareTo(BigDecimal.ZERO) > 0) {
+      final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(startDate,firstBillingCycleDate,leadingProRationPeriods);
+      log.info("Adding pro-ration: {}",itemData);
+      results.add(itemData);
+    }
+  }
+  final LocalDate effectiveEndDate;
+  if (endDate != null) {
+    effectiveEndDate=calculateEffectiveEndDate(firstBillingCycleDate,targetDate,endDate,billingPeriod);
+  }
+ else {
+    effectiveEndDate=calculateEffectiveEndDate(firstBillingCycleDate,targetDate,billingPeriod);
+  }
+  final LocalDate lastBillingCycleDate=calculateLastBillingCycleDateBefore(effectiveEndDate,firstBillingCycleDate,billingCycleDayLocal,billingPeriod);
+  final int numberOfWholeBillingPeriods=calculateNumberOfWholeBillingPeriods(firstBillingCycleDate,lastBillingCycleDate,billingPeriod);
+  final int numberOfMonthsPerBillingPeriod=billingPeriod.getNumberOfMonths();
+  for (int i=0; i < numberOfWholeBillingPeriods; i++) {
+    final LocalDate servicePeriodStartDate;
+    if (results.size() > 0) {
+      servicePeriodStartDate=results.get(results.size() - 1).getEndDate();
+    }
+ else     if (i == 0) {
+      servicePeriodStartDate=startDate;
+    }
+ else {
+      throw new IllegalStateException("We should at least have one invoice item!");
+    }
+    final LocalDate servicePeriodEndDate=firstBillingCycleDate.plusMonths((i + 1) * numberOfMonthsPerBillingPeriod);
+    results.add(new RecurringInvoiceItemData(servicePeriodStartDate,servicePeriodEndDate,BigDecimal.ONE));
+  }
+  if (effectiveEndDate.isAfter(lastBillingCycleDate)) {
+    final BigDecimal trailingProRationPeriods=calculateProRationAfterLastBillingCycleDate(effectiveEndDate,lastBillingCycleDate,billingPeriod);
+    if (trailingProRationPeriods.compareTo(BigDecimal.ZERO) > 0) {
+      final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(lastBillingCycleDate,effectiveEndDate,trailingProRationPeriods);
+      log.info("Adding trailing pro-ration: {}",itemData);
+      results.add(itemData);
+    }
+  }
+  return results;
+}

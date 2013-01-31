@@ -2,6 +2,7 @@
   try {
     final BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId,context);
     final Account account=accountApi.getAccountById(accountId,context);
+    final DateAndTimeZoneContext dateAndTimeZoneContext=billingEvents.iterator().hasNext() ? new DateAndTimeZoneContext(billingEvents.iterator().next().getEffectiveDate(),account.getTimeZone(),clock) : new DateAndTimeZoneContext(null,account.getTimeZone(),clock);
     List<Invoice> invoices=new ArrayList<Invoice>();
     if (!billingEvents.isAccountAutoInvoiceOff()) {
       invoices=ImmutableList.<Invoice>copyOf(Collections2.transform(invoiceDao.getInvoicesByAccount(accountId,context),new Function<InvoiceModelDao,Invoice>(){
@@ -12,8 +13,8 @@
 ));
     }
     final Currency targetCurrency=account.getCurrency();
-    final LocalDate targetDate=new LocalDate(targetDateTime,account.getTimeZone());
-    final Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,account.getTimeZone(),targetCurrency);
+    final LocalDate targetDate=dateAndTimeZoneContext.computeTargetDate(targetDateTime);
+    final Invoice invoice=generator.generateInvoice(accountId,billingEvents,invoices,targetDate,targetCurrency);
     if (invoice == null) {
       log.info("Generated null invoice for accountId {} and targetDate {} (targetDateTime {})",new Object[]{accountId,targetDate,targetDateTime});
       if (!dryRun) {
@@ -43,11 +44,11 @@
           }
         }
 ));
-        final Map<UUID,DateTime> callbackDateTimePerSubscriptions=createNextFutureNotificationDate(invoiceItemModelDaos,account.getTimeZone());
+        final Map<UUID,DateTime> callbackDateTimePerSubscriptions=createNextFutureNotificationDate(invoiceItemModelDaos,dateAndTimeZoneContext);
         invoiceDao.createInvoice(invoiceModelDao,invoiceItemModelDaos,invoicePaymentModelDaos,isRealInvoiceWithItems,callbackDateTimePerSubscriptions,context);
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
-        setChargedThroughDates(account.getBillCycleDay(),account.getTimeZone(),fixedPriceInvoiceItems,recurringInvoiceItems,context);
+        setChargedThroughDates(dateAndTimeZoneContext,fixedPriceInvoiceItems,recurringInvoiceItems,context);
         final InvoiceCreationInternalEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
         if (isRealInvoiceWithItems) {
           postEvent(event,accountId,context);

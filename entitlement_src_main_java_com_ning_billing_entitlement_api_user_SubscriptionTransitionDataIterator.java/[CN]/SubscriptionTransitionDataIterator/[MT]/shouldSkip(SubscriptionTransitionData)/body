@@ -2,7 +2,7 @@
   if (visibility == Visibility.FROM_DISK_ONLY && !input.isFromDisk()) {
     return true;
   }
-  if ((kind == Kind.ENTITLEMENT && input.getTransitionType() == SubscriptionTransitionType.MIGRATE_BILLING) || (kind == Kind.BILLING && input.getTransitionType() == SubscriptionTransitionType.MIGRATE_ENTITLEMENT)) {
+  if ((kind == Kind.ENTITLEMENT && shouldSkipForEntitlementEvents(input)) || (kind == Kind.BILLING && shouldSkipForBillingEvents(input))) {
     return true;
   }
   if ((timeLimit == TimeLimit.FUTURE_ONLY && !input.getEffectiveTransitionTime().isAfter(clock.getUTCNow())) || ((timeLimit == TimeLimit.PAST_OR_PRESENT_ONLY && input.getEffectiveTransitionTime().isAfter(clock.getUTCNow())))) {

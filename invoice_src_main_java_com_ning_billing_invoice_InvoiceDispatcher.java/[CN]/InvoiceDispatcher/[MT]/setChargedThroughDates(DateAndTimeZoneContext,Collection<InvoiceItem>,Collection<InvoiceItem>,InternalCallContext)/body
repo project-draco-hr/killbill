@@ -1,0 +1,11 @@
+{
+  final Map<UUID,DateTime> chargeThroughDates=new HashMap<UUID,DateTime>();
+  addInvoiceItemsToChargeThroughDates(dateAndTimeZoneContext,chargeThroughDates,fixedPriceItems);
+  addInvoiceItemsToChargeThroughDates(dateAndTimeZoneContext,chargeThroughDates,recurringItems);
+  for (  final UUID subscriptionId : chargeThroughDates.keySet()) {
+    if (subscriptionId != null) {
+      final DateTime chargeThroughDate=chargeThroughDates.get(subscriptionId);
+      entitlementApi.setChargedThroughDate(subscriptionId,chargeThroughDate,context);
+    }
+  }
+}

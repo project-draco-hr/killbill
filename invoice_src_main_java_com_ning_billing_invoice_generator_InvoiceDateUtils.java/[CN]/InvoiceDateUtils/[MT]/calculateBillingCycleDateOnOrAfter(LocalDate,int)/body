@@ -1,0 +1,15 @@
+{
+  final int lastDayOfMonth=date.dayOfMonth().getMaximumValue();
+  final LocalDate fixedDate;
+  if (billingCycleDayLocal > lastDayOfMonth) {
+    fixedDate=new LocalDate(date.getYear(),date.getMonthOfYear(),lastDayOfMonth,date.getChronology());
+  }
+ else {
+    fixedDate=new LocalDate(date.getYear(),date.getMonthOfYear(),billingCycleDayLocal,date.getChronology());
+  }
+  LocalDate proposedDate=fixedDate;
+  while (proposedDate.isBefore(date)) {
+    proposedDate=proposedDate.plusMonths(1);
+  }
+  return proposedDate;
+}

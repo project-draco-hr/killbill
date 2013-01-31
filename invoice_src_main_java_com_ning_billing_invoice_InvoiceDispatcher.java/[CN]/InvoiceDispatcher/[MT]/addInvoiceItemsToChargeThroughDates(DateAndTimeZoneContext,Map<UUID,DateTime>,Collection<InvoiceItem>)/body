@@ -1,0 +1,15 @@
+{
+  for (  final InvoiceItem item : items) {
+    final UUID subscriptionId=item.getSubscriptionId();
+    final LocalDate endDate=(item.getEndDate() != null) ? item.getEndDate() : item.getStartDate();
+    final DateTime proposedChargedThroughDate=dateAndTimeZoneContext.computeUTCDateTimeFromLocalDate(endDate);
+    if (chargeThroughDates.containsKey(subscriptionId)) {
+      if (chargeThroughDates.get(subscriptionId).isBefore(proposedChargedThroughDate)) {
+        chargeThroughDates.put(subscriptionId,proposedChargedThroughDate);
+      }
+    }
+ else {
+      chargeThroughDates.put(subscriptionId,proposedChargedThroughDate);
+    }
+  }
+}

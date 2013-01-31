@@ -9,7 +9,7 @@
   final PlanPhase basePlanEvergreen=new MockPlanPhase(price10,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
   final BillingEventSet events=new MockBillingEventSet();
   events.add(createBillingEvent(baseSubscription.getId(),april25,basePlan,basePlanEvergreen,25));
-  final Invoice invoice1=generator.generateInvoice(accountId,events,null,april25,DateTimeZone.UTC,Currency.USD);
+  final Invoice invoice1=generator.generateInvoice(accountId,events,null,april25,Currency.USD);
   assertNotNull(invoice1);
   assertEquals(invoice1.getNumberOfItems(),1);
   assertEquals(invoice1.getBalance().compareTo(TEN),0);
@@ -24,7 +24,7 @@
   final Plan addOn2Plan=new MockPlan("add on 2");
   final PlanPhase addOn2PlanPhaseEvergreen=new MockPlanPhase(price20,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
   events.add(createBillingEvent(addOnSubscription2.getId(),april28,addOn2Plan,addOn2PlanPhaseEvergreen,25));
-  final Invoice invoice2=generator.generateInvoice(accountId,events,invoices,april28,DateTimeZone.UTC,Currency.USD);
+  final Invoice invoice2=generator.generateInvoice(accountId,events,invoices,april28,Currency.USD);
   invoices.add(invoice2);
   assertNotNull(invoice2);
   assertEquals(invoice2.getNumberOfItems(),2);
@@ -36,7 +36,7 @@
   newEvents.add(createBillingEvent(baseSubscription.getId(),april25,basePlan2,basePlan2Phase,25));
   newEvents.add(createBillingEvent(addOnSubscription1.getId(),april28,addOn1Plan,addOn1PlanPhaseEvergreen,25));
   final LocalDate may1=new LocalDate(2012,5,1);
-  final Invoice invoice3=generator.generateInvoice(accountId,newEvents,invoices,may1,DateTimeZone.UTC,Currency.USD);
+  final Invoice invoice3=generator.generateInvoice(accountId,newEvents,invoices,may1,Currency.USD);
   assertNotNull(invoice3);
   assertEquals(invoice3.getNumberOfItems(),5);
   assertEquals(invoice3.getBalance().compareTo(FIFTEEN.negate()),0);

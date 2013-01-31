@@ -1,0 +1,36 @@
+{
+  final List<InvoiceItem> items=new ArrayList<InvoiceItem>();
+  final InvoiceItem fixedPriceInvoiceItem=generateFixedPriceItem(invoiceId,accountId,thisEvent,targetDate,currency);
+  if (fixedPriceInvoiceItem != null) {
+    items.add(fixedPriceInvoiceItem);
+  }
+  final BillingPeriod billingPeriod=thisEvent.getBillingPeriod();
+  if (billingPeriod != BillingPeriod.NO_BILLING_PERIOD) {
+    final BillingMode billingMode=instantiateBillingMode(thisEvent.getBillingMode());
+    final LocalDate startDate=new LocalDate(thisEvent.getEffectiveDate(),thisEvent.getTimeZone());
+    if (!startDate.isAfter(targetDate)) {
+      final LocalDate endDate=(nextEvent == null) ? null : new LocalDate(nextEvent.getEffectiveDate(),nextEvent.getTimeZone());
+      final int billCycleDayLocal=thisEvent.getBillCycleDay().getDayOfMonthLocal();
+      final List<RecurringInvoiceItemData> itemData;
+      try {
+        itemData=billingMode.calculateInvoiceItemData(startDate,endDate,targetDate,billCycleDayLocal,billingPeriod);
+      }
+ catch (      InvalidDateSequenceException e) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_INVALID_DATE_SEQUENCE,startDate,endDate,targetDate);
+      }
+      for (      final RecurringInvoiceItemData itemDatum : itemData) {
+        final BigDecimal rate=thisEvent.getRecurringPrice();
+        if (rate != null) {
+          final BigDecimal amount=itemDatum.getNumberOfCycles().multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_MODE);
+          final RecurringInvoiceItem recurringItem=new RecurringInvoiceItem(invoiceId,accountId,thisEvent.getSubscription().getBundleId(),thisEvent.getSubscription().getId(),thisEvent.getPlan().getName(),thisEvent.getPlanPhase().getName(),itemDatum.getStartDate(),itemDatum.getEndDate(),amount,rate,currency);
+          items.add(recurringItem);
+        }
+      }
+    }
+  }
+  logStringBuilder.append("\n").append(thisEvent);
+  for (  final InvoiceItem item : items) {
+    logStringBuilder.append("\n\t").append(item);
+  }
+  return items;
+}

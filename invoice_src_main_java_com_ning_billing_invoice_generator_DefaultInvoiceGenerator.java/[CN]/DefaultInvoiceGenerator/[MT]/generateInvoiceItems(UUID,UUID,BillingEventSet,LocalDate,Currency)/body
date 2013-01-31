@@ -1,0 +1,20 @@
+{
+  final List<InvoiceItem> items=new ArrayList<InvoiceItem>();
+  if (events.size() == 0) {
+    return items;
+  }
+  final StringBuilder logStringBuilder=new StringBuilder("Invoice items generated for invoiceId ").append(invoiceId).append(" and accountId ").append(accountId);
+  final Iterator<BillingEvent> eventIt=events.iterator();
+  BillingEvent nextEvent=eventIt.next();
+  while (eventIt.hasNext()) {
+    final BillingEvent thisEvent=nextEvent;
+    nextEvent=eventIt.next();
+    if (!events.getSubscriptionIdsWithAutoInvoiceOff().contains(thisEvent.getSubscription().getId())) {
+      final BillingEvent adjustedNextEvent=(thisEvent.getSubscription().getId() == nextEvent.getSubscription().getId()) ? nextEvent : null;
+      items.addAll(processEvents(invoiceId,accountId,thisEvent,adjustedNextEvent,targetDate,currency,logStringBuilder));
+    }
+  }
+  items.addAll(processEvents(invoiceId,accountId,nextEvent,null,targetDate,currency,logStringBuilder));
+  log.info(logStringBuilder.toString());
+  return items;
+}
