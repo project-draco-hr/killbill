@@ -1,7 +1,7 @@
 {
-  final InvoiceItem invoiceItem=invoiceUserApi.getInvoice(invoiceId,tenantContext).getInvoiceItems().get(0);
+  final InvoiceItem invoiceItem=invoiceUserApi.getInvoice(invoiceId,callContext).getInvoiceItems().get(0);
   try {
-    invoiceUserApi.insertInvoiceItemAdjustment(accountId,invoiceId,invoiceItem.getId(),clock.getUTCToday(),BigDecimal.TEN.negate(),accountCurrency,context);
+    invoiceUserApi.insertInvoiceItemAdjustment(accountId,invoiceId,invoiceItem.getId(),clock.getUTCToday(),BigDecimal.TEN.negate(),accountCurrency,callContext);
     Assert.fail("Should not have been able to adjust an item with a negative amount");
   }
  catch (  InvoiceApiException e) {

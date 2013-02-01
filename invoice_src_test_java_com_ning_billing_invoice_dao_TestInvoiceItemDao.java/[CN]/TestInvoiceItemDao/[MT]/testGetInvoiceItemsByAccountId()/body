@@ -3,13 +3,13 @@
   final UUID bundleId=UUID.randomUUID();
   final LocalDate targetDate=new LocalDate(2011,5,23);
   final DefaultInvoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate,Currency.USD);
-  createInvoice(invoice,true,internalCallContext);
+  invoiceUtil.createInvoice(invoice,true,internalCallContext);
   final UUID invoiceId=invoice.getId();
   final LocalDate startDate=new LocalDate(2011,3,1);
   final BigDecimal rate=new BigDecimal("20.00");
   final UUID subscriptionId=UUID.randomUUID();
   final RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate,startDate.plusMonths(1),rate,rate,Currency.USD);
-  createInvoiceItem(item,internalCallContext);
-  final List<InvoiceItemModelDao> items=invoiceItemSqlDao.getInvoiceItemsByAccount(accountId.toString(),internalCallContext);
+  invoiceUtil.createInvoiceItem(item,internalCallContext);
+  final List<InvoiceItemModelDao> items=invoiceUtil.getInvoiceItemByAccountId(accountId,internalCallContext);
   assertEquals(items.size(),1);
 }

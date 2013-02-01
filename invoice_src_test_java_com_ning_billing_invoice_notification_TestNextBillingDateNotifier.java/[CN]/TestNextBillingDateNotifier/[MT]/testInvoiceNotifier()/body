@@ -1,26 +1,18 @@
 {
   final UUID accountId=UUID.randomUUID();
-  final UUID subscriptionId=new UUID(0L,1L);
+  final Subscription subscription=invoiceUtil.createSubscription();
+  final UUID subscriptionId=subscription.getId();
   final DateTime now=new DateTime();
   final DateTime readyTime=now.plusMillis(2000);
-  final NextBillingDatePoster poster=new DefaultNextBillingDatePoster(notificationQueueService,internalCallContextFactory);
-  eventBus.start();
-  notifier.initialize();
-  notifier.start();
-  entitySqlDaoTransactionalJdbiWrapper.execute(new EntitySqlDaoTransactionWrapper<Void>(){
-    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
-      poster.insertNextBillingNotification(entitySqlDaoWrapperFactory,accountId,subscriptionId,readyTime,UUID.randomUUID());
-      return null;
-    }
-  }
-);
+  final NotificationQueue nextBillingQueue=notificationQueueService.getNotificationQueue(DefaultInvoiceService.INVOICE_SERVICE_NAME,DefaultNextBillingDateNotifier.NEXT_BILLING_DATE_NOTIFIER_QUEUE);
+  nextBillingQueue.recordFutureNotification(now,new NextBillingDateNotificationKey(subscriptionId),internalCallContext);
   ((ClockMock)clock).setDeltaFromReality(3000);
   await().atMost(1,MINUTES).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {
-      return listener.getEventCount() == 1;
+      return testInvoiceNotificationQListener.getEventCount() == 1;
     }
   }
 );
-  Assert.assertEquals(listener.getEventCount(),1);
-  Assert.assertEquals(listener.getLatestSubscriptionId(),subscriptionId);
+  Assert.assertEquals(testInvoiceNotificationQListener.getEventCount(),1);
+  Assert.assertEquals(testInvoiceNotificationQListener.getLatestSubscriptionId(),subscriptionId);
 }

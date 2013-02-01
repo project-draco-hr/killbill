@@ -3,14 +3,14 @@
   final UUID bundleId=UUID.randomUUID();
   final LocalDate targetDate1=new LocalDate(2011,10,6);
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1,Currency.USD);
-  createInvoice(invoice1,true,internalCallContext);
+  invoiceUtil.createInvoice(invoice1,true,internalCallContext);
   final LocalDate startDate=new LocalDate(2011,3,1);
   final LocalDate endDate=startDate.plusMonths(1);
   final BigDecimal rate1=new BigDecimal("17.0");
   final RecurringInvoiceItem item1=new RecurringInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase A",startDate,endDate,rate1,rate1,Currency.USD);
-  createInvoiceItem(item1,internalCallContext);
+  invoiceUtil.createInvoiceItem(item1,internalCallContext);
   final CreditAdjInvoiceItem creditItem=new CreditAdjInvoiceItem(invoice1.getId(),accountId,new LocalDate(),rate1.negate(),Currency.USD);
-  createInvoiceItem(creditItem,internalCallContext);
+  invoiceUtil.createInvoiceItem(creditItem,internalCallContext);
   final BigDecimal balance=invoiceDao.getAccountBalance(accountId,internalCallContext);
   assertEquals(balance.compareTo(BigDecimal.ZERO),0);
 }

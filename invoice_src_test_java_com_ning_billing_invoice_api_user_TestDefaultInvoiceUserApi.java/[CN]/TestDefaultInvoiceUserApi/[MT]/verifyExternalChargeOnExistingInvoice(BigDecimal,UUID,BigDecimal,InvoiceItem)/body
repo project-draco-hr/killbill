@@ -6,8 +6,8 @@
   Assert.assertEquals(externalChargeInvoiceItem.getAmount(),externalChargeAmount);
   Assert.assertEquals(externalChargeInvoiceItem.getCurrency(),accountCurrency);
   Assert.assertNull(externalChargeInvoiceItem.getLinkedItemId());
-  final BigDecimal adjustedInvoiceBalance=invoiceUserApi.getInvoice(invoiceId,tenantContext).getBalance();
+  final BigDecimal adjustedInvoiceBalance=invoiceUserApi.getInvoice(invoiceId,callContext).getBalance();
   Assert.assertEquals(adjustedInvoiceBalance.compareTo(initialInvoiceBalance.add(externalChargeAmount)),0);
-  final BigDecimal adjustedAccountBalance=invoiceUserApi.getAccountBalance(accountId,tenantContext);
+  final BigDecimal adjustedAccountBalance=invoiceUserApi.getAccountBalance(accountId,callContext);
   Assert.assertEquals(adjustedAccountBalance,adjustedInvoiceBalance);
 }

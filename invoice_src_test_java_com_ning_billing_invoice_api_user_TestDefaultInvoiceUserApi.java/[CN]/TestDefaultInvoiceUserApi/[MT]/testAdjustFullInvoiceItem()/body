@@ -1,19 +1,19 @@
 {
-  final InvoiceItem invoiceItem=invoiceUserApi.getInvoice(invoiceId,tenantContext).getInvoiceItems().get(0);
+  final InvoiceItem invoiceItem=invoiceUserApi.getInvoice(invoiceId,callContext).getInvoiceItems().get(0);
   Assert.assertEquals(invoiceItem.getAmount().compareTo(BigDecimal.ZERO),1);
-  final BigDecimal invoiceBalance=invoiceUserApi.getInvoice(invoiceId,tenantContext).getBalance();
+  final BigDecimal invoiceBalance=invoiceUserApi.getInvoice(invoiceId,callContext).getBalance();
   Assert.assertEquals(invoiceBalance.compareTo(BigDecimal.ZERO),1);
-  final BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId,tenantContext);
+  final BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId,callContext);
   Assert.assertEquals(accountBalance,invoiceBalance);
-  final InvoiceItem adjInvoiceItem=invoiceUserApi.insertInvoiceItemAdjustment(accountId,invoiceId,invoiceItem.getId(),clock.getUTCToday(),context);
+  final InvoiceItem adjInvoiceItem=invoiceUserApi.insertInvoiceItemAdjustment(accountId,invoiceId,invoiceItem.getId(),clock.getUTCToday(),callContext);
   Assert.assertEquals(adjInvoiceItem.getInvoiceId(),invoiceId);
   Assert.assertEquals(adjInvoiceItem.getInvoiceItemType(),InvoiceItemType.ITEM_ADJ);
   Assert.assertEquals(adjInvoiceItem.getAccountId(),accountId);
   Assert.assertEquals(adjInvoiceItem.getAmount(),invoiceItem.getAmount().negate());
   Assert.assertEquals(adjInvoiceItem.getCurrency(),accountCurrency);
   Assert.assertEquals(adjInvoiceItem.getLinkedItemId(),invoiceItem.getId());
-  final BigDecimal adjustedInvoiceBalance=invoiceUserApi.getInvoice(invoiceId,tenantContext).getBalance();
+  final BigDecimal adjustedInvoiceBalance=invoiceUserApi.getInvoice(invoiceId,callContext).getBalance();
   verifyAdjustedInvoiceBalance(invoiceBalance,invoiceItem.getAmount(),adjustedInvoiceBalance);
-  final BigDecimal adjustedAccountBalance=invoiceUserApi.getAccountBalance(accountId,tenantContext);
+  final BigDecimal adjustedAccountBalance=invoiceUserApi.getAccountBalance(accountId,callContext);
   Assert.assertEquals(adjustedAccountBalance,adjustedInvoiceBalance);
 }
