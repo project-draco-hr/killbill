@@ -17,11 +17,8 @@ synchronized (thePersistentQ) {
         doneInitialization.countDown();
         try {
           while (true) {
-synchronized (thePersistentQ) {
-              if (!isProcessingEvents) {
-                thePersistentQ.notify();
-                break;
-              }
+            if (!isProcessingEvents) {
+              break;
             }
             try {
               if (!isProcessingSuspended.get()) {
@@ -44,6 +41,7 @@ catch (        Throwable e) {
           log.info(String.format("%s: Thread %s has exited",svcQName,Thread.currentThread().getName()));
 synchronized (thePersistentQ) {
             curActiveThreads--;
+            thePersistentQ.notify();
           }
         }
       }
