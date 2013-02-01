@@ -13,7 +13,7 @@
   final UUID bundleId=UUID.randomUUID();
   final String externalKey=UUID.randomUUID().toString();
   final SubscriptionJsonWithEvents subscription=new SubscriptionJsonWithEvents(bundleId,subscriptionTimeline,null,ImmutableMap.<UUID,List<AuditLog>>of());
-  final List<AuditLogJson> auditLogs=createAuditLogsJson();
+  final List<AuditLogJson> auditLogs=createAuditLogsJson(clock.getUTCNow());
   final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=new BundleJsonWithSubscriptions(bundleId.toString(),externalKey,ImmutableList.<SubscriptionJsonWithEvents>of(subscription),auditLogs);
   Assert.assertEquals(bundleJsonWithSubscriptions.getBundleId(),bundleId.toString());
   Assert.assertEquals(bundleJsonWithSubscriptions.getExternalKey(),externalKey);
