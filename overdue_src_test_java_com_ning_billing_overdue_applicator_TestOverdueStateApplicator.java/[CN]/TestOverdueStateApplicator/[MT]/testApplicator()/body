@@ -1,23 +1,20 @@
 {
-  bus.register(listener);
-  bus.start();
-  final InputStream is=new ByteArrayInputStream(configXml.getBytes());
-  config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
+  final InputStream is=new ByteArrayInputStream(testOverdueHelper.getConfigXml().getBytes());
+  final OverdueConfig config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
   overdueWrapperFactory.setOverdueConfig(config);
   final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
   Mockito.when(bundle.getId()).thenReturn(UUID.randomUUID());
   OverdueState<SubscriptionBundle> state;
   state=config.getBundleStateSet().findState("OD1");
   applicator.apply(null,null,bundle,DefaultBlockingState.CLEAR_STATE_NAME,state,internalCallContext);
-  checkStateApplied(state);
+  testOverdueHelper.checkStateApplied(state);
   checkBussEvent("OD1");
   state=config.getBundleStateSet().findState("OD2");
   applicator.apply(null,null,bundle,DefaultBlockingState.CLEAR_STATE_NAME,state,internalCallContext);
-  checkStateApplied(state);
+  testOverdueHelper.checkStateApplied(state);
   checkBussEvent("OD2");
   state=config.getBundleStateSet().findState("OD3");
   applicator.apply(null,null,bundle,DefaultBlockingState.CLEAR_STATE_NAME,state,internalCallContext);
-  checkStateApplied(state);
+  testOverdueHelper.checkStateApplied(state);
   checkBussEvent("OD3");
-  bus.stop();
 }

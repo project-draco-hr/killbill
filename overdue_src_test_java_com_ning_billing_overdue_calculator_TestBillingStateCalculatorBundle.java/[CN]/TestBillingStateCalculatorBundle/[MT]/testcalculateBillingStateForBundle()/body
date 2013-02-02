@@ -8,13 +8,10 @@
   invoices.add(createInvoice(now.minusDays(3),new BigDecimal("100.00"),createInvoiceItems(new UUID[]{thatBundleId,thisBundleId,thatBundleId})));
   invoices.add(createInvoice(now.minusDays(2),new BigDecimal("1000.00"),createInvoiceItems(new UUID[]{thisBundleId})));
   invoices.add(createInvoice(now.minusDays(1),new BigDecimal("10000.00"),createInvoiceItems(new UUID[]{thatBundleId,thisBundleId})));
-  final Clock clock=new ClockMock();
-  final InvoiceInternalApi invoiceApi=Mockito.mock(InvoiceInternalApi.class);
   Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any(),Mockito.<InternalTenantContext>any())).thenReturn(invoices);
   final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
   Mockito.when(bundle.getId()).thenReturn(thisBundleId);
   Mockito.when(bundle.getAccountId()).thenReturn(UUID.randomUUID());
-  final EntitlementInternalApi entitlementApi=Mockito.mock(EntitlementInternalApi.class);
   final Subscription subscription=Mockito.mock(Subscription.class);
   Mockito.when(entitlementApi.getBaseSubscription(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscription);
   final Plan plan=MockPlan.createBicycleNoTrialEvergreen1USD();
@@ -22,8 +19,7 @@
   Mockito.when(subscription.getCurrentPlan()).thenReturn(plan);
   Mockito.when(subscription.getCurrentPriceList()).thenReturn(pricelist);
   Mockito.when(subscription.getCurrentPhase()).thenReturn(plan.getFinalPhase());
-  final BillingStateCalculatorBundle calc=new BillingStateCalculatorBundle(entitlementApi,invoiceApi,accountApi,clock);
-  final BillingStateBundle state=calc.calculateBillingState(bundle,internalCallContext);
+  final BillingStateBundle state=calculatorBundle.calculateBillingState(bundle,internalCallContext);
   Assert.assertEquals(state.getNumberOfUnpaidInvoices(),4);
   Assert.assertEquals(state.getBalanceOfUnpaidInvoices().intValue(),11100);
   Assert.assertEquals(state.getDateOfEarliestUnpaidInvoice().compareTo(now.minusDays(5)),0);
