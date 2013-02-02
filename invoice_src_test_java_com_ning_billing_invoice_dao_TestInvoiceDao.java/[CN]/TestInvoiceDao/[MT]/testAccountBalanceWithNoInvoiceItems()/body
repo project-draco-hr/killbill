@@ -2,10 +2,10 @@
   final UUID accountId=UUID.randomUUID();
   final LocalDate targetDate1=new LocalDate(2011,10,6);
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1,Currency.USD);
-  createInvoice(invoice1,true,internalCallContext);
+  invoiceUtil.createInvoice(invoice1,true,internalCallContext);
   final BigDecimal payment1=new BigDecimal("48.0");
   final InvoicePayment payment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice1.getId(),new DateTime(),payment1,Currency.USD);
-  createPayment(payment,internalCallContext);
+  invoiceUtil.createPayment(payment,internalCallContext);
   final BigDecimal balance=invoiceDao.getAccountBalance(accountId,internalCallContext);
   assertEquals(balance.compareTo(BigDecimal.ZERO.subtract(payment1)),0);
 }

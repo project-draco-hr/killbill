@@ -1,6 +1,6 @@
 {
   final Invoice invoice=createAndPersistInvoice(invoiceDao,clock,THIRTY,CURRENCY,internalCallContext);
-  final InvoicePayment payment=createAndPersistPayment(invoiceApi,clock,invoice.getId(),THIRTY,CURRENCY,internalCallContext);
+  final InvoicePayment payment=createAndPersistPayment(invoiceInternalApi,clock,invoice.getId(),THIRTY,CURRENCY,internalCallContext);
   invoicePaymentApi.createChargeback(payment.getId(),FIFTEEN,callContext);
   final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByPaymentId(payment.getPaymentId(),callContext);
   assertNotNull(chargebacks);

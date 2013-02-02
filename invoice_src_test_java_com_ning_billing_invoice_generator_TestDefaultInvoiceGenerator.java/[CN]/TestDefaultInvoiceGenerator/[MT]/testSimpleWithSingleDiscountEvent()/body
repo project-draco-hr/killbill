@@ -5,13 +5,13 @@
   final PlanPhase phaseEvergreen=createMockMonthlyPlanPhase(EIGHT,PhaseType.DISCOUNT);
   final DateTimeZone accountTimeZone=DateTimeZone.UTC;
   final int bcdUTC=16;
-  final LocalDate startDate=buildDate(2012,7,16);
+  final LocalDate startDate=invoiceUtil.buildDate(2012,7,16);
   final BillingEventSet events=new MockBillingEventSet();
   events.add(createBillingEvent(sub.getId(),startDate,plan,phaseEvergreen,bcdUTC));
   final LocalDate targetDate=startDate;
   final Invoice invoice=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),1);
-  assertEquals(invoice.getInvoiceItems().get(0).getStartDate(),buildDate(2012,7,16));
-  assertEquals(invoice.getInvoiceItems().get(0).getEndDate(),buildDate(2012,8,16));
+  assertEquals(invoice.getInvoiceItems().get(0).getStartDate(),invoiceUtil.buildDate(2012,7,16));
+  assertEquals(invoice.getInvoiceItems().get(0).getEndDate(),invoiceUtil.buildDate(2012,8,16));
 }

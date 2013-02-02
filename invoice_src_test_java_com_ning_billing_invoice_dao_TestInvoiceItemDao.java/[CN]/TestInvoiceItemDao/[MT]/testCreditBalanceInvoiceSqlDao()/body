@@ -3,7 +3,7 @@
   final UUID accountId=UUID.randomUUID();
   final LocalDate creditDate=new LocalDate(2012,4,1);
   final InvoiceItem creditInvoiceItem=new CreditBalanceAdjInvoiceItem(invoiceId,accountId,creditDate,TEN,Currency.USD);
-  createInvoiceItem(creditInvoiceItem,internalCallContext);
-  final InvoiceItemModelDao savedItem=invoiceItemSqlDao.getById(creditInvoiceItem.getId().toString(),internalCallContext);
+  invoiceUtil.createInvoiceItem(creditInvoiceItem,internalCallContext);
+  final InvoiceItemModelDao savedItem=invoiceUtil.getInvoiceItemById(creditInvoiceItem.getId(),internalCallContext);
   assertEquals(InvoiceItemFactory.fromModelDao(savedItem),creditInvoiceItem);
 }

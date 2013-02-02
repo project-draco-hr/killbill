@@ -6,17 +6,17 @@
   final PlanPhase phase=createMockMonthlyPlanPhase(rate);
   final int bcdLocal=16;
   final int bcdUTC=17;
-  final LocalDate startDate=buildDate(2012,7,bcdLocal);
+  final LocalDate startDate=invoiceUtil.buildDate(2012,7,bcdLocal);
   final BillingEventSet events=new MockBillingEventSet();
   final BillingEvent event=createBillingEvent(sub.getId(),startDate,plan,phase,bcdUTC,bcdLocal);
   events.add(event);
-  final LocalDate targetDate=buildDate(2012,8,bcdLocal);
+  final LocalDate targetDate=invoiceUtil.buildDate(2012,8,bcdLocal);
   final DateTimeZone accountTimeZone=DateTimeZone.forID("HST");
   final Invoice invoice=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
-  assertEquals(invoice.getInvoiceItems().get(0).getStartDate(),buildDate(2012,7,16));
-  assertEquals(invoice.getInvoiceItems().get(0).getEndDate(),buildDate(2012,8,16));
-  assertEquals(invoice.getInvoiceItems().get(1).getStartDate(),buildDate(2012,8,16));
-  assertEquals(invoice.getInvoiceItems().get(1).getEndDate(),buildDate(2012,9,16));
+  assertEquals(invoice.getInvoiceItems().get(0).getStartDate(),invoiceUtil.buildDate(2012,7,16));
+  assertEquals(invoice.getInvoiceItems().get(0).getEndDate(),invoiceUtil.buildDate(2012,8,16));
+  assertEquals(invoice.getInvoiceItems().get(1).getStartDate(),invoiceUtil.buildDate(2012,8,16));
+  assertEquals(invoice.getInvoiceItems().get(1).getEndDate(),invoiceUtil.buildDate(2012,9,16));
 }

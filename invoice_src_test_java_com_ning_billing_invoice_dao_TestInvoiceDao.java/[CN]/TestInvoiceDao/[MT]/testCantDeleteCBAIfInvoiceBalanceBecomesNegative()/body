@@ -3,11 +3,11 @@
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),clock.getUTCToday(),Currency.USD);
   final RepairAdjInvoiceItem repairAdjInvoiceItem=new RepairAdjInvoiceItem(invoice1.getId(),invoice1.getAccountId(),invoice1.getInvoiceDate(),invoice1.getInvoiceDate(),BigDecimal.TEN.negate(),invoice1.getCurrency(),UUID.randomUUID());
   final CreditBalanceAdjInvoiceItem creditBalanceAdjInvoiceItem1=new CreditBalanceAdjInvoiceItem(invoice1.getId(),invoice1.getAccountId(),invoice1.getInvoiceDate(),repairAdjInvoiceItem.getAmount().negate(),invoice1.getCurrency());
-  createInvoice(invoice1,true,internalCallContext);
-  createInvoiceItem(repairAdjInvoiceItem,internalCallContext);
-  createInvoiceItem(creditBalanceAdjInvoiceItem1,internalCallContext);
+  invoiceUtil.createInvoice(invoice1,true,internalCallContext);
+  invoiceUtil.createInvoiceItem(repairAdjInvoiceItem,internalCallContext);
+  invoiceUtil.createInvoiceItem(creditBalanceAdjInvoiceItem1,internalCallContext);
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,internalCallContext).doubleValue(),10.00);
-  verifyInvoice(invoice1.getId(),0.00,10.00);
+  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00);
   try {
     invoiceDao.deleteCBA(accountId,invoice1.getId(),creditBalanceAdjInvoiceItem1.getId(),internalCallContext);
     Assert.fail();
@@ -17,5 +17,5 @@
     Assert.assertEquals(((InvoiceApiException)e.getCause()).getCode(),ErrorCode.INVOICE_WOULD_BE_NEGATIVE.getCode());
   }
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,internalCallContext).doubleValue(),10.00);
-  verifyInvoice(invoice1.getId(),0.00,10.00);
+  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00);
 }

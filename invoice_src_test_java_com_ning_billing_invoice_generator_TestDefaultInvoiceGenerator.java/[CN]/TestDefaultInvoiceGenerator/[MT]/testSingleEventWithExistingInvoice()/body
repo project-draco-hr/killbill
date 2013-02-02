@@ -1,18 +1,18 @@
 {
   final BillingEventSet events=new MockBillingEventSet();
   final Subscription sub=createZombieSubscription();
-  final LocalDate startDate=buildDate(2011,9,1);
+  final LocalDate startDate=invoiceUtil.buildDate(2011,9,1);
   final Plan plan1=new MockPlan();
   final BigDecimal rate=FIVE;
   final PlanPhase phase1=createMockMonthlyPlanPhase(rate);
   final BillingEvent event1=createBillingEvent(sub.getId(),startDate,plan1,phase1,1);
   events.add(event1);
-  LocalDate targetDate=buildDate(2011,12,1);
+  LocalDate targetDate=invoiceUtil.buildDate(2011,12,1);
   final UUID accountId=UUID.randomUUID();
   final Invoice invoice1=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
   final List<Invoice> existingInvoices=new ArrayList<Invoice>();
   existingInvoices.add(invoice1);
-  targetDate=buildDate(2011,12,3);
+  targetDate=invoiceUtil.buildDate(2011,12,3);
   final Invoice invoice2=generator.generateInvoice(accountId,events,existingInvoices,targetDate,Currency.USD);
   assertNull(invoice2);
 }
