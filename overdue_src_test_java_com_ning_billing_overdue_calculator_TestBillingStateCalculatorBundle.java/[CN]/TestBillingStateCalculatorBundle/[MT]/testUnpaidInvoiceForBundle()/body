@@ -8,9 +8,6 @@
   invoices.add(createInvoice(now.plusDays(2),new BigDecimal("100.00"),createInvoiceItems(new UUID[]{thatBundleId,thisBundleId,thatBundleId})));
   invoices.add(createInvoice(now.plusDays(3),new BigDecimal("1000.00"),createInvoiceItems(new UUID[]{thisBundleId})));
   invoices.add(createInvoice(now.plusDays(4),new BigDecimal("10000.00"),createInvoiceItems(new UUID[]{thatBundleId,thisBundleId})));
-  final Clock clock=new ClockMock();
-  final InvoiceInternalApi invoiceApi=Mockito.mock(InvoiceInternalApi.class);
-  final EntitlementInternalApi entitlementApi=Mockito.mock(EntitlementInternalApi.class);
   Mockito.when(invoiceApi.getUnpaidInvoicesByAccountId(Mockito.<UUID>any(),Mockito.<LocalDate>any(),Mockito.<InternalTenantContext>any())).thenReturn(Collections2.filter(invoices,new Predicate<Invoice>(){
     @Override public boolean apply(    @Nullable final Invoice invoice){
       return invoice != null && BigDecimal.ZERO.compareTo(invoice.getBalance()) < 0;
