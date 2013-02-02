@@ -1,8 +1,8 @@
 {
   final String lockName=UUID.randomUUID().toString();
-  final GlobalLocker locker=new MySqlGlobalLocker(dbi);
+  final GlobalLocker locker=new MySqlGlobalLocker(getDBI());
   final GlobalLock lock=locker.lockWithNumberOfTries(LockerType.ACCOUNT_FOR_INVOICE_PAYMENTS,lockName,3);
-  dbi.inTransaction(new TransactionCallback<Void>(){
+  getDBI().inTransaction(new TransactionCallback<Void>(){
     @Override public Void inTransaction(    final Handle conn,    final TransactionStatus status) throws Exception {
       conn.execute("insert into dummy2 (dummy_id) values ('" + UUID.randomUUID().toString() + "')");
       return null;

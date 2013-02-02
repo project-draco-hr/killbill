@@ -1,0 +1,13 @@
+{
+  super.setup();
+  auditLogs=ImmutableList.<AuditLog>of(createAuditLog(),createAuditLog(),createAuditLog(),createAuditLog());
+  objectIds=ImmutableList.<UUID>of(UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID());
+  super.setup();
+  for (  final TableName tableName : TableName.values()) {
+    for (    final UUID objectId : objectIds) {
+      for (      final AuditLog auditLog : auditLogs) {
+        ((MockAuditDao)auditDao).addAuditLogForId(tableName,objectId,auditLog);
+      }
+    }
+  }
+}
