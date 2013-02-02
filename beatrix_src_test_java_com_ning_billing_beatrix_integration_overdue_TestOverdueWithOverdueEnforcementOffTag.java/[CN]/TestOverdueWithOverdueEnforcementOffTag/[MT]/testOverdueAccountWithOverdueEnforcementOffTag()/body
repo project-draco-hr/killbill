@@ -9,8 +9,12 @@
   invoiceChecker.checkChargedThroughDate(baseSubscription.getId(),new LocalDate(2012,6,30),callContext);
   addDaysAndCheckForCompletion(6);
   checkODState("OD1");
+  busHandler.pushExpectedEvent(NextEvent.TAG);
   tagUserApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.OVERDUE_ENFORCEMENT_OFF.getId(),callContext);
+  busHandler.isCompleted(DELAY);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
+  busHandler.pushExpectedEvent(NextEvent.TAG);
   tagUserApi.removeTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.OVERDUE_ENFORCEMENT_OFF.getId(),callContext);
+  busHandler.isCompleted(DELAY);
   checkODState("OD1");
 }
