@@ -1,24 +1,21 @@
 {
-  accountApi=Mockito.mock(AccountInternalApi.class);
-  final List<SubscriptionBundle> bundles=new ArrayList<SubscriptionBundle>();
   final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
   Mockito.when(bundle.getId()).thenReturn(bunId);
-  bundles.add(bundle);
+  final List<SubscriptionBundle> bundles=ImmutableList.<SubscriptionBundle>of(bundle);
   effectiveSubscriptionTransitions=new LinkedList<EffectiveSubscriptionInternalEvent>();
-  final List<Subscription> subscriptions=new LinkedList<Subscription>();
   final DateTime subscriptionStartDate=clock.getUTCNow().minusDays(3);
   subscription=new MockSubscription(subId,bunId,null,subscriptionStartDate,effectiveSubscriptionTransitions);
-  subscriptions.add(subscription);
-  entitlementApi=Mockito.mock(EntitlementInternalApi.class);
-  Mockito.when(entitlementApi.getBundlesForAccount(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(bundles);
-  Mockito.when(entitlementApi.getSubscriptionsForBundle(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscriptions);
-  Mockito.when(entitlementApi.getSubscriptionFromId(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscription);
-  Mockito.when(entitlementApi.getBundleFromId(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(bundle);
-  Mockito.when(entitlementApi.getBaseSubscription(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscription);
-  Mockito.when(entitlementApi.getBillingTransitions(Mockito.<Subscription>any(),Mockito.<InternalTenantContext>any())).thenReturn(effectiveSubscriptionTransitions);
-  Mockito.when(entitlementApi.getAllTransitions(Mockito.<Subscription>any(),Mockito.<InternalTenantContext>any())).thenReturn(effectiveSubscriptionTransitions);
-  tagApi=mock(TagInternalApi.class);
-  bcdCalculator=new BillCycleDayCalculator(catalogService,entitlementApi);
-  api=new DefaultInternalBillingApi(accountApi,bcdCalculator,entitlementApi,blockCalculator,catalogService,tagApi);
-  ((MockCatalog)catalogService.getFullCatalog()).setBillingAlignment(BillingAlignment.ACCOUNT);
+  final List<Subscription> subscriptions=ImmutableList.<Subscription>of(subscription);
+  Mockito.when(entitlementInternalApi.getBundlesForAccount(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(bundles);
+  Mockito.when(entitlementInternalApi.getSubscriptionsForBundle(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscriptions);
+  Mockito.when(entitlementInternalApi.getSubscriptionFromId(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscription);
+  Mockito.when(entitlementInternalApi.getBundleFromId(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(bundle);
+  Mockito.when(entitlementInternalApi.getBaseSubscription(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(subscription);
+  Mockito.when(entitlementInternalApi.getBillingTransitions(Mockito.<Subscription>any(),Mockito.<InternalTenantContext>any())).thenReturn(effectiveSubscriptionTransitions);
+  Mockito.when(entitlementInternalApi.getAllTransitions(Mockito.<Subscription>any(),Mockito.<InternalTenantContext>any())).thenReturn(effectiveSubscriptionTransitions);
+  catalog=((MockCatalog)catalogService.getCurrentCatalog());
+  Mockito.when(catalogService.getFullCatalog()).thenReturn(catalog);
+  catalog.setBillingAlignment(BillingAlignment.ACCOUNT);
+  ((MockBlockingStateDao)blockingStateDao).clear();
+  ((MockTagDao)tagDao).clear();
 }

@@ -1,9 +1,9 @@
 {
-  final Plan nextPlan=catalogService.getFullCatalog().findPlan("PickupTrialEvergreen10USD",clock.getUTCNow());
+  final Plan nextPlan=catalog.findPlan("PickupTrialEvergreen10USD",clock.getUTCNow());
   final PlanPhase nextPhase=nextPlan.getAllPhases()[1];
   final DateTime now=createSubscriptionCreationEvent(nextPlan,nextPhase);
   final Account account=createAccount(1);
-  ((MockCatalog)catalogService.getFullCatalog()).setBillingAlignment(BillingAlignment.SUBSCRIPTION);
-  final SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext);
+  catalog.setBillingAlignment(BillingAlignment.SUBSCRIPTION);
+  final SortedSet<BillingEvent> events=billingInternalApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext);
   checkFirstEvent(events,nextPlan,subscription.getStartDate().getDayOfMonth(),subId,now,nextPhase,SubscriptionTransitionType.CREATE.toString());
 }

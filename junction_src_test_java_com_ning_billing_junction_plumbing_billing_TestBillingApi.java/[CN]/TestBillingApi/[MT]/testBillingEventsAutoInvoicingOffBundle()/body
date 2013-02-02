@@ -1,14 +1,10 @@
 {
-  final Plan nextPlan=catalogService.getFullCatalog().findPlan("PickupTrialEvergreen10USD",clock.getUTCNow());
+  final Plan nextPlan=catalog.findPlan("PickupTrialEvergreen10USD",clock.getUTCNow());
   final PlanPhase nextPhase=nextPlan.getAllPhases()[1];
   createSubscriptionCreationEvent(nextPlan,nextPhase);
   final Account account=createAccount(32);
-  final List<Tag> tags=new ArrayList<Tag>();
-  final Tag aioTag=mock(Tag.class);
-  when(aioTag.getTagDefinitionId()).thenReturn(ControlTagType.AUTO_INVOICING_OFF.getId());
-  tags.add(aioTag);
-  when(tagApi.getTags(bunId,ObjectType.BUNDLE,internalCallContext)).thenReturn(tags);
-  final BillingEventSet events=api.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext);
+  tagInternalApi.addTag(bunId,ObjectType.BUNDLE,ControlTagType.AUTO_INVOICING_OFF.getId(),internalCallContext);
+  final BillingEventSet events=billingInternalApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext);
   assertEquals(events.getSubscriptionIdsWithAutoInvoiceOff().size(),1);
   assertEquals(events.getSubscriptionIdsWithAutoInvoiceOff().get(0),subId);
   assertEquals(events.size(),0);

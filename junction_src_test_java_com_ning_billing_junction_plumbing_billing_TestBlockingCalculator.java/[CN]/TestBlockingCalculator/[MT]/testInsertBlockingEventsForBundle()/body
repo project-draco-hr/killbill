@@ -12,20 +12,20 @@
   final List<BlockingState> blockingStates=new ArrayList<BlockingState>();
   blockingStates.add(new DefaultBlockingState(UUID.randomUUID(),bundleId1,DISABLED_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now,null));
   blockingStates.add(new DefaultBlockingState(UUID.randomUUID(),bundleId1,CLEAR_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now.plusDays(2),null));
-  Mockito.when(blockingApi.getBlockingHistory(bundleId1,internalCallContext)).thenReturn(blockingStates);
-  odc.insertBlockingEvents(billingEvents,internalCallContext);
+  setBlockingStates(bundleId1,blockingStates);
+  blockingCalculator.insertBlockingEvents(billingEvents,internalCallContext);
   assertEquals(billingEvents.size(),7);
-  final SortedSet<BillingEvent> s1Events=odc.filter(billingEvents,subscription1);
+  final SortedSet<BillingEvent> s1Events=blockingCalculator.filter(billingEvents,subscription1);
   final Iterator<BillingEvent> it1=s1Events.iterator();
   assertEquals(it1.next(),A);
   assertEquals(it1.next().getTransitionType(),SubscriptionTransitionType.START_BILLING_DISABLED);
   assertEquals(it1.next().getTransitionType(),SubscriptionTransitionType.END_BILLING_DISABLED);
-  final SortedSet<BillingEvent> s2Events=odc.filter(billingEvents,subscription2);
+  final SortedSet<BillingEvent> s2Events=blockingCalculator.filter(billingEvents,subscription2);
   final Iterator<BillingEvent> it2=s2Events.iterator();
   assertEquals(it2.next(),B);
   assertEquals(it2.next().getTransitionType(),SubscriptionTransitionType.START_BILLING_DISABLED);
   assertEquals(it2.next().getTransitionType(),SubscriptionTransitionType.END_BILLING_DISABLED);
-  final SortedSet<BillingEvent> s3Events=odc.filter(billingEvents,subscription3);
+  final SortedSet<BillingEvent> s3Events=blockingCalculator.filter(billingEvents,subscription3);
   final Iterator<BillingEvent> it3=s3Events.iterator();
   assertEquals(it3.next(),D);
 }

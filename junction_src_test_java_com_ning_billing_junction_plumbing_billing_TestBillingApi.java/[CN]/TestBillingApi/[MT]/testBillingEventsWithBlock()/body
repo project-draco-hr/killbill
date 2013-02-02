@@ -1,33 +1,13 @@
 {
-  final Plan nextPlan=catalogService.getFullCatalog().findPlan("PickupTrialEvergreen10USD",clock.getUTCNow());
+  final Plan nextPlan=catalog.findPlan("PickupTrialEvergreen10USD",clock.getUTCNow());
   final PlanPhase nextPhase=nextPlan.getAllPhases()[1];
   final DateTime now=createSubscriptionCreationEvent(nextPlan,nextPhase);
   final Account account=createAccount(32);
   final List<BlockingState> blockingStates=new ArrayList<BlockingState>();
   blockingStates.add(new DefaultBlockingState(UUID.randomUUID(),bunId,DISABLED_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(1),null));
   blockingStates.add(new DefaultBlockingState(UUID.randomUUID(),bunId,CLEAR_BUNDLE,Blockable.Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now.plusDays(2),null));
-  final BlockingCalculator blockingCal=new BlockingCalculator(new BlockingInternalApi(){
-    @Override public <T extends Blockable>void setBlockingState(    final BlockingState state,    final InternalCallContext context){
-    }
-    @Override public BlockingState getBlockingStateFor(    final UUID overdueableId,    final InternalTenantContext context){
-      return null;
-    }
-    @Override public BlockingState getBlockingStateFor(    final Blockable overdueable,    final InternalTenantContext context){
-      return null;
-    }
-    @Override public List<BlockingState> getBlockingHistory(    final UUID overdueableId,    final InternalTenantContext context){
-      if (overdueableId == bunId) {
-        return blockingStates;
-      }
-      return new ArrayList<BlockingState>();
-    }
-    @Override public List<BlockingState> getBlockingHistory(    final Blockable overdueable,    final InternalTenantContext context){
-      return new ArrayList<BlockingState>();
-    }
-  }
-);
-  final BillingInternalApi api=new DefaultInternalBillingApi(accountApi,bcdCalculator,entitlementApi,blockingCal,catalogService,tagApi);
-  final SortedSet<BillingEvent> events=api.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext);
+  ((MockBlockingStateDao)blockingStateDao).setBlockingStates(bunId,blockingStates);
+  final SortedSet<BillingEvent> events=billingInternalApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext);
   Assert.assertEquals(events.size(),3);
   final Iterator<BillingEvent> it=events.iterator();
   checkEvent(it.next(),nextPlan,account.getBillCycleDay().getDayOfMonthUTC(),subId,now,nextPhase,SubscriptionTransitionType.CREATE.toString(),nextPhase.getFixedPrice(),nextPhase.getRecurringPrice());

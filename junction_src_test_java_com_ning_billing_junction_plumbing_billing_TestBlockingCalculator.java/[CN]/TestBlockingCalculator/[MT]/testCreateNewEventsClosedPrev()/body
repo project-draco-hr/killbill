@@ -4,7 +4,7 @@
   final SortedSet<BillingEvent> billingEvents=new TreeSet<BillingEvent>();
   disabledDuration.add(new DisabledDuration(now,now.plusDays(2)));
   billingEvents.add(createRealEvent(now.minusDays(1),subscription1));
-  final SortedSet<BillingEvent> results=odc.createNewEvents(disabledDuration,billingEvents,account,subscription1);
+  final SortedSet<BillingEvent> results=blockingCalculator.createNewEvents(disabledDuration,billingEvents,account,subscription1);
   assertEquals(results.size(),2);
   assertEquals(results.first().getEffectiveDate(),now);
   assertNull(results.first().getFixedPrice());
