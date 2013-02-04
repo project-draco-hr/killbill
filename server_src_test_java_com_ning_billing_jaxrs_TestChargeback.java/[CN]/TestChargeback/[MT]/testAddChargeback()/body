@@ -1,15 +1,4 @@
 {
   final PaymentJsonSimple payment=createAccountWithInvoiceAndPayment();
-  final ChargebackJson input=new ChargebackJson(null,null,BigDecimal.TEN,payment.getPaymentId(),null,null);
-  final String jsonInput=mapper.writeValueAsString(input);
-  Response response=doPost(JaxrsResource.CHARGEBACKS_PATH,jsonInput,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode(),response.getResponseBody());
-  final String location=response.getHeader("Location");
-  assertNotNull(location);
-  response=doGetWithUrl(location,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  verifySingleChargebackResponse(response,input);
-  response=doGet(JaxrsResource.CHARGEBACKS_PATH + "/accounts/" + payment.getAccountId(),DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  verifyCollectionChargebackResponse(response,input);
-  response=doGet(JaxrsResource.CHARGEBACKS_PATH + "/payments/" + payment.getPaymentId(),DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  verifyCollectionChargebackResponse(response,input);
+  createAndVerifyChargeback(payment);
 }
