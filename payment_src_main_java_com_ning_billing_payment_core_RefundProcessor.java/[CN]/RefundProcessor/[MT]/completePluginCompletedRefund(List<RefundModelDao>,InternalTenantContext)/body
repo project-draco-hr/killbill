@@ -9,7 +9,7 @@
     return false;
   }
   try {
-    final InternalCallContext context=internalCallContextFactory.createInternalCallContext(tenantContext.getTenantRecordId(),tenantContext.getAccountRecordId(),"RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,null);
+    final InternalCallContext context=internalCallContextFactory.createInternalCallContext(refundsToBeFixed.iterator().next().getId(),ObjectType.REFUND,"RefundProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,null);
     final Account account=accountInternalApi.getAccountById(refundsToBeFixed.iterator().next().getAccountId(),context);
     new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
       @Override public Void doOperation() throws PaymentApiException {

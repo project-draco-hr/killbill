@@ -1,0 +1,11 @@
+{
+  final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePayments(paymentId,context);
+  final Collection<InvoicePayment> refundInvoicePayments=Collections2.filter(invoicePayments,new Predicate<InvoicePayment>(){
+    @Override public boolean apply(    @Nullable final InvoicePayment invoicePayment){
+      return invoicePayment.getType() == type && invoicePayment.getPaymentId().equals(paymentId);
+    }
+  }
+);
+  Assert.assertEquals(refundInvoicePayments.size(),1);
+  return refundInvoicePayments.iterator().next();
+}

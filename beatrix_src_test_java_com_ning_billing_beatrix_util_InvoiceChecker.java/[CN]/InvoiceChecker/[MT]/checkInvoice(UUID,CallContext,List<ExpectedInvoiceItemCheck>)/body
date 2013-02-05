@@ -6,14 +6,14 @@
   for (  final ExpectedInvoiceItemCheck cur : expected) {
     boolean found=false;
     for (    final InvoiceItem in : actual) {
-      if (in.getInvoiceItemType() != cur.getType() || (in.getStartDate().compareTo(cur.getStartDate()) != 0)) {
+      if (in.getInvoiceItemType() != cur.getType() || (cur.shouldCheckDates() && in.getStartDate().compareTo(cur.getStartDate()) != 0)) {
         continue;
       }
       if (in.getAmount().compareTo(cur.getAmount()) != 0) {
         log.info(String.format("Found item type = %s and startDate = %s but amount differ (actual = %s, expected = %s) ",cur.getType(),cur.getStartDate(),in.getAmount(),cur.getAmount()));
         continue;
       }
-      if ((cur.getEndDate() == null && in.getEndDate() == null) || (cur.getEndDate() != null && in.getEndDate() != null && cur.getEndDate().compareTo(in.getEndDate()) == 0)) {
+      if (!cur.shouldCheckDates() || (cur.getEndDate() == null && in.getEndDate() == null) || (cur.getEndDate() != null && in.getEndDate() != null && cur.getEndDate().compareTo(in.getEndDate()) == 0)) {
         found=true;
         break;
       }
