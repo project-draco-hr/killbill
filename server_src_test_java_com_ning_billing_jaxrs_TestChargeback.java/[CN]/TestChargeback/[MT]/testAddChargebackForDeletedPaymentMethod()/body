@@ -1,0 +1,8 @@
+{
+  final PaymentJsonSimple payment=createAccountWithInvoiceAndPayment();
+  assertEquals(getAccountById(payment.getAccountId()).getPaymentMethodId(),payment.getPaymentMethodId());
+  assertEquals(getPaymentMethod(payment.getPaymentMethodId()).getAccountId(),payment.getAccountId());
+  deletePaymentMethod(payment.getPaymentMethodId(),true);
+  assertNull(getAccountById(payment.getAccountId()).getPaymentMethodId());
+  createAndVerifyChargeback(payment);
+}
