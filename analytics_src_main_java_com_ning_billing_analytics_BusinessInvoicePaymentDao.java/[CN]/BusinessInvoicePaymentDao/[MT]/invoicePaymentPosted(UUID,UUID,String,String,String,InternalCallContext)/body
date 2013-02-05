@@ -18,13 +18,12 @@
     log.warn("Ignoring payment {}: payment does not exist",paymentId);
     return;
   }
-  final PaymentMethod paymentMethod;
+  PaymentMethod paymentMethod=null;
   try {
     paymentMethod=paymentApi.getPaymentMethod(account,payment.getPaymentMethodId(),true,context);
   }
  catch (  PaymentApiException e) {
-    log.warn("Ignoring payment {}: payment method {} does not exist",paymentId,payment.getPaymentMethodId());
-    return;
+    log.info("For payment {}: payment method {} does not exist",paymentId,payment.getPaymentMethodId());
   }
   Invoice invoice=null;
   InvoicePayment invoicePayment=null;
