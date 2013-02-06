@@ -6,7 +6,7 @@
       try {
         pluginApi=pluginRegistry.getPlugin(pluginName);
         pm=new DefaultPaymentMethod(account.getId(),pluginName,paymentMethodProps);
-        final String externalId=pluginApi.addPaymentMethod(account.getExternalKey(),paymentMethodProps,setDefault,context.toCallContext());
+        final String externalId=pluginApi.addPaymentMethod(paymentMethodProps,account.getId(),setDefault,context.toCallContext());
         final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getCreatedDate(),pm.getUpdatedDate(),pm.getAccountId(),pm.getPluginName(),pm.isActive(),externalId);
         paymentDao.insertPaymentMethod(pmModel,context);
         if (setDefault) {

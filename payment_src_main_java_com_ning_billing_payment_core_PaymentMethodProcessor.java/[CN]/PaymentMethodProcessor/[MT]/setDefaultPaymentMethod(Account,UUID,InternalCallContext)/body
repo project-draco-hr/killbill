@@ -6,8 +6,8 @@
         throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,paymentMethodId);
       }
       try {
-        final PaymentPluginApi pluginApi=getPluginApi(paymentMethodId,account.getId(),context);
-        pluginApi.setDefaultPaymentMethod(account.getExternalKey(),paymentMethodModel.getExternalId(),context.toCallContext());
+        final PaymentPluginApi pluginApi=getPluginApi(paymentMethodId,context);
+        pluginApi.setDefaultPaymentMethod(paymentMethodModel.getExternalId(),account.getId(),context.toCallContext());
         accountInternalApi.updatePaymentMethod(account.getId(),paymentMethodId,context);
         return null;
       }
