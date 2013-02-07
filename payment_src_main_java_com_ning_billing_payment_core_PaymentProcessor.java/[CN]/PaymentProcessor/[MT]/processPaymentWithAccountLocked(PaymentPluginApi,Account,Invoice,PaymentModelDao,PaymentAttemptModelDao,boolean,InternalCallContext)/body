@@ -9,14 +9,14 @@
   BusInternalEvent event=null;
   PaymentStatus paymentStatus;
   try {
-    final PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(account.getExternalKey(),paymentInput.getId(),attemptInput.getRequestedAmount(),context.toCallContext());
+    final PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(paymentInput.getId(),paymentInput.getPaymentMethodId(),attemptInput.getRequestedAmount(),context.toCallContext());
 switch (paymentPluginInfo.getStatus()) {
 case PROCESSED:
       paymentStatus=PaymentStatus.SUCCESS;
     paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,paymentPluginInfo.getGatewayErrorCode(),null,attemptInput.getId(),context);
   allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId(),context);
 payment=paymentDao.getPayment(paymentInput.getId(),context);
-invoiceApi.notifyOfPayment(invoice.getId(),payment.getAmount(),paymentStatus == PaymentStatus.SUCCESS ? payment.getCurrency() : null,payment.getId(),payment.getEffectiveDate(),context);
+invoiceApi.notifyOfPayment(invoice.getId(),payment.getAmount(),payment.getCurrency(),payment.getId(),payment.getEffectiveDate(),context);
 event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,context.getUserToken(),payment.getEffectiveDate(),context.getAccountRecordId(),context.getTenantRecordId());
 break;
 case ERROR:
