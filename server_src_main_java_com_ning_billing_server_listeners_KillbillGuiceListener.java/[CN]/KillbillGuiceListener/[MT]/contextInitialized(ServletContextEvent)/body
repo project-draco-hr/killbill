@@ -7,11 +7,12 @@
   guiceModule=builder.build();
   super.contextInitialized(event);
   logger.info("KillbillLifecycleListener : contextInitialized");
-  final Injector theInjector=injector(event);
-  killbillLifecycle=theInjector.getInstance(DefaultLifecycle.class);
-  killbillBusService=theInjector.getInstance(BusService.class);
-  killbilleventHandler=theInjector.getInstance(KillbillEventHandler.class);
-  registerMBeansForCache(theInjector.getInstance(CacheManager.class));
+  injector=injector(event);
+  event.getServletContext().setAttribute(Injector.class.getName(),injector);
+  killbillLifecycle=injector.getInstance(DefaultLifecycle.class);
+  killbillBusService=injector.getInstance(BusService.class);
+  killbilleventHandler=injector.getInstance(KillbillEventHandler.class);
+  registerMBeansForCache(injector.getInstance(CacheManager.class));
   killbillLifecycle.fireStartupSequencePriorEventRegistration();
   try {
     killbillBusService.getBus().register(killbilleventHandler);
