@@ -8,8 +8,7 @@
   final Thread th=new Thread(new Runnable(){
     @Override public void run(){
       while (isRunning) {
-        @SuppressWarnings("unchecked") final ServiceReference<AccountUserApi> accountUserApiReference=(ServiceReference<AccountUserApi>)context.getServiceReference(AccountUserApi.class.getName());
-        final AccountUserApi accountUserApi=context.getService(accountUserApiReference);
+        final AccountUserApi accountUserApi=osgiKillbill.getAccountUserApi();
         try {
           final List<Account> accounts=accountUserApi.getAccounts(tenantContext);
           System.out.println("Found " + accounts.size() + " accounts");
@@ -20,11 +19,6 @@
         }
 catch (        Exception e) {
           System.err.println("Error in HelloActivator: " + e.getLocalizedMessage());
-        }
- finally {
-          if (accountUserApiReference != null) {
-            context.ungetService(accountUserApiReference);
-          }
         }
       }
     }

@@ -1,15 +1,11 @@
 {
-  @SuppressWarnings("unchecked") final ServiceReference<ExternalBus> externalBusReference=(ServiceReference<ExternalBus>)context.getServiceReference(ExternalBus.class.getName());
   try {
-    final ExternalBus externalBus=context.getService(externalBusReference);
+    final ExternalBus externalBus=osgiKillbill.getExternalBus();
     externalBus.register(this);
   }
  catch (  Exception e) {
     System.err.println("Error in HelloActivator: " + e.getLocalizedMessage());
   }
  finally {
-    if (externalBusReference != null) {
-      context.ungetService(externalBusReference);
-    }
   }
 }
