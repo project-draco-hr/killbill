@@ -1,0 +1,26 @@
+{
+  final String[] objectClass=(String[])event.getServiceReference().getProperty("objectClass");
+  if (objectClass == null || objectClass.length == 0 || !claz.getName().equals(objectClass[0])) {
+    return false;
+  }
+  final ServiceReference serviceReference=event.getServiceReference();
+  final String pluginName=(String)serviceReference.getProperty(OSGIPluginProperties.PLUGIN_NAME_PROP);
+  if (pluginName == null) {
+    return true;
+  }
+  final T theService=(T)context.getService(serviceReference);
+  if (theService == null) {
+    return true;
+  }
+switch (event.getType()) {
+case ServiceEvent.REGISTERED:
+    registation.registerService(pluginName,theService);
+  break;
+case ServiceEvent.UNREGISTERING:
+registation.unregisterService(pluginName);
+break;
+default :
+break;
+}
+return true;
+}

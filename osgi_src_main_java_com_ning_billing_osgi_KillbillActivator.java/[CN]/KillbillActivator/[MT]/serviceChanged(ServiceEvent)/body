@@ -1,3 +1,10 @@
 {
-  listenForServlets(event);
+  if (context == null || (event.getType() != ServiceEvent.REGISTERED && event.getType() != ServiceEvent.UNREGISTERING)) {
+    return;
+  }
+  for (  OSGIServiceRegistration cur : allRegistrationHandlers) {
+    if (listenForServiceType(event,cur.getServiceType(),cur)) {
+      break;
+    }
+  }
 }
