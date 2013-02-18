@@ -1,27 +1,26 @@
 {
   Assert.assertEquals(service.getName(),"analytics-service");
-  try {
-    service.registerForNotifications();
-  }
- catch (  Throwable t) {
-    Assert.fail("Unable to start the bus or service! " + t);
-  }
   Assert.assertNull(accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext));
   bus.post(accountCreationNotification,internalCallContext);
-  Thread.sleep(5000);
-  Assert.assertNotNull(accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext));
+  waitALittle(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return (accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext) != null);
+    }
+  }
+);
   bus.post(transition,internalCallContext);
-  Thread.sleep(5000);
-  Assert.assertEquals(accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT),1);
+  waitALittle(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return (subscriptionTransitionSqlDao.getTransitionsForAccount(ACCOUNT_KEY,internalCallContext).size() == 1);
+    }
+  }
+);
   bus.post(invoiceCreationNotification,internalCallContext);
-  Thread.sleep(5000);
-  Assert.assertEquals(accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT),1);
+  waitALittle(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return (accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext).getTotalInvoiceBalance().compareTo(INVOICE_AMOUNT) == 0);
+    }
+  }
+);
   bus.post(paymentInfoNotification,internalCallContext);
-  Thread.sleep(5000);
-  try {
-    bus.stop();
-  }
- catch (  Throwable t) {
-    Assert.fail("Unable to stop the bus!");
-  }
 }

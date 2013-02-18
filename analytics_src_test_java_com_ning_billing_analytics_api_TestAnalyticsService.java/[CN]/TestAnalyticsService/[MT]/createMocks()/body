@@ -1,13 +1,14 @@
 {
+  Mockito.when(catalogService.getFullCatalog()).thenReturn(new MockCatalog());
   final PaymentMethod paymentMethod=Mockito.mock(PaymentMethod.class);
   final UUID paymentMethodId=UUID.randomUUID();
   Mockito.when(paymentMethod.getId()).thenReturn(paymentMethodId);
   final Account account=new MockAccountBuilder(UUID.randomUUID()).externalKey(ACCOUNT_KEY).currency(ACCOUNT_CURRENCY).paymentMethodId(paymentMethodId).build();
+  Mockito.when(accountInternalApi.getAccountById(Mockito.eq(account.getId()),Mockito.<InternalCallContext>any())).thenReturn(account);
   try {
-    final Account storedAccount=accountApi.createAccount(account,callContext);
-    createSubscriptionTransitionEvent(storedAccount);
-    createAccountCreationEvent(storedAccount);
-    createInvoiceAndPaymentCreationEvents(storedAccount);
+    createSubscriptionTransitionEvent(account);
+    createAccountCreationEvent(account);
+    createInvoiceAndPaymentCreationEvents(account);
   }
  catch (  Throwable t) {
     fail("Initializing accounts failed.",t);
