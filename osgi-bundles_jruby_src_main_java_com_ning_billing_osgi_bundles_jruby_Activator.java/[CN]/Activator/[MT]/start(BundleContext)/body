@@ -1,7 +1,7 @@
 {
-  logger=retrieveApi(context,LogService.class);
+  logger.start(context);
   osgiKillbill=retrieveApi(context,OSGIKillbill.class);
-  log(LogService.LOG_INFO,"JRuby bundle activated");
+  logger.log(LogService.LOG_INFO,"JRuby bundle activated");
   doMagicToMakeJRubyAndFelixHappy();
   final PluginRubyConfig rubyConfig=retrievePluginRubyConfig(context);
   final ScriptingContainer scriptingContainer=setupScriptingContainer(rubyConfig);
@@ -15,6 +15,6 @@
   killbillServices.put("root",rubyConfig.getPluginVersionRoot().getAbsolutePath());
   killbillServices.put("logger",logger);
   plugin.instantiatePlugin(killbillServices);
-  log(LogService.LOG_INFO,"Starting JRuby plugin " + plugin.getPluginMainClass());
+  logger.log(LogService.LOG_INFO,"Starting JRuby plugin " + plugin.getPluginMainClass());
   plugin.startPlugin(context);
 }
