@@ -3,12 +3,34 @@
   try {
     checkOverdueQueue=notificationQueueService.getNotificationQueue(DefaultOverdueService.OVERDUE_SERVICE_NAME,DefaultOverdueCheckNotifier.OVERDUE_CHECK_NOTIFIER_QUEUE);
     log.info("Queuing overdue check notification. id: {}, timestamp: {}",overdueable.getId().toString(),futureNotificationTime.toString());
-    checkOverdueQueue.recordFutureNotification(futureNotificationTime,new OverdueCheckNotificationKey(overdueable.getId(),Blockable.Type.get(overdueable)),context);
+    final OverdueCheckNotificationKey notificationKey=new OverdueCheckNotificationKey(overdueable.getId(),Type.get(overdueable));
+    transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+      @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+        boolean shouldInsertNewNotification=true;
+        final List<Notification> futureNotificationsForKey=checkOverdueQueue.getFutureNotificationsForKeyFromTransaction(entitySqlDaoWrapperFactory,notificationKey,context);
+        if (futureNotificationsForKey.size() > 0) {
+          final DateTime earliestExistingNotificationDate=futureNotificationsForKey.get(0).getEffectiveDate();
+          final int minIndexToDeleteFrom;
+          if (earliestExistingNotificationDate.isBefore(futureNotificationTime)) {
+            minIndexToDeleteFrom=1;
+            shouldInsertNewNotification=false;
+          }
+ else {
+            minIndexToDeleteFrom=0;
+          }
+          for (int i=minIndexToDeleteFrom; i < futureNotificationsForKey.size(); i++) {
+            checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory,futureNotificationsForKey.get(i).getId(),context);
+          }
+        }
+        if (shouldInsertNewNotification) {
+          checkOverdueQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,futureNotificationTime,notificationKey,context);
+        }
+        return null;
+      }
+    }
+);
   }
  catch (  NoSuchNotificationQueue e) {
     log.error("Attempting to put items on a non-existent queue (DefaultOverdueCheck).",e);
-  }
-catch (  IOException e) {
-    log.error("Failed to serialize notifcationKey for {}",overdueable.toString());
   }
 }

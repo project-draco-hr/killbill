@@ -1,0 +1,18 @@
+{
+  final UUID subscriptionId=UUID.randomUUID();
+  final Blockable overdueable=Mockito.mock(Subscription.class);
+  Mockito.when(overdueable.getId()).thenReturn(subscriptionId);
+  verifyQueueContent(overdueable,10,10);
+  verifyQueueContent(overdueable,5,5);
+  verifyQueueContent(overdueable,15,5);
+  final UUID bundleId=UUID.randomUUID();
+  final Blockable otherOverdueable=Mockito.mock(SubscriptionBundle.class);
+  Mockito.when(otherOverdueable.getId()).thenReturn(bundleId);
+  verifyQueueContent(otherOverdueable,10,10);
+  verifyQueueContent(otherOverdueable,5,5);
+  verifyQueueContent(otherOverdueable,15,5);
+  final OverdueCheckNotificationKey notificationKey=new OverdueCheckNotificationKey(subscriptionId,Type.SUBSCRIPTION);
+  Assert.assertEquals(overdueQueue.getFutureNotificationsForKey(notificationKey,internalCallContext).size(),1);
+  final OverdueCheckNotificationKey otherNotificationKey=new OverdueCheckNotificationKey(bundleId,Type.SUBSCRIPTION_BUNDLE);
+  Assert.assertEquals(overdueQueue.getFutureNotificationsForKey(otherNotificationKey,internalCallContext).size(),1);
+}
