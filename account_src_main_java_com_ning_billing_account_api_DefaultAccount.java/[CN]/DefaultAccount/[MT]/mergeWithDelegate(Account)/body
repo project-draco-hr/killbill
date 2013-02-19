@@ -12,16 +12,14 @@
  else {
     accountData.setCurrency(currentAccount.getCurrency());
   }
-  if (billCycleDay != null && currentAccount.getBillCycleDay() != null && currentAccount.getBillCycleDay().getDayOfMonthLocal() != 0 && currentAccount.getBillCycleDay().getDayOfMonthUTC() != 0) {
-    if ((billCycleDay.getDayOfMonthUTC() != currentAccount.getBillCycleDay().getDayOfMonthUTC() || billCycleDay.getDayOfMonthLocal() != currentAccount.getBillCycleDay().getDayOfMonthLocal())) {
-      throw new IllegalArgumentException(String.format("Killbill doesn't support updating the account BCD yet: new=%s, current=%s",billCycleDay,currentAccount.getBillCycleDay()));
-    }
+  if (billCycleDayLocal != null && billCycleDayLocal != 0 && currentAccount.getBillCycleDayLocal() != 0 && !billCycleDayLocal.equals(currentAccount.getBillCycleDayLocal())) {
+    throw new IllegalArgumentException(String.format("Killbill doesn't support updating the account BCD yet: new=%s, current=%s",billCycleDayLocal,currentAccount.getBillCycleDayLocal()));
   }
- else   if (billCycleDay != null) {
-    accountData.setBillCycleDay(billCycleDay);
+ else   if (billCycleDayLocal != null && billCycleDayLocal != 0) {
+    accountData.setBillCycleDayLocal(billCycleDayLocal);
   }
  else {
-    accountData.setBillCycleDay(currentAccount.getBillCycleDay());
+    accountData.setBillCycleDayLocal(currentAccount.getBillCycleDayLocal());
   }
   accountData.setEmail(Objects.firstNonNull(email,currentAccount.getEmail()));
   accountData.setName(Objects.firstNonNull(name,currentAccount.getName()));
