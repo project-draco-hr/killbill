@@ -1,0 +1,12 @@
+{
+  final String resourceName=bundleName + "-" + killbillVersion+ "-jar-with-dependencies.jar";
+  final URL resourceUrl=Resources.getResource(resourceName);
+  if (resourceUrl != null) {
+    final String[] parts=resourceUrl.getPath().split("/");
+    final String lastPart=parts[parts.length - 1];
+    if (lastPart.startsWith(bundleName)) {
+      return createPluginConfig(resourceUrl.getPath(),lastPart);
+    }
+  }
+  return null;
+}

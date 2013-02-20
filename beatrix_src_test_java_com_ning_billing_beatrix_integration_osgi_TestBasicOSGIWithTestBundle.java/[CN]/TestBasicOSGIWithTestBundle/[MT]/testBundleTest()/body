@@ -1,0 +1,11 @@
+{
+  final TestActivatorWithAssertion assertTor=new TestActivatorWithAssertion(getDBI());
+  assertTor.assertPluginInitialized();
+  final Account account=createAccountWithPaymentMethod(getAccountData(1));
+  assertTor.assertPluginReceievdAccountCreationEvent(account.getExternalKey());
+  final PaymentPluginApi paymentPluginApi=getTestPluginPaymentApi();
+  final UUID paymentId=UUID.randomUUID();
+  final BigDecimal paymentAmount=new BigDecimal("14.32");
+  final PaymentInfoPlugin r=paymentPluginApi.processPayment(paymentId,account.getPaymentMethodId(),paymentAmount,callContext);
+  assertTor.assertPluginCreatedPayment(paymentId,account.getPaymentMethodId(),paymentAmount);
+}

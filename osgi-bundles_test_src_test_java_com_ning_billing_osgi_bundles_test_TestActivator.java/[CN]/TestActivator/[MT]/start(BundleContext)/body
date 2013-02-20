@@ -1,0 +1,13 @@
+{
+  final String bundleName=context.getBundle().getSymbolicName();
+  System.out.println("TestActivator starting bundle = " + bundleName);
+  fetchOSGIKIllbill(context);
+  fetchLogService(context);
+  final IDBI dbi=new DBI(osgiKillbill.getDataSource());
+  testDao=new TestDao(dbi);
+  registerPaymentApi(context,testDao);
+  registerForKillbillEvents(context);
+  testDao.createTable();
+  testDao.insertStarted();
+  this.isRunning=true;
+}
