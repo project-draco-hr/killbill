@@ -1,9 +1,9 @@
 {
-  BillCycleDay result=null;
+  int result=0;
 switch (alignment) {
 case ACCOUNT:
-    result=account.getBillCycleDay();
-  if (result == null || result.getDayOfMonthUTC() == 0) {
+    result=account.getBillCycleDayLocal();
+  if (result == 0) {
     result=calculateBcdFromSubscription(subscription,plan,account,catalog,context);
   }
 break;
@@ -19,7 +19,7 @@ case SUBSCRIPTION:
 result=calculateBcdFromSubscription(subscription,plan,account,catalog,context);
 break;
 }
-if (result == null) {
+if (result == 0) {
 throw new CatalogApiException(ErrorCode.CAT_INVALID_BILLING_ALIGNMENT,alignment.toString());
 }
 return result;

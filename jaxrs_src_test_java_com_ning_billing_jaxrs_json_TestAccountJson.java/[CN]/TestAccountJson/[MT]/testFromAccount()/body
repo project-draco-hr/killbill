@@ -3,7 +3,7 @@
   accountBuilder.address1(UUID.randomUUID().toString());
   accountBuilder.address2(UUID.randomUUID().toString());
   final int bcd=4;
-  accountBuilder.billingCycleDay(new MockBillCycleDay(bcd));
+  accountBuilder.billingCycleDayLocal(bcd);
   accountBuilder.city(UUID.randomUUID().toString());
   accountBuilder.companyName(UUID.randomUUID().toString());
   accountBuilder.country(UUID.randomUUID().toString());
@@ -24,7 +24,7 @@
   final AccountJson accountJson=new AccountJson(account);
   Assert.assertEquals(accountJson.getAddress1(),account.getAddress1());
   Assert.assertEquals(accountJson.getAddress2(),account.getAddress2());
-  Assert.assertEquals(accountJson.getBillCycleDay().toString(),"{\"dayOfMonthLocal\":" + bcd + ",\"dayOfMonthUTC\":"+ bcd+ "}");
+  Assert.assertEquals(accountJson.getBillCycleDayLocal(),(Integer)bcd);
   Assert.assertEquals(accountJson.getCountry(),account.getCountry());
   Assert.assertEquals(accountJson.getLocale(),account.getLocale());
   Assert.assertEquals(accountJson.getCompany(),account.getCompanyName());

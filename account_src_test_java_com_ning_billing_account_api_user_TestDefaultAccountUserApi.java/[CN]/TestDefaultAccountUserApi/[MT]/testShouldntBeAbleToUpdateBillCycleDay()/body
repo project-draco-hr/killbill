@@ -1,14 +1,6 @@
 {
   final Account account=accountUserApi.createAccount(new DefaultAccount(createTestAccount()),callContext);
   final MutableAccountData otherAccount=new DefaultAccount(account.getId(),account).toMutableAccountData();
-  otherAccount.setBillCycleDay(new BillCycleDay(){
-    @Override public int getDayOfMonthUTC(){
-      return account.getBillCycleDay().getDayOfMonthUTC() + 2;
-    }
-    @Override public int getDayOfMonthLocal(){
-      return account.getBillCycleDay().getDayOfMonthLocal() + 2;
-    }
-  }
-);
+  otherAccount.setBillCycleDayLocal(account.getBillCycleDayLocal() + 2);
   accountUserApi.updateAccount(new DefaultAccount(account.getId(),otherAccount),callContext);
 }

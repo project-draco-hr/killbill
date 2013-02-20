@@ -1,0 +1,11 @@
+{
+  final List<Notification> result=new ArrayList<Notification>();
+synchronized (notifications) {
+    for (    final Notification notification : notifications) {
+      if (notification.getAccountRecordId().equals(context.getAccountRecordId()) && notification.getEffectiveDate().isAfter(clock.getUTCNow())) {
+        result.add(notification);
+      }
+    }
+  }
+  return result;
+}

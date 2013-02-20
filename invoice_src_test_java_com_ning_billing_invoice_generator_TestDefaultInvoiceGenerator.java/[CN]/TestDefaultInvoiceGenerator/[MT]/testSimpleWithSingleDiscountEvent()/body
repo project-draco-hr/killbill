@@ -3,11 +3,10 @@
   final Subscription sub=createZombieSubscription();
   final Plan plan=new MockPlan("Plan with a single discount phase");
   final PlanPhase phaseEvergreen=createMockMonthlyPlanPhase(EIGHT,PhaseType.DISCOUNT);
-  final DateTimeZone accountTimeZone=DateTimeZone.UTC;
-  final int bcdUTC=16;
+  final int bcdLocal=16;
   final LocalDate startDate=invoiceUtil.buildDate(2012,7,16);
   final BillingEventSet events=new MockBillingEventSet();
-  events.add(createBillingEvent(sub.getId(),startDate,plan,phaseEvergreen,bcdUTC));
+  events.add(createBillingEvent(sub.getId(),startDate,plan,phaseEvergreen,bcdLocal));
   final LocalDate targetDate=startDate;
   final Invoice invoice=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
   assertNotNull(invoice);

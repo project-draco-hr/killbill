@@ -27,10 +27,10 @@
   transferApi.transferBundle(account.getId(),newAccount.getId(),"mycutebundle",clock.getUTCNow(),false,false,callContext);
   assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
-  final BillCycleDay oldBCD=accountUserApi.getAccountById(account.getId(),callContext).getBillCycleDay();
-  final BillCycleDay newBCD=accountUserApi.getAccountById(newAccount.getId(),callContext).getBillCycleDay();
-  assertEquals(oldBCD.getDayOfMonthUTC(),1);
-  assertEquals(newBCD.getDayOfMonthUTC(),3);
+  final Integer oldBCD=accountUserApi.getAccountById(account.getId(),callContext).getBillCycleDayLocal();
+  final Integer newBCD=accountUserApi.getAccountById(newAccount.getId(),callContext).getBillCycleDayLocal();
+  assertEquals(oldBCD,(Integer)1);
+  assertEquals(newBCD,(Integer)3);
   final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(newAccount.getId(),callContext);
   assertEquals(invoices.size(),1);
   final List<InvoiceItem> invoiceItems=invoices.get(0).getInvoiceItems();
