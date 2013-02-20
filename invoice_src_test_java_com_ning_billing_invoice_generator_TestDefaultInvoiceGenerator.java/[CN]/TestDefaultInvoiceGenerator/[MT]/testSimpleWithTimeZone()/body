@@ -5,13 +5,11 @@
   final BigDecimal rate=TEN;
   final PlanPhase phase=createMockMonthlyPlanPhase(rate);
   final int bcdLocal=16;
-  final int bcdUTC=17;
   final LocalDate startDate=invoiceUtil.buildDate(2012,7,bcdLocal);
   final BillingEventSet events=new MockBillingEventSet();
-  final BillingEvent event=createBillingEvent(sub.getId(),startDate,plan,phase,bcdUTC,bcdLocal);
+  final BillingEvent event=createBillingEvent(sub.getId(),startDate,plan,phase,bcdLocal);
   events.add(event);
   final LocalDate targetDate=invoiceUtil.buildDate(2012,8,bcdLocal);
-  final DateTimeZone accountTimeZone=DateTimeZone.forID("HST");
   final Invoice invoice=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);

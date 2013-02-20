@@ -21,7 +21,8 @@
     }
   }
   final DateTime date=plan.dateOfFirstRecurringNonZeroCharge(subscription.getStartDate(),initialPhaseType);
-  final CalculatedBillCycleDay calculatedBillCycleDay=new CalculatedBillCycleDay(account.getTimeZone(),date);
-  log.info("Calculated BCD: subscription id {}, subscription start {}, timezone {}, bcd UTC {}, bcd local {}",new Object[]{subscription.getId(),date.toDateTimeISO(),account.getTimeZone(),calculatedBillCycleDay.getDayOfMonthUTC(),calculatedBillCycleDay.getDayOfMonthLocal()});
-  return calculatedBillCycleDay;
+  final int bcdUTC=date.toDateTime(DateTimeZone.UTC).getDayOfMonth();
+  final int bcdLocal=date.toDateTime(account.getTimeZone()).getDayOfMonth();
+  log.info("Calculated BCD: subscription id {}, subscription start {}, timezone {}, bcd UTC {}, bcd local {}",subscription.getId(),date.toDateTimeISO(),account.getTimeZone(),bcdUTC,bcdLocal);
+  return bcdLocal;
 }
