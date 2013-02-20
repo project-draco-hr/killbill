@@ -1,18 +1,5 @@
 {
-  final BoneCPConfig dbConfig=new BoneCPConfig();
-  dbConfig.setJdbcUrl(config.getJdbcUrl());
-  dbConfig.setUsername(config.getUsername());
-  dbConfig.setPassword(config.getPassword());
-  dbConfig.setMinConnectionsPerPartition(config.getMinIdle());
-  dbConfig.setMaxConnectionsPerPartition(config.getMaxActive());
-  dbConfig.setConnectionTimeout(config.getConnectionTimeout().getPeriod(),config.getConnectionTimeout().getUnit());
-  dbConfig.setIdleMaxAge(config.getIdleMaxAge().getPeriod(),config.getIdleMaxAge().getUnit());
-  dbConfig.setMaxConnectionAge(config.getMaxConnectionAge().getPeriod(),config.getMaxConnectionAge().getUnit());
-  dbConfig.setIdleConnectionTestPeriod(config.getIdleConnectionTestPeriod().getPeriod(),config.getIdleConnectionTestPeriod().getUnit());
-  dbConfig.setPartitionCount(1);
-  dbConfig.setDefaultTransactionIsolation("READ_COMMITTED");
-  dbConfig.setDisableJMX(false);
-  final BoneCPDataSource ds=new BoneCPDataSource(dbConfig);
+  final DataSource ds=getC3P0DataSource();
   final DBI dbi=new DBI(ds);
   dbi.registerArgumentFactory(new UUIDArgumentFactory());
   dbi.registerArgumentFactory(new DateTimeZoneArgumentFactory());
