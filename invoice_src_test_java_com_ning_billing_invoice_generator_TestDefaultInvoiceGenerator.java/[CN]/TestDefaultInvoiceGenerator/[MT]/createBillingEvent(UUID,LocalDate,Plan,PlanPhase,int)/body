@@ -1,3 +1,5 @@
 {
-  return createBillingEvent(subscriptionId,startDate,plan,planPhase,billCycleDayUTC,billCycleDayUTC);
+  final Subscription sub=createZombieSubscription(subscriptionId);
+  final Currency currency=Currency.USD;
+  return invoiceUtil.createMockBillingEvent(null,sub,startDate.toDateTimeAtStartOfDay(),plan,planPhase,planPhase.getFixedPrice() == null ? null : planPhase.getFixedPrice().getPrice(currency),planPhase.getRecurringPrice() == null ? null : planPhase.getRecurringPrice().getPrice(currency),currency,planPhase.getBillingPeriod(),billCycleDayLocal,BillingModeType.IN_ADVANCE,"Test",1L,SubscriptionTransitionType.CREATE);
 }
