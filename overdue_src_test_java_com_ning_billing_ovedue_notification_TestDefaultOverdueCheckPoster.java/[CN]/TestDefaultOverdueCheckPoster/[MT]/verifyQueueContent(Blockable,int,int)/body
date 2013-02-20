@@ -2,7 +2,7 @@
   final DateTime futureNotificationTime=testReferenceTime.plusDays(nbDaysInFuture);
   poster.insertOverdueCheckNotification(overdueable,futureNotificationTime,internalCallContext);
   final OverdueCheckNotificationKey notificationKey=new OverdueCheckNotificationKey(overdueable.getId(),Blockable.Type.get(overdueable));
-  final List<Notification> notificationsForKey=overdueQueue.getFutureNotificationsForKey(notificationKey,internalCallContext);
+  final List<Notification> notificationsForKey=getNotificationsForOverdueable(overdueable);
   Assert.assertEquals(notificationsForKey.size(),1);
   Assert.assertEquals(notificationsForKey.get(0).getNotificationKey(),objectMapper.writeValueAsString(notificationKey));
   Assert.assertEquals(notificationsForKey.get(0).getEffectiveDate(),testReferenceTime.plusDays(expectedNbDaysInFuture));
