@@ -1,7 +1,10 @@
 {
-  final HttpServlet pluginServlet=getPluginServlet(req);
+  final String requestPath=req.getServletPath() + req.getPathInfo();
+  final Servlet pluginServlet=getPluginServlet(requestPath);
   if (pluginServlet != null) {
-    pluginServlet.service(req,resp);
+    initializeServletIfNeeded(req,pluginServlet);
+    final OSGIServletRequestWrapper requestWrapper=new OSGIServletRequestWrapper(req,servletRouter.getPluginPrefixForPath(requestPath));
+    pluginServlet.service(requestWrapper,resp);
   }
  else {
     resp.sendError(404);
