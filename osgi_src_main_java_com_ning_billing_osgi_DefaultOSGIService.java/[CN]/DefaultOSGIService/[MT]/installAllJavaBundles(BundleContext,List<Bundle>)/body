@@ -1,9 +1,8 @@
 {
-  final List<PluginJavaConfig> pluginJavaConfigs=pluginFinder.getLatestJavaPlugins();
-  for (  final PluginJavaConfig cur : pluginJavaConfigs) {
-    logger.info("Installing Java bundle for plugin {} in {}",cur.getPluginName(),cur.getBundleJarPath());
-    final Bundle bundle=context.installBundle("file:" + cur.getBundleJarPath());
-    ((DefaultPluginConfigServiceApi)pluginConfigServiceApi).registerBundle(bundle.getBundleId(),cur);
+  final List<String> bundleJarPaths=osgiBundleFinder.getLatestBundles();
+  for (  final String cur : bundleJarPaths) {
+    logger.info("Installing Java OSGI bundle in {}",cur);
+    final Bundle bundle=context.installBundle("file:" + cur);
     installedBundles.add(bundle);
   }
 }
