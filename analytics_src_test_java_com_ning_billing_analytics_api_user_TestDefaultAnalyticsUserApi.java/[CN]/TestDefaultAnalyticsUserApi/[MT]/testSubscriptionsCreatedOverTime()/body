@@ -8,10 +8,10 @@
   Mockito.when(catalog.findPhase(Mockito.anyString(),Mockito.<DateTime>any(),Mockito.<DateTime>any())).thenReturn(phase);
   final BusinessSubscriptionTransitionModelDao transition=new BusinessSubscriptionTransitionModelDao(3L,UUID.randomUUID(),UUID.randomUUID().toString(),UUID.randomUUID(),UUID.randomUUID().toString(),UUID.randomUUID(),clock.getUTCNow(),BusinessSubscriptionEvent.subscriptionCreated(plan.getName(),catalog,clock.getUTCNow(),clock.getUTCNow()),null,new BusinessSubscription("DEFAULT",plan.getName(),phase.getName(),Currency.USD,clock.getUTCNow(),Subscription.SubscriptionState.ACTIVE,catalog));
   subscriptionTransitionSqlDao.createTransition(transition,internalCallContext);
-  final TimeSeriesData notFoundData=analyticsUserApi.getSubscriptionsCreatedOverTime(productType,UUID.randomUUID().toString(),tenantContext);
+  final TimeSeriesData notFoundData=analyticsUserApi.getSubscriptionsCreatedOverTime(productType,UUID.randomUUID().toString(),callContext);
   Assert.assertEquals(notFoundData.getDates().size(),0);
   Assert.assertEquals(notFoundData.getValues().size(),0);
-  final TimeSeriesData data=analyticsUserApi.getSubscriptionsCreatedOverTime(productType,phase.getName(),tenantContext);
+  final TimeSeriesData data=analyticsUserApi.getSubscriptionsCreatedOverTime(productType,phase.getName(),callContext);
   Assert.assertEquals(data.getDates().size(),1);
   Assert.assertEquals(data.getDates().get(0),clock.getUTCToday());
   Assert.assertEquals(data.getValues().size(),1);

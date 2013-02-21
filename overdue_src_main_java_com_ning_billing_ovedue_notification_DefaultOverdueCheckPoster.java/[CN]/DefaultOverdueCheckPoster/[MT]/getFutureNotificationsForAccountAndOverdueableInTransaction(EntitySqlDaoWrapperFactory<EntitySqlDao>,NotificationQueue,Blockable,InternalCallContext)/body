@@ -1,0 +1,13 @@
+{
+  final List<Notification> notifications=new ArrayList<Notification>();
+  final List<Notification> candidates=checkOverdueQueue.getFutureNotificationsForAccountFromTransaction(entitySqlDaoWrapperFactory,context);
+  for (  final Notification candidate : candidates) {
+    if (OverdueCheckNotificationKey.class.getName().equals(candidate.getNotificationKeyClass())) {
+      final OverdueCheckNotificationKey key=PersistentQueueBase.deserializeEvent(candidate.getNotificationKeyClass(),candidate.getNotificationKey());
+      if (Type.get(overdueable).equals(key.getType()) && overdueable.getId().equals(key.getUuidKey())) {
+        notifications.add(candidate);
+      }
+    }
+  }
+  return notifications;
+}

@@ -1,8 +1,8 @@
 {
   final BusinessSubscription subscriptionWithNullFields=new BusinessSubscription(null,plan.getName(),phase.getName(),Currency.USD,null,null,catalog);
   final BusinessSubscriptionTransitionModelDao transitionWithNullFields=new BusinessSubscriptionTransitionModelDao(transition.getTotalOrdering(),transition.getBundleId(),transition.getExternalKey(),transition.getAccountId(),transition.getAccountKey(),transition.getSubscriptionId(),transition.getRequestedTimestamp(),transition.getEvent(),subscriptionWithNullFields,subscriptionWithNullFields);
-  businessSubscriptionTransitionSqlDao.createTransition(transitionWithNullFields,internalCallContext);
-  final List<BusinessSubscriptionTransitionModelDao> transitions=businessSubscriptionTransitionSqlDao.getTransitionsByKey(EXTERNAL_KEY,internalCallContext);
+  subscriptionTransitionSqlDao.createTransition(transitionWithNullFields,internalCallContext);
+  final List<BusinessSubscriptionTransitionModelDao> transitions=subscriptionTransitionSqlDao.getTransitionsByKey(EXTERNAL_KEY,internalCallContext);
   Assert.assertEquals(transitions.size(),1);
   Assert.assertEquals(transitions.get(0),transitionWithNullFields);
 }

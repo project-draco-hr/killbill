@@ -1,16 +1,16 @@
 {
-  businessAccountSqlDao.createAccount(account,internalCallContext);
-  final BusinessAccountModelDao foundAccount=businessAccountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext);
+  accountSqlDao.createAccount(account,internalCallContext);
+  final BusinessAccountModelDao foundAccount=accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext);
   Assert.assertEquals(foundAccount.getCreatedDate().getMillis(),account.getCreatedDate().getMillis());
   Assert.assertEquals(foundAccount.getUpdatedDate().getMillis(),account.getUpdatedDate().getMillis());
   Assert.assertTrue(foundAccount.equals(account));
   account.setBalance(BigDecimal.TEN);
   account.setPaymentMethod("PayPal");
   account.setCurrency("CAD");
-  businessAccountSqlDao.saveAccount(account,internalCallContext);
-  account=businessAccountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext);
+  accountSqlDao.saveAccount(account,internalCallContext);
+  account=accountSqlDao.getAccountByKey(ACCOUNT_KEY,internalCallContext);
   Assert.assertEquals(Rounder.round(BigDecimal.TEN),account.getRoundedBalance());
   Assert.assertEquals("PayPal",account.getPaymentMethod());
   Assert.assertEquals("CAD",account.getCurrency());
-  Assert.assertNull(businessAccountSqlDao.getAccountByKey("Doesn't exist",internalCallContext));
+  Assert.assertNull(accountSqlDao.getAccountByKey("Doesn't exist",internalCallContext));
 }
