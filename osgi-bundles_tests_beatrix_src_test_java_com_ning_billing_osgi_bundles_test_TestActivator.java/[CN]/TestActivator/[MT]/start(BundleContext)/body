@@ -1,13 +1,12 @@
 {
   final String bundleName=context.getBundle().getSymbolicName();
   System.out.println("TestActivator starting bundle = " + bundleName);
-  fetchOSGIKIllbill(context);
-  logger.start(context);
-  final IDBI dbi=new DBI(osgiKillbill.getDataSource());
+  kb=new OSGIKillbillTracker(context);
+  registrar=new OSGIKillbillRegistrar();
+  final IDBI dbi=new DBI(kb.getDataSource());
   testDao=new TestDao(dbi);
   registerPaymentApi(context,testDao);
   registerForKillbillEvents(context);
   testDao.createTable();
   testDao.insertStarted();
-  this.isRunning=true;
 }
