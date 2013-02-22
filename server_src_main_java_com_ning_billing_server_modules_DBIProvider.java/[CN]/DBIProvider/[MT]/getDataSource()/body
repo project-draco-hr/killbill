@@ -1,0 +1,14 @@
+{
+  final DataSource ds;
+  final String dataSource=System.getProperty("com.ning.jetty.jdbi.datasource","c3p0");
+  if (dataSource.equals("c3p0")) {
+    ds=getC3P0DataSource();
+  }
+ else   if (dataSource.equals("bonecp")) {
+    ds=getBoneCPDatSource();
+  }
+ else {
+    throw new IllegalArgumentException("DataSource " + dataSource + " unsupported");
+  }
+  return ds;
+}
