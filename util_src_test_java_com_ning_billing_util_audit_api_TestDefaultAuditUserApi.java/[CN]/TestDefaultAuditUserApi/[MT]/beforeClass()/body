@@ -1,0 +1,12 @@
+{
+  super.beforeClass();
+  auditLogs=ImmutableList.<AuditLog>of(createAuditLog(),createAuditLog(),createAuditLog(),createAuditLog());
+  objectIds=ImmutableList.<UUID>of(UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID());
+  for (  final TableName tableName : TableName.values()) {
+    for (    final UUID objectId : objectIds) {
+      for (      final AuditLog auditLog : auditLogs) {
+        ((MockAuditDao)auditDao).addAuditLogForId(tableName,objectId,auditLog);
+      }
+    }
+  }
+}

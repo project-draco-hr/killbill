@@ -1,0 +1,12 @@
+{
+  final String jdbcConnection=getDBTestingHelper().getJdbcConnectionString();
+  final String userName=DBTestingHelper.USERNAME;
+  final String userPwd=DBTestingHelper.PASSWORD;
+  System.setProperty(OSGIDataSourceConfig.DATA_SOURCE_PROP_PREFIX + "jdbc.url",jdbcConnection);
+  System.setProperty(OSGIDataSourceConfig.DATA_SOURCE_PROP_PREFIX + "jdbc.user",userName);
+  System.setProperty(OSGIDataSourceConfig.DATA_SOURCE_PROP_PREFIX + "jdbc.password",userPwd);
+  super.beforeClass();
+  final String killbillVersion=System.getProperty("killbill.version");
+  SetupBundleWithAssertion setupTest=new SetupBundleWithAssertion(BUNDLE_TEST_RESOURCE,osgiConfig,killbillVersion);
+  setupTest.setupBundle();
+}

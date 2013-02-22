@@ -1,0 +1,14 @@
+{
+  super.beforeMethod();
+  final String configXml=getOverdueConfig();
+  final InputStream is=new ByteArrayInputStream(configXml.getBytes());
+  final OverdueConfig config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
+  overdueWrapperFactory.setOverdueConfig(config);
+  account=createAccountWithPaymentMethod(getAccountData(0));
+  assertNotNull(account);
+  paymentApi.addPaymentMethod(BeatrixIntegrationModule.PLUGIN_NAME,account,true,paymentMethodPlugin,callContext);
+  bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",callContext);
+  productName="Shotgun";
+  term=BillingPeriod.MONTHLY;
+  paymentPlugin.clear();
+}
