@@ -1,0 +1,19 @@
+{
+  logger.log(LogService.LOG_INFO,"Received external event " + killbillEvent.toString());
+  if (killbillEvent.getEventType() != ExtBusEventType.ACCOUNT_CREATION) {
+    return;
+  }
+  final TenantContext tenantContext=new TenantContext(){
+    @Override public UUID getTenantId(){
+      return null;
+    }
+  }
+;
+  try {
+    Account account=osgiKillbill.getAccountUserApi().getAccountById(killbillEvent.getAccountId(),tenantContext);
+    testDao.insertAccountExternalKey(account.getExternalKey());
+  }
+ catch (  AccountApiException e) {
+    logger.log(LogService.LOG_ERROR,e.getMessage());
+  }
+}
