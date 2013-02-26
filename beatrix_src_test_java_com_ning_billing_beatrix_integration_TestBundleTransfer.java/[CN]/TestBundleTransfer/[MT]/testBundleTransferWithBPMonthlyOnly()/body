@@ -1,5 +1,5 @@
 {
-  final Account account=createAccountWithPaymentMethod(getAccountData(0));
+  final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(0));
   final DateTime initialDate=new DateTime(2012,4,1,0,15,42,0,testTimeZone);
   clock.setDeltaFromReality(initialDate.getMillis() - clock.getUTCNow().getMillis());
   final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"mycutebundle",callContext);
@@ -20,7 +20,7 @@
   clock.addDays(32);
   assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
-  final Account newAccount=createAccountWithPaymentMethod(getAccountData(0));
+  final Account newAccount=createAccountWithNonOsgiPaymentMethod(getAccountData(0));
   busHandler.pushExpectedEvent(NextEvent.TRANSFER);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
