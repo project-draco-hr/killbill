@@ -1,0 +1,24 @@
+{
+  final String serviceName=(String)serviceReference.getProperty(OSGIPluginProperties.PLUGIN_NAME_PROP);
+  if (serviceName == null) {
+    logger.warn("Ignoring registered OSGI service {} with no {} property",claz.getName(),OSGIPluginProperties.PLUGIN_NAME_PROP);
+    return true;
+  }
+  final T theService=(T)context.getService(serviceReference);
+  if (theService == null || !claz.isAssignableFrom(theService.getClass())) {
+    return false;
+  }
+  final String serviceInfo=(String)serviceReference.getProperty(OSGIPluginProperties.PLUGIN_SERVICE_INFO);
+  final OSGIServiceDescriptor desc=new DefaultOSGIServiceDescriptor(serviceReference.getBundle().getSymbolicName(),serviceName,serviceInfo,claz.getName());
+switch (eventType) {
+case ServiceEvent.REGISTERED:
+    registration.registerService(desc,theService);
+  break;
+case ServiceEvent.UNREGISTERING:
+registration.unregisterService(desc.getServiceName());
+break;
+default :
+break;
+}
+return true;
+}
