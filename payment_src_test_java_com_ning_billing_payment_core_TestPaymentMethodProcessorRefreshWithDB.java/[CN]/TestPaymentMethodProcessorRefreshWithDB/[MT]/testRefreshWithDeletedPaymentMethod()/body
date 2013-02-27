@@ -1,0 +1,17 @@
+{
+  final Account account=testHelper.createTestAccount("foo@bar.com",true);
+  Assert.assertEquals(getPluginApi().getPaymentMethods(account.getId(),true,callContext).size(),1);
+  final UUID firstPmId=account.getPaymentMethodId();
+  final UUID secondPmId=paymentApi.addPaymentMethod(TestPaymentHelper.PLUGIN_TEST_NAME,account,true,new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),false,null),callContext);
+  Assert.assertEquals(getPluginApi().getPaymentMethods(account.getId(),true,callContext).size(),2);
+  Assert.assertEquals(paymentApi.getPaymentMethods(account,callContext).size(),2);
+  getPluginApi().deletePaymentMethod(secondPmId,callContext);
+  Assert.assertEquals(getPluginApi().getPaymentMethods(account.getId(),true,callContext).size(),1);
+  Assert.assertEquals(paymentApi.getPaymentMethods(account,callContext).size(),2);
+  final List<PaymentMethod> methods=paymentMethodProcessor.refreshPaymentMethods(TestPaymentHelper.PLUGIN_TEST_NAME,account,internalCallContext);
+  Assert.assertEquals(methods.size(),1);
+  checkPaymentMethodExistsWithStatus(methods,firstPmId,true);
+  PaymentMethodModelDao deletedPMModel=paymentDao.getPaymentMethodIncludedDeleted(secondPmId,internalCallContext);
+  Assert.assertNotNull(deletedPMModel);
+  Assert.assertFalse(deletedPMModel.isActive());
+}
