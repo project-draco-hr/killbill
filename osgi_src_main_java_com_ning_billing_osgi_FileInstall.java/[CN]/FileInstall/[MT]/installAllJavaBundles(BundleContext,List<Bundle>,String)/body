@@ -1,7 +1,10 @@
 {
   final List<String> bundleJarPaths=osgiBundleFinder.getLatestBundles();
   for (  final String cur : bundleJarPaths) {
-    logger.info("Installing Java OSGI bundle in {}",cur);
+    if (jrubyBundlePath != null && jrubyBundlePath.equals(cur)) {
+      continue;
+    }
+    logger.info("Installing Java OSGI bundle from {}",cur);
     final Bundle bundle=context.installBundle("file:" + cur);
     installedBundles.add(bundle);
   }

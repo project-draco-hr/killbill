@@ -1,18 +1,13 @@
 {
   try {
     final BundleContext context=framework.getBundleContext();
+    final String jrubyBundlePath=findJrubyBundlePath();
     final List<Bundle> installedBundles=new LinkedList<Bundle>();
-    installAllJavaBundles(context,installedBundles);
+    installAllJavaBundles(context,installedBundles,jrubyBundlePath);
     installAllJavaPluginBundles(context,installedBundles);
-    installAllJRubyPluginBundles(context,installedBundles);
+    installAllJRubyPluginBundles(context,installedBundles,jrubyBundlePath);
     for (    final Bundle bundle : installedBundles) {
-      logger.info("Starting bundle {}",bundle.getLocation());
-      try {
-        bundle.start();
-      }
- catch (      BundleException e) {
-        logger.warn("Unable to start bundle",e);
-      }
+      startBundle(bundle);
     }
   }
  catch (  PluginConfigException e) {
