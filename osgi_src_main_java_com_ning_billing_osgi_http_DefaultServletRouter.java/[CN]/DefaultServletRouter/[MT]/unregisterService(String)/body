@@ -2,10 +2,16 @@
 synchronized (this) {
     final OSGIServiceDescriptor desc=pluginRegistrations.get(serviceName);
     if (desc != null) {
-      final String registeredPath=sanitizePathPrefix(desc.getServiceInfo());
-      pluginPathServlets.remove(registeredPath);
-      pluginRegistrations.remove(desc);
-      logger.info("Unregistering OSGI servlet " + desc.getServiceName() + " at path "+ registeredPath);
+      final String pathPrefix=getPathPrefixFromDescriptor(desc);
+      if (pathPrefix == null) {
+        logger.warn("Skipping unregistration of OSGI servlet for service {} (service info is not specified)",desc.getServiceName());
+        return;
+      }
+      logger.info("Unregistering OSGI servlet " + desc.getServiceName() + " at path "+ pathPrefix);
+synchronized (this) {
+        unRegisterServletInternal(pathPrefix);
+        unRegisterServiceInternal(desc);
+      }
     }
   }
 }
