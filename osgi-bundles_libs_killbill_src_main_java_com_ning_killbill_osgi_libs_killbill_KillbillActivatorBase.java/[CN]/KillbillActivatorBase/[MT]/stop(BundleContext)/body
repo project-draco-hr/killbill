@@ -1,0 +1,16 @@
+{
+  killbillAPI.close();
+  dispatcher.close();
+  dataSource.close();
+  logService.close();
+  try {
+    final OSGIKillbillEventHandler handler=getOSGIKillbillEventHandler();
+    if (handler != null) {
+      dispatcher.unregisterEventHandler(handler);
+    }
+  }
+ catch (  OSGIServiceNotAvailable ignore) {
+  }
+  registrar.unregisterAll();
+  System.out.println("Good bye world from TestActivator!");
+}

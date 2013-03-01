@@ -1,0 +1,14 @@
+{
+  boolean gotException=false;
+  try {
+    final PaymentPluginApiWithTestControl paymentPluginApi=getTestPluginPaymentApi();
+    final PaymentPluginApiException e=new PaymentPluginApiException("test-error","foo");
+    paymentPluginApi.setPaymentPluginApiExceptionOnNextCalls(e);
+    paymentPluginApi.processPayment(UUID.randomUUID(),UUID.randomUUID(),BigDecimal.TEN,callContext);
+    Assert.fail("Expected to fail with " + e.toString());
+  }
+ catch (  PaymentPluginApiException e) {
+    gotException=true;
+  }
+  Assert.assertTrue(gotException);
+}

@@ -1,0 +1,10 @@
+{
+  final String bundleName=context.getBundle().getSymbolicName();
+  System.out.println("TestActivator starting bundle = " + bundleName);
+  super.start(context);
+  final IDBI dbi=new DBI(dataSource.getDataSource());
+  testDao=new TestDao(dbi);
+  testDao.createTable();
+  testDao.insertStarted();
+  registerPaymentApi(context,testDao);
+}

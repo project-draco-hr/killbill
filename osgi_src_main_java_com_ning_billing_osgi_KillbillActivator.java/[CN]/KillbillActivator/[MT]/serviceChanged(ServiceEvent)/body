@@ -2,9 +2,15 @@
   if (context == null || (event.getType() != ServiceEvent.REGISTERED && event.getType() != ServiceEvent.UNREGISTERING)) {
     return;
   }
+  final ServiceReference serviceReference=event.getServiceReference();
+  boolean processedServiceChange=false;
   for (  OSGIServiceRegistration cur : allRegistrationHandlers) {
-    if (listenForServiceType(event,cur.getServiceType(),cur)) {
+    if (listenForServiceType(serviceReference,event.getType(),cur.getServiceType(),cur)) {
+      processedServiceChange=true;
       break;
     }
+  }
+  if (!processedServiceChange) {
+    logger.warn("Did not process ServiceEvent for {} ",serviceReference.getBundle().getSymbolicName());
   }
 }

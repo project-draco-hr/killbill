@@ -1,5 +1,20 @@
 {
   final DefaultNoOpPaymentProviderPlugin plugin=new DefaultNoOpPaymentProviderPlugin(clock);
-  registry.registerService(instanceName,plugin);
+  final OSGIServiceDescriptor desc=new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getServiceName(){
+      return instanceName;
+    }
+    @Override public String getServiceInfo(){
+      return null;
+    }
+    @Override public String getServiceType(){
+      return null;
+    }
+  }
+;
+  registry.registerService(desc,plugin);
   return plugin;
 }

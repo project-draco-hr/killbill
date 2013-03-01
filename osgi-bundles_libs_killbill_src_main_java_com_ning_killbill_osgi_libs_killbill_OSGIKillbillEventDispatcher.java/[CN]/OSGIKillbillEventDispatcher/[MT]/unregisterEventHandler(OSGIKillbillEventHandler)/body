@@ -1,0 +1,13 @@
+{
+  withServiceTracker(observableTracker,new APICallback<Void,Observable>(OBSERVABLE_SERVICE_NAME){
+    @Override public Void executeWithService(    final Observable service){
+      final Observer observer=handlerToObserver.get(handler);
+      if (observer != null) {
+        service.deleteObserver(observer);
+        handlerToObserver.remove(handler);
+      }
+      return null;
+    }
+  }
+);
+}
