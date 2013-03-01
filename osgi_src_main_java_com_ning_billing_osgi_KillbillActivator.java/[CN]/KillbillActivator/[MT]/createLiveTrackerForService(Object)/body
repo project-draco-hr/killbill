@@ -1,0 +1,10 @@
+{
+  final String serviceClassName=theServiceObject.getClass().getName();
+synchronized (liveTrackers) {
+    if (liveTrackers.get(serviceClassName) == null) {
+      final ServiceTracker tracker=new ServiceTracker(context,serviceClassName,null);
+      liveTrackers.put(serviceClassName,tracker);
+      tracker.open();
+    }
+  }
+}

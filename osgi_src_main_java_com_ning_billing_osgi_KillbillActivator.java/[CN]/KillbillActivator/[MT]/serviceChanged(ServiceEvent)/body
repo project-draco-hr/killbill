@@ -3,14 +3,10 @@
     return;
   }
   final ServiceReference serviceReference=event.getServiceReference();
-  boolean processedServiceChange=false;
+  registerUnregisterLiveTrackers(serviceReference,event.getType());
   for (  OSGIServiceRegistration cur : allRegistrationHandlers) {
     if (listenForServiceType(serviceReference,event.getType(),cur.getServiceType(),cur)) {
-      processedServiceChange=true;
       break;
     }
-  }
-  if (!processedServiceChange) {
-    logger.warn("Did not process ServiceEvent for {} ",serviceReference.getBundle().getSymbolicName());
   }
 }
