@@ -3,7 +3,7 @@
   Assert.assertEquals(getPluginApi().getPaymentMethods(account.getId(),true,callContext).size(),1);
   final UUID existingPMId=account.getPaymentMethodId();
   final UUID newPmId=UUID.randomUUID();
-  getPluginApi().addPaymentMethod(newPmId,null,false,callContext);
+  getPluginApi().addPaymentMethod(account.getId(),newPmId,null,false,callContext);
   final List<PaymentMethod> methods=paymentMethodProcessor.refreshPaymentMethods(TestPaymentHelper.PLUGIN_TEST_NAME,account,internalCallContext);
   Assert.assertEquals(methods.size(),2);
   checkPaymentMethodExistsWithStatus(methods,existingPMId,true);
