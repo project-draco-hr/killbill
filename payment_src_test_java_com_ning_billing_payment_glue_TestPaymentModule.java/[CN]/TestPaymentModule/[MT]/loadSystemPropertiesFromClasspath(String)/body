@@ -4,8 +4,9 @@
   try {
     final Properties properties=System.getProperties();
     properties.load(url.openStream());
-    properties.setProperty("killbill.payment.provider.default",TestPaymentHelper.PLUGIN_TEST_NAME);
+    properties.setProperty("killbill.payment.provider.default",MockPaymentProviderPlugin.PLUGIN_NAME);
     properties.setProperty("killbill.payment.engine.events.off","false");
+    return new SimplePropertyConfigSource(properties);
   }
  catch (  IOException e) {
     throw new RuntimeException(e);
