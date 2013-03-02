@@ -1,0 +1,20 @@
+{
+  final PaymentMethodModelDao paymentMethodModel=paymentDao.getPaymentMethod(paymentMethodId,context);
+  if (paymentMethodModel == null) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,paymentMethodId);
+  }
+  final PaymentMethodPlugin paymentMethodPlugin;
+  if (withPluginInfo) {
+    try {
+      final PaymentPluginApi pluginApi=pluginRegistry.getServiceForName(paymentMethodModel.getPluginName());
+      paymentMethodPlugin=pluginApi.getPaymentMethodDetail(paymentMethodModel.getAccountId(),paymentMethodId,context.toTenantContext());
+    }
+ catch (    PaymentPluginApiException e) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_GET_PAYMENT_METHODS,paymentMethodModel.getAccountId(),paymentMethodId);
+    }
+  }
+ else {
+    paymentMethodPlugin=null;
+  }
+  return new DefaultPaymentMethod(paymentMethodModel,paymentMethodPlugin);
+}
