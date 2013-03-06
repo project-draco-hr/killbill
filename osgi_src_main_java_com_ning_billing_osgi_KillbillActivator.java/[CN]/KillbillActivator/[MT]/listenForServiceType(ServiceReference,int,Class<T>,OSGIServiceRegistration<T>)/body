@@ -13,8 +13,9 @@
   final OSGIServiceDescriptor desc=new DefaultOSGIServiceDescriptor(serviceReference.getBundle().getSymbolicName(),serviceName,serviceInfo,claz.getName());
 switch (eventType) {
 case ServiceEvent.REGISTERED:
-    registration.registerService(desc,theService);
-  break;
+    final T wrappedService=ContextClassLoaderHelper.getWrappedServiceWithCorrectContextClassLoader(theService);
+  registration.registerService(desc,wrappedService);
+break;
 case ServiceEvent.UNREGISTERING:
 registration.unregisterService(desc.getServiceName());
 break;

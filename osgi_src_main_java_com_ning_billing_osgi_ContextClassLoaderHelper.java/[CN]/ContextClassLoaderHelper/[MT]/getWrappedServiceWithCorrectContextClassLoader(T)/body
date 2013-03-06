@@ -1,0 +1,28 @@
+{
+  final Class<T> serviceClass=(Class<T>)service.getClass();
+  final List<Class> allServiceInterfaces=getAllInterfaces(serviceClass);
+  final Class[] serviceClassInterfaces=allServiceInterfaces.toArray(new Class[allServiceInterfaces.size()]);
+  final InvocationHandler handler=new InvocationHandler(){
+    @Override public Object invoke(    final Object proxy,    final Method method,    final Object[] args) throws Throwable {
+      final ClassLoader initialContextClassLoader=Thread.currentThread().getContextClassLoader();
+      try {
+        Thread.currentThread().setContextClassLoader(serviceClass.getClassLoader());
+        return method.invoke(service,args);
+      }
+ catch (      InvocationTargetException e) {
+        if (e.getCause() != null) {
+          throw e.getCause();
+        }
+ else {
+          throw new RuntimeException(e);
+        }
+      }
+ finally {
+        Thread.currentThread().setContextClassLoader(initialContextClassLoader);
+      }
+    }
+  }
+;
+  final T wrappedService=(T)Proxy.newProxyInstance(serviceClass.getClassLoader(),serviceClassInterfaces,handler);
+  return wrappedService;
+}
