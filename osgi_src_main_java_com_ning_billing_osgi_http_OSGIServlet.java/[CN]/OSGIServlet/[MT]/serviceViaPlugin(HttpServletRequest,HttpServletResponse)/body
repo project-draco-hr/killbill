@@ -4,14 +4,7 @@
   if (pluginServlet != null) {
     initializeServletIfNeeded(req,pluginServlet);
     final OSGIServletRequestWrapper requestWrapper=new OSGIServletRequestWrapper(req,servletRouter.getPluginPrefixForPath(requestPath));
-    final ClassLoader prevContextClassLoader=Thread.currentThread().getContextClassLoader();
-    Thread.currentThread().setContextClassLoader(pluginServlet.getClass().getClassLoader());
-    try {
-      pluginServlet.service(requestWrapper,resp);
-    }
-  finally {
-      Thread.currentThread().setContextClassLoader(prevContextClassLoader);
-    }
+    pluginServlet.service(requestWrapper,resp);
   }
  else {
     resp.sendError(404);
