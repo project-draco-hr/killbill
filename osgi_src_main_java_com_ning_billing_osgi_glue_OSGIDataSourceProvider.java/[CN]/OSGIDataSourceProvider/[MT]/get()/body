@@ -1,3 +1,14 @@
 {
-  return new BoneCPDataSource(config);
+  final DataSource ds=getDataSource();
+  final DBI dbi=new DBI(ds);
+  dbi.registerArgumentFactory(new UUIDArgumentFactory());
+  dbi.registerArgumentFactory(new DateTimeZoneArgumentFactory());
+  dbi.registerArgumentFactory(new DateTimeArgumentFactory());
+  dbi.registerArgumentFactory(new LocalDateArgumentFactory());
+  dbi.registerArgumentFactory(new EnumArgumentFactory());
+  dbi.registerMapper(new UuidMapper());
+  if (sqlLog != null) {
+    dbi.setSQLLog(sqlLog);
+  }
+  return ds;
 }
