@@ -1,9 +1,13 @@
 {
-  ComboPooledDataSource cpds=new ComboPooledDataSource();
+  final ComboPooledDataSource cpds=new ComboPooledDataSource();
   cpds.setJdbcUrl(config.getJdbcUrl());
   cpds.setUser(config.getUsername());
   cpds.setPassword(config.getPassword());
-  cpds.setMinPoolSize(1);
-  cpds.setMaxPoolSize(10);
+  cpds.setMinPoolSize(config.getMinIdle());
+  cpds.setMaxPoolSize(config.getMaxActive());
+  cpds.setCheckoutTimeout(toMilliSeconds(config.getConnectionTimeout()));
+  cpds.setMaxIdleTime(toSeconds(config.getIdleMaxAge()));
+  cpds.setMaxConnectionAge(toSeconds(config.getMaxConnectionAge()));
+  cpds.setIdleConnectionTestPeriod(toSeconds(config.getIdleConnectionTestPeriod()));
   return cpds;
 }

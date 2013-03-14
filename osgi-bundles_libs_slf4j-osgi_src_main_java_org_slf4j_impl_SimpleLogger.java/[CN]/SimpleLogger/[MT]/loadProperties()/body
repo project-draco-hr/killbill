@@ -1,0 +1,22 @@
+{
+  InputStream in=(InputStream)AccessController.doPrivileged(new PrivilegedAction(){
+    public Object run(){
+      ClassLoader threadCL=Thread.currentThread().getContextClassLoader();
+      if (threadCL != null) {
+        return threadCL.getResourceAsStream(CONFIGURATION_FILE);
+      }
+ else {
+        return ClassLoader.getSystemResourceAsStream(CONFIGURATION_FILE);
+      }
+    }
+  }
+);
+  if (null != in) {
+    try {
+      SIMPLE_LOGGER_PROPS.load(in);
+      in.close();
+    }
+ catch (    java.io.IOException e) {
+    }
+  }
+}

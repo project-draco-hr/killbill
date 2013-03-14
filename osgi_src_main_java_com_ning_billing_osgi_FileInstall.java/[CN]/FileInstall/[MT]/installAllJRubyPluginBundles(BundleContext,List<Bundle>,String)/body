@@ -1,0 +1,12 @@
+{
+  if (jrubyBundlePath == null) {
+    return;
+  }
+  final List<PluginRubyConfig> pluginRubyConfigs=pluginFinder.getLatestRubyPlugins();
+  for (  final PluginRubyConfig cur : pluginRubyConfigs) {
+    logger.info("Installing JRuby bundle for plugin {} from {}",cur.getPluginName(),cur.getRubyLoadDir());
+    final Bundle bundle=context.installBundle("file:" + jrubyBundlePath);
+    ((DefaultPluginConfigServiceApi)pluginConfigServiceApi).registerBundle(bundle.getBundleId(),cur);
+    installedBundles.add(bundle);
+  }
+}

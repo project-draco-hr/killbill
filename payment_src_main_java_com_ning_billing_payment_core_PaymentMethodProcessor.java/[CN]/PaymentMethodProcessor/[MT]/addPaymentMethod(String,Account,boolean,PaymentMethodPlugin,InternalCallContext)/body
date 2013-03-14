@@ -4,10 +4,11 @@
       PaymentMethod pm=null;
       PaymentPluginApi pluginApi=null;
       try {
-        pluginApi=pluginRegistry.getPlugin(pluginName);
+        pluginApi=pluginRegistry.getServiceForName(paymentPluginServiceName);
+        final String pluginName=Objects.firstNonNull(paymentPluginServiceName,pluginApi.getName());
         pm=new DefaultPaymentMethod(account.getId(),pluginName,paymentMethodProps);
-        final String externalId=pluginApi.addPaymentMethod(account.getExternalKey(),paymentMethodProps,setDefault,context.toCallContext());
-        final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getCreatedDate(),pm.getUpdatedDate(),pm.getAccountId(),pm.getPluginName(),pm.isActive(),externalId);
+        pluginApi.addPaymentMethod(account.getId(),pm.getId(),paymentMethodProps,setDefault,context.toCallContext());
+        final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getCreatedDate(),pm.getUpdatedDate(),pm.getAccountId(),pm.getPluginName(),pm.isActive());
         paymentDao.insertPaymentMethod(pmModel,context);
         if (setDefault) {
           accountInternalApi.updatePaymentMethod(account.getId(),pm.getId(),context);

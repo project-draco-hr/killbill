@@ -13,10 +13,10 @@
       return phone;
     }
     @Override public Boolean isMigrated(){
-      return isMigrated;
+      return Objects.firstNonNull(isMigrated,false);
     }
     @Override public Boolean isNotifiedForInvoices(){
-      return isNotifiedForInvoices;
+      return Objects.firstNonNull(isNotifiedForInvoices,false);
     }
     @Override public UUID getPaymentMethodId(){
       return paymentMethodId != null ? UUID.fromString(paymentMethodId) : null;
@@ -28,7 +28,15 @@
       return locale;
     }
     @Override public Integer getFirstNameLength(){
-      return length;
+      if (length == null && name == null) {
+        return 0;
+      }
+ else       if (length == null) {
+        return name.length();
+      }
+ else {
+        return length;
+      }
     }
     @Override public String getExternalKey(){
       return externalKey;

@@ -1,0 +1,17 @@
+{
+  if ("System.err".equalsIgnoreCase(logFile))   return System.err;
+ else   if ("System.out".equalsIgnoreCase(logFile)) {
+    return System.out;
+  }
+ else {
+    try {
+      FileOutputStream fos=new FileOutputStream(logFile);
+      PrintStream printStream=new PrintStream(fos);
+      return printStream;
+    }
+ catch (    FileNotFoundException e) {
+      Util.report("Could not open [" + logFile + "]. Defaulting to System.err",e);
+      return System.err;
+    }
+  }
+}

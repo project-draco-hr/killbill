@@ -2,6 +2,11 @@
   final List<Payment> payments=paymentApi.getAccountPayments(accountId,context);
   Assert.assertEquals(payments.size(),paymentOrderingNumber);
   final Payment payment=payments.get(paymentOrderingNumber - 1);
-  checkPayment(accountId,payment,context,expected);
+  if (payment.getPaymentStatus() == PaymentStatus.UNKNOWN) {
+    checkPaymentNoAuditForRuntimeException(accountId,payment,context,expected);
+  }
+ else {
+    checkPayment(accountId,payment,context,expected);
+  }
   return payment;
 }

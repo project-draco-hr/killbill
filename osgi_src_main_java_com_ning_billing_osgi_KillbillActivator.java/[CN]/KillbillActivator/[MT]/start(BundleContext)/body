@@ -1,3 +1,11 @@
 {
-  registerServices(context);
+  this.context=context;
+  final Dictionary props=new Hashtable();
+  props.put(OSGIPluginProperties.PLUGIN_NAME_PROP,"killbill");
+  observable.register();
+  registrar.registerService(context,OSGIKillbill.class,osgiKillbill,props);
+  registrar.registerService(context,HttpService.class,defaultHttpService,props);
+  registrar.registerService(context,Observable.class,observable,props);
+  registrar.registerService(context,DataSource.class,dataSource,props);
+  context.addServiceListener(this);
 }

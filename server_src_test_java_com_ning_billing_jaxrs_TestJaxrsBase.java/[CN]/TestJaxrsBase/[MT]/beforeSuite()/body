@@ -1,0 +1,10 @@
+{
+  super.beforeSuite();
+  loadSystemPropertiesFromClasspath("/killbill.properties");
+  loadConfig();
+  listener=new TestKillbillGuiceListener(getDBTestingHelper());
+  server=new HttpServer();
+  server.configure(config,getListeners(),getFilters());
+  server.start();
+  listener.getInstantiatedInjector().injectMembers(this);
+}

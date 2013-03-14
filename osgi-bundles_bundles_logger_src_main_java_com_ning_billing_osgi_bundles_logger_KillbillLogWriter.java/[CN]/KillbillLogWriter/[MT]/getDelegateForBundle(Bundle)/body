@@ -1,0 +1,22 @@
+{
+  final String loggerName;
+  if (bundle != null) {
+    final String name=bundle.getSymbolicName();
+    Version version=bundle.getVersion();
+    if (version == null) {
+      version=Version.emptyVersion;
+    }
+    loggerName=name + '.' + version;
+  }
+ else {
+    loggerName=KillbillLogWriter.class.getName();
+  }
+  if (delegates.get(loggerName) == null) {
+synchronized (delegates) {
+      if (delegates.get(loggerName) == null) {
+        delegates.put(loggerName,LoggerFactory.getLogger(loggerName));
+      }
+    }
+  }
+  return delegates.get(loggerName);
+}

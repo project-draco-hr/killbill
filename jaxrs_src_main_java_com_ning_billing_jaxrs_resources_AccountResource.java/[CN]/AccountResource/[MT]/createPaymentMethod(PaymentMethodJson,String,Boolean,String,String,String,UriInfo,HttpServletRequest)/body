@@ -1,0 +1,7 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final PaymentMethod data=json.toPaymentMethod(accountId);
+  final Account account=accountApi.getAccountById(data.getAccountId(),callContext);
+  final UUID paymentMethodId=paymentApi.addPaymentMethod(data.getPluginName(),account,isDefault,data.getPluginDetail(),callContext);
+  return uriBuilder.buildResponse(PaymentMethodResource.class,"getPaymentMethod",paymentMethodId,uriInfo.getBaseUri().toString());
+}

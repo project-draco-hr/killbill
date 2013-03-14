@@ -1,5 +1,20 @@
 {
   final DefaultPaymentProviderPluginRegistry pluginRegistry=new DefaultPaymentProviderPluginRegistry(paymentConfig);
-  pluginRegistry.register(externalPaymentProviderPlugin,ExternalPaymentProviderPlugin.PLUGIN_NAME);
+  final OSGIServiceDescriptor desc=new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getServiceName(){
+      return ExternalPaymentProviderPlugin.PLUGIN_NAME;
+    }
+    @Override public String getServiceInfo(){
+      return null;
+    }
+    @Override public String getServiceType(){
+      return null;
+    }
+  }
+;
+  pluginRegistry.registerService(desc,externalPaymentProviderPlugin);
   return pluginRegistry;
 }

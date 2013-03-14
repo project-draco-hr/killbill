@@ -1,0 +1,16 @@
+{
+  final URL url=findResourceURL(req);
+  if (url != null) {
+    Resources.copy(url,resp.getOutputStream());
+    resp.setStatus(200);
+    return;
+  }
+  final RequestDispatcher rd=getServletContext().getNamedDispatcher("default");
+  final HttpServletRequest wrapped=new HttpServletRequestWrapper(req){
+    public String getServletPath(){
+      return "";
+    }
+  }
+;
+  rd.forward(wrapped,resp);
+}
