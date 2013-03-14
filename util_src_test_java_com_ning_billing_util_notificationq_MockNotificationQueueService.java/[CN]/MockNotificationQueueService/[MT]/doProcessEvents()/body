@@ -1,9 +1,22 @@
 {
-  int result=0;
-synchronized (queues) {
-    for (    NotificationQueue cur : queues.values()) {
-      result+=doProcessEventsForQueue((MockNotificationQueue)cur);
+  int retry=2;
+  do {
+    try {
+      int result=0;
+      Iterator<String> it=queues.keySet().iterator();
+      while (it.hasNext()) {
+        final String queueName=it.next();
+        final NotificationQueue cur=queues.get(queueName);
+        if (cur != null) {
+          result+=doProcessEventsForQueue((MockNotificationQueue)cur);
+        }
+      }
+      return result;
+    }
+ catch (    ConcurrentModificationException e) {
+      retry--;
     }
   }
-  return result;
+ while (retry > 0);
+  return 0;
 }
