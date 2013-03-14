@@ -1,6 +1,9 @@
 {
-  checkPluginIsRunning();
-  final Ruby runtime=getRuntime();
-  pluginInstance.callMethod("get_payment_methods",JavaEmbedUtils.javaToRuby(runtime,kbAccountId.toString()));
-  return null;
+  return callWithRuntimeAndChecking(new PluginCallback(){
+    @Override public List<PaymentMethodInfoPlugin> doCall(    final Ruby runtime){
+      final IRubyObject res=pluginInstance.callMethod("get_payment_methods",JavaEmbedUtils.javaToRuby(runtime,kbAccountId.toString()));
+      return null;
+    }
+  }
+);
 }

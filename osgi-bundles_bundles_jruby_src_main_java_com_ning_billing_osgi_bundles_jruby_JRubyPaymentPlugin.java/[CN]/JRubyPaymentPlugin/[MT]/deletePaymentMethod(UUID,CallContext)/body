@@ -1,6 +1,9 @@
 {
-  checkValidPaymentPlugin();
-  checkPluginIsRunning();
-  final Ruby runtime=getRuntime();
-  pluginInstance.callMethod("delete_payment_method",JavaEmbedUtils.javaToRuby(runtime,kbPaymentMethodId.toString()));
+  callWithRuntimeAndChecking(new PluginCallback(){
+    @Override public Void doCall(    final Ruby runtime){
+      final IRubyObject res=pluginInstance.callMethod("delete_payment_method",JavaEmbedUtils.javaToRuby(runtime,kbPaymentMethodId.toString()));
+      return null;
+    }
+  }
+);
 }
