@@ -4,7 +4,9 @@
   }
  else   if (blockable instanceof SubscriptionBundle) {
     for (    final Subscription cur : entitlementUserApi.getSubscriptionsForBundle(blockable.getId(),context)) {
-      computeSubscriptionsToCancel((T)cur,result,context);
+      if (!ProductCategory.ADD_ON.equals(cur.getCategory())) {
+        computeSubscriptionsToCancel((T)cur,result,context);
+      }
     }
   }
  else   if (blockable instanceof Account) {
