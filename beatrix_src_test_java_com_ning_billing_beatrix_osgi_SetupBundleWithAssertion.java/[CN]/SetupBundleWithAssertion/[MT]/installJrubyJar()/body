@@ -1,0 +1,11 @@
+{
+  final String resourceName=JRUBY_BUNDLE_RESOURCE + "-" + killbillVersion+ "-jar-with-dependencies.jar";
+  final URL resourceUrl=Resources.getResource(resourceName);
+  final File rubyJarInput=new File(resourceUrl.getFile());
+  final File platform=new File(rootInstallDir,"platform");
+  if (!platform.exists()) {
+    platform.mkdir();
+  }
+  final File rubyJarDestination=new File(platform,"jruby.jar");
+  ByteStreams.copy(new FileInputStream(rubyJarInput),new FileOutputStream(rubyJarDestination));
+}

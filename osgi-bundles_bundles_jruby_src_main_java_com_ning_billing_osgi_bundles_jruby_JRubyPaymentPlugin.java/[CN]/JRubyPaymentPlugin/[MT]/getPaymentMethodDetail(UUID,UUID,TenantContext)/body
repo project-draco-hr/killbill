@@ -1,8 +1,7 @@
 {
   return callWithRuntimeAndChecking(new PluginCallback(){
-    @Override public PaymentMethodPlugin doCall(    final Ruby runtime){
-      final IRubyObject res=pluginInstance.callMethod("get_payment_method_detail",JavaEmbedUtils.javaToRuby(runtime,kbAccountId.toString()),JavaEmbedUtils.javaToRuby(runtime,kbPaymentMethodId.toString()));
-      return null;
+    @Override public PaymentMethodPlugin doCall(    final Ruby runtime) throws PaymentPluginApiException {
+      return ((PaymentPluginApi)pluginInstance).getPaymentMethodDetail(kbAccountId,kbPaymentMethodId,context);
     }
   }
 );

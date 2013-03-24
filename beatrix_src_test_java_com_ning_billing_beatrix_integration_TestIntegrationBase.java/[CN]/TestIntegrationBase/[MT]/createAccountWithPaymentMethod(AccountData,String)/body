@@ -1,21 +1,7 @@
 {
   final Account account=accountUserApi.createAccount(accountData,callContext);
   assertNotNull(account);
-  final PaymentMethodPlugin info=new PaymentMethodPlugin(){
-    @Override public boolean isDefaultPaymentMethod(){
-      return false;
-    }
-    @Override public String getValueString(    final String key){
-      return null;
-    }
-    @Override public List<PaymentMethodKVInfo> getProperties(){
-      return null;
-    }
-    @Override public String getExternalPaymentMethodId(){
-      return UUID.randomUUID().toString();
-    }
-  }
-;
+  final PaymentMethodPlugin info=createPaymentMethodPlugin();
   paymentApi.addPaymentMethod(paymentPluginName,account,true,info,callContext);
   return accountUserApi.getAccountById(account.getId(),callContext);
 }

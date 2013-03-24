@@ -1,0 +1,20 @@
+{
+  try {
+    installJrubyJar();
+    final URL resourceUrl=Resources.getResource(bundleName);
+    final File unzippedRubyPlugin=unGzip(new File(resourceUrl.getFile()),rootInstallDir);
+    final StringBuilder tmp=new StringBuilder(rootInstallDir.getAbsolutePath());
+    tmp.append("/plugins/").append(PluginLanguage.RUBY.toString().toLowerCase());
+    final File destination=new File(tmp.toString());
+    if (!destination.exists()) {
+      destination.mkdir();
+    }
+    unTar(unzippedRubyPlugin,destination);
+  }
+ catch (  IOException e) {
+    Assert.fail(e.getMessage());
+  }
+catch (  ArchiveException e) {
+    Assert.fail(e.getMessage());
+  }
+}
