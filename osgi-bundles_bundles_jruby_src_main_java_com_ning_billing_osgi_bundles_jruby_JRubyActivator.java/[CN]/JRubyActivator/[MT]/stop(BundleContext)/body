@@ -1,5 +1,10 @@
 {
-  plugin.stopPlugin(context);
-  killbillAPI.close();
-  logService.close();
+  withContextClassLoader(new PluginCall(){
+    @Override public void doCall(){
+      plugin.stopPlugin(context);
+      killbillAPI.close();
+      logService.close();
+    }
+  }
+,this.getClass().getClassLoader());
 }

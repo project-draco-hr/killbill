@@ -1,20 +1,24 @@
 {
   super.start(context);
-  logService.log(LogService.LOG_INFO,"JRuby bundle activated");
-  doMagicToMakeJRubyAndFelixHappy();
-  final PluginRubyConfig rubyConfig=retrievePluginRubyConfig(context);
-  final ScriptingContainer scriptingContainer=setupScriptingContainer(rubyConfig);
-  if (PluginType.NOTIFICATION.equals(rubyConfig.getPluginType())) {
-    plugin=new JRubyNotificationPlugin(rubyConfig,scriptingContainer,context,logService);
-    dispatcher.registerEventHandler((OSGIKillbillEventHandler)plugin);
+  withContextClassLoader(new PluginCall(){
+    @Override public void doCall(){
+      logService.log(LogService.LOG_INFO,"JRuby bundle activated");
+      final PluginRubyConfig rubyConfig=retrievePluginRubyConfig(context);
+      final ScriptingContainer scriptingContainer=setupScriptingContainer(rubyConfig);
+      if (PluginType.NOTIFICATION.equals(rubyConfig.getPluginType())) {
+        plugin=new JRubyNotificationPlugin(rubyConfig,scriptingContainer,context,logService);
+        dispatcher.registerEventHandler((OSGIKillbillEventHandler)plugin);
+      }
+ else       if (PluginType.PAYMENT.equals(rubyConfig.getPluginType())) {
+        plugin=new JRubyPaymentPlugin(rubyConfig,scriptingContainer,context,logService);
+      }
+      final Map<String,Object> killbillServices=retrieveKillbillApis(context);
+      killbillServices.put("root",rubyConfig.getPluginVersionRoot().getAbsolutePath());
+      killbillServices.put("logger",logService);
+      plugin.instantiatePlugin(killbillServices);
+      logService.log(LogService.LOG_INFO,"Starting JRuby plugin " + plugin.getPluginMainClass());
+      plugin.startPlugin(context);
+    }
   }
- else   if (PluginType.PAYMENT.equals(rubyConfig.getPluginType())) {
-    plugin=new JRubyPaymentPlugin(rubyConfig,scriptingContainer,context,logService);
-  }
-  final Map<String,Object> killbillServices=retrieveKillbillApis(context);
-  killbillServices.put("root",rubyConfig.getPluginVersionRoot().getAbsolutePath());
-  killbillServices.put("logger",logService);
-  plugin.instantiatePlugin(killbillServices);
-  logService.log(LogService.LOG_INFO,"Starting JRuby plugin " + plugin.getPluginMainClass());
-  plugin.startPlugin(context);
+,this.getClass().getClassLoader());
 }
