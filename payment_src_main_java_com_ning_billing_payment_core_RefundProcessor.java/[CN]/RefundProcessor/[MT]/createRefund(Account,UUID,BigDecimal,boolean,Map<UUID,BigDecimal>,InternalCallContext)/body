@@ -10,7 +10,7 @@
         final RefundModelDao refundInfo=new RefundModelDao(account.getId(),paymentId,refundAmount,account.getCurrency(),isAdjusted);
         paymentDao.insertRefund(refundInfo,context);
         final PaymentPluginApi plugin=getPaymentProviderPlugin(payment.getPaymentMethodId(),context);
-        plugin.processRefund(paymentId,refundAmount,context.toCallContext());
+        plugin.processRefund(account.getId(),paymentId,refundAmount,account.getCurrency(),context.toCallContext());
         paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.PLUGIN_COMPLETED,context);
         invoiceApi.createRefund(paymentId,refundAmount,isAdjusted,invoiceItemIdsWithAmounts,refundInfo.getId(),context);
         paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.COMPLETED,context);

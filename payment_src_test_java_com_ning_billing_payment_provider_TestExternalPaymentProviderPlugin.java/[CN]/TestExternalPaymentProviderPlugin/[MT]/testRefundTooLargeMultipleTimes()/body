@@ -1,13 +1,14 @@
 {
+  final UUID accountId=UUID.randomUUID();
   final UUID paymentId=UUID.randomUUID();
   final UUID paymentMethodId=UUID.randomUUID();
-  plugin.processPayment(paymentId,paymentMethodId,BigDecimal.TEN,callContext);
+  plugin.processPayment(accountId,paymentId,paymentMethodId,BigDecimal.TEN,Currency.EUR,callContext);
   final Account account=Mockito.mock(Account.class);
   for (int i=0; i < 10; i++) {
-    plugin.processRefund(paymentId,BigDecimal.ONE,callContext);
+    plugin.processRefund(accountId,paymentId,BigDecimal.ONE,Currency.EUR,callContext);
   }
   try {
-    plugin.processRefund(paymentId,BigDecimal.ONE,callContext);
+    plugin.processRefund(accountId,paymentId,BigDecimal.ONE,Currency.EUR,callContext);
     Assert.fail("Shouldn't have been able to refund");
   }
  catch (  PaymentPluginApiException e) {
