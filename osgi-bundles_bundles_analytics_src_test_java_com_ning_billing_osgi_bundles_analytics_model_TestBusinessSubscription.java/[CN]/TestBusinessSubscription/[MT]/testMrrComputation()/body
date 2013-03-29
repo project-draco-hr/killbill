@@ -1,0 +1,11 @@
+{
+  int i=0;
+  for (  final Object[] object : catalogMapping) {
+    final BillingPeriod billingPeriod=(BillingPeriod)object[0];
+    final double price=(Double)object[1];
+    final double expectedMrr=(Double)object[2];
+    final BigDecimal computedMrr=BusinessSubscription.getMrrFromBillingPeriod(billingPeriod,BigDecimal.valueOf(price));
+    Assert.assertEquals(computedMrr.doubleValue(),expectedMrr,"Invalid mrr for product #" + i);
+    i++;
+  }
+}

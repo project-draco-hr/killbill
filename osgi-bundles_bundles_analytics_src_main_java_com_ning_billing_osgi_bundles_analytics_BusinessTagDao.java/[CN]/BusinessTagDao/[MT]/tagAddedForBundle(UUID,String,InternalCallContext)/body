@@ -1,0 +1,21 @@
+{
+  final SubscriptionBundle bundle;
+  try {
+    bundle=entitlementApi.getBundleFromId(bundleId,context);
+  }
+ catch (  EntitlementUserApiException e) {
+    log.warn("Ignoring tag addition of {} for bundle id {} (bundle does not exist)",name,bundleId.toString());
+    return;
+  }
+  final Account account;
+  try {
+    account=accountApi.getAccountById(bundle.getAccountId(),context);
+  }
+ catch (  AccountApiException e) {
+    log.warn("Ignoring tag addition of {} for bundle id {} and account id {} (account does not exist)",new Object[]{name,bundleId.toString(),bundle.getAccountId()});
+    return;
+  }
+  final String accountKey=account.getExternalKey();
+  final String externalKey=bundle.getExternalKey();
+  subscriptionTransitionTagSqlDao.addTag(accountKey,bundleId.toString(),externalKey,name,context);
+}

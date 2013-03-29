@@ -1,0 +1,20 @@
+{
+  final UUID itemId=getUUID(r,"item_id");
+  final UUID linkedItemId=getUUID(r,"linked_item_id");
+  final DateTime createdDate=new DateTime(r.getLong("created_date"),DateTimeZone.UTC);
+  final DateTime updatedDate=new DateTime(r.getLong("updated_date"),DateTimeZone.UTC);
+  final UUID invoiceId=getUUID(r,"invoice_id");
+  final String itemType=r.getString("item_type");
+  final String externalKey=r.getString("external_key");
+  final String productName=r.getString("product_name");
+  final String productType=r.getString("product_type");
+  final String productCategory=r.getString("product_category");
+  final String slug=r.getString("slug");
+  final String phase=r.getString("phase");
+  final String billingPeriod=r.getString("billing_period");
+  final LocalDate startDate=getDate(r,"start_date");
+  final LocalDate endDate=getDate(r,"end_date");
+  final BigDecimal amount=BigDecimal.valueOf(r.getDouble("amount"));
+  final Currency currency=Currency.valueOf(r.getString("currency"));
+  return new BusinessInvoiceItemModelDao(amount,billingPeriod,createdDate,currency,endDate,externalKey,invoiceId,itemId,linkedItemId,itemType,phase,productCategory,productName,productType,slug,startDate,updatedDate);
+}

@@ -1,0 +1,13 @@
+{
+  final String accountKey=UUID.randomUUID().toString();
+  final BusinessInvoicePaymentModelDao invoicePayment=createInvoicePayment(accountKey);
+  Assert.assertNull(invoicePaymentSqlDao.getInvoicePayment(invoicePayment.getPaymentId().toString(),internalCallContext));
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForAccountByKey(invoicePayment.getAccountKey(),internalCallContext).size(),0);
+  Assert.assertEquals(invoicePaymentSqlDao.createInvoicePayment(invoicePayment,internalCallContext),1);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePayment(invoicePayment.getPaymentId().toString(),internalCallContext),invoicePayment);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForAccountByKey(invoicePayment.getAccountKey(),internalCallContext).size(),1);
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForAccountByKey(invoicePayment.getAccountKey(),internalCallContext).get(0),invoicePayment);
+  Assert.assertEquals(invoicePaymentSqlDao.deleteInvoicePayment(invoicePayment.getPaymentId().toString(),internalCallContext),1);
+  Assert.assertNull(invoicePaymentSqlDao.getInvoicePayment(invoicePayment.getPaymentId().toString(),internalCallContext));
+  Assert.assertEquals(invoicePaymentSqlDao.getInvoicePaymentsForAccountByKey(invoicePayment.getAccountKey(),internalCallContext).size(),0);
+}

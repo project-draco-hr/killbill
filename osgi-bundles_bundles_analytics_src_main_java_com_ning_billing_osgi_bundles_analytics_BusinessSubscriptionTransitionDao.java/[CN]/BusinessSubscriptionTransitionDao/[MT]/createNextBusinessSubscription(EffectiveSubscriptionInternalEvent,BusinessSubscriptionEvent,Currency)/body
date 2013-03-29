@@ -1,0 +1,10 @@
+{
+  final BusinessSubscription nextSubscription;
+  if (BusinessSubscriptionEvent.EventType.CANCEL.equals(businessEvent.getEventType()) || BusinessSubscriptionEvent.EventType.SYSTEM_CANCEL.equals(businessEvent.getEventType())) {
+    nextSubscription=null;
+  }
+ else {
+    nextSubscription=new BusinessSubscription(event.getNextPriceList(),event.getNextPlan(),event.getNextPhase(),currency,event.getEffectiveTransitionTime(),event.getNextState(),catalogService.getFullCatalog());
+  }
+  return nextSubscription;
+}

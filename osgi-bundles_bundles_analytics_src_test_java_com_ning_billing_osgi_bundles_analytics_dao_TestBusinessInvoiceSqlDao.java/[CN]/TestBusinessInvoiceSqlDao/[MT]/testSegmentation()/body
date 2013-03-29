@@ -1,0 +1,17 @@
+{
+  final UUID invoiceId1=UUID.randomUUID();
+  final UUID accountId1=UUID.randomUUID();
+  final String accountKey1=UUID.randomUUID().toString();
+  final BusinessInvoiceModelDao invoice1=createInvoice(invoiceId1,accountId1,accountKey1);
+  final UUID invoiceId2=UUID.randomUUID();
+  final UUID accountId2=UUID.randomUUID();
+  final String accountKey2=UUID.randomUUID().toString();
+  final BusinessInvoiceModelDao invoice2=createInvoice(invoiceId2,accountId2,accountKey2);
+  Assert.assertEquals(invoiceSqlDao.createInvoice(invoice1,internalCallContext),1);
+  Assert.assertEquals(invoiceSqlDao.createInvoice(invoice2,internalCallContext),1);
+  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(accountId1.toString(),internalCallContext).size(),1);
+  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(accountId2.toString(),internalCallContext).size(),1);
+  Assert.assertEquals(invoiceSqlDao.deleteInvoice(invoice1.getInvoiceId().toString(),internalCallContext),1);
+  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(accountId1.toString(),internalCallContext).size(),0);
+  Assert.assertEquals(invoiceSqlDao.getInvoicesForAccount(accountId2.toString(),internalCallContext).size(),1);
+}

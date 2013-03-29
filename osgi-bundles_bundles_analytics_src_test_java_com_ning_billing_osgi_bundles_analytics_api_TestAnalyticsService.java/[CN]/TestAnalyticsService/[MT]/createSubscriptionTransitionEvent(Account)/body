@@ -1,0 +1,21 @@
+{
+  final DateTime effectiveTransitionTime=clock.getUTCNow();
+  final DateTime requestedTransitionTime=clock.getUTCNow();
+  final PriceList priceList=new MockPriceList().setName("something");
+  final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
+  Mockito.when(bundle.getId()).thenReturn(bundleId);
+  Mockito.when(bundle.getAccountId()).thenReturn(account.getId());
+  Mockito.when(bundle.getExternalKey()).thenReturn(BUNDLE_KEY);
+  Mockito.when(entitlementInternalApi.getBundleFromId(Mockito.eq(bundleId),Mockito.<InternalCallContext>any())).thenReturn(bundle);
+  final Subscription subscription=Mockito.mock(Subscription.class);
+  Mockito.when(subscription.getId()).thenReturn(subscriptionId);
+  Mockito.when(subscription.getBundleId()).thenReturn(bundleId);
+  Mockito.when(entitlementInternalApi.getSubscriptionFromId(Mockito.eq(subscriptionId),Mockito.<InternalCallContext>any())).thenReturn(subscription);
+  Mockito.when(entitlementInternalApi.getSubscriptionsForBundle(Mockito.eq(bundleId),Mockito.<InternalCallContext>any())).thenReturn(ImmutableList.<Subscription>of(subscription));
+  final EffectiveSubscriptionInternalEvent event=Mockito.mock(EffectiveSubscriptionInternalEvent.class);
+  Mockito.when(event.getEffectiveTransitionTime()).thenReturn(effectiveTransitionTime);
+  Mockito.when(event.getRequestedTransitionTime()).thenReturn(requestedTransitionTime);
+  Mockito.when(event.getTransitionType()).thenReturn(SubscriptionTransitionType.CREATE);
+  Mockito.when(entitlementInternalApi.getAllTransitions(Mockito.eq(subscription),Mockito.<InternalCallContext>any())).thenReturn(ImmutableList.<EffectiveSubscriptionInternalEvent>of(event));
+  transition=new DefaultEffectiveSubscriptionEvent(new SubscriptionTransitionData(UUID.randomUUID(),subscriptionId,bundleId,EntitlementEvent.EventType.API_USER,ApiEventType.CREATE,requestedTransitionTime,effectiveTransitionTime,null,null,null,null,Subscription.SubscriptionState.ACTIVE,plan,phase,priceList,TOTAL_ORDERING,null,true),null,null,1L,1L);
+}

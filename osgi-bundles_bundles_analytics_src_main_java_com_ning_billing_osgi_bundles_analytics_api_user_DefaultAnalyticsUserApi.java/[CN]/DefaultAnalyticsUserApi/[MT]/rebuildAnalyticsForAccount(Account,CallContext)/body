@@ -1,0 +1,16 @@
+{
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),context);
+  bacDao.accountUpdated(account.getId(),internalCallContext);
+  final Set<UUID> bundleIds=updateBST(account,internalCallContext);
+  invoiceDao.rebuildInvoicesForAccount(account.getId(),internalCallContext);
+  try {
+    updateBIP(account,internalCallContext);
+  }
+ catch (  PaymentApiException e) {
+    log.warn(e.toString());
+  }
+  for (  final UUID bundleId : bundleIds) {
+    bosDao.overdueStatusChanged(Type.SUBSCRIPTION_BUNDLE,bundleId,internalCallContext);
+  }
+  updateTags(account,internalCallContext);
+}

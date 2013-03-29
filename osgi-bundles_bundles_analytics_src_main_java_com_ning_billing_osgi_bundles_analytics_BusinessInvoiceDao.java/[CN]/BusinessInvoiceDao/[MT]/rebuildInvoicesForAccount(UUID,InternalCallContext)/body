@@ -1,0 +1,33 @@
+{
+  final Account account;
+  try {
+    account=accountApi.getAccountById(accountId,context);
+  }
+ catch (  AccountApiException e) {
+    log.warn("Ignoring invoice update for account id {} (account does not exist)",accountId);
+    return;
+  }
+  final Collection<Invoice> invoices=invoiceApi.getInvoicesByAccountId(account.getId(),context);
+  final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemModelDao>> businessInvoices=new HashMap<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemModelDao>>();
+  for (  final Invoice invoice : invoices) {
+    final BusinessInvoiceModelDao businessInvoice=new BusinessInvoiceModelDao(account.getExternalKey(),invoice);
+    final List<BusinessInvoiceItemModelDao> businessInvoiceItems=new ArrayList<BusinessInvoiceItemModelDao>();
+    for (    final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+      final BusinessInvoiceItemModelDao businessInvoiceItem=createBusinessInvoiceItem(invoiceItem,context);
+      if (businessInvoiceItem != null) {
+        businessInvoiceItems.add(businessInvoiceItem);
+      }
+    }
+    businessInvoices.put(businessInvoice,businessInvoiceItems);
+  }
+  final BusinessAccountModelDao bac=businessAccountDao.createBusinessAccountFromAccount(account,context);
+  sqlDao.inTransaction(new Transaction<Void,BusinessInvoiceSqlDao>(){
+    @Override public Void inTransaction(    final BusinessInvoiceSqlDao transactional,    final TransactionStatus status) throws Exception {
+      rebuildInvoicesForAccountInTransaction(account,businessInvoices,transactional,context);
+      final BusinessAccountSqlDao accountSqlDao=transactional.become(BusinessAccountSqlDao.class);
+      businessAccountDao.updateAccountInTransaction(bac,accountSqlDao,context);
+      return null;
+    }
+  }
+);
+}

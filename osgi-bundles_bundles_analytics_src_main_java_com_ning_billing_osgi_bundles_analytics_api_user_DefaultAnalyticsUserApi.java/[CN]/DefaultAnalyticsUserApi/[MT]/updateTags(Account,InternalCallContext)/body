@@ -1,0 +1,34 @@
+{
+  final List<TagDefinition> tagDefinitions=tagInternalApi.getTagDefinitions(internalCallContext);
+  final Collection<String> utilTags=Collections2.transform(tagInternalApi.getTags(account.getId(),ObjectType.ACCOUNT,internalCallContext),new Function<Tag,String>(){
+    @Override public String apply(    @Nullable final Tag input){
+      if (input == null) {
+        return "";
+      }
+      for (      final TagDefinition tagDefinition : tagDefinitions) {
+        if (tagDefinition.getId().equals(input.getTagDefinitionId())) {
+          return tagDefinition.getName();
+        }
+      }
+      return "";
+    }
+  }
+);
+  final Collection<String> analyticsTags=Collections2.transform(analyticsDao.getTagsForAccount(account.getExternalKey(),internalCallContext),new Function<BusinessAccountTagModelDao,String>(){
+    @Override public String apply(    @Nullable final BusinessAccountTagModelDao input){
+      if (input == null) {
+        return null;
+      }
+ else {
+        return input.getName();
+      }
+    }
+  }
+);
+  for (  final String tag : Sets.difference(new HashSet<String>(analyticsTags),new HashSet<String>(utilTags))) {
+    tagDao.tagRemoved(ObjectType.ACCOUNT,account.getId(),tag,internalCallContext);
+  }
+  for (  final String tag : Sets.difference(new HashSet<String>(utilTags),new HashSet<String>(analyticsTags))) {
+    tagDao.tagAdded(ObjectType.ACCOUNT,account.getId(),tag,internalCallContext);
+  }
+}

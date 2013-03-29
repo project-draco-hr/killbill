@@ -1,0 +1,15 @@
+{
+  final String accountKey=UUID.randomUUID().toString();
+  final UUID bundleId=UUID.randomUUID();
+  final String externalKey=UUID.randomUUID().toString();
+  final BusinessOverdueStatusModelDao firstOverdueStatus=createOverdueStatus(accountKey,bundleId,externalKey);
+  Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundleByKey(externalKey,internalCallContext).size(),0);
+  Assert.assertEquals(overdueStatusSqlDao.createOverdueStatus(firstOverdueStatus,internalCallContext),1);
+  Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundleByKey(externalKey,internalCallContext).size(),1);
+  Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundleByKey(externalKey,internalCallContext).get(0),firstOverdueStatus);
+  final BusinessOverdueStatusModelDao secondOverdueStatus=createOverdueStatus(accountKey,bundleId,externalKey);
+  Assert.assertEquals(overdueStatusSqlDao.createOverdueStatus(secondOverdueStatus,internalCallContext),1);
+  Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundleByKey(externalKey,internalCallContext).size(),2);
+  Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundleByKey(externalKey,internalCallContext).get(0),firstOverdueStatus);
+  Assert.assertEquals(overdueStatusSqlDao.getOverdueStatusesForBundleByKey(externalKey,internalCallContext).get(1),secondOverdueStatus);
+}

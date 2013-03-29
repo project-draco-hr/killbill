@@ -1,0 +1,12 @@
+{
+  final BusinessSubscription subscriptionWithNullPlanAndPhase=new BusinessSubscription(null,null,null,Currency.USD,null,null,catalog);
+  final BusinessSubscriptionTransitionModelDao transitionWithNullPlanAndPhase=new BusinessSubscriptionTransitionModelDao(transition.getTotalOrdering(),transition.getBundleId(),transition.getExternalKey(),transition.getAccountId(),transition.getAccountKey(),transition.getSubscriptionId(),transition.getRequestedTimestamp(),transition.getEvent(),subscriptionWithNullPlanAndPhase,subscriptionWithNullPlanAndPhase);
+  subscriptionTransitionSqlDao.createTransition(transitionWithNullPlanAndPhase,internalCallContext);
+  final List<BusinessSubscriptionTransitionModelDao> transitions=subscriptionTransitionSqlDao.getTransitionsByKey(EXTERNAL_KEY,internalCallContext);
+  Assert.assertEquals(transitions.size(),1);
+  Assert.assertEquals(transitions.get(0).getExternalKey(),transition.getExternalKey());
+  Assert.assertEquals(transitions.get(0).getRequestedTimestamp(),transition.getRequestedTimestamp());
+  Assert.assertEquals(transitions.get(0).getEvent(),transition.getEvent());
+  Assert.assertNull(transitions.get(0).getPreviousSubscription());
+  Assert.assertNull(transitions.get(0).getNextSubscription());
+}

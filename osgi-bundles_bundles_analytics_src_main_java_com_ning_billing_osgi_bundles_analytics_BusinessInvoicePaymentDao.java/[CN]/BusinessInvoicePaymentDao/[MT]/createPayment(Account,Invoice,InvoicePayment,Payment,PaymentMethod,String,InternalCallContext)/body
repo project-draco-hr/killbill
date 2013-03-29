@@ -1,0 +1,49 @@
+{
+  final String cardCountry;
+  final String cardType;
+  final String paymentMethodString;
+  if (paymentMethod != null) {
+    final PaymentMethodPlugin pluginDetail=paymentMethod.getPluginDetail();
+    cardCountry=PaymentMethodUtils.getCardCountry(pluginDetail);
+    cardType=PaymentMethodUtils.getCardType(pluginDetail);
+    paymentMethodString=PaymentMethodUtils.getPaymentMethodType(pluginDetail);
+  }
+ else {
+    cardCountry=null;
+    cardType=null;
+    paymentMethodString=null;
+  }
+  final String invoicePaymentType;
+  final UUID linkedInvoicePaymentId;
+  final DateTime createdDate;
+  final DateTime updatedDate;
+  if (invoicePayment != null) {
+    invoicePaymentType=invoicePayment.getType().toString();
+    linkedInvoicePaymentId=invoicePayment.getLinkedInvoicePaymentId();
+    createdDate=invoicePayment.getCreatedDate();
+    updatedDate=invoicePayment.getUpdatedDate();
+  }
+ else {
+    invoicePaymentType=null;
+    linkedInvoicePaymentId=null;
+    createdDate=clock.getUTCNow();
+    updatedDate=createdDate;
+  }
+  final BusinessInvoicePaymentModelDao businessInvoicePayment=new BusinessInvoicePaymentModelDao(account.getExternalKey(),payment.getAmount(),cardCountry,cardType,createdDate,payment.getCurrency(),payment.getEffectiveDate(),payment.getInvoiceId(),message,payment.getId(),paymentMethodString,"Electronic",paymentMethod == null ? null : paymentMethod.getPluginName(),payment.getPaymentStatus().toString(),payment.getAmount(),updatedDate,invoicePaymentType,linkedInvoicePaymentId);
+  final BusinessAccountModelDao bac=accountDao.createBusinessAccountFromAccount(account,context);
+  invoicePaymentSqlDao.inTransaction(new Transaction<Void,BusinessInvoicePaymentSqlDao>(){
+    @Override public Void inTransaction(    final BusinessInvoicePaymentSqlDao transactional,    final TransactionStatus status) throws Exception {
+      transactional.deleteInvoicePayment(payment.getId().toString(),context);
+      transactional.createInvoicePayment(businessInvoicePayment,context);
+      if (invoice != null) {
+        final BusinessInvoiceSqlDao invoiceSqlDao=transactional.become(BusinessInvoiceSqlDao.class);
+        invoiceDao.rebuildInvoiceInTransaction(account.getExternalKey(),invoice,invoiceSqlDao,context);
+      }
+      final BusinessAccountSqlDao accountSqlDao=transactional.become(BusinessAccountSqlDao.class);
+      accountDao.updateAccountInTransaction(bac,accountSqlDao,context);
+      log.info("Added payment {}",businessInvoicePayment);
+      return null;
+    }
+  }
+);
+}

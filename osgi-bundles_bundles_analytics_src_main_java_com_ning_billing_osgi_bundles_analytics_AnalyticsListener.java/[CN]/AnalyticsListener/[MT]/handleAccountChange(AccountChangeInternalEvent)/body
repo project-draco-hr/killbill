@@ -1,0 +1,12 @@
+{
+  if (!event.hasChanges()) {
+    return;
+  }
+  updateWithAccountLock(event.getAccountRecordId(),new Callable<Void>(){
+    @Override public Void call() throws Exception {
+      bacDao.accountUpdated(event.getAccountId(),createCallContext(event));
+      return null;
+    }
+  }
+);
+}
