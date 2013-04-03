@@ -1,0 +1,72 @@
+{
+  businessActive=true;
+  this.priceList=priceList == null ? null : priceList.getName();
+  if (currentPlan != null && currentPlan.getProduct() != null) {
+    final Product product=currentPlan.getProduct();
+    productName=product.getName();
+    productCategory=product.getCategory();
+    productType=product.getCatalogName();
+  }
+ else {
+    productName=null;
+    productCategory=null;
+    productType=null;
+  }
+  if (currentPhase != null) {
+    slug=currentPhase.getName();
+    if (currentPhase.getPhaseType() != null) {
+      phase=currentPhase.getPhaseType().toString();
+    }
+ else {
+      phase=null;
+    }
+    if (currentPhase.getBillingPeriod() != null) {
+      billingPeriod=currentPhase.getBillingPeriod().toString();
+    }
+ else {
+      billingPeriod=null;
+    }
+    if (currentPhase.getRecurringPrice() != null) {
+      BigDecimal tmpPrice;
+      try {
+        tmpPrice=currentPhase.getRecurringPrice().getPrice(USD);
+      }
+ catch (      CatalogApiException e) {
+        tmpPrice=null;
+      }
+      price=tmpPrice;
+      if (tmpPrice != null) {
+        mrr=getMrrFromBillingPeriod(currentPhase.getBillingPeriod(),price);
+      }
+ else {
+        mrr=null;
+      }
+    }
+ else {
+      price=BigDecimal.ZERO;
+      mrr=BigDecimal.ZERO;
+    }
+  }
+ else {
+    slug=null;
+    phase=null;
+    billingPeriod=null;
+    price=BigDecimal.ZERO;
+    mrr=BigDecimal.ZERO;
+  }
+  if (currency != null) {
+    this.currency=currency.toString();
+  }
+ else {
+    this.currency=null;
+  }
+  this.startDate=startDate;
+  if (currentPhase != null) {
+    final Duration duration=currentPhase.getDuration();
+    this.endDate=duration == null ? null : startDate.plus(duration.toJodaPeriod());
+  }
+ else {
+    this.endDate=null;
+  }
+  this.state=state;
+}

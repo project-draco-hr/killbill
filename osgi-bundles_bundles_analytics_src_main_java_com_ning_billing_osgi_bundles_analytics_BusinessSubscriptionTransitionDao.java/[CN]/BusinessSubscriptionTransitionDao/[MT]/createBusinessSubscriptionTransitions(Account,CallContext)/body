@@ -1,0 +1,19 @@
+{
+  final Collection<BusinessSubscriptionTransitionModelDao> bsts=new LinkedList<BusinessSubscriptionTransitionModelDao>();
+  final List<SubscriptionBundle> bundles=getSubscriptionBundlesForAccount(account.getId(),context);
+  for (  final SubscriptionBundle bundle : bundles) {
+    final Collection<Subscription> subscriptions=getSubscriptionsForBundle(bundle.getId(),context);
+    for (    final Subscription subscription : subscriptions) {
+      final List<SubscriptionTransition> transitions=new LinkedList<SubscriptionTransition>();
+      BusinessSubscriptionTransitionModelDao prevBst=null;
+      for (      final SubscriptionTransition transition : transitions) {
+        final BusinessSubscriptionTransitionModelDao bst=createBusinessSubscriptionTransition(account,bundle,transition,prevBst,context);
+        if (bst != null) {
+          bsts.add(bst);
+          prevBst=bst;
+        }
+      }
+    }
+  }
+  return bsts;
+}
