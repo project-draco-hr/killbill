@@ -1,0 +1,16 @@
+{
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(context);
+  final BusinessAccount businessAccount=getAccountByKey(account.getExternalKey(),context);
+  final List<SubscriptionBundle> bundles=entitlementInternalApi.getBundlesForAccount(account.getId(),internalTenantContext);
+  final Collection<BusinessSubscriptionTransition> businessSubscriptionTransitions=new ArrayList<BusinessSubscriptionTransition>();
+  final Collection<BusinessOverdueStatus> businessOverdueStatuses=new ArrayList<BusinessOverdueStatus>();
+  for (  final SubscriptionBundle bundle : bundles) {
+    businessSubscriptionTransitions.addAll(getTransitionsForBundle(bundle.getExternalKey(),context));
+    businessOverdueStatuses.addAll(getOverdueStatusesForBundle(bundle.getExternalKey(),context));
+  }
+  final Collection<BusinessInvoice> businessInvoices=getInvoicesForAccount(account.getExternalKey(),context);
+  final Collection<BusinessInvoicePayment> businessInvoicePayments=getInvoicePaymentsForAccount(account.getExternalKey(),context);
+  final Collection<BusinessTag> businessTags=getTagsForAccount(account.getExternalKey(),context);
+  final Collection<BusinessField> businessFields=ImmutableList.<BusinessField>of();
+  return new BusinessSnapshot(businessAccount,businessSubscriptionTransitions,businessInvoices,businessInvoicePayments,businessOverdueStatuses,businessTags,businessFields);
+}

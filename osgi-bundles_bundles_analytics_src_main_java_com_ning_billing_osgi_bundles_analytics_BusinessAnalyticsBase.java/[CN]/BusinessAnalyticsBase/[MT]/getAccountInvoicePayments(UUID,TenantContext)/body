@@ -1,0 +1,9 @@
+{
+  final InvoicePaymentApi invoicePaymentApi=getInvoicePaymentUserApi();
+  final Collection<Payment> payments=getPaymentsByAccountId(accountId,context);
+  final Collection<InvoicePayment> invoicePayments=new LinkedList<InvoicePayment>();
+  for (  final Payment payment : payments) {
+    invoicePayments.addAll(invoicePaymentApi.getInvoicePayments(payment.getId(),context));
+  }
+  return invoicePayments;
+}

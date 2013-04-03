@@ -1,0 +1,17 @@
+{
+  if (InvoiceItemType.REFUND_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+    return new BusinessInvoiceAdjustmentModelDao(account,invoice,invoiceItem,bundle,plan,planPhase,creationAuditLog);
+  }
+ else   if (InvoiceItemType.EXTERNAL_CHARGE.equals(invoiceItem.getInvoiceItemType()) || InvoiceItemType.FIXED.equals(invoiceItem.getInvoiceItemType()) || InvoiceItemType.RECURRING.equals(invoiceItem.getInvoiceItemType())) {
+    return new BusinessInvoiceItemModelDao(account,invoice,invoiceItem,bundle,plan,planPhase,creationAuditLog);
+  }
+ else   if (InvoiceItemType.ITEM_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+    return new BusinessInvoiceItemAdjustmentModelDao(account,invoice,invoiceItem,bundle,plan,planPhase,creationAuditLog);
+  }
+ else   if ((InvoiceItemType.CBA_ADJ.equals(invoiceItem.getInvoiceItemType()) && invoiceItem.getAmount().compareTo(BigDecimal.ZERO) <= 0) || InvoiceItemType.CREDIT_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+    return new BusinessInvoiceItemCreditModelDao(account,invoice,invoiceItem,bundle,plan,planPhase,creationAuditLog);
+  }
+ else {
+    return null;
+  }
+}

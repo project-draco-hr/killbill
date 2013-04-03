@@ -1,0 +1,17 @@
+{
+  final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>> businessInvoices=new HashMap<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>>();
+  final Collection<Invoice> invoices=getInvoicesByAccountId(account.getId(),context);
+  for (  final Invoice invoice : invoices) {
+    final AuditLog creationAuditLog=getInvoiceCreationAuditLog(invoice.getId(),context);
+    final BusinessInvoiceModelDao businessInvoice=new BusinessInvoiceModelDao(account,invoice,creationAuditLog);
+    final List<BusinessInvoiceItemBaseModelDao> businessInvoiceItems=new ArrayList<BusinessInvoiceItemBaseModelDao>();
+    for (    final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+      final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,context);
+      if (businessInvoiceItem != null) {
+        businessInvoiceItems.add(businessInvoiceItem);
+      }
+    }
+    businessInvoices.put(businessInvoice,businessInvoiceItems);
+  }
+  return businessInvoices;
+}

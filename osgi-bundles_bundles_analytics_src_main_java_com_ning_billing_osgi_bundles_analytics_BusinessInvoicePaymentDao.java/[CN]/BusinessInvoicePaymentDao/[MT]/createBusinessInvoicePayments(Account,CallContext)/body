@@ -1,0 +1,15 @@
+{
+  final Collection<BusinessInvoicePaymentBaseModelDao> businessInvoicePayments=new LinkedList<BusinessInvoicePaymentBaseModelDao>();
+  final Collection<InvoicePayment> invoicePayments=getAccountInvoicePayments(account.getId(),context);
+  for (  final InvoicePayment invoicePayment : invoicePayments) {
+    final Invoice invoice=getInvoice(invoicePayment.getInvoiceId(),context);
+    final Payment payment=getPayment(invoicePayment.getPaymentId(),context);
+    final PaymentMethod paymentMethod=getPaymentMethod(payment.getPaymentMethodId(),context);
+    final AuditLog creationAuditLog=getInvoicePaymentCreationAuditLog(invoicePayment.getId(),context);
+    final BusinessInvoicePaymentBaseModelDao businessInvoicePayment=BusinessInvoicePaymentBaseModelDao.create(account,invoice,invoicePayment,payment,paymentMethod,creationAuditLog);
+    if (businessInvoicePayment != null) {
+      businessInvoicePayments.add(businessInvoicePayment);
+    }
+  }
+  return businessInvoicePayments;
+}

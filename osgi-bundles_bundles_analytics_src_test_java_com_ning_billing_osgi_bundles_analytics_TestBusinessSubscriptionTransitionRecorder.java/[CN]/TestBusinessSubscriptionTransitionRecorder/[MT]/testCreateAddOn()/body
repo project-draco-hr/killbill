@@ -24,7 +24,7 @@
   Mockito.when(subscription.getId()).thenReturn(subscriptionId);
   Mockito.when(entitlementInternalApi.getAllTransitions(Mockito.eq(subscription),Mockito.<InternalTenantContext>any())).thenReturn(ImmutableList.<EffectiveSubscriptionInternalEvent>of(eventEffective));
   Mockito.when(entitlementInternalApi.getSubscriptionsForBundle(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(ImmutableList.<Subscription>of(subscription));
-  subscriptionTransitionDao.rebuildTransitionsForBundle(bundle.getId(),internalCallContext);
+  subscriptionTransitionDao.update(bundle.getId(),internalCallContext);
   Assert.assertEquals(subscriptionTransitionSqlDao.getTransitionsByKey(externalKey.toString(),internalCallContext).size(),1);
   final BusinessSubscriptionTransitionModelDao transition=subscriptionTransitionSqlDao.getTransitionsByKey(externalKey.toString(),internalCallContext).get(0);
   Assert.assertEquals(transition.getTotalOrdering(),(long)eventEffective.getTotalOrdering());

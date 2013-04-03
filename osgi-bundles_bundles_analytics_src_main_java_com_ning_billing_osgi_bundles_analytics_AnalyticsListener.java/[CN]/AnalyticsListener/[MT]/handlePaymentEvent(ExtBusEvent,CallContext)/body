@@ -1,0 +1,10 @@
+{
+  final UUID paymentId=getPaymentIdFromEvent(killbillEvent,callContext);
+  updateWithAccountLock(killbillEvent,new Callable<Void>(){
+    @Override public Void call() throws Exception {
+      bipDao.update(killbillEvent.getAccountId(),paymentId,callContext);
+      return null;
+    }
+  }
+);
+}

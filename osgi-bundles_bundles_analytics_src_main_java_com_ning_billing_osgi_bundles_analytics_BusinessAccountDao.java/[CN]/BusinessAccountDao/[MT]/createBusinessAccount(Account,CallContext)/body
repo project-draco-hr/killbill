@@ -1,0 +1,19 @@
+{
+  final AuditLog creationAuditLog=getAccountCreationAuditLog(account.getId(),context);
+  final BigDecimal accountBalance=getAccountBalance(account.getId(),context);
+  Invoice lastInvoice=null;
+  final Collection<Invoice> invoices=getInvoicesByAccountId(account.getId(),context);
+  for (  final Invoice invoice : invoices) {
+    if (lastInvoice == null || invoice.getInvoiceDate().isAfter(lastInvoice.getInvoiceDate())) {
+      lastInvoice=invoice;
+    }
+  }
+  Payment lastPayment=null;
+  final Collection<Payment> payments=getPaymentsByAccountId(account.getId(),context);
+  for (  final Payment payment : payments) {
+    if (lastPayment == null || payment.getEffectiveDate().isAfter(lastPayment.getEffectiveDate())) {
+      lastPayment=payment;
+    }
+  }
+  return new BusinessAccountModelDao(account,accountBalance,lastInvoice,lastPayment,creationAuditLog);
+}
