@@ -2,11 +2,11 @@
   if (transitions == null) {
     return Collections.emptyList();
   }
-  final List<SubscriptionTransitionData> result=new ArrayList<SubscriptionTransitionData>();
+  final List<SubscriptionTransition> result=new ArrayList<SubscriptionTransition>();
   final SubscriptionTransitionDataIterator it=new SubscriptionTransitionDataIterator(clock,transitions,Order.ASC_FROM_PAST,Kind.BILLING,Visibility.ALL,TimeLimit.ALL);
   boolean foundInitialEvent=false;
   while (it.hasNext()) {
-    final SubscriptionTransitionData curTransition=it.next();
+    final SubscriptionTransitionData curTransition=(SubscriptionTransitionData)it.next();
     if (!foundInitialEvent) {
       foundInitialEvent=curTransition.getEventType() == EventType.API_USER && (curTransition.getApiEventType() == ApiEventType.CREATE || curTransition.getApiEventType() == ApiEventType.MIGRATE_BILLING || curTransition.getApiEventType() == ApiEventType.TRANSFER);
     }
