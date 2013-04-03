@@ -1,0 +1,16 @@
+{
+  final Collection<BusinessOverdueStatusModelDao> businessOverdueStatuses=new LinkedList<BusinessOverdueStatusModelDao>();
+  final List<BlockingState> blockingStatesOrdered=getBlockingHistory(subscriptionBundle.getId(),context);
+  if (blockingStatesOrdered.size() == 0) {
+    return businessOverdueStatuses;
+  }
+  final List<BlockingState> blockingStates=Lists.reverse(ImmutableList.<BlockingState>copyOf(blockingStatesOrdered));
+  DateTime previousStartDate=null;
+  for (  final BlockingState state : blockingStates) {
+    final AuditLog creationAuditLog=getBlockingStateCreationAuditLog(state.getId(),context);
+    final BusinessOverdueStatusModelDao overdueStatus=new BusinessOverdueStatusModelDao(account,subscriptionBundle,state,previousStartDate,creationAuditLog);
+    businessOverdueStatuses.add(overdueStatus);
+    previousStartDate=state.getTimestamp();
+  }
+  return businessOverdueStatuses;
+}

@@ -1,0 +1,10 @@
+{
+  if (fieldModelDaos.size() == 0) {
+    return;
+  }
+  final BusinessFieldModelDao firstFieldModelDao=fieldModelDaos.iterator().next();
+  transactional.deleteByAccountRecordId(firstFieldModelDao.getTableName(),firstFieldModelDao.getAccountRecordId(),firstFieldModelDao.getTenantRecordId(),context);
+  for (  final BusinessFieldModelDao fieldModelDao : fieldModelDaos) {
+    transactional.create(fieldModelDao.getTableName(),fieldModelDao,context);
+  }
+}

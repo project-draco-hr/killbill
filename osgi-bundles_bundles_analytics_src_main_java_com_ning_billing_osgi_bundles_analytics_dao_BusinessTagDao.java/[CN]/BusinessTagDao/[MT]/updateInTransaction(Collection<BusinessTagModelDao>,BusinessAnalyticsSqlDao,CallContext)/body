@@ -1,0 +1,10 @@
+{
+  if (tagModelDaos.size() == 0) {
+    return;
+  }
+  final BusinessTagModelDao firstTagModelDao=tagModelDaos.iterator().next();
+  transactional.deleteByAccountRecordId(firstTagModelDao.getTableName(),firstTagModelDao.getAccountRecordId(),firstTagModelDao.getTenantRecordId(),context);
+  for (  final BusinessTagModelDao tagModelDao : tagModelDaos) {
+    transactional.create(tagModelDao.getTableName(),tagModelDao,context);
+  }
+}

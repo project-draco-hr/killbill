@@ -1,0 +1,11 @@
+{
+  final Collection<Tag> tags=getTagsForAccountAndObjectType(account.getId(),objectType,context);
+  final Collection<BusinessTagModelDao> tagModelDaos=new LinkedList<BusinessTagModelDao>();
+  for (  final Tag tag : tags) {
+    final TagDefinition tagDefinition=getTagDefinition(tag.getTagDefinitionId(),context);
+    final AuditLog creationAuditLog=getTagCreationAuditLog(tag.getId(),context);
+    final BusinessTagModelDao tagModelDao=BusinessTagModelDao.create(account,tag,tagDefinition,creationAuditLog);
+    tagModelDaos.add(tagModelDao);
+  }
+  return tagModelDaos;
+}

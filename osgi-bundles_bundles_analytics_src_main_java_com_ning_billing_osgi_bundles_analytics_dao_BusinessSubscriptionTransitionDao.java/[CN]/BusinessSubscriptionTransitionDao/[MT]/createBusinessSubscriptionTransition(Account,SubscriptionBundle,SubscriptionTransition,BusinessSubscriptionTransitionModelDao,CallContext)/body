@@ -1,0 +1,9 @@
+{
+  final BusinessSubscriptionEvent businessEvent=BusinessSubscriptionEvent.fromTransition(subscriptionTransition);
+  if (businessEvent == null) {
+    return null;
+  }
+  final BusinessSubscription nextSubscription=new BusinessSubscription(subscriptionTransition.getNextPlan(),subscriptionTransition.getNextPhase(),subscriptionTransition.getNextPriceList(),account.getCurrency(),subscriptionTransition.getEffectiveTransitionTime(),subscriptionTransition.getNextState());
+  final AuditLog creationAuditLog=getSubscriptionEventCreationAuditLog(null,context);
+  return new BusinessSubscriptionTransitionModelDao(account,subscriptionBundle,subscriptionTransition,subscriptionTransition.getRequestedTransitionTime(),businessEvent,prevBst == null ? null : prevBst.getNextSubscription(),nextSubscription,creationAuditLog);
+}

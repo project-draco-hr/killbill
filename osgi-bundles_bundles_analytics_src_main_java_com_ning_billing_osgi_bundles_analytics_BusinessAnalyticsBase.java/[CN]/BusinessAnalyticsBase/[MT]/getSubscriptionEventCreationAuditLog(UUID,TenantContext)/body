@@ -1,0 +1,9 @@
+{
+  final List<AuditLog> auditLogsForSubscriptionEvent=getAuditUserApi().getAuditLogs(subscriptionEventId,ObjectType.SUBSCRIPTION_EVENT,AuditLevel.MINIMAL,context);
+  for (  final AuditLog auditLog : auditLogsForSubscriptionEvent) {
+    if (auditLog.getChangeType().equals(ChangeType.INSERT)) {
+      return auditLog;
+    }
+  }
+  throw new AnalyticsRefreshException("Unable to find Subscription event creation audit log for id " + subscriptionEventId);
+}
