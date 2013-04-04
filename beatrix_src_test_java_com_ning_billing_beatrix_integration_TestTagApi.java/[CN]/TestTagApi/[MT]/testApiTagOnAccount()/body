@@ -1,0 +1,14 @@
+{
+  busHandler.pushExpectedEvents(NextEvent.TAG);
+  tagApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_INVOICING_OFF.getId(),callContext);
+  assertTrue(busHandler.isCompleted(DELAY));
+  busHandler.pushExpectedEvents(NextEvent.TAG);
+  tagApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_PAY_OFF.getId(),callContext);
+  assertTrue(busHandler.isCompleted(DELAY));
+  List<Tag> tags=tagApi.getTagsForAccount(account.getId(),callContext);
+  Assert.assertEquals(tags.size(),2);
+  tags=tagApi.getTagsForObject(account.getId(),ObjectType.ACCOUNT,callContext);
+  Assert.assertEquals(tags.size(),2);
+  tags=tagApi.getTagsForAccountType(account.getId(),ObjectType.ACCOUNT,callContext);
+  Assert.assertEquals(tags.size(),2);
+}
