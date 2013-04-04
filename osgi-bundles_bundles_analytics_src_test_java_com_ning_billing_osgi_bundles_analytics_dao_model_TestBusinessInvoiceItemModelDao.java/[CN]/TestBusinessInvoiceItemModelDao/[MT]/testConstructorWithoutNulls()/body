@@ -1,0 +1,12 @@
+{
+  final BusinessInvoiceItemModelDao invoiceItemModelDao=new BusinessInvoiceItemModelDao(account,invoice,invoiceItem,bundle,plan,phase,auditLog);
+  verifyInvoiceItemFields(invoiceItemModelDao);
+  Assert.assertEquals(invoiceItemModelDao.getBundleExternalKey(),bundle.getExternalKey());
+  Assert.assertEquals(invoiceItemModelDao.getProductName(),plan.getProduct().getName());
+  Assert.assertEquals(invoiceItemModelDao.getProductType(),plan.getProduct().getCatalogName());
+  Assert.assertEquals(invoiceItemModelDao.getProductCategory(),plan.getProduct().getCategory().toString());
+  Assert.assertEquals(invoiceItemModelDao.getSlug(),phase.getName());
+  Assert.assertEquals(invoiceItemModelDao.getPhase(),phase.getPhaseType().toString());
+  Assert.assertEquals(invoiceItemModelDao.getBillingPeriod(),phase.getBillingPeriod().toString());
+  Assert.assertEquals(invoiceItemModelDao.getEndDate(),invoiceItem.getStartDate().plus(phase.getDuration().toJodaPeriod()));
+}

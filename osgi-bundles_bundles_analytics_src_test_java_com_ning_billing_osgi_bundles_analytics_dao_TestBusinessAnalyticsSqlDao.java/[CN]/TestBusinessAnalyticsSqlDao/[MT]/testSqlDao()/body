@@ -1,0 +1,8 @@
+{
+  final BusinessAccountModelDao accountModelDao=new BusinessAccountModelDao(account,BigDecimal.ONE,invoice,payment,auditLog);
+  Assert.assertNull(analyticsSqlDao.getAccountByAccountRecordId(accountModelDao.getAccountRecordId(),accountModelDao.getTenantRecordId(),callContext));
+  analyticsSqlDao.create(accountModelDao.getTableName(),accountModelDao,callContext);
+  Assert.assertEquals(analyticsSqlDao.getAccountByAccountRecordId(accountModelDao.getAccountRecordId(),accountModelDao.getTenantRecordId(),callContext),accountModelDao);
+  analyticsSqlDao.deleteByAccountRecordId(accountModelDao.getTableName(),accountModelDao.getAccountRecordId(),accountModelDao.getTenantRecordId(),callContext);
+  Assert.assertNull(analyticsSqlDao.getAccountByAccountRecordId(accountModelDao.getAccountRecordId(),accountModelDao.getTenantRecordId(),callContext));
+}
