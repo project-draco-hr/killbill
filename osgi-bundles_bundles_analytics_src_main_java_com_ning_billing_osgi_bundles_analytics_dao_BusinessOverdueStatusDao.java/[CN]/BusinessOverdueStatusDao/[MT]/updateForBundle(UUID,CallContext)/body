@@ -1,7 +1,10 @@
 {
-  final SubscriptionBundle bundle=getSubscriptionBundle(bundleId,context);
-  final Account account=getAccount(bundle.getAccountId(),context);
-  final Collection<BusinessOverdueStatusModelDao> businessOverdueStatuses=createBusinessOverdueStatuses(account,bundle,context);
+  final Account account=getAccount(accountId,context);
+  final Collection<SubscriptionBundle> bundles=getSubscriptionBundlesForAccount(accountId,context);
+  final Collection<BusinessOverdueStatusModelDao> businessOverdueStatuses=new LinkedList<BusinessOverdueStatusModelDao>();
+  for (  final SubscriptionBundle bundle : bundles) {
+    businessOverdueStatuses.addAll(createBusinessOverdueStatuses(account,bundle,context));
+  }
   sqlDao.inTransaction(new Transaction<Void,BusinessAnalyticsSqlDao>(){
     @Override public Void inTransaction(    final BusinessAnalyticsSqlDao transactional,    final TransactionStatus status) throws Exception {
       updateInTransaction(businessOverdueStatuses,transactional,context);
