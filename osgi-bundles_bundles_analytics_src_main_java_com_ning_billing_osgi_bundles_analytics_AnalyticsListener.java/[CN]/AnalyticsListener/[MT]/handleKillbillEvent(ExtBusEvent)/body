@@ -1,31 +1,35 @@
 {
   final CallContext callContext=new AnalyticsCallContext(killbillEvent);
-  try {
 switch (killbillEvent.getEventType()) {
 case ACCOUNT_CREATION:
 case ACCOUNT_CHANGE:
-      handleAccountEvent(killbillEvent,callContext);
-    break;
+    handleAccountEvent(killbillEvent,callContext);
+  break;
 case SUBSCRIPTION_CREATION:
 case SUBSCRIPTION_CHANGE:
 case SUBSCRIPTION_CANCEL:
-  handleSubscriptionEvent(killbillEvent,callContext);
+handleSubscriptionEvent(killbillEvent,callContext);
 break;
 case OVERDUE_CHANGE:
 handleOverdueEvent(killbillEvent,callContext);
 break;
 case INVOICE_CREATION:
+case INVOICE_ADJUSTMENT:
 handleInvoiceEvent(killbillEvent,callContext);
 break;
 case PAYMENT_SUCCESS:
 case PAYMENT_FAILED:
 handlePaymentEvent(killbillEvent,callContext);
 break;
+case TAG_CREATION:
+case TAG_DELETION:
+handleTagEvent(killbillEvent,callContext);
+break;
+case CUSTOM_FIELD_CREATION:
+case CUSTOM_FIELD_DELETION:
+handleFieldEvent(killbillEvent,callContext);
+break;
 default :
 break;
-}
-}
- catch (AnalyticsRefreshException e) {
-logService.log(LogService.LOG_WARNING,"Refresh triggered by event " + killbillEvent + " failed",e);
 }
 }
