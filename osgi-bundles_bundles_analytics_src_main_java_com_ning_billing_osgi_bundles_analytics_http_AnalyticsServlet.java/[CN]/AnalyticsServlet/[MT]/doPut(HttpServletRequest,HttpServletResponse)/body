@@ -1,0 +1,11 @@
+{
+  final UUID kbAccountId=getKbAccountId(req,resp);
+  final CallContext context=createCallContext(req,resp);
+  try {
+    analyticsUserApi.rebuildAnalyticsForAccount(kbAccountId,context);
+    resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+  }
+ catch (  AnalyticsRefreshException e) {
+    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,e.getMessage());
+  }
+}
