@@ -1,8 +1,8 @@
 {
   super.setUp();
   killbillDataSource=new AnalyticsOSGIKillbillDataSource();
-  final String ddl=IOUtils.toString(Resources.getResource("com/ning/billing/osgi/bundles/analytics").openStream());
+  final String ddl=IOUtils.toString(Resources.getResource("com/ning/billing/osgi/bundles/analytics/ddl.sql").openStream());
   embeddedDB.executeScript(ddl);
-  dbi=new DBI(embeddedDB.getDataSource());
+  dbi=BusinessDBIProvider.get(embeddedDB.getDataSource());
   analyticsSqlDao=dbi.onDemand(BusinessAnalyticsSqlDao.class);
 }
