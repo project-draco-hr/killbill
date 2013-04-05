@@ -1,0 +1,11 @@
+{
+  final ObjectMapper objectMapper=new ObjectMapper();
+  final UUID customFieldId=UUID.randomUUID();
+  final UUID objectId=UUID.randomUUID();
+  final ObjectType objectType=ObjectType.ACCOUNT_EMAIL;
+  final UUID userToken=UUID.randomUUID();
+  final DefaultCustomFieldCreationEvent event=new DefaultCustomFieldCreationEvent(customFieldId,objectId,objectType,userToken,1L,1L);
+  final String json=objectMapper.writeValueAsString(event);
+  final DefaultCustomFieldCreationEvent fromJson=objectMapper.readValue(json,DefaultCustomFieldCreationEvent.class);
+  Assert.assertEquals(fromJson,event);
+}
