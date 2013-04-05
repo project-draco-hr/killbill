@@ -11,6 +11,9 @@
   if (invoiceItem.getSubscriptionId() != null && invoiceItem.getPhaseName() != null) {
     planPhase=getPlanPhaseFromInvoiceItem(invoiceItem,context);
   }
+  final Long invoiceItemRecordId=getInvoiceItemRecordId(invoiceItem.getId(),context);
   final AuditLog creationAuditLog=getInvoiceItemCreationAuditLog(invoiceItem.getId(),context);
-  return BusinessInvoiceItemBaseModelDao.create(account,invoice,invoiceItem,bundle,plan,planPhase,creationAuditLog);
+  final Long accountRecordId=getAccountRecordId(account.getId(),context);
+  final Long tenantRecordId=getTenantRecordId(context);
+  return BusinessInvoiceItemBaseModelDao.create(account,accountRecordId,invoice,invoiceItem,invoiceItemRecordId,bundle,plan,planPhase,creationAuditLog,tenantRecordId);
 }
