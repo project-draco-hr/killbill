@@ -3,13 +3,14 @@
   if (paymentConfig.isPaymentOff()) {
     paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),PaymentStatus.PAYMENT_SYSTEM_OFF,null,null,attemptInput.getId(),context);
     allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId(),context);
-    return new DefaultPayment(paymentInput,allAttempts,Collections.<RefundModelDao>emptyList());
+    return new DefaultPayment(paymentInput,null,allAttempts,Collections.<RefundModelDao>emptyList());
   }
   PaymentModelDao payment=null;
   BusInternalEvent event=null;
   PaymentStatus paymentStatus;
+  final PaymentInfoPlugin paymentPluginInfo;
   try {
-    final PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(account.getId(),paymentInput.getId(),paymentInput.getPaymentMethodId(),attemptInput.getRequestedAmount(),account.getCurrency(),context.toCallContext());
+    paymentPluginInfo=plugin.processPayment(account.getId(),paymentInput.getId(),paymentInput.getPaymentMethodId(),attemptInput.getRequestedAmount(),account.getCurrency(),context.toCallContext());
 switch (paymentPluginInfo.getStatus()) {
 case PROCESSED:
       paymentStatus=PaymentStatus.SUCCESS;
@@ -49,5 +50,5 @@ if (event != null) {
 postPaymentEvent(event,account.getId(),context);
 }
 }
-return new DefaultPayment(payment,allAttempts,Collections.<RefundModelDao>emptyList());
+return new DefaultPayment(payment,paymentPluginInfo,allAttempts,Collections.<RefundModelDao>emptyList());
 }
