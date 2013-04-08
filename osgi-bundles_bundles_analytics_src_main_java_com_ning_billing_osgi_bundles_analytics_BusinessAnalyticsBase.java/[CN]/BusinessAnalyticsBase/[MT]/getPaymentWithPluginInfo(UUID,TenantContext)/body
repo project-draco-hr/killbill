@@ -1,0 +1,10 @@
+{
+  final PaymentApi paymentApi=getPaymentUserApi();
+  try {
+    return paymentApi.getPayment(paymentId,true,context);
+  }
+ catch (  PaymentApiException e) {
+    logService.log(LogService.LOG_WARNING,"Error retrieving payment for id " + paymentId,e);
+    throw new AnalyticsRefreshException(e);
+  }
+}

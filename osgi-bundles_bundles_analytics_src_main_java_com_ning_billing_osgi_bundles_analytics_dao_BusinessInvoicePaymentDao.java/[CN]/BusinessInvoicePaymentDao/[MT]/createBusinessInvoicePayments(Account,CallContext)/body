@@ -6,10 +6,14 @@
   for (  final InvoicePayment invoicePayment : invoicePayments) {
     final Long invoicePaymentRecordId=getInvoicePaymentRecordId(invoicePayment.getId(),context);
     final Invoice invoice=getInvoice(invoicePayment.getInvoiceId(),context);
-    final Payment payment=getPayment(invoicePayment.getPaymentId(),context);
+    final Payment payment=getPaymentWithPluginInfo(invoicePayment.getPaymentId(),context);
+    Refund refund=null;
+    if (invoicePayment.getPaymentCookieId() != null) {
+      refund=getRefundWithPluginInfo(invoicePayment.getPaymentCookieId(),context);
+    }
     final PaymentMethod paymentMethod=getPaymentMethod(payment.getPaymentMethodId(),context);
     final AuditLog creationAuditLog=getInvoicePaymentCreationAuditLog(invoicePayment.getId(),context);
-    final BusinessInvoicePaymentBaseModelDao businessInvoicePayment=BusinessInvoicePaymentBaseModelDao.create(account,accountRecordId,invoice,invoicePayment,invoicePaymentRecordId,payment,paymentMethod,creationAuditLog,tenantRecordId);
+    final BusinessInvoicePaymentBaseModelDao businessInvoicePayment=BusinessInvoicePaymentBaseModelDao.create(account,accountRecordId,invoice,invoicePayment,invoicePaymentRecordId,payment,refund,paymentMethod,creationAuditLog,tenantRecordId);
     if (businessInvoicePayment != null) {
       businessInvoicePayments.add(businessInvoicePayment);
     }
