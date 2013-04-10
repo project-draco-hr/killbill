@@ -5,12 +5,13 @@
     final Collection<Subscription> subscriptions=getSubscriptionsForBundle(bundle.getId(),context);
     for (    final Subscription subscription : subscriptions) {
       final List<SubscriptionTransition> transitions=subscription.getAllTransitions();
-      BusinessSubscriptionTransitionModelDao prevBst=null;
+      BusinessSubscription prevNextSubscription=null;
       for (      final SubscriptionTransition transition : transitions) {
-        final BusinessSubscriptionTransitionModelDao bst=createBusinessSubscriptionTransition(account,bundle,transition,prevBst,context);
+        final BusinessSubscription nextSubscription=getBusinessSubscriptionFromTransition(account,transition);
+        final BusinessSubscriptionTransitionModelDao bst=createBusinessSubscriptionTransition(account,bundle,transition,prevNextSubscription,nextSubscription,context);
         if (bst != null) {
           bsts.add(bst);
-          prevBst=bst;
+          prevNextSubscription=nextSubscription;
         }
       }
     }
