@@ -2,6 +2,7 @@
   final Collection<BusinessInvoicePaymentBaseModelDao> businessInvoicePayments=new LinkedList<BusinessInvoicePaymentBaseModelDao>();
   final Long accountRecordId=getAccountRecordId(account.getId(),context);
   final Long tenantRecordId=getTenantRecordId(context);
+  final ReportGroup reportGroup=getReportGroup(account.getId(),context);
   final Collection<InvoicePayment> invoicePayments=getAccountInvoicePayments(account.getId(),context);
   for (  final InvoicePayment invoicePayment : invoicePayments) {
     final Long invoicePaymentRecordId=getInvoicePaymentRecordId(invoicePayment.getId(),context);
@@ -13,7 +14,7 @@
     }
     final PaymentMethod paymentMethod=getPaymentMethod(payment.getPaymentMethodId(),context);
     final AuditLog creationAuditLog=getInvoicePaymentCreationAuditLog(invoicePayment.getId(),context);
-    final BusinessInvoicePaymentBaseModelDao businessInvoicePayment=BusinessInvoicePaymentBaseModelDao.create(account,accountRecordId,invoice,invoicePayment,invoicePaymentRecordId,payment,refund,paymentMethod,creationAuditLog,tenantRecordId);
+    final BusinessInvoicePaymentBaseModelDao businessInvoicePayment=BusinessInvoicePaymentBaseModelDao.create(account,accountRecordId,invoice,invoicePayment,invoicePaymentRecordId,payment,refund,paymentMethod,creationAuditLog,tenantRecordId,reportGroup);
     if (businessInvoicePayment != null) {
       businessInvoicePayments.add(businessInvoicePayment);
     }
