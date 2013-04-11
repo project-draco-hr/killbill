@@ -6,13 +6,10 @@
     }
   }
   final Map<UUID,InvoiceItem> reparationInvoiceItemIdToRepairItemMappings=new LinkedHashMap<UUID,InvoiceItem>();
-  for (  final InvoiceItem repairedInvoiceItem : allInvoiceItems) {
-    if (!repairedInvoiceItemIdToRepairInvoiceItemMappings.keySet().contains(repairedInvoiceItem.getId())) {
-      continue;
-    }
+  for (  final InvoiceItem repairedInvoiceItem : repairedInvoiceItemIdToRepairInvoiceItemMappings.values()) {
     InvoiceItem reparationItem=null;
     for (    final InvoiceItem invoiceItem : allInvoiceItems) {
-      if (repairedInvoiceItem.getInvoiceItemType().equals(invoiceItem.getInvoiceItemType()) && repairedInvoiceItem.getSubscriptionId().equals(invoiceItem.getSubscriptionId()) && repairedInvoiceItem.getStartDate().compareTo(invoiceItem.getStartDate()) == 0 && repairedInvoiceItem.getEndDate().isAfter(invoiceItem.getEndDate())) {
+      if (repairedInvoiceItem.getInvoiceItemType().equals(invoiceItem.getInvoiceItemType()) && repairedInvoiceItem.getSubscriptionId().equals(invoiceItem.getSubscriptionId()) && repairedInvoiceItem.getStartDate().compareTo(invoiceItem.getStartDate()) == 0 && !repairedInvoiceItem.getEndDate().isBefore(invoiceItem.getEndDate())) {
         if (reparationItem == null) {
           reparationItem=invoiceItem;
         }
