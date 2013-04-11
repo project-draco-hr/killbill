@@ -1,0 +1,66 @@
+{
+  final UUID subscriptionId1=UUID.randomUUID();
+  final LocalDate startDate1=new LocalDate(2013,4,1);
+  final LocalDate endDate1=new LocalDate(2013,4,30);
+  final BigDecimal amount1=new BigDecimal("30");
+  final InvoiceItem recurring1=createInvoiceItem(InvoiceItemType.RECURRING,subscriptionId1,startDate1,endDate1,amount1,null);
+  final InvoiceItem repair1=createInvoiceItem(InvoiceItemType.REPAIR_ADJ,subscriptionId1,startDate1,endDate1,amount1.negate(),recurring1.getId());
+  final LocalDate reparationEndDate1=new LocalDate(2013,4,10);
+  final BigDecimal reparationAmount1=new BigDecimal("10");
+  final InvoiceItem reparation1=createInvoiceItem(InvoiceItemType.RECURRING,subscriptionId1,startDate1,reparationEndDate1,reparationAmount1,null);
+  final UUID subscriptionId2=UUID.randomUUID();
+  final LocalDate startDate2=new LocalDate(2013,4,10);
+  final LocalDate endDate2=new LocalDate(2013,4,30);
+  final BigDecimal amount2=new BigDecimal("20");
+  final InvoiceItem recurring2=createInvoiceItem(InvoiceItemType.RECURRING,subscriptionId2,startDate2,endDate2,amount2,null);
+  final InvoiceItem repair2=createInvoiceItem(InvoiceItemType.REPAIR_ADJ,subscriptionId2,startDate2,endDate2,amount2.negate(),recurring2.getId());
+  final LocalDate reparationEndDate2=new LocalDate(2013,4,15);
+  final BigDecimal reparationAmount2=new BigDecimal("5");
+  final InvoiceItem reparation2=createInvoiceItem(InvoiceItemType.RECURRING,subscriptionId2,startDate2,reparationEndDate2,reparationAmount2,null);
+  final UUID externalChargeSubscriptionId=UUID.randomUUID();
+  final LocalDate externalStartDate=new LocalDate(2012,1,1);
+  final BigDecimal externalChargeAmount=BigDecimal.TEN;
+  final InvoiceItem externalCharge=createInvoiceItem(InvoiceItemType.EXTERNAL_CHARGE,externalChargeSubscriptionId,externalStartDate,null,externalChargeAmount,null);
+  final BusinessInvoiceDao invoiceDao=new BusinessInvoiceDao(osgiKillbillLogService,null,osgiKillbillDataSource,null);
+  final Collection<InvoiceItem> sanitizedInvoiceItems=invoiceDao.sanitizeInvoiceItems(ImmutableList.<InvoiceItem>of(recurring1,repair1,reparation1,recurring2,repair2,reparation2,externalCharge));
+  Assert.assertEquals(sanitizedInvoiceItems.size(),2 + 2 + 1);
+  for (  final InvoiceItem invoiceItem : sanitizedInvoiceItems) {
+    if (invoiceItem.getId().equals(recurring1.getId())) {
+      Assert.assertEquals(invoiceItem,recurring1);
+    }
+ else     if (invoiceItem.getId().equals(repair1.getId())) {
+      Assert.fail("Repair item 1 shouldn't be in the sanitized elements");
+    }
+ else     if (invoiceItem.getId().equals(reparation1.getId())) {
+      Assert.fail("Reparation item 1 shouldn't be in the sanitized elements");
+    }
+ else     if (invoiceItem.getId().equals(recurring2.getId())) {
+      Assert.assertEquals(invoiceItem,recurring2);
+    }
+ else     if (invoiceItem.getId().equals(repair2.getId())) {
+      Assert.fail("Repair item 2 shouldn't be in the sanitized elements");
+    }
+ else     if (invoiceItem.getId().equals(reparation2.getId())) {
+      Assert.fail("Reparation item 2 shouldn't be in the sanitized elements");
+    }
+ else     if (invoiceItem.getId().equals(externalCharge.getId())) {
+      Assert.assertEquals(invoiceItem,externalCharge);
+    }
+ else {
+      if (InvoiceItemType.ITEM_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+        if (invoiceItem.getLinkedItemId().equals(recurring1.getId())) {
+          Assert.assertEquals(invoiceItem.getAmount(),new BigDecimal("20").negate());
+        }
+ else         if (invoiceItem.getLinkedItemId().equals(recurring2.getId())) {
+          Assert.assertEquals(invoiceItem.getAmount(),new BigDecimal("15").negate());
+        }
+ else {
+          Assert.fail("Shouldn't be in the sanitized elements: " + invoiceItem);
+        }
+      }
+ else {
+        Assert.fail("Shouldn't be in the sanitized elements: " + invoiceItem);
+      }
+    }
+  }
+}
