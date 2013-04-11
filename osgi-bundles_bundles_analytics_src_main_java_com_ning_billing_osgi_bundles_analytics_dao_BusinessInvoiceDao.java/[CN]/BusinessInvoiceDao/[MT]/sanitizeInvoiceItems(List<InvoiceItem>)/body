@@ -1,0 +1,45 @@
+{
+  final Map<UUID,InvoiceItem> repairedInvoiceItemIdToRepairInvoiceItemMappings=new HashMap<UUID,InvoiceItem>();
+  for (  final InvoiceItem invoiceItem : allInvoiceItems) {
+    if (InvoiceItemType.REPAIR_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+      repairedInvoiceItemIdToRepairInvoiceItemMappings.put(invoiceItem.getLinkedItemId(),invoiceItem);
+    }
+  }
+  final Map<UUID,InvoiceItem> reparationInvoiceItemIdToRepairItemMappings=new LinkedHashMap<UUID,InvoiceItem>();
+  for (  final InvoiceItem repairedInvoiceItem : allInvoiceItems) {
+    if (!repairedInvoiceItemIdToRepairInvoiceItemMappings.keySet().contains(repairedInvoiceItem.getId())) {
+      continue;
+    }
+    InvoiceItem reparationItem=null;
+    for (    final InvoiceItem invoiceItem : allInvoiceItems) {
+      if (repairedInvoiceItem.getInvoiceItemType().equals(invoiceItem.getInvoiceItemType()) && repairedInvoiceItem.getSubscriptionId().equals(invoiceItem.getSubscriptionId()) && repairedInvoiceItem.getStartDate().compareTo(invoiceItem.getStartDate()) == 0 && repairedInvoiceItem.getEndDate().isAfter(invoiceItem.getEndDate())) {
+        if (reparationItem == null) {
+          reparationItem=invoiceItem;
+        }
+ else {
+          logService.log(LogService.LOG_ERROR,"Found multiple reparation items matching the repair item id " + repairedInvoiceItem.getId() + " - this should never happen!");
+        }
+      }
+    }
+    if (reparationItem != null) {
+      reparationInvoiceItemIdToRepairItemMappings.put(reparationItem.getId(),repairedInvoiceItemIdToRepairInvoiceItemMappings.get(repairedInvoiceItem.getId()));
+    }
+ else {
+      logService.log(LogService.LOG_ERROR,"Could not find the reparation item for the repair item id " + repairedInvoiceItem.getId() + " - this should never happen!");
+    }
+  }
+  final Collection<InvoiceItem> invoiceItemsForAnalytics=new LinkedList<InvoiceItem>();
+  for (  final InvoiceItem invoiceItem : allInvoiceItems) {
+    if (InvoiceItemType.REPAIR_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+    }
+ else     if (reparationInvoiceItemIdToRepairItemMappings.keySet().contains(invoiceItem.getId())) {
+      final InvoiceItem repairInvoiceItem=reparationInvoiceItemIdToRepairItemMappings.get(invoiceItem.getId());
+      final InvoiceItem reparationInvoiceItem=invoiceItem;
+      invoiceItemsForAnalytics.add(new AdjustmentInvoiceItemForRepair(repairInvoiceItem,reparationInvoiceItem));
+    }
+ else {
+      invoiceItemsForAnalytics.add(invoiceItem);
+    }
+  }
+  return invoiceItemsForAnalytics;
+}
