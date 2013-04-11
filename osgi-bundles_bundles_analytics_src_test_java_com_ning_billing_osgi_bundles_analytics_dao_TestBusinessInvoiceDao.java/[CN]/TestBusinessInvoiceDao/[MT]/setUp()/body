@@ -1,9 +1,9 @@
 {
   super.setUp();
-  osgiKillbillDataSource=Mockito.mock(OSGIKillbillDataSource.class);
+  final OSGIKillbillDataSource osgiKillbillDataSource=Mockito.mock(OSGIKillbillDataSource.class);
   final DataSource dataSource=Mockito.mock(DataSource.class);
   Mockito.when(osgiKillbillDataSource.getDataSource()).thenReturn(dataSource);
-  osgiKillbillLogService=Mockito.mock(OSGIKillbillLogService.class);
+  final OSGIKillbillLogService osgiKillbillLogService=Mockito.mock(OSGIKillbillLogService.class);
   Mockito.doAnswer(new Answer(){
     @Override public Object answer(    final InvocationOnMock invocation) throws Throwable {
       logger.info(Arrays.toString(invocation.getArguments()));
@@ -11,4 +11,5 @@
     }
   }
 ).when(osgiKillbillLogService).log(Mockito.anyInt(),Mockito.anyString());
+  invoiceDao=new BusinessInvoiceDao(osgiKillbillLogService,null,osgiKillbillDataSource,null);
 }

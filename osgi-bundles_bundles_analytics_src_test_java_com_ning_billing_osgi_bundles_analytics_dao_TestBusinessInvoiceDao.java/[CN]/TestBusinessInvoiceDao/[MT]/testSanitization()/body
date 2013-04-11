@@ -21,7 +21,6 @@
   final LocalDate externalStartDate=new LocalDate(2012,1,1);
   final BigDecimal externalChargeAmount=BigDecimal.TEN;
   final InvoiceItem externalCharge=createInvoiceItem(InvoiceItemType.EXTERNAL_CHARGE,externalChargeSubscriptionId,externalStartDate,null,externalChargeAmount,null);
-  final BusinessInvoiceDao invoiceDao=new BusinessInvoiceDao(osgiKillbillLogService,null,osgiKillbillDataSource,null);
   final Collection<InvoiceItem> sanitizedInvoiceItems=invoiceDao.sanitizeInvoiceItems(ImmutableList.<InvoiceItem>of(recurring1,repair1,reparation1,recurring2,repair2,reparation2,externalCharge));
   Assert.assertEquals(sanitizedInvoiceItems.size(),2 + 2 + 1);
   for (  final InvoiceItem invoiceItem : sanitizedInvoiceItems) {

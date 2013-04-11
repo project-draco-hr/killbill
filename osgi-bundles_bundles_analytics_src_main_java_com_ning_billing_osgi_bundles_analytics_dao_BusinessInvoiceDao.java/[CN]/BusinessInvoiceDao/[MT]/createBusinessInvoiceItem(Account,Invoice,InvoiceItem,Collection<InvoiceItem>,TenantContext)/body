@@ -20,18 +20,19 @@
   if (isCharge(invoiceItem)) {
     businessInvoiceItemType=BusinessInvoiceItemType.CHARGE;
   }
- else   if (isAccountCreditItem(invoiceItem,otherInvoiceItemsOnInvoice)) {
+ else   if (isAccountCreditItem(invoiceItem)) {
     businessInvoiceItemType=BusinessInvoiceItemType.ACCOUNT_CREDIT;
   }
- else   if (isInvoiceItemAdjustementItem(invoiceItem)) {
+ else   if (isInvoiceItemAdjustmentItem(invoiceItem)) {
     businessInvoiceItemType=BusinessInvoiceItemType.INVOICE_ITEM_ADJUSTMENT;
   }
- else   if (isInvoiceAdjustementItem(invoiceItem,otherInvoiceItemsOnInvoice)) {
+ else   if (isInvoiceAdjustmentItem(invoiceItem,otherInvoiceItemsOnInvoice)) {
     businessInvoiceItemType=BusinessInvoiceItemType.INVOICE_ADJUSTMENT;
   }
  else {
     return null;
   }
+  final Boolean revenueRecognizable=isRevenueRecognizable(invoiceItem);
   final Long secondInvoiceItemRecordId;
   if (invoiceItem instanceof AdjustmentInvoiceItemForRepair) {
     secondInvoiceItemRecordId=getInvoiceItemRecordId(((AdjustmentInvoiceItemForRepair)invoiceItem).getSecondId(),context);
@@ -39,5 +40,5 @@
  else {
     secondInvoiceItemRecordId=null;
   }
-  return BusinessInvoiceItemBaseModelDao.create(account,accountRecordId,invoice,invoiceItem,businessInvoiceItemType,invoiceItemRecordId,secondInvoiceItemRecordId,bundle,plan,planPhase,creationAuditLog,tenantRecordId,reportGroup);
+  return BusinessInvoiceItemBaseModelDao.create(account,accountRecordId,invoice,invoiceItem,revenueRecognizable,businessInvoiceItemType,invoiceItemRecordId,secondInvoiceItemRecordId,bundle,plan,planPhase,creationAuditLog,tenantRecordId,reportGroup);
 }
