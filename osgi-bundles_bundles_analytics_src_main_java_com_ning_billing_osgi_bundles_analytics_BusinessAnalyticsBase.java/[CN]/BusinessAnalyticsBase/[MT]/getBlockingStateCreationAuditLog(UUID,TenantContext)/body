@@ -1,0 +1,9 @@
+{
+  final List<AuditLog> auditLogsForBlockingState=getAuditUserApi().getAuditLogs(blockingStateId,ObjectType.BLOCKING_STATES,AuditLevel.MINIMAL,context);
+  for (  final AuditLog auditLog : auditLogsForBlockingState) {
+    if (auditLog.getChangeType().equals(ChangeType.INSERT)) {
+      return auditLog;
+    }
+  }
+  throw new AnalyticsRefreshException("Unable to find Blocking state creation audit log for id " + blockingStateId);
+}

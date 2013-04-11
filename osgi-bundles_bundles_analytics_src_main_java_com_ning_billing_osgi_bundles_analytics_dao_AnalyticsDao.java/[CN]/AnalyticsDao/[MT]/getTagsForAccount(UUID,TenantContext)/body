@@ -1,0 +1,14 @@
+{
+  final Long accountRecordId=getAccountRecordId(accountId,context);
+  final Long tenantRecordId=getTenantRecordId(context);
+  final List<BusinessTagModelDao> businessTagModelDaos=new LinkedList<BusinessTagModelDao>();
+  businessTagModelDaos.addAll(sqlDao.getAccountTagsByAccountRecordId(accountRecordId,tenantRecordId,context));
+  businessTagModelDaos.addAll(sqlDao.getInvoiceTagsByAccountRecordId(accountRecordId,tenantRecordId,context));
+  businessTagModelDaos.addAll(sqlDao.getInvoicePaymentTagsByAccountRecordId(accountRecordId,tenantRecordId,context));
+  return Lists.transform(businessTagModelDaos,new Function<BusinessTagModelDao,BusinessTag>(){
+    @Override public BusinessTag apply(    final BusinessTagModelDao input){
+      return BusinessTag.create(input);
+    }
+  }
+);
+}

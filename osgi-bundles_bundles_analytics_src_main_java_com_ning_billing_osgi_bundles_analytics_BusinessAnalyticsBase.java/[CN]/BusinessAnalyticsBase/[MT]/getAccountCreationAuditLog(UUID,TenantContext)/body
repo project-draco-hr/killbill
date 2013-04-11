@@ -1,0 +1,9 @@
+{
+  final AuditLogsForAccount auditLogsForAccount=getAuditUserApi().getAuditLogsForAccount(accountId,AuditLevel.MINIMAL,context);
+  for (  final AuditLog auditLog : auditLogsForAccount.getAccountAuditLogs()) {
+    if (auditLog.getChangeType().equals(ChangeType.INSERT)) {
+      return auditLog;
+    }
+  }
+  throw new AnalyticsRefreshException("Unable to find Account creation audit log for id " + accountId);
+}

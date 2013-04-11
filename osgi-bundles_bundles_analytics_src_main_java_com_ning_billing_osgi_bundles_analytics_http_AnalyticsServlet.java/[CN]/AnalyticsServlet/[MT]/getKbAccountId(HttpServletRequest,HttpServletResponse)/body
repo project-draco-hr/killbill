@@ -1,0 +1,19 @@
+{
+  final String kbAccountIdString;
+  try {
+    kbAccountIdString=req.getPathInfo().substring(1,req.getPathInfo().length());
+  }
+ catch (  final StringIndexOutOfBoundsException e) {
+    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"Badly formed kb account id in request: " + req.getPathInfo());
+    return null;
+  }
+  final UUID kbAccountId;
+  try {
+    kbAccountId=UUID.fromString(kbAccountIdString);
+  }
+ catch (  final IllegalArgumentException e) {
+    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"Invalid UUID for kb account id: " + kbAccountIdString);
+    return null;
+  }
+  return kbAccountId;
+}

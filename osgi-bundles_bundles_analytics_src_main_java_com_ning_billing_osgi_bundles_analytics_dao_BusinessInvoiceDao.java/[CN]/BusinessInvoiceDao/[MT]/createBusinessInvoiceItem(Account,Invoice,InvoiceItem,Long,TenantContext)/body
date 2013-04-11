@@ -1,0 +1,19 @@
+{
+  SubscriptionBundle bundle=null;
+  if (invoiceItem.getBundleId() != null) {
+    bundle=getSubscriptionBundle(invoiceItem.getBundleId(),context);
+  }
+  Plan plan=null;
+  if (invoiceItem.getPlanName() != null) {
+    plan=getPlanFromInvoiceItem(invoiceItem,context);
+  }
+  PlanPhase planPhase=null;
+  if (invoiceItem.getSubscriptionId() != null && invoiceItem.getPhaseName() != null) {
+    planPhase=getPlanPhaseFromInvoiceItem(invoiceItem,context);
+  }
+  final Long invoiceItemRecordId=getInvoiceItemRecordId(invoiceItem.getId(),context);
+  final AuditLog creationAuditLog=getInvoiceItemCreationAuditLog(invoiceItem.getId(),context);
+  final Long accountRecordId=getAccountRecordId(account.getId(),context);
+  final Long tenantRecordId=getTenantRecordId(context);
+  return BusinessInvoiceItemBaseModelDao.create(account,accountRecordId,invoice,invoiceItem,invoiceItemRecordId,secondInvoiceItemRecordId,bundle,plan,planPhase,creationAuditLog,tenantRecordId);
+}

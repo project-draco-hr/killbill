@@ -1,0 +1,10 @@
+{
+  if (bsts.size() == 0) {
+    return;
+  }
+  final BusinessSubscriptionTransitionModelDao firstBst=bsts.iterator().next();
+  transactional.deleteByAccountRecordId(firstBst.getTableName(),firstBst.getAccountRecordId(),firstBst.getTenantRecordId(),context);
+  for (  final BusinessSubscriptionTransitionModelDao bst : bsts) {
+    transactional.create(bst.getTableName(),bst,context);
+  }
+}

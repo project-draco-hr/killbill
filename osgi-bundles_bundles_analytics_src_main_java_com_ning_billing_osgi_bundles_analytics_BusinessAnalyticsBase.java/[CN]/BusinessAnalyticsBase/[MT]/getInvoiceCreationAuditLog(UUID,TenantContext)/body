@@ -1,0 +1,9 @@
+{
+  final List<AuditLog> auditLogsForInvoice=getAuditUserApi().getAuditLogs(invoiceId,ObjectType.INVOICE,AuditLevel.MINIMAL,context);
+  for (  final AuditLog auditLog : auditLogsForInvoice) {
+    if (auditLog.getChangeType().equals(ChangeType.INSERT)) {
+      return auditLog;
+    }
+  }
+  throw new AnalyticsRefreshException("Unable to find Invoice creation audit log for id " + invoiceId);
+}

@@ -1,0 +1,19 @@
+{
+  final Long accountRecordId=getAccountRecordId(accountId,context);
+  final Long tenantRecordId=getTenantRecordId(context);
+  final List<BusinessInvoiceItemBaseModelDao> businessInvoiceItemModelDaos=sqlDao.getInvoiceItemsByAccountRecordId(accountRecordId,tenantRecordId,context);
+  final Map<UUID,List<BusinessInvoiceItemBaseModelDao>> itemsPerInvoice=new LinkedHashMap<UUID,List<BusinessInvoiceItemBaseModelDao>>();
+  for (  final BusinessInvoiceItemBaseModelDao businessInvoiceModelDao : businessInvoiceItemModelDaos) {
+    if (itemsPerInvoice.get(businessInvoiceModelDao.getInvoiceId()) == null) {
+      itemsPerInvoice.put(businessInvoiceModelDao.getInvoiceId(),new LinkedList<BusinessInvoiceItemBaseModelDao>());
+    }
+    itemsPerInvoice.get(businessInvoiceModelDao.getInvoiceId()).add(businessInvoiceModelDao);
+  }
+  final List<BusinessInvoiceModelDao> businessInvoiceModelDaos=sqlDao.getInvoicesByAccountRecordId(accountRecordId,tenantRecordId,context);
+  return Lists.transform(businessInvoiceModelDaos,new Function<BusinessInvoiceModelDao,BusinessInvoice>(){
+    @Override public BusinessInvoice apply(    final BusinessInvoiceModelDao input){
+      return new BusinessInvoice(input,Objects.firstNonNull(itemsPerInvoice.get(input.getInvoiceId()),ImmutableList.<BusinessInvoiceItemBaseModelDao>of()));
+    }
+  }
+);
+}

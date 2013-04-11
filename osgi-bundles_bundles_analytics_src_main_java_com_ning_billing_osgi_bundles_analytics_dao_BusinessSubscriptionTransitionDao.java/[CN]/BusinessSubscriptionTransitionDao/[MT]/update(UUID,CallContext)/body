@@ -1,0 +1,11 @@
+{
+  final Account account=getAccount(accountId,context);
+  final Collection<BusinessSubscriptionTransitionModelDao> bsts=createBusinessSubscriptionTransitions(account,context);
+  sqlDao.inTransaction(new Transaction<Void,BusinessAnalyticsSqlDao>(){
+    @Override public Void inTransaction(    final BusinessAnalyticsSqlDao transactional,    final TransactionStatus status) throws Exception {
+      updateInTransaction(bsts,transactional,context);
+      return null;
+    }
+  }
+);
+}
