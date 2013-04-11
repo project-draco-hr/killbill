@@ -12,7 +12,12 @@
     final Collection<InvoiceItem> sanitizedInvoiceItems=sanitizeInvoiceItems(allInvoiceItems);
     final List<BusinessInvoiceItemBaseModelDao> businessInvoiceItems=new ArrayList<BusinessInvoiceItemBaseModelDao>();
     for (    final InvoiceItem invoiceItem : sanitizedInvoiceItems) {
-      final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,null,context);
+      final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,Collections2.filter(sanitizedInvoiceItems,new Predicate<InvoiceItem>(){
+        @Override public boolean apply(        final InvoiceItem input){
+          return !input.getId().equals(invoiceItem.getId());
+        }
+      }
+),context);
       if (businessInvoiceItem != null) {
         businessInvoiceItems.add(businessInvoiceItem);
       }

@@ -1,0 +1,43 @@
+{
+  SubscriptionBundle bundle=null;
+  if (invoiceItem.getBundleId() != null) {
+    bundle=getSubscriptionBundle(invoiceItem.getBundleId(),context);
+  }
+  Plan plan=null;
+  if (invoiceItem.getPlanName() != null) {
+    plan=getPlanFromInvoiceItem(invoiceItem,context);
+  }
+  PlanPhase planPhase=null;
+  if (invoiceItem.getSubscriptionId() != null && invoiceItem.getPhaseName() != null) {
+    planPhase=getPlanPhaseFromInvoiceItem(invoiceItem,context);
+  }
+  final Long invoiceItemRecordId=getInvoiceItemRecordId(invoiceItem.getId(),context);
+  final AuditLog creationAuditLog=getInvoiceItemCreationAuditLog(invoiceItem.getId(),context);
+  final Long accountRecordId=getAccountRecordId(account.getId(),context);
+  final Long tenantRecordId=getTenantRecordId(context);
+  final ReportGroup reportGroup=getReportGroup(account.getId(),context);
+  final BusinessInvoiceItemType businessInvoiceItemType;
+  if (isCharge(invoiceItem)) {
+    businessInvoiceItemType=BusinessInvoiceItemType.CHARGE;
+  }
+ else   if (isAccountCreditItem(invoiceItem,otherInvoiceItemsOnInvoice)) {
+    businessInvoiceItemType=BusinessInvoiceItemType.ACCOUNT_CREDIT;
+  }
+ else   if (isInvoiceItemAdjustementItem(invoiceItem)) {
+    businessInvoiceItemType=BusinessInvoiceItemType.INVOICE_ITEM_ADJUSTMENT;
+  }
+ else   if (isInvoiceAdjustementItem(invoiceItem,otherInvoiceItemsOnInvoice)) {
+    businessInvoiceItemType=BusinessInvoiceItemType.INVOICE_ADJUSTMENT;
+  }
+ else {
+    return null;
+  }
+  final Long secondInvoiceItemRecordId;
+  if (invoiceItem instanceof AdjustmentInvoiceItemForRepair) {
+    secondInvoiceItemRecordId=getInvoiceItemRecordId(((AdjustmentInvoiceItemForRepair)invoiceItem).getSecondId(),context);
+  }
+ else {
+    secondInvoiceItemRecordId=null;
+  }
+  return BusinessInvoiceItemBaseModelDao.create(account,accountRecordId,invoice,invoiceItem,businessInvoiceItemType,invoiceItemRecordId,secondInvoiceItemRecordId,bundle,plan,planPhase,creationAuditLog,tenantRecordId,reportGroup);
+}
