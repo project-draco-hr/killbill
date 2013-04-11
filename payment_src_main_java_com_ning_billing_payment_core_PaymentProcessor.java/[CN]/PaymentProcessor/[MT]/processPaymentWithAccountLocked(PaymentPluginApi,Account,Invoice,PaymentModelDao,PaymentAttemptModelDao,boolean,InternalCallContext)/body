@@ -1,19 +1,20 @@
 {
   List<PaymentAttemptModelDao> allAttempts=null;
   if (paymentConfig.isPaymentOff()) {
-    paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),PaymentStatus.PAYMENT_SYSTEM_OFF,null,null,attemptInput.getId(),context);
+    paymentDao.updateStatusAndEffectiveDateForPaymentWithAttempt(paymentInput.getId(),PaymentStatus.PAYMENT_SYSTEM_OFF,clock.getUTCNow(),attemptInput.getId(),null,null,context);
     allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId(),context);
-    return new DefaultPayment(paymentInput,allAttempts,Collections.<RefundModelDao>emptyList());
+    return new DefaultPayment(paymentInput,null,allAttempts,Collections.<RefundModelDao>emptyList());
   }
   PaymentModelDao payment=null;
   BusInternalEvent event=null;
   PaymentStatus paymentStatus;
+  final PaymentInfoPlugin paymentPluginInfo;
   try {
-    final PaymentInfoPlugin paymentPluginInfo=plugin.processPayment(account.getId(),paymentInput.getId(),paymentInput.getPaymentMethodId(),attemptInput.getRequestedAmount(),account.getCurrency(),context.toCallContext());
+    paymentPluginInfo=plugin.processPayment(account.getId(),paymentInput.getId(),paymentInput.getPaymentMethodId(),attemptInput.getRequestedAmount(),account.getCurrency(),context.toCallContext());
 switch (paymentPluginInfo.getStatus()) {
 case PROCESSED:
       paymentStatus=PaymentStatus.SUCCESS;
-    paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,paymentPluginInfo.getGatewayErrorCode(),null,attemptInput.getId(),context);
+    paymentDao.updateStatusAndEffectiveDateForPaymentWithAttempt(paymentInput.getId(),paymentStatus,clock.getUTCNow(),attemptInput.getId(),paymentPluginInfo.getGatewayErrorCode(),null,context);
   allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId(),context);
 payment=paymentDao.getPayment(paymentInput.getId(),context);
 invoiceApi.notifyOfPayment(invoice.getId(),payment.getAmount(),payment.getCurrency(),payment.getId(),payment.getEffectiveDate(),context);
@@ -27,7 +28,7 @@ paymentStatus=scheduleRetryOnPaymentFailure(paymentInput.getId(),context);
  else {
 paymentStatus=PaymentStatus.PAYMENT_FAILURE_ABORTED;
 }
-paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,paymentPluginInfo.getGatewayErrorCode(),paymentPluginInfo.getGatewayError(),attemptInput.getId(),context);
+paymentDao.updateStatusAndEffectiveDateForPaymentWithAttempt(paymentInput.getId(),paymentStatus,clock.getUTCNow(),attemptInput.getId(),paymentPluginInfo.getGatewayErrorCode(),paymentPluginInfo.getGatewayError(),context);
 log.info(String.format("Could not process payment for account %s, invoice %s, error = %s",account.getId(),invoice.getId(),paymentPluginInfo.getGatewayError()));
 event=new DefaultPaymentErrorEvent(account.getId(),invoice.getId(),paymentInput.getId(),paymentPluginInfo.getGatewayError(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
 throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),paymentPluginInfo.getGatewayError());
@@ -38,7 +39,7 @@ throw new PaymentPluginApiException("",formatError);
 }
  catch (PaymentPluginApiException e) {
 paymentStatus=isInstantPayment ? PaymentStatus.PAYMENT_FAILURE_ABORTED : scheduleRetryOnPluginFailure(paymentInput.getId(),context);
-paymentDao.updateStatusForPaymentWithAttempt(paymentInput.getId(),paymentStatus,null,e.getMessage(),attemptInput.getId(),context);
+paymentDao.updateStatusAndEffectiveDateForPaymentWithAttempt(paymentInput.getId(),paymentStatus,clock.getUTCNow(),attemptInput.getId(),null,e.getMessage(),context);
 throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),e.toString());
 }
 catch (InvoiceApiException e) {
@@ -49,5 +50,5 @@ if (event != null) {
 postPaymentEvent(event,account.getId(),context);
 }
 }
-return new DefaultPayment(payment,allAttempts,Collections.<RefundModelDao>emptyList());
+return new DefaultPayment(payment,paymentPluginInfo,allAttempts,Collections.<RefundModelDao>emptyList());
 }

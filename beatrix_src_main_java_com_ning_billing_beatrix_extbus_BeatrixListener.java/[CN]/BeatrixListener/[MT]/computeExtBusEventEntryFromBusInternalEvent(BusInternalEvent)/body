@@ -30,16 +30,70 @@ eventBusType=ExtBusEventType.SUBSCRIPTION_CHANGE;
 }
 break;
 case INVOICE_CREATION:
+InvoiceCreationInternalEvent realEventInv=(InvoiceCreationInternalEvent)event;
+objectType=ObjectType.INVOICE;
+objectId=realEventInv.getInvoiceId();
+eventBusType=ExtBusEventType.INVOICE_CREATION;
+break;
+case INVOICE_ADJUSTMENT:
+InvoiceAdjustmentInternalEvent realEventInvAdj=(InvoiceAdjustmentInternalEvent)event;
+objectType=ObjectType.INVOICE;
+objectId=realEventInvAdj.getInvoiceId();
+eventBusType=ExtBusEventType.INVOICE_ADJUSTMENT;
 break;
 case PAYMENT_INFO:
+PaymentInfoInternalEvent realEventPay=(PaymentInfoInternalEvent)event;
+objectType=ObjectType.PAYMENT;
+objectId=realEventPay.getPaymentId();
+eventBusType=ExtBusEventType.PAYMENT_SUCCESS;
 break;
 case PAYMENT_ERROR:
+PaymentErrorInternalEvent realEventPayErr=(PaymentErrorInternalEvent)event;
+objectType=ObjectType.PAYMENT;
+objectId=realEventPayErr.getPaymentId();
+eventBusType=ExtBusEventType.PAYMENT_FAILED;
 break;
 case OVERDUE_CHANGE:
 OverdueChangeInternalEvent realEventOC=(OverdueChangeInternalEvent)event;
 objectType=ObjectType.BUNDLE;
 objectId=realEventOC.getOverdueObjectId();
 eventBusType=ExtBusEventType.OVERDUE_CHANGE;
+break;
+case USER_TAG_CREATION:
+UserTagCreationInternalEvent realUserTagEventCr=(UserTagCreationInternalEvent)event;
+objectType=ObjectType.TAG;
+objectId=realUserTagEventCr.getTagId();
+eventBusType=ExtBusEventType.TAG_CREATION;
+break;
+case CONTROL_TAG_CREATION:
+ControlTagCreationInternalEvent realTagEventCr=(ControlTagCreationInternalEvent)event;
+objectType=ObjectType.TAG;
+objectId=realTagEventCr.getTagId();
+eventBusType=ExtBusEventType.TAG_CREATION;
+break;
+case USER_TAG_DELETION:
+UserTagDefinitionDeletionInternalEvent realUserTagEventDel=(UserTagDefinitionDeletionInternalEvent)event;
+objectType=ObjectType.TAG;
+objectId=null;
+eventBusType=ExtBusEventType.TAG_DELETION;
+break;
+case CONTROL_TAG_DELETION:
+ControlTagDeletionInternalEvent realTagEventDel=(ControlTagDeletionInternalEvent)event;
+objectType=ObjectType.TAG;
+objectId=realTagEventDel.getTagId();
+eventBusType=ExtBusEventType.TAG_DELETION;
+break;
+case CUSTOM_FIELD_CREATION:
+CustomFieldCreationEvent realCustomEveventCr=(CustomFieldCreationEvent)event;
+objectType=ObjectType.CUSTOM_FIELD;
+objectId=realCustomEveventCr.getCustomFieldId();
+eventBusType=ExtBusEventType.CUSTOM_FIELD_CREATION;
+break;
+case CUSTOM_FIELD_DELETION:
+CustomFieldDeletionEvent realCustomEveventDel=(CustomFieldDeletionEvent)event;
+objectType=ObjectType.CUSTOM_FIELD;
+objectId=realCustomEveventDel.getCustomFieldId();
+eventBusType=ExtBusEventType.CUSTOM_FIELD_DELETION;
 break;
 default :
 }

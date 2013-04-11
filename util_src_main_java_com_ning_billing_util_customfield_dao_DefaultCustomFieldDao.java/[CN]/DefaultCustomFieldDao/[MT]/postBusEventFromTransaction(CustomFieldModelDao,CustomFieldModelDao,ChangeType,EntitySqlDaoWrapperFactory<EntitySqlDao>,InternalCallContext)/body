@@ -1,0 +1,19 @@
+{
+  BusInternalEvent customFieldEvent=null;
+switch (changeType) {
+case INSERT:
+    customFieldEvent=new DefaultCustomFieldCreationEvent(customField.getId(),customField.getObjectId(),customField.getObjectType(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+  break;
+case DELETE:
+customFieldEvent=new DefaultCustomFieldDeletionEvent(customField.getId(),customField.getObjectId(),customField.getObjectType(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+break;
+default :
+return;
+}
+try {
+bus.postFromTransaction(customFieldEvent,entitySqlDaoWrapperFactory,context);
+}
+ catch (InternalBus.EventBusException e) {
+log.warn("Failed to post tag event for custom field " + customField.getId().toString(),e);
+}
+}

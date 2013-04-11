@@ -3,22 +3,28 @@
     return;
   }
   this.events=inputEvents;
+  UUID nextUserToken=null;
+  UUID nextEventId=null;
+  DateTime nextCreatedDate=null;
   SubscriptionState nextState=null;
   String nextPlanName=null;
   String nextPhaseName=null;
   String nextPriceListName=null;
-  UUID nextUserToken=null;
+  UUID prevEventId=null;
+  DateTime prevCreatedDate=null;
   SubscriptionState previousState=null;
   PriceList previousPriceList=null;
-  transitions=new LinkedList<SubscriptionTransitionData>();
   Plan previousPlan=null;
   PlanPhase previousPhase=null;
+  transitions=new LinkedList<SubscriptionTransition>();
   for (  final EntitlementEvent cur : inputEvents) {
     if (!cur.isActive() || cur.getActiveVersion() < activeVersion) {
       continue;
     }
     ApiEventType apiEventType=null;
     boolean isFromDisk=true;
+    nextEventId=cur.getId();
+    nextCreatedDate=cur.getCreatedDate();
 switch (cur.getType()) {
 case PHASE:
       final PhaseEvent phaseEV=(PhaseEvent)cur;
@@ -34,6 +40,8 @@ case MIGRATE_BILLING:
 case MIGRATE_ENTITLEMENT:
 case CREATE:
 case RE_CREATE:
+prevEventId=null;
+prevCreatedDate=null;
 previousState=null;
 previousPlan=null;
 previousPhase=null;
@@ -73,11 +81,13 @@ nextPriceList=(nextPriceListName != null) ? catalog.findPriceList(nextPriceListN
  catch (CatalogApiException e) {
 log.error(String.format("Failed to build transition for subscription %s",id),e);
 }
-final SubscriptionTransitionData transition=new SubscriptionTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),previousState,previousPlan,previousPhase,previousPriceList,nextState,nextPlan,nextPhase,nextPriceList,cur.getTotalOrdering(),nextUserToken,isFromDisk);
+final SubscriptionTransitionData transition=new SubscriptionTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),prevEventId,prevCreatedDate,previousState,previousPlan,previousPhase,previousPriceList,nextEventId,nextCreatedDate,nextState,nextPlan,nextPhase,nextPriceList,cur.getTotalOrdering(),nextUserToken,isFromDisk);
 transitions.add(transition);
 previousState=nextState;
 previousPlan=nextPlan;
 previousPhase=nextPhase;
 previousPriceList=nextPriceList;
+prevEventId=nextEventId;
+prevCreatedDate=nextCreatedDate;
 }
 }
