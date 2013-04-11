@@ -1,7 +1,7 @@
 {
   final AnalyticsDao analyticsDao=new AnalyticsDao(killbillAPI,killbillDataSource);
   Assert.assertNull(analyticsDao.getAccountById(account.getId(),callContext));
-  final BusinessAccountModelDao accountModelDao=new BusinessAccountModelDao(account,accountRecordId,BigDecimal.ONE,invoice,payment,auditLog,tenantRecordId);
+  final BusinessAccountModelDao accountModelDao=new BusinessAccountModelDao(account,accountRecordId,BigDecimal.ONE,invoice,payment,auditLog,tenantRecordId,reportGroup);
   analyticsSqlDao.create(accountModelDao.getTableName(),accountModelDao,callContext);
   Assert.assertEquals(analyticsDao.getAccountById(account.getId(),callContext),new BusinessAccount(accountModelDao));
   analyticsSqlDao.deleteByAccountRecordId(accountModelDao.getTableName(),accountModelDao.getAccountRecordId(),accountModelDao.getTenantRecordId(),callContext);

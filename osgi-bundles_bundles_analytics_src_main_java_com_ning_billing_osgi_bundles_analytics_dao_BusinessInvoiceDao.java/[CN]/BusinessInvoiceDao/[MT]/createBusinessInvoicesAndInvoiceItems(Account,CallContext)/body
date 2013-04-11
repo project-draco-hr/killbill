@@ -1,12 +1,13 @@
 {
   final Long accountRecordId=getAccountRecordId(account.getId(),context);
   final Long tenantRecordId=getTenantRecordId(context);
+  final ReportGroup reportGroup=getReportGroup(account.getId(),context);
   final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>> businessInvoices=new HashMap<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>>();
   final Collection<Invoice> invoices=getInvoicesByAccountId(account.getId(),context);
   for (  final Invoice invoice : invoices) {
     final Long invoiceRecordId=getInvoiceRecordId(invoice.getId(),context);
     final AuditLog creationAuditLog=getInvoiceCreationAuditLog(invoice.getId(),context);
-    final BusinessInvoiceModelDao businessInvoice=new BusinessInvoiceModelDao(account,accountRecordId,invoice,invoiceRecordId,creationAuditLog,tenantRecordId);
+    final BusinessInvoiceModelDao businessInvoice=new BusinessInvoiceModelDao(account,accountRecordId,invoice,invoiceRecordId,creationAuditLog,tenantRecordId,reportGroup);
     final List<BusinessInvoiceItemBaseModelDao> businessInvoiceItems=new ArrayList<BusinessInvoiceItemBaseModelDao>();
     for (    final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
       final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,null,context);
