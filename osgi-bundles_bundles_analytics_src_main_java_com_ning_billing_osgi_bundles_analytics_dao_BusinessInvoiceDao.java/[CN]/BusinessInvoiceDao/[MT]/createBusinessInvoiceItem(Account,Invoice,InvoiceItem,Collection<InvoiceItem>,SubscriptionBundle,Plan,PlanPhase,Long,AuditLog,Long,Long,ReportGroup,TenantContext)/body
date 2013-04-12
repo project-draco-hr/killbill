@@ -1,0 +1,27 @@
+{
+  final BusinessInvoiceItemType businessInvoiceItemType;
+  if (isCharge(invoiceItem)) {
+    businessInvoiceItemType=BusinessInvoiceItemType.CHARGE;
+  }
+ else   if (isAccountCreditItem(invoiceItem)) {
+    businessInvoiceItemType=BusinessInvoiceItemType.ACCOUNT_CREDIT;
+  }
+ else   if (isInvoiceItemAdjustmentItem(invoiceItem)) {
+    businessInvoiceItemType=BusinessInvoiceItemType.INVOICE_ITEM_ADJUSTMENT;
+  }
+ else   if (isInvoiceAdjustmentItem(invoiceItem,otherInvoiceItemsOnInvoice)) {
+    businessInvoiceItemType=BusinessInvoiceItemType.INVOICE_ADJUSTMENT;
+  }
+ else {
+    return null;
+  }
+  final Boolean revenueRecognizable=isRevenueRecognizable(invoiceItem,otherInvoiceItemsOnInvoice);
+  final Long secondInvoiceItemRecordId;
+  if (invoiceItem instanceof AdjustmentInvoiceItemForRepair) {
+    secondInvoiceItemRecordId=getInvoiceItemRecordId(((AdjustmentInvoiceItemForRepair)invoiceItem).getSecondId(),context);
+  }
+ else {
+    secondInvoiceItemRecordId=null;
+  }
+  return BusinessInvoiceItemBaseModelDao.create(account,accountRecordId,invoice,invoiceItem,revenueRecognizable,businessInvoiceItemType,invoiceItemRecordId,secondInvoiceItemRecordId,bundle,plan,planPhase,creationAuditLog,tenantRecordId,reportGroup);
+}
