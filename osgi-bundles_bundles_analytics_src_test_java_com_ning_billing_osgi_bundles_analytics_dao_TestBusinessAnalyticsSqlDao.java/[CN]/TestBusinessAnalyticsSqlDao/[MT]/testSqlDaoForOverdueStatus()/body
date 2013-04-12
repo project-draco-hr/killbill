@@ -1,0 +1,10 @@
+{
+  final DateTime endDate=new DateTime(2005,6,5,4,5,6,DateTimeZone.UTC);
+  final BusinessOverdueStatusModelDao businessOverdueStatusModelDao=new BusinessOverdueStatusModelDao(account,accountRecordId,bundle,blockingState,blockingStateRecordId,endDate,auditLog,tenantRecordId,reportGroup);
+  Assert.assertEquals(analyticsSqlDao.getInvoicePaymentsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),0);
+  analyticsSqlDao.create(businessOverdueStatusModelDao.getTableName(),businessOverdueStatusModelDao,callContext);
+  Assert.assertEquals(analyticsSqlDao.getOverdueStatusesByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),1);
+  Assert.assertEquals(analyticsSqlDao.getOverdueStatusesByAccountRecordId(accountRecordId,tenantRecordId,callContext).get(0),businessOverdueStatusModelDao);
+  analyticsSqlDao.deleteByAccountRecordId(businessOverdueStatusModelDao.getTableName(),accountRecordId,tenantRecordId,callContext);
+  Assert.assertEquals(analyticsSqlDao.getOverdueStatusesByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),0);
+}

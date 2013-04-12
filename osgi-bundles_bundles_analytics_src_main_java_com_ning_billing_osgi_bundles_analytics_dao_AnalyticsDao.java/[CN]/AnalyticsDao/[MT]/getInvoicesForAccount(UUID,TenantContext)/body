@@ -1,7 +1,11 @@
 {
   final Long accountRecordId=getAccountRecordId(accountId,context);
   final Long tenantRecordId=getTenantRecordId(context);
-  final List<BusinessInvoiceItemBaseModelDao> businessInvoiceItemModelDaos=sqlDao.getInvoiceItemsByAccountRecordId(accountRecordId,tenantRecordId,context);
+  final List<BusinessInvoiceItemBaseModelDao> businessInvoiceItemModelDaos=new ArrayList<BusinessInvoiceItemBaseModelDao>();
+  businessInvoiceItemModelDaos.addAll(sqlDao.getInvoiceAdjustmentsByAccountRecordId(accountRecordId,tenantRecordId,context));
+  businessInvoiceItemModelDaos.addAll(sqlDao.getInvoiceItemsByAccountRecordId(accountRecordId,tenantRecordId,context));
+  businessInvoiceItemModelDaos.addAll(sqlDao.getInvoiceItemAdjustmentsByAccountRecordId(accountRecordId,tenantRecordId,context));
+  businessInvoiceItemModelDaos.addAll(sqlDao.getInvoiceItemCreditsByAccountRecordId(accountRecordId,tenantRecordId,context));
   final Map<UUID,List<BusinessInvoiceItemBaseModelDao>> itemsPerInvoice=new LinkedHashMap<UUID,List<BusinessInvoiceItemBaseModelDao>>();
   for (  final BusinessInvoiceItemBaseModelDao businessInvoiceModelDao : businessInvoiceItemModelDaos) {
     if (itemsPerInvoice.get(businessInvoiceModelDao.getInvoiceId()) == null) {
