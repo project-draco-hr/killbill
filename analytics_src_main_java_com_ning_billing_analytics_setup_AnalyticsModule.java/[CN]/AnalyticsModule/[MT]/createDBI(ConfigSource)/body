@@ -1,0 +1,26 @@
+{
+  final ComboPooledDataSource dataSource=new ComboPooledDataSource();
+  dataSource.setJdbcUrl(configSource.getString(ANALYTICS_DBI_CONFIG_STRING + "url"));
+  dataSource.setUser(configSource.getString(ANALYTICS_DBI_CONFIG_STRING + "user"));
+  dataSource.setPassword(configSource.getString(ANALYTICS_DBI_CONFIG_STRING + "password"));
+  dataSource.setMinPoolSize(1);
+  dataSource.setMaxPoolSize(10);
+  dataSource.setCheckoutTimeout(10 * 1000);
+  dataSource.setMaxIdleTime(60 * 60);
+  dataSource.setMaxConnectionAge(0);
+  dataSource.setIdleConnectionTestPeriod(5 * 60);
+  final DBI dbi=new DBI(dataSource);
+  dbi.registerArgumentFactory(new UUIDArgumentFactory());
+  dbi.registerArgumentFactory(new DateTimeZoneArgumentFactory());
+  dbi.registerArgumentFactory(new DateTimeArgumentFactory());
+  dbi.registerArgumentFactory(new LocalDateArgumentFactory());
+  dbi.registerArgumentFactory(new EnumArgumentFactory());
+  dbi.registerMapper(new UuidMapper());
+  try {
+    dbi.setTransactionHandler((TransactionHandler)Class.forName("com.ning.jetty.jdbi.RestartTransactionRunner").newInstance());
+  }
+ catch (  Exception e) {
+    logger.warn("Unable to register transaction handler");
+  }
+  return dbi;
+}
