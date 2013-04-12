@@ -1,0 +1,8 @@
+{
+  Assert.assertFalse(invoiceDao.isInvoiceAdjustmentItem(createInvoiceItem(InvoiceItemType.RECURRING),ImmutableList.<InvoiceItem>of()));
+  Assert.assertTrue(invoiceDao.isInvoiceAdjustmentItem(createInvoiceItem(InvoiceItemType.REFUND_ADJ),ImmutableList.<InvoiceItem>of()));
+  final InvoiceItem creditAdj=createInvoiceItem(InvoiceItemType.CREDIT_ADJ);
+  Assert.assertFalse(invoiceDao.isInvoiceAdjustmentItem(creditAdj,ImmutableList.<InvoiceItem>of(createInvoiceItem(InvoiceItemType.CBA_ADJ,creditAdj.getAmount().negate()))));
+  Assert.assertTrue(invoiceDao.isInvoiceAdjustmentItem(creditAdj,ImmutableList.<InvoiceItem>of(createInvoiceItem(InvoiceItemType.CBA_ADJ,creditAdj.getAmount().negate().add(BigDecimal.ONE)))));
+  Assert.assertTrue(invoiceDao.isInvoiceAdjustmentItem(creditAdj,ImmutableList.<InvoiceItem>of(createInvoiceItem(InvoiceItemType.RECURRING),createInvoiceItem(InvoiceItemType.CBA_ADJ,creditAdj.getAmount().negate()))));
+}

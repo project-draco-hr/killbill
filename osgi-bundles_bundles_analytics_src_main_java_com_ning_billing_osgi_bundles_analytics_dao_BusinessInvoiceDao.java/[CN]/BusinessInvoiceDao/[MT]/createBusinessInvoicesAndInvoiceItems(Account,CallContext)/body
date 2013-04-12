@@ -8,9 +8,16 @@
     final Long invoiceRecordId=getInvoiceRecordId(invoice.getId(),context);
     final AuditLog creationAuditLog=getInvoiceCreationAuditLog(invoice.getId(),context);
     final BusinessInvoiceModelDao businessInvoice=new BusinessInvoiceModelDao(account,accountRecordId,invoice,invoiceRecordId,creationAuditLog,tenantRecordId,reportGroup);
+    final List<InvoiceItem> allInvoiceItems=invoice.getInvoiceItems();
+    final Collection<InvoiceItem> sanitizedInvoiceItems=sanitizeInvoiceItems(allInvoiceItems);
     final List<BusinessInvoiceItemBaseModelDao> businessInvoiceItems=new ArrayList<BusinessInvoiceItemBaseModelDao>();
-    for (    final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
-      final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,null,context);
+    for (    final InvoiceItem invoiceItem : sanitizedInvoiceItems) {
+      final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,Collections2.filter(sanitizedInvoiceItems,new Predicate<InvoiceItem>(){
+        @Override public boolean apply(        final InvoiceItem input){
+          return !input.getId().equals(invoiceItem.getId());
+        }
+      }
+),context);
       if (businessInvoiceItem != null) {
         businessInvoiceItems.add(businessInvoiceItem);
       }
