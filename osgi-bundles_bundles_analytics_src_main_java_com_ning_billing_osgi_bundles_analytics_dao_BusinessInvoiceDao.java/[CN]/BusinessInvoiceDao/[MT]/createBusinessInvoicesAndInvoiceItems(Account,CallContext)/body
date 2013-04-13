@@ -2,27 +2,38 @@
   final Long accountRecordId=getAccountRecordId(account.getId(),context);
   final Long tenantRecordId=getTenantRecordId(context);
   final ReportGroup reportGroup=getReportGroup(account.getId(),context);
-  final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>> businessInvoices=new HashMap<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>>();
+  final Map<UUID,BusinessInvoiceModelDao> businessInvoices=new HashMap<UUID,BusinessInvoiceModelDao>();
+  final Map<UUID,Collection<BusinessInvoiceItemBaseModelDao>> businessInvoiceItems=new HashMap<UUID,Collection<BusinessInvoiceItemBaseModelDao>>();
+  final Collection<InvoiceItem> allInvoiceItems=new LinkedList<InvoiceItem>();
   final Collection<Invoice> invoices=getInvoicesByAccountId(account.getId(),context);
+  final Map<UUID,Invoice> invoiceIdToInvoiceMappings=new LinkedHashMap<UUID,Invoice>();
   for (  final Invoice invoice : invoices) {
+    invoiceIdToInvoiceMappings.put(invoice.getId(),invoice);
+    allInvoiceItems.addAll(invoice.getInvoiceItems());
     final Long invoiceRecordId=getInvoiceRecordId(invoice.getId(),context);
     final AuditLog creationAuditLog=getInvoiceCreationAuditLog(invoice.getId(),context);
     final BusinessInvoiceModelDao businessInvoice=new BusinessInvoiceModelDao(account,accountRecordId,invoice,invoiceRecordId,creationAuditLog,tenantRecordId,reportGroup);
-    final List<InvoiceItem> allInvoiceItems=invoice.getInvoiceItems();
-    final Collection<InvoiceItem> sanitizedInvoiceItems=sanitizeInvoiceItems(allInvoiceItems);
-    final List<BusinessInvoiceItemBaseModelDao> businessInvoiceItems=new ArrayList<BusinessInvoiceItemBaseModelDao>();
-    for (    final InvoiceItem invoiceItem : sanitizedInvoiceItems) {
-      final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,Collections2.filter(sanitizedInvoiceItems,new Predicate<InvoiceItem>(){
-        @Override public boolean apply(        final InvoiceItem input){
-          return !input.getId().equals(invoiceItem.getId());
-        }
-      }
-),context);
-      if (businessInvoiceItem != null) {
-        businessInvoiceItems.add(businessInvoiceItem);
+    businessInvoices.put(invoice.getId(),businessInvoice);
+  }
+  final Collection<InvoiceItem> sanitizedInvoiceItems=sanitizeInvoiceItems(allInvoiceItems);
+  for (  final InvoiceItem invoiceItem : sanitizedInvoiceItems) {
+    final Invoice invoice=invoiceIdToInvoiceMappings.get(invoiceItem.getInvoiceId());
+    final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,Collections2.filter(sanitizedInvoiceItems,new Predicate<InvoiceItem>(){
+      @Override public boolean apply(      final InvoiceItem input){
+        return !input.getId().equals(invoiceItem.getId());
       }
     }
-    businessInvoices.put(businessInvoice,businessInvoiceItems);
+),accountRecordId,tenantRecordId,reportGroup,context);
+    if (businessInvoiceItem != null) {
+      if (businessInvoiceItems.get(invoice.getId()) == null) {
+        businessInvoiceItems.put(invoice.getId(),new LinkedList<BusinessInvoiceItemBaseModelDao>());
+      }
+      businessInvoiceItems.get(invoice.getId()).add(businessInvoiceItem);
+    }
   }
-  return businessInvoices;
+  final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>> businessRecords=new HashMap<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>>();
+  for (  final BusinessInvoiceModelDao businessInvoiceModelDao : businessInvoices.values()) {
+    businessRecords.put(businessInvoiceModelDao,businessInvoiceItems.get(businessInvoiceModelDao.getInvoiceId()));
+  }
+  return businessRecords;
 }
