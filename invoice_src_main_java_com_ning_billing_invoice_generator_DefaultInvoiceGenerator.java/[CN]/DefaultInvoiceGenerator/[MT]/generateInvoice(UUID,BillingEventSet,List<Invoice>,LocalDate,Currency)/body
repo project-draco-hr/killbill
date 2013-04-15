@@ -12,22 +12,16 @@
         }
       }
     }
-    Collections.sort(existingItems);
   }
   final LocalDate adjustedTargetDate=adjustTargetDate(existingInvoices,targetDate);
   final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),adjustedTargetDate,targetCurrency);
   final UUID invoiceId=invoice.getId();
   final List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,adjustedTargetDate,targetCurrency);
-  removeCancellingInvoiceItems(existingItems);
-  removeDuplicatedInvoiceItems(proposedItems,existingItems);
-  addRepairedItems(existingItems,proposedItems);
+  removeRepairedAndRepairInvoiceItems(existingItems);
+  removeMatchingInvoiceItems(proposedItems,existingItems);
+  addRepairItems(existingItems,proposedItems);
   generateCBAForExistingInvoices(accountId,existingInvoices,proposedItems,targetCurrency);
   consumeExistingCredit(invoiceId,accountId,existingItems,proposedItems,targetCurrency);
-  if (proposedItems == null || proposedItems.size() == 0) {
-    return null;
-  }
- else {
-    invoice.addInvoiceItems(proposedItems);
-    return invoice;
-  }
+  invoice.addInvoiceItems(proposedItems);
+  return invoice;
 }
