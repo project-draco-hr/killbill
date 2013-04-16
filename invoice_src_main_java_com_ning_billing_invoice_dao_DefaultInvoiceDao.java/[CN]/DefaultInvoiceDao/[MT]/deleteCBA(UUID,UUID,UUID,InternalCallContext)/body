@@ -13,17 +13,17 @@
       }
       final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.CBA_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,cbaItem.getAmount().negate(),null,cbaItem.getCurrency(),cbaItem.getId());
       invoiceItemSqlDao.create(cbaAdjItem,context);
-      populateChildren(invoice,entitySqlDaoWrapperFactory,context);
+      invoiceDaoHelper.populateChildren(invoice,entitySqlDaoWrapperFactory,context);
       if (InvoiceModelDaoHelper.getBalance(invoice).compareTo(BigDecimal.ZERO) < 0) {
         throw new InvoiceApiException(ErrorCode.INVOICE_WOULD_BE_NEGATIVE);
       }
-      final BigDecimal accountCBA=getAccountCBAFromTransaction(accountId,entitySqlDaoWrapperFactory,context);
+      final BigDecimal accountCBA=cbaDao.getAccountCBAFromTransaction(accountId,entitySqlDaoWrapperFactory,context);
       if (accountCBA.compareTo(BigDecimal.ZERO) < 0) {
         if (accountCBA.compareTo(cbaItem.getAmount().negate()) < 0) {
           throw new IllegalStateException("The account balance can't be lower than the amount adjusted");
         }
         final List<InvoiceModelDao> invoicesFollowing=transactional.getInvoicesByAccountAfterDate(accountId.toString(),invoice.getInvoiceDate().toDateTimeAtStartOfDay().toDate(),context);
-        populateChildren(invoicesFollowing,entitySqlDaoWrapperFactory,context);
+        invoiceDaoHelper.populateChildren(invoicesFollowing,entitySqlDaoWrapperFactory,context);
         BigDecimal positiveRemainderToAdjust=accountCBA.negate();
         for (        final InvoiceModelDao invoiceFollowing : invoicesFollowing) {
           if (invoiceFollowing.getId().equals(invoice.getId())) {

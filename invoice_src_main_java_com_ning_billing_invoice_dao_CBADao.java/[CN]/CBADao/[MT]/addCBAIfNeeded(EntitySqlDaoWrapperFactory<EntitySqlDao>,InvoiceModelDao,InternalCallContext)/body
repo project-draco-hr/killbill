@@ -1,0 +1,8 @@
+{
+  final BigDecimal balance=InvoiceModelDaoHelper.getBalance(invoice);
+  if (balance.compareTo(BigDecimal.ZERO) < 0) {
+    final InvoiceItemSqlDao transInvoiceItemDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
+    final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),balance.negate(),invoice.getCurrency()));
+    transInvoiceItemDao.create(cbaAdjItem,context);
+  }
+}

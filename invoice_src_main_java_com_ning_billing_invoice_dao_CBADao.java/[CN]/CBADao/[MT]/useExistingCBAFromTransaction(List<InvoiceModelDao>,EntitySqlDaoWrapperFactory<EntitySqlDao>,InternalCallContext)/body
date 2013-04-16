@@ -1,9 +1,9 @@
 {
-  final BigDecimal accountCBA=getAccountCBAFromTransaction(accountId,entitySqlDaoWrapperFactory,context);
+  final BigDecimal accountCBA=getAccountCBAFromTransaction(invoices);
   if (accountCBA.compareTo(BigDecimal.ZERO) <= 0) {
     return;
   }
-  final List<InvoiceModelDao> unpaidInvoices=getUnpaidInvoicesByAccountFromTransaction(accountId,entitySqlDaoWrapperFactory,null,context);
+  final List<InvoiceModelDao> unpaidInvoices=invoiceDaoHelper.getUnpaidInvoicesByAccountFromTransaction(invoices,null);
   final List<InvoiceModelDao> orderedUnpaidInvoices=Ordering.from(new Comparator<InvoiceModelDao>(){
     @Override public int compare(    final InvoiceModelDao i1,    final InvoiceModelDao i2){
       return i1.getInvoiceDate().compareTo(i2.getInvoiceDate());
@@ -15,7 +15,7 @@
     final BigDecimal curInvoiceBalance=InvoiceModelDaoHelper.getBalance(cur);
     final BigDecimal cbaToApplyOnInvoice=remainingAccountCBA.compareTo(curInvoiceBalance) <= 0 ? remainingAccountCBA : curInvoiceBalance;
     remainingAccountCBA=remainingAccountCBA.subtract(cbaToApplyOnInvoice);
-    final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.CBA_ADJ,cur.getId(),cur.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,cbaToApplyOnInvoice.negate(),null,cur.getCurrency(),null);
+    final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(new CreditBalanceAdjInvoiceItem(cur.getId(),cur.getAccountId(),context.getCreatedDate().toLocalDate(),cbaToApplyOnInvoice.negate(),cur.getCurrency()));
     final InvoiceItemSqlDao transInvoiceItemDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
     transInvoiceItemDao.create(cbaAdjItem,context);
     if (remainingAccountCBA.compareTo(BigDecimal.ZERO) <= 0) {

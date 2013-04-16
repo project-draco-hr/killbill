@@ -9,7 +9,8 @@
         invoiceIdForCredit=invoiceForCredit.getId();
       }
       final InvoiceItemModelDao credit=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.CREDIT_ADJ,invoiceIdForCredit,accountId,null,null,null,null,effectiveDate,null,positiveCreditAmount.negate(),null,currency,null);
-      insertItemAndAddCBAIfNeeded(entitySqlDaoWrapperFactory,credit,context);
+      invoiceDaoHelper.insertItem(entitySqlDaoWrapperFactory,credit,context);
+      cbaDao.doCBAComplexity(accountId,entitySqlDaoWrapperFactory,context);
       notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,invoiceId,accountId,context.getUserToken(),context);
       return credit;
     }

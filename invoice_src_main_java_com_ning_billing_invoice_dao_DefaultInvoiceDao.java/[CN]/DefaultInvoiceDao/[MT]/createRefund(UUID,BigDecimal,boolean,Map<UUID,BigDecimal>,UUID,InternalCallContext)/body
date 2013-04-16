@@ -8,8 +8,8 @@
       if (payment == null) {
         throw new InvoiceApiException(ErrorCode.INVOICE_PAYMENT_BY_ATTEMPT_NOT_FOUND,paymentId);
       }
-      final Map<UUID,BigDecimal> invoiceItemIdsWithAmounts=computeItemAdjustments(payment.getInvoiceId().toString(),entitySqlDaoWrapperFactory,invoiceItemIdsWithNullAmounts,context);
-      final BigDecimal requestedPositiveAmount=computePositiveRefundAmount(payment,requestedRefundAmount,invoiceItemIdsWithAmounts);
+      final Map<UUID,BigDecimal> invoiceItemIdsWithAmounts=invoiceDaoHelper.computeItemAdjustments(payment.getInvoiceId().toString(),entitySqlDaoWrapperFactory,invoiceItemIdsWithNullAmounts,context);
+      final BigDecimal requestedPositiveAmount=invoiceDaoHelper.computePositiveRefundAmount(payment,requestedRefundAmount,invoiceItemIdsWithAmounts);
       final InvoicePaymentModelDao existingRefund=transactional.getPaymentsForCookieId(paymentCookieId.toString(),context);
       if (existingRefund != null) {
         return existingRefund;
@@ -18,7 +18,7 @@
       transactional.create(refund,context);
       final InvoiceModelDao invoice=transInvoiceDao.getById(payment.getInvoiceId().toString(),context);
       if (invoice != null) {
-        populateChildren(invoice,entitySqlDaoWrapperFactory,context);
+        invoiceDaoHelper.populateChildren(invoice,entitySqlDaoWrapperFactory,context);
       }
  else {
         throw new IllegalStateException("Invoice shouldn't be null for payment " + payment.getId());
@@ -36,11 +36,11 @@
  else       if (isInvoiceAdjusted) {
         for (        final UUID invoiceItemId : invoiceItemIdsWithAmounts.keySet()) {
           final BigDecimal adjAmount=invoiceItemIdsWithAmounts.get(invoiceItemId);
-          final InvoiceItemModelDao item=createAdjustmentItem(entitySqlDaoWrapperFactory,invoice.getId(),invoiceItemId,adjAmount,invoice.getCurrency(),context.getCreatedDate().toLocalDate(),context);
+          final InvoiceItemModelDao item=invoiceDaoHelper.createAdjustmentItem(entitySqlDaoWrapperFactory,invoice.getId(),invoiceItemId,adjAmount,invoice.getCurrency(),context.getCreatedDate().toLocalDate(),context);
           transInvoiceItemDao.create(item,context);
         }
       }
-      useExistingCBAFromTransaction(invoice.getAccountId(),entitySqlDaoWrapperFactory,context);
+      cbaDao.doCBAComplexity(invoice.getAccountId(),entitySqlDaoWrapperFactory,context);
       notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,invoice.getId(),invoice.getAccountId(),context.getUserToken(),context);
       return refund;
     }
