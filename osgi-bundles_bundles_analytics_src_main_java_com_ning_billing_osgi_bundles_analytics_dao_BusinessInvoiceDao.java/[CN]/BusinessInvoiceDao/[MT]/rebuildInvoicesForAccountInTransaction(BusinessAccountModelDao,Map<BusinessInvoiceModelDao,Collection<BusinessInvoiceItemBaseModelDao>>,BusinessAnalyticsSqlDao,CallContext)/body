@@ -1,6 +1,9 @@
 {
   deleteInvoicesAndInvoiceItemsForAccountInTransaction(transactional,account.getAccountRecordId(),account.getTenantRecordId(),context);
   for (  final BusinessInvoiceModelDao businessInvoice : businessInvoices.keySet()) {
-    createInvoiceInTransaction(transactional,businessInvoice,businessInvoices.get(businessInvoice),context);
+    final Collection<BusinessInvoiceItemBaseModelDao> invoiceItems=businessInvoices.get(businessInvoice);
+    if (invoiceItems != null) {
+      createInvoiceInTransaction(transactional,businessInvoice,invoiceItems,context);
+    }
   }
 }
