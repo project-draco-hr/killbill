@@ -15,8 +15,18 @@
       lastPayment=payment;
     }
   }
+  final List<SubscriptionBundle> bundles=getSubscriptionBundlesForAccount(account.getId(),context);
+  int nbActiveBundles=0;
+  for (  final SubscriptionBundle bundle : bundles) {
+    final Collection<Subscription> subscriptionsForBundle=getSubscriptionsForBundle(bundle.getId(),context);
+    for (    final Subscription subscription : subscriptionsForBundle) {
+      if (ProductCategory.BASE.equals(subscription.getCategory()) && !(subscription.getEndDate() != null && !subscription.getEndDate().isAfterNow())) {
+        nbActiveBundles++;
+      }
+    }
+  }
   final Long accountRecordId=getAccountRecordId(account.getId(),context);
   final Long tenantRecordId=getTenantRecordId(context);
   final ReportGroup reportGroup=getReportGroup(account.getId(),context);
-  return new BusinessAccountModelDao(account,accountRecordId,accountBalance,lastInvoice,lastPayment,creationAuditLog,tenantRecordId,reportGroup);
+  return new BusinessAccountModelDao(account,accountRecordId,accountBalance,lastInvoice,lastPayment,nbActiveBundles,creationAuditLog,tenantRecordId,reportGroup);
 }
