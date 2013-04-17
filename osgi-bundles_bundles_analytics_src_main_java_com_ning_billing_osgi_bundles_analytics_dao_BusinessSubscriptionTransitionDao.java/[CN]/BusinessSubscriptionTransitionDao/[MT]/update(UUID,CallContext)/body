@@ -1,9 +1,12 @@
 {
   final Account account=getAccount(accountId,context);
-  final Collection<BusinessSubscriptionTransitionModelDao> bsts=createBusinessSubscriptionTransitions(account,context);
+  final ReportGroup reportGroup=getReportGroup(account.getId(),context);
+  final BusinessAccountModelDao bac=businessAccountDao.createBusinessAccount(account,context);
+  final Collection<BusinessSubscriptionTransitionModelDao> bsts=createBusinessSubscriptionTransitions(account,bac.getAccountRecordId(),bac.getTenantRecordId(),reportGroup,context);
+  final Collection<BusinessBundleSummaryModelDao> bbss=businessBundleSummaryDao.createBusinessBundleSummaries(account,bac.getAccountRecordId(),bsts,bac.getTenantRecordId(),reportGroup,context);
   sqlDao.inTransaction(new Transaction<Void,BusinessAnalyticsSqlDao>(){
     @Override public Void inTransaction(    final BusinessAnalyticsSqlDao transactional,    final TransactionStatus status) throws Exception {
-      updateInTransaction(bsts,transactional,context);
+      updateInTransaction(bac,bbss,bsts,transactional,context);
       return null;
     }
   }
