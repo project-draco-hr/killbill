@@ -1,0 +1,10 @@
+{
+  Mockito.when(invoicePayment.getType()).thenReturn(InvoicePaymentType.REFUND);
+  final BusinessInvoicePaymentBaseModelDao businessInvoicePaymentRefundModelDao=BusinessInvoicePaymentModelDao.create(account,accountRecordId,invoice,invoicePayment,invoicePaymentRecordId,payment,refund,paymentMethod,auditLog,tenantRecordId,reportGroup);
+  Assert.assertEquals(analyticsSqlDao.getInvoicePaymentsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),0);
+  analyticsSqlDao.create(businessInvoicePaymentRefundModelDao.getTableName(),businessInvoicePaymentRefundModelDao,callContext);
+  Assert.assertEquals(analyticsSqlDao.getInvoicePaymentRefundsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),1);
+  Assert.assertEquals(analyticsSqlDao.getInvoicePaymentRefundsByAccountRecordId(accountRecordId,tenantRecordId,callContext).get(0),businessInvoicePaymentRefundModelDao);
+  analyticsSqlDao.deleteByAccountRecordId(businessInvoicePaymentRefundModelDao.getTableName(),accountRecordId,tenantRecordId,callContext);
+  Assert.assertEquals(analyticsSqlDao.getInvoicePaymentRefundsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),0);
+}
