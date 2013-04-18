@@ -5,6 +5,12 @@
   }
  catch (  PaymentApiException e) {
     logService.log(LogService.LOG_INFO,"Error retrieving payment method for id " + paymentMethodId + " (already deleted?)",e);
+  }
+  try {
+    return paymentApi.getPaymentMethodById(paymentMethodId,true,false,context);
+  }
+ catch (  PaymentApiException e) {
+    logService.log(LogService.LOG_INFO,"Error retrieving payment method for id " + paymentMethodId,e);
     return null;
   }
 }
