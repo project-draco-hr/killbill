@@ -1,4 +1,9 @@
 {
-  final RecordIdApi recordIdUserApi=getRecordIdUserApi();
-  return recordIdUserApi.getRecordId(context.getTenantId(),ObjectType.TENANT,context);
+  if (context.getTenantId() == null) {
+    return INTERNAL_TENANT_RECORD_ID;
+  }
+ else {
+    final RecordIdApi recordIdUserApi=getRecordIdUserApi();
+    return recordIdUserApi.getRecordId(context.getTenantId(),ObjectType.TENANT,context);
+  }
 }
