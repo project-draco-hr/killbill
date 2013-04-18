@@ -18,6 +18,12 @@
   assertEquals(savedMethod.getPluginName(),pluginName);
   assertEquals(savedMethod.isActive(),isActive);
   paymentDao.deletedPaymentMethod(paymentMethodId,internalCallContext);
-  final PaymentMethodModelDao deletedPaymentMethod=paymentDao.getPaymentMethod(paymentMethodId,internalCallContext);
+  PaymentMethodModelDao deletedPaymentMethod=paymentDao.getPaymentMethod(paymentMethodId,internalCallContext);
   assertNull(deletedPaymentMethod);
+  deletedPaymentMethod=paymentDao.getPaymentMethodIncludedDeleted(paymentMethodId,internalCallContext);
+  assertNotNull(deletedPaymentMethod);
+  assertFalse(deletedPaymentMethod.isActive());
+  assertEquals(deletedPaymentMethod.getAccountId(),accountId);
+  assertEquals(deletedPaymentMethod.getId(),paymentMethodId);
+  assertEquals(deletedPaymentMethod.getPluginName(),pluginName);
 }
