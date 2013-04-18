@@ -1,14 +1,17 @@
 {
   busHandler.pushExpectedEvents(NextEvent.TAG);
-  tagApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_INVOICING_OFF.getId(),callContext);
+  tagUserApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_INVOICING_OFF.getId(),callContext);
   assertTrue(busHandler.isCompleted(DELAY));
   busHandler.pushExpectedEvents(NextEvent.TAG);
-  tagApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_PAY_OFF.getId(),callContext);
+  tagUserApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_PAY_OFF.getId(),callContext);
   assertTrue(busHandler.isCompleted(DELAY));
-  List<Tag> tags=tagApi.getTagsForAccount(account.getId(),callContext);
+  List<Tag> tags=tagUserApi.getTagsForAccount(account.getId(),callContext);
   Assert.assertEquals(tags.size(),2);
-  tags=tagApi.getTagsForObject(account.getId(),ObjectType.ACCOUNT,callContext);
+  checkTagsExists(tags);
+  tags=tagUserApi.getTagsForObject(account.getId(),ObjectType.ACCOUNT,callContext);
   Assert.assertEquals(tags.size(),2);
-  tags=tagApi.getTagsForAccountType(account.getId(),ObjectType.ACCOUNT,callContext);
+  checkTagsExists(tags);
+  tags=tagUserApi.getTagsForAccountType(account.getId(),ObjectType.ACCOUNT,callContext);
   Assert.assertEquals(tags.size(),2);
+  checkTagsExists(tags);
 }
