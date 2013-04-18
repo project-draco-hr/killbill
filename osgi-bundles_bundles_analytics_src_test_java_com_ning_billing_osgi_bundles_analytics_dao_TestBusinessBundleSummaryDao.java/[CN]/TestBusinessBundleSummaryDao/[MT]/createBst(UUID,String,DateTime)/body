@@ -1,0 +1,13 @@
+{
+  final SubscriptionBundle bundle=Mockito.mock(SubscriptionBundle.class);
+  Mockito.when(bundle.getId()).thenReturn(bundleId);
+  final DateTime requestedTimestamp=new DateTime(2012,7,21,10,10,10,DateTimeZone.UTC);
+  final BusinessSubscriptionEvent event=BusinessSubscriptionEvent.valueOf(eventString);
+  final BusinessSubscription previousSubscription=null;
+  final Product product=Mockito.mock(Product.class);
+  Mockito.when(product.getCategory()).thenReturn(event.getCategory());
+  final Plan plan=Mockito.mock(Plan.class);
+  Mockito.when(plan.getProduct()).thenReturn(product);
+  final BusinessSubscription nextSubscription=new BusinessSubscription(plan,null,null,Currency.GBP,startDate,SubscriptionState.ACTIVE);
+  return new BusinessSubscriptionTransitionModelDao(account,accountRecordId,bundle,subscriptionTransition,subscriptionEventRecordId,requestedTimestamp,event,previousSubscription,nextSubscription,auditLog,tenantRecordId,reportGroup);
+}
