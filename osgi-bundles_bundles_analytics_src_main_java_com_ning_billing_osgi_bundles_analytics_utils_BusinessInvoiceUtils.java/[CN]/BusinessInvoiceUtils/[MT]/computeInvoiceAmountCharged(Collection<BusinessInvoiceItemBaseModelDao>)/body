@@ -1,0 +1,12 @@
+{
+  BigDecimal amountCharged=BigDecimal.ZERO;
+  if (businessInvoiceItems == null) {
+    return amountCharged;
+  }
+  for (  final BusinessInvoiceItemBaseModelDao businessInvoiceItem : businessInvoiceItems) {
+    if (BusinessInvoiceItemType.CHARGE.equals(businessInvoiceItem.getBusinessInvoiceItemType()) || BusinessInvoiceItemType.INVOICE_ADJUSTMENT.equals(businessInvoiceItem.getBusinessInvoiceItemType()) || BusinessInvoiceItemType.INVOICE_ITEM_ADJUSTMENT.equals(businessInvoiceItem.getBusinessInvoiceItemType())) {
+      amountCharged=amountCharged.add(businessInvoiceItem.getAmount());
+    }
+  }
+  return amountCharged;
+}
