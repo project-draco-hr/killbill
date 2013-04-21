@@ -1,0 +1,18 @@
+{
+  final List<NamedXYTimeSeries> res=new ArrayList<NamedXYTimeSeries>();
+  final List<XY> xys1=new ArrayList<XY>();
+  xys1.add(new XY("2013-01-01",11));
+  xys1.add(new XY("2013-01-02",7));
+  xys1.add(new XY("2013-01-03",34));
+  final NamedXYTimeSeries serie1=new NamedXYTimeSeries("serie1",xys1);
+  res.add(serie1);
+  final List<XY> xys2=new ArrayList<XY>();
+  xys2.add(new XY("2013-01-01",12));
+  xys2.add(new XY("2013-01-02",5));
+  xys2.add(new XY("2013-01-03",3));
+  final NamedXYTimeSeries serie2=new NamedXYTimeSeries("serie2",xys2);
+  res.add(serie2);
+  Writer writer=new StringWriter();
+  mapper.writeValue(writer,res);
+  Assert.assertEquals(writer.toString(),"[{\"name\":\"serie1\",\"values\":[{\"x\":\"2013-01-01\",\"y\":11},{\"x\":\"2013-01-02\",\"y\":7},{\"x\":\"2013-01-03\",\"y\":34}]},{\"name\":\"serie2\",\"values\":[{\"x\":\"2013-01-01\",\"y\":12},{\"x\":\"2013-01-02\",\"y\":5},{\"x\":\"2013-01-03\",\"y\":3}]}]");
+}

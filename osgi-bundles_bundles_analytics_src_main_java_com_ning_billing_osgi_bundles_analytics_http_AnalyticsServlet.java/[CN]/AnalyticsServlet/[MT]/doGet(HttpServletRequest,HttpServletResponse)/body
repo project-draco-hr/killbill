@@ -1,7 +1,19 @@
 {
-  final UUID kbAccountId=getKbAccountId(req,resp);
-  final CallContext context=createCallContext(req,resp);
-  final BusinessSnapshot businessSnapshot=analyticsUserApi.getBusinessSnapshot(kbAccountId,context);
-  resp.getOutputStream().write(mapper.writeValueAsBytes(businessSnapshot));
-  resp.setStatus(HttpServletResponse.SC_OK);
+  final String uriOperationInfo=extractUriOperationInfo(req);
+  if (uriOperationInfo.equals(RECURRING_REVENUE_OVER_TIME)) {
+    doHandleRecurringRevenueOverTime(req,resp);
+  }
+ else   if (uriOperationInfo.equals(PLAN_TRANSITIONS_OVER_TIME)) {
+    doHandlePlanTransitionsOverTime(req,resp);
+  }
+ else   if (uriOperationInfo.startsWith(STATIC_RESOURCES)) {
+    doHandleStaticResource(uriOperationInfo,resp);
+  }
+ else {
+    final UUID kbAccountId=getKbAccountId(req,resp);
+    final CallContext context=createCallContext(req,resp);
+    final BusinessSnapshot businessSnapshot=analyticsUserApi.getBusinessSnapshot(kbAccountId,context);
+    resp.getOutputStream().write(mapper.writeValueAsBytes(businessSnapshot));
+    resp.setStatus(HttpServletResponse.SC_OK);
+  }
 }
