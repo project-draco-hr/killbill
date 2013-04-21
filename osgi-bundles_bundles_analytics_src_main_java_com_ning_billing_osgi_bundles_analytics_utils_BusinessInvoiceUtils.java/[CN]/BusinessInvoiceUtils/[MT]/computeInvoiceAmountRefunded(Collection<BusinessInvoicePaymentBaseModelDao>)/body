@@ -1,0 +1,12 @@
+{
+  BigDecimal amountRefunded=BigDecimal.ZERO;
+  if (businessInvoicePayments == null) {
+    return amountRefunded;
+  }
+  for (  final BusinessInvoicePaymentBaseModelDao businessInvoicePayment : businessInvoicePayments) {
+    if (InvoicePaymentType.REFUND.toString().equals(businessInvoicePayment.getInvoicePaymentType()) || InvoicePaymentType.CHARGED_BACK.toString().equals(businessInvoicePayment.getInvoicePaymentType())) {
+      amountRefunded=amountRefunded.add(businessInvoicePayment.getAmount());
+    }
+  }
+  return amountRefunded;
+}

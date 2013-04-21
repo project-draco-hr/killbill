@@ -1,0 +1,12 @@
+{
+  BigDecimal amountPaid=BigDecimal.ZERO;
+  if (businessInvoicePayments == null) {
+    return amountPaid;
+  }
+  for (  final BusinessInvoicePaymentBaseModelDao businessInvoicePayment : businessInvoicePayments) {
+    if (InvoicePaymentType.ATTEMPT.toString().equals(businessInvoicePayment.getInvoicePaymentType())) {
+      amountPaid=amountPaid.add(businessInvoicePayment.getAmount());
+    }
+  }
+  return amountPaid;
+}

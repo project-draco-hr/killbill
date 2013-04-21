@@ -1,0 +1,9 @@
+{
+  businessInvoiceDao.updateInTransaction(bac,invoices,invoiceItems,transactional,context);
+  final Collection<BusinessInvoicePaymentBaseModelDao> flattenedInvoicePayments=new LinkedList<BusinessInvoicePaymentBaseModelDao>();
+  for (  final UUID invoiceId : invoicePayments.keySet()) {
+    flattenedInvoicePayments.addAll(invoicePayments.get(invoiceId));
+  }
+  businessInvoicePaymentDao.updateInTransaction(bac,flattenedInvoicePayments,transactional,context);
+  businessAccountDao.updateInTransaction(bac,transactional,context);
+}

@@ -1,0 +1,15 @@
+{
+  final Account account=getAccount(accountId,context);
+  final BusinessAccountModelDao bac=businessAccountDao.createBusinessAccount(account,context);
+  final Map<UUID,BusinessInvoiceModelDao> invoices=new HashMap<UUID,BusinessInvoiceModelDao>();
+  final Map<UUID,Collection<BusinessInvoiceItemBaseModelDao>> invoiceItems=new HashMap<UUID,Collection<BusinessInvoiceItemBaseModelDao>>();
+  final Map<UUID,Collection<BusinessInvoicePaymentBaseModelDao>> invoicePayments=new HashMap<UUID,Collection<BusinessInvoicePaymentBaseModelDao>>();
+  createBusinessPojos(account,invoices,invoiceItems,invoicePayments,context);
+  sqlDao.inTransaction(new Transaction<Void,BusinessAnalyticsSqlDao>(){
+    @Override public Void inTransaction(    final BusinessAnalyticsSqlDao transactional,    final TransactionStatus status) throws Exception {
+      updateInTransaction(bac,invoices,invoiceItems,invoicePayments,transactional,context);
+      return null;
+    }
+  }
+);
+}

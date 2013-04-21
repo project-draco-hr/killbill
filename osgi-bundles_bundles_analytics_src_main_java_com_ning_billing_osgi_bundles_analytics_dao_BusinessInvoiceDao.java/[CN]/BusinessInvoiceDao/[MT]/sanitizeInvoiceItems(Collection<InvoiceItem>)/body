@@ -28,9 +28,37 @@
       logService.log(LogService.LOG_ERROR,"Could not find the reparation item for the repair item id " + repairedInvoiceItem.getId() + " - this should never happen!");
     }
   }
+  final Set<UUID> cbasToIgnore=new HashSet<UUID>();
+  final Collection<AdjustedCBAInvoiceItem> newCbasToAdd=new LinkedList<AdjustedCBAInvoiceItem>();
+  for (  final InvoiceItem cbaInvoiceItem : allInvoiceItems) {
+    if (!InvoiceItemType.CBA_ADJ.equals(cbaInvoiceItem.getInvoiceItemType())) {
+      continue;
+    }
+    for (    final InvoiceItem invoiceItem : allInvoiceItems) {
+      if (reparationInvoiceItemIdToRepairItemMappings.keySet().contains(invoiceItem.getId())) {
+        final InvoiceItem repairInvoiceItem=reparationInvoiceItemIdToRepairItemMappings.get(invoiceItem.getId());
+        final InvoiceItem reparationInvoiceItem=invoiceItem;
+        if (repairInvoiceItem.getAmount().negate().compareTo(cbaInvoiceItem.getAmount()) == 0) {
+          cbasToIgnore.add(cbaInvoiceItem.getId());
+          newCbasToAdd.add(new AdjustedCBAInvoiceItem(cbaInvoiceItem,cbaInvoiceItem.getAmount().add(reparationInvoiceItem.getAmount().negate()),reparationInvoiceItem.getId()));
+          for (          final InvoiceItem cbaUsedOnNextInvoiceItem : allInvoiceItems) {
+            if (!InvoiceItemType.CBA_ADJ.equals(cbaUsedOnNextInvoiceItem.getInvoiceItemType()) || !cbaUsedOnNextInvoiceItem.getInvoiceId().equals(reparationInvoiceItem.getInvoiceId())) {
+              continue;
+            }
+            cbasToIgnore.add(cbaUsedOnNextInvoiceItem.getId());
+            newCbasToAdd.add(new AdjustedCBAInvoiceItem(cbaUsedOnNextInvoiceItem,cbaUsedOnNextInvoiceItem.getAmount().add(reparationInvoiceItem.getAmount()),reparationInvoiceItem.getId()));
+            break;
+          }
+          break;
+        }
+      }
+    }
+  }
   final Collection<InvoiceItem> invoiceItemsForAnalytics=new LinkedList<InvoiceItem>();
   for (  final InvoiceItem invoiceItem : allInvoiceItems) {
-    if (InvoiceItemType.REPAIR_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+    if (cbasToIgnore.contains(invoiceItem.getId())) {
+    }
+ else     if (InvoiceItemType.REPAIR_ADJ.equals(invoiceItem.getInvoiceItemType())) {
     }
  else     if (reparationInvoiceItemIdToRepairItemMappings.keySet().contains(invoiceItem.getId())) {
       final InvoiceItem repairInvoiceItem=reparationInvoiceItemIdToRepairItemMappings.get(invoiceItem.getId());
@@ -41,5 +69,6 @@
       invoiceItemsForAnalytics.add(invoiceItem);
     }
   }
+  invoiceItemsForAnalytics.addAll(newCbasToAdd);
   return invoiceItemsForAnalytics;
 }
