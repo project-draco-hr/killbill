@@ -1,0 +1,32 @@
+{
+  final Map<UUID,InvoiceItem> repairedInvoiceItemIdToRepairInvoiceItemMappings=new HashMap<UUID,InvoiceItem>();
+  for (  final InvoiceItem invoiceItem : allInvoiceItems) {
+    if (InvoiceItemType.REPAIR_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+      repairedInvoiceItemIdToRepairInvoiceItemMappings.put(invoiceItem.getLinkedItemId(),invoiceItem);
+    }
+  }
+  final Map<UUID,InvoiceItem> repareeInvoiceItemIdToRepairItemMappings=new LinkedHashMap<UUID,InvoiceItem>();
+  for (  final InvoiceItem repairedInvoiceItem : allInvoiceItems) {
+    if (!repairedInvoiceItemIdToRepairInvoiceItemMappings.keySet().contains(repairedInvoiceItem.getId())) {
+      continue;
+    }
+    InvoiceItem repareeItem=null;
+    for (    final InvoiceItem invoiceItem : allInvoiceItems) {
+      if (isRepareeItemForRepairedItem(repairedInvoiceItem,invoiceItem)) {
+        if (repareeItem == null) {
+          repareeItem=invoiceItem;
+        }
+ else {
+          logService.log(LogService.LOG_ERROR,"Found multiple reparee items matching the repair item id " + repairedInvoiceItem.getId() + " - this should never happen!");
+        }
+      }
+    }
+    if (repareeItem != null) {
+      repareeInvoiceItemIdToRepairItemMappings.put(repareeItem.getId(),repairedInvoiceItemIdToRepairInvoiceItemMappings.get(repairedInvoiceItem.getId()));
+    }
+ else {
+      logService.log(LogService.LOG_ERROR,"Could not find the reparee item for the repair item id " + repairedInvoiceItem.getId() + " - this should never happen!");
+    }
+  }
+  return repareeInvoiceItemIdToRepairItemMappings;
+}

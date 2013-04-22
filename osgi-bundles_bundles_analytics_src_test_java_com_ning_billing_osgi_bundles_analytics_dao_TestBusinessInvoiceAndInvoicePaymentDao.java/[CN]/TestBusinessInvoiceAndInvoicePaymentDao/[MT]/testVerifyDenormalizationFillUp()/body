@@ -31,8 +31,8 @@
   Mockito.when(invoicePayment.getAmount()).thenReturn(amountPaid349);
   Mockito.when(osgiKillbillApi.getInvoicePaymentApi().getInvoicePayments(payment.getId(),callContext)).thenReturn(ImmutableList.<InvoicePayment>of(invoicePayment));
   final Map<UUID,BusinessInvoiceModelDao> invoices=new HashMap<UUID,BusinessInvoiceModelDao>();
-  final Map<UUID,Collection<BusinessInvoiceItemBaseModelDao>> invoiceItems=new HashMap<UUID,Collection<BusinessInvoiceItemBaseModelDao>>();
-  final Map<UUID,Collection<BusinessInvoicePaymentBaseModelDao>> invoicePayments=new HashMap<UUID,Collection<BusinessInvoicePaymentBaseModelDao>>();
+  final Multimap<UUID,BusinessInvoiceItemBaseModelDao> invoiceItems=ArrayListMultimap.<UUID,BusinessInvoiceItemBaseModelDao>create();
+  final Multimap<UUID,BusinessInvoicePaymentBaseModelDao> invoicePayments=ArrayListMultimap.<UUID,BusinessInvoicePaymentBaseModelDao>create();
   dao.createBusinessPojos(account.getId(),invoices,invoiceItems,invoicePayments,callContext);
   Assert.assertEquals(invoices.keySet().size(),2);
   Assert.assertEquals(invoices.get(invoice349Id).getBalance().compareTo(balance349),0);

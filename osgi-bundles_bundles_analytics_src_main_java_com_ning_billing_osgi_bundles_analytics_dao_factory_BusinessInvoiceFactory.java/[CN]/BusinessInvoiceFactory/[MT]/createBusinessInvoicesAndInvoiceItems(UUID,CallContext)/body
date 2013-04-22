@@ -11,19 +11,17 @@
     allInvoiceItems.addAll(invoice.getInvoiceItems());
   }
   final Collection<InvoiceItem> sanitizedInvoiceItems=sanitizeInvoiceItems(allInvoiceItems);
-  final Map<UUID,Collection<BusinessInvoiceItemBaseModelDao>> businessInvoiceItemsForInvoiceId=new HashMap<UUID,Collection<BusinessInvoiceItemBaseModelDao>>();
+  final Multimap<UUID,BusinessInvoiceItemBaseModelDao> businessInvoiceItemsForInvoiceId=ArrayListMultimap.<UUID,BusinessInvoiceItemBaseModelDao>create();
   for (  final InvoiceItem invoiceItem : sanitizedInvoiceItems) {
     final Invoice invoice=invoiceIdToInvoiceMappings.get(invoiceItem.getInvoiceId());
-    final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,Collections2.filter(sanitizedInvoiceItems,new Predicate<InvoiceItem>(){
+    final Collection<InvoiceItem> otherInvoiceItems=Collections2.filter(sanitizedInvoiceItems,new Predicate<InvoiceItem>(){
       @Override public boolean apply(      final InvoiceItem input){
         return !input.getId().equals(invoiceItem.getId());
       }
     }
-),accountRecordId,tenantRecordId,reportGroup,context);
+);
+    final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,otherInvoiceItems,accountRecordId,tenantRecordId,reportGroup,context);
     if (businessInvoiceItem != null) {
-      if (businessInvoiceItemsForInvoiceId.get(invoice.getId()) == null) {
-        businessInvoiceItemsForInvoiceId.put(invoice.getId(),new LinkedList<BusinessInvoiceItemBaseModelDao>());
-      }
       businessInvoiceItemsForInvoiceId.get(invoice.getId()).add(businessInvoiceItem);
     }
   }

@@ -1,8 +1,8 @@
 {
   final BusinessAccountModelDao bac=bacFactory.createBusinessAccount(accountId,context);
   final Map<UUID,BusinessInvoiceModelDao> invoices=new HashMap<UUID,BusinessInvoiceModelDao>();
-  final Map<UUID,Collection<BusinessInvoiceItemBaseModelDao>> invoiceItems=new HashMap<UUID,Collection<BusinessInvoiceItemBaseModelDao>>();
-  final Map<UUID,Collection<BusinessInvoicePaymentBaseModelDao>> invoicePayments=new HashMap<UUID,Collection<BusinessInvoicePaymentBaseModelDao>>();
+  final Multimap<UUID,BusinessInvoiceItemBaseModelDao> invoiceItems=ArrayListMultimap.<UUID,BusinessInvoiceItemBaseModelDao>create();
+  final Multimap<UUID,BusinessInvoicePaymentBaseModelDao> invoicePayments=ArrayListMultimap.<UUID,BusinessInvoicePaymentBaseModelDao>create();
   createBusinessPojos(accountId,invoices,invoiceItems,invoicePayments,context);
   sqlDao.inTransaction(new Transaction<Void,BusinessAnalyticsSqlDao>(){
     @Override public Void inTransaction(    final BusinessAnalyticsSqlDao transactional,    final TransactionStatus status) throws Exception {
