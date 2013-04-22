@@ -11,7 +11,7 @@
   if (invoiceItem.getSubscriptionId() != null && Strings.emptyToNull(invoiceItem.getPhaseName()) != null) {
     planPhase=getPlanPhaseFromInvoiceItem(invoiceItem,context);
   }
-  final Long invoiceItemRecordId=getInvoiceItemRecordId(invoiceItem.getId(),context);
-  final AuditLog creationAuditLog=getInvoiceItemCreationAuditLog(invoiceItem.getId(),context);
+  final Long invoiceItemRecordId=invoiceItem.getId() != null ? getInvoiceItemRecordId(invoiceItem.getId(),context) : null;
+  final AuditLog creationAuditLog=invoiceItem.getId() != null ? getInvoiceItemCreationAuditLog(invoiceItem.getId(),context) : null;
   return createBusinessInvoiceItem(account,invoice,invoiceItem,otherInvoiceItems,bundle,plan,planPhase,invoiceItemRecordId,creationAuditLog,accountRecordId,tenantRecordId,reportGroup,context);
 }

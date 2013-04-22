@@ -1,0 +1,21 @@
+{
+  final Map<InvoiceItem,InvoiceItem> repareeInvoiceItemToRepairItemMappings=findRepareeInvoiceItems(allInvoiceItems.values());
+  final Collection<AdjustedCBAInvoiceItem> mergedCBAItems=buildMergedCBAItems(allInvoiceItems,repareeInvoiceItemToRepairItemMappings);
+  final Collection<InvoiceItem> invoiceItemsForAnalytics=new LinkedList<InvoiceItem>();
+  for (  final InvoiceItem invoiceItem : allInvoiceItems.values()) {
+    if (InvoiceItemType.CBA_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+    }
+ else     if (InvoiceItemType.REPAIR_ADJ.equals(invoiceItem.getInvoiceItemType())) {
+    }
+ else     if (repareeInvoiceItemToRepairItemMappings.keySet().contains(invoiceItem)) {
+      final InvoiceItem repairInvoiceItem=repareeInvoiceItemToRepairItemMappings.get(invoiceItem);
+      final InvoiceItem repareeInvoiceItem=invoiceItem;
+      invoiceItemsForAnalytics.add(new AdjustmentInvoiceItemForRepair(repairInvoiceItem,repareeInvoiceItem));
+    }
+ else {
+      invoiceItemsForAnalytics.add(invoiceItem);
+    }
+  }
+  invoiceItemsForAnalytics.addAll(mergedCBAItems);
+  return invoiceItemsForAnalytics;
+}

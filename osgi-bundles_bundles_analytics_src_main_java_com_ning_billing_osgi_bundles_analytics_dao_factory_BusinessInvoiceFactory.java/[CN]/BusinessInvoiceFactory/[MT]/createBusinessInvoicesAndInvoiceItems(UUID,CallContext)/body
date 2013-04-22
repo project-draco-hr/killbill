@@ -4,11 +4,11 @@
   final Long tenantRecordId=getTenantRecordId(context);
   final ReportGroup reportGroup=getReportGroup(account.getId(),context);
   final Collection<Invoice> invoices=getInvoicesByAccountId(account.getId(),context);
-  final Collection<InvoiceItem> allInvoiceItems=new LinkedList<InvoiceItem>();
+  final Multimap<UUID,InvoiceItem> allInvoiceItems=ArrayListMultimap.<UUID,InvoiceItem>create();
   final Map<UUID,Invoice> invoiceIdToInvoiceMappings=new LinkedHashMap<UUID,Invoice>();
   for (  final Invoice invoice : invoices) {
     invoiceIdToInvoiceMappings.put(invoice.getId(),invoice);
-    allInvoiceItems.addAll(invoice.getInvoiceItems());
+    allInvoiceItems.get(invoice.getId()).addAll(invoice.getInvoiceItems());
   }
   final Collection<InvoiceItem> sanitizedInvoiceItems=sanitizeInvoiceItems(allInvoiceItems);
   final Multimap<UUID,BusinessInvoiceItemBaseModelDao> businessInvoiceItemsForInvoiceId=ArrayListMultimap.<UUID,BusinessInvoiceItemBaseModelDao>create();
@@ -16,7 +16,7 @@
     final Invoice invoice=invoiceIdToInvoiceMappings.get(invoiceItem.getInvoiceId());
     final Collection<InvoiceItem> otherInvoiceItems=Collections2.filter(sanitizedInvoiceItems,new Predicate<InvoiceItem>(){
       @Override public boolean apply(      final InvoiceItem input){
-        return !input.getId().equals(invoiceItem.getId());
+        return input.getId() != null && !input.getId().equals(invoiceItem.getId());
       }
     }
 );

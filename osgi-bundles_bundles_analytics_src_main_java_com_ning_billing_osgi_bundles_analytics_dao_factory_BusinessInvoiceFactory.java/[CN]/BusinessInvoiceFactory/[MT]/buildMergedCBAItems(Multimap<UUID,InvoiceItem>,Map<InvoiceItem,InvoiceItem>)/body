@@ -1,0 +1,68 @@
+{
+  final Map<UUID,BigDecimal> cbaPerInvoice=new HashMap<UUID,BigDecimal>();
+  for (  final InvoiceItem repareeInvoiceItem : repareeInvoiceItemToRepairItemMappings.keySet()) {
+    if (cbaPerInvoice.get(repareeInvoiceItem.getInvoiceId()) == null) {
+      cbaPerInvoice.put(repareeInvoiceItem.getInvoiceId(),BigDecimal.ZERO);
+    }
+    final BigDecimal currentCBAForNewInvoice=cbaPerInvoice.get(repareeInvoiceItem.getInvoiceId());
+    final BigDecimal adjustedCBAForNewInvoice=currentCBAForNewInvoice.add(repareeInvoiceItem.getAmount());
+    cbaPerInvoice.put(repareeInvoiceItem.getInvoiceId(),adjustedCBAForNewInvoice);
+    final InvoiceItem repairInvoiceItem=repareeInvoiceItemToRepairItemMappings.get(repareeInvoiceItem);
+    if (cbaPerInvoice.get(repairInvoiceItem.getInvoiceId()) == null) {
+      cbaPerInvoice.put(repairInvoiceItem.getInvoiceId(),BigDecimal.ZERO);
+    }
+    final BigDecimal currentCBAForOriginalInvoice=cbaPerInvoice.get(repairInvoiceItem.getInvoiceId());
+    final BigDecimal adjustedCBAForOriginalInvoice=currentCBAForOriginalInvoice.add(repareeInvoiceItem.getAmount().negate());
+    cbaPerInvoice.put(repairInvoiceItem.getInvoiceId(),adjustedCBAForOriginalInvoice);
+  }
+  final Collection<AdjustedCBAInvoiceItem> mergedCBAs=new LinkedList<AdjustedCBAInvoiceItem>();
+  for (  final UUID invoiceId : allInvoiceItems.keySet()) {
+    if (allInvoiceItems.get(invoiceId) == null) {
+      continue;
+    }
+    final Collection<InvoiceItem> cbaItemsForInvoice=Collections2.filter(allInvoiceItems.get(invoiceId),new Predicate<InvoiceItem>(){
+      @Override public boolean apply(      final InvoiceItem invoiceItem){
+        return InvoiceItemType.CBA_ADJ.equals(invoiceItem.getInvoiceItemType());
+      }
+    }
+);
+    if (cbaItemsForInvoice.size() == 0) {
+      continue;
+    }
+    BigDecimal revenueRecognizableCBA=cbaPerInvoice.get(invoiceId);
+    if (revenueRecognizableCBA == null) {
+      revenueRecognizableCBA=BigDecimal.ZERO;
+    }
+    BigDecimal nonRevenueRecognizableCBA=BigDecimal.ZERO;
+    UUID accountId=null;
+    Currency currency=null;
+    for (    final InvoiceItem invoiceItem : cbaItemsForInvoice) {
+      final Collection<InvoiceItem> otherInvoiceItems=Collections2.filter(allInvoiceItems.values(),new Predicate<InvoiceItem>(){
+        @Override public boolean apply(        final InvoiceItem input){
+          return !input.getId().equals(invoiceItem.getId());
+        }
+      }
+);
+      final Boolean isRevenueRecognizable=isRevenueRecognizable(invoiceItem,otherInvoiceItems);
+      if (isRevenueRecognizable) {
+        revenueRecognizableCBA=revenueRecognizableCBA.add(invoiceItem.getAmount());
+      }
+ else {
+        nonRevenueRecognizableCBA=nonRevenueRecognizableCBA.add(invoiceItem.getAmount());
+      }
+      if (accountId == null) {
+        accountId=invoiceItem.getAccountId();
+      }
+      if (currency == null) {
+        currency=invoiceItem.getCurrency();
+      }
+    }
+    if (revenueRecognizableCBA.compareTo(BigDecimal.ZERO) != 0) {
+      mergedCBAs.add(new AdjustedCBAInvoiceItem(invoiceId,accountId,revenueRecognizableCBA,currency));
+    }
+    if (nonRevenueRecognizableCBA.compareTo(BigDecimal.ZERO) != 0) {
+      mergedCBAs.add(new AdjustedCBAInvoiceItem(invoiceId,accountId,nonRevenueRecognizableCBA,currency));
+    }
+  }
+  return mergedCBAs;
+}
