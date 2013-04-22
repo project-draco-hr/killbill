@@ -1,0 +1,14 @@
+{
+  final UUID subscriptionId1=UUID.randomUUID();
+  final LocalDate startDate1=new LocalDate(2013,4,1);
+  final LocalDate endDate1=new LocalDate(2013,4,30);
+  final BigDecimal amount1=new BigDecimal("30");
+  final UUID originalInvoice1=UUID.randomUUID();
+  final InvoiceItem recurring1=createInvoiceItem(originalInvoice1,InvoiceItemType.RECURRING,subscriptionId1,startDate1,endDate1,amount1,null);
+  final InvoiceItem repair1=createInvoiceItem(originalInvoice1,InvoiceItemType.REPAIR_ADJ,subscriptionId1,startDate1,endDate1,amount1.negate(),recurring1.getId());
+  final UUID repareeInvoice1=UUID.randomUUID();
+  final LocalDate repareeEndDate1=new LocalDate(2038,4,10);
+  final BigDecimal repareeAmount1=new BigDecimal("10");
+  final InvoiceItem reparee1=createInvoiceItem(repareeInvoice1,InvoiceItemType.RECURRING,subscriptionId1,startDate1,repareeEndDate1,repareeAmount1,null);
+  Assert.assertEquals(invoiceFactory.findRepareeInvoiceItems(ImmutableList.<InvoiceItem>of(recurring1,repair1,reparee1)).size(),0);
+}

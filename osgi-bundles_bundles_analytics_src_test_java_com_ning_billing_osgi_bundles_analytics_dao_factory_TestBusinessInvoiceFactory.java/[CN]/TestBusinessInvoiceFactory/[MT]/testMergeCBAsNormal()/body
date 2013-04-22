@@ -1,0 +1,18 @@
+{
+  final UUID invoiceId1=UUID.randomUUID();
+  final InvoiceItem cba1=createInvoiceItem(invoiceId1,InvoiceItemType.CBA_ADJ,BigDecimal.ONE);
+  final InvoiceItem cba2=createInvoiceItem(invoiceId1,InvoiceItemType.CBA_ADJ,BigDecimal.TEN.negate());
+  final InvoiceItem charge=createInvoiceItem(invoiceId1,InvoiceItemType.EXTERNAL_CHARGE,new BigDecimal("9"));
+  final UUID invoiceId2=UUID.randomUUID();
+  final InvoiceItem cba3=createInvoiceItem(invoiceId2,InvoiceItemType.CBA_ADJ,BigDecimal.ONE);
+  final Multimap<UUID,InvoiceItem> allInvoiceItems=ArrayListMultimap.<UUID,InvoiceItem>create();
+  allInvoiceItems.put(invoiceId1,cba1);
+  allInvoiceItems.put(invoiceId1,cba2);
+  allInvoiceItems.put(invoiceId1,charge);
+  allInvoiceItems.put(invoiceId2,cba3);
+  final Collection<AdjustedCBAInvoiceItem> adjustedCBAInvoiceItems=invoiceFactory.buildMergedCBAItems(allInvoiceItems,ImmutableMap.<InvoiceItem,InvoiceItem>of());
+  Assert.assertEquals(adjustedCBAInvoiceItems.size(),2);
+  for (  final AdjustedCBAInvoiceItem item : adjustedCBAInvoiceItems) {
+    Assert.assertEquals(item.getAmount(),item.getInvoiceId().equals(invoiceId1) ? new BigDecimal("-9") : BigDecimal.ONE);
+  }
+}

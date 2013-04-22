@@ -30,7 +30,7 @@
   allInvoiceItems.putAll(originalInvoice1,ImmutableList.<InvoiceItem>of(recurring1,repair1,reparation1));
   allInvoiceItems.putAll(originalInvoice2,ImmutableList.<InvoiceItem>of(recurring2,repair2,reparation2));
   allInvoiceItems.put(otherInvoice3,externalCharge);
-  final Collection<InvoiceItem> sanitizedInvoiceItems=invoiceDao.sanitizeInvoiceItems(allInvoiceItems);
+  final Collection<InvoiceItem> sanitizedInvoiceItems=invoiceFactory.sanitizeInvoiceItems(allInvoiceItems);
   Assert.assertEquals(sanitizedInvoiceItems.size(),2 + 2 + 1);
   for (  final InvoiceItem invoiceItem : sanitizedInvoiceItems) {
     if (invoiceItem.getId().equals(recurring1.getId())) {

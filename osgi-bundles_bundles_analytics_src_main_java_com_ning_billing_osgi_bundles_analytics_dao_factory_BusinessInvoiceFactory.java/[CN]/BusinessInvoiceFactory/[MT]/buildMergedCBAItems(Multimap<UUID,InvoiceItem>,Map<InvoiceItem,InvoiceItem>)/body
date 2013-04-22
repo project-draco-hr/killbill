@@ -1,19 +1,34 @@
 {
-  final Map<UUID,BigDecimal> cbaPerInvoice=new HashMap<UUID,BigDecimal>();
+  final Set<UUID> repairInvoiceBlackList=new HashSet<UUID>();
+  for (  final InvoiceItem repairInvoiceItem : repareeInvoiceItemToRepairItemMappings.values()) {
+    boolean shouldBlackList=true;
+    for (    final InvoiceItem invoiceItem : allInvoiceItems.get(repairInvoiceItem.getInvoiceId())) {
+      if (invoiceItem.getInvoiceItemType().equals(InvoiceItemType.CBA_ADJ) && invoiceItem.getAmount().compareTo(repairInvoiceItem.getAmount().negate()) == 0) {
+        shouldBlackList=false;
+      }
+    }
+    if (shouldBlackList) {
+      repairInvoiceBlackList.add(repairInvoiceItem.getInvoiceId());
+    }
+  }
+  final Map<UUID,BigDecimal> cbaAdjustmentPerInvoice=new HashMap<UUID,BigDecimal>();
   for (  final InvoiceItem repareeInvoiceItem : repareeInvoiceItemToRepairItemMappings.keySet()) {
-    if (cbaPerInvoice.get(repareeInvoiceItem.getInvoiceId()) == null) {
-      cbaPerInvoice.put(repareeInvoiceItem.getInvoiceId(),BigDecimal.ZERO);
-    }
-    final BigDecimal currentCBAForNewInvoice=cbaPerInvoice.get(repareeInvoiceItem.getInvoiceId());
-    final BigDecimal adjustedCBAForNewInvoice=currentCBAForNewInvoice.add(repareeInvoiceItem.getAmount());
-    cbaPerInvoice.put(repareeInvoiceItem.getInvoiceId(),adjustedCBAForNewInvoice);
     final InvoiceItem repairInvoiceItem=repareeInvoiceItemToRepairItemMappings.get(repareeInvoiceItem);
-    if (cbaPerInvoice.get(repairInvoiceItem.getInvoiceId()) == null) {
-      cbaPerInvoice.put(repairInvoiceItem.getInvoiceId(),BigDecimal.ZERO);
+    if (repairInvoiceBlackList.contains(repairInvoiceItem.getInvoiceId())) {
+      continue;
     }
-    final BigDecimal currentCBAForOriginalInvoice=cbaPerInvoice.get(repairInvoiceItem.getInvoiceId());
+    if (cbaAdjustmentPerInvoice.get(repairInvoiceItem.getInvoiceId()) == null) {
+      cbaAdjustmentPerInvoice.put(repairInvoiceItem.getInvoiceId(),BigDecimal.ZERO);
+    }
+    final BigDecimal currentCBAForOriginalInvoice=cbaAdjustmentPerInvoice.get(repairInvoiceItem.getInvoiceId());
     final BigDecimal adjustedCBAForOriginalInvoice=currentCBAForOriginalInvoice.add(repareeInvoiceItem.getAmount().negate());
-    cbaPerInvoice.put(repairInvoiceItem.getInvoiceId(),adjustedCBAForOriginalInvoice);
+    cbaAdjustmentPerInvoice.put(repairInvoiceItem.getInvoiceId(),adjustedCBAForOriginalInvoice);
+    if (cbaAdjustmentPerInvoice.get(repareeInvoiceItem.getInvoiceId()) == null) {
+      cbaAdjustmentPerInvoice.put(repareeInvoiceItem.getInvoiceId(),BigDecimal.ZERO);
+    }
+    final BigDecimal currentCBAForNewInvoice=cbaAdjustmentPerInvoice.get(repareeInvoiceItem.getInvoiceId());
+    final BigDecimal adjustedCBAForNewInvoice=currentCBAForNewInvoice.add(repareeInvoiceItem.getAmount());
+    cbaAdjustmentPerInvoice.put(repareeInvoiceItem.getInvoiceId(),adjustedCBAForNewInvoice);
   }
   final Collection<AdjustedCBAInvoiceItem> mergedCBAs=new LinkedList<AdjustedCBAInvoiceItem>();
   for (  final UUID invoiceId : allInvoiceItems.keySet()) {
@@ -29,7 +44,7 @@
     if (cbaItemsForInvoice.size() == 0) {
       continue;
     }
-    BigDecimal revenueRecognizableCBA=cbaPerInvoice.get(invoiceId);
+    BigDecimal revenueRecognizableCBA=cbaAdjustmentPerInvoice.get(invoiceId);
     if (revenueRecognizableCBA == null) {
       revenueRecognizableCBA=BigDecimal.ZERO;
     }
