@@ -1,0 +1,15 @@
+{
+  final Account account=getAccount(accountId,context);
+  final Long accountRecordId=getAccountRecordId(account.getId(),context);
+  final Long tenantRecordId=getTenantRecordId(context);
+  final ReportGroup reportGroup=getReportGroup(account.getId(),context);
+  final Collection<CustomField> fields=getFieldsForAccount(account.getId(),context);
+  final Collection<BusinessFieldModelDao> fieldModelDaos=new LinkedList<BusinessFieldModelDao>();
+  for (  final CustomField field : fields) {
+    final Long customFieldRecordId=getFieldRecordId(field.getId(),context);
+    final AuditLog creationAuditLog=getFieldCreationAuditLog(field.getId(),context);
+    final BusinessFieldModelDao fieldModelDao=BusinessFieldModelDao.create(account,accountRecordId,field,customFieldRecordId,creationAuditLog,tenantRecordId,reportGroup);
+    fieldModelDaos.add(fieldModelDao);
+  }
+  return fieldModelDaos;
+}

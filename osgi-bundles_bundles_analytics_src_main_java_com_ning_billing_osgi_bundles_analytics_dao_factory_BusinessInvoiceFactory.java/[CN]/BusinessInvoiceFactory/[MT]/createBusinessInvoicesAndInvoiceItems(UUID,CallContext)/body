@@ -1,0 +1,40 @@
+{
+  final Account account=getAccount(accountId,context);
+  final Long accountRecordId=getAccountRecordId(account.getId(),context);
+  final Long tenantRecordId=getTenantRecordId(context);
+  final ReportGroup reportGroup=getReportGroup(account.getId(),context);
+  final Collection<Invoice> invoices=getInvoicesByAccountId(account.getId(),context);
+  final Collection<InvoiceItem> allInvoiceItems=new LinkedList<InvoiceItem>();
+  final Map<UUID,Invoice> invoiceIdToInvoiceMappings=new LinkedHashMap<UUID,Invoice>();
+  for (  final Invoice invoice : invoices) {
+    invoiceIdToInvoiceMappings.put(invoice.getId(),invoice);
+    allInvoiceItems.addAll(invoice.getInvoiceItems());
+  }
+  final Collection<InvoiceItem> sanitizedInvoiceItems=sanitizeInvoiceItems(allInvoiceItems);
+  final Map<UUID,Collection<BusinessInvoiceItemBaseModelDao>> businessInvoiceItemsForInvoiceId=new HashMap<UUID,Collection<BusinessInvoiceItemBaseModelDao>>();
+  for (  final InvoiceItem invoiceItem : sanitizedInvoiceItems) {
+    final Invoice invoice=invoiceIdToInvoiceMappings.get(invoiceItem.getInvoiceId());
+    final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,Collections2.filter(sanitizedInvoiceItems,new Predicate<InvoiceItem>(){
+      @Override public boolean apply(      final InvoiceItem input){
+        return !input.getId().equals(invoiceItem.getId());
+      }
+    }
+),accountRecordId,tenantRecordId,reportGroup,context);
+    if (businessInvoiceItem != null) {
+      if (businessInvoiceItemsForInvoiceId.get(invoice.getId()) == null) {
+        businessInvoiceItemsForInvoiceId.put(invoice.getId(),new LinkedList<BusinessInvoiceItemBaseModelDao>());
+      }
+      businessInvoiceItemsForInvoiceId.get(invoice.getId()).add(businessInvoiceItem);
+    }
+  }
+  final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>> businessRecords=new HashMap<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>>();
+  for (  final Invoice invoice : invoices) {
+    final Collection<BusinessInvoiceItemBaseModelDao> businessInvoiceItems=businessInvoiceItemsForInvoiceId.get(invoice.getId());
+    if (businessInvoiceItems == null) {
+      continue;
+    }
+    final BusinessInvoiceModelDao businessInvoice=createBusinessInvoice(account,invoice,businessInvoiceItems,accountRecordId,tenantRecordId,reportGroup,context);
+    businessRecords.put(businessInvoice,businessInvoiceItems);
+  }
+  return businessRecords;
+}

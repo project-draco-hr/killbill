@@ -1,0 +1,13 @@
+{
+  final Account account=getAccount(accountId,context);
+  final ReportGroup reportGroup=getReportGroup(account.getId(),context);
+  final Map<UUID,Integer> rankForBundle=new LinkedHashMap<UUID,Integer>();
+  final Map<UUID,BusinessSubscriptionTransitionModelDao> bstForBundle=new LinkedHashMap<UUID,BusinessSubscriptionTransitionModelDao>();
+  filterBstsForBasePlans(bsts,rankForBundle,bstForBundle);
+  final Collection<BusinessBundleSummaryModelDao> bbss=new LinkedList<BusinessBundleSummaryModelDao>();
+  for (  final BusinessSubscriptionTransitionModelDao bst : bstForBundle.values()) {
+    final BusinessBundleSummaryModelDao bbs=buildBBS(account,accountRecordId,bst,rankForBundle.get(bst.getBundleId()),tenantRecordId,reportGroup,context);
+    bbss.add(bbs);
+  }
+  return bbss;
+}

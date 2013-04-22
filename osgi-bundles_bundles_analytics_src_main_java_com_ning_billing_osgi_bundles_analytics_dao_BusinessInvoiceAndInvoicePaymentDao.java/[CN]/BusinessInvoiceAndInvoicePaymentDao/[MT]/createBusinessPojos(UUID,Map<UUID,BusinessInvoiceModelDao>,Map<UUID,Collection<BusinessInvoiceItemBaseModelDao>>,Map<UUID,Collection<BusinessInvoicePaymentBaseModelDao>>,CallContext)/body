@@ -1,0 +1,20 @@
+{
+  final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>> businessInvoices=binFactory.createBusinessInvoicesAndInvoiceItems(accountId,context);
+  final Collection<BusinessInvoicePaymentBaseModelDao> businessInvoicePayments=bipFactory.createBusinessInvoicePayments(accountId,businessInvoices,context);
+  for (  final BusinessInvoiceModelDao businessInvoice : businessInvoices.keySet()) {
+    invoices.put(businessInvoice.getInvoiceId(),businessInvoice);
+    for (    final BusinessInvoiceItemBaseModelDao businessInvoiceItem : businessInvoices.get(businessInvoice)) {
+      if (invoiceItems.get(businessInvoice.getInvoiceId()) == null) {
+        invoiceItems.put(businessInvoice.getInvoiceId(),new LinkedList<BusinessInvoiceItemBaseModelDao>());
+      }
+      invoiceItems.get(businessInvoice.getInvoiceId()).add(businessInvoiceItem);
+    }
+  }
+  for (  final BusinessInvoicePaymentBaseModelDao businessInvoicePayment : businessInvoicePayments) {
+    if (invoicePayments.get(businessInvoicePayment.getInvoiceId()) == null) {
+      invoicePayments.put(businessInvoicePayment.getInvoiceId(),new LinkedList<BusinessInvoicePaymentBaseModelDao>());
+    }
+    invoicePayments.get(businessInvoicePayment.getInvoiceId()).add(businessInvoicePayment);
+  }
+  populatedMissingDenormalizedFields(invoices,invoiceItems,invoicePayments);
+}

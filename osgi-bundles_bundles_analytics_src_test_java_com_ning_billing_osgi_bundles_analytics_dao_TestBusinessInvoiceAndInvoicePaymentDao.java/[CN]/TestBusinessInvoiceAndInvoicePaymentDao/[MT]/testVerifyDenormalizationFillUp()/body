@@ -21,6 +21,7 @@
   final BigDecimal originalAmountCharged570=new BigDecimal("42.29");
   final BigDecimal amountCredited570=new BigDecimal("-42.29");
   final BigDecimal amountRefunded570=BigDecimal.ZERO;
+  Mockito.when(osgiKillbillApi.getAccountUserApi().getAccountById(account.getId(),callContext)).thenReturn(account);
   Mockito.when(osgiKillbillApi.getInvoiceUserApi().getInvoicesByAccount(account.getId(),callContext)).thenReturn(ImmutableList.<Invoice>of(invoice349,invoice570));
   Mockito.when(osgiKillbillApi.getInvoiceUserApi().getInvoice(invoice349Id,callContext)).thenReturn(invoice349);
   Mockito.when(osgiKillbillApi.getInvoiceUserApi().getInvoice(invoice570Id,callContext)).thenReturn(invoice570);
@@ -32,7 +33,7 @@
   final Map<UUID,BusinessInvoiceModelDao> invoices=new HashMap<UUID,BusinessInvoiceModelDao>();
   final Map<UUID,Collection<BusinessInvoiceItemBaseModelDao>> invoiceItems=new HashMap<UUID,Collection<BusinessInvoiceItemBaseModelDao>>();
   final Map<UUID,Collection<BusinessInvoicePaymentBaseModelDao>> invoicePayments=new HashMap<UUID,Collection<BusinessInvoicePaymentBaseModelDao>>();
-  dao.createBusinessPojos(account,invoices,invoiceItems,invoicePayments,callContext);
+  dao.createBusinessPojos(account.getId(),invoices,invoiceItems,invoicePayments,callContext);
   Assert.assertEquals(invoices.keySet().size(),2);
   Assert.assertEquals(invoices.get(invoice349Id).getBalance().compareTo(balance349),0);
   Assert.assertEquals(invoices.get(invoice349Id).getAmountPaid().compareTo(amountPaid349),0);
