@@ -4,6 +4,12 @@
     return paymentApi.getPayment(paymentId,true,context);
   }
  catch (  PaymentApiException e) {
+    logService.log(LogService.LOG_INFO,"Error retrieving payment with plugin info for id " + paymentId,e);
+  }
+  try {
+    return paymentApi.getPayment(paymentId,false,context);
+  }
+ catch (  PaymentApiException e) {
     logService.log(LogService.LOG_WARNING,"Error retrieving payment for id " + paymentId,e);
     throw new AnalyticsRefreshException(e);
   }
