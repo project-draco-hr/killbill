@@ -1,0 +1,29 @@
+{
+  final boolean withPartialRepair=false;
+  if (!withPartialRepair) {
+    proposedItems.add(candidateRepairItem);
+    return;
+  }
+  InvoiceItem repareeItem=null;
+  for (  final InvoiceItem cur : proposedItems) {
+    if (isRepareeItemForRepairedItem(repairedItem,cur)) {
+      if (repareeItem == null) {
+        repareeItem=cur;
+      }
+ else {
+        log.warn("Found multiple reparee item for repaired invoice item " + repairedItem.getId());
+      }
+    }
+  }
+  if (repareeItem == null) {
+    log.warn("Could not find reparee item for repaired invoice item " + repairedItem.getId());
+    proposedItems.add(candidateRepairItem);
+    return;
+  }
+  final BigDecimal partialRepairAmount=candidateRepairItem.getAmount().add(repareeItem.getAmount());
+  if (partialRepairAmount.compareTo(BigDecimal.ZERO) < 0) {
+    final RepairAdjInvoiceItem repairItem=new RepairAdjInvoiceItem(candidateRepairItem.getInvoiceId(),candidateRepairItem.getAccountId(),repareeItem.getEndDate(),candidateRepairItem.getEndDate(),partialRepairAmount,candidateRepairItem.getCurrency(),candidateRepairItem.getLinkedItemId());
+    proposedItems.remove(repareeItem);
+    proposedItems.add(repairItem);
+  }
+}
