@@ -2,6 +2,7 @@
   final BillingEventSet events=new MockBillingEventSet();
   final UUID subscriptionId=UUID.randomUUID();
   final UUID accountId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
   final int BILL_CYCLE_DAY=15;
   final Plan plan1=new MockPlan();
   final PlanPhase phase1=createMockMonthlyPlanPhase(null,ZERO,PhaseType.TRIAL);
@@ -9,11 +10,11 @@
   final PlanPhase phase2=createMockMonthlyPlanPhase(DISCOUNT_PRICE,null,PhaseType.DISCOUNT);
   final PlanPhase phase3=createMockMonthlyPlanPhase(new BigDecimal("19.95"),null,PhaseType.EVERGREEN);
   final LocalDate creationDate=new LocalDate(2012,3,6);
-  events.add(createBillingEvent(subscriptionId,creationDate,plan1,phase1,BILL_CYCLE_DAY));
+  events.add(createBillingEvent(subscriptionId,bundleId,creationDate,plan1,phase1,BILL_CYCLE_DAY));
   final LocalDate trialPhaseEndDate=creationDate.plusDays(30);
-  events.add(createBillingEvent(subscriptionId,trialPhaseEndDate,plan1,phase2,BILL_CYCLE_DAY));
+  events.add(createBillingEvent(subscriptionId,bundleId,trialPhaseEndDate,plan1,phase2,BILL_CYCLE_DAY));
   final LocalDate discountPhaseEndDate=trialPhaseEndDate.plusMonths(6);
-  events.add(createBillingEvent(subscriptionId,discountPhaseEndDate,plan1,phase3,BILL_CYCLE_DAY));
+  events.add(createBillingEvent(subscriptionId,bundleId,discountPhaseEndDate,plan1,phase3,BILL_CYCLE_DAY));
   final Invoice invoice1=generator.generateInvoice(accountId,events,null,creationDate,Currency.USD);
   assertNotNull(invoice1);
   assertEquals(invoice1.getNumberOfItems(),1);

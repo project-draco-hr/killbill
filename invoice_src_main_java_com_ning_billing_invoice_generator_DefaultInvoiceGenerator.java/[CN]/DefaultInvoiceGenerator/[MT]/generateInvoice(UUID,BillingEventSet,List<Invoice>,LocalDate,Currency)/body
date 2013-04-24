@@ -17,8 +17,8 @@
   final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),adjustedTargetDate,targetCurrency);
   final UUID invoiceId=invoice.getId();
   final List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,adjustedTargetDate,targetCurrency);
-  removeRepairedAndRepairInvoiceItems(existingItems);
-  removeMatchingInvoiceItems(proposedItems,existingItems);
+  removeRepairedAndRepairInvoiceItems(existingItems,proposedItems);
+  removeMatchingInvoiceItems(existingItems,proposedItems);
   addRepairItems(existingItems,proposedItems);
   invoice.addInvoiceItems(proposedItems);
   return proposedItems.size() != 0 ? invoice : null;

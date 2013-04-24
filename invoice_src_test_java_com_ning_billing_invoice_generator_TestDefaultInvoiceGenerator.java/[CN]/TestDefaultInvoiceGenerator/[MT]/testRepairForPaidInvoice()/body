@@ -6,7 +6,7 @@
   final MockInternationalPrice price10=new MockInternationalPrice(new DefaultPrice(TEN,Currency.USD));
   final PlanPhase originalPlanEvergreen=new MockPlanPhase(price10,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
   final BillingEventSet events=new MockBillingEventSet();
-  events.add(createBillingEvent(originalSubscription.getId(),april25,originalPlan,originalPlanEvergreen,25));
+  events.add(createBillingEvent(originalSubscription.getId(),originalSubscription.getBundleId(),april25,originalPlan,originalPlanEvergreen,25));
   final Invoice invoice1=generator.generateInvoice(accountId,events,null,april25,Currency.USD);
   printDetailInvoice(invoice1);
   assertEquals(invoice1.getNumberOfItems(),1);
@@ -19,14 +19,12 @@
   final Plan newPlan=new MockPlan("new plan");
   final MockInternationalPrice price5=new MockInternationalPrice(new DefaultPrice(FIVE,Currency.USD));
   final PlanPhase newPlanEvergreen=new MockPlanPhase(price5,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
-  events.add(createBillingEvent(newSubscription.getId(),april25,newPlan,newPlanEvergreen,25));
+  events.add(createBillingEvent(newSubscription.getId(),originalSubscription.getBundleId(),april25,newPlan,newPlanEvergreen,25));
   final Invoice invoice2=generator.generateInvoice(accountId,events,invoices,april25,Currency.USD);
   printDetailInvoice(invoice2);
-  assertEquals(invoice2.getNumberOfItems(),4);
+  assertEquals(invoice2.getNumberOfItems(),2);
   invoices.add(invoice2);
   distributeItems(invoices);
-  assertEquals(invoice1.getBalance().compareTo(ZERO),0);
-  assertEquals(invoice2.getBalance().compareTo(ZERO),0);
-  final BigDecimal creditBalance=invoice1.getCBAAmount().add(invoice2.getCBAAmount());
-  assertTrue(creditBalance.compareTo(FIVE) == 0);
+  assertEquals(invoice1.getBalance().compareTo(new BigDecimal("-10.0")),0);
+  assertEquals(invoice2.getBalance().compareTo(FIVE),0);
 }
