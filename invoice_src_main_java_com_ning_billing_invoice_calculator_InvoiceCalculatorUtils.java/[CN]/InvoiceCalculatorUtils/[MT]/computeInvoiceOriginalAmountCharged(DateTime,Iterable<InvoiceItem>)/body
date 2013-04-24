@@ -1,0 +1,12 @@
+{
+  BigDecimal amountCharged=BigDecimal.ZERO;
+  if (invoiceItems == null) {
+    return amountCharged;
+  }
+  for (  final InvoiceItem invoiceItem : invoiceItems) {
+    if (isCharge(invoiceItem) && invoiceItem.getCreatedDate().equals(invoiceCreatedDate)) {
+      amountCharged=amountCharged.add(invoiceItem.getAmount());
+    }
+  }
+  return amountCharged.setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
+}

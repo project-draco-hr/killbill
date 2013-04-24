@@ -1,4 +1,8 @@
 {
-  final InvoiceItemList invoiceItems=new InvoiceItemList(invoiceModelDao.getInvoiceItems());
-  return invoiceItems.getCBAAmount();
+  return InvoiceCalculatorUtils.computeInvoiceAmountCredited(Iterables.transform(invoiceModelDao.getInvoiceItems(),new Function<InvoiceItemModelDao,InvoiceItem>(){
+    @Override public InvoiceItem apply(    final InvoiceItemModelDao input){
+      return InvoiceItemFactory.fromModelDao(input);
+    }
+  }
+));
 }

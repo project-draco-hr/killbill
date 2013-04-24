@@ -1,0 +1,18 @@
+{
+  BigDecimal amountAdjusted=BigDecimal.ZERO;
+  if (invoiceItems == null) {
+    return amountAdjusted;
+  }
+  for (  final InvoiceItem invoiceItem : invoiceItems) {
+    final Iterable<InvoiceItem> otherInvoiceItems=Iterables.filter(invoiceItems,new Predicate<InvoiceItem>(){
+      @Override public boolean apply(      final InvoiceItem input){
+        return !input.getId().equals(invoiceItem.getId());
+      }
+    }
+);
+    if (InvoiceItemType.CREDIT_ADJ.equals(invoiceItem.getInvoiceItemType()) && (Iterables.size(otherInvoiceItems) == 1 && InvoiceItemType.CBA_ADJ.equals(otherInvoiceItems.iterator().next().getInvoiceItemType()) && otherInvoiceItems.iterator().next().getInvoiceId().equals(invoiceItem.getInvoiceId()) && otherInvoiceItems.iterator().next().getAmount().compareTo(invoiceItem.getAmount().negate()) == 0)) {
+      amountAdjusted=amountAdjusted.add(invoiceItem.getAmount());
+    }
+  }
+  return amountAdjusted.setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
+}
