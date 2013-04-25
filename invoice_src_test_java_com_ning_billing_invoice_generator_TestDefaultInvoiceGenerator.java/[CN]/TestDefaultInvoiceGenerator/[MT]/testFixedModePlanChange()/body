@@ -7,8 +7,9 @@
   final BillingEventSet events=new MockBillingEventSet();
   final UUID subscriptionId=UUID.randomUUID();
   final UUID accountId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
   final LocalDate startDate=new LocalDate(2011,1,1);
-  final BillingEvent event1=createBillingEvent(subscriptionId,startDate,plan1,phase1,1);
+  final BillingEvent event1=createBillingEvent(subscriptionId,bundleId,startDate,plan1,phase1,1);
   events.add(event1);
   final Invoice invoice1=generator.generateInvoice(accountId,events,null,startDate,Currency.USD);
   assertNotNull(invoice1);
@@ -17,7 +18,7 @@
   final List<Invoice> invoiceList=new ArrayList<Invoice>();
   invoiceList.add(invoice1);
   final LocalDate phaseChangeDate=startDate.plusMonths(1);
-  final BillingEvent event2=createBillingEvent(subscriptionId,phaseChangeDate,plan1,phase2,1);
+  final BillingEvent event2=createBillingEvent(subscriptionId,bundleId,phaseChangeDate,plan1,phase2,1);
   events.add(event2);
   final Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,phaseChangeDate,Currency.USD);
   assertNotNull(invoice2);
