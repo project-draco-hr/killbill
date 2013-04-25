@@ -5,21 +5,21 @@
   final BusinessInvoiceItemBaseModelDao businessCreditItem=invoiceFactory.createBusinessInvoiceItem(account,invoice,createInvoiceItem(invoiceId,InvoiceItemType.CBA_ADJ,new BigDecimal("10")),ImmutableList.<InvoiceItem>of(createInvoiceItem(invoiceId,InvoiceItemType.CREDIT_ADJ,new BigDecimal("-10"))),null,null,null,invoiceItemRecordId,auditLog,accountRecordId,tenantRecordId,reportGroup);
   Assert.assertEquals(businessCreditItem.getAmount().compareTo(new BigDecimal("10")),0);
   Assert.assertEquals(businessCreditItem.getItemType(),InvoiceItemType.CBA_ADJ.toString());
-  Assert.assertFalse(businessCreditItem.getRevenueRecognizable());
+  Assert.assertEquals(businessCreditItem.getItemSource(),ItemSource.user.toString());
   final BusinessInvoiceItemBaseModelDao businessInvoiceAdjustmentItem=invoiceFactory.createBusinessInvoiceItem(account,invoice,createInvoiceItem(invoiceId,InvoiceItemType.CREDIT_ADJ,new BigDecimal("-10")),ImmutableList.<InvoiceItem>of(createInvoiceItem(invoiceId,InvoiceItemType.RECURRING,new BigDecimal("10"))),null,null,null,invoiceItemRecordId,auditLog,accountRecordId,tenantRecordId,reportGroup);
   Assert.assertEquals(businessInvoiceAdjustmentItem.getAmount().compareTo(new BigDecimal("-10")),0);
   Assert.assertEquals(businessInvoiceAdjustmentItem.getItemType(),InvoiceItemType.CREDIT_ADJ.toString());
-  Assert.assertTrue(businessInvoiceAdjustmentItem.getRevenueRecognizable());
+  Assert.assertEquals(businessInvoiceAdjustmentItem.getItemSource(),ItemSource.user.toString());
   final BusinessInvoiceItemBaseModelDao businessRefundInvoiceAdjustmentItem=invoiceFactory.createBusinessInvoiceItem(account,invoice,createInvoiceItem(invoiceId,InvoiceItemType.REFUND_ADJ,new BigDecimal("-10")),ImmutableList.<InvoiceItem>of(createInvoiceItem(invoiceId,InvoiceItemType.RECURRING,new BigDecimal("10"))),null,null,null,invoiceItemRecordId,auditLog,accountRecordId,tenantRecordId,reportGroup);
   Assert.assertEquals(businessRefundInvoiceAdjustmentItem.getAmount().compareTo(new BigDecimal("-10")),0);
   Assert.assertEquals(businessRefundInvoiceAdjustmentItem.getItemType(),InvoiceItemType.REFUND_ADJ.toString());
-  Assert.assertTrue(businessRefundInvoiceAdjustmentItem.getRevenueRecognizable());
+  Assert.assertEquals(businessRefundInvoiceAdjustmentItem.getItemSource(),ItemSource.user.toString());
   final BusinessInvoiceItemBaseModelDao businessInvoiceItemAdjustmentItem=invoiceFactory.createBusinessInvoiceItem(account,invoice,createInvoiceItem(invoiceId,InvoiceItemType.ITEM_ADJ,new BigDecimal("-10")),ImmutableList.<InvoiceItem>of(createInvoiceItem(invoiceId,InvoiceItemType.RECURRING,new BigDecimal("10"))),null,null,null,invoiceItemRecordId,auditLog,accountRecordId,tenantRecordId,reportGroup);
   Assert.assertEquals(businessInvoiceItemAdjustmentItem.getAmount().compareTo(new BigDecimal("-10")),0);
   Assert.assertEquals(businessInvoiceItemAdjustmentItem.getItemType(),InvoiceItemType.ITEM_ADJ.toString());
-  Assert.assertTrue(businessInvoiceItemAdjustmentItem.getRevenueRecognizable());
+  Assert.assertEquals(businessInvoiceItemAdjustmentItem.getItemSource(),ItemSource.user.toString());
   final BusinessInvoiceItemBaseModelDao businessCBAItem=invoiceFactory.createBusinessInvoiceItem(account,invoice,createInvoiceItem(invoiceId,InvoiceItemType.CBA_ADJ,new BigDecimal("10")),ImmutableList.<InvoiceItem>of(createInvoiceItem(invoiceId,InvoiceItemType.RECURRING,new BigDecimal("30")),createInvoiceItem(invoiceId,InvoiceItemType.REPAIR_ADJ,new BigDecimal("-30")),createInvoiceItem(invoiceId,InvoiceItemType.RECURRING,new BigDecimal("20"))),null,null,null,invoiceItemRecordId,auditLog,accountRecordId,tenantRecordId,reportGroup);
   Assert.assertEquals(businessCBAItem.getAmount().compareTo(new BigDecimal("10")),0);
   Assert.assertEquals(businessCBAItem.getItemType(),InvoiceItemType.CBA_ADJ.toString());
-  Assert.assertTrue(businessCBAItem.getRevenueRecognizable());
+  Assert.assertEquals(businessCBAItem.getItemSource(),BusinessInvoiceItemBaseModelDao.DEFAULT_ITEM_SOURCE);
 }

@@ -1,6 +1,6 @@
 {
   final BusinessInvoiceModelDao invoiceModelDao=new BusinessInvoiceModelDao(account,accountRecordId,invoice,invoiceRecordId,auditLog,tenantRecordId,reportGroup);
-  final BusinessInvoiceItemBaseModelDao invoiceItemBaseModelDao=BusinessInvoiceItemBaseModelDao.create(account,accountRecordId,invoice,invoiceItem,recognizable,invoiceItemType,invoiceItemRecordId,secondInvoiceItemRecordId,bundle,plan,phase,auditLog,tenantRecordId,reportGroup);
+  final BusinessInvoiceItemBaseModelDao invoiceItemBaseModelDao=BusinessInvoiceItemBaseModelDao.create(account,accountRecordId,invoice,invoiceItem,itemSource,invoiceItemType,invoiceItemRecordId,secondInvoiceItemRecordId,bundle,plan,phase,auditLog,tenantRecordId,reportGroup);
   final BusinessInvoice businessInvoice=new BusinessInvoice(invoiceModelDao,ImmutableList.<BusinessInvoiceItemBaseModelDao>of(invoiceItemBaseModelDao));
   verifyBusinessEntityBase(businessInvoice);
   Assert.assertEquals(businessInvoice.getCreatedDate(),invoiceModelDao.getCreatedDate());
@@ -31,7 +31,7 @@
   Assert.assertEquals(businessInvoiceItem.getInvoiceOriginalAmountCharged(),invoiceItemBaseModelDao.getInvoiceOriginalAmountCharged());
   Assert.assertEquals(businessInvoiceItem.getInvoiceAmountCredited(),invoiceItemBaseModelDao.getInvoiceAmountCredited());
   Assert.assertEquals(businessInvoiceItem.getItemType(),invoiceItemBaseModelDao.getItemType());
-  Assert.assertEquals(businessInvoiceItem.getRecognizable(),invoiceItemBaseModelDao.getRevenueRecognizable());
+  Assert.assertEquals(businessInvoiceItem.getItemSource(),invoiceItemBaseModelDao.getItemSource());
   Assert.assertEquals(businessInvoiceItem.getBundleExternalKey(),invoiceItemBaseModelDao.getBundleExternalKey());
   Assert.assertEquals(businessInvoiceItem.getProductName(),invoiceItemBaseModelDao.getProductName());
   Assert.assertEquals(businessInvoiceItem.getProductType(),invoiceItemBaseModelDao.getProductType());
