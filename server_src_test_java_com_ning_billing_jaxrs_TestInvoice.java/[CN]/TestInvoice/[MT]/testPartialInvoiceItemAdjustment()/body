@@ -9,6 +9,6 @@
   final BigDecimal adjustedAmount=invoiceItem.getAmount().divide(BigDecimal.TEN);
   adjustInvoiceItem(accountJson.getAccountId(),invoice.getInvoiceId(),invoiceItem.getInvoiceItemId(),null,adjustedAmount,null);
   final InvoiceJsonSimple adjustedInvoice=getInvoice(invoice.getInvoiceId());
-  final BigDecimal adjustedInvoiceBalance=invoice.getBalance().add(adjustedAmount.negate().setScale(2,RoundingMode.HALF_UP));
+  final BigDecimal adjustedInvoiceBalance=invoice.getBalance().add(adjustedAmount.negate()).setScale(2,BigDecimal.ROUND_HALF_UP);
   assertEquals(adjustedInvoice.getBalance().compareTo(adjustedInvoiceBalance),0);
 }
