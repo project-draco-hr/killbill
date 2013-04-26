@@ -1,0 +1,17 @@
+{
+  String dateInput=new String("2012-05-01T23:17:41.000Z");
+  DateTime inputDate=DATE_TIME_FORMATTER.parseDateTime(dateInput);
+  System.out.println("(1) inputDate = " + inputDate + ", inputDate.plusMonths(1) = "+ inputDate.plusMonths(1));
+  System.out.println("(2) inputDate = " + inputDate + ", inputDate.plusMonths(1) = "+ inputDate.plus(Months.months(1)));
+  final DateTime now=new DateTime(DateTimeZone.UTC);
+  MutablePeriod delta=new MutablePeriod(now,inputDate);
+  final DateTime inputDateWithDelta=now.plus(delta);
+  ReadablePeriod period=Months.months(1);
+  delta.add(period);
+  System.out.println("(3) inputDate = " + inputDateWithDelta + ", inputDate.plusMonths(1) = "+ inputDateWithDelta.plusMonths(1));
+  System.out.println("(4) inputDate = " + inputDateWithDelta + ", inputDate.plusMonths(1) = "+ new DateTime(DateTimeZone.UTC).plus(delta));
+  period=Months.months(1);
+  delta.add(period);
+  System.out.println("(5) inputDate = " + inputDateWithDelta + ", inputDate.plusMonths(1) = "+ new DateTime(DateTimeZone.UTC).plus(delta));
+  Thread.sleep(1000);
+}

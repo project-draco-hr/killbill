@@ -25,12 +25,14 @@
  else {
       log.info("Generated invoice {} with {} items for accountId {} and targetDate {} (targetDateTime {})",new Object[]{invoice.getId(),invoice.getNumberOfItems(),accountId,targetDate,targetDateTime});
       if (!dryRun) {
-        final boolean isRealInvoiceWithItems=Collections2.filter(invoice.getInvoiceItems(),new Predicate<InvoiceItem>(){
-          @Override public boolean apply(          final InvoiceItem input){
-            return input.getInvoiceId().equals(invoice.getId());
+        final Set<UUID> adjustedUniqueOtherInvoiceId=new TreeSet<UUID>();
+        adjustedUniqueOtherInvoiceId.addAll(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,UUID>(){
+          @Nullable @Override public UUID apply(          @Nullable final InvoiceItem input){
+            return input.getInvoiceId();
           }
         }
-).size() > 0;
+));
+        final boolean isRealInvoiceWithItems=adjustedUniqueOtherInvoiceId.remove(invoice.getId());
         final InvoiceModelDao invoiceModelDao=new InvoiceModelDao(invoice);
         final List<InvoiceItemModelDao> invoiceItemModelDaos=ImmutableList.<InvoiceItemModelDao>copyOf(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,InvoiceItemModelDao>(){
           @Override public InvoiceItemModelDao apply(          final InvoiceItem input){
@@ -49,8 +51,15 @@
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         setChargedThroughDates(dateAndTimeZoneContext,fixedPriceInvoiceItems,recurringInvoiceItems,context);
-        final InvoiceCreationInternalEvent event=new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+        final List<InvoiceInternalEvent> events=new ArrayList<InvoiceInternalEvent>();
         if (isRealInvoiceWithItems) {
+          events.add(new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId()));
+        }
+        for (        UUID cur : adjustedUniqueOtherInvoiceId) {
+          final InvoiceAdjustmentInternalEvent event=new DefaultInvoiceAdjustmentEvent(cur,invoice.getAccountId(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+          events.add(event);
+        }
+        for (        InvoiceInternalEvent event : events) {
           postEvent(event,accountId,context);
         }
       }
