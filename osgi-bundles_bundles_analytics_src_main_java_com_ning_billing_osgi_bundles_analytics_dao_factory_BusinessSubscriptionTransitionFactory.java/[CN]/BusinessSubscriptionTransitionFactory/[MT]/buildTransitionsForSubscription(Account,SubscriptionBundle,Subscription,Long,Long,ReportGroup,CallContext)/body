@@ -1,0 +1,14 @@
+{
+  final Collection<BusinessSubscriptionTransitionModelDao> bsts=new LinkedList<BusinessSubscriptionTransitionModelDao>();
+  final List<SubscriptionTransition> transitions=subscription.getAllTransitions();
+  BusinessSubscription prevNextSubscription=null;
+  for (  final SubscriptionTransition transition : transitions) {
+    final BusinessSubscription nextSubscription=getBusinessSubscriptionFromTransition(account,transition);
+    final BusinessSubscriptionTransitionModelDao bst=createBusinessSubscriptionTransition(account,accountRecordId,bundle,transition,prevNextSubscription,nextSubscription,tenantRecordId,reportGroup,context);
+    if (bst != null) {
+      bsts.add(bst);
+      prevNextSubscription=nextSubscription;
+    }
+  }
+  return bsts;
+}
