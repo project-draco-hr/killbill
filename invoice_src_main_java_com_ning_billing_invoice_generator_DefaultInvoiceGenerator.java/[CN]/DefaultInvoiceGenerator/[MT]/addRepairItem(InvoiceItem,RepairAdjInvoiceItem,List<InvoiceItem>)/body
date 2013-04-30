@@ -1,23 +1,46 @@
 {
-  InvoiceItem repareeItem=null;
+  int nbTotalRepaireeDays=0;
+  BigDecimal totalRepareeItemAmount=candidateRepairItem.getAmount();
+  final List<InvoiceItem> reparees=new ArrayList<InvoiceItem>();
   for (  final InvoiceItem cur : proposedItems) {
     if (isRepareeItemForRepairedItem(repairedItem,cur)) {
-      if (repareeItem == null) {
-        repareeItem=cur;
-      }
- else {
-        log.warn("Found multiple reparee item for repaired invoice item " + repairedItem.getId());
-      }
+      nbTotalRepaireeDays+=Days.daysBetween(cur.getStartDate(),cur.getEndDate()).getDays();
+      reparees.add(cur);
+      totalRepareeItemAmount=totalRepareeItemAmount.add(cur.getAmount());
     }
   }
-  if (repareeItem == null) {
+  int nbTotalRepairedDays=Days.daysBetween(candidateRepairItem.getStartDate(),candidateRepairItem.getEndDate()).getDays() - nbTotalRepaireeDays;
+  if (reparees.size() == 0) {
     proposedItems.add(candidateRepairItem);
     return;
   }
-  final BigDecimal partialRepairAmount=candidateRepairItem.getAmount().add(repareeItem.getAmount());
-  if (partialRepairAmount.compareTo(BigDecimal.ZERO) < 0) {
-    final RepairAdjInvoiceItem repairItem=new RepairAdjInvoiceItem(candidateRepairItem.getInvoiceId(),candidateRepairItem.getAccountId(),repareeItem.getEndDate(),candidateRepairItem.getEndDate(),partialRepairAmount,candidateRepairItem.getCurrency(),candidateRepairItem.getLinkedItemId());
-    proposedItems.remove(repareeItem);
-    proposedItems.add(repairItem);
+  Collections.sort(reparees,new Comparator<InvoiceItem>(){
+    @Override public int compare(    final InvoiceItem o1,    final InvoiceItem o2){
+      return o1.getStartDate().compareTo(o2.getStartDate());
+    }
   }
+);
+  BigDecimal totalRepairItemAmount=BigDecimal.ZERO;
+  List<InvoiceItem> repairedItems=new ArrayList<InvoiceItem>();
+  InvoiceItem prevReparee=null;
+  final Iterator<InvoiceItem> it=reparees.iterator();
+  while (it.hasNext()) {
+    final InvoiceItem nextReparee=it.next();
+    if (prevReparee != null) {
+      final BigDecimal repairItemAmount=(nextReparee.getEndDate().compareTo(candidateRepairItem.getEndDate()) != 0) ? InvoiceDateUtils.calculateProrationBetweenDates(prevReparee.getEndDate(),nextReparee.getStartDate(),nbTotalRepairedDays).multiply(totalRepareeItemAmount) : totalRepareeItemAmount.subtract(totalRepairItemAmount);
+      totalRepairItemAmount=totalRepairItemAmount.add(repairItemAmount);
+      final RepairAdjInvoiceItem repairItem=new RepairAdjInvoiceItem(candidateRepairItem.getInvoiceId(),candidateRepairItem.getAccountId(),prevReparee.getEndDate(),nextReparee.getStartDate(),repairItemAmount,candidateRepairItem.getCurrency(),repairedItem.getId());
+      repairedItems.add(repairItem);
+    }
+    prevReparee=nextReparee;
+  }
+  if (prevReparee.getEndDate().compareTo(candidateRepairItem.getEndDate()) != 0) {
+    final BigDecimal repairItemAmount=totalRepareeItemAmount.subtract(totalRepairItemAmount);
+    final RepairAdjInvoiceItem repairItem=new RepairAdjInvoiceItem(candidateRepairItem.getInvoiceId(),candidateRepairItem.getAccountId(),prevReparee.getEndDate(),candidateRepairItem.getEndDate(),repairItemAmount,candidateRepairItem.getCurrency(),repairedItem.getId());
+    repairedItems.add(repairItem);
+  }
+  for (  InvoiceItem reparee : reparees) {
+    proposedItems.remove(reparee);
+  }
+  proposedItems.addAll(repairedItems);
 }
