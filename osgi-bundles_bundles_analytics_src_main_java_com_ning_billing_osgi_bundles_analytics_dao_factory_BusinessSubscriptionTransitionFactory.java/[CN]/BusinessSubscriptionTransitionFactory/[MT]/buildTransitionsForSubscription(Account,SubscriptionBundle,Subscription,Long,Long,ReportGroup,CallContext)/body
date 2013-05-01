@@ -10,5 +10,14 @@
       prevNextSubscription=nextSubscription;
     }
   }
+  final Iterator<BusinessSubscriptionTransitionModelDao> bstIterator=bsts.iterator();
+  if (bstIterator.hasNext()) {
+    BusinessSubscriptionTransitionModelDao prevBst=bstIterator.next();
+    while (bstIterator.hasNext()) {
+      final BusinessSubscriptionTransitionModelDao nextBst=bstIterator.next();
+      prevBst.setNextEndDate(nextBst.getNextStartDate());
+      prevBst=nextBst;
+    }
+  }
   return bsts;
 }
