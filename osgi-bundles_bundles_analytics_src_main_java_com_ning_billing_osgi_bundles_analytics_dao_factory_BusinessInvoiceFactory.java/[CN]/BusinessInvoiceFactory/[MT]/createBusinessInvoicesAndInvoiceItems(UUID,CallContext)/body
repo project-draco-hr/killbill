@@ -10,18 +10,28 @@
     invoiceIdToInvoiceMappings.put(invoice.getId(),invoice);
     allInvoiceItems.get(invoice.getId()).addAll(invoice.getInvoiceItems());
   }
+  final CompletionService<BusinessInvoiceItemBaseModelDao> completionService=new ExecutorCompletionService<BusinessInvoiceItemBaseModelDao>(executor);
   final Multimap<UUID,BusinessInvoiceItemBaseModelDao> businessInvoiceItemsForInvoiceId=ArrayListMultimap.<UUID,BusinessInvoiceItemBaseModelDao>create();
   for (  final InvoiceItem invoiceItem : allInvoiceItems.values()) {
-    final Invoice invoice=invoiceIdToInvoiceMappings.get(invoiceItem.getInvoiceId());
-    final Collection<InvoiceItem> otherInvoiceItems=Collections2.filter(allInvoiceItems.values(),new Predicate<InvoiceItem>(){
-      @Override public boolean apply(      final InvoiceItem input){
-        return input.getId() != null && !input.getId().equals(invoiceItem.getId());
+    completionService.submit(new Callable<BusinessInvoiceItemBaseModelDao>(){
+      @Override public BusinessInvoiceItemBaseModelDao call() throws Exception {
+        return createBusinessInvoiceItem(invoiceItem,allInvoiceItems,invoiceIdToInvoiceMappings,account,accountRecordId,tenantRecordId,reportGroup,context);
       }
     }
 );
-    final BusinessInvoiceItemBaseModelDao businessInvoiceItem=createBusinessInvoiceItem(account,invoice,invoiceItem,otherInvoiceItems,accountRecordId,tenantRecordId,reportGroup,context);
-    if (businessInvoiceItem != null) {
-      businessInvoiceItemsForInvoiceId.get(invoice.getId()).add(businessInvoiceItem);
+  }
+  for (int i=0; i < allInvoiceItems.values().size(); ++i) {
+    try {
+      final BusinessInvoiceItemBaseModelDao businessInvoiceItemModelDao=completionService.take().get();
+      if (businessInvoiceItemModelDao != null) {
+        businessInvoiceItemsForInvoiceId.get(businessInvoiceItemModelDao.getInvoiceId()).add(businessInvoiceItemModelDao);
+      }
+    }
+ catch (    InterruptedException e) {
+      throw new AnalyticsRefreshException(e);
+    }
+catch (    ExecutionException e) {
+      throw new AnalyticsRefreshException(e);
     }
   }
   final Map<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>> businessRecords=new HashMap<BusinessInvoiceModelDao,Collection<BusinessInvoiceItemBaseModelDao>>();

@@ -1,0 +1,9 @@
+{
+  final BusinessTagModelDao businessTagModelDao=new BusinessBundleTagModelDao(account,accountRecordId,tag,tagRecordId,tagDefinition,auditLog,tenantRecordId,reportGroup);
+  Assert.assertEquals(analyticsSqlDao.getBundleTagsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),0);
+  analyticsSqlDao.create(businessTagModelDao.getTableName(),businessTagModelDao,callContext);
+  Assert.assertEquals(analyticsSqlDao.getBundleTagsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),1);
+  Assert.assertEquals(analyticsSqlDao.getBundleTagsByAccountRecordId(accountRecordId,tenantRecordId,callContext).get(0),businessTagModelDao);
+  analyticsSqlDao.deleteByAccountRecordId(businessTagModelDao.getTableName(),accountRecordId,tenantRecordId,callContext);
+  Assert.assertEquals(analyticsSqlDao.getBundleTagsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),0);
+}

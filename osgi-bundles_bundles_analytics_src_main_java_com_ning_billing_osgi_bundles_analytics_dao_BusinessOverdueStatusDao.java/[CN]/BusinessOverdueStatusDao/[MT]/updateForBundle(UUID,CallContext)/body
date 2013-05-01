@@ -1,4 +1,5 @@
 {
+  logService.log(LogService.LOG_INFO,"Starting rebuild of Analytics overdue states for account " + accountId);
   final Collection<BusinessOverdueStatusModelDao> businessOverdueStatuses=bosFactory.createBusinessOverdueStatuses(accountId,context);
   sqlDao.inTransaction(new Transaction<Void,BusinessAnalyticsSqlDao>(){
     @Override public Void inTransaction(    final BusinessAnalyticsSqlDao transactional,    final TransactionStatus status) throws Exception {
@@ -7,4 +8,5 @@
     }
   }
 );
+  logService.log(LogService.LOG_INFO,"Finished rebuild of Analytics overdue states for account " + accountId);
 }
