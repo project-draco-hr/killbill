@@ -1,8 +1,25 @@
 {
+  final CompletionService<Collection<BusinessOverdueStatusModelDao>> completionService=new ExecutorCompletionService<Collection<BusinessOverdueStatusModelDao>>(executor);
   final Collection<SubscriptionBundle> bundles=getSubscriptionBundlesForAccount(accountId,context);
   final Collection<BusinessOverdueStatusModelDao> businessOverdueStatuses=new LinkedList<BusinessOverdueStatusModelDao>();
   for (  final SubscriptionBundle bundle : bundles) {
-    businessOverdueStatuses.addAll(createBusinessOverdueStatusesForBundle(accountId,bundle,context));
+    completionService.submit(new Callable<Collection<BusinessOverdueStatusModelDao>>(){
+      @Override public Collection<BusinessOverdueStatusModelDao> call() throws Exception {
+        return createBusinessOverdueStatusesForBundle(accountId,bundle,context);
+      }
+    }
+);
+  }
+  for (  final SubscriptionBundle ignored : bundles) {
+    try {
+      businessOverdueStatuses.addAll(completionService.take().get());
+    }
+ catch (    InterruptedException e) {
+      throw new AnalyticsRefreshException(e);
+    }
+catch (    ExecutionException e) {
+      throw new AnalyticsRefreshException(e);
+    }
   }
   return businessOverdueStatuses;
 }

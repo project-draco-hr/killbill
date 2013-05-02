@@ -16,18 +16,37 @@
       lastPayment=payment;
     }
   }
+  final CompletionService<Void> completionService=new ExecutorCompletionService<Void>(executor);
   final List<SubscriptionBundle> bundles=getSubscriptionBundlesForAccount(account.getId(),context);
-  int nbActiveBundles=0;
+  final AtomicInteger nbActiveBundles=new AtomicInteger(0);
   for (  final SubscriptionBundle bundle : bundles) {
-    final Collection<Subscription> subscriptionsForBundle=getSubscriptionsForBundle(bundle.getId(),context);
-    for (    final Subscription subscription : subscriptionsForBundle) {
-      if (ProductCategory.BASE.equals(subscription.getCategory()) && !(subscription.getEndDate() != null && !subscription.getEndDate().isAfterNow())) {
-        nbActiveBundles++;
+    completionService.submit(new Callable<Void>(){
+      @Override public Void call() throws Exception {
+        final Collection<Subscription> subscriptionsForBundle=getSubscriptionsForBundle(bundle.getId(),context);
+        for (        final Subscription subscription : subscriptionsForBundle) {
+          if (ProductCategory.BASE.equals(subscription.getCategory()) && !(subscription.getEndDate() != null && !subscription.getEndDate().isAfterNow())) {
+            nbActiveBundles.incrementAndGet();
+            break;
+          }
+        }
+        return null;
       }
+    }
+);
+  }
+  for (  final SubscriptionBundle ignored : bundles) {
+    try {
+      completionService.take().get();
+    }
+ catch (    InterruptedException e) {
+      throw new AnalyticsRefreshException(e);
+    }
+catch (    ExecutionException e) {
+      throw new AnalyticsRefreshException(e);
     }
   }
   final Long accountRecordId=getAccountRecordId(account.getId(),context);
   final Long tenantRecordId=getTenantRecordId(context);
   final ReportGroup reportGroup=getReportGroup(account.getId(),context);
-  return new BusinessAccountModelDao(account,accountRecordId,accountBalance,lastInvoice,lastPayment,nbActiveBundles,creationAuditLog,tenantRecordId,reportGroup);
+  return new BusinessAccountModelDao(account,accountRecordId,accountBalance,lastInvoice,lastPayment,nbActiveBundles.get(),creationAuditLog,tenantRecordId,reportGroup);
 }

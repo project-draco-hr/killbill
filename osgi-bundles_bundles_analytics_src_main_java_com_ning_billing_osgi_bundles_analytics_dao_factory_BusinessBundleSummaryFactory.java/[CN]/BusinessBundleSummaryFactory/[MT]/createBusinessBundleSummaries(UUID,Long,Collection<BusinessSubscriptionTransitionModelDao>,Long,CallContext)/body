@@ -4,10 +4,26 @@
   final Map<UUID,Integer> rankForBundle=new LinkedHashMap<UUID,Integer>();
   final Map<UUID,BusinessSubscriptionTransitionModelDao> bstForBundle=new LinkedHashMap<UUID,BusinessSubscriptionTransitionModelDao>();
   filterBstsForBasePlans(bsts,rankForBundle,bstForBundle);
+  final CompletionService<BusinessBundleSummaryModelDao> completionService=new ExecutorCompletionService<BusinessBundleSummaryModelDao>(executor);
   final Collection<BusinessBundleSummaryModelDao> bbss=new LinkedList<BusinessBundleSummaryModelDao>();
   for (  final BusinessSubscriptionTransitionModelDao bst : bstForBundle.values()) {
-    final BusinessBundleSummaryModelDao bbs=buildBBS(account,accountRecordId,bst,rankForBundle.get(bst.getBundleId()),tenantRecordId,reportGroup,context);
-    bbss.add(bbs);
+    completionService.submit(new Callable<BusinessBundleSummaryModelDao>(){
+      @Override public BusinessBundleSummaryModelDao call() throws Exception {
+        return buildBBS(account,accountRecordId,bst,rankForBundle.get(bst.getBundleId()),tenantRecordId,reportGroup,context);
+      }
+    }
+);
+  }
+  for (  final BusinessSubscriptionTransitionModelDao ignored : bstForBundle.values()) {
+    try {
+      bbss.add(completionService.take().get());
+    }
+ catch (    InterruptedException e) {
+      throw new AnalyticsRefreshException(e);
+    }
+catch (    ExecutionException e) {
+      throw new AnalyticsRefreshException(e);
+    }
   }
   return bbss;
 }

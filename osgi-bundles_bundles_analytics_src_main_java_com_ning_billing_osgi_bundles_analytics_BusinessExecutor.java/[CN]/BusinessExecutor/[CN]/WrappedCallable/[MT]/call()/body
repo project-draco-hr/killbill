@@ -1,0 +1,17 @@
+{
+  final Thread currentThread=Thread.currentThread();
+  try {
+    return callable.call();
+  }
+ catch (  Exception e) {
+    logService.log(LogService.LOG_DEBUG,currentThread + " ended with an exception",e);
+    throw e;
+  }
+catch (  Error e) {
+    logService.log(LogService.LOG_ERROR,currentThread + " ended with an exception",e);
+    throw e;
+  }
+ finally {
+    logService.log(LogService.LOG_DEBUG,currentThread + " finished executing");
+  }
+}

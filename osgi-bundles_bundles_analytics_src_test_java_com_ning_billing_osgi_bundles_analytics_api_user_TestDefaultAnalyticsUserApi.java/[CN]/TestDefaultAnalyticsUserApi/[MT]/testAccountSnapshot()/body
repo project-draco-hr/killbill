@@ -1,7 +1,7 @@
 {
   final BusinessAccountModelDao accountModelDao=new BusinessAccountModelDao(account,accountRecordId,BigDecimal.ONE,invoice,payment,3,auditLog,tenantRecordId,reportGroup);
   analyticsSqlDao.create(accountModelDao.getTableName(),accountModelDao,callContext);
-  final AnalyticsUserApi analyticsUserApi=new AnalyticsUserApi(logService,killbillAPI,killbillDataSource);
+  final AnalyticsUserApi analyticsUserApi=new AnalyticsUserApi(logService,killbillAPI,killbillDataSource,BusinessExecutor.create(logService));
   final BusinessSnapshot businessSnapshot=analyticsUserApi.getBusinessSnapshot(account.getId(),callContext);
   Assert.assertEquals(businessSnapshot.getBusinessAccount(),new BusinessAccount(accountModelDao));
 }
