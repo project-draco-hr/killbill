@@ -1,14 +1,9 @@
 {
-  final List<AuditLog> auditLogs=new ArrayList<AuditLog>();
-  Long targetRecordId=auditSqlDao.getRecordIdForTable(tableName.getTableName().toLowerCase(),objectId.toString(),context);
-  final List<Long> recordIds=auditSqlDao.getHistoryRecordIdsForTable(tableName.getHistoryTableName().getTableName().toLowerCase(),targetRecordId,context);
-  if (recordIds == null) {
-    return auditLogs;
+  final TableName historyTableName=tableName.getHistoryTableName();
+  if (historyTableName == null) {
+    throw new IllegalStateException("History table shouldn't be null for " + tableName);
   }
- else {
-    for (    final Long recordId : recordIds) {
-      auditLogs.addAll(getAuditLogsForRecordId(tableName.getHistoryTableName(),recordId,auditLevel,context));
-    }
-    return auditLogs;
-  }
+  final Long targetRecordId=nonEntitySqlDao.getRecordIdFromObject(objectId.toString(),tableName.getTableName());
+  final List<AuditLog> allAuditLogs=auditSqlDao.getAuditLogsViaHistoryForTargetRecordId(historyTableName,historyTableName.getTableName().toLowerCase(),targetRecordId,context);
+  return buildAuditLogs(auditLevel,allAuditLogs);
 }
