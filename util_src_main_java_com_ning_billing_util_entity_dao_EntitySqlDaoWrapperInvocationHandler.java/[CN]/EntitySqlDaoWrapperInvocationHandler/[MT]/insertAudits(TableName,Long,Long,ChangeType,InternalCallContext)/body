@@ -1,0 +1,13 @@
+{
+  final TableName destinationTableName=Objects.firstNonNull(tableName.getHistoryTableName(),tableName);
+  final EntityAudit audit=new EntityAudit(destinationTableName,historyRecordId,changeType,clock.getUTCNow());
+  sqlDao.insertAuditFromTransaction(audit,context);
+  if (tableName.getHistoryTableName() != null) {
+    final String key=buildCacheKey(ImmutableMap.<Integer,Object>of(0,tableName.getHistoryTableName(),1,tableName.getHistoryTableName(),2,entityRecordId));
+    cacheControllerDispatcher.getCacheController(CacheType.AUDIT_LOG_VIA_HISTORY).remove(key);
+  }
+ else {
+    final String key=buildCacheKey(ImmutableMap.<Integer,Object>of(0,tableName,1,entityRecordId));
+    cacheControllerDispatcher.getCacheController(CacheType.AUDIT_LOG).remove(key);
+  }
+}
