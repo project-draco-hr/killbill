@@ -1,0 +1,20 @@
+{
+  boolean gotIt=false;
+  try {
+    voidPluginDispatcher.dispatchWithAccountLockAndTimeout(new Callable<Void>(){
+      @Override public Void call() throws Exception {
+        Thread.sleep(1000);
+        return null;
+      }
+    }
+,100,TimeUnit.MILLISECONDS);
+    Assert.fail("Failed : should have had Timeout exception");
+  }
+ catch (  TimeoutException e) {
+    gotIt=true;
+  }
+catch (  PaymentApiException e) {
+    Assert.fail("Failed : should have had Timeout exception");
+  }
+  Assert.assertTrue(gotIt);
+}

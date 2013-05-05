@@ -1,0 +1,19 @@
+{
+  boolean gotIt=false;
+  try {
+    voidPluginDispatcher.dispatchWithAccountLockAndTimeout(new Callable<Void>(){
+      @Override public Void call() throws Exception {
+        throw new PaymentApiException(ErrorCode.PAYMENT_ADD_PAYMENT_METHOD,"foo","foo");
+      }
+    }
+,100,TimeUnit.MILLISECONDS);
+    Assert.fail("Failed : should have had Timeout exception");
+  }
+ catch (  TimeoutException e) {
+    Assert.fail("Failed : should have had PaymentApiException exception");
+  }
+catch (  PaymentApiException e) {
+    gotIt=true;
+  }
+  Assert.assertTrue(gotIt);
+}
