@@ -1,0 +1,18 @@
+{
+  final CacheManager cacheManager;
+  try {
+    cacheManager=CacheManager.create(EhCacheCacheManagerProvider.class.getResource(cacheConfig.getCacheConfigLocation()).openStream());
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  for (  final BaseCacheLoader cacheLoader : cacheLoaders) {
+    cacheLoader.init();
+    final Cache cache=cacheManager.getCache(cacheLoader.getCacheType().getCacheName());
+    for (    final CacheLoader existingCacheLoader : cache.getRegisteredCacheLoaders()) {
+      cache.unregisterCacheLoader(existingCacheLoader);
+    }
+    cache.registerCacheLoader(cacheLoader);
+  }
+  return cacheManager;
+}

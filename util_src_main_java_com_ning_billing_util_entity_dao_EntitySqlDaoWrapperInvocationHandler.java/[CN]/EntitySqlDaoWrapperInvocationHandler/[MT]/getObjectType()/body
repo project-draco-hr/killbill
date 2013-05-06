@@ -1,25 +1,29 @@
 {
   int foundIndexForEntitySqlDao=-1;
   for (int i=0; i < sqlDaoClass.getGenericInterfaces().length; i++) {
-    if (EntitySqlDao.class.getName().equals(((Class)((java.lang.reflect.ParameterizedType)sqlDaoClass.getGenericInterfaces()[0]).getRawType()).getName())) {
+    final Type type=sqlDaoClass.getGenericInterfaces()[0];
+    if (!(type instanceof java.lang.reflect.ParameterizedType)) {
+      return null;
+    }
+    if (EntitySqlDao.class.getName().equals(((Class)((java.lang.reflect.ParameterizedType)type).getRawType()).getName())) {
       foundIndexForEntitySqlDao=i;
       break;
     }
   }
   if (foundIndexForEntitySqlDao >= 0) {
-    Type[] types=((java.lang.reflect.ParameterizedType)sqlDaoClass.getGenericInterfaces()[foundIndexForEntitySqlDao]).getActualTypeArguments();
+    final Type[] types=((java.lang.reflect.ParameterizedType)sqlDaoClass.getGenericInterfaces()[foundIndexForEntitySqlDao]).getActualTypeArguments();
     int foundIndexForEntityModelDao=-1;
     for (int i=0; i < types.length; i++) {
-      Class clz=((Class)types[i]);
+      final Class clz=((Class)types[i]);
       if (EntityModelDao.class.getName().equals(((Class)((java.lang.reflect.ParameterizedType)clz.getGenericInterfaces()[0]).getRawType()).getName())) {
         foundIndexForEntityModelDao=i;
         break;
       }
     }
     if (foundIndexForEntityModelDao >= 0) {
-      String modelClassName=((Class)types[foundIndexForEntityModelDao]).getName();
-      Class<? extends EntityModelDao<?>> clz=(Class<? extends EntityModelDao<?>>)Class.forName(modelClassName);
-      EntityModelDao<?> modelDao=(EntityModelDao<?>)clz.newInstance();
+      final String modelClassName=((Class)types[foundIndexForEntityModelDao]).getName();
+      final Class<? extends EntityModelDao<?>> clz=(Class<? extends EntityModelDao<?>>)Class.forName(modelClassName);
+      final EntityModelDao<?> modelDao=(EntityModelDao<?>)clz.newInstance();
       return modelDao.getTableName().getObjectType();
     }
   }

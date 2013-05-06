@@ -4,6 +4,11 @@
     throw new IllegalStateException("History table shouldn't be null for " + tableName);
   }
   final Long targetRecordId=nonEntitySqlDao.getRecordIdFromObject(objectId.toString(),tableName.getTableName());
-  final List<AuditLog> allAuditLogs=auditSqlDao.getAuditLogsViaHistoryForTargetRecordId(historyTableName,historyTableName.getTableName().toLowerCase(),targetRecordId,context);
+  final List<AuditLog> allAuditLogs=transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<AuditLog>>(){
+    @Override public List<AuditLog> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      return entitySqlDaoWrapperFactory.become(EntitySqlDao.class).getAuditLogsViaHistoryForTargetRecordId(historyTableName,historyTableName.getTableName().toLowerCase(),targetRecordId,context);
+    }
+  }
+);
   return buildAuditLogs(auditLevel,allAuditLogs);
 }

@@ -1,17 +1,6 @@
 {
-  installConfig();
-  bind(CacheManager.class).toProvider(CacheManagerProvider.class).asEagerSingleton();
-  bind(CacheLoader.class).annotatedWith(RECORD_ID_CACHE_NAMED).to(RecordIdCacheLoader.class).asEagerSingleton();
-  bind(new TypeLiteral<CacheController<UUID,Long>>(){
-  }
-).annotatedWith(RECORD_ID_CACHE_NAMED).toProvider(new CacheControllerProvider<UUID,Long>(Cachable.RECORD_ID_CACHE_NAME)).asEagerSingleton();
-  bind(CacheLoader.class).annotatedWith(ACCOUNT_RECORD_ID_CACHE_NAMED).to(AccountRecordIdCacheLoader.class).asEagerSingleton();
-  bind(new TypeLiteral<CacheController<UUID,Long>>(){
-  }
-).annotatedWith(ACCOUNT_RECORD_ID_CACHE_NAMED).toProvider(new CacheControllerProvider<UUID,Long>(Cachable.ACCOUNT_RECORD_ID_CACHE_NAME)).asEagerSingleton();
-  bind(CacheLoader.class).annotatedWith(TENANT_RECORD_ID_CACHE_NAMED).to(TenantRecordIdCacheLoader.class).asEagerSingleton();
-  bind(new TypeLiteral<CacheController<UUID,Long>>(){
-  }
-).annotatedWith(TENANT_RECORD_ID_CACHE_NAMED).toProvider(new CacheControllerProvider<UUID,Long>(Cachable.TENANT_RECORD_ID_CACHE_NAME)).asEagerSingleton();
-  bind(CacheControllerDispatcher.class).asEagerSingleton();
+  final CacheConfig config=new ConfigurationObjectFactory(configSource).build(CacheConfig.class);
+  bind(CacheConfig.class).toInstance(config);
+  bind(CacheManager.class).toProvider(EhCacheCacheManagerProvider.class).asEagerSingleton();
+  bind(CacheControllerDispatcher.class).toProvider(CacheControllerDispatcherProvider.class).asEagerSingleton();
 }
