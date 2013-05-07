@@ -10,7 +10,13 @@
   PaymentStatus paymentStatus;
   final PaymentInfoPlugin paymentPluginInfo;
   try {
-    paymentPluginInfo=plugin.processPayment(account.getId(),paymentInput.getId(),paymentInput.getPaymentMethodId(),attemptInput.getRequestedAmount(),account.getCurrency(),context.toCallContext());
+    try {
+      paymentPluginInfo=plugin.processPayment(account.getId(),paymentInput.getId(),paymentInput.getPaymentMethodId(),attemptInput.getRequestedAmount(),account.getCurrency(),context.toCallContext());
+    }
+ catch (    RuntimeException e) {
+      final String formatError=String.format("Plugin threw RuntimeException for payment %s",paymentInput.getId());
+      throw new PaymentPluginApiException(formatError,e);
+    }
 switch (paymentPluginInfo.getStatus()) {
 case PROCESSED:
       paymentStatus=PaymentStatus.SUCCESS;

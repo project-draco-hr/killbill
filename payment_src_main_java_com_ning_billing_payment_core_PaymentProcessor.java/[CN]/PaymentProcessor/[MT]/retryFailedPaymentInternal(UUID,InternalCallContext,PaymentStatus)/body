@@ -2,7 +2,7 @@
   try {
     final PaymentModelDao payment=paymentDao.getPayment(paymentId,context);
     if (payment == null) {
-      log.error("Invalid retry for non existnt paymentId {}",paymentId);
+      log.error("Invalid retry for non existent paymentId {}",paymentId);
       return;
     }
     if (isAccountAutoPayOff(payment.getAccountId(),context)) {
@@ -32,6 +32,7 @@
           }
           if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
             log.info("Aborted retry for payment {} because invoice has been paid",paymentId);
+            setTerminalStateOnRetryWithAccountLocked(account,invoice,payment,invoice.getBalance(),"Paid invoice",context);
             return null;
           }
           processRetryPaymentWithAccountLocked(plugin,account,invoice,payment,invoice.getBalance(),context);
