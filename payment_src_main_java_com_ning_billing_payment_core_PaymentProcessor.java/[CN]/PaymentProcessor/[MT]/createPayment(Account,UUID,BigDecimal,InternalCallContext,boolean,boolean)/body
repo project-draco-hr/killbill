@@ -51,4 +51,13 @@
       return null;
     }
   }
+catch (  RuntimeException e) {
+    log.error("Failure when dispatching payment for invoice " + invoiceId,e);
+    if (isInstantPayment) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,invoiceId);
+    }
+ else {
+      return null;
+    }
+  }
 }
