@@ -15,6 +15,7 @@
       final Map<String,Object> killbillServices=retrieveKillbillApis(context);
       killbillServices.put("root",rubyConfig.getPluginVersionRoot().getAbsolutePath());
       killbillServices.put("logger",logService);
+      killbillServices.put("conf_dir",Objects.firstNonNull(jrubyPluginsConfDir,rubyConfig.getPluginVersionRoot().getAbsolutePath()));
       plugin.instantiatePlugin(killbillServices);
       logService.log(LogService.LOG_INFO,"Starting JRuby plugin " + plugin.getPluginMainClass());
       plugin.startPlugin(context);

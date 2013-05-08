@@ -1,3 +1,9 @@
 {
+  final Collection<InvoiceItem> otherInvoiceItems=Collections2.filter(otherInvoiceItemsOnAllInvoices,new Predicate<InvoiceItem>(){
+    @Override public boolean apply(    final InvoiceItem input){
+      return input.getInvoiceId().equals(invoiceItem.getInvoiceId());
+    }
+  }
+);
   return InvoiceItemType.REFUND_ADJ.equals(invoiceItem.getInvoiceItemType()) || (InvoiceItemType.CREDIT_ADJ.equals(invoiceItem.getInvoiceItemType()) && !(otherInvoiceItems.size() == 1 && InvoiceItemType.CBA_ADJ.equals(otherInvoiceItems.iterator().next().getInvoiceItemType()) && otherInvoiceItems.iterator().next().getInvoiceId().equals(invoiceItem.getInvoiceId()) && otherInvoiceItems.iterator().next().getAmount().compareTo(invoiceItem.getAmount().negate()) == 0));
 }
