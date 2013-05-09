@@ -1,0 +1,21 @@
+{
+  try {
+    checkPluginIsRunning();
+switch (cb.getPluginType()) {
+case NOTIFICATION:
+      checkValidNotificationPlugin();
+    break;
+case PAYMENT:
+  checkValidPaymentPlugin();
+break;
+default :
+break;
+}
+final Ruby runtime=getRuntime();
+return cb.doCall(runtime);
+}
+ catch (RuntimeException e) {
+log.warn("RuntimeException in jruby plugin ",e);
+throw e;
+}
+}
