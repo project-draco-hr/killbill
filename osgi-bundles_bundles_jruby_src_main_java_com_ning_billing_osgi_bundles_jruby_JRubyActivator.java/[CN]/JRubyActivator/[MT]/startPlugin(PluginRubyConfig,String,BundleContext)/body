@@ -1,0 +1,34 @@
+{
+  final Map<String,Object> killbillServices=retrieveKillbillApis(context);
+  killbillServices.put("root",rubyConfig.getPluginVersionRoot().getAbsolutePath());
+  killbillServices.put("logger",logService);
+  killbillServices.put("conf_dir",Objects.firstNonNull(JRUBY_PLUGINS_CONF_DIR,rubyConfig.getPluginVersionRoot().getAbsolutePath()));
+  doStartPlugin(pluginMain,context,killbillServices);
+  final File tmpDirPath=new File(rubyConfig.getPluginVersionRoot().getAbsolutePath() + "/" + TMP_DIR_NAME);
+  if (!tmpDirPath.exists()) {
+    if (!tmpDirPath.mkdir()) {
+      logService.log(LogService.LOG_WARNING,"Unable to create directory " + tmpDirPath + ", the restart mechanism is disabled");
+      return;
+    }
+  }
+  if (!tmpDirPath.isDirectory()) {
+    logService.log(LogService.LOG_WARNING,tmpDirPath + " is not a directory, the restart mechanism is disabled");
+    return;
+  }
+  restartFuture=Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(new Runnable(){
+    long lastRestartMillis=System.currentTimeMillis();
+    @Override public void run(){
+      final File restartFile=new File(tmpDirPath + "/" + RESTART_FILE_NAME);
+      if (!restartFile.isFile()) {
+        return;
+      }
+      if (restartFile.lastModified() > lastRestartMillis) {
+        logService.log(LogService.LOG_INFO,"Restarting JRuby plugin " + plugin.getPluginMainClass());
+        doStopPlugin(context);
+        doStartPlugin(pluginMain,context,killbillServices);
+        lastRestartMillis=restartFile.lastModified();
+      }
+    }
+  }
+,JRUBY_PLUGINS_RESTART_DELAY_SECS,JRUBY_PLUGINS_RESTART_DELAY_SECS,TimeUnit.SECONDS);
+}

@@ -18,13 +18,7 @@
  else {
         throw new IllegalStateException("Unsupported plugin type " + rubyConfig.getPluginType());
       }
-      final Map<String,Object> killbillServices=retrieveKillbillApis(context);
-      killbillServices.put("root",rubyConfig.getPluginVersionRoot().getAbsolutePath());
-      killbillServices.put("logger",logService);
-      killbillServices.put("conf_dir",Objects.firstNonNull(jrubyPluginsConfDir,rubyConfig.getPluginVersionRoot().getAbsolutePath()));
-      plugin.instantiatePlugin(killbillServices,pluginMain);
-      logService.log(LogService.LOG_INFO,"Starting JRuby plugin " + plugin.getPluginMainClass());
-      plugin.startPlugin(context);
+      startPlugin(rubyConfig,pluginMain,context);
     }
   }
 ,this.getClass().getClassLoader());

@@ -1,7 +1,8 @@
 {
   withContextClassLoader(new PluginCall(){
     @Override public void doCall(){
-      plugin.stopPlugin(context);
+      restartFuture.cancel(true);
+      doStopPlugin(context);
       killbillAPI.close();
       logService.close();
     }
