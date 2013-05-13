@@ -1,5 +1,10 @@
 {
   prepareOSGIRequest(request,servletContext,servletConfig);
   osgiServlet.service(new OSGIServletRequestWrapper(request),new OSGIServletResponseWrapper(response));
-  return Response.status(response.getStatus()).build();
+  if (response.isCommitted()) {
+    return null;
+  }
+ else {
+    return Response.status(response.getStatus()).build();
+  }
 }
