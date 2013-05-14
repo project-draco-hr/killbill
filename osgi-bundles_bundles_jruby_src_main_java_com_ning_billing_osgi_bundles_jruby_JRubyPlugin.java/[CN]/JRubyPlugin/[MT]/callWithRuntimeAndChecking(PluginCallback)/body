@@ -1,13 +1,14 @@
 {
-  try {
-    checkPluginIsRunning();
+synchronized (pluginMonitor) {
+    try {
+      checkPluginIsRunning();
 switch (cb.getPluginType()) {
 case NOTIFICATION:
-      checkValidNotificationPlugin();
-    break;
+        checkValidNotificationPlugin();
+      break;
 case PAYMENT:
-  checkValidPaymentPlugin();
-break;
+    checkValidPaymentPlugin();
+  break;
 default :
 break;
 }
@@ -17,5 +18,6 @@ return cb.doCall(runtime);
  catch (RuntimeException e) {
 log.warn("RuntimeException in jruby plugin ",e);
 throw e;
+}
 }
 }
