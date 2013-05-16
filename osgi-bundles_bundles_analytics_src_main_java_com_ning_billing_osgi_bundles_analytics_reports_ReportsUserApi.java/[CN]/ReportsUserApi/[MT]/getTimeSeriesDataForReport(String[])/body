@@ -1,0 +1,16 @@
+{
+  final Map<String,List<XY>> dataForReports=new LinkedHashMap<String,List<XY>>();
+  for (  final String reportName : reportNames) {
+    final String tableName=reportsConfiguration.getTableNameForReport(reportName);
+    if (tableName != null) {
+      final List<XY> data=getData(tableName);
+      dataForReports.put(reportName,data);
+    }
+  }
+  normalizeXValues(dataForReports);
+  final List<NamedXYTimeSeries> results=new LinkedList<NamedXYTimeSeries>();
+  for (  final String reportName : dataForReports.keySet()) {
+    results.add(new NamedXYTimeSeries(reportsConfiguration.getPrettyNameForReport(reportName),dataForReports.get(reportName)));
+  }
+  return results;
+}

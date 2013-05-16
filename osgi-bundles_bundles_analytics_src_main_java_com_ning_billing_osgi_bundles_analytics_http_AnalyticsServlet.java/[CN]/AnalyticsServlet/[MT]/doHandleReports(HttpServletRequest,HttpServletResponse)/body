@@ -1,0 +1,12 @@
+{
+  final String[] reportNames=req.getParameterValues(REPORTS_QUERY_NAME);
+  if (reportNames == null || reportNames.length == 0) {
+    resp.sendError(404);
+    return;
+  }
+  final List<NamedXYTimeSeries> result=reportsUserApi.getTimeSeriesDataForReport(reportNames);
+  resp.getOutputStream().write(mapper.writeValueAsBytes(result));
+  resp.setContentType("application/json");
+  setCrossSiteScriptingHeaders(resp);
+  resp.setStatus(HttpServletResponse.SC_OK);
+}

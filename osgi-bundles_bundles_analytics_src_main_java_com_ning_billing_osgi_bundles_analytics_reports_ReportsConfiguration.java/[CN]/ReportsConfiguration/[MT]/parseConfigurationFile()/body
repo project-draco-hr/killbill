@@ -1,0 +1,16 @@
+{
+  if (REPORTS_CONFIGURATION_FILE_PATH == null) {
+    return;
+  }
+  final File configurationFile=new File(REPORTS_CONFIGURATION_FILE_PATH);
+  final Ini ini=new Ini(configurationFile);
+  for (  final String reportName : ini.keySet()) {
+    final Section section=ini.get(reportName);
+    Thread.currentThread().setContextClassLoader(ReportsConfiguration.class.getClassLoader());
+    final ReportConfigurationSection reportConfigurationSection=section.as(ReportConfigurationSection.class);
+    if (reportConfigurationSection.getFrequency() != null && reportConfigurationSection.getStoredProcedureName() != null) {
+      scheduler.schedule(reportName,reportConfigurationSection.getStoredProcedureName(),reportConfigurationSection.getFrequency(),reportConfigurationSection.getRefreshTimeOfTheDayGMT());
+    }
+    configurationPerReport.put(reportName,reportConfigurationSection);
+  }
+}

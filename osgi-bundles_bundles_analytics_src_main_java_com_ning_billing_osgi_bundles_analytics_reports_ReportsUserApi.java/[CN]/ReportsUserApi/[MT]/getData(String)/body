@@ -1,0 +1,22 @@
+{
+  final List<XY> timeSeries=new LinkedList<XY>();
+  Handle handle=null;
+  try {
+    handle=dbi.open();
+    final List<Map<String,Object>> results=handle.select("select day, count from " + tableName);
+    for (    final Map<String,Object> row : results) {
+      if (row.get("day") == null || row.get("count") == null) {
+        continue;
+      }
+      final String date=row.get("day").toString();
+      final Float value=Float.valueOf(row.get("count").toString());
+      timeSeries.add(new XY(date,value));
+    }
+  }
+  finally {
+    if (handle != null) {
+      handle.close();
+    }
+  }
+  return timeSeries;
+}
