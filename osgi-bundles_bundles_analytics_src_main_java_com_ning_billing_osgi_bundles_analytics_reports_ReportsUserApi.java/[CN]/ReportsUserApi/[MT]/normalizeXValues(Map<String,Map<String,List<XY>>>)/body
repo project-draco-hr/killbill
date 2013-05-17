@@ -1,0 +1,29 @@
+{
+  final Set<String> xValues=new HashSet<String>();
+  for (  final Map<String,List<XY>> dataForReport : dataForReports.values()) {
+    for (    final List<XY> dataForPivot : dataForReport.values()) {
+      for (      final XY xy : dataForPivot) {
+        xValues.add(xy.getX());
+      }
+    }
+  }
+  for (  final Map<String,List<XY>> dataForReport : dataForReports.values()) {
+    for (    final List<XY> dataForPivot : dataForReport.values()) {
+      for (      final String x : xValues) {
+        if (!hasX(dataForPivot,x)) {
+          dataForPivot.add(new XY(x,0));
+        }
+      }
+    }
+  }
+  for (  final String reportName : dataForReports.keySet()) {
+    for (    final String pivotName : dataForReports.get(reportName).keySet()) {
+      Collections.sort(dataForReports.get(reportName).get(pivotName),new Comparator<XY>(){
+        @Override public int compare(        final XY o1,        final XY o2){
+          return new DateTime(o1.getX(),DateTimeZone.UTC).compareTo(new DateTime(o2.getX(),DateTimeZone.UTC));
+        }
+      }
+);
+    }
+  }
+}

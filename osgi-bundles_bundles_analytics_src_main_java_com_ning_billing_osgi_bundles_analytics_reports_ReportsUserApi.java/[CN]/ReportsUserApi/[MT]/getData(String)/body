@@ -1,16 +1,28 @@
 {
-  final List<XY> timeSeries=new LinkedList<XY>();
+  final Map<String,List<XY>> timeSeries=new LinkedHashMap<String,List<XY>>();
   Handle handle=null;
   try {
     handle=dbi.open();
-    final List<Map<String,Object>> results=handle.select("select day, count from " + tableName);
+    final List<Map<String,Object>> results=handle.select("select * from " + tableName);
     for (    final Map<String,Object> row : results) {
       if (row.get("day") == null || row.get("count") == null) {
         continue;
       }
       final String date=row.get("day").toString();
       final Float value=Float.valueOf(row.get("count").toString());
-      timeSeries.add(new XY(date,value));
+      if (row.keySet().size() == 2) {
+        if (timeSeries.get(NO_PIVOT) == null) {
+          timeSeries.put(NO_PIVOT,new LinkedList<XY>());
+        }
+        timeSeries.get(NO_PIVOT).add(new XY(date,value));
+      }
+ else       if (row.get("pivot") != null) {
+        final String pivot=row.get("pivot").toString();
+        if (timeSeries.get(pivot) == null) {
+          timeSeries.put(pivot,new LinkedList<XY>());
+        }
+        timeSeries.get(pivot).add(new XY(date,value));
+      }
     }
   }
   finally {

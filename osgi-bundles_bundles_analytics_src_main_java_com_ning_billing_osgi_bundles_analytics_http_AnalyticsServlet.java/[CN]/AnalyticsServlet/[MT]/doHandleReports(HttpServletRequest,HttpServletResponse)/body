@@ -4,7 +4,9 @@
     resp.sendError(404);
     return;
   }
-  final List<NamedXYTimeSeries> result=reportsUserApi.getTimeSeriesDataForReport(reportNames);
+  final LocalDate startDate=Strings.emptyToNull(req.getParameter(QUERY_START_DATE)) != null ? DATE_FORMAT.parseLocalDate(req.getParameter(QUERY_START_DATE)) : null;
+  final LocalDate endDate=Strings.emptyToNull(req.getParameter(QUERY_END_DATE)) != null ? DATE_FORMAT.parseLocalDate(req.getParameter(QUERY_END_DATE)) : null;
+  final List<NamedXYTimeSeries> result=reportsUserApi.getTimeSeriesDataForReport(reportNames,startDate,endDate);
   resp.getOutputStream().write(mapper.writeValueAsBytes(result));
   resp.setContentType("application/json");
   setCrossSiteScriptingHeaders(resp);

@@ -1,0 +1,13 @@
+{
+  for (  final Map<String,List<XY>> dataForReport : dataForReports.values()) {
+    for (    final List<XY> dataForPivot : dataForReport.values()) {
+      final Iterator<XY> iterator=dataForPivot.iterator();
+      while (iterator.hasNext()) {
+        final XY xy=iterator.next();
+        if (startDate != null && new DateTime(xy.getX(),DateTimeZone.UTC).toLocalDate().isBefore(startDate) || endDate != null && new DateTime(xy.getX(),DateTimeZone.UTC).toLocalDate().isAfter(endDate)) {
+          iterator.remove();
+        }
+      }
+    }
+  }
+}
