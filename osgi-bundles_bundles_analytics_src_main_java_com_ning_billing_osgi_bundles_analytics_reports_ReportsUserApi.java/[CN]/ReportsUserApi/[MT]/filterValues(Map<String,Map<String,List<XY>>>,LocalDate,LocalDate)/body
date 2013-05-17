@@ -1,13 +1,15 @@
 {
+  if (startDate == null && endDate == null) {
+    return;
+  }
   for (  final Map<String,List<XY>> dataForReport : dataForReports.values()) {
     for (    final List<XY> dataForPivot : dataForReport.values()) {
-      final Iterator<XY> iterator=dataForPivot.iterator();
-      while (iterator.hasNext()) {
-        final XY xy=iterator.next();
-        if (startDate != null && new DateTime(xy.getX(),DateTimeZone.UTC).toLocalDate().isBefore(startDate) || endDate != null && new DateTime(xy.getX(),DateTimeZone.UTC).toLocalDate().isAfter(endDate)) {
-          iterator.remove();
+      Iterables.removeIf(dataForPivot,new Predicate<XY>(){
+        @Override public boolean apply(        final XY xy){
+          return startDate != null && xy.getxDate().toLocalDate().isBefore(startDate) || endDate != null && xy.getxDate().toLocalDate().isAfter(endDate);
         }
       }
+);
     }
   }
 }
