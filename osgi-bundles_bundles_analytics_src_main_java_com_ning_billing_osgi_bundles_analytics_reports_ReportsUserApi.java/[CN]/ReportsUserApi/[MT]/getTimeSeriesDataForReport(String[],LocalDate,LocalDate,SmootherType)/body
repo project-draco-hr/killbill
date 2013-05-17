@@ -1,0 +1,14 @@
+{
+  final Map<String,Map<String,List<XY>>> dataForReports=new ConcurrentHashMap<String,Map<String,List<XY>>>();
+  fetchData(reportNames,dataForReports);
+  filterValues(dataForReports,startDate,endDate);
+  normalizeAndSortXValues(dataForReports,startDate,endDate);
+  if (smootherType != null) {
+    final Smoother smoother=smootherType.createSmoother(dataForReports);
+    smoother.smooth();
+    return buildNamedXYTimeSeries(smoother.getDataForReports());
+  }
+ else {
+    return buildNamedXYTimeSeries(dataForReports);
+  }
+}
