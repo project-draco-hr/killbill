@@ -1,0 +1,27 @@
+{
+  final boolean hasExcludes=rawReportName.contains("!");
+  final boolean hasIncludes=rawReportName.contains("$");
+  if (hasExcludes && hasIncludes) {
+    throw new IllegalArgumentException();
+  }
+  final Iterator<String> reportIterator=Splitter.on(Pattern.compile("[\\!\\$]")).trimResults().omitEmptyStrings().split(rawReportName).iterator();
+  boolean isFirst=true;
+  while (reportIterator.hasNext()) {
+    final String piece=reportIterator.next();
+    if (isFirst) {
+      reportName=piece;
+    }
+ else {
+      if (hasExcludes) {
+        pivotNamesToExclude.add(piece);
+      }
+ else       if (hasIncludes) {
+        pivotNamesToInclude.add(piece);
+      }
+ else {
+        throw new IllegalArgumentException();
+      }
+    }
+    isFirst=false;
+  }
+}

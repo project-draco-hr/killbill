@@ -1,7 +1,11 @@
 {
   final Map<String,Map<String,List<XY>>> dataForReports=new ConcurrentHashMap<String,Map<String,List<XY>>>();
-  fetchData(reportNames,dataForReports);
-  filterValues(dataForReports,startDate,endDate);
+  final List<ReportSpecification> reportSpecifications=new ArrayList<ReportSpecification>();
+  for (  final String rawReportName : rawReportNames) {
+    reportSpecifications.add(new ReportSpecification(rawReportName));
+  }
+  fetchData(reportSpecifications,dataForReports);
+  filterValues(reportSpecifications,dataForReports,startDate,endDate);
   normalizeAndSortXValues(dataForReports,startDate,endDate);
   if (smootherType != null) {
     final Smoother smoother=smootherType.createSmoother(dataForReports);
