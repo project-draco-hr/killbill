@@ -1,9 +1,13 @@
 {
   super.start(context);
-  final Executor executor=BusinessExecutor.create(logService);
+  final Executor executor=BusinessExecutor.newCachedThreadPool();
   analyticsListener=new AnalyticsListener(logService,killbillAPI,dataSource,executor);
   dispatcher.registerEventHandler(analyticsListener);
+  jobsScheduler=new JobsScheduler(logService,dataSource);
+  final ReportsConfiguration reportsConfiguration=new ReportsConfiguration(logService,jobsScheduler);
+  reportsConfiguration.initialize();
   final AnalyticsUserApi analyticsUserApi=new AnalyticsUserApi(logService,killbillAPI,dataSource,executor);
-  final AnalyticsServlet analyticsServlet=new AnalyticsServlet(analyticsUserApi,logService);
+  reportsUserApi=new ReportsUserApi(dataSource,reportsConfiguration);
+  final AnalyticsServlet analyticsServlet=new AnalyticsServlet(analyticsUserApi,reportsUserApi,logService);
   registerServlet(context,analyticsServlet);
 }

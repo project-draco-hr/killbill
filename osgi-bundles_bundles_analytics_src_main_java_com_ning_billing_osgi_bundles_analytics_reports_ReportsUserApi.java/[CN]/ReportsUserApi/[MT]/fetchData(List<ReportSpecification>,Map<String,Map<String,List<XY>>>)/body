@@ -1,0 +1,27 @@
+{
+  final List<Future> jobs=new LinkedList<Future>();
+  for (  final ReportSpecification reportSpecification : reportSpecifications) {
+    final String reportName=reportSpecification.getReportName();
+    final String tableName=reportsConfiguration.getTableNameForReport(reportName);
+    if (tableName != null) {
+      jobs.add(dbiThreadsExecutor.submit(new Runnable(){
+        @Override public void run(){
+          final Map<String,List<XY>> data=getData(tableName);
+          dataForReports.put(reportName,data);
+        }
+      }
+));
+    }
+  }
+  for (  final Future job : jobs) {
+    try {
+      job.get();
+    }
+ catch (    InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+catch (    ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}
