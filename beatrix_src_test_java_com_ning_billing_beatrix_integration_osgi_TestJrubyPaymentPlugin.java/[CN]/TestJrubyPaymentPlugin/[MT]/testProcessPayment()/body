@@ -1,7 +1,8 @@
 {
   PaymentPluginApi api=getTestPluginPaymentApi();
+  account=createAccountWithNonOsgiPaymentMethod(getAccountData(4));
   final DateTime beforeCall=new DateTime().toDateTime(DateTimeZone.UTC).minusSeconds(1);
-  PaymentInfoPlugin res=api.processPayment(UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),BigDecimal.TEN,Currency.USD,callContext);
+  PaymentInfoPlugin res=api.processPayment(account.getId(),UUID.randomUUID(),UUID.randomUUID(),BigDecimal.TEN,Currency.USD,callContext);
   final DateTime afterCall=new DateTime().toDateTime(DateTimeZone.UTC).plusSeconds(1);
   Assert.assertTrue(res.getAmount().compareTo(BigDecimal.TEN) == 0);
   Assert.assertTrue(res.getCreatedDate().compareTo(beforeCall) >= 0);

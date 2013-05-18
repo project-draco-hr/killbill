@@ -1,5 +1,18 @@
 {
-  PaymentPluginApi result=paymentPluginApiOSGIServiceRegistration.getServiceForName(BUNDLE_TEST_RESOURCE_PREFIX);
+  int retry=5;
+  PaymentPluginApi result=null;
+  do {
+    result=paymentPluginApiOSGIServiceRegistration.getServiceForName(BUNDLE_TEST_RESOURCE_PREFIX);
+    if (result == null) {
+      try {
+        log.info("Waiting for Killbill initialization to complete time = " + clock.getUTCNow());
+        Thread.sleep(1000);
+      }
+ catch (      InterruptedException ignore) {
+      }
+    }
+  }
+ while (result == null && retry-- > 0);
   Assert.assertNotNull(result);
   return result;
 }
