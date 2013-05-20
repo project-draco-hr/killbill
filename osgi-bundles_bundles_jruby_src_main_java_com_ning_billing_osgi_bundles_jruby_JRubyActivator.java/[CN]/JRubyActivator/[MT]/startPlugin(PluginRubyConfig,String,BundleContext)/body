@@ -14,16 +14,10 @@
     logService.log(LogService.LOG_WARNING,tmpDirPath + " is not a directory, the restart mechanism is disabled");
     return;
   }
-  final AtomicBoolean firstStart=new AtomicBoolean(true);
+  doStartPlugin(pluginMain,context,killbillServices);
   restartFuture=Executors.newSingleThreadScheduledExecutor("jruby-restarter-" + pluginMain).scheduleWithFixedDelay(new Runnable(){
     long lastRestartMillis=System.currentTimeMillis();
     @Override public void run(){
-      if (firstStart.get()) {
-        logService.log(LogService.LOG_INFO,"Starting JRuby plugin " + rubyConfig.getRubyMainClass());
-        doStartPlugin(pluginMain,context,killbillServices);
-        firstStart.set(false);
-        return;
-      }
       final File restartFile=new File(tmpDirPath + "/" + RESTART_FILE_NAME);
       if (!restartFile.isFile()) {
         return;
@@ -36,5 +30,5 @@
       }
     }
   }
-,0,JRUBY_PLUGINS_RESTART_DELAY_SECS,TimeUnit.SECONDS);
+,JRUBY_PLUGINS_RESTART_DELAY_SECS,JRUBY_PLUGINS_RESTART_DELAY_SECS,TimeUnit.SECONDS);
 }
