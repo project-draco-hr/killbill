@@ -1,0 +1,13 @@
+{
+  final ByteArrayOutputStream out=new ByteArrayOutputStream();
+  final Map<String,String> data=new HashMap<String,String>();
+  for (  final String key : request.getParameterMap().keySet()) {
+    data.put(key,request.getParameter(key));
+  }
+  for (  final String key : form.keySet()) {
+    data.put(key,form.getFirst(key));
+  }
+  appendFormParametersToBody(out,data);
+  ByteStreams.copy(request.getInputStream(),out);
+  return new ByteArrayInputStream(out.toByteArray());
+}

@@ -1,13 +1,3 @@
 {
-  prepareOSGIRequest(request,servletContext,servletConfig);
-  osgiServlet.service(new OSGIServletRequestWrapper(request,createInputStream(request)),new OSGIServletResponseWrapper(response));
-  if (response.isCommitted()) {
-    if (response.getStatus() >= 400) {
-      log.warn("{} responded {}",request.getPathInfo(),response.getStatus());
-    }
-    return null;
-  }
- else {
-    return Response.status(response.getStatus()).build();
-  }
+  return serviceViaOSGIPlugin(request,request.getInputStream(),response,servletContext,servletConfig);
 }
