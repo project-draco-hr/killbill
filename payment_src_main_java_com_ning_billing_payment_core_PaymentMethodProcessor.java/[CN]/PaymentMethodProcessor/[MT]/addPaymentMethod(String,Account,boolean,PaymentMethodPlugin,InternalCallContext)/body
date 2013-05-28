@@ -4,10 +4,7 @@
       PaymentMethod pm=null;
       PaymentPluginApi pluginApi=null;
       try {
-        pluginApi=pluginRegistry.getServiceForName(paymentPluginServiceName);
-        if (pluginApi == null) {
-          throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_PLUGIN,paymentPluginServiceName);
-        }
+        pluginApi=getPaymentPluginApi(paymentPluginServiceName);
         pm=new DefaultPaymentMethod(account.getId(),paymentPluginServiceName,paymentMethodProps);
         pluginApi.addPaymentMethod(account.getId(),pm.getId(),paymentMethodProps,setDefault,context.toCallContext());
         final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getCreatedDate(),pm.getUpdatedDate(),pm.getAccountId(),pm.getPluginName(),pm.isActive());
