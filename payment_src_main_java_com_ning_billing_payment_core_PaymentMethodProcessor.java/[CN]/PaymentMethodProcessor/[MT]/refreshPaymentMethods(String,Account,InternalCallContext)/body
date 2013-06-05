@@ -36,12 +36,7 @@
         throw new PaymentApiException(ErrorCode.PAYMENT_REFRESH_PAYMENT_METHOD,account.getId(),e.getErrorMessage());
       }
       try {
-        if (defaultPaymentMethodId != null) {
-          accountInternalApi.updatePaymentMethod(account.getId(),defaultPaymentMethodId,context);
-        }
- else {
-          accountInternalApi.removePaymentMethod(account.getId(),context);
-        }
+        updateDefaultPaymentMethodIfNeeded(pluginName,account,defaultPaymentMethodId,context);
       }
  catch (      AccountApiException e) {
         throw new PaymentApiException(e);

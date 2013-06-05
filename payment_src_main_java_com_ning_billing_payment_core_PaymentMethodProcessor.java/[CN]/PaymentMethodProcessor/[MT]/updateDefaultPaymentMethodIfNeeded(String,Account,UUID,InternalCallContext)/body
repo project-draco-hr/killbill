@@ -1,0 +1,16 @@
+{
+  boolean shouldUpdateDefaultPaymentMethod=true;
+  if (account.getPaymentMethodId() != null) {
+    final PaymentMethodModelDao currentDefaultPaymentMethod=paymentDao.getPaymentMethod(account.getPaymentMethodId(),context);
+    shouldUpdateDefaultPaymentMethod=pluginName.equals(currentDefaultPaymentMethod.getPluginName());
+  }
+  if (!shouldUpdateDefaultPaymentMethod) {
+    return;
+  }
+  if (defaultPaymentMethodId != null) {
+    accountInternalApi.updatePaymentMethod(account.getId(),defaultPaymentMethodId,context);
+  }
+ else {
+    accountInternalApi.removePaymentMethod(account.getId(),context);
+  }
+}
