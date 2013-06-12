@@ -30,7 +30,9 @@
         }
       }
       for (      final PaymentMethodModelDao existingPaymentMethod : existingPaymentMethods) {
-        deletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),context);
+        if (existingPaymentMethod.isActive()) {
+          deletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),context);
+        }
       }
       return transactional.getByAccountId(accountId.toString(),context);
     }
