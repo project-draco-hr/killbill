@@ -1,6 +1,6 @@
 {
   final BigDecimal maxRefundAmount=payment.getAmount() == null ? BigDecimal.ZERO : payment.getAmount();
-  final BigDecimal requestedPositiveAmount=requestedAmount == null ? maxRefundAmount : requestedAmount;
+  final BigDecimal requestedPositiveAmount=requestedRefundAmount == null ? maxRefundAmount : requestedRefundAmount;
   if (requestedPositiveAmount.compareTo(maxRefundAmount) > 0) {
     throw new InvoiceApiException(ErrorCode.REFUND_AMOUNT_TOO_HIGH,requestedPositiveAmount,maxRefundAmount);
   }
@@ -8,7 +8,7 @@
   for (  final BigDecimal itemAmount : invoiceItemIdsWithAmounts.values()) {
     amountFromItems=amountFromItems.add(itemAmount);
   }
-  if (amountFromItems.compareTo(BigDecimal.ZERO) != 0 && requestedPositiveAmount.compareTo(amountFromItems) != 0) {
+  if (amountFromItems.compareTo(BigDecimal.ZERO) != 0 && requestedPositiveAmount.compareTo(amountFromItems) < 0) {
     throw new InvoiceApiException(ErrorCode.REFUND_AMOUNT_DONT_MATCH_ITEMS_TO_ADJUST,requestedPositiveAmount,amountFromItems);
   }
   return requestedPositiveAmount;

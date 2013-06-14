@@ -11,10 +11,15 @@
     throw new IllegalStateException("Invoice shouldn't be null for id " + invoiceId);
   }
   for (  final UUID invoiceItemId : invoiceItemIdsWithNullAmounts.keySet()) {
-    final BigDecimal adjAmount=Objects.firstNonNull(invoiceItemIdsWithNullAmounts.get(invoiceItemId),getInvoiceItemAmountForId(invoice,invoiceItemId));
-    final BigDecimal adjAmountRemainingAfterRepair=computeItemAdjustmentAmount(invoiceItemId,adjAmount,invoice.getInvoiceItems());
-    if (adjAmountRemainingAfterRepair.compareTo(BigDecimal.ZERO) > 0) {
-      invoiceItemIdsWithAmountsBuilder.put(invoiceItemId,adjAmountRemainingAfterRepair);
+    final BigDecimal originalItemAmount=getInvoiceItemAmountForId(invoice,invoiceItemId);
+    final BigDecimal maxAdjAmount=computeItemAdjustmentAmount(invoiceItemId,originalItemAmount,invoice.getInvoiceItems());
+    final BigDecimal proposedItemAmount=invoiceItemIdsWithNullAmounts.get(invoiceItemId);
+    if (proposedItemAmount != null && proposedItemAmount.compareTo(maxAdjAmount) > 0) {
+      throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_ADJUSTMENT_AMOUNT_INVALID,proposedItemAmount,maxAdjAmount);
+    }
+    final BigDecimal itemAmountToAdjust=Objects.firstNonNull(proposedItemAmount,maxAdjAmount);
+    if (itemAmountToAdjust.compareTo(BigDecimal.ZERO) > 0) {
+      invoiceItemIdsWithAmountsBuilder.put(invoiceItemId,itemAmountToAdjust);
     }
   }
   return invoiceItemIdsWithAmountsBuilder.build();
