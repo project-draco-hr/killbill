@@ -1,8 +1,5 @@
 {
   final KillbillConfigSource configSource=new KillbillConfigSource(System.getProperties());
-  configSource.setProperty(AnalyticsModule.ANALYTICS_DBI_CONFIG_STRING + "url",helper.getJdbcConnectionString());
-  configSource.setProperty(AnalyticsModule.ANALYTICS_DBI_CONFIG_STRING + "user",DBTestingHelper.USERNAME);
-  configSource.setProperty(AnalyticsModule.ANALYTICS_DBI_CONFIG_STRING + "password",DBTestingHelper.PASSWORD);
   install(new GuicyKillbillTestWithEmbeddedDBModule());
   install(new EmailModule(configSource));
   install(new CacheModule(configSource));
@@ -19,7 +16,6 @@
   install(new InvoiceModuleWithMockSender(configSource));
   install(new TemplateModule());
   install(new DefaultEntitlementModule(configSource));
-  install(new AnalyticsModule(configSource));
   install(new PaymentMockModule(configSource));
   install(new BeatrixModule());
   install(new DefaultJunctionModule(configSource));
