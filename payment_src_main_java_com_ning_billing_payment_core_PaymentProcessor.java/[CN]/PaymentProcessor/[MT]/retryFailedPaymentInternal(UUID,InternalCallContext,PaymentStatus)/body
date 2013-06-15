@@ -26,8 +26,8 @@
             log.info("Aborted retry for payment {} because it is {} state",paymentId,payment.getPaymentStatus());
             return null;
           }
-          final Invoice invoice=invoiceApi.getInvoiceById(payment.getInvoiceId(),context);
-          if (invoice.isMigrationInvoice()) {
+          final Invoice invoice=rebalanceAndGetInvoice(payment.getAccountId(),payment.getInvoiceId(),context);
+          if (invoice == null || invoice.isMigrationInvoice()) {
             return null;
           }
           if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
