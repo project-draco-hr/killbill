@@ -1,8 +1,11 @@
 {
   PaymentPluginApi api=getTestPluginPaymentApi();
-  final List<PaymentMethodInfoPlugin> res=api.getPaymentMethods(UUID.randomUUID(),true,callContext);
-  Assert.assertEquals(res.size(),1);
+  final UUID kbAccountId=UUID.randomUUID();
+  final List<PaymentMethodInfoPlugin> res=api.getPaymentMethods(kbAccountId,true,callContext);
+  assertEquals(res.size(),1);
   final PaymentMethodInfoPlugin res0=res.get(0);
   Assert.assertTrue(res0.isDefault());
-  Assert.assertEquals(res0.getExternalPaymentMethodId(),"external_payment_method_id");
+  assertEquals(res0.getExternalPaymentMethodId(),"external_payment_method_id");
+  assertEquals(res0.getAccountId(),kbAccountId);
+  assertEquals(res0.getPaymentMethodId(),kbAccountId);
 }
