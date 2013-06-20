@@ -1,4 +1,11 @@
 {
+  try {
+    eventBus.register(invoiceHandler);
+    eventBus.register(tagHandler);
+  }
+ catch (  InternalBus.EventBusException e) {
+    log.error("Unable to register with the EventBus!",e);
+  }
   failedRetryService.initialize(SERVICE_NAME);
   timedoutRetryService.initialize(SERVICE_NAME);
   autoPayoffRetryService.initialize(SERVICE_NAME);

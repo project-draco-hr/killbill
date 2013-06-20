@@ -1,14 +1,11 @@
 {
+  final List<Bundle> installedBundles=new LinkedList<Bundle>();
   try {
     final BundleContext context=framework.getBundleContext();
     final String jrubyBundlePath=findJrubyBundlePath();
-    final List<Bundle> installedBundles=new LinkedList<Bundle>();
     installAllJavaBundles(context,installedBundles,jrubyBundlePath);
     installAllJavaPluginBundles(context,installedBundles);
     installAllJRubyPluginBundles(context,installedBundles,jrubyBundlePath);
-    for (    final Bundle bundle : installedBundles) {
-      startBundle(bundle);
-    }
   }
  catch (  PluginConfigException e) {
     logger.error("Error while parsing plugin configurations",e);
@@ -16,4 +13,5 @@
 catch (  BundleException e) {
     logger.error("Error while parsing plugin configurations",e);
   }
+  return installedBundles;
 }
