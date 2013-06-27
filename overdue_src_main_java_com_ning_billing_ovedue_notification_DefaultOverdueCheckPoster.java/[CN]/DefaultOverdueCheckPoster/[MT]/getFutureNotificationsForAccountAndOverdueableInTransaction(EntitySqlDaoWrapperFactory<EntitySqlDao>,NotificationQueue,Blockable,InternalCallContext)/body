@@ -1,13 +1,18 @@
 {
-  final List<Notification> notifications=new ArrayList<Notification>();
-  final List<Notification> candidates=checkOverdueQueue.getFutureNotificationsForAccountFromTransaction(context.getAccountRecordId(),entitySqlDaoWrapperFactory.getSqlDao());
-  for (  final Notification candidate : candidates) {
-    if (OverdueCheckNotificationKey.class.getName().equals(candidate.getNotificationKeyClass())) {
-      final OverdueCheckNotificationKey key=PersistentQueueBase.deserializeEvent(candidate.getNotificationKeyClass(),candidate.getNotificationKey());
-      if (Type.get(overdueable).equals(key.getType()) && overdueable.getId().equals(key.getUuidKey())) {
-        notifications.add(candidate);
-      }
+  final Map<Notification,OverdueCheckNotificationKey> candidates=checkOverdueQueue.getFutureNotificationsForAccountAndTypeFromTransaction(OverdueCheckNotificationKey.class,context.getAccountRecordId(),entitySqlDaoWrapperFactory.getSqlDao());
+  final Map<Notification,OverdueCheckNotificationKey> notifications=Maps.filterEntries(candidates,new Predicate<Entry<Notification,OverdueCheckNotificationKey>>(){
+    @Override public boolean apply(    @Nullable final Entry<Notification,OverdueCheckNotificationKey> input){
+      final OverdueCheckNotificationKey notificationKey=input.getValue();
+      return (Type.get(overdueable).equals(notificationKey.getType()) && overdueable.getId().equals(notificationKey.getUuidKey()));
     }
   }
-  return notifications;
+);
+  final List<Notification> result=new ArrayList(notifications.keySet());
+  Collections.sort(result,new Comparator<Notification>(){
+    @Override public int compare(    final Notification o1,    final Notification o2){
+      return o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
+    }
+  }
+);
+  return result;
 }
