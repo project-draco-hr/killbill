@@ -6,7 +6,7 @@
     SubscriptionData subscription=testUtil.createSubscription(bundle,prod,term,planSet);
     final PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    final DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    final DateTime expectedPhaseTrialChange=TestEntitlementHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     testUtil.checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
@@ -15,7 +15,7 @@
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
     final Duration ctd=testUtil.getDurationMonth(1);
-    final DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
+    final DateTime newChargedThroughDate=TestEntitlementHelper.addDuration(expectedPhaseTrialChange,ctd);
     entitlementInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
     subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId(),callContext);
     subscription.cancel(clock.getUTCNow(),callContext);

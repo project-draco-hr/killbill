@@ -21,9 +21,9 @@
           tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context);
         }
         try {
-          bus.postFromTransaction(tagDefinitionEvent,entitySqlDaoWrapperFactory,context);
+          bus.postFromTransaction(tagDefinitionEvent,entitySqlDaoWrapperFactory.getSqlDao());
         }
- catch (        InternalBus.EventBusException e) {
+ catch (        PersistentBus.EventBusException e) {
           log.warn("Failed to post tag definition creation event for tag " + tagDefinition.getId(),e);
         }
         return tagDefinition;

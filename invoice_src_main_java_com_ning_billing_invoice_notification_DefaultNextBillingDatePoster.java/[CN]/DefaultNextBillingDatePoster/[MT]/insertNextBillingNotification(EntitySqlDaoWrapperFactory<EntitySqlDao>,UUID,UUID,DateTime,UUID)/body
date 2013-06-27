@@ -4,7 +4,7 @@
   try {
     nextBillingQueue=notificationQueueService.getNotificationQueue(DefaultInvoiceService.INVOICE_SERVICE_NAME,DefaultNextBillingDateNotifier.NEXT_BILLING_DATE_NOTIFIER_QUEUE);
     log.info("Queuing next billing date notification at {} for subscriptionId {}",futureNotificationTime.toString(),subscriptionId.toString());
-    nextBillingQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,futureNotificationTime,new NextBillingDateNotificationKey(subscriptionId),context);
+    nextBillingQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),futureNotificationTime,new NextBillingDateNotificationKey(subscriptionId),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
   }
  catch (  NoSuchNotificationQueue e) {
     log.error("Attempting to put items on a non-existent queue (NextBillingDateNotifier).",e);

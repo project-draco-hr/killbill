@@ -1,12 +1,12 @@
 {
   final ExtBusEventEntry externalEvent=computeExtBusEventEntryFromBusInternalEvent(event);
-  try {
-    if (externalEvent != null) {
-      final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(event.getTenantRecordId(),event.getAccountRecordId(),"BeatrixListener",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken());
+  if (externalEvent != null) {
+    final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(event.getTenantRecordId(),event.getAccountRecordId(),"BeatrixListener",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken());
+    try {
       ((PersistentExternalBus)externalBus).post(externalEvent,internalContext);
     }
-  }
- catch (  EventBusException e) {
-    log.warn("Failed to post external bus event {} {} ",externalEvent.getExtBusType(),externalEvent.getObjectId());
+ catch (    EventBusException e) {
+      log.warn("Failed to dispatch external bus events",e);
+    }
   }
 }

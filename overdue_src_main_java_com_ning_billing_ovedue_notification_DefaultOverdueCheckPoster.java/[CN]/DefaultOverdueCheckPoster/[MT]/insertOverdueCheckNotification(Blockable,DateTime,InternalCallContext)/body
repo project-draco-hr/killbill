@@ -17,13 +17,13 @@
             minIndexToDeleteFrom=0;
           }
           for (int i=minIndexToDeleteFrom; i < futureNotifications.size(); i++) {
-            checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory,futureNotifications.get(i).getId(),context);
+            checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),futureNotifications.get(i).getId());
           }
         }
         if (shouldInsertNewNotification) {
           log.debug("Queuing overdue check notification. Overdueable id: {}, timestamp: {}",overdueable.getId().toString(),futureNotificationTime.toString());
           final OverdueCheckNotificationKey notificationKey=new OverdueCheckNotificationKey(overdueable.getId(),Type.get(overdueable));
-          checkOverdueQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,futureNotificationTime,notificationKey,context);
+          checkOverdueQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),futureNotificationTime,notificationKey,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
         }
  else {
           log.debug("Skipping queuing overdue check notification. Overdueable id: {}, timestamp: {}",overdueable.getId().toString(),futureNotificationTime.toString());

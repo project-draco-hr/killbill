@@ -5,7 +5,7 @@
       @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
         final List<Notification> futureNotifications=getFutureNotificationsForAccountAndOverdueableInTransaction(entitySqlDaoWrapperFactory,checkOverdueQueue,overdueable,context);
         for (        final Notification notification : futureNotifications) {
-          checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory,notification.getId(),context);
+          checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),notification.getId());
         }
         return null;
       }

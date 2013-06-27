@@ -8,7 +8,7 @@
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.TRIAL);
     assertTrue(testListener.isCompleted(5000));
     final PlanPhase currentPhase=subscription.getCurrentPhase();
-    final DateTime nextExpectedPhaseChange=DefaultClock.addDuration(subscription.getStartDate(),currentPhase.getDuration());
+    final DateTime nextExpectedPhaseChange=TestEntitlementHelper.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     testUtil.checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));

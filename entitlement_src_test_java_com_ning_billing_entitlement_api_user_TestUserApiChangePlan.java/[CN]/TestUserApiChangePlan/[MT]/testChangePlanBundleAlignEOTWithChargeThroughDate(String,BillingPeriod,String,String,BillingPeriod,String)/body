@@ -2,7 +2,7 @@
   try {
     SubscriptionData subscription=testUtil.createSubscription(bundle,fromProd,fromTerm,fromPlanSet);
     final PlanPhase trialPhase=subscription.getCurrentPhase();
-    final DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    final DateTime expectedPhaseTrialChange=TestEntitlementHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
@@ -11,7 +11,7 @@
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
     final Duration ctd=testUtil.getDurationMonth(1);
-    final DateTime newChargedThroughDate=DefaultClock.addDuration(expectedPhaseTrialChange,ctd);
+    final DateTime newChargedThroughDate=TestEntitlementHelper.addDuration(expectedPhaseTrialChange,ctd);
     entitlementInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
     testListener.setNonExpectedMode();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
@@ -21,7 +21,7 @@
     testListener.reset();
     currentPhase=subscription.getCurrentPhase();
     checkChangePlan(subscription,fromProd,ProductCategory.BASE,fromTerm,PhaseType.DISCOUNT);
-    final DateTime nextExpectedPhaseChange=DefaultClock.addDuration(expectedPhaseTrialChange,currentPhase.getDuration());
+    final DateTime nextExpectedPhaseChange=TestEntitlementHelper.addDuration(expectedPhaseTrialChange,currentPhase.getDuration());
     testUtil.checkNextPhaseChange(subscription,2,nextExpectedPhaseChange);
     final List<EntitlementEvent> events=dao.getPendingEventsForSubscription(subscription.getId(),internalCallContext);
     assertTrue(events.get(0) instanceof ApiEvent);

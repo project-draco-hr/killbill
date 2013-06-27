@@ -17,7 +17,7 @@
       }
       try {
         final RepairEntitlementInternalEvent busEvent=new DefaultRepairEntitlementEvent(context.getUserToken(),accountId,bundleId,clock.getUTCNow(),context.getAccountRecordId(),context.getTenantRecordId());
-        eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory,context);
+        eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory.getSqlDao());
       }
  catch (      EventBusException e) {
         log.warn("Failed to post repair entitlement event for bundle " + bundleId,e);

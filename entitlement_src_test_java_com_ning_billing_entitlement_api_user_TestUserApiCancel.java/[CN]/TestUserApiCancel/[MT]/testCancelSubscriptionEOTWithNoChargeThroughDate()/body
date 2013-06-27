@@ -6,7 +6,7 @@
     final SubscriptionData subscription=testUtil.createSubscription(bundle,prod,term,planSet);
     PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    final DateTime expectedPhaseTrialChange=DefaultClock.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    final DateTime expectedPhaseTrialChange=TestEntitlementHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     testUtil.checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
     testListener.pushExpectedEvent(NextEvent.PHASE);
     final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));

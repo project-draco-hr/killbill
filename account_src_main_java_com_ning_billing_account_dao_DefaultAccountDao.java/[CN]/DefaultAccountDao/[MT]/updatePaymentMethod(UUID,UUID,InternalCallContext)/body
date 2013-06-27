@@ -14,7 +14,7 @@
       final AccountModelDao account=transactional.getById(accountId.toString(),context);
       final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(accountId,context.getUserToken(),currentAccount,account,context.getAccountRecordId(),context.getTenantRecordId());
       try {
-        eventBus.postFromTransaction(changeEvent,entitySqlDaoWrapperFactory,context);
+        eventBus.postFromTransaction(changeEvent,entitySqlDaoWrapperFactory.getSqlDao());
       }
  catch (      final EventBusException e) {
         log.warn("Failed to post account change event for account " + accountId,e);

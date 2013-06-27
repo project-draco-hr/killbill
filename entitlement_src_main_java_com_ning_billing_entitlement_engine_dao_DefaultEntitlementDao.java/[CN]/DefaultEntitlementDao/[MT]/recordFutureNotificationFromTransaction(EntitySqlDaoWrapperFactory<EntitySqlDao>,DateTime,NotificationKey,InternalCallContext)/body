@@ -1,7 +1,7 @@
 {
   try {
     final NotificationQueue subscriptionEventQueue=notificationQueueService.getNotificationQueue(Engine.ENTITLEMENT_SERVICE_NAME,Engine.NOTIFICATION_QUEUE_NAME);
-    subscriptionEventQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,effectiveDate,notificationKey,context);
+    subscriptionEventQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),effectiveDate,notificationKey,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
   }
  catch (  NoSuchNotificationQueue e) {
     throw new RuntimeException(e);
