@@ -1,23 +1,15 @@
 {
-  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID,null,"ExtPersistentBus",CallOrigin.INTERNAL,UserType.SYSTEM,null);
-  final List<ExtBusEventEntry> events=getNextBusEvent(context);
+  final List<BusEventEntry> events=getNextBusEvent();
   if (events.size() == 0) {
     return 0;
   }
   int result=0;
-  for (  final ExtBusEventEntry cur : events) {
-    final UUID accountId;
-    if (cur.getObjectType() == ObjectType.ACCOUNT && cur.getExtBusType() == ExtBusEventType.ACCOUNT_CREATION) {
-      accountId=cur.getObjectId();
-    }
- else {
-      accountId=getAccountIdFromRecordId(cur.getAccountRecordId(),context);
-    }
-    final ExtBusEvent event=new DefaultBusEvent(cur.getExtBusType(),cur.getObjectType(),cur.getObjectId(),accountId,null);
+  for (  final BusEventEntry cur : events) {
+    final String jsonWithAccountAndTenantRecorId=tweakJsonToIncludeAccountAndTenantRecordId(cur.getBusEventJson(),cur.getAccountRecordId(),cur.getTenantRecordId());
+    final BusPersistentEvent evt=deserializeEvent(cur.getBusEventClass(),objectMapper,jsonWithAccountAndTenantRecorId);
     result++;
-    eventBusDelegate.post(event);
-    final InternalCallContext rehydratedContext=internalCallContextFactory.createInternalCallContext(cur.getTenantRecordId(),cur.getAccountRecordId(),context);
-    dao.clearBusExtEvent(cur.getId(),hostname,rehydratedContext);
+    eventBusDelegate.post(evt);
+    dao.clearBusEvent(cur.getId(),com.ning.billing.Hostname.get());
   }
   return result;
 }

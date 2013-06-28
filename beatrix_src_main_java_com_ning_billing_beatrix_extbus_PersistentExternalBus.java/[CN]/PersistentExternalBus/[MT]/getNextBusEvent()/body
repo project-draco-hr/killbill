@@ -1,0 +1,14 @@
+{
+  final Date now=clock.getUTCNow().toDate();
+  final Date nextAvailable=clock.getUTCNow().plus(DELTA_IN_PROCESSING_TIME_MS).toDate();
+  final List<BusEventEntry> entries=dao.getNextBusEventEntries(config.getPrefetchAmount(),com.ning.billing.Hostname.get(),now);
+  final List<BusEventEntry> claimedEntries=new LinkedList<BusEventEntry>();
+  for (  final BusEventEntry entry : entries) {
+    final boolean claimed=(dao.claimBusEvent(com.ning.billing.Hostname.get(),nextAvailable,entry.getId(),now) == 1);
+    if (claimed) {
+      dao.insertClaimedHistory(com.ning.billing.Hostname.get(),now,entry.getId(),entry.getAccountRecordId(),entry.getTenantRecordId());
+      claimedEntries.add(entry);
+    }
+  }
+  return claimedEntries;
+}

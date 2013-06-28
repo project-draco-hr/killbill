@@ -1,0 +1,11 @@
+{
+  final String json;
+  try {
+    json=objectMapper.writeValueAsString(event);
+    final BusEventEntry entry=new BusEventEntry(com.ning.billing.Hostname.get(),event.getClass().getName(),json,event.getUserToken(),event.getAccountRecordId(),event.getTenantRecordId());
+    dao.insertBusEvent(entry);
+  }
+ catch (  JsonProcessingException e) {
+    throw new EventBusException("Failed to serialize ext bus event",e);
+  }
+}
