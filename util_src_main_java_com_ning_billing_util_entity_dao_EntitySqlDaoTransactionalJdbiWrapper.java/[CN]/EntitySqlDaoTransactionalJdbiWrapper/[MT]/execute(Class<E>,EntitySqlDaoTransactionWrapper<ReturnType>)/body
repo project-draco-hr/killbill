@@ -1,0 +1,17 @@
+{
+  final EntitySqlDao<EntityModelDao<Entity>,Entity> entitySqlDao=dbi.onDemand(InitialEntitySqlDao.class);
+  try {
+    return execute(entitySqlDaoTransactionWrapper);
+  }
+ catch (  RuntimeException e) {
+    if (e.getCause() != null && e.getCause().getClass().isAssignableFrom(exception)) {
+      throw (E)e.getCause();
+    }
+ else     if (e.getCause() != null && e.getCause() instanceof RuntimeException) {
+      throw (RuntimeException)e.getCause();
+    }
+ else {
+      throw e;
+    }
+  }
+}
