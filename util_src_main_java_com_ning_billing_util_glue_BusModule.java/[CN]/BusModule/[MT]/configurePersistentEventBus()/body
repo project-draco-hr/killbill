@@ -1,5 +1,5 @@
 {
   configurePersistentBusConfig();
-  bind(String.class).annotatedWith(BusTableName.class).toInstance(tableName);
-  bind(PersistentBus.class).to(DefaultPersistentBus.class).asEagerSingleton();
+  bind(BusProvider.class).toInstance(new BusProvider(tableName));
+  bind(PersistentBus.class).toProvider(BusProvider.class).asEagerSingleton();
 }

@@ -1,6 +1,5 @@
 {
   loadSystemPropertiesFromClasspath("/beatrix.properties");
-  bind(Lifecycle.class).to(SubsetDefaultLifecycle.class).asEagerSingleton();
   install(new GuicyKillbillTestWithEmbeddedDBModule());
   install(new GlobalLockerModule());
   install(new CacheModule(configSource));
@@ -25,11 +24,11 @@
   install(new DefaultOSGIModule(configSource));
   install(new NonEntityDaoModule());
   install(new RecordIdModule());
+  install(new BeatrixModuleWithSubsetLifecycle());
   bind(AccountChecker.class).asEagerSingleton();
   bind(EntitlementChecker.class).asEagerSingleton();
   bind(InvoiceChecker.class).asEagerSingleton();
   bind(PaymentChecker.class).asEagerSingleton();
   bind(RefundChecker.class).asEagerSingleton();
   bind(AuditChecker.class).asEagerSingleton();
-  installPublicBus();
 }
