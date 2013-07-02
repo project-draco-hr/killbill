@@ -1,9 +1,0 @@
-{
-  final UUID invoiceId=UUID.randomUUID();
-  Assert.assertFalse(BusinessInvoiceUtils.isInvoiceAdjustmentItem(createInvoiceItem(invoiceId,InvoiceItemType.RECURRING),ImmutableList.<InvoiceItem>of()));
-  Assert.assertTrue(BusinessInvoiceUtils.isInvoiceAdjustmentItem(createInvoiceItem(invoiceId,InvoiceItemType.REFUND_ADJ),ImmutableList.<InvoiceItem>of()));
-  final InvoiceItem creditAdj=createInvoiceItem(invoiceId,InvoiceItemType.CREDIT_ADJ);
-  Assert.assertFalse(BusinessInvoiceUtils.isInvoiceAdjustmentItem(creditAdj,ImmutableList.<InvoiceItem>of(createInvoiceItem(invoiceId,InvoiceItemType.CBA_ADJ,creditAdj.getAmount().negate()))));
-  Assert.assertTrue(BusinessInvoiceUtils.isInvoiceAdjustmentItem(creditAdj,ImmutableList.<InvoiceItem>of(createInvoiceItem(invoiceId,InvoiceItemType.CBA_ADJ,creditAdj.getAmount().negate().add(BigDecimal.ONE)))));
-  Assert.assertTrue(BusinessInvoiceUtils.isInvoiceAdjustmentItem(creditAdj,ImmutableList.<InvoiceItem>of(createInvoiceItem(invoiceId,InvoiceItemType.RECURRING),createInvoiceItem(invoiceId,InvoiceItemType.CBA_ADJ,creditAdj.getAmount().negate()))));
-}

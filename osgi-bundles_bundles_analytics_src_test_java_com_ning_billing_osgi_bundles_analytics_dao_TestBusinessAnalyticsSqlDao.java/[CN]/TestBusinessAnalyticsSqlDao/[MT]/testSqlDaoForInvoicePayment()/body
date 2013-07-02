@@ -1,9 +1,0 @@
-{
-  final BusinessInvoicePaymentBaseModelDao businessInvoicePaymentModelDao=BusinessInvoicePaymentModelDao.create(account,accountRecordId,invoice,invoicePayment,invoicePaymentRecordId,payment,null,paymentMethod,auditLog,tenantRecordId,reportGroup);
-  Assert.assertEquals(analyticsSqlDao.getInvoicePaymentsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),0);
-  analyticsSqlDao.create(businessInvoicePaymentModelDao.getTableName(),businessInvoicePaymentModelDao,callContext);
-  Assert.assertEquals(analyticsSqlDao.getInvoicePaymentsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),1);
-  Assert.assertEquals(analyticsSqlDao.getInvoicePaymentsByAccountRecordId(accountRecordId,tenantRecordId,callContext).get(0),businessInvoicePaymentModelDao);
-  analyticsSqlDao.deleteByAccountRecordId(businessInvoicePaymentModelDao.getTableName(),accountRecordId,tenantRecordId,callContext);
-  Assert.assertEquals(analyticsSqlDao.getInvoicePaymentsByAccountRecordId(accountRecordId,tenantRecordId,callContext).size(),0);
-}
