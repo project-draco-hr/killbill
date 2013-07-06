@@ -1,0 +1,7 @@
+{
+  final ControlTagDeletionInternalEvent event=eventWithMetadata.getEvent();
+  if (event.getTagDefinition().getName().equals(ControlTagType.OVERDUE_ENFORCEMENT_OFF.toString()) && event.getObjectType() == ObjectType.ACCOUNT) {
+    final UUID accountId=event.getObjectId();
+    dispatcher.processOverdueForAccount(accountId,createCallContext(eventWithMetadata.getUserToken(),eventWithMetadata.getSearchKey1(),eventWithMetadata.getSearchKey2()));
+  }
+}

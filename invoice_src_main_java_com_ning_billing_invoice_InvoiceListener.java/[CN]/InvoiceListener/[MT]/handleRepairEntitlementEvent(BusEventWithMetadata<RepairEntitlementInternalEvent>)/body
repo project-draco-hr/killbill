@@ -1,0 +1,10 @@
+{
+  final RepairEntitlementInternalEvent repairEvent=eventWithMetadata.getEvent();
+  try {
+    final InternalCallContext context=internalCallContextFactory.createInternalCallContext(eventWithMetadata.getSearchKey2(),eventWithMetadata.getSearchKey1(),"RepairBundle",CallOrigin.INTERNAL,UserType.SYSTEM,eventWithMetadata.getUserToken());
+    dispatcher.processAccount(repairEvent.getAccountId(),repairEvent.getEffectiveDate(),false,context);
+  }
+ catch (  InvoiceApiException e) {
+    log.error(e.getMessage());
+  }
+}

@@ -3,9 +3,9 @@
     final NotificationQueue checkOverdueQueue=notificationQueueService.getNotificationQueue(DefaultOverdueService.OVERDUE_SERVICE_NAME,DefaultOverdueCheckNotifier.OVERDUE_CHECK_NOTIFIER_QUEUE);
     transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
       @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
-        final List<Notification> futureNotifications=getFutureNotificationsForAccountAndOverdueableInTransaction(entitySqlDaoWrapperFactory,checkOverdueQueue,overdueable,context);
-        for (        final Notification notification : futureNotifications) {
-          checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),notification.getId());
+        final Collection<NotificationEventWithMetadata<OverdueCheckNotificationKey>> futureNotifications=getFutureNotificationsForAccountAndOverdueableInTransaction(entitySqlDaoWrapperFactory,checkOverdueQueue,overdueable,context);
+        for (        final NotificationEventWithMetadata<OverdueCheckNotificationKey> notification : futureNotifications) {
+          checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),notification.getRecordId());
         }
         return null;
       }

@@ -1,0 +1,13 @@
+{
+  final BusInternalEvent event=eventWithMetadata.getEvent();
+  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(eventWithMetadata.getSearchKey2(),eventWithMetadata.getSearchKey1(),"BeatrixListener",CallOrigin.INTERNAL,UserType.SYSTEM,eventWithMetadata.getUserToken());
+  try {
+    final BusEvent externalEvent=computeExtBusEventEntryFromBusInternalEvent(event,internalContext);
+    if (externalEvent != null) {
+      externalBus.post(externalEvent,internalContext.getUserToken(),internalContext.getAccountRecordId(),internalContext.getTenantRecordId());
+    }
+  }
+ catch (  EventBusException e) {
+    log.warn("Failed to dispatch external bus events",e);
+  }
+}

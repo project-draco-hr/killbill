@@ -1,0 +1,18 @@
+{
+  final InvoiceCreationInternalEvent event=eventWithMetadata.getEvent();
+  log.info("Received invoice creation notification for account {} and invoice {}",event.getAccountId(),event.getInvoiceId());
+  final Account account;
+  try {
+    final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(eventWithMetadata.getSearchKey2(),eventWithMetadata.getSearchKey1(),"PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,eventWithMetadata.getUserToken());
+    account=accountApi.getAccountById(event.getAccountId(),internalContext);
+    paymentProcessor.createPayment(account,event.getInvoiceId(),null,internalContext,false,false);
+  }
+ catch (  AccountApiException e) {
+    log.error("Failed to process invoice payment",e);
+  }
+catch (  PaymentApiException e) {
+    if (e.getCode() != ErrorCode.PAYMENT_NULL_INVOICE.getCode() && e.getCode() != ErrorCode.PAYMENT_CREATE_PAYMENT.getCode()) {
+      log.error("Failed to process invoice payment {}",e.toString());
+    }
+  }
+}

@@ -18,7 +18,7 @@
     if (invoice == null) {
       log.info("Generated null invoice for accountId {} and targetDate {} (targetDateTime {})",new Object[]{accountId,targetDate,targetDateTime});
       if (!dryRun) {
-        final BusInternalEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+        final BusInternalEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday());
         postEvent(event,accountId,context);
       }
     }
@@ -53,10 +53,10 @@
         setChargedThroughDates(dateAndTimeZoneContext,fixedPriceInvoiceItems,recurringInvoiceItems,context);
         final List<InvoiceInternalEvent> events=new ArrayList<InvoiceInternalEvent>();
         if (isRealInvoiceWithItems) {
-          events.add(new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId()));
+          events.add(new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency()));
         }
         for (        UUID cur : adjustedUniqueOtherInvoiceId) {
-          final InvoiceAdjustmentInternalEvent event=new DefaultInvoiceAdjustmentEvent(cur,invoice.getAccountId(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+          final InvoiceAdjustmentInternalEvent event=new DefaultInvoiceAdjustmentEvent(cur,invoice.getAccountId());
           events.add(event);
         }
         for (        InvoiceInternalEvent event : events) {

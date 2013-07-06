@@ -2,7 +2,7 @@
   final InternalCallContext context=createCallContextFromPaymentId(paymentId);
   try {
     final NotificationQueue retryQueue=notificationQueueService.getNotificationQueue(DefaultPaymentService.SERVICE_NAME,getQueueName());
-    final NotificationKey key=new PaymentRetryNotificationKey(paymentId);
+    final NotificationEvent key=new PaymentRetryNotificationKey(paymentId);
     if (retryQueue != null) {
       if (transactionalDao == null) {
         retryQueue.recordFutureNotification(timeOfRetry,key,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());

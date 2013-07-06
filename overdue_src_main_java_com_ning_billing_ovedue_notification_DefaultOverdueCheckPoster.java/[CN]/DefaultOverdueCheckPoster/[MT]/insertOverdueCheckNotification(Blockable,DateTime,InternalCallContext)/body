@@ -5,9 +5,9 @@
     transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
       @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
         boolean shouldInsertNewNotification=true;
-        final List<Notification> futureNotifications=getFutureNotificationsForAccountAndOverdueableInTransaction(entitySqlDaoWrapperFactory,checkOverdueQueue,overdueable,context);
+        final Collection<NotificationEventWithMetadata<OverdueCheckNotificationKey>> futureNotifications=getFutureNotificationsForAccountAndOverdueableInTransaction(entitySqlDaoWrapperFactory,checkOverdueQueue,overdueable,context);
         if (futureNotifications.size() > 0) {
-          final DateTime earliestExistingNotificationDate=futureNotifications.get(0).getEffectiveDate();
+          final DateTime earliestExistingNotificationDate=futureNotifications.iterator().next().getEffectiveDate();
           final int minIndexToDeleteFrom;
           if (earliestExistingNotificationDate.isBefore(futureNotificationTime)) {
             minIndexToDeleteFrom=1;
@@ -16,8 +16,14 @@
  else {
             minIndexToDeleteFrom=0;
           }
-          for (int i=minIndexToDeleteFrom; i < futureNotifications.size(); i++) {
-            checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),futureNotifications.get(i).getId());
+          int index=0;
+          final Iterator<NotificationEventWithMetadata<OverdueCheckNotificationKey>> it=futureNotifications.iterator();
+          while (it.hasNext()) {
+            final NotificationEventWithMetadata<OverdueCheckNotificationKey> cur=it.next();
+            if (minIndexToDeleteFrom >= index) {
+              checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),cur.getRecordId());
+            }
+            index++;
           }
         }
         if (shouldInsertNewNotification) {

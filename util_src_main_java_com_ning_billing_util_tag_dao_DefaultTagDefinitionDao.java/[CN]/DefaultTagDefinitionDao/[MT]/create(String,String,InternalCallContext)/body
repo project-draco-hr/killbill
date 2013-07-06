@@ -15,13 +15,13 @@
         final boolean isControlTag=TagModelDaoHelper.isControlTag(tagDefinition.getName());
         final TagDefinitionInternalEvent tagDefinitionEvent;
         if (isControlTag) {
-          tagDefinitionEvent=tagEventBuilder.newControlTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context);
+          tagDefinitionEvent=tagEventBuilder.newControlTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition);
         }
  else {
-          tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context);
+          tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition);
         }
         try {
-          bus.postFromTransaction(tagDefinitionEvent,entitySqlDaoWrapperFactory.getSqlDao());
+          bus.postFromTransaction(tagDefinitionEvent,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId(),entitySqlDaoWrapperFactory.getSqlDao());
         }
  catch (        PersistentBus.EventBusException e) {
           log.warn("Failed to post tag definition creation event for tag " + tagDefinition.getId(),e);
