@@ -1,0 +1,14 @@
+{
+  final ExtBusEvent event=eventWithMetadata.getEvent();
+  final TenantContext context=contextFactory.createTenantContext(event.getTenantId());
+  try {
+    final List<String> callbacks=getCallbacksForTenant(context);
+    dispatchCallback(event.getTenantId(),event,callbacks);
+  }
+ catch (  final TenantApiException e) {
+    log.warn("Failed to retrieve push notification callback for tenant {}",event.getTenantId());
+  }
+catch (  final IOException e) {
+    log.warn("Failed to retrieve push notification callback for tenant {}",event.getTenantId());
+  }
+}
