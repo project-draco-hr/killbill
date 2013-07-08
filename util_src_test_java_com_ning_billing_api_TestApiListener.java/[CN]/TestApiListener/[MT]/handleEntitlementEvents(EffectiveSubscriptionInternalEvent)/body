@@ -1,0 +1,43 @@
+{
+  log.info(String.format("Got subscription event %s",eventEffective.toString()));
+switch (eventEffective.getTransitionType()) {
+case TRANSFER:
+    assertEqualsNicely(NextEvent.TRANSFER);
+  notifyIfStackEmpty();
+break;
+case MIGRATE_ENTITLEMENT:
+assertEqualsNicely(NextEvent.MIGRATE_ENTITLEMENT);
+notifyIfStackEmpty();
+break;
+case MIGRATE_BILLING:
+assertEqualsNicely(NextEvent.MIGRATE_BILLING);
+notifyIfStackEmpty();
+break;
+case CREATE:
+assertEqualsNicely(NextEvent.CREATE);
+notifyIfStackEmpty();
+break;
+case RE_CREATE:
+assertEqualsNicely(NextEvent.RE_CREATE);
+notifyIfStackEmpty();
+break;
+case CANCEL:
+assertEqualsNicely(NextEvent.CANCEL);
+notifyIfStackEmpty();
+break;
+case CHANGE:
+assertEqualsNicely(NextEvent.CHANGE);
+notifyIfStackEmpty();
+break;
+case UNCANCEL:
+assertEqualsNicely(NextEvent.UNCANCEL);
+notifyIfStackEmpty();
+break;
+case PHASE:
+assertEqualsNicely(NextEvent.PHASE);
+notifyIfStackEmpty();
+break;
+default :
+throw new RuntimeException("Unexpected event type " + eventEffective.getRequestedTransitionTime());
+}
+}
