@@ -15,4 +15,10 @@
   SubscriptionData subscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,callContext));
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
+  await().atMost(10,SECONDS).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return externalBusCount.get() == 4;
+    }
+  }
+);
 }
