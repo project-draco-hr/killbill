@@ -1,0 +1,9 @@
+{
+  try {
+    invoiceDao.createRefund(UUID.randomUUID(),BigDecimal.TEN,false,ImmutableMap.<UUID,BigDecimal>of(),null,internalCallContext);
+    Assert.fail();
+  }
+ catch (  InvoiceApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.INVOICE_PAYMENT_BY_ATTEMPT_NOT_FOUND.getCode());
+  }
+}

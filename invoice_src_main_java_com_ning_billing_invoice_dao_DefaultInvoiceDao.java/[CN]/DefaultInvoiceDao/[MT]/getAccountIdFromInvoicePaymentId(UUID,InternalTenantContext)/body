@@ -1,5 +1,5 @@
 {
-  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<UUID>(){
+  return transactionalSqlDao.execute(InvoiceApiException.class,new EntitySqlDaoTransactionWrapper<UUID>(){
     @Override public UUID inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final UUID accountId=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class).getAccountIdFromInvoicePaymentId(invoicePaymentId.toString(),context);
       if (accountId == null) {

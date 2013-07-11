@@ -12,9 +12,8 @@
     invoiceDao.deleteCBA(accountId,invoice1.getId(),creditBalanceAdjInvoiceItem1.getId(),internalCallContext);
     Assert.fail();
   }
- catch (  TransactionFailedException e) {
-    Assert.assertTrue(e.getCause() instanceof InvoiceApiException);
-    Assert.assertEquals(((InvoiceApiException)e.getCause()).getCode(),ErrorCode.INVOICE_WOULD_BE_NEGATIVE.getCode());
+ catch (  InvoiceApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.INVOICE_WOULD_BE_NEGATIVE.getCode());
   }
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,internalCallContext).doubleValue(),10.00);
   invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00);

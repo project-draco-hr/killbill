@@ -1,7 +1,12 @@
 {
-  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<InvoiceItemModelDao>(){
+  return transactionalSqlDao.execute(InvoiceApiException.class,new EntitySqlDaoTransactionWrapper<InvoiceItemModelDao>(){
     @Override public InvoiceItemModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
-      return entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class).getById(externalChargeId.toString(),context);
+      final InvoiceItemSqlDao invoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
+      final InvoiceItemModelDao invoiceItemModelDao=invoiceItemSqlDao.getById(externalChargeId.toString(),context);
+      if (invoiceItemModelDao == null) {
+        throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_NOT_FOUND,externalChargeId.toString());
+      }
+      return invoiceItemModelDao;
     }
   }
 );

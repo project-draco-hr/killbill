@@ -1,5 +1,12 @@
 {
   final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(objectId,objectType,context);
   final TagModelDao tag=new TagModelDao(context.getCreatedDate(),tagDefinitionId,objectId,objectType);
-  tagDao.create(tag,internalContext);
+  try {
+    tagDao.create(tag,internalContext);
+  }
+ catch (  TagApiException e) {
+    if (ErrorCode.TAG_ALREADY_EXISTS.getCode() != e.getCode()) {
+      throw e;
+    }
+  }
 }

@@ -1,11 +1,23 @@
 {
-  final TagDefinitionJson input=new TagDefinitionJson(new UUID(0,1).toString(),false,"AUTO_PAY_OFF","nothing more to say",ImmutableList.<String>of());
-  final Map<String,String> queryParams=new HashMap<String,String>();
-  queryParams.put(JaxrsResource.QUERY_TAGS,input.getId());
-  final String uri=JaxrsResource.ACCOUNTS_PATH + "/" + UUID.randomUUID().toString()+ "/"+ JaxrsResource.TAGS;
-  Response response=doPost(uri,null,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
+  final String accountId=UUID.randomUUID().toString();
+  final String uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountId+ "/"+ JaxrsResource.TAGS;
+  final String accountTagsUrl=getUrlFromUri(uri);
+  final String autoPayOffId=new UUID(0,1).toString();
+  Response response=doPost(uri,null,ImmutableMap.<String,String>of(JaxrsResource.QUERY_TAGS,autoPayOffId),DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  final String url=getUrlFromUri(uri);
-  response=doGetWithUrl(url,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  response=doGetWithUrl(accountTagsUrl,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  final List<TagJson> tags1=mapper.readValue(response.getResponseBody(),new TypeReference<List<TagJson>>(){
+  }
+);
+  Assert.assertEquals(tags1.size(),1);
+  Assert.assertEquals(tags1.get(0).getTagDefinitionId(),autoPayOffId);
+  response=doPost(uri,null,ImmutableMap.<String,String>of(JaxrsResource.QUERY_TAGS,autoPayOffId),DEFAULT_HTTP_TIMEOUT_SEC);
+  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
+  response=doGetWithUrl(accountTagsUrl,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
+  final List<TagJson> tags2=mapper.readValue(response.getResponseBody(),new TypeReference<List<TagJson>>(){
+  }
+);
+  Assert.assertEquals(tags2,tags1);
 }

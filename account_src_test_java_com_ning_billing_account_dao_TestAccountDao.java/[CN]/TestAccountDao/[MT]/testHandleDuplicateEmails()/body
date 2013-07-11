@@ -9,8 +9,7 @@
     accountDao.addEmail(accountEmailModelDao,internalCallContext);
     Assert.fail();
   }
- catch (  TransactionFailedException e) {
-    Assert.assertTrue(e.getCause() instanceof AccountApiException);
-    Assert.assertEquals(((AccountApiException)e.getCause()).getCode(),ErrorCode.ACCOUNT_EMAIL_ALREADY_EXISTS.getCode());
+ catch (  AccountApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.ACCOUNT_EMAIL_ALREADY_EXISTS.getCode());
   }
 }
