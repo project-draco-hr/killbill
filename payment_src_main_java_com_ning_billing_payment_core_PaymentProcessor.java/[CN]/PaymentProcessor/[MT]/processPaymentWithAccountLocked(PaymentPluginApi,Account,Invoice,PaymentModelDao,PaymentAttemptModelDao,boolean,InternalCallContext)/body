@@ -46,6 +46,7 @@ throw new PaymentPluginApiException("",formatError);
  catch (PaymentPluginApiException e) {
 paymentStatus=isInstantPayment ? PaymentStatus.PAYMENT_FAILURE_ABORTED : scheduleRetryOnPluginFailure(paymentInput.getId(),context);
 paymentDao.updateStatusAndEffectiveDateForPaymentWithAttempt(paymentInput.getId(),paymentStatus,clock.getUTCNow(),attemptInput.getId(),null,e.getMessage(),context);
+event=new DefaultPaymentPluginErrorEvent(account.getId(),invoice.getId(),paymentInput.getId(),e.getMessage(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
 throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),e.toString());
 }
 catch (InvoiceApiException e) {
