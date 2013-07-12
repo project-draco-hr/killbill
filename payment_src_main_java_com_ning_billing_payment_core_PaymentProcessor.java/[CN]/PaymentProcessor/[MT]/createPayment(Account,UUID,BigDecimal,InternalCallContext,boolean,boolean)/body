@@ -1,20 +1,10 @@
 {
-  final PaymentPluginApi plugin;
-  final UUID paymentMethodId;
-  try {
-    if (isExternalPayment) {
-      plugin=paymentMethodProcessor.getExternalPaymentProviderPlugin(account,context);
-      paymentMethodId=paymentMethodProcessor.getExternalPaymentMethod(account,context).getId();
-    }
- else {
-      plugin=getPaymentProviderPlugin(account,context);
-      paymentMethodId=account.getPaymentMethodId();
-    }
+  final PaymentPluginApi externalPaymentPlugin;
+  if (isExternalPayment) {
+    externalPaymentPlugin=paymentMethodProcessor.getExternalPaymentProviderPlugin(account,context);
   }
- catch (  PaymentApiException e) {
-    final PaymentErrorInternalEvent event=new DefaultPaymentErrorEvent(account.getId(),invoiceId,null,ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD.toString(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
-    postPaymentEvent(event,account.getId(),context);
-    throw e;
+ else {
+    externalPaymentPlugin=null;
   }
   try {
     return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
@@ -25,9 +15,26 @@
             log.error("Received invoice for payment that is a migration invoice - don't know how to handle those yet: {}",invoice);
             return null;
           }
+          final BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
+          final PaymentPluginApi plugin;
+          final UUID paymentMethodId;
+          try {
+            if (isExternalPayment) {
+              plugin=externalPaymentPlugin;
+              paymentMethodId=paymentMethodProcessor.getExternalPaymentMethod(account,context).getId();
+            }
+ else {
+              plugin=getPaymentProviderPlugin(account,context);
+              paymentMethodId=account.getPaymentMethodId();
+            }
+          }
+ catch (          PaymentApiException e) {
+            final PaymentErrorInternalEvent event=new DefaultPaymentErrorEvent(account.getId(),invoiceId,null,ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD.toString(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+            postPaymentEvent(event,account.getId(),context);
+            throw e;
+          }
           final boolean isAccountAutoPayOff=isAccountAutoPayOff(account.getId(),context);
           setUnsaneAccount_AUTO_PAY_OFFWithAccountLock(account.getId(),paymentMethodId,isAccountAutoPayOff,context,isInstantPayment);
-          final BigDecimal requestedAmount=getAndValidatePaymentAmount(invoice,inputAmount,isInstantPayment);
           if (!isInstantPayment && isAccountAutoPayOff) {
             return processNewPaymentForAutoPayOffWithAccountLocked(paymentMethodId,account,invoice,requestedAmount,context);
           }
