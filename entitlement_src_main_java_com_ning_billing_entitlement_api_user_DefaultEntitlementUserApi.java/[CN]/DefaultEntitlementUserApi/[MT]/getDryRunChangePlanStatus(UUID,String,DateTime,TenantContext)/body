@@ -1,10 +1,10 @@
 {
   final Subscription subscription=dao.getSubscriptionFromId(subscriptionId,internalCallContextFactory.createInternalTenantContext(context));
   if (subscription == null) {
-    throw new EntitlementUserApiException(ErrorCode.ENT_INVALID_SUBSCRIPTION_ID,subscriptionId);
+    throw new SubscriptionUserApiException(ErrorCode.SUB_INVALID_SUBSCRIPTION_ID,subscriptionId);
   }
   if (subscription.getCategory() != ProductCategory.BASE) {
-    throw new EntitlementUserApiException(ErrorCode.ENT_CHANGE_DRY_RUN_NOT_BP);
+    throw new SubscriptionUserApiException(ErrorCode.SUB_CHANGE_DRY_RUN_NOT_BP);
   }
   final List<SubscriptionStatusDryRun> result=new LinkedList<SubscriptionStatusDryRun>();
   final List<Subscription> bundleSubscriptions=dao.getSubscriptions(subscription.getBundleId(),internalCallContextFactory.createInternalTenantContext(context));

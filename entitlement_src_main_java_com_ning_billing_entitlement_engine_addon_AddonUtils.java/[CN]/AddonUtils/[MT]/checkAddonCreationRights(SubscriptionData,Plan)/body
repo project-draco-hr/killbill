@@ -1,12 +1,12 @@
 {
   if (baseSubscription.getState() != SubscriptionState.ACTIVE) {
-    throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_AO_BP_NON_ACTIVE,targetAddOnPlan.getName());
+    throw new SubscriptionUserApiException(ErrorCode.SUB_CREATE_AO_BP_NON_ACTIVE,targetAddOnPlan.getName());
   }
   final Product baseProduct=baseSubscription.getCurrentPlan().getProduct();
   if (isAddonIncluded(baseProduct,targetAddOnPlan)) {
-    throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_AO_ALREADY_INCLUDED,targetAddOnPlan.getName(),baseSubscription.getCurrentPlan().getProduct().getName());
+    throw new SubscriptionUserApiException(ErrorCode.SUB_CREATE_AO_ALREADY_INCLUDED,targetAddOnPlan.getName(),baseSubscription.getCurrentPlan().getProduct().getName());
   }
   if (!isAddonAvailable(baseProduct,targetAddOnPlan)) {
-    throw new EntitlementUserApiException(ErrorCode.ENT_CREATE_AO_NOT_AVAILABLE,targetAddOnPlan.getName(),baseSubscription.getCurrentPlan().getProduct().getName());
+    throw new SubscriptionUserApiException(ErrorCode.SUB_CREATE_AO_NOT_AVAILABLE,targetAddOnPlan.getName(),baseSubscription.getCurrentPlan().getProduct().getName());
   }
 }

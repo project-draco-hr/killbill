@@ -14,10 +14,10 @@
       }
     }
     if (!foundDeletedEvent && nbDeleted > 0) {
-      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_INVALID_DELETE_SET,cur.getId(),data.getId());
+      throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_INVALID_DELETE_SET,cur.getId(),data.getId());
     }
     if (firstBPDeletedTime != null && !cur.getEffectiveDate().isBefore(firstBPDeletedTime) && !foundDeletedEvent) {
-      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_MISSING_AO_DELETE_EVENT,cur.getId(),data.getId());
+      throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_MISSING_AO_DELETE_EVENT,cur.getId(),data.getId());
     }
     if (nbDeleted == 0) {
       result.add(cur);
@@ -32,7 +32,7 @@
         }
       }
       if (!found) {
-        throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_NON_EXISTENT_DELETE_EVENT,d.getEventId(),data.getId());
+        throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_NON_EXISTENT_DELETE_EVENT,d.getEventId(),data.getId());
       }
     }
   }

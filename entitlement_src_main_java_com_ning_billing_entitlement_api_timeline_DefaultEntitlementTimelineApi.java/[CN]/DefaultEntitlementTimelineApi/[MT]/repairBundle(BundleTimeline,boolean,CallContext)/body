@@ -3,15 +3,15 @@
   try {
     final SubscriptionBundle bundle=dao.getSubscriptionBundleFromId(input.getId(),tenantContext);
     if (bundle == null) {
-      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_BUNDLE,input.getId());
+      throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_UNKNOWN_BUNDLE,input.getId());
     }
     final List<SubscriptionDataRepair> subscriptions=convertToSubscriptionsDataRepair(dao.getSubscriptions(input.getId(),tenantContext));
     if (subscriptions.size() == 0) {
-      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_NO_ACTIVE_SUBSCRIPTIONS,input.getId());
+      throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_NO_ACTIVE_SUBSCRIPTIONS,input.getId());
     }
     final String viewId=getViewId(((SubscriptionBundleData)bundle).getLastSysUpdateDate(),subscriptions);
     if (!viewId.equals(input.getViewId())) {
-      throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_VIEW_CHANGED,input.getId(),input.getViewId(),viewId);
+      throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_VIEW_CHANGED,input.getId(),input.getViewId(),viewId);
     }
     DateTime firstDeletedBPEventTime=null;
     DateTime lastRemainingBPEventTime=null;
@@ -28,10 +28,10 @@
         final boolean isPlanRecreate=(curRepair.getNewEvents().size() > 0 && (curRepair.getNewEvents().get(0).getSubscriptionTransitionType() == SubscriptionTransitionType.CREATE || curRepair.getNewEvents().get(0).getSubscriptionTransitionType() == SubscriptionTransitionType.RE_CREATE));
         final DateTime newSubscriptionStartDate=isPlanRecreate ? curRepair.getNewEvents().get(0).getRequestedDate() : null;
         if (isPlanRecreate && remaining.size() != 0) {
-          throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_SUB_RECREATE_NOT_EMPTY,cur.getId(),cur.getBundleId());
+          throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_SUB_RECREATE_NOT_EMPTY,cur.getId(),cur.getBundleId());
         }
         if (!isPlanRecreate && remaining.size() == 0) {
-          throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_SUB_EMPTY,cur.getId(),cur.getBundleId());
+          throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_SUB_EMPTY,cur.getId(),cur.getBundleId());
         }
         if (cur.getCategory() == ProductCategory.BASE) {
           final int bpTransitionSize=((SubscriptionData)cur).getAllTransitions().size();
@@ -49,7 +49,7 @@
         inRepair.add(curOutputRepair);
         if (curOutputRepair.getCategory() == ProductCategory.ADD_ON) {
           if (isPlanRecreate && (subscriptions.get(0)).getStartDate().isAfter(curRepair.getNewEvents().get(0).getRequestedDate())) {
-            throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_AO_CREATE_BEFORE_BP_START,cur.getId(),cur.getBundleId());
+            throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_AO_CREATE_BEFORE_BP_START,cur.getId(),cur.getBundleId());
           }
           addOnSubscriptionInRepair.add(curOutputRepair);
         }
@@ -85,7 +85,7 @@ for (final NewEvent newEvent : newEvents) {
 final DefaultNewEvent cur=(DefaultNewEvent)newEvent;
 final SubscriptionDataRepair curDataRepair=findSubscriptionDataRepair(cur.getSubscriptionId(),inRepair);
 if (curDataRepair == null) {
-throw new EntitlementRepairException(ErrorCode.ENT_REPAIR_UNKNOWN_SUBSCRIPTION,cur.getSubscriptionId());
+throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_UNKNOWN_SUBSCRIPTION,cur.getSubscriptionId());
 }
 curDataRepair.addNewRepairEvent(cur,baseSubscriptionRepair,addOnSubscriptionInRepair,context);
 }
@@ -100,7 +100,7 @@ return getBundleTimeline(input.getId(),context);
 }
 }
  catch (CatalogApiException e) {
-throw new EntitlementRepairException(e);
+throw new SubscriptionRepairException(e);
 }
  finally {
 repairDao.cleanup(tenantContext);

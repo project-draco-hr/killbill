@@ -1,6 +1,6 @@
 {
   test.withException(new TestWithExceptionCallback(){
-    @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
+    @Override public void doTest() throws SubscriptionRepairException, SubscriptionUserApiException {
       Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
       clock.addDeltaFromReality(it.toDurationMillis());
       final SubscriptionData aoSubscription=testUtil.createSubscription(bundle,"Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
@@ -24,5 +24,5 @@
       repairApi.repairBundle(bRepair,dryRun,callContext);
     }
   }
-,ErrorCode.ENT_REPAIR_AO_CREATE_BEFORE_BP_START);
+,ErrorCode.SUB_REPAIR_AO_CREATE_BEFORE_BP_START);
 }

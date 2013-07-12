@@ -2,7 +2,7 @@
   try {
     final SubscriptionState currentState=subscription.getState();
     if (currentState != SubscriptionState.ACTIVE) {
-      throw new EntitlementUserApiException(ErrorCode.ENT_CANCEL_BAD_STATE,subscription.getId(),currentState);
+      throw new SubscriptionUserApiException(ErrorCode.SUB_CANCEL_BAD_STATE,subscription.getId(),currentState);
     }
     final DateTime now=clock.getUTCNow();
     final DateTime requestedDate=(requestedDateWithMs != null) ? DefaultClock.truncateMs(requestedDateWithMs) : now;
@@ -12,6 +12,6 @@
     return doCancelPlan(subscription,requestedDateWithMs,now,policy,context);
   }
  catch (  CatalogApiException e) {
-    throw new EntitlementUserApiException(e);
+    throw new SubscriptionUserApiException(e);
   }
 }

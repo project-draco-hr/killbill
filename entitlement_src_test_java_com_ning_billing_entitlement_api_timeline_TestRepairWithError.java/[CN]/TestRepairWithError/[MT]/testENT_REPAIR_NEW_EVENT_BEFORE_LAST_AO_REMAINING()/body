@@ -1,6 +1,6 @@
 {
   test.withException(new TestWithExceptionCallback(){
-    @Override public void doTest() throws EntitlementRepairException, EntitlementUserApiException {
+    @Override public void doTest() throws SubscriptionRepairException, SubscriptionUserApiException {
       Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
       clock.addDeltaFromReality(it.toDurationMillis());
       final SubscriptionData aoSubscription=testUtil.createSubscription(bundle,"Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
@@ -21,5 +21,5 @@
       repairApi.repairBundle(bundleRepair,dryRun,callContext);
     }
   }
-,ErrorCode.ENT_REPAIR_NEW_EVENT_BEFORE_LAST_AO_REMAINING);
+,ErrorCode.SUB_REPAIR_NEW_EVENT_BEFORE_LAST_AO_REMAINING);
 }
