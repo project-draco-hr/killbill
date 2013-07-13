@@ -1,11 +1,11 @@
 {
-  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",callContext);
+  final SubscriptionBundle bundle=subscriptionUserApi.createBundleForAccount(account.getId(),"whatever",callContext);
   final String productName="Shotgun";
   final BillingPeriod term=BillingPeriod.ANNUAL;
   final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE);
   final PlanPhaseSpecifier bpPlanPhaseSpecifier=new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null);
-  final SubscriptionData bpSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),bpPlanPhaseSpecifier,null,callContext));
+  final SubscriptionData bpSubscription=subscriptionDataFromSubscription(subscriptionUserApi.createSubscription(bundle.getId(),bpPlanPhaseSpecifier,null,callContext));
   assertNotNull(bpSubscription);
   assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();

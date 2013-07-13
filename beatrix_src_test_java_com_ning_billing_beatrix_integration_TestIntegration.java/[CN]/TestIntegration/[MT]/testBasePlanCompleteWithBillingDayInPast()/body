@@ -4,7 +4,7 @@
   log.info("Beginning test with BCD of " + billingDay);
   final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(billingDay));
   clock.setTime(initialCreationDate);
-  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever",callContext);
+  final SubscriptionBundle bundle=subscriptionUserApi.createBundleForAccount(account.getId(),"whatever",callContext);
   int invoiceItemCount=1;
   SubscriptionData subscription=subscriptionDataFromSubscription(createSubscriptionAndCheckForCompletion(bundle.getId(),"Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE));
   invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,new ExpectedInvoiceItemCheck(initialCreationDate.toLocalDate(),null,InvoiceItemType.FIXED,new BigDecimal("0")));

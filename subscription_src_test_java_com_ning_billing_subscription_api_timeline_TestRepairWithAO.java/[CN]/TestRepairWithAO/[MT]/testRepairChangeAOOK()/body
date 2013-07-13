@@ -33,7 +33,7 @@
   for (  final ExistingEvent e : expected) {
     testUtil.validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
   }
-  SubscriptionData newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+  SubscriptionData newAoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
   assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newAoSubscription.getAllTransitions().size(),2);
   dryRun=false;
@@ -46,7 +46,7 @@
   for (  final ExistingEvent e : expected) {
     testUtil.validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
   }
-  newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+  newAoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
   assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newAoSubscription.getAllTransitions().size(),3);
   assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
@@ -64,7 +64,7 @@
   it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(60));
   clock.addDeltaFromReality(it.toDurationMillis());
   assertTrue(testListener.isCompleted(5000));
-  newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+  newAoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
   currentPhase=newAoSubscription.getCurrentPhase();
   assertNotNull(currentPhase);
   assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);

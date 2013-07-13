@@ -4,7 +4,7 @@
     final BillingPeriod term=BillingPeriod.ANNUAL;
     final String planSetName="gunclubDiscount";
     testListener.pushExpectedEvent(NextEvent.CREATE);
-    SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),callContext);
+    SubscriptionData subscription=(SubscriptionData)subscriptionApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),callContext);
     assertNotNull(subscription);
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
@@ -21,7 +21,7 @@
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusYears(1));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
-    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId(),callContext);
+    subscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(subscription.getId(),callContext);
     currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);

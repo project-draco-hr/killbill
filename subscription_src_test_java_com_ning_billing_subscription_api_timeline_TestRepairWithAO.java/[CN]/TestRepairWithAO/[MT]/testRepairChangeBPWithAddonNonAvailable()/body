@@ -44,11 +44,11 @@
   for (  final ExistingEvent e : expectedBP) {
     testUtil.validateExistingEventForAssertion(e,bpRepair.getExistingEvents().get(index++));
   }
-  SubscriptionData newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+  SubscriptionData newAoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
   assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newAoSubscription.getAllTransitions().size(),2);
   assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
-  SubscriptionData newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+  SubscriptionData newBaseSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(newBaseSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newBaseSubscription.getAllTransitions().size(),2);
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
@@ -68,11 +68,11 @@
   for (  final ExistingEvent e : expectedBP) {
     testUtil.validateExistingEventForAssertion(e,bpRepair.getExistingEvents().get(index++));
   }
-  newAoSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+  newAoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
   assertEquals(newAoSubscription.getState(),SubscriptionState.CANCELLED);
   assertEquals(newAoSubscription.getAllTransitions().size(),3);
   assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
-  newBaseSubscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+  newBaseSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(newBaseSubscription.getState(),SubscriptionState.ACTIVE);
   assertEquals(newBaseSubscription.getAllTransitions().size(),3);
   assertEquals(newBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);

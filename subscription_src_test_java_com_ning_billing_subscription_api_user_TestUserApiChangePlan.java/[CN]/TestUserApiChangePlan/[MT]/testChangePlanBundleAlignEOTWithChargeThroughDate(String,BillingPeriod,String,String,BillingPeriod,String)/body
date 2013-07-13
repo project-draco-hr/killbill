@@ -15,7 +15,7 @@
     subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
     testListener.setNonExpectedMode();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId(),callContext);
+    subscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(subscription.getId(),callContext);
     subscription.changePlan(toProd,toTerm,toPlanSet,clock.getUTCNow(),callContext);
     assertFalse(testListener.isCompleted(3000));
     testListener.reset();
@@ -29,7 +29,7 @@
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
-    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId(),callContext);
+    subscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(subscription.getId(),callContext);
     currentPhase=subscription.getCurrentPhase();
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.DISCOUNT);
     assertListenerStatus();

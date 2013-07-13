@@ -3,7 +3,7 @@
     final NotificationQueueHandler queueHandler=new NotificationQueueHandler(){
       @Override public void handleReadyNotification(      final NotificationEvent inputKey,      final DateTime eventDateTime,      final UUID fromNotificationQueueUserToken,      final Long accountRecordId,      final Long tenantRecordId){
         if (!(inputKey instanceof SubscriptionNotificationKey)) {
-          log.error("Entitlement service received an unexpected event type {}" + inputKey.getClass().getName());
+          log.error("Subscription service received an unexpected event type {}" + inputKey.getClass().getName());
           return;
         }
         final SubscriptionNotificationKey key=(SubscriptionNotificationKey)inputKey;
@@ -17,7 +17,7 @@
       }
     }
 ;
-    subscriptionEventQueue=notificationQueueService.createNotificationQueue(ENTITLEMENT_SERVICE_NAME,NOTIFICATION_QUEUE_NAME,queueHandler);
+    subscriptionEventQueue=notificationQueueService.createNotificationQueue(SUBSCRIPTION_SERVICE_NAME,NOTIFICATION_QUEUE_NAME,queueHandler);
   }
  catch (  NotificationQueueAlreadyExists e) {
     throw new RuntimeException(e);

@@ -3,12 +3,12 @@
   final UUID uuid=UUID.fromString(accountId);
   accountApi.getAccountById(uuid,tenantContext);
   if (externalKey != null) {
-    final SubscriptionBundle bundle=entitlementApi.getBundleForAccountAndKey(uuid,externalKey,tenantContext);
+    final SubscriptionBundle bundle=subscriptionApi.getBundleForAccountAndKey(uuid,externalKey,tenantContext);
     final BundleJsonNoSubscriptions json=new BundleJsonNoSubscriptions(bundle);
     return Response.status(Status.OK).entity(json).build();
   }
  else {
-    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(uuid,tenantContext);
+    final List<SubscriptionBundle> bundles=subscriptionApi.getBundlesForAccount(uuid,tenantContext);
     final Collection<BundleJsonNoSubscriptions> result=Collections2.transform(bundles,new Function<SubscriptionBundle,BundleJsonNoSubscriptions>(){
       @Override public BundleJsonNoSubscriptions apply(      final SubscriptionBundle input){
         return new BundleJsonNoSubscriptions(input);

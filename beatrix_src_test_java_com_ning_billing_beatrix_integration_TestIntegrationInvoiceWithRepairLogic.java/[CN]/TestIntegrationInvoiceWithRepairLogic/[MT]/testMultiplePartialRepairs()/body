@@ -5,10 +5,10 @@
   final String productName="Shotgun";
   final BillingPeriod term=BillingPeriod.MONTHLY;
   final String pricelistName=PriceListSet.DEFAULT_PRICELIST_NAME;
-  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),UUID.randomUUID().toString(),callContext);
+  final SubscriptionBundle bundle=subscriptionUserApi.createBundleForAccount(account.getId(),UUID.randomUUID().toString(),callContext);
   final PlanPhaseSpecifier bpPlanPhaseSpecifier=new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,pricelistName,null);
   busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE);
-  final SubscriptionData bpSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),bpPlanPhaseSpecifier,null,callContext));
+  final SubscriptionData bpSubscription=subscriptionDataFromSubscription(subscriptionUserApi.createSubscription(bundle.getId(),bpPlanPhaseSpecifier,null,callContext));
   assertNotNull(bpSubscription);
   assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();

@@ -1,0 +1,45 @@
+{
+  return new AccountMigration(){
+    private final UUID accountId=UUID.randomUUID();
+    @Override public BundleMigration[] getBundles(){
+      final List<BundleMigration> bundles=new ArrayList<BundleMigration>();
+      final BundleMigration bundle0=new BundleMigration(){
+        @Override public SubscriptionMigration[] getSubscriptions(){
+          final SubscriptionMigration[] result=new SubscriptionMigration[cases.size()];
+          for (int i=0; i < cases.size(); i++) {
+            final List<SubscriptionMigrationCaseWithCTD> curCases=cases.get(i);
+            final SubscriptionMigration subscription=new SubscriptionMigration(){
+              @Override public SubscriptionMigrationCaseWithCTD[] getSubscriptionCases(){
+                return curCases.toArray(new SubscriptionMigrationCaseWithCTD[curCases.size()]);
+              }
+              @Override public ProductCategory getCategory(){
+                return curCases.get(0).getPlanPhaseSpecifier().getProductCategory();
+              }
+              @Override public DateTime getChargedThroughDate(){
+                for (                final SubscriptionMigrationCaseWithCTD cur : curCases) {
+                  if (cur.getChargedThroughDate() != null) {
+                    return cur.getChargedThroughDate();
+                  }
+                }
+                return null;
+              }
+            }
+;
+            result[i]=subscription;
+          }
+          return result;
+        }
+        @Override public String getBundleKey(){
+          return "12345";
+        }
+      }
+;
+      bundles.add(bundle0);
+      return bundles.toArray(new BundleMigration[bundles.size()]);
+    }
+    @Override public UUID getAccountKey(){
+      return accountId;
+    }
+  }
+;
+}

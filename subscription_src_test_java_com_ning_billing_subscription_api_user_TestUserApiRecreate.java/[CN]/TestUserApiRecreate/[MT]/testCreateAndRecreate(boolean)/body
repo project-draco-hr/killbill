@@ -6,7 +6,7 @@
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   testListener.pushExpectedEvent(NextEvent.PHASE);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  SubscriptionData subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
+  SubscriptionData subscription=(SubscriptionData)subscriptionApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
   assertNotNull(subscription);
   assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   assertEquals(subscription.getBundleId(),bundle.getId());
@@ -18,7 +18,7 @@
   planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   try {
     if (fromUserAPi) {
-      subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
+      subscription=(SubscriptionData)subscriptionApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
     }
  else {
       subscription.recreate(testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
@@ -38,7 +38,7 @@
  catch (  InterruptedException ignored) {
   }
   if (fromUserAPi) {
-    subscription=(SubscriptionData)entitlementApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
+    subscription=(SubscriptionData)subscriptionApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
   }
  else {
     subscription.recreate(testUtil.getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),callContext);

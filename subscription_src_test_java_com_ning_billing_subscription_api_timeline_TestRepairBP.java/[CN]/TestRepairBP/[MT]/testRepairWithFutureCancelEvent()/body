@@ -7,7 +7,7 @@
   assertTrue(testListener.isCompleted(5000));
   final DateTime newChargedThroughDate=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
   subscriptionInternalApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,internalCallContext);
-  baseSubscription=entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+  baseSubscription=subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   final DateTime requestedChange=clock.getUTCNow();
   baseSubscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,requestedChange,callContext);
   Plan currentPlan=baseSubscription.getCurrentPlan();
@@ -28,7 +28,7 @@
   testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
   repairApi.repairBundle(bRepair,dryRun,callContext);
   assertTrue(testListener.isCompleted(5000));
-  baseSubscription=entitlementApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+  baseSubscription=subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
   assertEquals(((SubscriptionData)baseSubscription).getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
   assertEquals(baseSubscription.getBundleId(),bundle.getId());
   assertEquals(baseSubscription.getStartDate(),baseSubscription.getStartDate());
