@@ -1,0 +1,15 @@
+{
+synchronized (events) {
+    final Iterator<SubscriptionEvent> it=events.descendingIterator();
+    while (it.hasNext()) {
+      final SubscriptionEvent cur=it.next();
+      if (cur.getSubscriptionId() != subscriptionId) {
+        continue;
+      }
+      if (cur.getType() == EventType.API_USER && ApiEventType.CHANGE == ((ApiEvent)cur).getEventType() && cur.getEffectiveDate().isAfter(clock.getUTCNow())) {
+        cur.deactivate();
+        break;
+      }
+    }
+  }
+}

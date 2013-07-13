@@ -1,0 +1,24 @@
+{
+  final DateTime now=clock.getUTCNow();
+  if (effectiveDate.compareTo(now) > 0) {
+    return 0;
+  }
+  final Product baseProduct=(baseSubscription.getState() == SubscriptionState.CANCELLED) ? null : baseSubscription.getCurrentPlan().getProduct();
+  final List<Subscription> subscriptions=dao.getSubscriptions(baseSubscription.getBundleId(),context);
+  final List<SubscriptionData> subscriptionsToBeCancelled=new LinkedList<SubscriptionData>();
+  final List<SubscriptionEvent> cancelEvents=new LinkedList<SubscriptionEvent>();
+  for (  final Subscription subscription : subscriptions) {
+    final SubscriptionData cur=(SubscriptionData)subscription;
+    if (cur.getState() == SubscriptionState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
+      continue;
+    }
+    final Plan addonCurrentPlan=cur.getCurrentPlan();
+    if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
+      final SubscriptionEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now).setFromDisk(true));
+      subscriptionsToBeCancelled.add(cur);
+      cancelEvents.add(cancelEvent);
+    }
+  }
+  dao.cancelSubscriptions(subscriptionsToBeCancelled,cancelEvents,context);
+  return subscriptionsToBeCancelled.size();
+}

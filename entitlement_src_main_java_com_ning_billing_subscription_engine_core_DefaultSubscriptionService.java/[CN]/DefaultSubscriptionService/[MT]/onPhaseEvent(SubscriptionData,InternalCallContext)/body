@@ -1,0 +1,13 @@
+{
+  try {
+    final DateTime now=clock.getUTCNow();
+    final TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(subscription,now,now);
+    final PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,now,nextTimedPhase.getStartPhase()) : null;
+    if (nextPhaseEvent != null) {
+      dao.createNextPhaseEvent(subscription,nextPhaseEvent,context);
+    }
+  }
+ catch (  SubscriptionError e) {
+    log.error(String.format("Failed to insert next phase for subscription %s",subscription.getId()),e);
+  }
+}

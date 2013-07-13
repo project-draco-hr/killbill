@@ -1,0 +1,25 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Map<UUID,List<SubscriptionEvent>>>(){
+    @Override public Map<UUID,List<SubscriptionEvent>> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final SubscriptionSqlDao transactional=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
+      final List<SubscriptionModelDao> subscriptionModels=transactional.getSubscriptionsFromBundleId(bundleId.toString(),context);
+      if (subscriptionModels.size() == 0) {
+        return Collections.emptyMap();
+      }
+      final SubscriptionEventSqlDao eventsDaoFromSameTransaction=entitySqlDaoWrapperFactory.become(SubscriptionEventSqlDao.class);
+      final Map<UUID,List<SubscriptionEvent>> result=new HashMap<UUID,List<SubscriptionEvent>>();
+      for (      final SubscriptionModelDao cur : subscriptionModels) {
+        final List<SubscriptionEventModelDao> eventModels=eventsDaoFromSameTransaction.getEventsForSubscription(cur.getId().toString(),context);
+        final List<SubscriptionEvent> events=new ArrayList<SubscriptionEvent>(Collections2.transform(eventModels,new Function<SubscriptionEventModelDao,SubscriptionEvent>(){
+          @Override public SubscriptionEvent apply(          @Nullable final SubscriptionEventModelDao input){
+            return SubscriptionEventModelDao.toEntitlementEvent(input);
+          }
+        }
+));
+        result.put(cur.getId(),events);
+      }
+      return result;
+    }
+  }
+);
+}

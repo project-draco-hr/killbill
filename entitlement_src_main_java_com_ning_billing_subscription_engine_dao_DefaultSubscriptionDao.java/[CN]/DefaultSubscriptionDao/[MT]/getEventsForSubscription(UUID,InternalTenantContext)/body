@@ -1,0 +1,20 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<SubscriptionEvent>>(){
+    @Override public List<SubscriptionEvent> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final List<SubscriptionEventModelDao> models=entitySqlDaoWrapperFactory.become(SubscriptionEventSqlDao.class).getEventsForSubscription(subscriptionId.toString(),context);
+      final Collection<SubscriptionEventModelDao> filteredModels=Collections2.filter(models,new Predicate<SubscriptionEventModelDao>(){
+        @Override public boolean apply(        @Nullable final SubscriptionEventModelDao input){
+          return input.getUserType() != ApiEventType.UNCANCEL;
+        }
+      }
+);
+      return new ArrayList<SubscriptionEvent>(Collections2.transform(filteredModels,new Function<SubscriptionEventModelDao,SubscriptionEvent>(){
+        @Override public SubscriptionEvent apply(        @Nullable final SubscriptionEventModelDao input){
+          return SubscriptionEventModelDao.toEntitlementEvent(input);
+        }
+      }
+));
+    }
+  }
+);
+}

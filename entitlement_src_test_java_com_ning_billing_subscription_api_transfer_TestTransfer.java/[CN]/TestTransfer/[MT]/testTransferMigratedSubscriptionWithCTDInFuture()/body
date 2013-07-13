@@ -1,0 +1,41 @@
+{
+  final UUID newAccountId=UUID.randomUUID();
+  try {
+    final DateTime startDate=clock.getUTCNow().minusMonths(2);
+    final DateTime beforeMigration=clock.getUTCNow();
+    final EntitlementAccountMigration toBeMigrated=testUtil.createAccountForMigrationWithRegularBasePlan(startDate);
+    final DateTime afterMigration=clock.getUTCNow();
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    migrationApi.migrate(toBeMigrated,callContext);
+    assertTrue(testListener.isCompleted(5000));
+    final List<SubscriptionBundle> bundles=entitlementApi.getBundlesForAccount(toBeMigrated.getAccountKey(),callContext);
+    assertEquals(bundles.size(),1);
+    final SubscriptionBundle bundle=bundles.get(0);
+    final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(bundle.getId(),callContext);
+    assertEquals(subscriptions.size(),1);
+    final Subscription subscription=subscriptions.get(0);
+    testUtil.assertDateWithin(subscription.getStartDate(),beforeMigration.minusMonths(2),afterMigration.minusMonths(2));
+    assertEquals(subscription.getEndDate(),null);
+    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
+    assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
+    assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(subscription.getCurrentPlan().getName(),"shotgun-annual");
+    assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
+    assertEquals(subscriptionInternalApi.getBillingTransitions(subscription,internalCallContext).size(),1);
+    assertEquals(subscriptionInternalApi.getBillingTransitions(subscription,internalCallContext).get(0).getTransitionType(),SubscriptionTransitionType.MIGRATE_BILLING);
+    assertTrue(subscriptionInternalApi.getBillingTransitions(subscription,internalCallContext).get(0).getEffectiveTransitionTime().compareTo(clock.getUTCNow()) > 0);
+    assertListenerStatus();
+    clock.addDays(20);
+    final DateTime transferRequestedDate=clock.getUTCNow();
+    testListener.pushExpectedEvent(NextEvent.TRANSFER);
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getExternalKey(),transferRequestedDate,false,true,callContext);
+    assertTrue(testListener.isCompleted(3000));
+    final Subscription oldBaseSubscription=entitlementApi.getBaseSubscription(bundle.getId(),callContext);
+    assertTrue(oldBaseSubscription.getState() == SubscriptionState.CANCELLED);
+    assertEquals(subscriptionInternalApi.getBillingTransitions(oldBaseSubscription,internalCallContext).size(),0);
+  }
+ catch (  SubscriptionMigrationApiException e) {
+    Assert.fail("",e);
+  }
+}
