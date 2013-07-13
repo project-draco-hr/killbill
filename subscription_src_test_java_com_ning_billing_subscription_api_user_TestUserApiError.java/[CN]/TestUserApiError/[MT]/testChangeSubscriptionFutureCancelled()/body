@@ -1,0 +1,33 @@
+{
+  try {
+    Subscription subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+    final PlanPhase trialPhase=subscription.getCurrentPhase();
+    final PlanPhase currentPhase=subscription.getCurrentPhase();
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
+    final DateTime expectedPhaseTrialChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    final Duration ctd=testUtil.getDurationMonth(1);
+    final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
+    subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
+    subscription=entitlementApi.getSubscriptionFromId(subscription.getId(),tenantContext);
+    subscription.cancel(clock.getUTCNow(),callContext);
+    try {
+      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);
+    }
+ catch (    SubscriptionUserApiException e) {
+      assertEquals(e.getCode(),ErrorCode.SUB_CHANGE_FUTURE_CANCELLED.getCode());
+      try {
+        log.info(e.getMessage());
+      }
+ catch (      Throwable el) {
+        assertFalse(true);
+      }
+    }
+    assertListenerStatus();
+  }
+ catch (  Exception e) {
+    Assert.fail(e.toString());
+  }
+}

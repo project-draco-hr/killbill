@@ -1,0 +1,21 @@
+{
+  final SubscriptionSqlDao transSubDao=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
+  final BundleSqlDao transBundleDao=entitySqlDaoWrapperFactory.become(BundleSqlDao.class);
+  final SubscriptionBundleData bundleData=bundleTransferData.getData();
+  final SubscriptionBundleModelDao existingBundleModel=transBundleDao.getBundleFromAccountAndKey(bundleData.getAccountId().toString(),bundleData.getExternalKey(),context);
+  if (existingBundleModel != null) {
+    log.error(String.format("Attempted to create a bundle for account %s and key %s that already existed, skip...",bundleData.getAccountId().toString(),bundleData.getExternalKey()));
+    return;
+  }
+  for (  final SubscriptionMigrationData curSubscription : bundleTransferData.getSubscriptions()) {
+    final SubscriptionData subData=curSubscription.getData();
+    for (    final SubscriptionEvent curEvent : curSubscription.getInitialEvents()) {
+      transactional.create(new SubscriptionEventModelDao(curEvent),context);
+      recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,curEvent.getEffectiveDate(),new SubscriptionNotificationKey(curEvent.getId()),context);
+    }
+    transSubDao.create(new SubscriptionModelDao(subData),context);
+    final SubscriptionEvent finalEvent=curSubscription.getInitialEvents().get(curSubscription.getInitialEvents().size() - 1);
+    notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subData,finalEvent,context);
+  }
+  transBundleDao.create(new SubscriptionBundleModelDao(bundleData),context);
+}

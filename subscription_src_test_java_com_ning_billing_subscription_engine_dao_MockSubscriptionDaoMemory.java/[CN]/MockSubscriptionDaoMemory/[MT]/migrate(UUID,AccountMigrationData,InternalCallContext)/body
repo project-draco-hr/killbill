@@ -1,0 +1,16 @@
+{
+synchronized (events) {
+    for (    final BundleMigrationData curBundle : accountData.getData()) {
+      final SubscriptionBundleData bundleData=curBundle.getData();
+      for (      final SubscriptionMigrationData curSubscription : curBundle.getSubscriptions()) {
+        final SubscriptionData subData=curSubscription.getData();
+        for (        final SubscriptionEvent curEvent : curSubscription.getInitialEvents()) {
+          events.add(curEvent);
+          recordFutureNotificationFromTransaction(null,curEvent.getEffectiveDate(),new SubscriptionNotificationKey(curEvent.getId()),context);
+        }
+        subscriptions.add(subData);
+      }
+      bundles.add(bundleData);
+    }
+  }
+}

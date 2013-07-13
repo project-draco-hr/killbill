@@ -1,0 +1,54 @@
+{
+  try {
+    final String prod="Shotgun";
+    final BillingPeriod term=BillingPeriod.MONTHLY;
+    final String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
+    SubscriptionData subscription=testUtil.createSubscription(bundle,prod,term,planSet);
+    PlanPhase trialPhase=subscription.getCurrentPhase();
+    assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
+    final DateTime expectedPhaseTrialChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+    testUtil.checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
+    trialPhase=subscription.getCurrentPhase();
+    assertEquals(trialPhase.getPhaseType(),PhaseType.EVERGREEN);
+    final Duration ctd=testUtil.getDurationMonth(1);
+    final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
+    subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
+    subscription=(SubscriptionData)entitlementApi.getSubscriptionFromId(subscription.getId(),callContext);
+    assertEquals(subscription.getLastActiveProductName(),prod);
+    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
+    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
+    testListener.setNonExpectedMode();
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    subscription.cancel(clock.getUTCNow(),callContext);
+    assertFalse(testListener.isCompleted(3000));
+    testListener.reset();
+    assertEquals(subscription.getLastActiveProductName(),prod);
+    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
+    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
+    final DateTime futureEndDate=subscription.getFutureEndDate();
+    Assert.assertNotNull(futureEndDate);
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    final DateTime future=clock.getUTCNow();
+    assertTrue(testListener.isCompleted(5000));
+    assertTrue(futureEndDate.compareTo(subscription.getEndDate()) == 0);
+    final PlanPhase currentPhase=subscription.getCurrentPhase();
+    assertNull(currentPhase);
+    testUtil.checkNextPhaseChange(subscription,0,null);
+    assertEquals(subscription.getLastActiveProductName(),prod);
+    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
+    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
+    assertListenerStatus();
+  }
+ catch (  SubscriptionUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}
