@@ -1,0 +1,22 @@
+{
+  try {
+    final Subscription subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME);
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    subscription.cancel(clock.getUTCNow(),callContext);
+    try {
+      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);
+    }
+ catch (    SubscriptionUserApiException e) {
+      assertEquals(e.getCode(),ErrorCode.SUB_CHANGE_NON_ACTIVE.getCode());
+      try {
+        log.info(e.getMessage());
+      }
+ catch (      Throwable el) {
+        assertFalse(true);
+      }
+    }
+  }
+ catch (  Exception e) {
+    Assert.fail(e.toString());
+  }
+}

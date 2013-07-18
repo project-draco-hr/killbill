@@ -3,7 +3,7 @@
   busHandler.pushExpectedEvents(NextEvent.TAG);
   add_AUTO_INVOICING_OFF_Tag(account.getId(),ObjectType.ACCOUNT);
   busHandler.pushExpectedEvents(NextEvent.CREATE);
-  final SubscriptionData baseSubscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,callContext));
+  final SubscriptionData baseSubscription=subscriptionDataFromSubscription(subscriptionUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,callContext));
   assertNotNull(baseSubscription);
   assertTrue(busHandler.isCompleted(DELAY));
   Collection<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId(),callContext);

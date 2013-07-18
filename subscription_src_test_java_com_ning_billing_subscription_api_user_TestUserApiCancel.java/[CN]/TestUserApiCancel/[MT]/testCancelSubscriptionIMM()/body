@@ -1,0 +1,32 @@
+{
+  try {
+    final DateTime init=clock.getUTCNow();
+    final String prod="Shotgun";
+    final BillingPeriod term=BillingPeriod.MONTHLY;
+    final String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
+    final SubscriptionData subscription=testUtil.createSubscription(bundle,prod,term,planSet);
+    PlanPhase currentPhase=subscription.getCurrentPhase();
+    assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
+    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    final DateTime future=clock.getUTCNow();
+    testListener.pushExpectedEvent(NextEvent.CANCEL);
+    assertEquals(subscription.getLastActiveProductName(),prod);
+    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
+    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
+    subscription.cancel(clock.getUTCNow(),callContext);
+    currentPhase=subscription.getCurrentPhase();
+    testListener.isCompleted(3000);
+    assertEquals(subscription.getLastActiveProductName(),prod);
+    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
+    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
+    assertNull(currentPhase);
+    testUtil.checkNextPhaseChange(subscription,0,null);
+    assertListenerStatus();
+  }
+ catch (  SubscriptionUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}

@@ -1,0 +1,10 @@
+{
+  try {
+    final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(context);
+    checker.checkBlockedChange(accountId,Type.ACCOUNT,internalContext);
+    return new BlockingSubscriptionBundle(subscriptionUserApi.createBundleForAccount(accountId,bundleKey,context),blockingApi,internalContext);
+  }
+ catch (  BlockingApiException e) {
+    throw new SubscriptionUserApiException(e,e.getCode(),e.getMessage());
+  }
+}

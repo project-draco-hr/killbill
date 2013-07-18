@@ -7,12 +7,12 @@
   try {
     if (Type.SUBSCRIPTION.equals(overdueableType)) {
       final UUID bundleId=((Subscription)overdueable).getBundleId();
-      final SubscriptionBundle bundle=entitlementUserApi.getBundleFromId(bundleId,context);
+      final SubscriptionBundle bundle=subscriptionUserApi.getBundleFromId(bundleId,context);
       account=accountApi.getAccountById(bundle.getAccountId(),context);
     }
  else     if (Type.SUBSCRIPTION_BUNDLE.equals(overdueableType)) {
       final UUID bundleId=((SubscriptionBundle)overdueable).getId();
-      final SubscriptionBundle bundle=entitlementUserApi.getBundleFromId(bundleId,context);
+      final SubscriptionBundle bundle=subscriptionUserApi.getBundleFromId(bundleId,context);
       account=accountApi.getAccountById(bundle.getAccountId(),context);
     }
  else     if (Type.ACCOUNT.equals(overdueableType)) {
@@ -23,7 +23,7 @@
       return;
     }
   }
- catch (  EntitlementUserApiException e) {
+ catch (  SubscriptionUserApiException e) {
     log.warn(String.format("Unable to retrieve account for overdueable %s (type %s)",overdueable.getId(),overdueableType),e);
     return;
   }

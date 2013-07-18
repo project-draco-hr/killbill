@@ -1,0 +1,20 @@
+{
+  test.withException(new TestWithExceptionCallback(){
+    @Override public void doTest() throws SubscriptionRepairException {
+      testListener.pushExpectedEvent(NextEvent.PHASE);
+      final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(40));
+      clock.addDeltaFromReality(it.toDurationMillis());
+      assertTrue(testListener.isCompleted(5000));
+      final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
+      testUtil.sortEventsOnBundle(bundleRepair);
+      final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
+      final NewEvent ne=testUtil.createNewEvent(SubscriptionTransitionType.CREATE,baseSubscription.getStartDate().plusDays(10),spec);
+      final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+      des.add(testUtil.createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
+      final SubscriptionTimeline sRepair=testUtil.createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
+      final BundleTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      repairApi.repairBundle(bRepair,true,callContext);
+    }
+  }
+,ErrorCode.SUB_REPAIR_SUB_RECREATE_NOT_EMPTY);
+}

@@ -1,0 +1,51 @@
+{
+  final DateTime init=clock.getUTCNow();
+  final DateTime requestedDate=init.minusYears(1);
+  String productName="Shotgun";
+  BillingPeriod term=BillingPeriod.MONTHLY;
+  String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  testListener.pushExpectedEvent(NextEvent.CREATE);
+  SubscriptionData subscription=(SubscriptionData)subscriptionApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
+  assertNotNull(subscription);
+  assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
+  assertEquals(subscription.getBundleId(),bundle.getId());
+  assertEquals(subscription.getStartDate(),requestedDate);
+  assertEquals(productName,subscription.getCurrentPlan().getProduct().getName());
+  assertTrue(testListener.isCompleted(5000));
+  productName="Pistol";
+  term=BillingPeriod.MONTHLY;
+  planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  try {
+    if (fromUserAPi) {
+      subscription=(SubscriptionData)subscriptionApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
+    }
+ else {
+      subscription.recreate(testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
+    }
+    Assert.fail("Expected Create API to fail since BP already exists");
+  }
+ catch (  SubscriptionUserApiException e) {
+    assertTrue(true);
+  }
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  subscription.cancel(null,callContext);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  testListener.pushExpectedEvent(NextEvent.RE_CREATE);
+  try {
+    Thread.sleep(1000);
+  }
+ catch (  InterruptedException ignored) {
+  }
+  if (fromUserAPi) {
+    subscription=(SubscriptionData)subscriptionApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,callContext);
+  }
+ else {
+    subscription.recreate(testUtil.getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),callContext);
+  }
+  assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
+  assertEquals(subscription.getBundleId(),bundle.getId());
+  assertEquals(subscription.getStartDate(),requestedDate);
+  assertEquals(productName,subscription.getCurrentPlan().getProduct().getName());
+  return subscription;
+}

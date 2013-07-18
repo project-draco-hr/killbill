@@ -1,0 +1,58 @@
+{
+  try {
+    final String baseProduct="Shotgun";
+    final BillingPeriod baseTerm=BillingPeriod.ANNUAL;
+    final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    SubscriptionData baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+    final String aoProduct="Telescopic-Scope";
+    final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
+    final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    SubscriptionData aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
+    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
+    final DateTime now=clock.getUTCNow();
+    final Duration aoCtd=testUtil.getDurationMonth(1);
+    final DateTime newAOChargedThroughDate=TestSubscriptionHelper.addDuration(now,aoCtd);
+    subscriptionInternalApi.setChargedThroughDate(aoSubscription.getId(),newAOChargedThroughDate,internalCallContext);
+    final Duration bpCtd=testUtil.getDurationMonth(11);
+    final DateTime newBPChargedThroughDate=TestSubscriptionHelper.addDuration(now,bpCtd);
+    subscriptionInternalApi.setChargedThroughDate(baseSubscription.getId(),newBPChargedThroughDate,internalCallContext);
+    baseSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+    aoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(1));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    aoSubscription.cancel(clock.getUTCNow(),callContext);
+    aoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertTrue(aoSubscription.isSubscriptionFutureCancelled());
+    baseSubscription.cancel(clock.getUTCNow(),callContext);
+    baseSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+    assertEquals(baseSubscription.getState(),SubscriptionState.ACTIVE);
+    assertTrue(baseSubscription.isSubscriptionFutureCancelled());
+    aoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+    List<SubscriptionTransition> aoTransitions=aoSubscription.getAllTransitions();
+    assertEquals(aoTransitions.size(),3);
+    assertEquals(aoTransitions.get(0).getTransitionType(),SubscriptionTransitionType.CREATE);
+    assertEquals(aoTransitions.get(1).getTransitionType(),SubscriptionTransitionType.PHASE);
+    assertEquals(aoTransitions.get(2).getTransitionType(),SubscriptionTransitionType.CANCEL);
+    assertTrue(aoSubscription.getFutureEndDate().compareTo(newAOChargedThroughDate) == 0);
+    testListener.pushExpectedEvent(NextEvent.UNCANCEL);
+    aoSubscription.uncancel(callContext);
+    assertTrue(testListener.isCompleted(5000));
+    aoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+    aoTransitions=aoSubscription.getAllTransitions();
+    assertEquals(aoTransitions.size(),3);
+    assertEquals(aoTransitions.get(0).getTransitionType(),SubscriptionTransitionType.CREATE);
+    assertEquals(aoTransitions.get(1).getTransitionType(),SubscriptionTransitionType.PHASE);
+    assertEquals(aoTransitions.get(2).getTransitionType(),SubscriptionTransitionType.CANCEL);
+    assertTrue(aoSubscription.getFutureEndDate().compareTo(newBPChargedThroughDate) == 0);
+    assertListenerStatus();
+  }
+ catch (  Exception e) {
+    Assert.fail(e.getMessage());
+  }
+}

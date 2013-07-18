@@ -1,0 +1,38 @@
+{
+  try {
+    SubscriptionData subscription=testUtil.createSubscription(bundle,"Assault-Rifle",BillingPeriod.MONTHLY,"gunclubDiscount");
+    final PlanPhase trialPhase=subscription.getCurrentPhase();
+    assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
+    final List<Duration> durationList=new ArrayList<Duration>();
+    durationList.add(trialPhase.getDuration());
+    final DateTime startDiscountPhase=TestSubscriptionHelper.addDuration(subscription.getStartDate(),durationList);
+    final Duration ctd=testUtil.getDurationMonth(1);
+    final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(startDiscountPhase,ctd);
+    subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
+    subscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(subscription.getId(),callContext);
+    testListener.setNonExpectedMode();
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow(),callContext);
+    assertFalse(testListener.isCompleted(3000));
+    testListener.reset();
+    testListener.pushExpectedEvent(NextEvent.CHANGE);
+    subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),callContext);
+    assertTrue(testListener.isCompleted(5000));
+    final Plan currentPlan=subscription.getCurrentPlan();
+    assertNotNull(currentPlan);
+    assertEquals(currentPlan.getProduct().getName(),"Assault-Rifle");
+    assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
+    assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.ANNUAL);
+    final PlanPhase currentPhase=subscription.getCurrentPhase();
+    assertNotNull(currentPhase);
+    assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
+    assertListenerStatus();
+  }
+ catch (  SubscriptionUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}

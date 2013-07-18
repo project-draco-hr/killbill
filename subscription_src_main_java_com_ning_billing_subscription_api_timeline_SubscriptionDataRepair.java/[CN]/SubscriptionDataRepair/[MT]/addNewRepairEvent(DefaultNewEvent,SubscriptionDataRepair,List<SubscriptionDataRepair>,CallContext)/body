@@ -1,0 +1,31 @@
+{
+  try {
+    final PlanPhaseSpecifier spec=input.getPlanPhaseSpecifier();
+switch (input.getSubscriptionTransitionType()) {
+case CREATE:
+case RE_CREATE:
+      recreate(spec,input.getRequestedDate(),context);
+    checkAddonRights(baseSubscription);
+  break;
+case CHANGE:
+changePlan(spec.getProductName(),spec.getBillingPeriod(),spec.getPriceListName(),input.getRequestedDate(),context);
+checkAddonRights(baseSubscription);
+trickleDownBPEffectForAddon(addonSubscriptions,getLastUserEventEffectiveDate(),context);
+break;
+case CANCEL:
+cancel(input.getRequestedDate(),context);
+trickleDownBPEffectForAddon(addonSubscriptions,getLastUserEventEffectiveDate(),context);
+break;
+case PHASE:
+break;
+default :
+throw new SubscriptionRepairException(ErrorCode.SUB_REPAIR_UNKNOWN_TYPE,input.getSubscriptionTransitionType(),id);
+}
+}
+ catch (SubscriptionUserApiException e) {
+throw new SubscriptionRepairException(e);
+}
+catch (CatalogApiException e) {
+throw new SubscriptionRepairException(e);
+}
+}

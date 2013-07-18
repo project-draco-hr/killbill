@@ -1,0 +1,10 @@
+{
+  final DateTime transferDate=clock.getUTCNow();
+  final DateTime migrateSubscriptionEventEffectiveDate=transferDate.minusDays(10);
+  final DateTime migrateBillingEventEffectiveDate=migrateSubscriptionEventEffectiveDate;
+  final List<SubscriptionEvent> events=transferBundle(migrateSubscriptionEventEffectiveDate,migrateBillingEventEffectiveDate,transferDate);
+  Assert.assertEquals(events.size(),1);
+  Assert.assertEquals(events.get(0).getType(),EventType.API_USER);
+  Assert.assertEquals(events.get(0).getEffectiveDate(),transferDate);
+  Assert.assertEquals(((ApiEventTransfer)events.get(0)).getEventType(),ApiEventType.TRANSFER);
+}

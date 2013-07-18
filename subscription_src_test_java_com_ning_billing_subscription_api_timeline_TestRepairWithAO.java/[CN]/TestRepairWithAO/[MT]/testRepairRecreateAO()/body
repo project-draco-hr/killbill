@@ -1,0 +1,56 @@
+{
+  final String baseProduct="Shotgun";
+  final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+  final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final SubscriptionData baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+  Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  final SubscriptionData aoSubscription=testUtil.createSubscription(bundle,"Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+  it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
+  testUtil.sortEventsOnBundle(bundleRepair);
+  final SubscriptionTimeline bpRepair=testUtil.getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
+  assertEquals(bpRepair.getExistingEvents().size(),2);
+  SubscriptionTimeline aoRepair=testUtil.getSubscriptionRepair(aoSubscription.getId(),bundleRepair);
+  assertEquals(aoRepair.getExistingEvents().size(),2);
+  final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+  des.add(testUtil.createDeletedEvent(aoRepair.getExistingEvents().get(0).getEventId()));
+  des.add(testUtil.createDeletedEvent(aoRepair.getExistingEvents().get(1).getEventId()));
+  final DateTime aoRecreateDate=aoSubscription.getStartDate().plusDays(1);
+  final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.DISCOUNT);
+  final NewEvent ne=testUtil.createNewEvent(SubscriptionTransitionType.CREATE,aoRecreateDate,spec);
+  final SubscriptionTimeline saoRepair=testUtil.createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
+  final BundleTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
+  boolean dryRun=true;
+  final BundleTimeline dryRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,callContext);
+  aoRepair=testUtil.getSubscriptionRepair(aoSubscription.getId(),dryRunBundleRepair);
+  assertEquals(aoRepair.getExistingEvents().size(),2);
+  final List<ExistingEvent> expected=new LinkedList<SubscriptionTimeline.ExistingEvent>();
+  expected.add(testUtil.createExistingEventForAssertion(SubscriptionTransitionType.CREATE,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoRecreateDate));
+  expected.add(testUtil.createExistingEventForAssertion(SubscriptionTransitionType.PHASE,"Telescopic-Scope",PhaseType.EVERGREEN,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,baseSubscription.getStartDate().plusMonths(1)));
+  int index=0;
+  for (  final ExistingEvent e : expected) {
+    testUtil.validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
+  }
+  SubscriptionData newAoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+  assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
+  assertEquals(newAoSubscription.getAllTransitions().size(),2);
+  assertEquals(newAoSubscription.getStartDate(),aoSubscription.getStartDate());
+  assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
+  dryRun=false;
+  testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
+  final BundleTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,callContext);
+  assertTrue(testListener.isCompleted(5000));
+  aoRepair=testUtil.getSubscriptionRepair(aoSubscription.getId(),realRunBundleRepair);
+  assertEquals(aoRepair.getExistingEvents().size(),2);
+  index=0;
+  for (  final ExistingEvent e : expected) {
+    testUtil.validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));
+  }
+  newAoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+  assertEquals(newAoSubscription.getState(),SubscriptionState.ACTIVE);
+  assertEquals(newAoSubscription.getAllTransitions().size(),2);
+  assertEquals(newAoSubscription.getStartDate(),aoRecreateDate);
+  assertEquals(newAoSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
+}

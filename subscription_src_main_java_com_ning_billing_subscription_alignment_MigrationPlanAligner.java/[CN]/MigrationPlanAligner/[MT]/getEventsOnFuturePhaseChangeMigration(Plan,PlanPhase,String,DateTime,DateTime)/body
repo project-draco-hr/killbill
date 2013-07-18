@@ -1,0 +1,20 @@
+{
+  final TimedMigration[] result=new TimedMigration[2];
+  result[0]=new TimedMigration(effectiveDate,EventType.API_USER,ApiEventType.MIGRATE_ENTITLEMENT,plan,initialPhase,priceList);
+  boolean foundCurrent=false;
+  PlanPhase nextPhase=null;
+  for (  final PlanPhase cur : plan.getAllPhases()) {
+    if (cur == initialPhase) {
+      foundCurrent=true;
+      continue;
+    }
+    if (foundCurrent) {
+      nextPhase=cur;
+    }
+  }
+  if (nextPhase == null) {
+    throw new SubscriptionMigrationApiException(String.format("Cannot find next phase for Plan %s and current Phase %s",plan.getName(),initialPhase.getName()));
+  }
+  result[1]=new TimedMigration(effectiveDateForNextPhase,EventType.PHASE,null,plan,nextPhase,priceList);
+  return result;
+}

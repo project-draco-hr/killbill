@@ -1,0 +1,22 @@
+{
+  test.withException(new TestWithExceptionCallback(){
+    @Override public void doTest() throws SubscriptionRepairException, SubscriptionUserApiException {
+      final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
+      clock.addDeltaFromReality(it.toDurationMillis());
+      final SubscriptionData aoSubscription=testUtil.createSubscription(bundle,"Laser-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+      final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
+      testUtil.sortEventsOnBundle(bundleRepair);
+      final DateTime newCreateTime=baseSubscription.getStartDate().plusDays(3);
+      final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Pistol",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
+      final NewEvent ne=testUtil.createNewEvent(SubscriptionTransitionType.CREATE,newCreateTime,spec);
+      final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+      des.add(testUtil.createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(0).getEventId()));
+      des.add(testUtil.createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
+      final SubscriptionTimeline sRepair=testUtil.createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
+      final BundleTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      final boolean dryRun=true;
+      repairApi.repairBundle(bRepair,dryRun,callContext);
+    }
+  }
+,ErrorCode.SUB_REPAIR_BP_RECREATE_MISSING_AO);
+}

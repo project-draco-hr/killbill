@@ -1,0 +1,51 @@
+{
+  try {
+    final String baseProduct="Shotgun";
+    final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+    final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+    final SubscriptionData baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(14));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    final DateTime beforeAOCreation=clock.getUTCNow();
+    SubscriptionData aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
+    final DateTime afterAOCreation=clock.getUTCNow();
+    Plan aoCurrentPlan=aoSubscription.getCurrentPlan();
+    assertNotNull(aoCurrentPlan);
+    assertEquals(aoCurrentPlan.getProduct().getName(),aoProduct);
+    assertEquals(aoCurrentPlan.getProduct().getCategory(),ProductCategory.ADD_ON);
+    assertEquals(aoCurrentPlan.getBillingPeriod(),aoTerm);
+    PlanPhase aoCurrentPhase=aoSubscription.getCurrentPhase();
+    assertNotNull(aoCurrentPhase);
+    assertEquals(aoCurrentPhase.getPhaseType(),PhaseType.DISCOUNT);
+    testUtil.assertDateWithin(aoSubscription.getStartDate(),beforeAOCreation,afterAOCreation);
+    assertEquals(aoSubscription.getBundleStartDate(),baseSubscription.getBundleStartDate());
+    SubscriptionTransition aoPendingTranstion=aoSubscription.getPendingTransition();
+    if (expAlignement == PlanAlignmentCreate.START_OF_BUNDLE) {
+      assertEquals(aoPendingTranstion.getEffectiveTransitionTime(),baseSubscription.getStartDate().plusMonths(1));
+    }
+ else {
+      assertEquals(aoPendingTranstion.getEffectiveTransitionTime(),aoSubscription.getStartDate().plusMonths(1));
+    }
+    testListener.reset();
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(33));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
+    aoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+    aoCurrentPlan=aoSubscription.getCurrentPlan();
+    assertNotNull(aoCurrentPlan);
+    assertEquals(aoCurrentPlan.getProduct().getName(),aoProduct);
+    assertEquals(aoCurrentPlan.getProduct().getCategory(),ProductCategory.ADD_ON);
+    assertEquals(aoCurrentPlan.getBillingPeriod(),aoTerm);
+    aoCurrentPhase=aoSubscription.getCurrentPhase();
+    assertNotNull(aoCurrentPhase);
+    assertEquals(aoCurrentPhase.getPhaseType(),PhaseType.EVERGREEN);
+    aoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+    aoPendingTranstion=aoSubscription.getPendingTransition();
+    assertNull(aoPendingTranstion);
+  }
+ catch (  SubscriptionUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}

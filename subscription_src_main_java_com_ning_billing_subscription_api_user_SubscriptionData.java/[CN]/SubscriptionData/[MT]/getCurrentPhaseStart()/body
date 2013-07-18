@@ -1,0 +1,13 @@
+{
+  if (transitions == null) {
+    throw new SubscriptionError(String.format("No transitions for subscription %s",getId()));
+  }
+  final SubscriptionTransitionDataIterator it=new SubscriptionTransitionDataIterator(clock,transitions,Order.DESC_FROM_FUTURE,Kind.SUBSCRIPTION,Visibility.ALL,TimeLimit.PAST_OR_PRESENT_ONLY);
+  while (it.hasNext()) {
+    final SubscriptionTransitionData cur=(SubscriptionTransitionData)it.next();
+    if (cur.getTransitionType() == SubscriptionTransitionType.PHASE || cur.getTransitionType() == SubscriptionTransitionType.TRANSFER || cur.getTransitionType() == SubscriptionTransitionType.CREATE || cur.getTransitionType() == SubscriptionTransitionType.RE_CREATE || cur.getTransitionType() == SubscriptionTransitionType.CHANGE || cur.getTransitionType() == SubscriptionTransitionType.MIGRATE_ENTITLEMENT) {
+      return cur.getEffectiveTransitionTime();
+    }
+  }
+  throw new SubscriptionError(String.format("Failed to find CurrentPhaseStart id = %s",getId().toString()));
+}

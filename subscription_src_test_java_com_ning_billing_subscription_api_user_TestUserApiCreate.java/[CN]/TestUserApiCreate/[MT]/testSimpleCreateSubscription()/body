@@ -1,0 +1,42 @@
+{
+  try {
+    final DateTime init=clock.getUTCNow();
+    final String productName="Shotgun";
+    final BillingPeriod term=BillingPeriod.MONTHLY;
+    final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+    testListener.pushExpectedEvent(NextEvent.CREATE);
+    final SubscriptionData subscription=(SubscriptionData)subscriptionApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),clock.getUTCNow(),callContext);
+    assertNotNull(subscription);
+    assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
+    assertEquals(subscription.getBundleId(),bundle.getId());
+    testUtil.assertDateWithin(subscription.getStartDate(),init,clock.getUTCNow());
+    testUtil.assertDateWithin(subscription.getBundleStartDate(),init,clock.getUTCNow());
+    final Plan currentPlan=subscription.getCurrentPlan();
+    assertNotNull(currentPlan);
+    assertEquals(currentPlan.getProduct().getName(),productName);
+    assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
+    assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.MONTHLY);
+    final PlanPhase currentPhase=subscription.getCurrentPhase();
+    assertNotNull(currentPhase);
+    assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
+    assertTrue(testListener.isCompleted(5000));
+    final List<SubscriptionEvent> events=dao.getPendingEventsForSubscription(subscription.getId(),internalCallContext);
+    assertNotNull(events);
+    testUtil.printEvents(events);
+    assertTrue(events.size() == 1);
+    assertTrue(events.get(0) instanceof PhaseEvent);
+    final DateTime nextPhaseChange=((PhaseEvent)events.get(0)).getEffectiveDate();
+    final DateTime nextExpectedPhaseChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),currentPhase.getDuration());
+    assertEquals(nextPhaseChange,nextExpectedPhaseChange);
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    final DateTime futureNow=clock.getUTCNow();
+    assertTrue(futureNow.isAfter(nextPhaseChange));
+    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
+  }
+ catch (  SubscriptionUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}

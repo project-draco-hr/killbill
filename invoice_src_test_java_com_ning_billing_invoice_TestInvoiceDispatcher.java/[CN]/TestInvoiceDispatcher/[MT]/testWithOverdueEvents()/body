@@ -9,7 +9,7 @@
   events.add(invoiceUtil.createMockBillingEvent(account,subscription,new DateTime("2012-07-25T00:04:00.000Z"),jetTrialEvergreen1000USD,new MockPlanPhase(jetTrialEvergreen1000USD,PhaseType.EVERGREEN),null,new BigDecimal("1000"),account.getCurrency(),BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"CHANGE",3L,SubscriptionTransitionType.CHANGE));
   Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(Mockito.<UUID>any(),Mockito.<InternalCallContext>any())).thenReturn(events);
   final InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
-  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,entitlementApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock);
+  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,subscriptionApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock);
   final Invoice invoice=dispatcher.processAccount(account.getId(),new DateTime("2012-07-30T00:00:00.000Z"),false,internalCallContext);
   Assert.assertNotNull(invoice);
   final List<InvoiceItem> invoiceItems=invoice.getInvoiceItems();

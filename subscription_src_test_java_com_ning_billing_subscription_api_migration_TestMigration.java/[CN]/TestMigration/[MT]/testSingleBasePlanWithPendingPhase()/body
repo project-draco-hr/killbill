@@ -1,0 +1,38 @@
+{
+  try {
+    final DateTime trialDate=clock.getUTCNow().minusDays(10);
+    final AccountMigration toBeMigrated=testUtil.createAccountForMigrationFuturePendingPhase(trialDate);
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+    migrationApi.migrate(toBeMigrated,callContext);
+    assertTrue(testListener.isCompleted(5000));
+    final List<SubscriptionBundle> bundles=subscriptionApi.getBundlesForAccount(toBeMigrated.getAccountKey(),callContext);
+    assertEquals(bundles.size(),1);
+    final SubscriptionBundle bundle=bundles.get(0);
+    final List<Subscription> subscriptions=subscriptionApi.getSubscriptionsForBundle(bundle.getId(),callContext);
+    assertEquals(subscriptions.size(),1);
+    final Subscription subscription=subscriptions.get(0);
+    assertEquals(subscription.getStartDate(),trialDate);
+    assertEquals(subscription.getEndDate(),null);
+    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
+    assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.TRIAL);
+    assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-monthly");
+    assertEquals(subscription.getChargedThroughDate(),trialDate.plusDays(30));
+    testListener.pushExpectedEvent(NextEvent.PHASE);
+    testListener.pushExpectedEvent(NextEvent.MIGRATE_BILLING);
+    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
+    clock.addDeltaFromReality(it.toDurationMillis());
+    assertTrue(testListener.isCompleted(5000));
+    assertEquals(subscription.getStartDate(),trialDate);
+    assertEquals(subscription.getEndDate(),null);
+    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
+    assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
+    assertEquals(subscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-monthly");
+    assertEquals(subscription.getCurrentPhase().getName(),"assault-rifle-monthly-evergreen");
+    assertListenerStatus();
+  }
+ catch (  SubscriptionMigrationApiException e) {
+    Assert.fail("",e);
+  }
+}

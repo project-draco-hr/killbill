@@ -1,0 +1,16 @@
+{
+  try {
+    if (type == Type.SUBSCRIPTION && getBlockedStateSubscriptionId(blockableId,context).isBlockChange()) {
+      throw new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,ACTION_CHANGE,TYPE_SUBSCRIPTION,blockableId.toString());
+    }
+ else     if (type == Type.SUBSCRIPTION_BUNDLE && getBlockedStateBundleId(blockableId,context).isBlockChange()) {
+      throw new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,ACTION_CHANGE,TYPE_BUNDLE,blockableId.toString());
+    }
+ else     if (type == Type.ACCOUNT && getBlockedStateAccountId(blockableId,context).isBlockChange()) {
+      throw new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,ACTION_CHANGE,TYPE_ACCOUNT,blockableId.toString());
+    }
+  }
+ catch (  SubscriptionUserApiException e) {
+    throw new BlockingApiException(e,ErrorCode.fromCode(e.getCode()));
+  }
+}

@@ -6,13 +6,13 @@
   final UUID accountId=account.getId();
   assertNotNull(account);
   clock.setDeltaFromReality(initialDate.getMillis() - clock.getUTCNow().getMillis());
-  final SubscriptionBundle bundle=entitlementUserApi.createBundleForAccount(account.getId(),"whatever2",callContext);
+  final SubscriptionBundle bundle=subscriptionUserApi.createBundleForAccount(account.getId(),"whatever2",callContext);
   String productName="Shotgun";
   BillingPeriod term=BillingPeriod.MONTHLY;
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  SubscriptionData subscription=subscriptionDataFromSubscription(entitlementUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,callContext));
+  SubscriptionData subscription=subscriptionDataFromSubscription(subscriptionUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,callContext));
   assertNotNull(subscription);
   assertTrue(busHandler.isCompleted(DELAY));
   final DateTime startDate=subscription.getCurrentPhaseStart();
@@ -24,7 +24,7 @@
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
-  subscription=subscriptionDataFromSubscription(entitlementUserApi.getSubscriptionFromId(subscription.getId(),callContext));
+  subscription=subscriptionDataFromSubscription(subscriptionUserApi.getSubscriptionFromId(subscription.getId(),callContext));
   subscription.cancel(clock.getUTCNow(),callContext);
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
   DateTime endDate=subscription.getChargedThroughDate();

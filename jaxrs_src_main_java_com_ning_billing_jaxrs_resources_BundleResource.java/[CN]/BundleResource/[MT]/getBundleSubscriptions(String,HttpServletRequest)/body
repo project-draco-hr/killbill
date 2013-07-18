@@ -1,11 +1,11 @@
 {
   final TenantContext tenantContext=context.createContext(request);
   final UUID uuid=UUID.fromString(bundleId);
-  final SubscriptionBundle bundle=entitlementApi.getBundleFromId(uuid,tenantContext);
+  final SubscriptionBundle bundle=subscriptionApi.getBundleFromId(uuid,tenantContext);
   if (bundle == null) {
     return Response.status(Status.NO_CONTENT).build();
   }
-  final List<Subscription> subscriptions=entitlementApi.getSubscriptionsForBundle(uuid,tenantContext);
+  final List<Subscription> subscriptions=subscriptionApi.getSubscriptionsForBundle(uuid,tenantContext);
   final Collection<SubscriptionJsonNoEvents> result=Collections2.transform(subscriptions,new Function<Subscription,SubscriptionJsonNoEvents>(){
     @Override public SubscriptionJsonNoEvents apply(    final Subscription input){
       return new SubscriptionJsonNoEvents(input,null);

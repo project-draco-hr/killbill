@@ -1,0 +1,50 @@
+{
+  final SubscriptionEventModelDao migrateBillingEvent=findFutureEventFromTransaction(subscriptionId,entitySqlDaoWrapperFactory,EventType.API_USER,ApiEventType.MIGRATE_BILLING,context);
+  if (migrateBillingEvent == null) {
+    return changeEvents;
+  }
+  String prevPlan=null;
+  String prevPhase=null;
+  String prevPriceList=null;
+  String curPlan=null;
+  String curPhase=null;
+  String curPriceList=null;
+  for (  SubscriptionEvent cur : changeEvents) {
+switch (cur.getType()) {
+case API_USER:
+      final ApiEvent apiEvent=(ApiEvent)cur;
+    curPlan=apiEvent.getEventPlan();
+  curPhase=apiEvent.getEventPlanPhase();
+curPriceList=apiEvent.getPriceList();
+break;
+case PHASE:
+final PhaseEvent phaseEvent=(PhaseEvent)cur;
+curPhase=phaseEvent.getPhase();
+break;
+default :
+throw new SubscriptionError("Unknown event type " + cur.getType());
+}
+if (cur.getEffectiveDate().compareTo(migrateBillingEvent.getEffectiveDate()) > 0) {
+if (cur.getType() == EventType.API_USER && ((ApiEvent)cur).getEventType() == ApiEventType.CHANGE) {
+return changeEvents;
+}
+break;
+}
+prevPlan=curPlan;
+prevPhase=curPhase;
+prevPriceList=curPriceList;
+}
+if (prevPlan != null) {
+final DateTime now=clock.getUTCNow();
+final ApiEventBuilder builder=new ApiEventBuilder().setActive(true).setEventType(ApiEventType.MIGRATE_BILLING).setFromDisk(true).setTotalOrdering(migrateBillingEvent.getTotalOrdering()).setUuid(UUID.randomUUID()).setSubscriptionId(migrateBillingEvent.getSubscriptionId()).setCreatedDate(now).setUpdatedDate(now).setRequestedDate(migrateBillingEvent.getRequestedDate()).setEffectiveDate(migrateBillingEvent.getEffectiveDate()).setProcessedDate(now).setActiveVersion(migrateBillingEvent.getCurrentVersion()).setEventPlan(prevPlan).setEventPlanPhase(prevPhase).setEventPriceList(prevPriceList);
+final SubscriptionEvent newMigrateBillingEvent=new ApiEventMigrateBilling(builder);
+changeEvents.add(newMigrateBillingEvent);
+Collections.sort(changeEvents,new Comparator<SubscriptionEvent>(){
+@Override public int compare(final SubscriptionEvent o1,final SubscriptionEvent o2){
+return o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
+}
+}
+);
+}
+return changeEvents;
+}

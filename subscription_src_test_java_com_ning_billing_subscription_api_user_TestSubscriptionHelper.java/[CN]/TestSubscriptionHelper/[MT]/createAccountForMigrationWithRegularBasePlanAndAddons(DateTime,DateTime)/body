@@ -1,0 +1,11 @@
+{
+  final List<SubscriptionMigrationCaseWithCTD> cases=new LinkedList<SubscriptionMigrationCaseWithCTD>();
+  cases.add(new SubscriptionMigrationCaseWithCTD(new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN),initialBPstart,null,initialBPstart.plusYears(1)));
+  final List<SubscriptionMigrationCaseWithCTD> firstAddOnCases=new LinkedList<SubscriptionMigrationCaseWithCTD>();
+  firstAddOnCases.add(new SubscriptionMigrationCaseWithCTD(new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.DISCOUNT),initalAddonStart,initalAddonStart.plusMonths(1),initalAddonStart.plusMonths(1)));
+  firstAddOnCases.add(new SubscriptionMigrationCaseWithCTD(new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN),initalAddonStart.plusMonths(1),null,null));
+  final List<List<SubscriptionMigrationCaseWithCTD>> input=new ArrayList<List<SubscriptionMigrationCaseWithCTD>>();
+  input.add(cases);
+  input.add(firstAddOnCases);
+  return createAccountForMigrationTest(input);
+}

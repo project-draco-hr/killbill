@@ -1,0 +1,15 @@
+{
+  try {
+    subscriptionApi.createSubscription(bundleId,testUtil.getProductSpecifier(productName,planSet,term,null),clock.getUTCNow(),callContext);
+    Assert.fail("Exception expected, error code: " + expected);
+  }
+ catch (  SubscriptionUserApiException e) {
+    assertEquals(e.getCode(),expected.getCode());
+    try {
+      log.info(e.getMessage());
+    }
+ catch (    Throwable el) {
+      assertFalse(true);
+    }
+  }
+}

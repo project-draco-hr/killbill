@@ -1,0 +1,27 @@
+{
+  final String productName="laser-scope-monthly";
+  final PhaseType initialPhase=PhaseType.DISCOUNT;
+  final SubscriptionData subscriptionData=createSubscriptionStartedInThePast(productName,initialPhase);
+  final DateTime effectiveDate=clock.getUTCNow();
+  final TimedPhase[] phases=getTimedPhasesOnCreate(productName,initialPhase,subscriptionData,effectiveDate);
+  Assert.assertEquals(phases[0].getStartPhase(),subscriptionData.getStartDate());
+  Assert.assertEquals(phases[1].getStartPhase(),subscriptionData.getStartDate().plusMonths(1));
+  final TimedPhase nextTimePhase=planAligner.getNextTimedPhase(subscriptionData,effectiveDate,effectiveDate);
+  Assert.assertEquals(nextTimePhase.getStartPhase(),subscriptionData.getStartDate().plusMonths(1));
+  final DateTime effectiveDateInThePast=subscriptionData.getStartDate().minusHours(10);
+  final TimedPhase[] phasesInThePast=getTimedPhasesOnCreate(productName,initialPhase,subscriptionData,effectiveDateInThePast);
+  Assert.assertNull(phasesInThePast[0]);
+  Assert.assertEquals(phasesInThePast[1].getStartPhase(),subscriptionData.getStartDate());
+  try {
+    planAligner.getNextTimedPhase(subscriptionData,effectiveDateInThePast,effectiveDateInThePast);
+    Assert.fail("Can't use getNextTimedPhase(): the effective date is before the initial plan");
+  }
+ catch (  SubscriptionError e) {
+    Assert.assertTrue(true);
+  }
+  final String newProductName="telescopic-scope-monthly";
+  final DateTime effectiveChangeDate=subscriptionData.getStartDate().plusMonths(1);
+  changeSubscription(effectiveChangeDate,subscriptionData,productName,newProductName,initialPhase);
+  final TimedPhase newPhase=getNextTimedPhaseOnChange(subscriptionData,newProductName,effectiveChangeDate);
+  Assert.assertNull(newPhase);
+}

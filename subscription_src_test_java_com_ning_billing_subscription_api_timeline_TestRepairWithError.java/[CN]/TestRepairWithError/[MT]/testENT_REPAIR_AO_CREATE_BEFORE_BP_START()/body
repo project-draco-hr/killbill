@@ -1,0 +1,28 @@
+{
+  test.withException(new TestWithExceptionCallback(){
+    @Override public void doTest() throws SubscriptionRepairException, SubscriptionUserApiException {
+      Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
+      clock.addDeltaFromReality(it.toDurationMillis());
+      final SubscriptionData aoSubscription=testUtil.createSubscription(bundle,"Telescopic-Scope",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+      it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(4));
+      clock.addDeltaFromReality(it.toDurationMillis());
+      final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
+      testUtil.sortEventsOnBundle(bundleRepair);
+      final SubscriptionTimeline bpRepair=testUtil.getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
+      assertEquals(bpRepair.getExistingEvents().size(),2);
+      final SubscriptionTimeline aoRepair=testUtil.getSubscriptionRepair(aoSubscription.getId(),bundleRepair);
+      assertEquals(aoRepair.getExistingEvents().size(),2);
+      final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+      des.add(testUtil.createDeletedEvent(aoRepair.getExistingEvents().get(0).getEventId()));
+      des.add(testUtil.createDeletedEvent(aoRepair.getExistingEvents().get(1).getEventId()));
+      final DateTime aoRecreateDate=aoSubscription.getStartDate().minusDays(5);
+      final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.DISCOUNT);
+      final NewEvent ne=testUtil.createNewEvent(SubscriptionTransitionType.CREATE,aoRecreateDate,spec);
+      final SubscriptionTimeline saoRepair=testUtil.createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
+      final BundleTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
+      final boolean dryRun=true;
+      repairApi.repairBundle(bRepair,dryRun,callContext);
+    }
+  }
+,ErrorCode.SUB_REPAIR_AO_CREATE_BEFORE_BP_START);
+}

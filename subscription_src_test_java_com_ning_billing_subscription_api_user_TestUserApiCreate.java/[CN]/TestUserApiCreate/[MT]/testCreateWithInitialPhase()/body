@@ -1,0 +1,27 @@
+{
+  try {
+    final DateTime init=clock.getUTCNow();
+    final String productName="Shotgun";
+    final BillingPeriod term=BillingPeriod.MONTHLY;
+    final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+    testListener.pushExpectedEvent(NextEvent.CREATE);
+    final SubscriptionData subscription=(SubscriptionData)subscriptionApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,PhaseType.EVERGREEN),clock.getUTCNow(),callContext);
+    assertNotNull(subscription);
+    assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
+    assertEquals(subscription.getBundleId(),bundle.getId());
+    testUtil.assertDateWithin(subscription.getStartDate(),init,clock.getUTCNow());
+    testUtil.assertDateWithin(subscription.getBundleStartDate(),init,clock.getUTCNow());
+    final Plan currentPlan=subscription.getCurrentPlan();
+    assertNotNull(currentPlan);
+    assertEquals(currentPlan.getProduct().getName(),productName);
+    assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
+    assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.MONTHLY);
+    final PlanPhase currentPhase=subscription.getCurrentPhase();
+    assertNotNull(currentPhase);
+    assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);
+    assertListenerStatus();
+  }
+ catch (  SubscriptionUserApiException e) {
+    Assert.fail(e.getMessage());
+  }
+}
