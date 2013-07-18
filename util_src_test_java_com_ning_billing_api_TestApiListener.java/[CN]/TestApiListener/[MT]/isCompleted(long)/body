@@ -9,6 +9,19 @@ synchronized (this) {
         final DateTime before=new DateTime();
         wait(500);
         if (completed) {
+          await().atMost(10,SECONDS).until(new Callable<Boolean>(){
+            @Override public Boolean call() throws Exception {
+              final long inProcessingBusEvents=idbi.withHandle(new HandleCallback<Long>(){
+                @Override public Long withHandle(                final Handle handle) throws Exception {
+                  return (Long)handle.select("select count(distinct record_id) count from bus_events").get(0).get("count");
+                }
+              }
+);
+              log.debug("Events still in processing: " + inProcessingBusEvents);
+              return inProcessingBusEvents == 0;
+            }
+          }
+);
           return completed;
         }
         final DateTime after=new DateTime();
