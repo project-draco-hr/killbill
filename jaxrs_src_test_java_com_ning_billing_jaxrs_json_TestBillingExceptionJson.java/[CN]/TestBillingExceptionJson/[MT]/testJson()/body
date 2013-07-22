@@ -1,0 +1,17 @@
+{
+  final String className=UUID.randomUUID().toString();
+  final int code=Integer.MIN_VALUE;
+  final String message=UUID.randomUUID().toString();
+  final String causeClassName=UUID.randomUUID().toString();
+  final String causeMessage=UUID.randomUUID().toString();
+  final BillingExceptionJson exceptionJson=new BillingExceptionJson(className,code,message,causeClassName,causeMessage,ImmutableList.<StackTraceElementJson>of());
+  Assert.assertEquals(exceptionJson.getClassName(),className);
+  Assert.assertEquals(exceptionJson.getCode(),(Integer)code);
+  Assert.assertEquals(exceptionJson.getMessage(),message);
+  Assert.assertEquals(exceptionJson.getCauseClassName(),causeClassName);
+  Assert.assertEquals(exceptionJson.getCauseMessage(),causeMessage);
+  Assert.assertEquals(exceptionJson.getStackTrace().size(),0);
+  final String asJson=mapper.writeValueAsString(exceptionJson);
+  final BillingExceptionJson fromJson=mapper.readValue(asJson,BillingExceptionJson.class);
+  Assert.assertEquals(fromJson,exceptionJson);
+}

@@ -1,0 +1,19 @@
+{
+  final String nil=null;
+  try {
+    nil.toString();
+    Assert.fail();
+  }
+ catch (  NullPointerException e) {
+    final BillingExceptionJson exceptionJson=new BillingExceptionJson(e);
+    Assert.assertEquals(exceptionJson.getClassName(),e.getClass().getName());
+    Assert.assertNull(exceptionJson.getCode());
+    Assert.assertNull(exceptionJson.getMessage());
+    Assert.assertNull(exceptionJson.getCauseClassName());
+    Assert.assertNull(exceptionJson.getCauseMessage());
+    Assert.assertFalse(exceptionJson.getStackTrace().isEmpty());
+    Assert.assertEquals(exceptionJson.getStackTrace().get(0).getClassName(),TestBillingExceptionJson.class.getName());
+    Assert.assertEquals(exceptionJson.getStackTrace().get(0).getMethodName(),"testFromException");
+    Assert.assertFalse(exceptionJson.getStackTrace().get(0).getNativeMethod());
+  }
+}
