@@ -1,0 +1,10 @@
+{
+  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(callContext);
+  final DateTime requestedDate=fromLocalDateAndReferenceTime(localDate,subscription.getStartDate(),clock,context);
+  try {
+    return subscription.cancel(requestedDate,callContext);
+  }
+ catch (  SubscriptionUserApiException e) {
+    throw new EntitlementApiException(e);
+  }
+}

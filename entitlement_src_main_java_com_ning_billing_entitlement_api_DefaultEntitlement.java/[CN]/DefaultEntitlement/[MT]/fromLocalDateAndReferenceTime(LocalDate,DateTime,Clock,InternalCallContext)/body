@@ -1,0 +1,10 @@
+{
+  try {
+    final Account account=accountApi.getAccountByRecordId(callContext.getAccountRecordId(),callContext);
+    final DateAndTimeZoneContext timeZoneContext=new DateAndTimeZoneContext(subscriptionStartDate,account.getTimeZone(),clock);
+    return timeZoneContext.computeUTCDateTimeFromLocalDate(requestedDate);
+  }
+ catch (  AccountApiException e) {
+    throw new EntitlementApiException(e);
+  }
+}
