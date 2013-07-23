@@ -1,0 +1,20 @@
+{
+  if (productCategory == ProductCategory.ADD_ON) {
+    throw new RuntimeException("Unxepected Call for creating ADD_ON");
+  }
+  return (DefaultEntitlement)doCallAndCheckForCompletion(new Function<Void,Entitlement>(){
+    @Override public Entitlement apply(    @Nullable final Void dontcare){
+      try {
+        final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(productName,productCategory,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+        final Entitlement entitlement=entitlementApi.createBaseEntitlement(accountId,spec,bundleExternalKey,callContext);
+        assertNotNull(entitlement);
+        return entitlement;
+      }
+ catch (      EntitlementApiException e) {
+        fail();
+        return null;
+      }
+    }
+  }
+,events);
+}

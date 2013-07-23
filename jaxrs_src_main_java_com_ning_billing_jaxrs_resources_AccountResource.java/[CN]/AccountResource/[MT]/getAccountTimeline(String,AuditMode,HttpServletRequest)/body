@@ -18,12 +18,6 @@
   for (  final InvoicePayment chargeback : chargebacks) {
     chargebacksByPayment.put(chargeback.getPaymentId(),chargeback);
   }
-  final List<SubscriptionBundle> bundles=subscriptionApi.getBundlesForAccount(account.getId(),tenantContext);
-  final List<BundleTimeline> bundlesTimeline=new LinkedList<BundleTimeline>();
-  for (  final SubscriptionBundle bundle : bundles) {
-    bundlesTimeline.add(timelineApi.getBundleTimeline(bundle.getId(),tenantContext));
-  }
-  final AuditLogsForBundles bundlesAuditLogs=auditUserApi.getAuditLogsForBundles(bundlesTimeline,auditMode.getLevel(),tenantContext);
-  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundlesTimeline,refundsByPayment,chargebacksByPayment,invoicesAuditLogs,paymentsAuditLogs,refundsAuditLogs,chargebacksAuditLogs,bundlesAuditLogs);
+  final AccountTimelineJson json=null;
   return Response.status(Status.OK).entity(json).build();
 }

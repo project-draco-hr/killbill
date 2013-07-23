@@ -1,0 +1,16 @@
+{
+  return (DefaultEntitlement)doCallAndCheckForCompletion(new Function<Void,Entitlement>(){
+    @Override public Entitlement apply(    @Nullable final Void dontcare){
+      try {
+        final Entitlement refreshedEntitlement=entitlementApi.getEntitlementFromId(entitlement.getId(),callContext);
+        refreshedEntitlement.changePlan(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),callContext);
+        return refreshedEntitlement;
+      }
+ catch (      EntitlementApiException e) {
+        fail(e.getMessage());
+        return null;
+      }
+    }
+  }
+,events);
+}

@@ -6,11 +6,7 @@
   final UUID accountId=account.getId();
   final String productName="Blowdart";
   final String planSetName="DEFAULT";
-  busHandler.pushExpectedEvent(NextEvent.CREATE);
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  final SubscriptionBundle bundle=subscriptionUserApi.createBundleForAccount(accountId,"testKey",callContext);
-  subscriptionDataFromSubscription(subscriptionUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,BillingPeriod.MONTHLY,planSetName,PhaseType.TRIAL),null,callContext));
-  assertTrue(busHandler.isCompleted(DELAY));
+  final DefaultEntitlement baseEntitlementAndCheckForCompletion=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",productName,ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId,callContext);
   assertNotNull(invoices);
   assertTrue(invoices.size() == 1);
