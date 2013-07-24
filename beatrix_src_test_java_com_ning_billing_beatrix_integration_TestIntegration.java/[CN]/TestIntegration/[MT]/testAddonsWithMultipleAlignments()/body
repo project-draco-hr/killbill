@@ -6,15 +6,15 @@
   final String productName="Shotgun";
   final BillingPeriod term=BillingPeriod.MONTHLY;
   final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-  final DefaultEntitlement baseEntitlementAndCheckForCompletion=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
+  final DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
   log.info("Moving clock from" + clock.getUTCNow() + " to "+ clock.getUTCNow().plusDays(3));
   clock.addDays(3);
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
-  final DefaultEntitlement aoEntitlement1=addAOEntitlementAndCheckForCompletion(baseEntitlementAndCheckForCompletion.getId(),"Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE,NextEvent.PAYMENT);
-  final DefaultEntitlement aoEntitlement2=addAOEntitlementAndCheckForCompletion(baseEntitlementAndCheckForCompletion.getId(),"Laser-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  final DefaultEntitlement aoEntitlement1=addAOEntitlementAndCheckForCompletion(baseEntitlement.getId(),"Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  final DefaultEntitlement aoEntitlement2=addAOEntitlementAndCheckForCompletion(baseEntitlement.getId(),"Laser-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE,NextEvent.PAYMENT);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);

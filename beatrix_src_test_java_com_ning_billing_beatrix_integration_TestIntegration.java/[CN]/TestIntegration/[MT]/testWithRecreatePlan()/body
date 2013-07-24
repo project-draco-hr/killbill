@@ -11,10 +11,10 @@
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   busHandler.pushExpectedEvent(NextEvent.CREATE);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  final DefaultEntitlement baseEntitlementAndCheckForCompletion=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
-  assertNotNull(baseEntitlementAndCheckForCompletion);
+  final DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
+  assertNotNull(baseEntitlement);
   assertTrue(busHandler.isCompleted(DELAY));
-  final SubscriptionData subscription=(SubscriptionData)baseEntitlementAndCheckForCompletion.getSubscription();
+  final SubscriptionData subscription=(SubscriptionData)baseEntitlement.getSubscription();
   final DateTime startDate=subscription.getCurrentPhaseStart();
   final BigDecimal rate=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
   final int invoiceItemCount=1;
@@ -24,7 +24,7 @@
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
-  final DefaultEntitlement entitlement=(DefaultEntitlement)entitlementApi.getEntitlementFromId(baseEntitlementAndCheckForCompletion.getId(),callContext);
+  final DefaultEntitlement entitlement=(DefaultEntitlement)entitlementApi.getEntitlementFromId(baseEntitlement.getId(),callContext);
   entitlement.cancelEntitlementWithDate(clock.getUTCNow().toLocalDate(),callContext);
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
   DateTime endDate=subscription.getChargedThroughDate();

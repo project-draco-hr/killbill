@@ -11,7 +11,7 @@
     final Duration ctd=testUtil.getDurationMonth(1);
     final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
     subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
-    subscription=subscriptionApi.getSubscriptionFromId(subscription.getId(),tenantContext);
+    subscription=subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
     subscription.cancel(clock.getUTCNow(),callContext);
     try {
       subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);

@@ -13,11 +13,11 @@
   testListener.pushExpectedEvent(NextEvent.TRANSFER);
   transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getExternalKey(),transferRequestedDate,false,false,callContext);
   assertTrue(testListener.isCompleted(3000));
-  final Subscription oldBaseSubscription=subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+  final Subscription oldBaseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
   assertNotNull(oldBaseSubscription.getFutureEndDate());
   assertTrue(oldBaseSubscription.getFutureEndDate().compareTo(ctd) == 0);
-  final SubscriptionBundle newBundle=subscriptionApi.getBundleForAccountAndKey(newAccountId,bundle.getExternalKey(),callContext);
-  final List<Subscription> subscriptions=subscriptionApi.getSubscriptionsForBundle(newBundle.getId(),callContext);
+  final SubscriptionBundle newBundle=subscriptionInternalApi.getBundleForAccountAndKey(newAccountId,bundle.getExternalKey(),internalCallContext);
+  final List<Subscription> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(newBundle.getId(),internalCallContext);
   assertEquals(subscriptions.size(),1);
   final Subscription newBaseSubscription=subscriptions.get(0);
   assertTrue(((SubscriptionData)newBaseSubscription).getAlignStartDate().compareTo(((SubscriptionData)baseSubscription).getAlignStartDate()) == 0);
@@ -36,7 +36,7 @@
   clock.addDays(2);
   final DateTime newCtd=newBaseSubscription.getStartDate().plusYears(1);
   subscriptionInternalApi.setChargedThroughDate(newBaseSubscription.getId(),newCtd,internalCallContext);
-  final Subscription newBaseSubscriptionWithCtd=subscriptionApi.getSubscriptionFromId(newBaseSubscription.getId(),callContext);
+  final Subscription newBaseSubscriptionWithCtd=subscriptionInternalApi.getSubscriptionFromId(newBaseSubscription.getId(),internalCallContext);
   final String newBaseProduct2="Pistol";
   final BillingPeriod newBaseTerm2=BillingPeriod.ANNUAL;
   final DateTime changeDate2=clock.getUTCNow();

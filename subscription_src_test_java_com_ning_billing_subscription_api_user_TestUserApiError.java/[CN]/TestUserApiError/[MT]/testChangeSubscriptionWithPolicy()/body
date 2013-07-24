@@ -6,8 +6,8 @@
   }
  catch (  SubscriptionError error) {
     assertTrue(true);
-    assertEquals(subscriptionApi.getSubscriptionFromId(subscription.getId(),tenantContext).getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
+    assertEquals(subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext).getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
   }
   assertTrue(subscription.changePlanWithPolicy("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),ActionPolicy.IMMEDIATE,callContext));
-  assertEquals(subscriptionApi.getSubscriptionFromId(subscription.getId(),tenantContext).getCurrentPlan().getBillingPeriod(),BillingPeriod.MONTHLY);
+  assertEquals(subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext).getCurrentPlan().getBillingPeriod(),BillingPeriod.MONTHLY);
 }

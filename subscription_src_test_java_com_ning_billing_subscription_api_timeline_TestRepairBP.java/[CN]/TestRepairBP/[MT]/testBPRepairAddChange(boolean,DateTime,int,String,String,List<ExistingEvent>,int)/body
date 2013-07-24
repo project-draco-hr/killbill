@@ -31,7 +31,7 @@
   for (  final ExistingEvent e : expectedEvents) {
     testUtil.validateExistingEventForAssertion(e,events.get(index++));
   }
-  final SubscriptionData dryRunBaseSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+  final SubscriptionData dryRunBaseSubscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
   assertEquals(dryRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
   assertEquals(dryRunBaseSubscription.getBundleId(),bundle.getId());
   assertEquals(dryRunBaseSubscription.getStartDate(),baseSubscription.getStartDate());
@@ -62,7 +62,7 @@
   for (  final ExistingEvent e : expectedEvents) {
     testUtil.validateExistingEventForAssertion(e,events.get(index++));
   }
-  final SubscriptionData realRunBaseSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+  final SubscriptionData realRunBaseSubscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
   assertEquals(realRunBaseSubscription.getAllTransitions().size(),expectedTransitions);
   assertEquals(realRunBaseSubscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
   assertEquals(realRunBaseSubscription.getBundleId(),bundle.getId());

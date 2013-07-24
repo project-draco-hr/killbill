@@ -18,9 +18,9 @@
     final Duration ctd=testUtil.getDurationMonth(1);
     final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(now,ctd);
     subscriptionInternalApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,internalCallContext);
-    baseSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(baseSubscription.getId(),callContext);
+    baseSubscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
     baseSubscription.cancel(now,callContext);
-    aoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+    aoSubscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
     testListener.reset();
@@ -29,7 +29,7 @@
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
-    aoSubscription=(SubscriptionData)subscriptionApi.getSubscriptionFromId(aoSubscription.getId(),callContext);
+    aoSubscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
     assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);
     assertListenerStatus();
   }

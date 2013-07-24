@@ -3,7 +3,12 @@
     @Override public Entitlement apply(    @Nullable final Void dontcare){
       try {
         final Entitlement refreshedEntitlement=entitlementApi.getEntitlementFromId(entitlement.getId(),callContext);
-        refreshedEntitlement.changePlan(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),callContext);
+        if (billingPolicy == null) {
+          refreshedEntitlement.changePlan(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),callContext);
+        }
+ else {
+          refreshedEntitlement.changePlanOverrideBillingPolicy(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),billingPolicy,callContext);
+        }
         return refreshedEntitlement;
       }
  catch (      EntitlementApiException e) {

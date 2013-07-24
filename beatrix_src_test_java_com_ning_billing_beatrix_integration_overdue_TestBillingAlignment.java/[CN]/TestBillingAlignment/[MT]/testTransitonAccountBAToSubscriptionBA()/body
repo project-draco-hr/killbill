@@ -1,9 +1,9 @@
 {
   final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(1));
   clock.setDay(new LocalDate(2012,4,1));
-  final SubscriptionBundle bundle=subscriptionUserApi.createBundleForAccount(account.getId(),"whatever",callContext);
-  final Subscription bpSubscription=createBaseEntitlementAndCheckForCompletion(bundle.getId(),"Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
+  final DefaultEntitlement bpEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
+  assertNotNull(bpEntitlement);
   invoiceChecker.checkInvoice(account.getId(),1,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,4,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
   addDaysAndCheckForCompletion(33,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
-  changeEntitlementAndCheckForCompletion(bpSubscription,"Shotgun",BillingPeriod.ANNUAL,NextEvent.CHANGE,NextEvent.INVOICE);
+  changeEntitlementAndCheckForCompletion(bpEntitlement,"Shotgun",BillingPeriod.ANNUAL,null,NextEvent.CHANGE,NextEvent.INVOICE);
 }

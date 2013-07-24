@@ -1,0 +1,13 @@
+{
+  if (shouldFail) {
+    try {
+      entitlement.changePlan("Pistol",term,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),callContext);
+    }
+ catch (    EntitlementApiException e) {
+      assertTrue(e.getCause() instanceof BlockingApiException);
+    }
+  }
+ else {
+    changeEntitlementAndCheckForCompletion(entitlement,"Assault-Rifle",BillingPeriod.MONTHLY,null,NextEvent.CHANGE,NextEvent.INVOICE,NextEvent.INVOICE_ADJUSTMENT);
+  }
+}

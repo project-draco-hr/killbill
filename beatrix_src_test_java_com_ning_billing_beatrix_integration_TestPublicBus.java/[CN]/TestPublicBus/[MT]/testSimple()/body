@@ -6,15 +6,11 @@
   final UUID accountId=account.getId();
   assertNotNull(account);
   clock.setDeltaFromReality(initialDate.getMillis() - clock.getUTCNow().getMillis());
-  final SubscriptionBundle bundle=subscriptionUserApi.createBundleForAccount(account.getId(),"whatever2",callContext);
   String productName="Shotgun";
   BillingPeriod term=BillingPeriod.MONTHLY;
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-  busHandler.pushExpectedEvent(NextEvent.CREATE);
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  SubscriptionData subscription=subscriptionDataFromSubscription(subscriptionUserApi.createSubscription(bundle.getId(),new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,planSetName,null),null,callContext));
-  assertNotNull(subscription);
-  assertTrue(busHandler.isCompleted(DELAY));
+  final DefaultEntitlement bpEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
+  assertNotNull(bpEntitlement);
   await().atMost(10,SECONDS).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {
       return externalBusCount.get() == 4;
