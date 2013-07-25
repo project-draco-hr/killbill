@@ -5,7 +5,7 @@
   final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(billingDay));
   clock.setTime(initialCreationDate);
   int invoiceItemCount=1;
-  final DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
+  DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
   SubscriptionData subscription=subscriptionDataFromSubscription(baseEntitlement.getSubscription());
   invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,new ExpectedInvoiceItemCheck(initialCreationDate.toLocalDate(),null,InvoiceItemType.FIXED,new BigDecimal("0")));
   invoiceChecker.checkChargedThroughDate(subscription.getId(),clock.getUTCToday(),callContext);
@@ -18,7 +18,8 @@
   setDateAndCheckForCompletion(new DateTime(2012,3,2,23,59,59,0,testTimeZone),NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
   invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,3,2),new LocalDate(2012,4,2),InvoiceItemType.RECURRING,new BigDecimal("599.95")));
   invoiceChecker.checkChargedThroughDate(subscription.getId(),new LocalDate(2012,4,2),callContext);
-  changeEntitlementAndCheckForCompletion(baseEntitlement,"Pistol",BillingPeriod.MONTHLY,null);
+  baseEntitlement=changeEntitlementAndCheckForCompletion(baseEntitlement,"Pistol",BillingPeriod.MONTHLY,null);
+  subscription=subscriptionDataFromSubscription(baseEntitlement.getSubscription());
   final LocalDate firstRecurringPistolDate=subscription.getChargedThroughDate().toLocalDate();
   final LocalDate secondRecurringPistolDate=firstRecurringPistolDate.plusMonths(1);
   addDaysAndCheckForCompletion(31,NextEvent.CHANGE,NextEvent.INVOICE,NextEvent.PAYMENT);

@@ -1,3 +1,14 @@
 {
-  return false;
+  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(accountId,callContext);
+  final DateTime requestedDate=fromLocalDateAndReferenceTime(localDate,subscription.getStartDate(),clock,context);
+  try {
+    checker.checkBlockedChange(subscription,context);
+    return subscription.changePlanWithPolicy(productName,billingPeriod,priceList,requestedDate,actionPolicy,callContext);
+  }
+ catch (  BlockingApiException e) {
+    throw new EntitlementApiException(e,e.getCode(),e.getMessage());
+  }
+catch (  SubscriptionUserApiException e) {
+    throw new EntitlementApiException(e);
+  }
 }

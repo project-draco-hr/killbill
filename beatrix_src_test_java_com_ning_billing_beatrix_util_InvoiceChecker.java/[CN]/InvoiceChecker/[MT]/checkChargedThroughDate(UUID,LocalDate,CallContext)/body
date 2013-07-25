@@ -1,18 +1,19 @@
 {
   try {
-    final Subscription subscription=subscriptionApi.getSubscriptionFromId(subscriptionId,context);
+    final DefaultEntitlement entitlement=(DefaultEntitlement)entitlementApi.getEntitlementFromId(entitlementId,context);
+    final Subscription subscription=entitlement.getSubscription();
     if (expectedLocalCTD == null) {
       assertNull(subscription.getChargedThroughDate());
     }
  else {
       final DateTime expectedCTD=expectedLocalCTD.toDateTime(new LocalTime(subscription.getStartDate().getMillis(),DateTimeZone.UTC),DateTimeZone.UTC);
-      final String msg=String.format("Checking CTD for subscription %s : expectedLocalCTD = %s => expectedCTD = %s, got %s",subscriptionId,expectedLocalCTD,expectedCTD,subscription.getChargedThroughDate());
+      final String msg=String.format("Checking CTD for entitlement %s : expectedLocalCTD = %s => expectedCTD = %s, got %s",entitlementId,expectedLocalCTD,expectedCTD,subscription.getChargedThroughDate());
       log.info(msg);
       assertNotNull(subscription.getChargedThroughDate());
       assertTrue(subscription.getChargedThroughDate().compareTo(expectedCTD) == 0,msg);
     }
   }
- catch (  SubscriptionUserApiException e) {
-    fail("Failed to retrieve subscription for " + subscriptionId);
+ catch (  EntitlementApiException e) {
+    fail("Failed to retrieve entitlement for " + entitlementId);
   }
 }

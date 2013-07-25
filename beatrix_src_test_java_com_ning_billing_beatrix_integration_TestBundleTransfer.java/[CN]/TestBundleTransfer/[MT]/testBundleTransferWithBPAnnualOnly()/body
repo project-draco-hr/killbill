@@ -7,8 +7,6 @@
   final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   final DefaultEntitlement bpEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   assertNotNull(bpEntitlement);
-  assertTrue(busHandler.isCompleted(DELAY));
-  assertListenerStatus();
   assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).size(),1);
   assertEquals(bpEntitlement.getSubscription().getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
   busHandler.pushExpectedEvent(NextEvent.PHASE);
@@ -21,7 +19,7 @@
   busHandler.pushExpectedEvent(NextEvent.TRANSFER);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
-  transferApi.transferBundle(account.getId(),newAccount.getId(),"mycutebundle",clock.getUTCNow(),false,false,callContext);
+  transferApi.transferBundle(account.getId(),newAccount.getId(),"externalKey",clock.getUTCNow(),false,false,callContext);
   assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(newAccount.getId(),callContext);
