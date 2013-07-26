@@ -1,0 +1,20 @@
+{
+  final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
+  final List<PaymentMethodPlugin> paymentMethods;
+  try {
+    paymentMethods=pluginApi.searchPaymentMethods(searchKey,internalTenantContext.toTenantContext());
+  }
+ catch (  PaymentPluginApiException e) {
+    throw new PaymentApiException(e,ErrorCode.PAYMENT_PLUGIN_SEARCH_PAYMENT_METHODS,pluginName,searchKey);
+  }
+  final List<PaymentMethod> results=new LinkedList<PaymentMethod>();
+  for (  final PaymentMethodPlugin paymentMethodPlugin : paymentMethods) {
+    final PaymentMethodModelDao paymentMethodModelDao=paymentDao.getPaymentMethodIncludedDeleted(paymentMethodPlugin.getKbPaymentMethodId(),internalTenantContext);
+    if (paymentMethodModelDao == null) {
+      log.warn("Unable to find payment method id " + paymentMethodPlugin.getKbPaymentMethodId() + " present in plugin "+ pluginName);
+      continue;
+    }
+    results.add(new DefaultPaymentMethod(paymentMethodModelDao,paymentMethodPlugin));
+  }
+  return results;
+}
