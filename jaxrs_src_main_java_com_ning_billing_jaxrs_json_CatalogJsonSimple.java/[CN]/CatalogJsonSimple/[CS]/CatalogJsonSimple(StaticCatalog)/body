@@ -1,28 +1,27 @@
 {
   name=catalog.getCatalogName();
-  Map<String,ProductJson> productMap=new HashMap<String,CatalogJsonSimple.ProductJson>();
-  Plan[] plans=catalog.getCurrentPlans();
-  for (  Plan plan : plans) {
-    Product product=plan.getProduct();
-    ProductJson jProduct=productMap.get(product.getName());
-    if (jProduct == null) {
-      jProduct=new ProductJson(product.getCategory().toString(),product.getName(),toProductNames(product.getIncluded()),toProductNames(product.getAvailable()));
-      productMap.put(product.getName(),jProduct);
+  final Plan[] plans=catalog.getCurrentPlans();
+  final Map<String,ProductJson> productMap=new HashMap<String,ProductJson>();
+  for (  final Plan plan : plans) {
+    final Product product=plan.getProduct();
+    ProductJson productJson=productMap.get(product.getName());
+    if (productJson == null) {
+      productJson=new ProductJson(product.getCategory().toString(),product.getName(),toProductNames(product.getIncluded()),toProductNames(product.getAvailable()));
+      productMap.put(product.getName(),productJson);
     }
-    int i=0;
-    PhaseJson[] phases=new PhaseJson[plan.getAllPhases().length];
-    for (    PlanPhase phase : plan.getAllPhases()) {
-      Map<String,BigDecimal> prices=new HashMap<String,BigDecimal>();
+    final List<PhaseJson> phases=new LinkedList<PhaseJson>();
+    for (    final PlanPhase phase : plan.getAllPhases()) {
+      final List<PriceJson> prices=new LinkedList<PriceJson>();
       if (phase.getRecurringPrice() != null) {
-        for (        Price cur : phase.getRecurringPrice().getPrices()) {
-          prices.put(cur.getCurrency().toString(),cur.getValue());
+        for (        final Price price : phase.getRecurringPrice().getPrices()) {
+          prices.add(new PriceJson(price));
         }
       }
-      PhaseJson jPhase=new PhaseJson(phase.getPhaseType().toString(),prices);
-      phases[i++]=jPhase;
+      final PhaseJson phaseJson=new PhaseJson(phase.getPhaseType().toString(),prices);
+      phases.add(phaseJson);
     }
-    PlanJson jPlan=new PlanJson(plan.getName(),phases);
-    jProduct.addPlan(jPlan);
+    final PlanJson planJson=new PlanJson(plan.getName(),phases);
+    productJson.getPlans().add(planJson);
   }
-  products=productMap.values().toArray(new ProductJson[productMap.values().size()]);
+  products=ImmutableList.<ProductJson>copyOf(productMap.values());
 }
