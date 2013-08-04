@@ -1,5 +1,12 @@
 {
   super.configure();
-  bind(DBTestingHelper.class).toInstance(instance);
-  bind(IDBI.class).toInstance(instance.getDBI());
+  final EmbeddedDB instance=DBTestingHelper.get();
+  bind(EmbeddedDB.class).toInstance(instance);
+  try {
+    bind(DataSource.class).toInstance(DBTestingHelper.get().getDataSource());
+    bind(IDBI.class).toInstance(DBTestingHelper.getDBI());
+  }
+ catch (  IOException e) {
+    Assert.fail(e.toString());
+  }
 }
