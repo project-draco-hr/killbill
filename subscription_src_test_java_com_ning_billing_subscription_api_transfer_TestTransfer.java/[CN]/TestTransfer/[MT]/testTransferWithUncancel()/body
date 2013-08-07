@@ -3,7 +3,7 @@
   final String baseProduct="Shotgun";
   final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
   final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  Subscription baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+  SubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
   testListener.pushExpectedEvent(NextEvent.PHASE);
   clock.addDays(30);
   assertTrue(testListener.isCompleted(3000));
@@ -21,6 +21,6 @@
   transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getExternalKey(),transferRequestedDate,true,false,callContext);
   assertTrue(testListener.isCompleted(3000));
   final SubscriptionBundle newBundle=subscriptionInternalApi.getBundleForAccountAndKey(newAccountId,bundle.getExternalKey(),internalCallContext);
-  final List<Subscription> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(newBundle.getId(),internalCallContext);
+  final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(newBundle.getId(),internalCallContext);
   assertEquals(subscriptions.size(),1);
 }

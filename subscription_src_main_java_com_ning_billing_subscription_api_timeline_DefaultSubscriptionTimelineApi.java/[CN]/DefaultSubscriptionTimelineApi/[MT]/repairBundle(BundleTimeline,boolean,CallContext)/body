@@ -20,7 +20,7 @@
     SubscriptionDataRepair baseSubscriptionRepair=null;
     final List<SubscriptionDataRepair> addOnSubscriptionInRepair=new LinkedList<SubscriptionDataRepair>();
     final List<SubscriptionDataRepair> inRepair=new LinkedList<SubscriptionDataRepair>();
-    for (    final Subscription cur : subscriptions) {
+    for (    final SubscriptionBase cur : subscriptions) {
       final SubscriptionTimeline curRepair=findAndCreateSubscriptionRepair(cur.getId(),input.getSubscriptions());
       if (curRepair != null) {
         final SubscriptionDataRepair curInputRepair=((SubscriptionDataRepair)cur);
@@ -61,7 +61,7 @@
     final RepairType repairType=getRepairType(subscriptions.get(0),(baseSubscriptionRepair != null));
 switch (repairType) {
 case BASE_REPAIR:
-      for (      final Subscription cur : subscriptions) {
+      for (      final SubscriptionBase cur : subscriptions) {
         if (cur.getCategory() == ProductCategory.ADD_ON && !inRepair.contains(cur)) {
           final SubscriptionDataRepair curOutputRepair=createSubscriptionDataRepair((SubscriptionDataRepair)cur,newBundleStartDate,null,((SubscriptionDataRepair)cur).getEvents());
           repairDao.initializeRepair(curOutputRepair.getId(),((SubscriptionDataRepair)cur).getEvents(),tenantContext);

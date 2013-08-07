@@ -1,0 +1,10 @@
+{
+  final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(tenantContext);
+  try {
+    final SubscriptionBundle bundle=subscriptionInternalApi.getBundleForAccountAndKey(accountId,externalKey,context);
+    return getAllEntitlementsFromBundleId(bundle.getId(),bundle.getAccountId(),context);
+  }
+ catch (  SubscriptionUserApiException e) {
+    throw new EntitlementApiException(e);
+  }
+}

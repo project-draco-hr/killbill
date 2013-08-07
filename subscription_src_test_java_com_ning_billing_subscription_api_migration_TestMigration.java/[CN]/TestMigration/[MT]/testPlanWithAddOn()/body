@@ -12,9 +12,9 @@
     final List<SubscriptionBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
     assertEquals(bundles.size(),1);
     final SubscriptionBundle bundle=bundles.get(0);
-    final List<Subscription> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
+    final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
     assertEquals(subscriptions.size(),2);
-    final Subscription baseSubscription=(subscriptions.get(0).getCurrentPlan().getProduct().getCategory() == ProductCategory.BASE) ? subscriptions.get(0) : subscriptions.get(1);
+    final SubscriptionBase baseSubscription=(subscriptions.get(0).getCurrentPlan().getProduct().getCategory() == ProductCategory.BASE) ? subscriptions.get(0) : subscriptions.get(1);
     assertTrue(baseSubscription.getStartDate().compareTo(initalBPStart) == 0);
     assertEquals(baseSubscription.getEndDate(),null);
     assertEquals(baseSubscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
@@ -22,7 +22,7 @@
     assertEquals(baseSubscription.getState(),SubscriptionState.ACTIVE);
     assertEquals(baseSubscription.getCurrentPlan().getName(),"shotgun-annual");
     assertEquals(baseSubscription.getChargedThroughDate(),initalBPStart.plusYears(1));
-    final Subscription aoSubscription=(subscriptions.get(0).getCurrentPlan().getProduct().getCategory() == ProductCategory.ADD_ON) ? subscriptions.get(0) : subscriptions.get(1);
+    final SubscriptionBase aoSubscription=(subscriptions.get(0).getCurrentPlan().getProduct().getCategory() == ProductCategory.ADD_ON) ? subscriptions.get(0) : subscriptions.get(1);
     assertEquals(aoSubscription.getStartDate(),initalAddonStart.plusMonths(1).minusMonths(1));
     assertEquals(aoSubscription.getEndDate(),null);
     assertEquals(aoSubscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);

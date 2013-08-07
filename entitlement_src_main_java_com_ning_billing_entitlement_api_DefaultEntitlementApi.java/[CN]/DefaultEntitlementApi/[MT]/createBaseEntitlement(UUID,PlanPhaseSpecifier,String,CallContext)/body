@@ -2,8 +2,8 @@
   final InternalCallContext context=internalCallContextFactory.createInternalCallContext(callContext);
   try {
     final SubscriptionBundle bundle=subscriptionInternalApi.createBundleForAccount(accountId,externalKey,context);
-    final Subscription subscription=subscriptionInternalApi.createSubscription(bundle.getId(),planPhaseSpecifier,clock.getUTCNow(),context);
-    return new DefaultEntitlement(accountApi,subscriptionInternalApi,subscription,accountId,internalCallContextFactory,clock,checker);
+    final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(bundle.getId(),planPhaseSpecifier,clock.getUTCNow(),context);
+    return new DefaultEntitlement(accountApi,subscription,accountId,internalCallContextFactory,clock,checker);
   }
  catch (  SubscriptionUserApiException e) {
     throw new EntitlementApiException(e);

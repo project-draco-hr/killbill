@@ -1,0 +1,9 @@
+{
+  final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundleId,context);
+  return ImmutableList.<Entitlement>copyOf(Collections2.transform(subscriptions,new Function<SubscriptionBase,Entitlement>(){
+    @Nullable @Override public Entitlement apply(    @Nullable final SubscriptionBase input){
+      return new DefaultEntitlement(accountApi,input,accountId,internalCallContextFactory,clock,checker);
+    }
+  }
+));
+}

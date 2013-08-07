@@ -1,5 +1,5 @@
 {
-  final Subscription subscription=dao.getSubscriptionFromId(subscriptionId,context);
+  final SubscriptionBase subscription=dao.getSubscriptionFromId(subscriptionId,context);
   if (subscription == null) {
     throw new SubscriptionUserApiException(ErrorCode.SUB_INVALID_SUBSCRIPTION_ID,subscriptionId);
   }
@@ -7,8 +7,8 @@
     throw new SubscriptionUserApiException(ErrorCode.SUB_CHANGE_DRY_RUN_NOT_BP);
   }
   final List<SubscriptionStatusDryRun> result=new LinkedList<SubscriptionStatusDryRun>();
-  final List<Subscription> bundleSubscriptions=dao.getSubscriptions(subscription.getBundleId(),context);
-  for (  final Subscription cur : bundleSubscriptions) {
+  final List<SubscriptionBase> bundleSubscriptions=dao.getSubscriptions(subscription.getBundleId(),context);
+  for (  final SubscriptionBase cur : bundleSubscriptions) {
     if (cur.getId().equals(subscriptionId)) {
       continue;
     }

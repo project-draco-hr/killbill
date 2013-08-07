@@ -1,15 +1,15 @@
 {
   final InternalCallContext context=internalCallContextFactory.createInternalCallContext(callContext);
   try {
-    final Subscription baseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscriptionId,context);
+    final SubscriptionBase baseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscriptionId,context);
     if (baseSubscription.getCategory() != ProductCategory.BASE || baseSubscription.getState() != SubscriptionState.ACTIVE) {
       throw new EntitlementApiException(new SubscriptionUserApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,baseSubscription.getBundleId()));
     }
     final SubscriptionBundle bundle=subscriptionInternalApi.getBundleFromId(baseSubscription.getBundleId(),context);
     final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundle.getAccountId(),callContext);
     final DateTime requestedDate=fromNowAndReferenceTime(baseSubscription.getStartDate(),contextWithValidAccountRecordId);
-    final Subscription subscription=subscriptionInternalApi.createSubscription(baseSubscription.getBundleId(),planPhaseSpecifier,requestedDate,context);
-    return new DefaultEntitlement(accountApi,subscriptionInternalApi,subscription,bundle.getAccountId(),internalCallContextFactory,clock,checker);
+    final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(baseSubscription.getBundleId(),planPhaseSpecifier,requestedDate,context);
+    return new DefaultEntitlement(accountApi,subscription,bundle.getAccountId(),internalCallContextFactory,clock,checker);
   }
  catch (  SubscriptionUserApiException e) {
     throw new EntitlementApiException(e);

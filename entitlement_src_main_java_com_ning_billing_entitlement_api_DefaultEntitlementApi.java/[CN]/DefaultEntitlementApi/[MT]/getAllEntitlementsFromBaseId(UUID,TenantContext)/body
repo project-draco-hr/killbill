@@ -1,0 +1,11 @@
+{
+  final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(tenantContext);
+  try {
+    final SubscriptionBase baseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscriptionId,context);
+    final SubscriptionBundle bundle=subscriptionInternalApi.getBundleFromId(baseSubscription.getBundleId(),context);
+    return getAllEntitlementsFromBundleId(baseSubscription.getBundleId(),bundle.getAccountId(),context);
+  }
+ catch (  SubscriptionUserApiException e) {
+    return ImmutableList.<Entitlement>of();
+  }
+}

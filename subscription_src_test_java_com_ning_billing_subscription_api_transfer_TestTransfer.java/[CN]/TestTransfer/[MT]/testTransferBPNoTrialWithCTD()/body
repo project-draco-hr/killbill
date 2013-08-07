@@ -3,7 +3,7 @@
   final String baseProduct="Shotgun";
   final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
   final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  final Subscription baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+  final SubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
   testListener.pushExpectedEvent(NextEvent.PHASE);
   clock.addDays(40);
   assertTrue(testListener.isCompleted(3000));
@@ -13,13 +13,13 @@
   testListener.pushExpectedEvent(NextEvent.TRANSFER);
   transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getExternalKey(),transferRequestedDate,false,false,callContext);
   assertTrue(testListener.isCompleted(3000));
-  final Subscription oldBaseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
+  final SubscriptionBase oldBaseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
   assertNotNull(oldBaseSubscription.getFutureEndDate());
   assertTrue(oldBaseSubscription.getFutureEndDate().compareTo(ctd) == 0);
   final SubscriptionBundle newBundle=subscriptionInternalApi.getBundleForAccountAndKey(newAccountId,bundle.getExternalKey(),internalCallContext);
-  final List<Subscription> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(newBundle.getId(),internalCallContext);
+  final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(newBundle.getId(),internalCallContext);
   assertEquals(subscriptions.size(),1);
-  final Subscription newBaseSubscription=subscriptions.get(0);
+  final SubscriptionBase newBaseSubscription=subscriptions.get(0);
   assertTrue(((SubscriptionData)newBaseSubscription).getAlignStartDate().compareTo(((SubscriptionData)baseSubscription).getAlignStartDate()) == 0);
   assertEquals(subscriptionInternalApi.getAllTransitions(newBaseSubscription,internalCallContext).size(),1);
   Plan newPlan=newBaseSubscription.getCurrentPlan();
@@ -36,7 +36,7 @@
   clock.addDays(2);
   final DateTime newCtd=newBaseSubscription.getStartDate().plusYears(1);
   subscriptionInternalApi.setChargedThroughDate(newBaseSubscription.getId(),newCtd,internalCallContext);
-  final Subscription newBaseSubscriptionWithCtd=subscriptionInternalApi.getSubscriptionFromId(newBaseSubscription.getId(),internalCallContext);
+  final SubscriptionBase newBaseSubscriptionWithCtd=subscriptionInternalApi.getSubscriptionFromId(newBaseSubscription.getId(),internalCallContext);
   final String newBaseProduct2="Pistol";
   final BillingPeriod newBaseTerm2=BillingPeriod.ANNUAL;
   final DateTime changeDate2=clock.getUTCNow();

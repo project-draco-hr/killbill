@@ -3,7 +3,7 @@
   final String baseProduct="Shotgun";
   final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
   final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  final Subscription baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+  final SubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
   final DateTime ctd=baseSubscription.getStartDate().plusDays(30);
   subscriptionInternalApi.setChargedThroughDate(baseSubscription.getId(),ctd,internalCallContext);
   final DateTime evergreenPhaseDate=((SubscriptionData)baseSubscription).getPendingTransition().getEffectiveTransitionTime();
@@ -12,13 +12,13 @@
   final DateTime transferRequestedDate=clock.getUTCNow();
   transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getExternalKey(),transferRequestedDate,false,false,callContext);
   assertTrue(testListener.isCompleted(3000));
-  final Subscription oldBaseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
+  final SubscriptionBase oldBaseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
   assertNotNull(oldBaseSubscription.getFutureEndDate());
   assertTrue(oldBaseSubscription.getFutureEndDate().compareTo(ctd) == 0);
   final SubscriptionBundle newBundle=subscriptionInternalApi.getBundleForAccountAndKey(newAccountId,bundle.getExternalKey(),internalCallContext);
-  final List<Subscription> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(newBundle.getId(),internalCallContext);
+  final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(newBundle.getId(),internalCallContext);
   assertEquals(subscriptions.size(),1);
-  final Subscription newBaseSubscription=subscriptions.get(0);
+  final SubscriptionBase newBaseSubscription=subscriptions.get(0);
   assertTrue(((SubscriptionData)newBaseSubscription).getAlignStartDate().compareTo(((SubscriptionData)oldBaseSubscription).getAlignStartDate()) == 0);
   assertEquals(subscriptionInternalApi.getAllTransitions(newBaseSubscription,internalCallContext).size(),2);
   assertTrue(subscriptionInternalApi.getAllTransitions(newBaseSubscription,internalCallContext).get(1).getEffectiveTransitionTime().compareTo(evergreenPhaseDate) == 0);

@@ -4,7 +4,7 @@
   final UUID eventId=UUID.randomUUID();
   final List<AuditLogJson> auditLogs=createAuditLogsJson(clock.getUTCNow());
   final SubscriptionJsonWithEvents.SubscriptionReadEventJson newEvent=new SubscriptionJsonWithEvents.SubscriptionReadEventJson(eventId.toString(),BillingPeriod.NO_BILLING_PERIOD.toString(),requestedDate,effectiveDate,UUID.randomUUID().toString(),UUID.randomUUID().toString(),SubscriptionTransitionType.CREATE.toString(),PhaseType.DISCOUNT.toString(),auditLogs);
-  final Subscription subscription=Mockito.mock(Subscription.class);
+  final SubscriptionBase subscription=Mockito.mock(SubscriptionBase.class);
   Mockito.when(subscription.getId()).thenReturn(UUID.randomUUID());
   final SubscriptionJsonWithEvents subscriptionJsonWithEvents=new SubscriptionJsonWithEvents(subscription,ImmutableList.<SubscriptionJsonWithEvents.SubscriptionReadEventJson>of(newEvent),null,null,null);
   Assert.assertEquals(subscriptionJsonWithEvents.getSubscriptionId(),subscription.getId().toString());
