@@ -2,11 +2,11 @@
   if (transitions == null || event == null) {
     return null;
   }
-  SubscriptionTransitionData prev=null;
-  for (  final SubscriptionTransition cur : transitions) {
-    final SubscriptionTransitionData curData=(SubscriptionTransitionData)cur;
+  SubscriptionBaseTransitionData prev=null;
+  for (  final SubscriptionBaseTransition cur : transitions) {
+    final SubscriptionBaseTransitionData curData=(SubscriptionBaseTransitionData)cur;
     if (curData.getId().equals(event.getId())) {
-      final SubscriptionTransitionData withSeq=new SubscriptionTransitionData(curData,seqId);
+      final SubscriptionBaseTransitionData withSeq=new SubscriptionBaseTransitionData(curData,seqId);
       return withSeq;
     }
     if (curData.getTotalOrdering() < event.getTotalOrdering()) {
@@ -14,7 +14,7 @@
     }
   }
   if (prev != null && event.getType() == EventType.API_USER && ((ApiEvent)event).getEventType() == ApiEventType.UNCANCEL) {
-    final SubscriptionTransitionData withSeq=new SubscriptionTransitionData((SubscriptionTransitionData)prev,EventType.API_USER,ApiEventType.UNCANCEL,seqId);
+    final SubscriptionBaseTransitionData withSeq=new SubscriptionBaseTransitionData((SubscriptionBaseTransitionData)prev,EventType.API_USER,ApiEventType.UNCANCEL,seqId);
     return withSeq;
   }
   return null;

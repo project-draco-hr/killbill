@@ -3,13 +3,13 @@
     return;
   }
   try {
-    final ActionPolicy actionPolicy;
+    final BillingActionPolicy actionPolicy;
 switch (nextOverdueState.getSubscriptionCancellationPolicy()) {
 case END_OF_TERM:
-      actionPolicy=ActionPolicy.END_OF_TERM;
+      actionPolicy=BillingActionPolicy.END_OF_TERM;
     break;
 case IMMEDIATE:
-  actionPolicy=ActionPolicy.IMMEDIATE;
+  actionPolicy=BillingActionPolicy.IMMEDIATE;
 break;
 default :
 throw new IllegalStateException("Unexpected OverdueCancellationPolicy " + nextOverdueState.getSubscriptionCancellationPolicy());
@@ -20,7 +20,7 @@ for (final SubscriptionBase cur : toBeCancelled) {
 cur.cancelWithPolicy(clock.getUTCNow(),actionPolicy,context.toCallContext());
 }
 }
- catch (SubscriptionUserApiException e) {
+ catch (SubscriptionBaseApiException e) {
 throw new OverdueException(e);
 }
 }

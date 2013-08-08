@@ -4,11 +4,11 @@
   validateRequestedDate(subscription,now,requestedDate);
   validateSubscriptionState(subscription);
   final PlanChangeResult planChangeResult=getPlanChangeResult(subscription,productName,term,priceList,requestedDate);
-  final ActionPolicy policy=planChangeResult.getPolicy();
+  final BillingActionPolicy policy=planChangeResult.getPolicy();
   try {
     return doChangePlan(subscription,planChangeResult,now,requestedDate,productName,term,policy,context);
   }
  catch (  CatalogApiException e) {
-    throw new SubscriptionUserApiException(e);
+    throw new SubscriptionBaseApiException(e);
   }
 }

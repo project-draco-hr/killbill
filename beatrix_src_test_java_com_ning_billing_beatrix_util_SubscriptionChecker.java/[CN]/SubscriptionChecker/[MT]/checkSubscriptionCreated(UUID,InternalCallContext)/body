@@ -2,9 +2,9 @@
   final SubscriptionBase subscription=subscriptionApi.getSubscriptionFromId(subscriptionId,context);
   Assert.assertNotNull(subscription);
   auditChecker.checkSubscriptionCreated(subscription.getBundleId(),subscriptionId,context.toCallContext());
-  List<SubscriptionTransition> subscriptionEvents=getSubscriptionEvents(subscription);
+  List<SubscriptionBaseTransition> subscriptionEvents=getSubscriptionEvents(subscription);
   Assert.assertTrue(subscriptionEvents.size() >= 1);
-  auditChecker.checkSubscriptionEventCreated(subscription.getBundleId(),((SubscriptionTransitionData)subscriptionEvents.get(0)).getId(),context.toCallContext());
+  auditChecker.checkSubscriptionEventCreated(subscription.getBundleId(),((SubscriptionBaseTransitionData)subscriptionEvents.get(0)).getId(),context.toCallContext());
   auditChecker.checkBundleCreated(subscription.getBundleId(),context.toCallContext());
   return subscription;
 }

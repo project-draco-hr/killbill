@@ -16,7 +16,7 @@
   PriceList previousPriceList=null;
   Plan previousPlan=null;
   PlanPhase previousPhase=null;
-  transitions=new LinkedList<SubscriptionTransition>();
+  transitions=new LinkedList<SubscriptionBaseTransition>();
   for (  final SubscriptionEvent cur : inputEvents) {
     if (!cur.isActive() || cur.getActiveVersion() < activeVersion) {
       continue;
@@ -80,7 +80,7 @@ nextPriceList=(nextPriceListName != null) ? catalog.findPriceList(nextPriceListN
  catch (CatalogApiException e) {
 log.error(String.format("Failed to build transition for subscription %s",id),e);
 }
-final SubscriptionTransitionData transition=new SubscriptionTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),prevEventId,prevCreatedDate,previousState,previousPlan,previousPhase,previousPriceList,nextEventId,nextCreatedDate,nextState,nextPlan,nextPhase,nextPriceList,cur.getTotalOrdering(),nextUserToken,isFromDisk);
+final SubscriptionBaseTransitionData transition=new SubscriptionBaseTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),prevEventId,prevCreatedDate,previousState,previousPlan,previousPhase,previousPriceList,nextEventId,nextCreatedDate,nextState,nextPlan,nextPhase,nextPriceList,cur.getTotalOrdering(),nextUserToken,isFromDisk);
 transitions.add(transition);
 previousState=nextState;
 previousPlan=nextPlan;

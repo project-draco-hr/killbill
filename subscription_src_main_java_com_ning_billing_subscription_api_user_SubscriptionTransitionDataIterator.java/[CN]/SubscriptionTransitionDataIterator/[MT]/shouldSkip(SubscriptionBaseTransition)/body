@@ -1,0 +1,12 @@
+{
+  if (visibility == Visibility.FROM_DISK_ONLY && !((SubscriptionBaseTransitionData)input).isFromDisk()) {
+    return true;
+  }
+  if ((kind == Kind.SUBSCRIPTION && shouldSkipForSubscriptionEvents((SubscriptionBaseTransitionData)input)) || (kind == Kind.BILLING && shouldSkipForBillingEvents((SubscriptionBaseTransitionData)input))) {
+    return true;
+  }
+  if ((timeLimit == TimeLimit.FUTURE_ONLY && !input.getEffectiveTransitionTime().isAfter(clock.getUTCNow())) || ((timeLimit == TimeLimit.PAST_OR_PRESENT_ONLY && input.getEffectiveTransitionTime().isAfter(clock.getUTCNow())))) {
+    return true;
+  }
+  return false;
+}

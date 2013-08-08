@@ -2,7 +2,7 @@
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final SubscriptionCallCompletionCallback<Response> callback=new SubscriptionCallCompletionCallback<Response>(){
     private boolean isImmediateOp=true;
-    @Override public Response doOperation(    final CallContext ctx) throws SubscriptionUserApiException, InterruptedException, TimeoutException {
+    @Override public Response doOperation(    final CallContext ctx) throws SubscriptionBaseApiException, InterruptedException, TimeoutException {
       final UUID uuid=UUID.fromString(subscriptionId);
       final SubscriptionBase current=null;
       final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
@@ -10,7 +10,7 @@
         isImmediateOp=current.cancel(inputDate,ctx);
       }
  else {
-        final ActionPolicy policy=ActionPolicy.valueOf(policyString.toUpperCase());
+        final BillingActionPolicy policy=BillingActionPolicy.valueOf(policyString.toUpperCase());
         isImmediateOp=current.cancelWithPolicy(inputDate,policy,ctx);
       }
       return Response.status(Status.OK).build();

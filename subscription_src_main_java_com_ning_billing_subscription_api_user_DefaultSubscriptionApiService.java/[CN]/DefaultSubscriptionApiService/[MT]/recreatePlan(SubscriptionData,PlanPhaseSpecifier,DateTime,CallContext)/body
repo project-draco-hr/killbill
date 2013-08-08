@@ -1,7 +1,7 @@
 {
   final SubscriptionState currentState=subscription.getState();
   if (currentState != null && currentState != SubscriptionState.CANCELLED) {
-    throw new SubscriptionUserApiException(ErrorCode.SUB_RECREATE_BAD_STATE,subscription.getId(),currentState);
+    throw new SubscriptionBaseApiException(ErrorCode.SUB_RECREATE_BAD_STATE,subscription.getId(),currentState);
   }
   final DateTime now=clock.getUTCNow();
   final DateTime requestedDate=(requestedDateWithMs != null) ? DefaultClock.truncateMs(requestedDateWithMs) : now;
@@ -19,6 +19,6 @@
     return true;
   }
  catch (  CatalogApiException e) {
-    throw new SubscriptionUserApiException(e);
+    throw new SubscriptionBaseApiException(e);
   }
 }

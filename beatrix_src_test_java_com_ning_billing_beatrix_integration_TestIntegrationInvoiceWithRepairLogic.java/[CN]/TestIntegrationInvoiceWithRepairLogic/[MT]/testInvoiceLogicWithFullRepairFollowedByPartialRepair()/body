@@ -18,7 +18,7 @@
   assertEquals(invoices.size(),2);
   ImmutableList<ExpectedInvoiceItemCheck> toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),new LocalDate(2013,5,1),InvoiceItemType.RECURRING,new BigDecimal("2399.95")));
   invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,toBeChecked);
-  changeEntitlementAndCheckForCompletion(bpEntitlement,productName,BillingPeriod.MONTHLY,ActionPolicy.IMMEDIATE,NextEvent.CHANGE,NextEvent.INVOICE,NextEvent.INVOICE_ADJUSTMENT);
+  changeEntitlementAndCheckForCompletion(bpEntitlement,productName,BillingPeriod.MONTHLY,BillingActionPolicy.IMMEDIATE,NextEvent.CHANGE,NextEvent.INVOICE,NextEvent.INVOICE_ADJUSTMENT);
   assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);

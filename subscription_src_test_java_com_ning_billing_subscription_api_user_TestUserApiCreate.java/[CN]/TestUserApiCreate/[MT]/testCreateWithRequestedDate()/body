@@ -18,13 +18,13 @@
     assertEquals(subscription.getStartDate(),requestedDate);
     assertTrue(testListener.isCompleted(5000));
     assertListenerStatus();
-    final SubscriptionTransition transition=subscription.getPreviousTransition();
+    final SubscriptionBaseTransition transition=subscription.getPreviousTransition();
     assertEquals(transition.getPreviousEventId(),trialEvent.getId());
     assertEquals(transition.getNextEventId(),phaseEvent.getId());
     assertEquals(transition.getPreviousEventCreatedDate().compareTo(trialEvent.getCreatedDate()),0);
     assertEquals(transition.getNextEventCreatedDate().compareTo(phaseEvent.getCreatedDate()),0);
   }
- catch (  SubscriptionUserApiException e) {
+ catch (  SubscriptionBaseApiException e) {
     log.error("Unexpected exception",e);
     Assert.fail(e.getMessage());
   }

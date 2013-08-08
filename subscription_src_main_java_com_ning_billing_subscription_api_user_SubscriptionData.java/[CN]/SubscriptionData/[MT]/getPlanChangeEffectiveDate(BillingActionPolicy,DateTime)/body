@@ -1,0 +1,14 @@
+{
+  if (policy == BillingActionPolicy.IMMEDIATE) {
+    return requestedDate;
+  }
+  if (policy != BillingActionPolicy.END_OF_TERM) {
+    throw new SubscriptionError(String.format("Unexpected policy type %s",policy.toString()));
+  }
+  if (chargedThroughDate == null) {
+    return requestedDate;
+  }
+ else {
+    return chargedThroughDate.isBefore(requestedDate) ? requestedDate : chargedThroughDate;
+  }
+}
