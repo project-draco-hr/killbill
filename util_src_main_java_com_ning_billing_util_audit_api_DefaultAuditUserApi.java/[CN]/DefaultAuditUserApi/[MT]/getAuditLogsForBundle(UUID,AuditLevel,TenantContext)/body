@@ -1,3 +1,9 @@
 {
-  return getAuditLogsForBundles(ImmutableList.<BundleTimeline>of(timelineApi.getBundleTimeline(bundleId,context)),auditLevel,context);
+  try {
+    return getAuditLogsForBundles(ImmutableList.<BundleTimeline>of(timelineApi.getBundleTimeline(bundleId,context)),auditLevel,context);
+  }
+ catch (  SubscriptionRepairException e) {
+    e.printStackTrace();
+    return null;
+  }
 }
