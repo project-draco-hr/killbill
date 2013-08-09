@@ -10,7 +10,7 @@
   Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(Mockito.<UUID>any(),Mockito.<InternalCallContext>any())).thenReturn(events);
   final DateTime target=new DateTime();
   final InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
-  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,subscriptionApi,invoiceDao,invoiceNotifier,locker,busService.getBus(),clock);
+  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,subscriptionApi,invoiceDao,nonEntityDao,invoiceNotifier,locker,busService.getBus(),clock);
   Invoice invoice=dispatcher.processAccount(accountId,target,true,internalCallContext);
   Assert.assertNotNull(invoice);
   final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(callContext);
