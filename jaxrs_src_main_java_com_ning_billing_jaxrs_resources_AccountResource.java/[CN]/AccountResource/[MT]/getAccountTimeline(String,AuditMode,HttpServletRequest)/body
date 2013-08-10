@@ -18,6 +18,8 @@
   for (  final InvoicePayment chargeback : chargebacks) {
     chargebacksByPayment.put(chargeback.getPaymentId(),chargeback);
   }
-  final AccountTimelineJson json=null;
+  final List<SubscriptionBundle> bundles=subscriptionApi.getSubscriptionBundlesForAccountId(account.getId(),tenantContext);
+  final AuditLogsForBundles bundlesAuditLogs=auditUserApi.getAuditLogsForBundles(bundles,auditMode.getLevel(),tenantContext);
+  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundles,refundsByPayment,chargebacksByPayment,invoicesAuditLogs,paymentsAuditLogs,refundsAuditLogs,chargebacksAuditLogs,bundlesAuditLogs);
   return Response.status(Status.OK).entity(json).build();
 }

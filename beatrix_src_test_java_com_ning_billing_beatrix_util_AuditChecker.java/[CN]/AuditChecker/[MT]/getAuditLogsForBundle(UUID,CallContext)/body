@@ -1,3 +1,10 @@
 {
-  return auditUserApi.getAuditLogsForBundle(bundleId,AuditLevel.FULL,context);
+  try {
+    final SubscriptionBundle bundle=subscriptionApi.getSubscriptionBundle(bundleId,context);
+    return auditUserApi.getAuditLogsForBundles(Collections.singletonList(bundle),AuditLevel.FULL,context);
+  }
+ catch (  SubscriptionApiException e) {
+    Assert.fail(e.toString());
+    return null;
+  }
 }
