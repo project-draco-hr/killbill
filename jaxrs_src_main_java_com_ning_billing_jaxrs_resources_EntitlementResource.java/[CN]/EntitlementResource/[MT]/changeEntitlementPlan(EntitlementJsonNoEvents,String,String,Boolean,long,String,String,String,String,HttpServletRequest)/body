@@ -1,0 +1,32 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final EntitlementCallCompletionCallback<Response> callback=new EntitlementCallCompletionCallback<Response>(){
+    private boolean isImmediateOp=true;
+    @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException {
+      final UUID uuid=UUID.fromString(entitlementId);
+      final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
+      final Entitlement current=entitlementApi.getEntitlementForId(uuid,callContext);
+      final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),inputDate,callContext);
+      if (policyString == null) {
+        isImmediateOp=current.changePlan(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,ctx);
+      }
+ else {
+        final BillingActionPolicy policy=BillingActionPolicy.valueOf(policyString.toUpperCase());
+        isImmediateOp=current.changePlanOverrideBillingPolicy(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,policy,ctx);
+      }
+      return Response.status(Status.OK).build();
+    }
+    @Override public boolean isImmOperation(){
+      return isImmediateOp;
+    }
+    @Override public Response doResponseOk(    final Response operationResponse) throws EntitlementApiException {
+      if (operationResponse.getStatus() != Status.OK.getStatusCode()) {
+        return operationResponse;
+      }
+      return getEntitlement(entitlementId,request);
+    }
+  }
+;
+  final EntitlementCallCompletion<Response> callCompletionCreation=new EntitlementCallCompletion<Response>();
+  return callCompletionCreation.withSynchronization(callback,timeoutSec,callCompletion,callContext);
+}

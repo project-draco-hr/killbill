@@ -1,9 +1,9 @@
 {
   final InternalCallContext context=internalCallContextFactory.createInternalCallContext(accountId,callContext);
-  final DateTime requestedDate=fromLocalDateAndReferenceTime(localDate,subscription.getStartDate(),clock,context);
+  final DateTime requestedDate=fromLocalDateAndReferenceTime(localDate,subscriptionBase.getStartDate(),clock,context);
   try {
-    checker.checkBlockedChange(subscription,context);
-    return subscription.changePlan(productName,billingPeriod,priceList,requestedDate,callContext);
+    checker.checkBlockedChange(subscriptionBase,context);
+    return subscriptionBase.changePlan(productName,billingPeriod,priceList,requestedDate,callContext);
   }
  catch (  BlockingApiException e) {
     throw new EntitlementApiException(e,e.getCode(),e.getMessage());

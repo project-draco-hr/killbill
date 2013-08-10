@@ -5,7 +5,7 @@
   final PlanPhaseSpecifier planPhaseSpecifier=new PlanPhaseSpecifier(UUID.randomUUID().toString(),ProductCategory.BASE,BillingPeriod.NO_BILLING_PERIOD,UUID.randomUUID().toString(),PhaseType.EVERGREEN);
   Mockito.when(event.getEffectiveDate()).thenReturn(effectiveDate);
   Mockito.when(event.getEventId()).thenReturn(eventId);
-  Mockito.when(event.getSubscriptionTransitionType()).thenReturn(SubscriptionTransitionType.CREATE);
+  Mockito.when(event.getSubscriptionTransitionType()).thenReturn(SubscriptionBaseTransitionType.CREATE);
   Mockito.when(event.getPlanPhaseSpecifier()).thenReturn(planPhaseSpecifier);
   final SubscriptionTimeline subscriptionTimeline=Mockito.mock(SubscriptionTimeline.class);
   Mockito.when(subscriptionTimeline.getId()).thenReturn(UUID.randomUUID());
@@ -20,7 +20,7 @@
   Assert.assertEquals(bundleJsonWithSubscriptions.getBundleId(),bundleId.toString());
   Assert.assertEquals(bundleJsonWithSubscriptions.getExternalKey(),externalKey);
   Assert.assertEquals(bundleJsonWithSubscriptions.getSubscriptions().size(),1);
-  final SubscriptionJsonWithEvents events=bundleJsonWithSubscriptions.getSubscriptions().get(0);
+  final EntitlementJsonWithEvents events=bundleJsonWithSubscriptions.getSubscriptions().get(0);
   Assert.assertNull(events.getDeletedEvents());
   Assert.assertNull(events.getNewEvents());
   Assert.assertEquals(events.getEvents().size(),1);

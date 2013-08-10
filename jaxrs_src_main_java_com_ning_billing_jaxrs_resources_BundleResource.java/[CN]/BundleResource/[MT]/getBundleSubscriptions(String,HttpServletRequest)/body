@@ -1,13 +1,8 @@
 {
-  final TenantContext tenantContext=context.createContext(request);
-  final UUID uuid=UUID.fromString(bundleId);
-  final SubscriptionBundle bundle=null;
-  if (bundle == null) {
-    return Response.status(Status.NO_CONTENT).build();
-  }
-  final List<SubscriptionBase> subscriptions=null;
-  final Collection<SubscriptionJsonNoEvents> result=Collections2.transform(subscriptions,new Function<SubscriptionBase,SubscriptionJsonNoEvents>(){
-    @Override public SubscriptionJsonNoEvents apply(    final SubscriptionBase input){
+  final UUID id=UUID.fromString(bundleId);
+  final SubscriptionBundle bundle=subscriptionApi.getAllSubscriptionsForBundle(id,context.createContext(request));
+  final Collection<SubscriptionJsonNoEvents> result=Collections2.transform(bundle.getSubscriptions(),new Function<Subscription,SubscriptionJsonNoEvents>(){
+    @Nullable @Override public SubscriptionJsonNoEvents apply(    @Nullable final Subscription input){
       return new SubscriptionJsonNoEvents(input,null);
     }
   }

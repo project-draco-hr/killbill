@@ -17,7 +17,7 @@
   final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
   des.add(testUtil.createDeletedEvent(aoRepair.getExistingEvents().get(1).getEventId()));
   final DateTime aoCancelDate=aoSubscription.getStartDate().plusDays(1);
-  final NewEvent ne=testUtil.createNewEvent(SubscriptionTransitionType.CANCEL,aoCancelDate,null);
+  final NewEvent ne=testUtil.createNewEvent(SubscriptionBaseTransitionType.CANCEL,aoCancelDate,null);
   final SubscriptionTimeline saoRepair=testUtil.createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
   final BundleTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
   boolean dryRun=true;
@@ -27,8 +27,8 @@
   bpRepair=testUtil.getSubscriptionRepair(baseSubscription.getId(),bundleRepair);
   assertEquals(bpRepair.getExistingEvents().size(),2);
   final List<ExistingEvent> expected=new LinkedList<SubscriptionTimeline.ExistingEvent>();
-  expected.add(testUtil.createExistingEventForAssertion(SubscriptionTransitionType.CREATE,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoSubscription.getStartDate()));
-  expected.add(testUtil.createExistingEventForAssertion(SubscriptionTransitionType.CANCEL,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoCancelDate));
+  expected.add(testUtil.createExistingEventForAssertion(SubscriptionBaseTransitionType.CREATE,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoSubscription.getStartDate()));
+  expected.add(testUtil.createExistingEventForAssertion(SubscriptionBaseTransitionType.CANCEL,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoCancelDate));
   int index=0;
   for (  final ExistingEvent e : expected) {
     testUtil.validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));

@@ -6,7 +6,7 @@
   clock.setTime(initialCreationDate);
   int invoiceItemCount=1;
   DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
-  SubscriptionData subscription=subscriptionDataFromSubscription(baseEntitlement.getSubscription());
+  SubscriptionData subscription=subscriptionDataFromSubscription(baseEntitlement.getSubscriptionBase());
   invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,new ExpectedInvoiceItemCheck(initialCreationDate.toLocalDate(),null,InvoiceItemType.FIXED,new BigDecimal("0")));
   invoiceChecker.checkChargedThroughDate(subscription.getId(),clock.getUTCToday(),callContext);
   baseEntitlement=changeEntitlementAndCheckForCompletion(baseEntitlement,"Assault-Rifle",BillingPeriod.MONTHLY,null,NextEvent.CHANGE,NextEvent.INVOICE);
@@ -22,7 +22,7 @@
   invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,3,3),new LocalDate(2012,4,3),InvoiceItemType.RECURRING,new BigDecimal("599.95")));
   invoiceChecker.checkChargedThroughDate(subscription.getId(),new LocalDate(2012,4,3),callContext);
   baseEntitlement=changeEntitlementAndCheckForCompletion(baseEntitlement,"Pistol",BillingPeriod.MONTHLY,null);
-  subscription=subscriptionDataFromSubscription(baseEntitlement.getSubscription());
+  subscription=subscriptionDataFromSubscription(baseEntitlement.getSubscriptionBase());
   final LocalDate firstRecurringPistolDate=subscription.getChargedThroughDate().toLocalDate();
   final LocalDate secondRecurringPistolDate=firstRecurringPistolDate.plusMonths(1);
   addDaysAndCheckForCompletion(31,NextEvent.CHANGE,NextEvent.INVOICE,NextEvent.PAYMENT);

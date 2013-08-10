@@ -4,9 +4,9 @@
   final DateTime effectiveDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
   final UUID eventId=UUID.randomUUID();
   final List<AuditLogJson> auditLogs=createAuditLogsJson(clock.getUTCNow());
-  final SubscriptionJsonWithEvents.SubscriptionReadEventJson newEvent=new SubscriptionJsonWithEvents.SubscriptionReadEventJson(eventId.toString(),BillingPeriod.NO_BILLING_PERIOD.toString(),requestedDate,effectiveDate,UUID.randomUUID().toString(),UUID.randomUUID().toString(),SubscriptionTransitionType.CREATE.toString(),PhaseType.DISCOUNT.toString(),auditLogs);
-  final SubscriptionJsonWithEvents subscriptionJsonWithEvents=new SubscriptionJsonWithEvents(subscriptionId,ImmutableList.<SubscriptionJsonWithEvents.SubscriptionReadEventJson>of(newEvent),null,null,null);
+  final EntitlementJsonWithEvents.SubscriptionReadEventJson newEvent=new EntitlementJsonWithEvents.SubscriptionReadEventJson(eventId.toString(),BillingPeriod.NO_BILLING_PERIOD.toString(),requestedDate,effectiveDate,UUID.randomUUID().toString(),UUID.randomUUID().toString(),SubscriptionBaseTransitionType.CREATE.toString(),PhaseType.DISCOUNT.toString(),auditLogs);
+  final EntitlementJsonWithEvents subscriptionJsonWithEvents=null;
   final String asJson=mapper.writeValueAsString(subscriptionJsonWithEvents);
-  final SubscriptionJsonWithEvents fromJson=mapper.readValue(asJson,SubscriptionJsonWithEvents.class);
+  final EntitlementJsonWithEvents fromJson=mapper.readValue(asJson,EntitlementJsonWithEvents.class);
   Assert.assertEquals(fromJson,subscriptionJsonWithEvents);
 }

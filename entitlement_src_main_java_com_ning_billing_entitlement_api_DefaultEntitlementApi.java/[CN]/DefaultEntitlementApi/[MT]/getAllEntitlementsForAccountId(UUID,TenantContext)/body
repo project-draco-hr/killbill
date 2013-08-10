@@ -1,0 +1,10 @@
+{
+  final List<Entitlement> result=new LinkedList<Entitlement>();
+  final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(tenantContext);
+  final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(accountId,context);
+  for (  final SubscriptionBaseBundle bundle : bundles) {
+    final List<Entitlement> entitlements=getAllEntitlementsForBundleId(bundle.getId(),bundle.getAccountId(),bundle.getExternalKey(),context);
+    result.addAll(entitlements);
+  }
+  return result;
+}

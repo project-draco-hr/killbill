@@ -11,7 +11,7 @@
   String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   final DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   assertNotNull(baseEntitlement);
-  SubscriptionData subscription=(SubscriptionData)baseEntitlement.getSubscription();
+  SubscriptionData subscription=(SubscriptionData)baseEntitlement.getSubscriptionBase();
   final DateTime startDate=subscription.getCurrentPhaseStart();
   final BigDecimal rate=subscription.getCurrentPhase().getFixedPrice().getPrice(Currency.USD);
   final int invoiceItemCount=1;
@@ -21,9 +21,9 @@
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertTrue(busHandler.isCompleted(DELAY));
-  DefaultEntitlement entitlement=(DefaultEntitlement)entitlementApi.getEntitlementFromId(baseEntitlement.getId(),callContext);
+  DefaultEntitlement entitlement=(DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   entitlement.cancelEntitlementWithDate(clock.getUTCNow().toLocalDate(),callContext);
-  subscription=(SubscriptionData)baseEntitlement.getSubscription();
+  subscription=(SubscriptionData)baseEntitlement.getSubscriptionBase();
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
   DateTime endDate=subscription.getChargedThroughDate();
   final Interval it=new Interval(clock.getUTCNow(),endDate);

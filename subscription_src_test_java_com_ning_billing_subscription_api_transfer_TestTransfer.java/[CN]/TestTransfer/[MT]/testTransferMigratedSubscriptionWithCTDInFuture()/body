@@ -8,9 +8,9 @@
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated,callContext);
     assertTrue(testListener.isCompleted(5000));
-    final List<SubscriptionBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
+    final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
     assertEquals(bundles.size(),1);
-    final SubscriptionBundle bundle=bundles.get(0);
+    final SubscriptionBaseBundle bundle=bundles.get(0);
     final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
     assertEquals(subscriptions.size(),1);
     final SubscriptionBase subscription=subscriptions.get(0);
@@ -22,7 +22,7 @@
     assertEquals(subscription.getCurrentPlan().getName(),"shotgun-annual");
     assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
     assertEquals(subscriptionInternalApi.getBillingTransitions(subscription,internalCallContext).size(),1);
-    assertEquals(subscriptionInternalApi.getBillingTransitions(subscription,internalCallContext).get(0).getTransitionType(),SubscriptionTransitionType.MIGRATE_BILLING);
+    assertEquals(subscriptionInternalApi.getBillingTransitions(subscription,internalCallContext).get(0).getTransitionType(),SubscriptionBaseTransitionType.MIGRATE_BILLING);
     assertTrue(subscriptionInternalApi.getBillingTransitions(subscription,internalCallContext).get(0).getEffectiveTransitionTime().compareTo(clock.getUTCNow()) > 0);
     assertListenerStatus();
     clock.addDays(20);

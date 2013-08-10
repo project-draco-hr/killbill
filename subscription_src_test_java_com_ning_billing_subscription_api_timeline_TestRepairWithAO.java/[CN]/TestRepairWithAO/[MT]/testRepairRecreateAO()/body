@@ -19,7 +19,7 @@
   des.add(testUtil.createDeletedEvent(aoRepair.getExistingEvents().get(1).getEventId()));
   final DateTime aoRecreateDate=aoSubscription.getStartDate().plusDays(1);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.DISCOUNT);
-  final NewEvent ne=testUtil.createNewEvent(SubscriptionTransitionType.CREATE,aoRecreateDate,spec);
+  final NewEvent ne=testUtil.createNewEvent(SubscriptionBaseTransitionType.CREATE,aoRecreateDate,spec);
   final SubscriptionTimeline saoRepair=testUtil.createSubscriptionRepair(aoSubscription.getId(),des,Collections.singletonList(ne));
   final BundleTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(saoRepair));
   boolean dryRun=true;
@@ -27,8 +27,8 @@
   aoRepair=testUtil.getSubscriptionRepair(aoSubscription.getId(),dryRunBundleRepair);
   assertEquals(aoRepair.getExistingEvents().size(),2);
   final List<ExistingEvent> expected=new LinkedList<SubscriptionTimeline.ExistingEvent>();
-  expected.add(testUtil.createExistingEventForAssertion(SubscriptionTransitionType.CREATE,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoRecreateDate));
-  expected.add(testUtil.createExistingEventForAssertion(SubscriptionTransitionType.PHASE,"Telescopic-Scope",PhaseType.EVERGREEN,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,baseSubscription.getStartDate().plusMonths(1)));
+  expected.add(testUtil.createExistingEventForAssertion(SubscriptionBaseTransitionType.CREATE,"Telescopic-Scope",PhaseType.DISCOUNT,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,aoRecreateDate));
+  expected.add(testUtil.createExistingEventForAssertion(SubscriptionBaseTransitionType.PHASE,"Telescopic-Scope",PhaseType.EVERGREEN,ProductCategory.ADD_ON,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,baseSubscription.getStartDate().plusMonths(1)));
   int index=0;
   for (  final ExistingEvent e : expected) {
     testUtil.validateExistingEventForAssertion(e,aoRepair.getExistingEvents().get(index++));

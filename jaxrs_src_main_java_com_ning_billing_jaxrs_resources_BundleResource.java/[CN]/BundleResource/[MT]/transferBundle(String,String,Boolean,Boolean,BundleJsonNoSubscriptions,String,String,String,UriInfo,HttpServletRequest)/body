@@ -1,7 +1,9 @@
 {
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  final SubscriptionBundle bundle=null;
+  final UUID bundleId=UUID.fromString(id);
+  final SubscriptionBundle bundle=subscriptionApi.getAllSubscriptionsForBundle(bundleId,callContext);
   final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
-  final SubscriptionBundle newBundle=transferApi.transferBundle(bundle.getAccountId(),UUID.fromString(json.getAccountId()),bundle.getExternalKey(),inputDate,transferAddOn,cancelImmediatley,callContext);
-  return uriBuilder.buildResponse(BundleResource.class,"getBundle",newBundle.getId(),uriInfo.getBaseUri().toString());
+  final LocalDate inputLocalDate=toLocalDate(bundle.getAccountId(),inputDate,callContext);
+  final UUID newBundleId=entitlementApi.transferEntitlements(bundle.getAccountId(),UUID.fromString(json.getAccountId()),bundle.getExternalKey(),inputLocalDate,callContext);
+  return uriBuilder.buildResponse(BundleResource.class,"getBundle",newBundleId,uriInfo.getBaseUri().toString());
 }
