@@ -6,9 +6,9 @@
   final LocalDate now=new LocalDate();
   final ObjectType objectType=ObjectType.BUNDLE;
   final UUID objectId=new UUID(0L,1L);
-  final BillingState<Blockable> state0=new BillingState<Blockable>(objectId,0,BigDecimal.ZERO,null,DateTimeZone.UTC,unpaidInvoiceId,PaymentResponse.LOST_OR_STOLEN_CARD,new Tag[]{new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF,objectType,objectId,clock.getUTCNow()),new DescriptiveTag(UUID.randomUUID(),objectType,objectId,clock.getUTCNow())});
-  final BillingState<Blockable> state1=new BillingState<Blockable>(objectId,1,new BigDecimal("100.00"),now.minusDays(10),DateTimeZone.UTC,unpaidInvoiceId,PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{new DefaultControlTag(ControlTagType.OVERDUE_ENFORCEMENT_OFF,objectType,objectId,clock.getUTCNow())});
-  final BillingState<Blockable> state2=new BillingState<Blockable>(objectId,1,new BigDecimal("200.00"),now.minusDays(20),DateTimeZone.UTC,unpaidInvoiceId,PaymentResponse.DO_NOT_HONOR,new Tag[]{new DefaultControlTag(ControlTagType.OVERDUE_ENFORCEMENT_OFF,objectType,objectId,clock.getUTCNow()),new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF,objectType,objectId,clock.getUTCNow()),new DescriptiveTag(UUID.randomUUID(),objectType,objectId,clock.getUTCNow())});
+  final BillingState state0=new BillingState(objectId,0,BigDecimal.ZERO,null,DateTimeZone.UTC,unpaidInvoiceId,PaymentResponse.LOST_OR_STOLEN_CARD,new Tag[]{new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF,objectType,objectId,clock.getUTCNow()),new DescriptiveTag(UUID.randomUUID(),objectType,objectId,clock.getUTCNow())});
+  final BillingState state1=new BillingState(objectId,1,new BigDecimal("100.00"),now.minusDays(10),DateTimeZone.UTC,unpaidInvoiceId,PaymentResponse.INSUFFICIENT_FUNDS,new Tag[]{new DefaultControlTag(ControlTagType.OVERDUE_ENFORCEMENT_OFF,objectType,objectId,clock.getUTCNow())});
+  final BillingState state2=new BillingState(objectId,1,new BigDecimal("200.00"),now.minusDays(20),DateTimeZone.UTC,unpaidInvoiceId,PaymentResponse.DO_NOT_HONOR,new Tag[]{new DefaultControlTag(ControlTagType.OVERDUE_ENFORCEMENT_OFF,objectType,objectId,clock.getUTCNow()),new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF,objectType,objectId,clock.getUTCNow()),new DescriptiveTag(UUID.randomUUID(),objectType,objectId,clock.getUTCNow())});
   Assert.assertTrue(!c.evaluate(state0,now));
   Assert.assertTrue(c.evaluate(state1,now));
   Assert.assertTrue(c.evaluate(state2,now));

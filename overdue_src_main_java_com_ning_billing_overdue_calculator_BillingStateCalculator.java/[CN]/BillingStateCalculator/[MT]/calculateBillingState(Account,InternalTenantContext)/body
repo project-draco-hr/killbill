@@ -1,0 +1,15 @@
+{
+  final SortedSet<Invoice> unpaidInvoices=unpaidInvoicesForAccount(account.getId(),account.getTimeZone(),context);
+  final int numberOfUnpaidInvoices=unpaidInvoices.size();
+  final BigDecimal unpaidInvoiceBalance=sumBalance(unpaidInvoices);
+  LocalDate dateOfEarliestUnpaidInvoice=null;
+  UUID idOfEarliestUnpaidInvoice=null;
+  final Invoice invoice=earliest(unpaidInvoices);
+  if (invoice != null) {
+    dateOfEarliestUnpaidInvoice=invoice.getInvoiceDate();
+    idOfEarliestUnpaidInvoice=invoice.getId();
+  }
+  final PaymentResponse responseForLastFailedPayment=PaymentResponse.INSUFFICIENT_FUNDS;
+  final Tag[] tags=new Tag[]{};
+  return new BillingState(account.getId(),numberOfUnpaidInvoices,unpaidInvoiceBalance,dateOfEarliestUnpaidInvoice,account.getTimeZone(),idOfEarliestUnpaidInvoice,responseForLastFailedPayment,tags);
+}

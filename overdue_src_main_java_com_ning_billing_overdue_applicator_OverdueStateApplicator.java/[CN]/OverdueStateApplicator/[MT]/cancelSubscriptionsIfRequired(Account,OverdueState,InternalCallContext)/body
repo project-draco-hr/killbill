@@ -1,0 +1,26 @@
+{
+  if (nextOverdueState.getSubscriptionCancellationPolicy() == OverdueCancellationPolicicy.NONE) {
+    return;
+  }
+  try {
+    final BillingActionPolicy actionPolicy;
+switch (nextOverdueState.getSubscriptionCancellationPolicy()) {
+case END_OF_TERM:
+      actionPolicy=BillingActionPolicy.END_OF_TERM;
+    break;
+case IMMEDIATE:
+  actionPolicy=BillingActionPolicy.IMMEDIATE;
+break;
+default :
+throw new IllegalStateException("Unexpected OverdueCancellationPolicy " + nextOverdueState.getSubscriptionCancellationPolicy());
+}
+final List<Entitlement> toBeCancelled=new LinkedList<Entitlement>();
+computeEntitlementsToCancel(account,toBeCancelled,context);
+for (final Entitlement cur : toBeCancelled) {
+cur.cancelEntitlementWithDateOverrideBillingPolicy(new LocalDate(clock.getUTCNow(),account.getTimeZone()),actionPolicy,context.toCallContext());
+}
+}
+ catch (EntitlementApiException e) {
+throw new OverdueException(e);
+}
+}

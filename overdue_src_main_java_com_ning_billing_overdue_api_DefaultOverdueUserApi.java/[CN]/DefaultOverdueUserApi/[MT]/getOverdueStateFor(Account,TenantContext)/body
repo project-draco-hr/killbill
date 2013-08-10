@@ -1,0 +1,10 @@
+{
+  try {
+    final String stateName=accessApi.getBlockingStateFor(overdueable,internalCallContextFactory.createInternalTenantContext(context)).getStateName();
+    final OverdueStateSet states=overdueConfig.getBundleStateSet();
+    return states.findState(stateName);
+  }
+ catch (  OverdueApiException e) {
+    throw new OverdueException(e,ErrorCode.OVERDUE_CAT_ERROR_ENCOUNTERED,overdueable.getId(),overdueable.getClass().getSimpleName());
+  }
+}

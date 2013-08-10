@@ -4,8 +4,8 @@
   final DateTime now=createSubscriptionCreationEvent(nextPlan,nextPhase);
   final Account account=createAccount(32);
   final List<BlockingState> blockingStates=new ArrayList<BlockingState>();
-  blockingStates.add(new DefaultBlockingState(UUID.randomUUID(),bunId,DISABLED_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",true,true,true,now.plusDays(1),null));
-  blockingStates.add(new DefaultBlockingState(UUID.randomUUID(),bunId,CLEAR_BUNDLE,Type.SUBSCRIPTION_BUNDLE,"test",false,false,false,now.plusDays(2),null));
+  blockingStates.add(new DefaultBlockingState(UUID.randomUUID(),bunId,DISABLED_BUNDLE,"test",true,true,true,now.plusDays(1),null));
+  blockingStates.add(new DefaultBlockingState(UUID.randomUUID(),bunId,CLEAR_BUNDLE,"test",false,false,false,now.plusDays(2),null));
   ((MockBlockingStateDao)blockingStateDao).setBlockingStates(bunId,blockingStates);
   final SortedSet<BillingEvent> events=billingInternalApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),internalCallContext);
   Assert.assertEquals(events.size(),3);

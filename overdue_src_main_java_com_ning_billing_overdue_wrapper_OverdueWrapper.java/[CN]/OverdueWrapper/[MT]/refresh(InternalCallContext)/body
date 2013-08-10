@@ -2,9 +2,9 @@
   if (overdueStateSet.size() < 1) {
     return overdueStateSet.getClearState();
   }
-  final BillingState<T> billingState=billingState(context);
+  final BillingState billingState=billingState(context);
   final String previousOverdueStateName=api.getBlockingStateFor(overdueable,context).getStateName();
-  final OverdueState<T> nextOverdueState=overdueStateSet.calculateOverdueState(billingState,clock.getToday(billingState.getAccountTimeZone()));
+  final OverdueState nextOverdueState=overdueStateSet.calculateOverdueState(billingState,clock.getToday(billingState.getAccountTimeZone()));
   overdueStateApplicator.apply(overdueStateSet.getFirstState(),billingState,overdueable,previousOverdueStateName,nextOverdueState,context);
   return nextOverdueState;
 }
