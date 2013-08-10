@@ -1,0 +1,14 @@
+{
+  super(input.getAccountId().toString(),input.getBundleId().toString(),input.getId().toString(),input.getExternalKey(),toAuditLogJson(bundleAuditLogs));
+  this.events=new LinkedList<SubscriptionReadEventJson>();
+  for (  SubscriptionEvent cur : subscriptionEvents) {
+    final String eventId=cur.getId().toString();
+    final BillingPeriod billingPeriod=cur.getNextBillingPeriod() != null ? cur.getNextBillingPeriod() : cur.getPrevBillingPeriod();
+    final Product product=cur.getNextProduct() != null ? cur.getNextProduct() : cur.getPrevProduct();
+    final PriceList priceList=cur.getNextPriceList() != null ? cur.getNextPriceList() : cur.getPrevPriceList();
+    final PlanPhase phase=cur.getNextPhase() != null ? cur.getNextPhase() : cur.getPrevPhase();
+    this.events.add(new SubscriptionReadEventJson(cur.getId().toString(),billingPeriod != null ? billingPeriod.toString() : null,cur.getRequestedDate(),cur.getEffectiveDate(),product != null ? product.toString() : null,priceList != null ? priceList.getName() : null,cur.getSubscriptionEventType().toString(),phase != null ? phase.getName() : null,toAuditLogJson(subscriptionEventsAuditLogs.get(cur.getId()))));
+  }
+  this.newEvents=null;
+  this.deletedEvents=null;
+}

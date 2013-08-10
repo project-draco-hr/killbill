@@ -29,7 +29,7 @@
       }
  else {
         final DateTime effectiveCancelDate=!cancelImmediately && oldSubscription.getChargedThroughDate() != null && effectiveTransferDate.isBefore(oldSubscription.getChargedThroughDate()) ? oldSubscription.getChargedThroughDate() : effectiveTransferDate;
-        final SubscriptionEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(clock.getUTCNow()).setEffectiveDate(effectiveCancelDate).setRequestedDate(effectiveTransferDate).setFromDisk(true));
+        final SubscriptionBaseEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(clock.getUTCNow()).setEffectiveDate(effectiveCancelDate).setRequestedDate(effectiveTransferDate).setFromDisk(true));
         TransferCancelData cancelData=new TransferCancelData(oldSubscription,cancelEvent);
         transferCancelDataList.add(cancelData);
       }
@@ -37,8 +37,8 @@
       if (bundleStartdate == null) {
         bundleStartdate=oldSubscription.getStartDate();
       }
-      final DefaultSubscriptionBase defaultSubscriptionBase=createSubscriptionForApiUse(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(subscriptionBundleData.getId()).setCategory(productCategory).setBundleStartDate(effectiveTransferDate).setAlignStartDate(subscriptionAlignStartDate),ImmutableList.<SubscriptionEvent>of());
-      final List<SubscriptionEvent> events=toEvents(existingEvents,defaultSubscriptionBase,effectiveTransferDate,context);
+      final DefaultSubscriptionBase defaultSubscriptionBase=createSubscriptionForApiUse(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(subscriptionBundleData.getId()).setCategory(productCategory).setBundleStartDate(effectiveTransferDate).setAlignStartDate(subscriptionAlignStartDate),ImmutableList.<SubscriptionBaseEvent>of());
+      final List<SubscriptionBaseEvent> events=toEvents(existingEvents,defaultSubscriptionBase,effectiveTransferDate,context);
       final SubscriptionMigrationData curData=new SubscriptionMigrationData(defaultSubscriptionBase,events,null);
       subscriptionMigrationDataList.add(curData);
     }

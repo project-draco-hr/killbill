@@ -5,10 +5,10 @@
       final SubscriptionEventSqlDao transEventDao=entitySqlDaoWrapperFactory.become(SubscriptionEventSqlDao.class);
       for (      final SubscriptionDataRepair cur : inRepair) {
         transactional.updateForRepair(cur.getId().toString(),cur.getActiveVersion(),cur.getAlignStartDate().toDate(),cur.getBundleStartDate().toDate(),context);
-        for (        final SubscriptionEvent event : cur.getInitialEvents()) {
+        for (        final SubscriptionBaseEvent event : cur.getInitialEvents()) {
           transEventDao.updateVersion(event.getId().toString(),event.getActiveVersion(),context);
         }
-        for (        final SubscriptionEvent event : cur.getNewEvents()) {
+        for (        final SubscriptionBaseEvent event : cur.getNewEvents()) {
           transEventDao.create(new SubscriptionEventModelDao(event),context);
           if (event.getEffectiveDate().isAfter(clock.getUTCNow())) {
             recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,event.getEffectiveDate(),new SubscriptionNotificationKey(event.getId()),context);

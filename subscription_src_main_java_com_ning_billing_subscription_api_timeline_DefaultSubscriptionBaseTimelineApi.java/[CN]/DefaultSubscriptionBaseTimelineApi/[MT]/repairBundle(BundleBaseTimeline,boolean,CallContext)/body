@@ -24,7 +24,7 @@
       final SubscriptionBaseTimeline curRepair=findAndCreateSubscriptionRepair(cur.getId(),input.getSubscriptions());
       if (curRepair != null) {
         final SubscriptionDataRepair curInputRepair=((SubscriptionDataRepair)cur);
-        final List<SubscriptionEvent> remaining=getRemainingEventsAndValidateDeletedEvents(curInputRepair,firstDeletedBPEventTime,curRepair.getDeletedEvents());
+        final List<SubscriptionBaseEvent> remaining=getRemainingEventsAndValidateDeletedEvents(curInputRepair,firstDeletedBPEventTime,curRepair.getDeletedEvents());
         final boolean isPlanRecreate=(curRepair.getNewEvents().size() > 0 && (curRepair.getNewEvents().get(0).getSubscriptionTransitionType() == SubscriptionBaseTransitionType.CREATE || curRepair.getNewEvents().get(0).getSubscriptionTransitionType() == SubscriptionBaseTransitionType.RE_CREATE));
         final DateTime newSubscriptionStartDate=isPlanRecreate ? curRepair.getNewEvents().get(0).getRequestedDate() : null;
         if (isPlanRecreate && remaining.size() != 0) {

@@ -1,0 +1,15 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final SubscriptionEventSqlDao transactional=entitySqlDaoWrapperFactory.become(SubscriptionEventSqlDao.class);
+      for (      final SubscriptionBaseEvent cur : recreateEvents) {
+        transactional.create(new SubscriptionEventModelDao(cur),context);
+        final boolean isBusEvent=cur.getEffectiveDate().compareTo(clock.getUTCNow()) <= 0 && (cur.getType() == EventType.API_USER);
+        recordBusOrFutureNotificationFromTransaction(subscription,cur,entitySqlDaoWrapperFactory,isBusEvent,0,context);
+      }
+      notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,recreateEvents.get(recreateEvents.size() - 1),context);
+      return null;
+    }
+  }
+);
+}

@@ -1,12 +1,12 @@
 {
-  final List<SubscriptionEvent> events=dao.getPendingEventsForSubscription(subscription.getId(),callContext);
+  final List<SubscriptionBaseEvent> events=dao.getPendingEventsForSubscription(subscription.getId(),callContext);
   assertNotNull(events);
   printEvents(events);
   assertEquals(events.size(),expPendingEvents);
   if (events.size() > 0 && expPhaseChange != null) {
     boolean foundPhase=false;
     boolean foundChange=false;
-    for (    final SubscriptionEvent cur : events) {
+    for (    final SubscriptionBaseEvent cur : events) {
       if (cur instanceof PhaseEvent) {
         assertEquals(foundPhase,false);
         foundPhase=true;

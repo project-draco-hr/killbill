@@ -3,8 +3,8 @@
     throw new SubscriptionBaseApiException(ErrorCode.SUB_UNCANCEL_BAD_STATE,subscription.getId().toString());
   }
   final DateTime now=clock.getUTCNow();
-  final SubscriptionEvent uncancelEvent=new ApiEventUncancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setRequestedDate(now).setEffectiveDate(now).setFromDisk(true));
-  final List<SubscriptionEvent> uncancelEvents=new ArrayList<SubscriptionEvent>();
+  final SubscriptionBaseEvent uncancelEvent=new ApiEventUncancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setRequestedDate(now).setEffectiveDate(now).setFromDisk(true));
+  final List<SubscriptionBaseEvent> uncancelEvents=new ArrayList<SubscriptionBaseEvent>();
   uncancelEvents.add(uncancelEvent);
   final TimedPhase nextTimedPhase=planAligner.getNextTimedPhase(subscription,now,now);
   final PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,now,nextTimedPhase.getStartPhase()) : null;

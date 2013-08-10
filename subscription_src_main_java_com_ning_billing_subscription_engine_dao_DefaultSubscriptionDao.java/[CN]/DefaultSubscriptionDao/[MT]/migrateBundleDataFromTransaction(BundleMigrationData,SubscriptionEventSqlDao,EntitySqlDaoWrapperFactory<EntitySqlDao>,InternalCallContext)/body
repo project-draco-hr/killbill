@@ -9,12 +9,12 @@
   }
   for (  final SubscriptionMigrationData curSubscription : bundleTransferData.getSubscriptions()) {
     final DefaultSubscriptionBase subData=curSubscription.getData();
-    for (    final SubscriptionEvent curEvent : curSubscription.getInitialEvents()) {
+    for (    final SubscriptionBaseEvent curEvent : curSubscription.getInitialEvents()) {
       transactional.create(new SubscriptionEventModelDao(curEvent),context);
       recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,curEvent.getEffectiveDate(),new SubscriptionNotificationKey(curEvent.getId()),context);
     }
     transSubDao.create(new SubscriptionModelDao(subData),context);
-    final SubscriptionEvent finalEvent=curSubscription.getInitialEvents().get(curSubscription.getInitialEvents().size() - 1);
+    final SubscriptionBaseEvent finalEvent=curSubscription.getInitialEvents().get(curSubscription.getInitialEvents().size() - 1);
     notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subData,finalEvent,context);
   }
   transBundleDao.create(new SubscriptionBundleModelDao(bundleData),context);
