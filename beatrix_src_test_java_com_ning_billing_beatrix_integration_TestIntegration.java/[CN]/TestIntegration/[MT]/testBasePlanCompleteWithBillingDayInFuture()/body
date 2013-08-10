@@ -6,7 +6,7 @@
   clock.setTime(initialCreationDate);
   int invoiceItemCount=1;
   DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
-  SubscriptionData subscription=subscriptionDataFromSubscription(baseEntitlement.getSubscriptionBase());
+  DefaultSubscriptionBase subscription=subscriptionDataFromSubscription(baseEntitlement.getSubscriptionBase());
   invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,new ExpectedInvoiceItemCheck(initialCreationDate.toLocalDate(),null,InvoiceItemType.FIXED,new BigDecimal("0")));
   invoiceChecker.checkChargedThroughDate(subscription.getId(),clock.getUTCToday(),callContext);
   baseEntitlement=changeEntitlementAndCheckForCompletion(baseEntitlement,"Assault-Rifle",BillingPeriod.MONTHLY,null,NextEvent.CHANGE,NextEvent.INVOICE);
