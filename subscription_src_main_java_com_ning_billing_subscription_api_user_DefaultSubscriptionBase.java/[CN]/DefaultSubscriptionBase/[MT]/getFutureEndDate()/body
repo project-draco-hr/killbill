@@ -1,0 +1,13 @@
+{
+  if (transitions == null) {
+    return null;
+  }
+  final SubscriptionBaseTransitionDataIterator it=new SubscriptionBaseTransitionDataIterator(clock,transitions,Order.ASC_FROM_PAST,Kind.SUBSCRIPTION,Visibility.ALL,TimeLimit.FUTURE_ONLY);
+  while (it.hasNext()) {
+    final SubscriptionBaseTransition cur=it.next();
+    if (cur.getTransitionType() == SubscriptionBaseTransitionType.CANCEL) {
+      return cur.getEffectiveTransitionTime();
+    }
+  }
+  return null;
+}

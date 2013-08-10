@@ -1,0 +1,13 @@
+{
+  if (transitions == null) {
+    throw new SubscriptionBaseError(String.format("No transitions for subscription %s",getId()));
+  }
+  final SubscriptionBaseTransitionDataIterator it=new SubscriptionBaseTransitionDataIterator(clock,transitions,Order.DESC_FROM_FUTURE,Kind.SUBSCRIPTION,Visibility.ALL,TimeLimit.PAST_OR_PRESENT_ONLY);
+  while (it.hasNext()) {
+    final SubscriptionBaseTransitionData cur=(SubscriptionBaseTransitionData)it.next();
+    if (cur.getTransitionType() == SubscriptionBaseTransitionType.CREATE || cur.getTransitionType() == SubscriptionBaseTransitionType.RE_CREATE || cur.getTransitionType() == SubscriptionBaseTransitionType.TRANSFER || cur.getTransitionType() == SubscriptionBaseTransitionType.CHANGE || cur.getTransitionType() == SubscriptionBaseTransitionType.MIGRATE_ENTITLEMENT) {
+      return cur;
+    }
+  }
+  throw new SubscriptionBaseError(String.format("Failed to find InitialTransitionForCurrentPlan id = %s",getId()));
+}

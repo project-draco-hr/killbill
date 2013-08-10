@@ -1,6 +1,6 @@
 {
   try {
-    SubscriptionData subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+    DefaultSubscriptionBase subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
     PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(2));
@@ -23,7 +23,7 @@
     assertTrue(testListener.isCompleted(5000));
     trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.DISCOUNT);
-    subscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
+    subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
     final DateTime expectedNextPhaseDate=subscription.getStartDate().plusDays(30).plusMonths(6);
     final SubscriptionBaseTransition nextPhase=subscription.getPendingTransition();
     final DateTime nextPhaseEffectiveDate=nextPhase.getEffectiveTransitionTime();

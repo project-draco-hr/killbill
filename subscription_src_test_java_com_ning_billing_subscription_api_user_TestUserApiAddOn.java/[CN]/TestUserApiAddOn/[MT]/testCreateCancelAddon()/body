@@ -3,17 +3,17 @@
     final String baseProduct="Shotgun";
     final BillingPeriod baseTerm=BillingPeriod.ANNUAL;
     final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-    SubscriptionData baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+    DefaultSubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
     final String aoProduct="Telescopic-Scope";
     final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
     final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-    SubscriptionData aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
+    DefaultSubscriptionBase aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
     assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     final DateTime now=clock.getUTCNow();
     aoSubscription.cancel(now,callContext);
     assertTrue(testListener.isCompleted(5000));
-    aoSubscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
+    aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
     assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);
     assertListenerStatus();
   }

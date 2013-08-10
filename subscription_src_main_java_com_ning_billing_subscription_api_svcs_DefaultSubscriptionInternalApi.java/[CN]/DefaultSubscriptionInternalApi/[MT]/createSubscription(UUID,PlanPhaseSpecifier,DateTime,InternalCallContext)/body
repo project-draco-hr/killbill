@@ -11,14 +11,14 @@
     final Plan plan=catalog.findPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,requestedDate);
     final PlanPhase phase=plan.getAllPhases()[0];
     if (phase == null) {
-      throw new SubscriptionError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",spec.getProductName(),spec.getBillingPeriod().toString(),realPriceList));
+      throw new SubscriptionBaseError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",spec.getProductName(),spec.getBillingPeriod().toString(),realPriceList));
     }
     final SubscriptionBaseBundle bundle=dao.getSubscriptionBundleFromId(bundleId,context);
     if (bundle == null) {
       throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_NO_BUNDLE,bundleId);
     }
     DateTime bundleStartDate=null;
-    final SubscriptionData baseSubscription=(SubscriptionData)dao.getBaseSubscription(bundleId,context);
+    final DefaultSubscriptionBase baseSubscription=(DefaultSubscriptionBase)dao.getBaseSubscription(bundleId,context);
 switch (plan.getProduct().getCategory()) {
 case BASE:
       if (baseSubscription != null) {
@@ -50,7 +50,7 @@ throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_BP_EXISTS,bundleId);
 bundleStartDate=requestedDate;
 break;
 default :
-throw new SubscriptionError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
+throw new SubscriptionBaseError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
 }
 return apiService.createPlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(effectiveDate),plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,now,context.toCallContext());
 }

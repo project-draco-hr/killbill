@@ -11,7 +11,7 @@
         return 1;
       }
  else {
-        return ((SubscriptionData)o1).getAlignStartDate().compareTo(((SubscriptionData)o2).getAlignStartDate());
+        return ((DefaultSubscriptionBase)o1).getAlignStartDate().compareTo(((DefaultSubscriptionBase)o2).getAlignStartDate());
       }
     }
   }
@@ -37,7 +37,7 @@ final String baseProductName=(futureBaseEvent instanceof ApiEventChange) ? ((Api
 final boolean createCancelEvent=(futureBaseEvent != null && targetAddOnPlan != null) && ((futureBaseEvent instanceof ApiEventCancel) || ((!addonUtils.isAddonAvailableFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan)) || (addonUtils.isAddonIncludedFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan))));
 if (createCancelEvent && reloaded.getFutureEndDate() == null) {
 final DateTime now=clock.getUTCNow();
-final SubscriptionEvent addOnCancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(reloaded.getId()).setActiveVersion(((SubscriptionData)reloaded).getActiveVersion()).setProcessedDate(now).setEffectiveDate(futureBaseEvent.getEffectiveDate()).setRequestedDate(now).setFromDisk(false));
+final SubscriptionEvent addOnCancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(reloaded.getId()).setActiveVersion(((DefaultSubscriptionBase)reloaded).getActiveVersion()).setProcessedDate(now).setEffectiveDate(futureBaseEvent.getEffectiveDate()).setRequestedDate(now).setFromDisk(false));
 events.add(addOnCancelEvent);
 reloaded=createSubscriptionForInternalUse(cur,events);
 }

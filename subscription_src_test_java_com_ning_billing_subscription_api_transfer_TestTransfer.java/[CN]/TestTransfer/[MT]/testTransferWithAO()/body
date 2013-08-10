@@ -7,12 +7,12 @@
   clock.addDays(3);
   final String aoProduct1="Telescopic-Scope";
   final BillingPeriod aoTerm1=BillingPeriod.MONTHLY;
-  final SubscriptionData aoSubscription1=testUtil.createSubscription(bundle,aoProduct1,aoTerm1,basePriceList);
+  final DefaultSubscriptionBase aoSubscription1=testUtil.createSubscription(bundle,aoProduct1,aoTerm1,basePriceList);
   assertEquals(aoSubscription1.getState(),SubscriptionState.ACTIVE);
   clock.addDays(25);
   final String aoProduct2="Laser-Scope";
   final BillingPeriod aoTerm2=BillingPeriod.MONTHLY;
-  final SubscriptionData aoSubscription2=testUtil.createSubscription(bundle,aoProduct2,aoTerm2,basePriceList);
+  final DefaultSubscriptionBase aoSubscription2=testUtil.createSubscription(bundle,aoProduct2,aoTerm2,basePriceList);
   assertEquals(aoSubscription2.getState(),SubscriptionState.ACTIVE);
   testListener.pushExpectedEvent(NextEvent.PHASE);
   testListener.pushExpectedEvent(NextEvent.PHASE);
@@ -37,18 +37,18 @@
     final Product curProduct=curPlan.getProduct();
     if (curProduct.getName().equals(baseProduct)) {
       foundBP=true;
-      assertTrue(((SubscriptionData)cur).getAlignStartDate().compareTo(((SubscriptionData)baseSubscription).getAlignStartDate()) == 0);
-      assertNull(((SubscriptionData)cur).getPendingTransition());
+      assertTrue(((DefaultSubscriptionBase)cur).getAlignStartDate().compareTo(((DefaultSubscriptionBase)baseSubscription).getAlignStartDate()) == 0);
+      assertNull(((DefaultSubscriptionBase)cur).getPendingTransition());
     }
  else     if (curProduct.getName().equals(aoProduct1)) {
       foundAO1=true;
-      assertTrue(((SubscriptionData)cur).getAlignStartDate().compareTo((aoSubscription1).getAlignStartDate()) == 0);
-      assertNull(((SubscriptionData)cur).getPendingTransition());
+      assertTrue(((DefaultSubscriptionBase)cur).getAlignStartDate().compareTo((aoSubscription1).getAlignStartDate()) == 0);
+      assertNull(((DefaultSubscriptionBase)cur).getPendingTransition());
     }
  else     if (curProduct.getName().equals(aoProduct2)) {
       foundAO2=true;
-      assertTrue(((SubscriptionData)cur).getAlignStartDate().compareTo((aoSubscription2).getAlignStartDate()) == 0);
-      assertNotNull(((SubscriptionData)cur).getPendingTransition());
+      assertTrue(((DefaultSubscriptionBase)cur).getAlignStartDate().compareTo((aoSubscription2).getAlignStartDate()) == 0);
+      assertNotNull(((DefaultSubscriptionBase)cur).getPendingTransition());
     }
  else {
       Assert.fail("Unexpected product " + curProduct.getName());

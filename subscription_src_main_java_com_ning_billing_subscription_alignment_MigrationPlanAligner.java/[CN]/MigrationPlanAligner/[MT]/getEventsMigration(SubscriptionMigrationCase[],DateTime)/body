@@ -20,7 +20,7 @@
         }
       }
       if (curPhaseDuration == null) {
-        throw new SubscriptionMigrationApiException(String.format("Failed to compute current phase duration for plan %s and phase %s",plan0.getName(),curPhaseType));
+        throw new SubscriptionBaseMigrationApiException(String.format("Failed to compute current phase duration for plan %s and phase %s",plan0.getName(),curPhaseType));
       }
       migrationStartDate=removeDuration(input[1].getEffectiveDate(),curPhaseDuration);
       events=getEventsOnFuturePhaseChangeMigration(plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifier().getPhaseType()),input[0].getPlanPhaseSpecifier().getPriceListName(),migrationStartDate,input[1].getEffectiveDate());
@@ -29,11 +29,11 @@
       events=getEventsOnFuturePlanChangeMigration(plan0,getPlanPhase(plan0,input[0].getPlanPhaseSpecifier().getPhaseType()),plan1,getPlanPhase(plan1,input[1].getPlanPhaseSpecifier().getPhaseType()),input[0].getPlanPhaseSpecifier().getPriceListName(),migrationStartDate,input[1].getEffectiveDate());
     }
  else {
-      throw new SubscriptionMigrationApiException("Unknown migration type");
+      throw new SubscriptionBaseMigrationApiException("Unknown migration type");
     }
     return events;
   }
  catch (  CatalogApiException e) {
-    throw new SubscriptionMigrationApiException(e);
+    throw new SubscriptionBaseMigrationApiException(e);
   }
 }

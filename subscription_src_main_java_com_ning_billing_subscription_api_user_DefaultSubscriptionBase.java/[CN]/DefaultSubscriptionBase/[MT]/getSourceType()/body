@@ -1,0 +1,15 @@
+{
+  if (transitions == null) {
+    return null;
+  }
+  final SubscriptionBaseTransitionData initialTransition=(SubscriptionBaseTransitionData)transitions.get(0);
+switch (initialTransition.getApiEventType()) {
+case MIGRATE_BILLING:
+case MIGRATE_ENTITLEMENT:
+    return SubscriptionSourceType.MIGRATED;
+case TRANSFER:
+  return SubscriptionSourceType.TRANSFERED;
+default :
+return SubscriptionSourceType.NATIVE;
+}
+}

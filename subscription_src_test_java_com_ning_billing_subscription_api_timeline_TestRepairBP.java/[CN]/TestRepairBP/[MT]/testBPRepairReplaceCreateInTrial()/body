@@ -4,7 +4,7 @@
   final DateTime startDate=clock.getUTCNow();
   final int clockShift=10;
   final DateTime restartDate=startDate.plusDays(clockShift).minusDays(1);
-  final LinkedList<ExistingEvent> expected=new LinkedList<SubscriptionTimeline.ExistingEvent>();
+  final LinkedList<ExistingEvent> expected=new LinkedList<SubscriptionBaseTimeline.ExistingEvent>();
   expected.add(testUtil.createExistingEventForAssertion(SubscriptionBaseTransitionType.CREATE,newBaseProduct,PhaseType.TRIAL,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.NO_BILLING_PERIOD,restartDate));
   expected.add(testUtil.createExistingEventForAssertion(SubscriptionBaseTransitionType.PHASE,newBaseProduct,PhaseType.EVERGREEN,ProductCategory.BASE,PriceListSet.DEFAULT_PRICELIST_NAME,BillingPeriod.MONTHLY,restartDate.plusDays(30)));
   final UUID baseSubscriptionId=testBPRepairCreate(true,startDate,clockShift,baseProduct,newBaseProduct,expected);
@@ -12,7 +12,7 @@
   final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(32));
   clock.addDeltaFromReality(it.toDurationMillis());
   assertTrue(testListener.isCompleted(5000));
-  final SubscriptionData subscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(baseSubscriptionId,internalCallContext);
+  final DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(baseSubscriptionId,internalCallContext);
   assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION + 1);
   assertEquals(subscription.getBundleId(),bundle.getId());
   assertEquals(subscription.getStartDate(),restartDate);

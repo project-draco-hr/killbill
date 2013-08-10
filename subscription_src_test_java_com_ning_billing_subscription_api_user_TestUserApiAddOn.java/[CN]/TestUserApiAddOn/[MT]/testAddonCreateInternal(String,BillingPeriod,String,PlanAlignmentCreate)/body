@@ -3,11 +3,11 @@
     final String baseProduct="Shotgun";
     final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
     final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-    final SubscriptionData baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+    final DefaultSubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(14));
     clock.addDeltaFromReality(it.toDurationMillis());
     final DateTime beforeAOCreation=clock.getUTCNow();
-    SubscriptionData aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
+    DefaultSubscriptionBase aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
     final DateTime afterAOCreation=clock.getUTCNow();
     Plan aoCurrentPlan=aoSubscription.getCurrentPlan();
     assertNotNull(aoCurrentPlan);
@@ -32,7 +32,7 @@
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(33));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
-    aoSubscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
+    aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
     aoCurrentPlan=aoSubscription.getCurrentPlan();
     assertNotNull(aoCurrentPlan);
     assertEquals(aoCurrentPlan.getProduct().getName(),aoProduct);
@@ -41,7 +41,7 @@
     aoCurrentPhase=aoSubscription.getCurrentPhase();
     assertNotNull(aoCurrentPhase);
     assertEquals(aoCurrentPhase.getPhaseType(),PhaseType.EVERGREEN);
-    aoSubscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
+    aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
     aoPendingTranstion=aoSubscription.getPendingTransition();
     assertNull(aoPendingTranstion);
   }

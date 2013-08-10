@@ -10,12 +10,12 @@
     if (bundle == null) {
       throw new SubscriptionTransferApiException(ErrorCode.SUB_CREATE_NO_BUNDLE,bundleKey);
     }
-    final BundleTimeline bundleTimeline=timelineApi.getBundleTimeline(bundle,context);
+    final BundleBaseTimeline bundleBaseTimeline=timelineApi.getBundleTimeline(bundle,context);
     final SubscriptionBundleData subscriptionBundleData=new SubscriptionBundleData(bundleKey,destAccountId,effectiveTransferDate);
     final List<SubscriptionMigrationData> subscriptionMigrationDataList=new LinkedList<SubscriptionMigrationData>();
     final List<TransferCancelData> transferCancelDataList=new LinkedList<TransferCancelData>();
     DateTime bundleStartdate=null;
-    for (    final SubscriptionTimeline cur : bundleTimeline.getSubscriptions()) {
+    for (    final SubscriptionBaseTimeline cur : bundleBaseTimeline.getSubscriptions()) {
       final SubscriptionData oldSubscription=(SubscriptionData)dao.getSubscriptionFromId(cur.getId(),fromInternalCallContext);
       if (oldSubscription.getState() == SubscriptionState.CANCELLED) {
         continue;

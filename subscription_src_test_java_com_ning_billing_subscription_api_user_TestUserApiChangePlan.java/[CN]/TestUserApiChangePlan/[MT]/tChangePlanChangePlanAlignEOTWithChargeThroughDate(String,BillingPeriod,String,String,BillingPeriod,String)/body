@@ -1,7 +1,7 @@
 {
   try {
     DateTime currentTime=clock.getUTCNow();
-    SubscriptionData subscription=testUtil.createSubscription(bundle,fromProd,fromTerm,fromPlanSet);
+    DefaultSubscriptionBase subscription=testUtil.createSubscription(bundle,fromProd,fromTerm,fromPlanSet);
     final PlanPhase trialPhase=subscription.getCurrentPhase();
     final DateTime expectedPhaseTrialChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
@@ -14,7 +14,7 @@
     final Duration ctd=testUtil.getDurationMonth(1);
     final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
     subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
-    subscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
+    subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
     PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.EVERGREEN);

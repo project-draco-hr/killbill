@@ -1,27 +1,27 @@
 {
   final String productName="pistol-monthly";
   final PhaseType initialPhase=PhaseType.TRIAL;
-  final SubscriptionData subscriptionData=createSubscriptionStartedInThePast(productName,initialPhase);
+  final DefaultSubscriptionBase defaultSubscriptionBase=createSubscriptionStartedInThePast(productName,initialPhase);
   final DateTime effectiveDate=clock.getUTCNow();
-  final TimedPhase[] phases=getTimedPhasesOnCreate(productName,initialPhase,subscriptionData,effectiveDate);
-  Assert.assertEquals(phases[0].getStartPhase(),subscriptionData.getBundleStartDate());
-  Assert.assertEquals(phases[1].getStartPhase(),subscriptionData.getBundleStartDate().plusDays(30));
-  final TimedPhase nextTimePhase=planAligner.getNextTimedPhase(subscriptionData,effectiveDate,effectiveDate);
-  Assert.assertEquals(nextTimePhase.getStartPhase(),subscriptionData.getBundleStartDate().plusDays(30));
-  final DateTime effectiveDateInThePast=subscriptionData.getBundleStartDate().minusHours(10);
-  final TimedPhase[] phasesInThePast=getTimedPhasesOnCreate(productName,initialPhase,subscriptionData,effectiveDateInThePast);
+  final TimedPhase[] phases=getTimedPhasesOnCreate(productName,initialPhase,defaultSubscriptionBase,effectiveDate);
+  Assert.assertEquals(phases[0].getStartPhase(),defaultSubscriptionBase.getBundleStartDate());
+  Assert.assertEquals(phases[1].getStartPhase(),defaultSubscriptionBase.getBundleStartDate().plusDays(30));
+  final TimedPhase nextTimePhase=planAligner.getNextTimedPhase(defaultSubscriptionBase,effectiveDate,effectiveDate);
+  Assert.assertEquals(nextTimePhase.getStartPhase(),defaultSubscriptionBase.getBundleStartDate().plusDays(30));
+  final DateTime effectiveDateInThePast=defaultSubscriptionBase.getBundleStartDate().minusHours(10);
+  final TimedPhase[] phasesInThePast=getTimedPhasesOnCreate(productName,initialPhase,defaultSubscriptionBase,effectiveDateInThePast);
   Assert.assertNull(phasesInThePast[0]);
-  Assert.assertEquals(phasesInThePast[1].getStartPhase(),subscriptionData.getBundleStartDate());
+  Assert.assertEquals(phasesInThePast[1].getStartPhase(),defaultSubscriptionBase.getBundleStartDate());
   try {
-    planAligner.getNextTimedPhase(subscriptionData,effectiveDateInThePast,effectiveDateInThePast);
+    planAligner.getNextTimedPhase(defaultSubscriptionBase,effectiveDateInThePast,effectiveDateInThePast);
     Assert.fail("Can't use getNextTimedPhase(): the effective date is before the initial plan");
   }
- catch (  SubscriptionError e) {
+ catch (  SubscriptionBaseError e) {
     Assert.assertTrue(true);
   }
   final String newProductName="shotgun-monthly";
   final DateTime effectiveChangeDate=clock.getUTCNow();
-  changeSubscription(effectiveChangeDate,subscriptionData,productName,newProductName,initialPhase);
-  final TimedPhase newPhase=getNextTimedPhaseOnChange(subscriptionData,newProductName,effectiveChangeDate);
-  Assert.assertEquals(newPhase.getStartPhase(),subscriptionData.getStartDate().plusDays(30),String.format("Start phase: %s, but bundle start date: %s and subscription start date: %s",newPhase.getStartPhase(),subscriptionData.getBundleStartDate(),subscriptionData.getStartDate()));
+  changeSubscription(effectiveChangeDate,defaultSubscriptionBase,productName,newProductName,initialPhase);
+  final TimedPhase newPhase=getNextTimedPhaseOnChange(defaultSubscriptionBase,newProductName,effectiveChangeDate);
+  Assert.assertEquals(newPhase.getStartPhase(),defaultSubscriptionBase.getStartDate().plusDays(30),String.format("Start phase: %s, but bundle start date: %s and subscription start date: %s",newPhase.getStartPhase(),defaultSubscriptionBase.getBundleStartDate(),defaultSubscriptionBase.getStartDate()));
 }

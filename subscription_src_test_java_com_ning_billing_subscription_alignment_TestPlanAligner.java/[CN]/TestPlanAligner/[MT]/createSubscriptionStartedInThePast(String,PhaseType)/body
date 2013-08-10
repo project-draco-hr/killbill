@@ -2,11 +2,11 @@
   final SubscriptionBuilder builder=new SubscriptionBuilder();
   builder.setBundleStartDate(clock.getUTCNow().minusHours(10));
   builder.setAlignStartDate(new DateTime(builder.getBundleStartDate().plusHours(5)));
-  final SubscriptionData subscriptionData=new SubscriptionData(builder,null,clock);
-  final SubscriptionEvent event=createSubscriptionEvent(builder.getAlignStartDate(),productName,phaseType,ApiEventType.CREATE,subscriptionData.getActiveVersion());
-  subscriptionData.rebuildTransitions(ImmutableList.<SubscriptionEvent>of(event),catalogService.getFullCatalog());
-  Assert.assertEquals(subscriptionData.getAllTransitions().size(),1);
-  Assert.assertNull(subscriptionData.getAllTransitions().get(0).getPreviousPhase());
-  Assert.assertNotNull(subscriptionData.getAllTransitions().get(0).getNextPhase());
-  return subscriptionData;
+  final DefaultSubscriptionBase defaultSubscriptionBase=new DefaultSubscriptionBase(builder,null,clock);
+  final SubscriptionEvent event=createSubscriptionEvent(builder.getAlignStartDate(),productName,phaseType,ApiEventType.CREATE,defaultSubscriptionBase.getActiveVersion());
+  defaultSubscriptionBase.rebuildTransitions(ImmutableList.<SubscriptionEvent>of(event),catalogService.getFullCatalog());
+  Assert.assertEquals(defaultSubscriptionBase.getAllTransitions().size(),1);
+  Assert.assertNull(defaultSubscriptionBase.getAllTransitions().get(0).getPreviousPhase());
+  Assert.assertNotNull(defaultSubscriptionBase.getAllTransitions().get(0).getNextPhase());
+  return defaultSubscriptionBase;
 }

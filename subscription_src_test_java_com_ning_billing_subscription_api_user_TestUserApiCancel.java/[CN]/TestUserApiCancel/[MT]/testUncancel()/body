@@ -3,7 +3,7 @@
     final String prod="Shotgun";
     final BillingPeriod term=BillingPeriod.MONTHLY;
     final String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
-    SubscriptionData subscription=testUtil.createSubscription(bundle,prod,term,planSet);
+    DefaultSubscriptionBase subscription=testUtil.createSubscription(bundle,prod,term,planSet);
     final PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     final DateTime expectedPhaseTrialChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
@@ -17,7 +17,7 @@
     final Duration ctd=testUtil.getDurationMonth(1);
     final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
     subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
-    subscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
+    subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
     subscription.cancel(clock.getUTCNow(),callContext);
     subscription.uncancel(callContext);
     testListener.pushExpectedEvent(NextEvent.UNCANCEL);

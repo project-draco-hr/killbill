@@ -6,11 +6,11 @@
   final String aoProduct="Telescopic-Scope";
   final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
   final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-  final SubscriptionData aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
-  final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
-  final List<SubscriptionTimeline> subscriptionRepair=bundleRepair.getSubscriptions();
+  final DefaultSubscriptionBase aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
+  final BundleBaseTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
+  final List<SubscriptionBaseTimeline> subscriptionRepair=bundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),2);
-  for (  final SubscriptionTimeline cur : subscriptionRepair) {
+  for (  final SubscriptionBaseTimeline cur : subscriptionRepair) {
     assertNull(cur.getDeletedEvents());
     assertNull(cur.getNewEvents());
     final List<ExistingEvent> events=cur.getExistingEvents();

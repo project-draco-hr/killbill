@@ -3,16 +3,16 @@
   final DateTime startDate=clock.getUTCNow();
   final SubscriptionBase baseSubscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,startDate);
   test.withException(new TestWithExceptionCallback(){
-    @Override public void doTest() throws SubscriptionRepairException, SubscriptionBaseApiException {
-      final BundleTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
+    @Override public void doTest() throws SubscriptionBaseRepairException, SubscriptionBaseApiException {
+      final BundleBaseTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
       testUtil.sortEventsOnBundle(bundleRepair);
       final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);
       final NewEvent ne=testUtil.createNewEvent(SubscriptionBaseTransitionType.CHANGE,baseSubscription.getStartDate().plusDays(10),spec);
-      final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+      final List<DeletedEvent> des=new LinkedList<SubscriptionBaseTimeline.DeletedEvent>();
       des.add(testUtil.createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(0).getEventId()));
       des.add(testUtil.createDeletedEvent(bundleRepair.getSubscriptions().get(0).getExistingEvents().get(1).getEventId()));
-      final SubscriptionTimeline sRepair=testUtil.createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
-      final BundleTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
+      final SubscriptionBaseTimeline sRepair=testUtil.createSubscriptionRepair(baseSubscription.getId(),des,Collections.singletonList(ne));
+      final BundleBaseTimeline bRepair=testUtil.createBundleRepair(bundle.getId(),bundleRepair.getViewId(),Collections.singletonList(sRepair));
       testListener.pushExpectedEvent(NextEvent.CHANGE);
       final DateTime changeTime=clock.getUTCNow();
       baseSubscription.changePlan("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,changeTime,callContext);

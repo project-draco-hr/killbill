@@ -1,0 +1,14 @@
+{
+  final TreeSet<NewEvent> newEventSet=new TreeSet<SubscriptionBaseTimeline.NewEvent>(new Comparator<NewEvent>(){
+    @Override public int compare(    final NewEvent o1,    final NewEvent o2){
+      return o1.getRequestedDate().compareTo(o2.getRequestedDate());
+    }
+  }
+);
+  for (  final SubscriptionBaseTimeline cur : subscriptionsReapir) {
+    for (    final NewEvent e : cur.getNewEvents()) {
+      newEventSet.add(new DefaultNewEvent(cur.getId(),e.getPlanPhaseSpecifier(),e.getRequestedDate(),e.getSubscriptionTransitionType()));
+    }
+  }
+  return newEventSet;
+}

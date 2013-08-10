@@ -26,16 +26,16 @@
   }
   final boolean ifRepair=false;
   if (ifRepair) {
-    BundleTimeline bundleRepair=repairApi.getBundleTimeline(bpEntitlement.getSubscriptionBase().getBundleId(),callContext);
+    BundleBaseTimeline bundleRepair=repairApi.getBundleTimeline(bpEntitlement.getSubscriptionBase().getBundleId(),callContext);
     sortEventsOnBundle(bundleRepair);
-    SubscriptionTimeline bpRepair=getSubscriptionRepair(bpEntitlement.getId(),bundleRepair);
+    SubscriptionBaseTimeline bpRepair=getSubscriptionRepair(bpEntitlement.getId(),bundleRepair);
     assertEquals(bpRepair.getExistingEvents().size(),2);
-    final SubscriptionTimeline aoRepair=getSubscriptionRepair(aoEntitlement1.getId(),bundleRepair);
+    final SubscriptionBaseTimeline aoRepair=getSubscriptionRepair(aoEntitlement1.getId(),bundleRepair);
     assertEquals(aoRepair.getExistingEvents().size(),2);
-    final SubscriptionTimeline aoRepair2=getSubscriptionRepair(aoEntitlement2.getId(),bundleRepair);
+    final SubscriptionBaseTimeline aoRepair2=getSubscriptionRepair(aoEntitlement2.getId(),bundleRepair);
     assertEquals(aoRepair2.getExistingEvents().size(),2);
     final DateTime bpChangeDate=clock.getUTCNow().minusDays(1);
-    final List<DeletedEvent> des=new LinkedList<SubscriptionTimeline.DeletedEvent>();
+    final List<DeletedEvent> des=new LinkedList<SubscriptionBaseTimeline.DeletedEvent>();
     des.add(createDeletedEvent(bpRepair.getExistingEvents().get(1).getEventId()));
     final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.TRIAL);
     final NewEvent ne=createNewEvent(SubscriptionBaseTransitionType.CHANGE,bpChangeDate,spec);

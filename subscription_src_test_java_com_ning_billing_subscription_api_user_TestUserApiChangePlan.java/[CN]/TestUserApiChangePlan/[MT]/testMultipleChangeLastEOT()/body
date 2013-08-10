@@ -1,6 +1,6 @@
 {
   try {
-    SubscriptionData subscription=testUtil.createSubscription(bundle,"Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount");
+    DefaultSubscriptionBase subscription=testUtil.createSubscription(bundle,"Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount");
     final PlanPhase trialPhase=subscription.getCurrentPhase();
     assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
     testListener.pushExpectedEvent(NextEvent.PHASE);
@@ -13,7 +13,7 @@
     final Duration ctd=testUtil.getDurationMonth(1);
     final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(startDiscountPhase,ctd);
     subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
-    subscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
+    subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
     testListener.setNonExpectedMode();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan("Shotgun",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow(),callContext);
@@ -48,7 +48,7 @@
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(6));
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
-    subscription=(SubscriptionData)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
+    subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
     currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);
     assertEquals(currentPlan.getProduct().getName(),"Pistol");
