@@ -1,19 +1,10 @@
 {
-  final SubscriptionBaseTimeline.ExistingEvent event=Mockito.mock(SubscriptionBaseTimeline.ExistingEvent.class);
-  final DateTime effectiveDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
-  final UUID eventId=UUID.randomUUID();
-  final PlanPhaseSpecifier planPhaseSpecifier=new PlanPhaseSpecifier(UUID.randomUUID().toString(),ProductCategory.BASE,BillingPeriod.NO_BILLING_PERIOD,UUID.randomUUID().toString(),PhaseType.EVERGREEN);
-  Mockito.when(event.getEffectiveDate()).thenReturn(effectiveDate);
-  Mockito.when(event.getEventId()).thenReturn(eventId);
-  Mockito.when(event.getSubscriptionTransitionType()).thenReturn(SubscriptionBaseTransitionType.CREATE);
-  Mockito.when(event.getPlanPhaseSpecifier()).thenReturn(planPhaseSpecifier);
-  final SubscriptionBaseTimeline subscriptionTimeline=Mockito.mock(SubscriptionBaseTimeline.class);
-  Mockito.when(subscriptionTimeline.getId()).thenReturn(UUID.randomUUID());
-  Mockito.when(subscriptionTimeline.getExistingEvents()).thenReturn(ImmutableList.<SubscriptionBaseTimeline.ExistingEvent>of(event));
+  final String someUUID=UUID.randomUUID().toString();
   final UUID bundleId=UUID.randomUUID();
   final String externalKey=UUID.randomUUID().toString();
-  final EntitlementJsonWithEvents subscription=null;
   final List<AuditLogJson> auditLogs=createAuditLogsJson(clock.getUTCNow());
+  SubscriptionReadEventJson event=new SubscriptionReadEventJson(someUUID,BillingPeriod.NO_BILLING_PERIOD.toString(),new LocalDate(),new LocalDate(),"product","priceList","eventType","phase",null);
+  final EntitlementJsonWithEvents subscription=new EntitlementJsonWithEvents(someUUID,someUUID,someUUID,externalKey,ImmutableList.<SubscriptionReadEventJson>of(event),null,null,auditLogs);
   final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=new BundleJsonWithSubscriptions(bundleId.toString(),externalKey,ImmutableList.<EntitlementJsonWithEvents>of(subscription),auditLogs);
   Assert.assertEquals(bundleJsonWithSubscriptions.getBundleId(),bundleId.toString());
   Assert.assertEquals(bundleJsonWithSubscriptions.getExternalKey(),externalKey);

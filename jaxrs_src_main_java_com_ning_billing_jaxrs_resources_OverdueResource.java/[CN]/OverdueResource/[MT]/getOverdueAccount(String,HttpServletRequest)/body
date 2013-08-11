@@ -1,5 +1,6 @@
 {
   final TenantContext tenantContext=context.createContext(request);
   final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),tenantContext);
-  return null;
+  final OverdueState overdueState=overdueApi.getOverdueStateFor(account,tenantContext);
+  return Response.status(Status.OK).entity(new OverdueStateJson(overdueState)).build();
 }
