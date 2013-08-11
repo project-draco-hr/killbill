@@ -7,11 +7,15 @@
       throw new EntitlementApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,baseSubscription.getBundleId());
     }
     final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundle.getAccountId(),callContext);
+    checker.checkBlockedChange(baseSubscription,contextWithValidAccountRecordId);
     final DateTime requestedDate=fromNowAndReferenceTime(baseSubscription.getStartDate(),contextWithValidAccountRecordId);
     final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(baseSubscription.getBundleId(),planPhaseSpecifier,requestedDate,context);
     return new DefaultEntitlement(accountApi,subscription,bundle.getAccountId(),bundle.getExternalKey(),internalCallContextFactory,clock,checker);
   }
  catch (  SubscriptionBaseApiException e) {
+    throw new EntitlementApiException(e);
+  }
+catch (  BlockingApiException e) {
     throw new EntitlementApiException(e);
   }
 }

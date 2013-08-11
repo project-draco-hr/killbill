@@ -1,8 +1,10 @@
 {
   final BlockingAggregator result=new BlockingAggregator();
   if (blockableId != null) {
-    final BlockingState blockableState=dao.getBlockingStateFor(blockableId,context);
-    result.or(blockableState);
+    final List<BlockingState> blockableState=dao.getBlockingState(blockableId,context);
+    for (    BlockingState cur : blockableState) {
+      result.or(cur);
+    }
   }
   return result;
 }

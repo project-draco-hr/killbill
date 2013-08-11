@@ -1,2 +1,8 @@
 {
+  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(context);
+  final BlockingState currentState=blockingStateDao.getBlockingStateForService(bundleId,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalContext);
+  if (currentState != null && currentState.getStateName().equals(ENT_STATE_BLOCKED)) {
+    throw new EntitlementApiException(ErrorCode.ENT_ALREADY_BLOCKED,bundleId);
+  }
+  blockingStateDao.setBlockingState(new DefaultBlockingState(bundleId,BlockingStateType.BUNDLE,ENT_STATE_BLOCKED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,true),clock,internalContext);
 }
