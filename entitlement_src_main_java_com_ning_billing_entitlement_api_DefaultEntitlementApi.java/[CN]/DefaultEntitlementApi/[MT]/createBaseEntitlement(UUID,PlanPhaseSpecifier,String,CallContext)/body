@@ -1,9 +1,9 @@
 {
-  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(callContext);
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
   try {
-    final Account account=accountApi.getAccountById(accountId,context);
-    final SubscriptionBaseBundle bundle=subscriptionInternalApi.createBundleForAccount(accountId,externalKey,context);
-    final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(bundle.getId(),planPhaseSpecifier,clock.getUTCNow(),context);
+    final Account account=accountApi.getAccountById(accountId,contextWithValidAccountRecordId);
+    final SubscriptionBaseBundle bundle=subscriptionInternalApi.createBundleForAccount(accountId,externalKey,contextWithValidAccountRecordId);
+    final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(bundle.getId(),planPhaseSpecifier,clock.getUTCNow(),contextWithValidAccountRecordId);
     return new DefaultEntitlement(accountApi,subscription,accountId,bundle.getExternalKey(),false,null,account.getTimeZone(),internalCallContextFactory,clock,checker);
   }
  catch (  SubscriptionBaseApiException e) {
