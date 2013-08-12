@@ -1,0 +1,17 @@
+{
+  try {
+    final UUID accountId=UUID.randomUUID();
+    final String externalKey="externalKey";
+    final Account account=Mockito.mock(Account.class);
+    Mockito.when(account.getId()).thenReturn(accountId);
+    Mockito.when(accountInternalApi.getAccountById(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(account);
+    final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+    entitlementApi.createBaseEntitlement(accountId,spec,externalKey,callContext);
+  }
+ catch (  EntitlementApiException e) {
+    Assert.fail("Test failed " + e.getMessage());
+  }
+catch (  AccountApiException e) {
+    Assert.fail("Test failed " + e.getMessage());
+  }
+}
