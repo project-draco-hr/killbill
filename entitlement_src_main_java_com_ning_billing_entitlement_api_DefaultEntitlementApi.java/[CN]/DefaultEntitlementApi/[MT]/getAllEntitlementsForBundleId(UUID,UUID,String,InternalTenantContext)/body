@@ -1,9 +1,23 @@
 {
-  final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundleId,context);
-  return ImmutableList.<Entitlement>copyOf(Collections2.transform(subscriptions,new Function<SubscriptionBase,Entitlement>(){
-    @Nullable @Override public Entitlement apply(    @Nullable final SubscriptionBase input){
-      return new DefaultEntitlement(accountApi,input,accountId,externalKey,internalCallContextFactory,clock,checker);
+  try {
+    final Account account=accountApi.getAccountById(bundleId,context);
+    final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundleId,context);
+    return ImmutableList.<Entitlement>copyOf(Collections2.transform(subscriptions,new Function<SubscriptionBase,Entitlement>(){
+      @Nullable @Override public Entitlement apply(      @Nullable final SubscriptionBase input){
+        BlockingAggregator blocking=null;
+        try {
+          blocking=checker.getBlockedStatus(input,context);
+        }
+ catch (        BlockingApiException e) {
+          log.warn("Failed to extract blocking state for subscription " + input.getId().toString());
+        }
+        final BlockingState currentState=blockingStateDao.getBlockingStateForService(input.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,context);
+        return new DefaultEntitlement(accountApi,input,accountId,externalKey,(blocking != null ? blocking.isBlockEntitlement() : false),currentState,account.getTimeZone(),internalCallContextFactory,clock,checker);
+      }
     }
-  }
 ));
+  }
+ catch (  AccountApiException e) {
+    throw new EntitlementApiException(e);
+  }
 }

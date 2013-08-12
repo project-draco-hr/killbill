@@ -3,9 +3,18 @@
   try {
     final SubscriptionBase subscription=subscriptionInternalApi.getSubscriptionFromId(uuid,context);
     final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleFromId(subscription.getBundleId(),context);
-    return new DefaultEntitlement(accountApi,subscription,bundle.getAccountId(),bundle.getExternalKey(),internalCallContextFactory,clock,checker);
+    final BlockingAggregator blocking=checker.getBlockedStatus(subscription,context);
+    final Account account=accountApi.getAccountById(bundle.getAccountId(),context);
+    final BlockingState currentState=blockingStateDao.getBlockingStateForService(subscription.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,context);
+    return new DefaultEntitlement(accountApi,subscription,bundle.getAccountId(),bundle.getExternalKey(),blocking.isBlockEntitlement(),currentState,account.getTimeZone(),internalCallContextFactory,clock,checker);
   }
  catch (  SubscriptionBaseApiException e) {
+    throw new EntitlementApiException(e);
+  }
+catch (  BlockingApiException e) {
+    throw new EntitlementApiException(e);
+  }
+catch (  AccountApiException e) {
     throw new EntitlementApiException(e);
   }
 }

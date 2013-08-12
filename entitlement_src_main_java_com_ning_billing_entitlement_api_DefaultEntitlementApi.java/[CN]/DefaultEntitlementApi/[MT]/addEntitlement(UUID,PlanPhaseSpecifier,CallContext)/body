@@ -3,19 +3,30 @@
   try {
     final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleFromId(bundleId,context);
     final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundleId,context);
-    if (baseSubscription.getCategory() != ProductCategory.BASE || baseSubscription.getState() != SubscriptionState.ACTIVE) {
+    if (baseSubscription.getCategory() != ProductCategory.BASE || baseSubscription.getState() != EntitlementState.ACTIVE) {
       throw new EntitlementApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,baseSubscription.getBundleId());
     }
     final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundle.getAccountId(),callContext);
-    checker.checkBlockedChange(baseSubscription,contextWithValidAccountRecordId);
+    final BlockingAggregator blocking=checker.getBlockedStatus(baseSubscription,contextWithValidAccountRecordId);
+    if (blocking.isBlockChange()) {
+      throw new EntitlementApiException(new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,BlockingChecker.ACTION_CHANGE,BlockingChecker.TYPE_SUBSCRIPTION,baseSubscription.getId().toString()));
+    }
+    final BlockingState currentState=blockingStateDao.getBlockingStateForService(baseSubscription.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,contextWithValidAccountRecordId);
+    if (currentState != null && currentState.getStateName().equals(ENT_STATE_CANCELLED)) {
+      throw new EntitlementApiException(new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,BlockingChecker.ACTION_CHANGE,BlockingChecker.TYPE_SUBSCRIPTION,baseSubscription.getId().toString()));
+    }
+    final Account account=accountApi.getAccountById(bundle.getAccountId(),context);
     final DateTime requestedDate=fromNowAndReferenceTime(baseSubscription.getStartDate(),contextWithValidAccountRecordId);
     final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(baseSubscription.getBundleId(),planPhaseSpecifier,requestedDate,context);
-    return new DefaultEntitlement(accountApi,subscription,bundle.getAccountId(),bundle.getExternalKey(),internalCallContextFactory,clock,checker);
+    return new DefaultEntitlement(accountApi,subscription,bundle.getAccountId(),bundle.getExternalKey(),blocking.isBlockEntitlement(),null,account.getTimeZone(),internalCallContextFactory,clock,checker);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);
   }
 catch (  BlockingApiException e) {
+    throw new EntitlementApiException(e);
+  }
+catch (  AccountApiException e) {
     throw new EntitlementApiException(e);
   }
 }

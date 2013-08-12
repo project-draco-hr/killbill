@@ -1,4 +1,10 @@
 {
-  final SubscriptionBaseBundle bundle=subscriptionApi.getBundleFromId(bundleId,context);
-  return getBlockedStateBundle(bundle,context);
+  final SubscriptionBaseBundle bundle;
+  try {
+    bundle=subscriptionApi.getBundleFromId(bundleId,context);
+    return getBlockedStateBundle(bundle,context);
+  }
+ catch (  SubscriptionBaseApiException e) {
+    throw new BlockingApiException(e,ErrorCode.fromCode(e.getCode()));
+  }
 }

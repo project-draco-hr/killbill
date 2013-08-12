@@ -3,13 +3,13 @@
   if (effectiveDate.compareTo(now) > 0) {
     return 0;
   }
-  final Product baseProduct=(baseSubscription.getState() == SubscriptionState.CANCELLED) ? null : baseSubscription.getCurrentPlan().getProduct();
+  final Product baseProduct=(baseSubscription.getState() == EntitlementState.CANCELLED) ? null : baseSubscription.getCurrentPlan().getProduct();
   final List<SubscriptionBase> subscriptions=dao.getSubscriptions(baseSubscription.getBundleId(),context);
   final List<DefaultSubscriptionBase> subscriptionsToBeCancelled=new LinkedList<DefaultSubscriptionBase>();
   final List<SubscriptionBaseEvent> cancelEvents=new LinkedList<SubscriptionBaseEvent>();
   for (  final SubscriptionBase subscription : subscriptions) {
     final DefaultSubscriptionBase cur=(DefaultSubscriptionBase)subscription;
-    if (cur.getState() == SubscriptionState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
+    if (cur.getState() == EntitlementState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
       continue;
     }
     final Plan addonCurrentPlan=cur.getCurrentPlan();

@@ -18,19 +18,19 @@
     final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
     subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
     subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
-    assertEquals(subscription.getLastActiveProductName(),prod);
-    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveProduct(),prod);
+    assertEquals(subscription.getLastActivePriceList(),planSet);
     assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
-    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
+    assertEquals(subscription.getLastActiveCategory(),"BASE");
     testListener.setNonExpectedMode();
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     subscription.cancel(clock.getUTCNow(),callContext);
     assertFalse(testListener.isCompleted(3000));
     testListener.reset();
-    assertEquals(subscription.getLastActiveProductName(),prod);
-    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveProduct(),prod);
+    assertEquals(subscription.getLastActivePriceList(),planSet);
     assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
-    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
+    assertEquals(subscription.getLastActiveCategory(),"BASE");
     final DateTime futureEndDate=subscription.getFutureEndDate();
     Assert.assertNotNull(futureEndDate);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
@@ -42,10 +42,10 @@
     final PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNull(currentPhase);
     testUtil.checkNextPhaseChange(subscription,0,null);
-    assertEquals(subscription.getLastActiveProductName(),prod);
-    assertEquals(subscription.getLastActivePriceListName(),planSet);
+    assertEquals(subscription.getLastActiveProduct(),prod);
+    assertEquals(subscription.getLastActivePriceList(),planSet);
     assertEquals(subscription.getLastActiveBillingPeriod(),term.toString());
-    assertEquals(subscription.getLastActiveCategoryName(),"BASE");
+    assertEquals(subscription.getLastActiveCategory(),"BASE");
     assertListenerStatus();
   }
  catch (  SubscriptionBaseApiException e) {
