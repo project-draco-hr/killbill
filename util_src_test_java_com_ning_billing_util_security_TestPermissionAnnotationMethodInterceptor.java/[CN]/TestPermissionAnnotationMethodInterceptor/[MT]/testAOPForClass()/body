@@ -1,0 +1,13 @@
+{
+  final IAopTester simpleTester=new AopTester();
+  try {
+    simpleTester.createRefund();
+  }
+ catch (  Exception e) {
+    Assert.fail(e.getLocalizedMessage());
+  }
+  configureShiro();
+  final Injector injector=Guice.createInjector(Stage.PRODUCTION,new SecurityModule());
+  final AopTester aopedTester=injector.getInstance(AopTester.class);
+  verifyAopedTester(aopedTester);
+}

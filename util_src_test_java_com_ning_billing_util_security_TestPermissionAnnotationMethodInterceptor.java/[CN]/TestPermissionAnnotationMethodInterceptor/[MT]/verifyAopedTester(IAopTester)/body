@@ -1,0 +1,24 @@
+{
+  logout();
+  try {
+    aopedTester.createRefund();
+    Assert.fail();
+  }
+ catch (  UnauthenticatedException e) {
+  }
+catch (  Exception e) {
+    Assert.fail(e.getLocalizedMessage());
+  }
+  login("pierre");
+  try {
+    aopedTester.createRefund();
+    Assert.fail();
+  }
+ catch (  AuthorizationException e) {
+  }
+catch (  Exception e) {
+    Assert.fail(e.getLocalizedMessage());
+  }
+  login("stephane");
+  aopedTester.createRefund();
+}

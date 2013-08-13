@@ -1,0 +1,17 @@
+{
+synchronized (annotatedInterfaceCache) {
+    final Boolean flag=annotatedInterfaceCache.get(iface);
+    if (flag != null) {
+      return flag;
+    }
+    boolean found=false;
+    for (    final Method ifcMethod : iface.getMethods()) {
+      if (ifcMethod.getAnnotations().length > 0) {
+        found=true;
+        break;
+      }
+    }
+    annotatedInterfaceCache.put(iface,found);
+    return found;
+  }
+}
