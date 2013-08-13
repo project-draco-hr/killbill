@@ -1,0 +1,13 @@
+{
+  final Ini config=new Ini();
+  config.addSection("users");
+  config.getSection("users").put("pierre","password, creditor");
+  config.getSection("users").put("stephane","password, refunder");
+  config.addSection("roles");
+  config.getSection("roles").put("creditor",Permission.INVOICE_CAN_CREDIT.toString() + "," + Permission.INVOICE_CAN_ITEM_ADJUST.toString());
+  config.getSection("roles").put("refunder",Permission.PAYMENT_CAN_REFUND.toString());
+  ThreadContext.unbindSecurityManager();
+  final Factory<SecurityManager> factory=new IniSecurityManagerFactory(config);
+  final SecurityManager securityManager=factory.getInstance();
+  SecurityUtils.setSecurityManager(securityManager);
+}

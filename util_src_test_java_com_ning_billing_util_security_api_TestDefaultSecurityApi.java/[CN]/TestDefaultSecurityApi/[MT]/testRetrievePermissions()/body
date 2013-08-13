@@ -1,0 +1,14 @@
+{
+  configureShiro();
+  final SecurityApi securityApi=new DefaultSecurityApi();
+  final Set<Permission> anonsPermissions=securityApi.getCurrentUserPermissions(callContext);
+  Assert.assertEquals(anonsPermissions.size(),0);
+  login("pierre");
+  final Set<Permission> pierresPermissions=securityApi.getCurrentUserPermissions(callContext);
+  Assert.assertEquals(pierresPermissions.size(),2);
+  Assert.assertTrue(pierresPermissions.containsAll(ImmutableList.<Permission>of(Permission.INVOICE_CAN_CREDIT,Permission.INVOICE_CAN_ITEM_ADJUST)));
+  login("stephane");
+  final Set<Permission> stephanesPermissions=securityApi.getCurrentUserPermissions(callContext);
+  Assert.assertEquals(stephanesPermissions.size(),1);
+  Assert.assertTrue(stephanesPermissions.containsAll(ImmutableList.<Permission>of(Permission.PAYMENT_CAN_REFUND)));
+}

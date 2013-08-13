@@ -1,0 +1,13 @@
+{
+  final Permission[] killbillPermissions=Permission.values();
+  final String[] killbillPermissionsString=getAllPermissionsAsStrings();
+  final Subject subject=SecurityUtils.getSubject();
+  final boolean[] permissions=subject.isPermitted(killbillPermissionsString);
+  final Set<Permission> userPermissions=new HashSet<Permission>();
+  for (int i=0; i < permissions.length; i++) {
+    if (permissions[i]) {
+      userPermissions.add(killbillPermissions[i]);
+    }
+  }
+  return userPermissions;
+}
