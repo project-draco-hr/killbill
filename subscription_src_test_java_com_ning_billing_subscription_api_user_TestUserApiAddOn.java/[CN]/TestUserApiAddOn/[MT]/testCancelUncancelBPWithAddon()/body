@@ -21,7 +21,7 @@
     baseSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
     baseSubscription.cancel(now,callContext);
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.UNCANCEL);
@@ -29,17 +29,17 @@
     baseSubscription.uncancel(callContext);
     assertTrue(testListener.isCompleted(5000));
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
     assertFalse(aoSubscription.isSubscriptionFutureCancelled());
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(1));
     clock.addDeltaFromReality(it.toDurationMillis());
     baseSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
     baseSubscription.cancel(clock.getUTCNow(),callContext);
     baseSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
-    assertEquals(baseSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(baseSubscription.getState(),EntitlementState.ACTIVE);
     assertTrue(baseSubscription.isSubscriptionFutureCancelled());
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
     assertListenerStatus();
   }

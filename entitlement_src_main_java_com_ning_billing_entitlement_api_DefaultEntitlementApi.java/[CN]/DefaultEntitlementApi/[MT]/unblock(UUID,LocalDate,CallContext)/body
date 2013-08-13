@@ -1,8 +1,8 @@
 {
-  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(context);
-  final BlockingState currentState=blockingStateDao.getBlockingStateForService(bundleId,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalContext);
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundleId,ObjectType.BUNDLE,context);
+  final BlockingState currentState=blockingStateDao.getBlockingStateForService(bundleId,EntitlementService.ENTITLEMENT_SERVICE_NAME,contextWithValidAccountRecordId);
   if (currentState == null || currentState.getStateName().equals(ENT_STATE_CLEAR)) {
     return;
   }
-  blockingStateDao.setBlockingState(new DefaultBlockingState(bundleId,BlockingStateType.BUNDLE,ENT_STATE_CLEAR,EntitlementService.ENTITLEMENT_SERVICE_NAME,false,false,false),clock,internalContext);
+  blockingStateDao.setBlockingState(new DefaultBlockingState(bundleId,BlockingStateType.BUNDLE,ENT_STATE_CLEAR,EntitlementService.ENTITLEMENT_SERVICE_NAME,false,false,false,clock.getUTCNow()),clock,contextWithValidAccountRecordId);
 }

@@ -1,3 +1,14 @@
 {
-  throw new UnsupportedOperationException();
+  final List<BlockingState> blockingStatesForId=blockingStates.get(blockableId);
+  if (blockingStatesForId == null) {
+    return new ArrayList<BlockingState>();
+  }
+  final Map<String,BlockingState> tmp=new HashMap<String,BlockingState>();
+  for (  BlockingState cur : blockingStatesForId) {
+    final BlockingState curStateForService=tmp.get(cur.getService());
+    if (curStateForService == null || curStateForService.getCreatedDate().compareTo(cur.getCreatedDate()) < 0) {
+      tmp.put(cur.getService(),cur);
+    }
+  }
+  return new ArrayList<BlockingState>(tmp.values());
 }

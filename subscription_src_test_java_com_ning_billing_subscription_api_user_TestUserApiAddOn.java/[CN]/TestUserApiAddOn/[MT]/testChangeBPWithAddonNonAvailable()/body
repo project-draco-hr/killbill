@@ -32,7 +32,7 @@
     assertEquals(aoStatus.get(0).getReason(),DryRunChangeReason.AO_NOT_AVAILABLE_IN_NEW_PLAN);
     baseSubscription.changePlan(newBaseProduct,newBaseTerm,newBasePriceList,now,callContext);
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
@@ -41,7 +41,7 @@
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);
+    assertEquals(aoSubscription.getState(),EntitlementState.CANCELLED);
     assertListenerStatus();
   }
  catch (  Exception e) {

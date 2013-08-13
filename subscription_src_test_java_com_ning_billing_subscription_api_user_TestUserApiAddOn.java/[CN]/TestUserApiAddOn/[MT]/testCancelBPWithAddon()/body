@@ -21,7 +21,7 @@
     baseSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
     baseSubscription.cancel(now,callContext);
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CANCEL);
@@ -30,7 +30,7 @@
     clock.addDeltaFromReality(it.toDurationMillis());
     assertTrue(testListener.isCompleted(5000));
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);
+    assertEquals(aoSubscription.getState(),EntitlementState.CANCELLED);
     assertListenerStatus();
   }
  catch (  Exception e) {

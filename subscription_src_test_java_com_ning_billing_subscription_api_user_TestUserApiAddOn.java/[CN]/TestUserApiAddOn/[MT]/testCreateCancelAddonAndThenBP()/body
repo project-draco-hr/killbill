@@ -8,7 +8,7 @@
     final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
     final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
     DefaultSubscriptionBase aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
-    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
     testListener.pushExpectedEvent(NextEvent.PHASE);
     testListener.pushExpectedEvent(NextEvent.PHASE);
@@ -27,11 +27,11 @@
     clock.addDeltaFromReality(it.toDurationMillis());
     aoSubscription.cancel(clock.getUTCNow(),callContext);
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
     baseSubscription.cancel(clock.getUTCNow(),callContext);
     baseSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
-    assertEquals(baseSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(baseSubscription.getState(),EntitlementState.ACTIVE);
     assertTrue(baseSubscription.isSubscriptionFutureCancelled());
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
     List<SubscriptionBaseTransition> aoTransitions=aoSubscription.getAllTransitions();

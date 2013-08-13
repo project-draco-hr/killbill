@@ -8,13 +8,13 @@
     final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
     final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
     DefaultSubscriptionBase aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
-    assertEquals(aoSubscription.getState(),SubscriptionState.ACTIVE);
+    assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     final DateTime now=clock.getUTCNow();
     aoSubscription.cancel(now,callContext);
     assertTrue(testListener.isCompleted(5000));
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),SubscriptionState.CANCELLED);
+    assertEquals(aoSubscription.getState(),EntitlementState.CANCELLED);
     assertListenerStatus();
   }
  catch (  Exception e) {

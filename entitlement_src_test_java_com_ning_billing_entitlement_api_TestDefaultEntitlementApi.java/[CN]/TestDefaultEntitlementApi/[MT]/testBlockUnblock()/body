@@ -14,6 +14,13 @@
     assertEquals(baseEntitlement2.getState(),EntitlementState.BLOCKED);
     final Entitlement telescopicEntitlement2=entitlementApi.getEntitlementForId(telescopicEntitlement.getId(),callContext);
     assertEquals(telescopicEntitlement2.getState(),EntitlementState.BLOCKED);
+    try {
+      entitlementApi.block(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),callContext);
+      Assert.fail("Should not have succeeded to block in a blocked state");
+    }
+ catch (    EntitlementApiException e) {
+      assertEquals(e.getCode(),ErrorCode.ENT_ALREADY_BLOCKED.getCode());
+    }
     final List<Entitlement> bundleEntitlements2=entitlementApi.getAllEntitlementsForBundle(telescopicEntitlement2.getBundleId(),callContext);
     assertEquals(bundleEntitlements2.size(),2);
     for (    Entitlement cur : bundleEntitlements2) {
@@ -27,6 +34,7 @@
       assertEquals(e.getCode(),ErrorCode.BLOCK_BLOCKED_ACTION.getCode());
     }
     clock.addDays(3);
+    entitlementApi.unblock(baseEntitlement.getBundleId(),new LocalDate(),callContext);
     entitlementApi.unblock(baseEntitlement.getBundleId(),new LocalDate(),callContext);
     final Entitlement baseEntitlement3=entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
     assertEquals(baseEntitlement3.getState(),EntitlementState.ACTIVE);
