@@ -1,0 +1,14 @@
+{
+  final LocalDate cancellationDate;
+switch (entitlementPolicy) {
+case IMM:
+    cancellationDate=new LocalDate(clock.getUTCNow(),accountTimeZone);
+  break;
+case EOT:
+cancellationDate=subscriptionBase.getChargedThroughDate() != null ? new LocalDate(subscriptionBase.getChargedThroughDate(),accountTimeZone) : new LocalDate(clock.getUTCNow(),accountTimeZone);
+break;
+default :
+throw new RuntimeException("Unsupported policy " + entitlementPolicy);
+}
+return cancellationDate;
+}

@@ -1,3 +1,16 @@
 {
-  return false;
+  if (state == EntitlementState.CANCELLED) {
+    throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
+  }
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
+  final LocalDate effectiveLocalDate=new LocalDate(localCancelDate,accountTimeZone);
+  final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(effectiveLocalDate,subscriptionBase.getStartDate(),contextWithValidAccountRecordId);
+  try {
+    subscriptionBase.cancelWithPolicy(null,billingPolicy,callContext);
+    blockingStateDao.setBlockingState(new DefaultBlockingState(getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveDate),clock,contextWithValidAccountRecordId);
+    return effectiveLocalDate.compareTo(new LocalDate(clock.getUTCNow())) <= 0;
+  }
+ catch (  SubscriptionBaseApiException e) {
+    throw new EntitlementApiException(e);
+  }
 }

@@ -1,0 +1,13 @@
+{
+  if (currentState != null && currentState.getStateName().equals(ENT_STATE_CANCELLED)) {
+    return EntitlementState.CANCELLED;
+  }
+  try {
+    BlockingAggregator blocking=checker.getBlockedStatus(subscriptionBase,context);
+    return blocking != null && blocking.isBlockEntitlement() ? EntitlementState.BLOCKED : EntitlementState.ACTIVE;
+  }
+ catch (  BlockingApiException e) {
+    log.warn("Failed to extract blocking state for subscription " + subscriptionBase.getId().toString());
+    return null;
+  }
+}

@@ -1,8 +1,13 @@
 {
-  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(accountId,callContext);
-  final DateTime requestedDate=fromLocalDateAndReferenceTime(localDate,subscriptionBase.getStartDate(),clock,context);
+  if (state == EntitlementState.CANCELLED) {
+    throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
+  }
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
+  final DateTime effectiveCancelDate=dateHelper.fromLocalDateAndReferenceTime(localCancelDate,subscriptionBase.getStartDate(),contextWithValidAccountRecordId);
   try {
-    return subscriptionBase.cancel(requestedDate,callContext);
+    subscriptionBase.cancel(null,callContext);
+    blockingStateDao.setBlockingState(new DefaultBlockingState(getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveCancelDate),clock,contextWithValidAccountRecordId);
+    return localCancelDate.compareTo(new LocalDate(clock.getUTCNow())) <= 0;
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);
