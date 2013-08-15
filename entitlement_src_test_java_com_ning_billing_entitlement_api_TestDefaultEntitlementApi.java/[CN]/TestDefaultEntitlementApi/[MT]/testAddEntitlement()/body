@@ -4,9 +4,9 @@
     clock.setDay(initialDate);
     final Account account=accountApi.createAccount(getAccountData(7),callContext);
     final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,null);
-    final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),callContext);
+    final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),initialDate,callContext);
     final PlanPhaseSpecifier spec1=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
-    final Entitlement telescopicEntitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,callContext);
+    final Entitlement telescopicEntitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,initialDate,callContext);
     assertEquals(telescopicEntitlement.getAccountId(),account.getId());
     assertEquals(telescopicEntitlement.getExternalKey(),account.getExternalKey());
     assertEquals(telescopicEntitlement.getEffectiveStartDate(),initialDate);

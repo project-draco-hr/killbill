@@ -7,13 +7,15 @@
       final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
       final Entitlement current=entitlementApi.getEntitlementForId(uuid,callContext);
       final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),inputDate,callContext);
+      final Entitlement newEntitlement;
       if (policyString == null) {
-        isImmediateOp=current.changePlan(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,ctx);
+        newEntitlement=current.changePlan(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,ctx);
       }
  else {
         final BillingActionPolicy policy=BillingActionPolicy.valueOf(policyString.toUpperCase());
-        isImmediateOp=current.changePlanOverrideBillingPolicy(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,policy,ctx);
+        newEntitlement=current.changePlanOverrideBillingPolicy(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,policy,ctx);
       }
+      isImmediateOp=newEntitlement.getProduct().getName().equals(entitlement.getProductName()) && newEntitlement.getPlan().getBillingPeriod() == BillingPeriod.valueOf(entitlement.getBillingPeriod()) && newEntitlement.getPriceList().getName().equals(entitlement.getPriceList());
       return Response.status(Status.OK).build();
     }
     @Override public boolean isImmOperation(){

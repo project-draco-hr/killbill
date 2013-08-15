@@ -1,0 +1,10 @@
+{
+  final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(context);
+  final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForKey(externalKey,internalContext);
+  final List<SubscriptionBundle> result=new ArrayList<SubscriptionBundle>(bundles.size());
+  for (  SubscriptionBaseBundle cur : bundles) {
+    final SubscriptionBundle bundle=getSubscriptionBundleForAccountIdAndExternalKey(cur.getAccountId(),cur.getExternalKey(),context);
+    result.add(bundle);
+  }
+  return result;
+}

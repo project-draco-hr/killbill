@@ -7,7 +7,7 @@
   try {
     subscriptionBase.cancel(null,callContext);
     blockingStateDao.setBlockingState(new DefaultBlockingState(getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveCancelDate),clock,contextWithValidAccountRecordId);
-    return localCancelDate.compareTo(new LocalDate(clock.getUTCNow())) <= 0;
+    return entitlementApi.getEntitlementForId(getId(),callContext);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

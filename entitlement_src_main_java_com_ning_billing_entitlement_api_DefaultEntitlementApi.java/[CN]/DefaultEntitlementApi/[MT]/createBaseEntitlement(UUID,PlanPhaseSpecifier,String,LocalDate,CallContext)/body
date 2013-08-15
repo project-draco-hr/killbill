@@ -3,8 +3,10 @@
   try {
     final Account account=accountApi.getAccountById(accountId,contextWithValidAccountRecordId);
     final SubscriptionBaseBundle bundle=subscriptionInternalApi.createBundleForAccount(accountId,externalKey,contextWithValidAccountRecordId);
-    final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(bundle.getId(),planPhaseSpecifier,clock.getUTCNow(),contextWithValidAccountRecordId);
-    return new DefaultEntitlement(dateHelper,subscription,accountId,bundle.getExternalKey(),EntitlementState.ACTIVE,null,account.getTimeZone(),internalCallContextFactory,blockingStateDao,clock,checker);
+    final DateTime referenceTime=clock.getUTCNow();
+    final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,referenceTime,contextWithValidAccountRecordId);
+    final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(bundle.getId(),planPhaseSpecifier,requestedDate,contextWithValidAccountRecordId);
+    return new DefaultEntitlement(dateHelper,subscription,accountId,bundle.getExternalKey(),EntitlementState.ACTIVE,null,account.getTimeZone(),this,internalCallContextFactory,blockingStateDao,clock,checker);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

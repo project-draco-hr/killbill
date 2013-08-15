@@ -14,9 +14,9 @@
     if (blocking.isBlockChange()) {
       throw new EntitlementApiException(new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,BlockingChecker.ACTION_CHANGE,BlockingChecker.TYPE_SUBSCRIPTION,baseSubscription.getId().toString()));
     }
-    final DateTime requestedDate=dateHelper.fromNowAndReferenceTime(baseSubscription.getStartDate(),contextWithValidAccountRecordId);
+    final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
     final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(baseSubscription.getBundleId(),planPhaseSpecifier,requestedDate,context);
-    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),getStateForEntitlement(subscription,currentBaseState,account.getTimeZone(),context),null,account.getTimeZone(),internalCallContextFactory,blockingStateDao,clock,checker);
+    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),getStateForEntitlement(subscription,currentBaseState,account.getTimeZone(),context),null,account.getTimeZone(),this,internalCallContextFactory,blockingStateDao,clock,checker);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

@@ -6,7 +6,8 @@
   final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(localDate,subscriptionBase.getStartDate(),context);
   try {
     checker.checkBlockedChange(subscriptionBase,context);
-    return subscriptionBase.changePlanWithPolicy(productName,billingPeriod,priceList,requestedDate,actionPolicy,callContext);
+    subscriptionBase.changePlanWithPolicy(productName,billingPeriod,priceList,requestedDate,actionPolicy,callContext);
+    return entitlementApi.getEntitlementForId(getId(),callContext);
   }
  catch (  BlockingApiException e) {
     throw new EntitlementApiException(e,e.getCode(),e.getMessage());
