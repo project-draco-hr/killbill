@@ -6,7 +6,7 @@
   if (subscription.getCategory() != ProductCategory.BASE) {
     throw new SubscriptionBaseApiException(ErrorCode.SUB_CHANGE_DRY_RUN_NOT_BP);
   }
-  final List<EntitlementStatusDryRun> result=new LinkedList<EntitlementStatusDryRun>();
+  final List<EntitlementAOStatusDryRun> result=new LinkedList<EntitlementAOStatusDryRun>();
   final List<SubscriptionBase> bundleSubscriptions=dao.getSubscriptions(subscription.getBundleId(),context);
   for (  final SubscriptionBase cur : bundleSubscriptions) {
     if (cur.getId().equals(subscriptionId)) {
@@ -25,7 +25,7 @@
  else {
       reason=DryRunChangeReason.AO_NOT_AVAILABLE_IN_NEW_PLAN;
     }
-    final EntitlementStatusDryRun status=new DefaultSubscriptionStatusDryRun(cur.getId(),cur.getCurrentPlan().getProduct().getName(),cur.getCurrentPhase().getPhaseType(),cur.getCurrentPlan().getBillingPeriod(),cur.getCurrentPriceList().getName(),reason);
+    final EntitlementAOStatusDryRun status=new DefaultSubscriptionStatusDryRun(cur.getId(),cur.getCurrentPlan().getProduct().getName(),cur.getCurrentPhase().getPhaseType(),cur.getCurrentPlan().getBillingPeriod(),cur.getCurrentPriceList().getName(),reason);
     result.add(status);
   }
   return result;

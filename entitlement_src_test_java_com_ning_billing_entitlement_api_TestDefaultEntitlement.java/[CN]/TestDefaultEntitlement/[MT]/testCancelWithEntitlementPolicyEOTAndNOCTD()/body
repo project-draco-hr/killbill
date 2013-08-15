@@ -5,7 +5,7 @@
     final Account account=accountApi.createAccount(getAccountData(7),callContext);
     final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
     final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),callContext);
-    final boolean isCancelled=entitlement.cancelEntitlementWithPolicy(EntitlementActionPolicy.EOT,callContext);
+    final boolean isCancelled=entitlement.cancelEntitlementWithPolicy(EntitlementActionPolicy.END_OF_TERM,callContext);
     assertTrue(isCancelled);
     final Entitlement entitlement2=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
     assertEquals(entitlement2.getState(),EntitlementState.CANCELLED);
