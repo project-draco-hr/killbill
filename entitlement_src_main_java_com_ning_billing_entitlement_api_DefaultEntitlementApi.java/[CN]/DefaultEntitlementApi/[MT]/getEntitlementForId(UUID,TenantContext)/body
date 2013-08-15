@@ -5,7 +5,7 @@
     final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleFromId(subscription.getBundleId(),context);
     final Account account=accountApi.getAccountById(bundle.getAccountId(),context);
     final BlockingState currentState=blockingStateDao.getBlockingStateForService(subscription.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,context);
-    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),getStateForEntitlement(subscription,currentState,context),currentState,account.getTimeZone(),internalCallContextFactory,blockingStateDao,clock,checker);
+    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),getStateForEntitlement(subscription,currentState,account.getTimeZone(),context),currentState,account.getTimeZone(),internalCallContextFactory,blockingStateDao,clock,checker);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

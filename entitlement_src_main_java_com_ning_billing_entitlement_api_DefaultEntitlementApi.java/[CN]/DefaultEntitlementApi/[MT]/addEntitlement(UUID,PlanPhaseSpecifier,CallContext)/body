@@ -5,7 +5,8 @@
     final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundleId,context);
     final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundle.getAccountId(),callContext);
     final BlockingState currentBaseState=blockingStateDao.getBlockingStateForService(baseSubscription.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,contextWithValidAccountRecordId);
-    final EntitlementState baseEntitlementState=getStateForEntitlement(baseSubscription,currentBaseState,contextWithValidAccountRecordId);
+    final Account account=accountApi.getAccountById(bundle.getAccountId(),context);
+    final EntitlementState baseEntitlementState=getStateForEntitlement(baseSubscription,currentBaseState,account.getTimeZone(),contextWithValidAccountRecordId);
     if (baseSubscription.getCategory() != ProductCategory.BASE || baseEntitlementState != EntitlementState.ACTIVE) {
       throw new EntitlementApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,baseSubscription.getBundleId());
     }
@@ -13,10 +14,9 @@
     if (blocking.isBlockChange()) {
       throw new EntitlementApiException(new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,BlockingChecker.ACTION_CHANGE,BlockingChecker.TYPE_SUBSCRIPTION,baseSubscription.getId().toString()));
     }
-    final Account account=accountApi.getAccountById(bundle.getAccountId(),context);
     final DateTime requestedDate=dateHelper.fromNowAndReferenceTime(baseSubscription.getStartDate(),contextWithValidAccountRecordId);
     final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(baseSubscription.getBundleId(),planPhaseSpecifier,requestedDate,context);
-    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),getStateForEntitlement(subscription,currentBaseState,context),null,account.getTimeZone(),internalCallContextFactory,blockingStateDao,clock,checker);
+    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),getStateForEntitlement(subscription,currentBaseState,account.getTimeZone(),context),null,account.getTimeZone(),internalCallContextFactory,blockingStateDao,clock,checker);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

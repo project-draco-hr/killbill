@@ -1,10 +1,7 @@
 {
   try {
     final Account account=accountApi.getAccountByRecordId(callContext.getAccountRecordId(),callContext);
-    final LocalDate localDateNowInAccountTimezone=new LocalDate(clock.getUTCNow(),account.getTimeZone());
-    final DateTime t1=localDateNowInAccountTimezone.toDateTime(referenceDateTime.toLocalTime(),account.getTimeZone());
-    final DateTime t2=new DateTime(t1,DateTimeZone.UTC);
-    return t2;
+    return fromNowAndReferenceTime(referenceDateTime,account.getTimeZone());
   }
  catch (  AccountApiException e) {
     throw new EntitlementApiException(e);
