@@ -1,3 +1,10 @@
 {
-  return null;
+  try {
+    final Entitlement entitlement=entitlementApi.getEntitlementForId(entitlementId,context);
+    final InternalTenantContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalTenantContext(entitlement.getAccountId(),context);
+    return fromEntitlement(entitlement,contextWithValidAccountRecordId);
+  }
+ catch (  EntitlementApiException e) {
+    throw new SubscriptionApiException(e);
+  }
 }

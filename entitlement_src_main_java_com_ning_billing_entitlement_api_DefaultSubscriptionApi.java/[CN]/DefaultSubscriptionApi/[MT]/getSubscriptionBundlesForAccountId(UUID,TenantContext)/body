@@ -1,3 +1,25 @@
 {
-  return null;
+  try {
+    final List<Entitlement> entitlements=entitlementApi.getAllEntitlementsForAccountId(accountId,context);
+    if (entitlements.isEmpty()) {
+      throw new SubscriptionApiException(ErrorCode.SUB_GET_INVALID_ACCOUNT_ID,accountId);
+    }
+    final ListMultimap<UUID,Entitlement> perBundleEntitlements=LinkedListMultimap.create();
+    for (    Entitlement cur : entitlements) {
+      perBundleEntitlements.put(cur.getBundleId(),cur);
+    }
+    final List<SubscriptionBundle> result=new ArrayList<SubscriptionBundle>(perBundleEntitlements.keySet().size());
+    for (    UUID bundleId : perBundleEntitlements.keySet()) {
+      final List<Entitlement> e=perBundleEntitlements.get(bundleId);
+      final SubscriptionBundle b=getSubscriptionBundleFromEntitlement(bundleId,e,context);
+      result.add(b);
+    }
+    return result;
+  }
+ catch (  EntitlementApiException e) {
+    throw new SubscriptionApiException(e);
+  }
+catch (  SubscriptionBaseApiException e) {
+    throw new SubscriptionApiException(e);
+  }
 }

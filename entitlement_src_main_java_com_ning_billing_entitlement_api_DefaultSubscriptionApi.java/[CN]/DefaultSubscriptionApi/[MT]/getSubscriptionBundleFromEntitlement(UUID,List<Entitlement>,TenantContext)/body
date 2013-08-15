@@ -1,0 +1,13 @@
+{
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(context);
+  final SubscriptionBaseBundle baseBundle=subscriptionInternalApi.getBundleFromId(bundleId,internalTenantContext);
+  final List<Subscription> subscriptions=new ArrayList<Subscription>();
+  subscriptions.addAll(Collections2.transform(entitlements,new Function<Entitlement,Subscription>(){
+    @Override public Subscription apply(    final Entitlement input){
+      return fromEntitlement(input,internalTenantContext);
+    }
+  }
+));
+  final DefaultSubscriptionBundle bundle=new DefaultSubscriptionBundle(bundleId,baseBundle.getAccountId(),baseBundle.getExternalKey(),subscriptions,null,baseBundle.getCreatedDate(),baseBundle.getUpdatedDate());
+  return bundle;
+}
