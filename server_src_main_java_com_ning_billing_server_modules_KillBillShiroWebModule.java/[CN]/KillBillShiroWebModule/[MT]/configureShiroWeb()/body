@@ -1,5 +1,9 @@
 {
   bindRealm().toProvider(IniRealmProvider.class).asEagerSingleton();
+  final boolean ldapEnabled=Boolean.parseBoolean(System.getProperty(KillBillShiroModule.KILLBILL_LDAP_PROPERTY,"false"));
+  if (ldapEnabled) {
+    bindRealm().to(KillBillJndiLdapRealm.class).asEagerSingleton();
+  }
   bind(CacheManager.class).toProvider(EhCacheManagerProvider.class).asEagerSingleton();
   final boolean rbacEnabled=Boolean.parseBoolean(System.getProperty(KILLBILL_RBAC_PROPERTY,"true"));
   if (rbacEnabled) {

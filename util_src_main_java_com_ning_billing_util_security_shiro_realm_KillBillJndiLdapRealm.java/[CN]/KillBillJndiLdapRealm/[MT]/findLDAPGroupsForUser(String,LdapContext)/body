@@ -1,0 +1,12 @@
+{
+  final NamingEnumeration<SearchResult> foundGroups=ldapCtx.search(searchBase,groupSearchFilter.replace(USERDN_SUBSTITUTION_TOKEN,userName),SUBTREE_SCOPE);
+  final Iterator<SearchResult> groupsIterator=Iterators.<SearchResult>forEnumeration(foundGroups);
+  final Iterator<String> groupsNameIterator=Iterators.<SearchResult,String>transform(groupsIterator,new Function<SearchResult,String>(){
+    @Override public String apply(    final SearchResult groupEntry){
+      return extractGroupNameFromSearchResult(groupEntry);
+    }
+  }
+);
+  final Iterator<String> finalGroupsNameIterator=Iterators.<String>filter(groupsNameIterator,Predicates.notNull());
+  return Sets.newHashSet(finalGroupsNameIterator);
+}

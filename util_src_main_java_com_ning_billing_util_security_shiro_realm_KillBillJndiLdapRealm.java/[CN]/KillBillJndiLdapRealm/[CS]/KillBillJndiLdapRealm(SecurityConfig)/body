@@ -1,0 +1,36 @@
+{
+  super();
+  if (securityConfig.getShiroLDAPUserDnTemplate() != null) {
+    setUserDnTemplate(securityConfig.getShiroLDAPUserDnTemplate());
+  }
+  final JndiLdapContextFactory contextFactory=(JndiLdapContextFactory)getContextFactory();
+  if (securityConfig.disableShiroLDAPSSLCheck()) {
+    contextFactory.getEnvironment().put("java.naming.ldap.factory.socket",SkipSSLCheckSocketFactory.class.getName());
+  }
+  if (securityConfig.getShiroLDAPUrl() != null) {
+    contextFactory.setUrl(securityConfig.getShiroLDAPUrl());
+  }
+  if (securityConfig.getShiroLDAPSystemUsername() != null) {
+    contextFactory.setSystemUsername(securityConfig.getShiroLDAPSystemUsername());
+  }
+  if (securityConfig.getShiroLDAPSystemPassword() != null) {
+    contextFactory.setSystemPassword(securityConfig.getShiroLDAPSystemPassword());
+  }
+  if (securityConfig.getShiroLDAPAuthenticationMechanism() != null) {
+    contextFactory.setAuthenticationMechanism(securityConfig.getShiroLDAPAuthenticationMechanism());
+  }
+  setContextFactory(contextFactory);
+  searchBase=securityConfig.getShiroLDAPSearchBase();
+  groupSearchFilter=securityConfig.getShiroLDAPGroupSearchFilter();
+  groupNameId=securityConfig.getShiroLDAPGroupNameID();
+  if (securityConfig.getShiroLDAPPermissionsByGroup() != null) {
+    final Ini ini=new Ini();
+    ini.load(securityConfig.getShiroLDAPPermissionsByGroup());
+    for (    final Section section : ini.getSections()) {
+      for (      final String role : section.keySet()) {
+        final Collection<String> permissions=ImmutableList.<String>copyOf(SPLITTER.split(section.get(role)));
+        permissionsByGroup.put(role,permissions);
+      }
+    }
+  }
+}

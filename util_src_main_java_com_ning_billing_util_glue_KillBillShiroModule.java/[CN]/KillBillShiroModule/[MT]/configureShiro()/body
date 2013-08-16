@@ -1,3 +1,7 @@
 {
   bindRealm().toProvider(IniRealmProvider.class).asEagerSingleton();
+  final boolean ldapEnabled=Boolean.parseBoolean(System.getProperty(KILLBILL_LDAP_PROPERTY,"false"));
+  if (ldapEnabled) {
+    bindRealm().to(KillBillJndiLdapRealm.class).asEagerSingleton();
+  }
 }
