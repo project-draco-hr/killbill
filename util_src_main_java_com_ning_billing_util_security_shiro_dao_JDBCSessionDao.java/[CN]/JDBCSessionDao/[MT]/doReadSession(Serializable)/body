@@ -1,0 +1,13 @@
+{
+  final SessionModelDao sessionModelDao=jdbcSessionSqlDao.read(sessionId);
+  if (sessionModelDao == null) {
+    return null;
+  }
+  try {
+    return sessionModelDao.toSimpleSession();
+  }
+ catch (  IOException e) {
+    log.warn("Corrupted cookie",e);
+    return null;
+  }
+}

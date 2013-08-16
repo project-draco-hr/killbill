@@ -1,0 +1,8 @@
+{
+  bindRealm().toProvider(IniRealmProvider.class).asEagerSingleton();
+  bind(CacheManager.class).toProvider(EhCacheManagerProvider.class).asEagerSingleton();
+  final boolean rbacEnabled=Boolean.parseBoolean(System.getProperty(KILLBILL_RBAC_PROPERTY,"true"));
+  if (rbacEnabled) {
+    addFilterChain(JaxrsResource.PREFIX + "/**",AUTHC_BASIC);
+  }
+}

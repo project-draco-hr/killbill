@@ -1,0 +1,11 @@
+{
+  final Serializable sessionId=jdbcSessionSqlDao.inTransaction(new Transaction<Long,JDBCSessionSqlDao>(){
+    @Override public Long inTransaction(    final JDBCSessionSqlDao transactional,    final TransactionStatus status) throws Exception {
+      transactional.create(new SessionModelDao(session));
+      return transactional.getLastInsertId();
+    }
+  }
+);
+  assignSessionId(session,sessionId);
+  return sessionId;
+}

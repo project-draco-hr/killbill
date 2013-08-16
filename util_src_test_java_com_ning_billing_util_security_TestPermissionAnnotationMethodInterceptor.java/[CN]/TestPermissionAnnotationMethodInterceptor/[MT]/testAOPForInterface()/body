@@ -7,9 +7,11 @@
     Assert.fail(e.getLocalizedMessage());
   }
   configureShiro();
-  final Injector injector=Guice.createInjector(Stage.PRODUCTION,new SecurityModule(),new Module(){
-    @Override public void configure(    final Binder binder){
-      binder.bind(IAopTester.class).to(AopTesterImpl.class).asEagerSingleton();
+  CacheManager.getInstance().shutdown();
+  final Injector injector=Guice.createInjector(Stage.PRODUCTION,new KillBillShiroModule(),new KillBillShiroAopModule(),new SecurityModule(),new AbstractModule(){
+    @Override public void configure(){
+      bind(IDBI.class).toInstance(Mockito.mock(IDBI.class));
+      bind(IAopTester.class).to(AopTesterImpl.class).asEagerSingleton();
     }
   }
 );
