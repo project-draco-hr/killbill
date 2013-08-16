@@ -2,12 +2,12 @@
   return (DefaultEntitlement)doCallAndCheckForCompletion(new Function<Void,Entitlement>(){
     @Override public Entitlement apply(    @Nullable final Void dontcare){
       try {
-        final Entitlement refreshedEntitlement=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
+        Entitlement refreshedEntitlement=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
         if (billingPolicy == null) {
-          refreshedEntitlement.changePlan(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),callContext);
+          refreshedEntitlement=refreshedEntitlement.changePlan(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),callContext);
         }
  else {
-          refreshedEntitlement.changePlanOverrideBillingPolicy(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),billingPolicy,callContext);
+          refreshedEntitlement=refreshedEntitlement.changePlanOverrideBillingPolicy(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),billingPolicy,callContext);
         }
         return refreshedEntitlement;
       }
