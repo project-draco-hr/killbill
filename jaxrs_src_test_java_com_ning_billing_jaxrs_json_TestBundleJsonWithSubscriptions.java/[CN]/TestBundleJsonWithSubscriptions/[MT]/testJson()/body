@@ -4,8 +4,8 @@
   final String externalKey=UUID.randomUUID().toString();
   final List<AuditLogJson> auditLogs=createAuditLogsJson(clock.getUTCNow());
   SubscriptionReadEventJson event=new SubscriptionReadEventJson(someUUID,BillingPeriod.NO_BILLING_PERIOD.toString(),new LocalDate(),new LocalDate(),"product","priceList","eventType","phase",null);
-  final EntitlementJsonWithEvents subscription=new EntitlementJsonWithEvents(someUUID,someUUID,someUUID,externalKey,ImmutableList.<SubscriptionReadEventJson>of(event),null,null,auditLogs);
-  final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=new BundleJsonWithSubscriptions(bundleId.toString(),externalKey,ImmutableList.<EntitlementJsonWithEvents>of(subscription),auditLogs);
+  final SubscriptionJsonWithEvents subscription=new SubscriptionJsonWithEvents(someUUID,someUUID,someUUID,externalKey,ImmutableList.<SubscriptionReadEventJson>of(event),null,null,auditLogs);
+  final BundleJsonWithSubscriptions bundleJsonWithSubscriptions=new BundleJsonWithSubscriptions(bundleId.toString(),externalKey,ImmutableList.<SubscriptionJsonWithEvents>of(subscription),auditLogs);
   Assert.assertEquals(bundleJsonWithSubscriptions.getBundleId(),bundleId.toString());
   Assert.assertEquals(bundleJsonWithSubscriptions.getExternalKey(),externalKey);
   Assert.assertEquals(bundleJsonWithSubscriptions.getSubscriptions().size(),1);
