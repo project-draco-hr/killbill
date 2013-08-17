@@ -34,14 +34,8 @@
 );
   for (  BlockingState bs : allBlockingStates) {
     final LocalDate bsEffectiveDate=new LocalDate(bs.getEffectiveDate(),accountTimeZone);
-    final Map<UUID,Boolean> isBlockedBillingMap=new HashMap<UUID,Boolean>();
-    final Map<UUID,Boolean> isBlockedEntitlementMap=new HashMap<UUID,Boolean>();
-    for (    UUID uuid : allEntitlementUUIDs) {
-      isBlockedBillingMap.put(uuid,Boolean.TRUE);
-      isBlockedEntitlementMap.put(uuid,Boolean.TRUE);
-    }
     final List<SubscriptionEvent> newEvents=new ArrayList<SubscriptionEvent>();
-    int index=insertFromBlockingEvent(accountTimeZone,allEntitlementUUIDs,result,bs,bsEffectiveDate,isBlockedBillingMap,isBlockedEntitlementMap,newEvents);
+    int index=insertFromBlockingEvent(accountTimeZone,allEntitlementUUIDs,result,bs,bsEffectiveDate,newEvents);
     result.addAll(index,newEvents);
   }
   return result;
