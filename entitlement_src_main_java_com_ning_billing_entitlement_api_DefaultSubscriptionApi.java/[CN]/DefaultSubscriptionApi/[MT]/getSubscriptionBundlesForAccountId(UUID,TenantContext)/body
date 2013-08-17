@@ -11,7 +11,7 @@
     final List<SubscriptionBundle> result=new ArrayList<SubscriptionBundle>(perBundleEntitlements.keySet().size());
     for (    UUID bundleId : perBundleEntitlements.keySet()) {
       final List<Entitlement> e=perBundleEntitlements.get(bundleId);
-      final SubscriptionBundle b=getSubscriptionBundleFromEntitlement(bundleId,e,context);
+      final SubscriptionBundle b=getSubscriptionBundleFromEntitlements(bundleId,e,context);
       result.add(b);
     }
     return result;
@@ -20,6 +20,9 @@
     throw new SubscriptionApiException(e);
   }
 catch (  SubscriptionBaseApiException e) {
+    throw new SubscriptionApiException(e);
+  }
+catch (  AccountApiException e) {
     throw new SubscriptionApiException(e);
   }
 }

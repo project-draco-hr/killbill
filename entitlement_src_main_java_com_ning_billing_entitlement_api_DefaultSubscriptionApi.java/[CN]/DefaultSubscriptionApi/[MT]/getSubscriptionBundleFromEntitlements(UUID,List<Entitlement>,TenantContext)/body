@@ -1,0 +1,22 @@
+{
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(context);
+  final SubscriptionBaseBundle baseBundle=subscriptionInternalApi.getBundleFromId(bundleId,internalTenantContext);
+  final List<Subscription> subscriptions=new ArrayList<Subscription>();
+  subscriptions.addAll(Collections2.transform(entitlements,new Function<Entitlement,Subscription>(){
+    @Override public Subscription apply(    final Entitlement input){
+      return fromEntitlement(input,internalTenantContext);
+    }
+  }
+));
+  final Account account=accountApi.getAccountById(baseBundle.getAccountId(),internalTenantContext);
+  final DateTimeZone accountTimeZone=account.getTimeZone();
+  final List<BlockingState> allBlockingStates=new ArrayList<BlockingState>();
+  allBlockingStates.addAll(blockingStateDao.getBlockingAll(account.getId(),internalTenantContext));
+  allBlockingStates.addAll(blockingStateDao.getBlockingAll(bundleId,internalTenantContext));
+  for (  Entitlement cur : entitlements) {
+    allBlockingStates.addAll(blockingStateDao.getBlockingAll(cur.getId(),internalTenantContext));
+  }
+  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,account.getId(),bundleId,baseBundle.getExternalKey(),entitlements,allBlockingStates);
+  final DefaultSubscriptionBundle bundle=new DefaultSubscriptionBundle(bundleId,baseBundle.getAccountId(),baseBundle.getExternalKey(),subscriptions,timeline,baseBundle.getCreatedDate(),baseBundle.getUpdatedDate());
+  return bundle;
+}

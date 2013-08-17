@@ -4,12 +4,15 @@
     if (entitlements.isEmpty()) {
       throw new SubscriptionApiException(ErrorCode.SUB_GET_INVALID_BUNDLE_KEY,externalKey);
     }
-    return getSubscriptionBundleFromEntitlement(entitlements.get(0).getBundleId(),entitlements,context);
+    return getSubscriptionBundleFromEntitlements(entitlements.get(0).getBundleId(),entitlements,context);
   }
  catch (  EntitlementApiException e) {
     throw new SubscriptionApiException(e);
   }
 catch (  SubscriptionBaseApiException e) {
+    throw new SubscriptionApiException(e);
+  }
+catch (  AccountApiException e) {
     throw new SubscriptionApiException(e);
   }
 }

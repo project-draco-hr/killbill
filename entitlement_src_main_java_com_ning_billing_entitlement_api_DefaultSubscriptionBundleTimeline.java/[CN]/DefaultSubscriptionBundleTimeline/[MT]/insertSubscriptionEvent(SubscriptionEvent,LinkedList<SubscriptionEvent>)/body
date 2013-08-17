@@ -1,0 +1,30 @@
+{
+  int index=0;
+  for (  SubscriptionEvent cur : result) {
+    int compEffectiveDate=event.getEffectiveDate().compareTo(cur.getEffectiveDate());
+    if (compEffectiveDate < 0) {
+      break;
+    }
+ else     if (compEffectiveDate == 0) {
+      int compCreatedDate=((DefaultSubscriptionEvent)event).getCreatedDate().compareTo(((DefaultSubscriptionEvent)cur).getCreatedDate());
+      if (compCreatedDate < 0) {
+        break;
+      }
+ else       if (compCreatedDate == 0) {
+        int compUUID=event.getId().compareTo(cur.getId());
+        if (compUUID < 0) {
+          break;
+        }
+ else         if (compUUID == 0) {
+          if (event.getSubscriptionEventType().ordinal() < cur.getSubscriptionEventType().ordinal()) {
+            break;
+          }
+ else {
+            index++;
+          }
+        }
+      }
+    }
+  }
+  result.add(index,event);
+}

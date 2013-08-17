@@ -1,0 +1,48 @@
+{
+  final Set<UUID> allEntitlementUUIDs=new TreeSet(Collections2.transform(entitlements,new Function<Entitlement,UUID>(){
+    @Override public UUID apply(    final Entitlement input){
+      return input.getId();
+    }
+  }
+));
+  final LinkedList<SubscriptionEvent> result=computeSubscriptionBaseEvents(entitlements,accountTimeZone);
+  Collections.sort(allBlockingStates,new Comparator<BlockingState>(){
+    @Override public int compare(    final BlockingState o1,    final BlockingState o2){
+      final int effectivedComp=o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
+      if (effectivedComp != 0) {
+        return effectivedComp;
+      }
+      final int createdDateComp=o1.getCreatedDate().compareTo(o2.getCreatedDate());
+      if (createdDateComp != 0) {
+        return createdDateComp;
+      }
+      final int uuidComp=o1.getId().compareTo(o2.getId());
+      if (uuidComp != 0) {
+        return uuidComp;
+      }
+      final int serviceNameComp=o1.getService().compareTo(o2.getService());
+      if (serviceNameComp != 0) {
+        return serviceNameComp;
+      }
+      final int serviceStateComp=o1.getStateName().compareTo(o2.getStateName());
+      if (serviceStateComp != 0) {
+        return serviceStateComp;
+      }
+      return 0;
+    }
+  }
+);
+  for (  BlockingState bs : allBlockingStates) {
+    final LocalDate bsEffectiveDate=new LocalDate(bs.getEffectiveDate(),accountTimeZone);
+    final Map<UUID,Boolean> isBlockedBillingMap=new HashMap<UUID,Boolean>();
+    final Map<UUID,Boolean> isBlockedEntitlementMap=new HashMap<UUID,Boolean>();
+    for (    UUID uuid : allEntitlementUUIDs) {
+      isBlockedBillingMap.put(uuid,Boolean.TRUE);
+      isBlockedEntitlementMap.put(uuid,Boolean.TRUE);
+    }
+    final List<SubscriptionEvent> newEvents=new ArrayList<SubscriptionEvent>();
+    int index=insertFromBlockingEvent(accountTimeZone,allEntitlementUUIDs,result,bs,bsEffectiveDate,isBlockedBillingMap,isBlockedEntitlementMap,newEvents);
+    result.addAll(index,newEvents);
+  }
+  return result;
+}
