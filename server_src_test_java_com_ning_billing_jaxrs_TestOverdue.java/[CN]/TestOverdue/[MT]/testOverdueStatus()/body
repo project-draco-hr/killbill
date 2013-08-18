@@ -3,21 +3,21 @@
   final List<InvoiceJsonWithItems> invoices=getInvoicesWithItemsForAccount(accountJson.getAccountId());
   assertEquals(invoices.size(),2);
   final String bundleId=invoices.get(1).getItems().get(0).getBundleId();
-  Assert.assertTrue(getOverdueStateForBundle(bundleId).isClearState());
+  Assert.assertTrue(getOverdueStateForAccount(accountJson.getAccountId()).isClearState());
   clock.addDays(30);
   crappyWaitForLackOfProperSynchonization();
-  Assert.assertEquals(getOverdueStateForBundle(bundleId).getName(),"OD1");
+  Assert.assertEquals(getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD1");
   clock.addDays(10);
   crappyWaitForLackOfProperSynchonization();
-  Assert.assertEquals(getOverdueStateForBundle(bundleId).getName(),"OD2");
+  Assert.assertEquals(getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD2");
   clock.addDays(10);
   crappyWaitForLackOfProperSynchonization();
-  Assert.assertEquals(getOverdueStateForBundle(bundleId).getName(),"OD3");
+  Assert.assertEquals(getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD3");
   for (  final InvoiceJsonSimple invoice : getInvoicesForAccount(accountJson.getAccountId())) {
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
       createExternalPayment(accountJson,invoice.getInvoiceId(),invoice.getBalance());
     }
   }
   crappyWaitForLackOfProperSynchonization();
-  Assert.assertTrue(getOverdueStateForBundle(bundleId).isClearState());
+  Assert.assertTrue(getOverdueStateForAccount(accountJson.getAccountId()).isClearState());
 }

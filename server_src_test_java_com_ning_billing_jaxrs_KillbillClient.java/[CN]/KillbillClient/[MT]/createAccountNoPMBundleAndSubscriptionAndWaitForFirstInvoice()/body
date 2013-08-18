@@ -1,9 +1,7 @@
 {
   final AccountJson accountJson=createAccount();
   assertNotNull(accountJson);
-  final BundleJsonNoSubscriptions bundleJson=createBundle(accountJson.getAccountId(),UUID.randomUUID().toString());
-  assertNotNull(bundleJson);
-  final EntitlementJsonNoEvents subscriptionJson=createSubscription(bundleJson.getBundleId(),"Shotgun",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),true);
+  final EntitlementJsonNoEvents subscriptionJson=createEntitlement(accountJson.getAccountId(),UUID.randomUUID().toString(),"Shotgun",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),true);
   assertNotNull(subscriptionJson);
   clock.addMonths(1);
   crappyWaitForLackOfProperSynchonization();

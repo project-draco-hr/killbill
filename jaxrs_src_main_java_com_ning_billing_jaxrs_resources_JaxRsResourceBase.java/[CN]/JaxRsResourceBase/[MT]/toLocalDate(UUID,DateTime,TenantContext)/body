@@ -7,13 +7,13 @@
     log.info("Failed to retrieve account for id " + accountId);
   }
   if (account == null && inputDate == null) {
-    return new LocalDate();
+    return new LocalDate(clock.getUTCNow());
   }
  else   if (account == null && inputDate != null) {
     return new LocalDate(inputDate);
   }
  else   if (account != null && inputDate == null) {
-    return new LocalDate(account.getTimeZone());
+    return new LocalDate(clock.getUTCNow(),account.getTimeZone());
   }
  else {
     return new LocalDate(inputDate,account.getTimeZone());
