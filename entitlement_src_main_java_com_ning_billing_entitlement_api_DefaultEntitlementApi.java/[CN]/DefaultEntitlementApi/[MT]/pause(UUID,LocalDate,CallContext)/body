@@ -5,11 +5,27 @@
     if (currentState != null && currentState.getStateName().equals(ENT_STATE_BLOCKED)) {
       throw new EntitlementApiException(ErrorCode.ENT_ALREADY_BLOCKED,bundleId);
     }
+    final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleFromId(bundleId,contextWithValidAccountRecordId);
+    final Account account=accountApi.getAccountById(bundle.getAccountId(),contextWithValidAccountRecordId);
     final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundleId,contextWithValidAccountRecordId);
     final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(localEffectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
-    blockingStateDao.setBlockingState(new DefaultBlockingState(bundleId,BlockingStateType.BUNDLE,ENT_STATE_BLOCKED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,true,effectiveDate),clock,contextWithValidAccountRecordId);
+    if (!dateHelper.isBeforeOrEqualsToday(effectiveDate,account.getTimeZone())) {
+      throw new UnsupportedOperationException("Pausing with a future date has not been implemented yet");
+    }
+    final DefaultBlockingState state=new DefaultBlockingState(bundleId,BlockingStateType.BUNDLE,ENT_STATE_BLOCKED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,true,effectiveDate);
+    blockingStateDao.setBlockingState(state,clock,contextWithValidAccountRecordId);
+    final DefaultEffectiveEntitlementEvent event=new DefaultEffectiveEntitlementEvent(state.getId(),baseSubscription.getId(),bundleId,bundle.getAccountId(),EntitlementTransitionType.BLOCK_BUNDLE,effectiveDate,clock.getUTCNow(),contextWithValidAccountRecordId.getAccountRecordId(),contextWithValidAccountRecordId.getTenantRecordId(),contextWithValidAccountRecordId.getUserToken());
+    try {
+      eventBus.post(event);
+    }
+ catch (    EventBusException e) {
+      log.warn("Failed to post bus event for pause operation on bundle " + bundleId);
+    }
   }
  catch (  SubscriptionBaseApiException e) {
+    throw new EntitlementApiException(e);
+  }
+catch (  AccountApiException e) {
     throw new EntitlementApiException(e);
   }
 }
