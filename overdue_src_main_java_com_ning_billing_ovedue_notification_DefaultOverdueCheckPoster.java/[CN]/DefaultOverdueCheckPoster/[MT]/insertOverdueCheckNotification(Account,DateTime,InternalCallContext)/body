@@ -5,7 +5,7 @@
     transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
       @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
         boolean shouldInsertNewNotification=true;
-        final Collection<NotificationEventWithMetadata<OverdueCheckNotificationKey>> futureNotifications=getFutureNotificationsForAccountAndOverdueableInTransaction(entitySqlDaoWrapperFactory,checkOverdueQueue,overdueable,context);
+        final Collection<NotificationEventWithMetadata<OverdueCheckNotificationKey>> futureNotifications=getFutureNotificationsForAccountAndOverdueableInTransaction(entitySqlDaoWrapperFactory,checkOverdueQueue,account,context);
         if (futureNotifications.size() > 0) {
           final DateTime earliestExistingNotificationDate=futureNotifications.iterator().next().getEffectiveDate();
           final int minIndexToDeleteFrom;
@@ -27,12 +27,12 @@
           }
         }
         if (shouldInsertNewNotification) {
-          log.debug("Queuing overdue check notification. Overdueable id: {}, timestamp: {}",overdueable.getId().toString(),futureNotificationTime.toString());
-          final OverdueCheckNotificationKey notificationKey=new OverdueCheckNotificationKey(overdueable.getId());
+          log.debug("Queuing overdue check notification. Account id: {}, timestamp: {}",account.getId().toString(),futureNotificationTime.toString());
+          final OverdueCheckNotificationKey notificationKey=new OverdueCheckNotificationKey(account.getId());
           checkOverdueQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),futureNotificationTime,notificationKey,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
         }
  else {
-          log.debug("Skipping queuing overdue check notification. Overdueable id: {}, timestamp: {}",overdueable.getId().toString(),futureNotificationTime.toString());
+          log.debug("Skipping queuing overdue check notification. Account id: {}, timestamp: {}",account.getId().toString(),futureNotificationTime.toString());
         }
         return null;
       }
