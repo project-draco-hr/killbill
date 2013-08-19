@@ -1,5 +1,8 @@
 {
   super.configureInterceptors(resolver);
+  if (!KillBillShiroModule.isRBACEnabled()) {
+    return;
+  }
   final PermissionAnnotationHandler permissionAnnotationHandler=new PermissionAnnotationHandler();
   requestInjection(permissionAnnotationHandler);
   final PermissionAnnotationMethodInterceptor methodInterceptor=new PermissionAnnotationMethodInterceptor(permissionAnnotationHandler,resolver);
