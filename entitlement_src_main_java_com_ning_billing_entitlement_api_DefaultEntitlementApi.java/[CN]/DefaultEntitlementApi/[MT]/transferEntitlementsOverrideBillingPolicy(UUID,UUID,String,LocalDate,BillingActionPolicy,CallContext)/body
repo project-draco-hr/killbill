@@ -1,3 +1,28 @@
 {
-  return null;
+  final boolean cancelImm;
+switch (billingPolicy) {
+case IMMEDIATE:
+    cancelImm=true;
+  break;
+case END_OF_TERM:
+cancelImm=false;
+break;
+default :
+throw new RuntimeException("Unexpected billing policy " + billingPolicy);
+}
+final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(sourceAccountId,context);
+try {
+final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleForAccountAndKey(sourceAccountId,externalKey,contextWithValidAccountRecordId);
+final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundle.getId(),contextWithValidAccountRecordId);
+final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
+final SubscriptionBaseBundle newBundle=subscriptionTransferApi.transferBundle(sourceAccountId,destAccountId,externalKey,requestedDate,true,cancelImm,context);
+blockingStateDao.setBlockingState(new DefaultBlockingState(bundle.getId(),BlockingStateType.BUNDLE,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,requestedDate),clock,contextWithValidAccountRecordId);
+return newBundle.getId();
+}
+ catch (SubscriptionBaseTransferApiException e) {
+throw new EntitlementApiException(e);
+}
+catch (SubscriptionBaseApiException e) {
+throw new EntitlementApiException(e);
+}
 }

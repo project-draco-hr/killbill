@@ -5,8 +5,9 @@
     final EntitlementApi thisEntitlementApi=this;
     return ImmutableList.<Entitlement>copyOf(Collections2.transform(subscriptions,new Function<SubscriptionBase,Entitlement>(){
       @Nullable @Override public Entitlement apply(      @Nullable final SubscriptionBase input){
-        final BlockingState currentState=blockingStateDao.getBlockingStateForService(input.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,context);
-        return new DefaultEntitlement(dateHelper,input,accountId,externalKey,getStateForEntitlement(input,currentState,account.getTimeZone(),context),currentState,account.getTimeZone(),thisEntitlementApi,internalCallContextFactory,blockingStateDao,clock,checker);
+        final LocalDate effectiveEndDate=getEffectiveEndDate(accountId,input,account.getTimeZone(),context);
+        final EntitlementState entitlementState=getStateForEntitlement(effectiveEndDate,input,account.getTimeZone(),context);
+        return new DefaultEntitlement(dateHelper,input,accountId,externalKey,entitlementState,effectiveEndDate,account.getTimeZone(),thisEntitlementApi,internalCallContextFactory,blockingStateDao,clock,checker);
       }
     }
 ));

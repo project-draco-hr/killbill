@@ -6,7 +6,8 @@
     final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundle.getAccountId(),callContext);
     final BlockingState currentBaseState=blockingStateDao.getBlockingStateForService(baseSubscription.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,contextWithValidAccountRecordId);
     final Account account=accountApi.getAccountById(bundle.getAccountId(),context);
-    final EntitlementState baseEntitlementState=getStateForEntitlement(baseSubscription,currentBaseState,account.getTimeZone(),contextWithValidAccountRecordId);
+    final LocalDate baseEntitlementEffectiveEndDate=getEffectiveEndDate(bundle.getAccountId(),baseSubscription,account.getTimeZone(),contextWithValidAccountRecordId);
+    final EntitlementState baseEntitlementState=getStateForEntitlement(baseEntitlementEffectiveEndDate,baseSubscription,account.getTimeZone(),contextWithValidAccountRecordId);
     if (baseSubscription.getCategory() != ProductCategory.BASE || baseEntitlementState != EntitlementState.ACTIVE) {
       throw new EntitlementApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,baseSubscription.getBundleId());
     }
@@ -16,7 +17,7 @@
     }
     final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
     final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(baseSubscription.getBundleId(),planPhaseSpecifier,requestedDate,context);
-    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),getStateForEntitlement(subscription,currentBaseState,account.getTimeZone(),context),null,account.getTimeZone(),this,internalCallContextFactory,blockingStateDao,clock,checker);
+    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),baseEntitlementState,null,account.getTimeZone(),this,internalCallContextFactory,blockingStateDao,clock,checker);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);
