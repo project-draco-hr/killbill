@@ -1,0 +1,10 @@
+{
+  final Invoice invoice=invoiceApi.getInvoiceByNumber(invoiceNumber,context.createContext(request));
+  if (invoice == null) {
+    throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceNumber);
+  }
+ else {
+    final InvoiceJsonSimple json=withItems ? new InvoiceJsonWithItems(invoice) : new InvoiceJsonSimple(invoice);
+    return Response.status(Status.OK).entity(json).build();
+  }
+}

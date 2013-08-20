@@ -1,0 +1,9 @@
+{
+  bindInterceptor(Matchers.any(),new AbstractMatcher<Method>(){
+    public boolean matches(    final Method method){
+      final Class<? extends Annotation> annotation=methodInterceptor.getHandler().getAnnotationClass();
+      return resolver.getAnnotationFromMethod(method,annotation) != null;
+    }
+  }
+,new AopAllianceMethodInterceptorAdapter(methodInterceptor));
+}

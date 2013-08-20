@@ -1,0 +1,20 @@
+{
+  if (!(annotation instanceof RequiresPermissions)) {
+    return;
+  }
+  final RequiresPermissions requiresPermissions=(RequiresPermissions)annotation;
+  try {
+    securityApi.checkCurrentUserPermissions(ImmutableList.<Permission>copyOf(requiresPermissions.value()),requiresPermissions.logical(),context);
+  }
+ catch (  SecurityApiException e) {
+    if (e.getCause() != null && e.getCause() instanceof AuthorizationException) {
+      throw (AuthorizationException)e.getCause();
+    }
+ else     if (e.getCause() != null) {
+      throw new AuthorizationException(e.getCause());
+    }
+ else {
+      throw new AuthorizationException(e);
+    }
+  }
+}

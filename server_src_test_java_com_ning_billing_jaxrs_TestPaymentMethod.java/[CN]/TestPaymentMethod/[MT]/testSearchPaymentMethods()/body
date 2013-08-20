@@ -1,0 +1,14 @@
+{
+  Assert.assertEquals(searchPaymentMethodsByKey(UUID.randomUUID().toString()).size(),0);
+  Assert.assertEquals(searchPaymentMethodsByKeyAndPlugin(UUID.randomUUID().toString(),PLUGIN_NAME).size(),0);
+  final AccountJson accountJson=createAccountWithDefaultPaymentMethod();
+  final PaymentMethodJson paymentMethodJson=getPaymentMethodWithPluginInfo(accountJson.getPaymentMethodId());
+  Assert.assertEquals(searchPaymentMethodsByKey(UUID.randomUUID().toString()).size(),0);
+  Assert.assertEquals(searchPaymentMethodsByKeyAndPlugin(UUID.randomUUID().toString(),PLUGIN_NAME).size(),0);
+  doSearch("Foo",paymentMethodJson);
+  doSearch("4365",paymentMethodJson);
+  doSearch("Bozo",paymentMethodJson);
+  doSearch("SF",paymentMethodJson);
+  doSearch("CA",paymentMethodJson);
+  doSearch("Zimbawe",paymentMethodJson);
+}

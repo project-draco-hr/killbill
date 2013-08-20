@@ -4,6 +4,10 @@
     builder.addHeader(JaxrsResource.HDR_REASON,reason);
     builder.addHeader(JaxrsResource.HDR_COMMENT,comment);
   }
+  if (username != null && password != null) {
+    final Realm realm=new Realm.RealmBuilder().setPrincipal(username).setPassword(password).setUsePreemptiveAuth(true).setScheme(AuthScheme.BASIC).build();
+    builder.setRealm(realm);
+  }
   Response response=null;
   try {
     final ListenableFuture<Response> futureStatus=builder.execute(new AsyncCompletionHandler<Response>(){

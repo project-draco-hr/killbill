@@ -1,0 +1,19 @@
+{
+  final SimpleSession simpleSession=new SimpleSession();
+  simpleSession.setStartTimestamp(new Date(System.currentTimeMillis() - 5000));
+  simpleSession.setLastAccessTime(new Date(System.currentTimeMillis()));
+  simpleSession.setTimeout(493934L);
+  simpleSession.setHost(UUID.randomUUID().toString());
+  simpleSession.setAttribute(UUID.randomUUID(),Short.MIN_VALUE);
+  simpleSession.setAttribute(UUID.randomUUID(),Integer.MIN_VALUE);
+  simpleSession.setAttribute(UUID.randomUUID(),Long.MIN_VALUE);
+  simpleSession.setAttribute(UUID.randomUUID().toString(),UUID.randomUUID().toString());
+  simpleSession.setAttribute(UUID.randomUUID().toString(),UUID.randomUUID());
+  simpleSession.setAttribute(UUID.randomUUID().toString(),new Date(1242));
+  final SessionModelDao sessionModelDao=new SessionModelDao(simpleSession);
+  Assert.assertEquals(sessionModelDao.getTimeout(),simpleSession.getTimeout());
+  Assert.assertEquals(sessionModelDao.getHost(),simpleSession.getHost());
+  Assert.assertTrue(sessionModelDao.getSessionData().length > 0);
+  final Session retrievedSession=sessionModelDao.toSimpleSession();
+  Assert.assertEquals(retrievedSession,simpleSession);
+}

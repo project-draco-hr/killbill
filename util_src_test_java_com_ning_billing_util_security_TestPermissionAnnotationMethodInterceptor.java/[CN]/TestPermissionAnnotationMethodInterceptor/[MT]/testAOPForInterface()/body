@@ -1,0 +1,20 @@
+{
+  final IAopTester simpleTester=new AopTesterImpl();
+  try {
+    simpleTester.createRefund();
+  }
+ catch (  Exception e) {
+    Assert.fail(e.getLocalizedMessage());
+  }
+  configureShiro();
+  CacheManager.getInstance().shutdown();
+  final Injector injector=Guice.createInjector(Stage.PRODUCTION,new KillBillShiroModule(),new KillBillShiroAopModule(),new SecurityModule(),new AbstractModule(){
+    @Override public void configure(){
+      bind(IDBI.class).toInstance(Mockito.mock(IDBI.class));
+      bind(IAopTester.class).to(AopTesterImpl.class).asEagerSingleton();
+    }
+  }
+);
+  final IAopTester aopedTester=injector.getInstance(IAopTester.class);
+  verifyAopedTester(aopedTester);
+}

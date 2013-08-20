@@ -1,0 +1,10 @@
+{
+  bindRealm().toProvider(IniRealmProvider.class).asEagerSingleton();
+  if (KillBillShiroModule.isLDAPEnabled()) {
+    bindRealm().to(KillBillJndiLdapRealm.class).asEagerSingleton();
+  }
+  bind(CacheManager.class).toProvider(EhCacheManagerProvider.class).asEagerSingleton();
+  if (KillBillShiroModule.isRBACEnabled()) {
+    addFilterChain(JaxrsResource.PREFIX + "/**",AUTHC_BASIC);
+  }
+}
