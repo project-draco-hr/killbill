@@ -7,7 +7,6 @@
     return blocking != null && blocking.isBlockEntitlement() ? EntitlementState.BLOCKED : EntitlementState.ACTIVE;
   }
  catch (  BlockingApiException e) {
-    log.warn("Failed to extract blocking state for subscription " + subscriptionBase.getId().toString());
-    return null;
+    throw new EntitlementApiException(e);
   }
 }

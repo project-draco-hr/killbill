@@ -6,7 +6,14 @@
     return ImmutableList.<Entitlement>copyOf(Collections2.transform(subscriptions,new Function<SubscriptionBase,Entitlement>(){
       @Nullable @Override public Entitlement apply(      @Nullable final SubscriptionBase input){
         final LocalDate effectiveEndDate=getEffectiveEndDate(accountId,input,account.getTimeZone(),context);
-        final EntitlementState entitlementState=getStateForEntitlement(effectiveEndDate,input,account.getTimeZone(),context);
+        EntitlementState entitlementState;
+        try {
+          entitlementState=getStateForEntitlement(effectiveEndDate,input,account.getTimeZone(),context);
+        }
+ catch (        EntitlementApiException e) {
+          log.warn("Failed to extract blocking state for subscription " + input.getId().toString());
+          entitlementState=EntitlementState.CANCELLED;
+        }
         return new DefaultEntitlement(dateHelper,input,accountId,externalKey,entitlementState,effectiveEndDate,account.getTimeZone(),thisEntitlementApi,internalCallContextFactory,blockingStateDao,clock,checker);
       }
     }
