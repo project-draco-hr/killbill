@@ -16,7 +16,7 @@ final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleForAccountA
 final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundle.getId(),contextWithValidAccountRecordId);
 final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
 final SubscriptionBaseBundle newBundle=subscriptionTransferApi.transferBundle(sourceAccountId,destAccountId,externalKey,requestedDate,true,cancelImm,context);
-blockingStateDao.setBlockingState(new DefaultBlockingState(bundle.getId(),BlockingStateType.BUNDLE,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,requestedDate),clock,contextWithValidAccountRecordId);
+blockingStateDao.setBlockingState(new DefaultBlockingState(bundle.getId(),BlockingStateType.SUBSCRIPTION_BUNDLE,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,requestedDate),clock,contextWithValidAccountRecordId);
 return newBundle.getId();
 }
  catch (SubscriptionBaseTransferApiException e) {

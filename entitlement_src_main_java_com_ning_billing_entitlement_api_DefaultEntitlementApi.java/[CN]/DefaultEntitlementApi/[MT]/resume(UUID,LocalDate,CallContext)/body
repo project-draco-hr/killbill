@@ -12,7 +12,7 @@
     if (!dateHelper.isBeforeOrEqualsToday(effectiveDate,account.getTimeZone())) {
       throw new UnsupportedOperationException("Resuming with a future date has not been implemented yet");
     }
-    final DefaultBlockingState state=new DefaultBlockingState(bundleId,BlockingStateType.BUNDLE,ENT_STATE_CLEAR,EntitlementService.ENTITLEMENT_SERVICE_NAME,false,false,false,effectiveDate);
+    final DefaultBlockingState state=new DefaultBlockingState(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,ENT_STATE_CLEAR,EntitlementService.ENTITLEMENT_SERVICE_NAME,false,false,false,effectiveDate);
     blockingStateDao.setBlockingState(state,clock,contextWithValidAccountRecordId);
     final DefaultEffectiveEntitlementEvent event=new DefaultEffectiveEntitlementEvent(state.getId(),baseSubscription.getId(),bundleId,bundle.getAccountId(),EntitlementTransitionType.UNBLOCK_BUNDLE,effectiveDate,clock.getUTCNow(),contextWithValidAccountRecordId.getAccountRecordId(),contextWithValidAccountRecordId.getTenantRecordId(),contextWithValidAccountRecordId.getUserToken());
     try {
