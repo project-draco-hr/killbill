@@ -35,11 +35,11 @@ break;
 break;
 }
 }
-final DefaultSubscriptionEvent next=it.hasNext() ? (DefaultSubscriptionEvent)it.next() : null;
 final List<UUID> targetEntitlementIds=bs.getType() == BlockingStateType.SUBSCRIPTION ? ImmutableList.<UUID>of(bs.getBlockedId()) : ImmutableList.<UUID>copyOf(allEntitlementUUIDs);
 for (UUID target : targetEntitlementIds) {
+final SubscriptionEvent[] prevNext=findPrevNext(result,target,cur,bs);
 if (bs.getStateName().equals(DefaultEntitlementApi.ENT_STATE_CANCELLED)) {
-newEvents.add(toSubscriptionEvent(cur,next,target,bs,SubscriptionEventType.STOP_ENTITLEMENT,accountTimeZone));
+newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.STOP_ENTITLEMENT,accountTimeZone));
 continue;
 }
 final Boolean isResumeEntitlement=(blockedEntitlementMap.get(target) && !bs.isBlockEntitlement());
@@ -48,19 +48,19 @@ final Boolean isResumeBilling=(blockedBillingMap.get(target) && !bs.isBlockBilli
 final Boolean isPauseBilling=(!blockedBillingMap.get(target) && bs.isBlockBilling());
 final Boolean isServiceStateChange=!(isResumeEntitlement || isPauseEntitlement || isResumeBilling|| isPauseBilling);
 if (isResumeEntitlement) {
-newEvents.add(toSubscriptionEvent(cur,next,target,bs,SubscriptionEventType.RESUME_ENTITLEMENT,accountTimeZone));
+newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.RESUME_ENTITLEMENT,accountTimeZone));
 }
  else if (isPauseEntitlement) {
-newEvents.add(toSubscriptionEvent(cur,next,target,bs,SubscriptionEventType.PAUSE_ENTITLEMENT,accountTimeZone));
+newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.PAUSE_ENTITLEMENT,accountTimeZone));
 }
 if (isResumeBilling) {
-newEvents.add(toSubscriptionEvent(cur,next,target,bs,SubscriptionEventType.RESUME_BILLING,accountTimeZone));
+newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.RESUME_BILLING,accountTimeZone));
 }
  else if (isPauseBilling) {
-newEvents.add(toSubscriptionEvent(cur,next,target,bs,SubscriptionEventType.PAUSE_BILLING,accountTimeZone));
+newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.PAUSE_BILLING,accountTimeZone));
 }
 if (isServiceStateChange) {
-newEvents.add(toSubscriptionEvent(cur,next,target,bs,SubscriptionEventType.SERVICE_STATE_CHANGE,accountTimeZone));
+newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.SERVICE_STATE_CHANGE,accountTimeZone));
 }
 }
 return index;

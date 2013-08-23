@@ -1,0 +1,25 @@
+{
+  final SubscriptionEvent[] result=new DefaultSubscriptionEvent[2];
+  final Iterator<SubscriptionEvent> it=events.iterator();
+  DefaultSubscriptionEvent prev=null;
+  DefaultSubscriptionEvent next=null;
+  boolean foundCur=false;
+  while (it.hasNext()) {
+    final DefaultSubscriptionEvent tmp=(DefaultSubscriptionEvent)it.next();
+    if (tmp.getEntitlementId().equals(targetEntitlementId)) {
+      if (!foundCur) {
+        prev=tmp;
+      }
+ else {
+        next=tmp;
+        break;
+      }
+    }
+    if (tmp.getId().equals(insertionEvent.getId())) {
+      foundCur=true;
+    }
+  }
+  result[0]=prev;
+  result[1]=next;
+  return result;
+}

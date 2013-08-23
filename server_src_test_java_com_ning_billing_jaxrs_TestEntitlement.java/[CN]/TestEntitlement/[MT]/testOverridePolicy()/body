@@ -5,14 +5,14 @@
   final String productName="Shotgun";
   final BillingPeriod term=BillingPeriod.ANNUAL;
   final EntitlementJsonNoEvents entitlementJsonNoEvents=createEntitlement(accountJson.getAccountId(),"99999",productName,ProductCategory.BASE.toString(),term.toString(),true);
-  final String uri=JaxrsResource.ENTITLEMENTS_PATH + "/" + entitlementJsonNoEvents.getEntitlementId();
+  final String uri=JaxrsResource.ENTITLEMENTS_PATH + "/" + entitlementJsonNoEvents.getSubscriptionId();
   Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   String baseJson=response.getResponseBody();
   EntitlementJsonNoEvents objFromJson=mapper.readValue(baseJson,EntitlementJsonNoEvents.class);
   Assert.assertTrue(objFromJson.equals(entitlementJsonNoEvents));
   assertEquals(objFromJson.getBillingPeriod(),BillingPeriod.ANNUAL.toString());
-  final EntitlementJsonNoEvents newInput=new EntitlementJsonNoEvents(null,null,entitlementJsonNoEvents.getEntitlementId(),null,null,entitlementJsonNoEvents.getProductName(),entitlementJsonNoEvents.getProductCategory(),BillingPeriod.MONTHLY.toString(),entitlementJsonNoEvents.getPriceList(),entitlementJsonNoEvents.getCancelledDate(),null);
+  final EntitlementJsonNoEvents newInput=new EntitlementJsonNoEvents(null,null,entitlementJsonNoEvents.getSubscriptionId(),null,null,entitlementJsonNoEvents.getProductName(),entitlementJsonNoEvents.getProductCategory(),BillingPeriod.MONTHLY.toString(),entitlementJsonNoEvents.getPriceList(),entitlementJsonNoEvents.getCancelledDate(),null);
   baseJson=mapper.writeValueAsString(newInput);
   final Map<String,String> queryParams=getQueryParamsForCallCompletion(CALL_COMPLETION_TIMEOUT_SEC);
   queryParams.put(JaxrsResource.QUERY_POLICY,"immediate");
