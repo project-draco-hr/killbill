@@ -9,11 +9,11 @@
   final List<BlockingState> blockingStates=new ArrayList<BlockingState>();
   final DateTime requestedDate=new DateTime();
   DateTime effectiveDate=new DateTime(2013,1,1,15,43,25,0,DateTimeZone.UTC);
-  final SubscriptionBaseTransition tr1=createTransition(entitlementId,EventType.API_USER,ApiEventType.CREATE,requestedDate,effectiveDate,clock.getUTCNow());
+  final SubscriptionBaseTransition tr1=createTransition(entitlementId,EventType.API_USER,ApiEventType.CREATE,requestedDate,effectiveDate,clock.getUTCNow(),0);
   allTransitions.add(tr1);
   effectiveDate=effectiveDate.plusDays(30);
   clock.addDays(30);
-  final SubscriptionBaseTransition tr2=createTransition(entitlementId,EventType.PHASE,null,requestedDate,effectiveDate,clock.getUTCNow());
+  final SubscriptionBaseTransition tr2=createTransition(entitlementId,EventType.PHASE,null,requestedDate,effectiveDate,clock.getUTCNow(),1);
   allTransitions.add(tr2);
   effectiveDate=effectiveDate.plusDays(5);
   clock.addDays(5);
@@ -21,7 +21,7 @@
   blockingStates.add(bs1);
   effectiveDate=effectiveDate.plusDays(15);
   clock.addDays(15);
-  final SubscriptionBaseTransition tr3=createTransition(entitlementId,EventType.API_USER,ApiEventType.CANCEL,requestedDate,effectiveDate,clock.getUTCNow());
+  final SubscriptionBaseTransition tr3=createTransition(entitlementId,EventType.API_USER,ApiEventType.CANCEL,requestedDate,effectiveDate,clock.getUTCNow(),2);
   allTransitions.add(tr3);
   final BlockingState bs2=new DefaultBlockingState(UUID.randomUUID(),entitlementId,BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveDate,clock.getUTCNow(),clock.getUTCNow());
   blockingStates.add(bs2);

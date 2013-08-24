@@ -1,9 +1,7 @@
 {
-  final Map<UUID,Boolean> blockedEntitlementMap=new HashMap<UUID,Boolean>();
-  final Map<UUID,Boolean> blockedBillingMap=new HashMap<UUID,Boolean>();
-  for (  UUID uuid : allEntitlementUUIDs) {
-    blockedEntitlementMap.put(uuid,Boolean.TRUE);
-    blockedBillingMap.put(uuid,Boolean.TRUE);
+  final Map<UUID,TargetState> targetStates=new HashMap<UUID,TargetState>();
+  for (  UUID cur : allEntitlementUUIDs) {
+    targetStates.put(cur,new TargetState());
   }
   int index=-1;
   final Iterator<SubscriptionEvent> it=result.iterator();
@@ -13,21 +11,24 @@
     index++;
     final int compEffectiveDate=bsEffectiveDate.compareTo(cur.getEffectiveDate());
     final boolean shouldContinue=(compEffectiveDate > 0 || (compEffectiveDate == 0 && bs.getCreatedDate().compareTo(cur.getCreatedDate()) >= 0));
+    final TargetState curTargetState=targetStates.get(cur.getEntitlementId());
     if (shouldContinue) {
 switch (cur.getSubscriptionEventType()) {
 case START_ENTITLEMENT:
-        blockedEntitlementMap.put(cur.getEntitlementId(),Boolean.FALSE);
+        curTargetState.setEntitlementStarted();
       break;
-case START_BILLING:
-    blockedBillingMap.put(cur.getEntitlementId(),Boolean.FALSE);
-  break;
-case PAUSE_ENTITLEMENT:
 case STOP_ENTITLEMENT:
-blockedEntitlementMap.put(cur.getEntitlementId(),Boolean.TRUE);
+    curTargetState.setEntitlementStopped();
+  break;
+case START_BILLING:
+curTargetState.setBillingStarted();
 break;
 case PAUSE_BILLING:
+case PAUSE_ENTITLEMENT:
+curTargetState.addEntitlementEvent(cur);
+break;
 case STOP_BILLING:
-blockedBillingMap.put(cur.getEntitlementId(),Boolean.TRUE);
+curTargetState.setBillingStopped();
 break;
 }
 }
@@ -38,29 +39,10 @@ break;
 final List<UUID> targetEntitlementIds=bs.getType() == BlockingStateType.SUBSCRIPTION ? ImmutableList.<UUID>of(bs.getBlockedId()) : ImmutableList.<UUID>copyOf(allEntitlementUUIDs);
 for (UUID target : targetEntitlementIds) {
 final SubscriptionEvent[] prevNext=findPrevNext(result,target,cur,bs);
-if (bs.getStateName().equals(DefaultEntitlementApi.ENT_STATE_CANCELLED)) {
-newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.STOP_ENTITLEMENT,accountTimeZone));
-continue;
-}
-final Boolean isResumeEntitlement=(blockedEntitlementMap.get(target) && !bs.isBlockEntitlement());
-final Boolean isPauseEntitlement=(!blockedEntitlementMap.get(target) && bs.isBlockEntitlement());
-final Boolean isResumeBilling=(blockedBillingMap.get(target) && !bs.isBlockBilling());
-final Boolean isPauseBilling=(!blockedBillingMap.get(target) && bs.isBlockBilling());
-final Boolean isServiceStateChange=!(isResumeEntitlement || isPauseEntitlement || isResumeBilling|| isPauseBilling);
-if (isResumeEntitlement) {
-newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.RESUME_ENTITLEMENT,accountTimeZone));
-}
- else if (isPauseEntitlement) {
-newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.PAUSE_ENTITLEMENT,accountTimeZone));
-}
-if (isResumeBilling) {
-newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.RESUME_BILLING,accountTimeZone));
-}
- else if (isPauseBilling) {
-newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.PAUSE_BILLING,accountTimeZone));
-}
-if (isServiceStateChange) {
-newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,SubscriptionEventType.SERVICE_STATE_CHANGE,accountTimeZone));
+final TargetState curTargetState=targetStates.get(target);
+final List<SubscriptionEventType> eventTypes=curTargetState.addStateAndReturnEventTypes(bs);
+for (SubscriptionEventType t : eventTypes) {
+newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,t,accountTimeZone));
 }
 }
 return index;
