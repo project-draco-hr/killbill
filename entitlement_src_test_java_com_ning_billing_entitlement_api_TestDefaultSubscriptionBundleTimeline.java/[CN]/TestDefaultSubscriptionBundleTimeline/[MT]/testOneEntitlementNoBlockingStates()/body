@@ -8,15 +8,15 @@
   final List<SubscriptionBaseTransition> allTransitions=new ArrayList<SubscriptionBaseTransition>();
   final DateTime requestedDate=new DateTime();
   DateTime effectiveDate=new DateTime(2013,1,1,15,43,25,0,DateTimeZone.UTC);
-  final SubscriptionBaseTransition tr1=createTransition(entitlementId,EventType.API_USER,ApiEventType.CREATE,requestedDate,effectiveDate,clock.getUTCNow(),0);
+  final SubscriptionBaseTransition tr1=createTransition(entitlementId,EventType.API_USER,ApiEventType.CREATE,requestedDate,effectiveDate,clock.getUTCNow(),null,"trial");
   allTransitions.add(tr1);
   effectiveDate=effectiveDate.plusDays(30);
   clock.addDays(30);
-  final SubscriptionBaseTransition tr2=createTransition(entitlementId,EventType.PHASE,null,requestedDate,effectiveDate,clock.getUTCNow(),1);
+  final SubscriptionBaseTransition tr2=createTransition(entitlementId,EventType.PHASE,null,requestedDate,effectiveDate,clock.getUTCNow(),"trial","phase");
   allTransitions.add(tr2);
   effectiveDate=effectiveDate.plusDays(15);
   clock.addDays(15);
-  final SubscriptionBaseTransition tr3=createTransition(entitlementId,EventType.API_USER,ApiEventType.CANCEL,requestedDate,effectiveDate,clock.getUTCNow(),2);
+  final SubscriptionBaseTransition tr3=createTransition(entitlementId,EventType.API_USER,ApiEventType.CANCEL,requestedDate,effectiveDate,clock.getUTCNow(),"phase",null);
   allTransitions.add(tr3);
   final List<Entitlement> entitlements=new ArrayList<Entitlement>();
   final Entitlement entitlement=createEntitlement(entitlementId,allTransitions);
@@ -35,8 +35,8 @@
   assertEquals(events.get(1).getSubscriptionEventType(),SubscriptionEventType.START_BILLING);
   assertEquals(events.get(2).getSubscriptionEventType(),SubscriptionEventType.PHASE);
   assertEquals(events.get(3).getSubscriptionEventType(),SubscriptionEventType.STOP_BILLING);
-  assertEquals(events.get(0).getNextPhase().getName(),"phase-0");
-  assertEquals(events.get(1).getNextPhase().getName(),"phase-0");
-  assertEquals(events.get(2).getNextPhase().getName(),"phase-1");
-  assertEquals(events.get(3).getNextPhase().getName(),"phase-2");
+  assertEquals(events.get(0).getNextPhase().getName(),"trial");
+  assertEquals(events.get(1).getNextPhase().getName(),"trial");
+  assertEquals(events.get(2).getNextPhase().getName(),"phase");
+  assertEquals(events.get(3).getNextPhase(),null);
 }
