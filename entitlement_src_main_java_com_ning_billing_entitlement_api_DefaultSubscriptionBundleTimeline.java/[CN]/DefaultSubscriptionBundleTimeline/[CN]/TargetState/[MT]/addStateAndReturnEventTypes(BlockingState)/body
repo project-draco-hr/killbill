@@ -1,12 +1,13 @@
 {
+  final BlockingState fixedBlockingState=new DefaultBlockingState(bs.getBlockedId(),bs.getType(),bs.getStateName(),bs.getService(),bs.isBlockChange(),(bs.isBlockEntitlement() && isEntitlementStarted && !isEntitlementStopped),(bs.isBlockBilling() && isBillingStarted && !isBillingStopped),bs.getEffectiveDate());
   final List<SubscriptionEventType> result=new ArrayList<SubscriptionEventType>(4);
-  if (bs.getStateName().equals(DefaultEntitlementApi.ENT_STATE_CANCELLED)) {
+  if (fixedBlockingState.getStateName().equals(DefaultEntitlementApi.ENT_STATE_CANCELLED)) {
     isEntitlementStopped=true;
     result.add(SubscriptionEventType.STOP_ENTITLEMENT);
     return result;
   }
   final BlockingAggregator stateBefore=getState();
-  perServiceBlockingState.put(bs.getService(),bs);
+  perServiceBlockingState.put(fixedBlockingState.getService(),fixedBlockingState);
   final BlockingAggregator stateAfter=getState();
   final boolean shouldResumeEntitlement=isEntitlementStarted && !isEntitlementStopped && stateBefore.isBlockEntitlement()&& !stateAfter.isBlockEntitlement();
   if (shouldResumeEntitlement) {
@@ -24,7 +25,7 @@
   if (shouldBlockBilling) {
     result.add(SubscriptionEventType.PAUSE_BILLING);
   }
-  if (!shouldResumeEntitlement && !shouldBlockEntitlement && !shouldBlockEntitlement&& !shouldBlockBilling&& !bs.getService().equals(DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME)) {
+  if (!shouldResumeEntitlement && !shouldBlockEntitlement && !shouldBlockEntitlement&& !shouldBlockBilling&& !fixedBlockingState.getService().equals(DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME)) {
     result.add(SubscriptionEventType.SERVICE_STATE_CHANGE);
   }
   return result;

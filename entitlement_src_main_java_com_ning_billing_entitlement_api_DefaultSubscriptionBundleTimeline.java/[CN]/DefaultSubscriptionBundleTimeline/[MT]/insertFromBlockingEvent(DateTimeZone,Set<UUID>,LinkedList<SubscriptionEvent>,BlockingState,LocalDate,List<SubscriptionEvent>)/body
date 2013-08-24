@@ -5,21 +5,23 @@
   }
   int index=-1;
   final Iterator<SubscriptionEvent> it=result.iterator();
-  DefaultSubscriptionEvent cur=null;
+  DefaultSubscriptionEvent curInsertion=null;
   while (it.hasNext()) {
-    cur=(DefaultSubscriptionEvent)it.next();
+    DefaultSubscriptionEvent cur=(DefaultSubscriptionEvent)it.next();
     index++;
     final int compEffectiveDate=bsEffectiveDate.compareTo(cur.getEffectiveDate());
     final boolean shouldContinue=(compEffectiveDate > 0 || (compEffectiveDate == 0 && bs.getCreatedDate().compareTo(cur.getCreatedDate()) >= 0));
+    if (!shouldContinue) {
+      break;
+    }
     final TargetState curTargetState=targetStates.get(cur.getEntitlementId());
-    if (shouldContinue) {
 switch (cur.getSubscriptionEventType()) {
 case START_ENTITLEMENT:
-        curTargetState.setEntitlementStarted();
-      break;
+      curTargetState.setEntitlementStarted();
+    break;
 case STOP_ENTITLEMENT:
-    curTargetState.setEntitlementStopped();
-  break;
+  curTargetState.setEntitlementStopped();
+break;
 case START_BILLING:
 curTargetState.setBillingStarted();
 break;
@@ -31,14 +33,11 @@ case STOP_BILLING:
 curTargetState.setBillingStopped();
 break;
 }
-}
- else {
-break;
-}
+curInsertion=cur;
 }
 final List<UUID> targetEntitlementIds=bs.getType() == BlockingStateType.SUBSCRIPTION ? ImmutableList.<UUID>of(bs.getBlockedId()) : ImmutableList.<UUID>copyOf(allEntitlementUUIDs);
 for (UUID target : targetEntitlementIds) {
-final SubscriptionEvent[] prevNext=findPrevNext(result,target,cur,bs);
+final SubscriptionEvent[] prevNext=findPrevNext(result,target,curInsertion);
 final TargetState curTargetState=targetStates.get(target);
 final List<SubscriptionEventType> eventTypes=curTargetState.addStateAndReturnEventTypes(bs);
 for (SubscriptionEventType t : eventTypes) {

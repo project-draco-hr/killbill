@@ -1,14 +1,14 @@
 {
   final Set<UUID> guiltyEntitlementIds=new TreeSet<UUID>();
-  ListIterator<SubscriptionEvent> it=input.listIterator(input.size() - 1);
+  ListIterator<SubscriptionEvent> it=input.listIterator(input.size());
   while (it.hasPrevious()) {
     final SubscriptionEvent cur=it.previous();
     if (cur.getSubscriptionEventType() == SubscriptionEventType.RESUME_BILLING) {
-      guiltyEntitlementIds.add(cur.getId());
+      guiltyEntitlementIds.add(cur.getEntitlementId());
       continue;
     }
-    if (cur.getSubscriptionEventType() == SubscriptionEventType.STOP_BILLING && guiltyEntitlementIds.contains(cur.getId())) {
-      guiltyEntitlementIds.remove(cur.getId());
+    if (cur.getSubscriptionEventType() == SubscriptionEventType.STOP_BILLING && guiltyEntitlementIds.contains(cur.getEntitlementId())) {
+      guiltyEntitlementIds.remove(cur.getEntitlementId());
       final SubscriptionEvent correctedEvent=new DefaultSubscriptionEvent((DefaultSubscriptionEvent)cur,SubscriptionEventType.PAUSE_BILLING);
       it.set(correctedEvent);
     }
