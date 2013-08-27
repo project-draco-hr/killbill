@@ -1,0 +1,9 @@
+{
+  final List<CustomField> fields=customFieldUserApi.getCustomFieldsForObject(id,getObjectType(),context);
+  final List<CustomFieldJson> result=new LinkedList<CustomFieldJson>();
+  for (  final CustomField cur : fields) {
+    final List<AuditLog> auditLogs=auditUserApi.getAuditLogs(cur.getId(),ObjectType.CUSTOM_FIELD,auditMode.getLevel(),context);
+    result.add(new CustomFieldJson(cur,auditLogs));
+  }
+  return Response.status(Response.Status.OK).entity(result).build();
+}

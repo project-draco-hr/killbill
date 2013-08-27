@@ -1,0 +1,10 @@
+{
+  final List<Tag> tags=tagUserApi.getTagsForObject(taggedObjectId,getObjectType(),context);
+  final Collection<TagJson> result=new LinkedList<TagJson>();
+  for (  final Tag tag : tags) {
+    final TagDefinition tagDefinition=tagUserApi.getTagDefinition(tag.getTagDefinitionId(),context);
+    final List<AuditLog> auditLogs=auditUserApi.getAuditLogs(tag.getId(),ObjectType.TAG,auditMode.getLevel(),context);
+    result.add(new TagJson(tagDefinition,auditLogs));
+  }
+  return Response.status(Response.Status.OK).entity(result).build();
+}

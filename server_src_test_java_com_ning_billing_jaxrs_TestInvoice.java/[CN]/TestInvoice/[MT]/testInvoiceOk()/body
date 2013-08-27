@@ -2,8 +2,18 @@
   final DateTime initialDate=new DateTime(2012,4,25,0,3,42,0);
   clock.setDeltaFromReality(initialDate.getMillis() - clock.getUTCNow().getMillis());
   final AccountJson accountJson=createAccountWithPMBundleAndSubscriptionAndWaitForFirstInvoice();
-  final List<InvoiceJsonSimple> invoices=getInvoicesForAccount(accountJson.getAccountId());
+  final List<InvoiceJsonSimple> invoices=getInvoicesForAccountWithAudits(accountJson.getAccountId(),AuditLevel.FULL);
   assertEquals(invoices.size(),2);
+  for (  final InvoiceJsonSimple invoiceJsonSimple : invoices) {
+    Assert.assertEquals(invoiceJsonSimple.getAuditLogs().size(),1);
+    final AuditLogJson auditLogJson=invoiceJsonSimple.getAuditLogs().get(0);
+    Assert.assertEquals(auditLogJson.getChangeType(),"INSERT");
+    Assert.assertEquals(auditLogJson.getChangedBy(),"SubscriptionBaseTransition");
+    Assert.assertFalse(auditLogJson.getChangeDate().isBefore(initialDate));
+    Assert.assertNotNull(auditLogJson.getUserToken());
+    Assert.assertNull(auditLogJson.getReasonCode());
+    Assert.assertNull(auditLogJson.getComments());
+  }
   final InvoiceJsonSimple invoiceJsonSimple=invoices.get(0);
   final InvoiceJsonSimple firstInvoiceJson=getInvoice(invoiceJsonSimple.getInvoiceId());
   assertEquals(firstInvoiceJson,invoiceJsonSimple);

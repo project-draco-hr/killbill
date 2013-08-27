@@ -1,0 +1,10 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final List<Payment> payments=paymentApi.getInvoicePayments(UUID.fromString(invoiceId),tenantContext);
+  final AuditLogsForPayments auditLogsForPayments=auditUserApi.getAuditLogsForPayments(payments,auditMode.getLevel(),tenantContext);
+  final List<PaymentJsonSimple> result=new ArrayList<PaymentJsonSimple>(payments.size());
+  for (  final Payment cur : payments) {
+    result.add(new PaymentJsonSimple(cur,auditLogsForPayments.getPaymentsAuditLogs().get(cur.getId())));
+  }
+  return Response.status(Status.OK).entity(result).build();
+}

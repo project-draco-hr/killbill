@@ -1,0 +1,20 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  accountUserApi.getAccountById(UUID.fromString(accountId),tenantContext);
+  final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(UUID.fromString(accountId),tenantContext);
+  final AuditLogsForInvoices invoicesAuditLogs=auditUserApi.getAuditLogsForInvoices(invoices,auditMode.getLevel(),tenantContext);
+  if (withItems) {
+    final List<InvoiceJsonWithItems> result=new LinkedList<InvoiceJsonWithItems>();
+    for (    final Invoice invoice : invoices) {
+      result.add(new InvoiceJsonWithItems(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId()),invoicesAuditLogs.getInvoiceItemsAuditLogs()));
+    }
+    return Response.status(Status.OK).entity(result).build();
+  }
+ else {
+    final List<InvoiceJsonSimple> result=new LinkedList<InvoiceJsonSimple>();
+    for (    final Invoice invoice : invoices) {
+      result.add(new InvoiceJsonSimple(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId())));
+    }
+    return Response.status(Status.OK).entity(result).build();
+  }
+}

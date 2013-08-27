@@ -15,10 +15,18 @@
   Assert.assertEquals(tags1.get(0).getTagDefinitionId(),autoPayOffId);
   response=doPost(uri,null,ImmutableMap.<String,String>of(JaxrsResource.QUERY_TAGS,autoPayOffId),DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  response=doGetWithUrl(accountTagsUrl,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
+  response=doGetWithUrl(accountTagsUrl,ImmutableMap.<String,String>of(JaxrsResource.QUERY_AUDIT,AuditLevel.FULL.toString()),DEFAULT_HTTP_TIMEOUT_SEC);
   Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   final List<TagJson> tags2=mapper.readValue(response.getResponseBody(),new TypeReference<List<TagJson>>(){
   }
 );
   Assert.assertEquals(tags2,tags1);
+  Assert.assertEquals(tags2.get(0).getAuditLogs().size(),1);
+  final AuditLogJson auditLogJson=tags2.get(0).getAuditLogs().get(0);
+  Assert.assertEquals(auditLogJson.getChangeType(),"INSERT");
+  Assert.assertEquals(auditLogJson.getChangedBy(),createdBy);
+  Assert.assertEquals(auditLogJson.getReasonCode(),reason);
+  Assert.assertEquals(auditLogJson.getComments(),comment);
+  Assert.assertNotNull(auditLogJson.getChangeDate());
+  Assert.assertNotNull(auditLogJson.getUserToken());
 }
