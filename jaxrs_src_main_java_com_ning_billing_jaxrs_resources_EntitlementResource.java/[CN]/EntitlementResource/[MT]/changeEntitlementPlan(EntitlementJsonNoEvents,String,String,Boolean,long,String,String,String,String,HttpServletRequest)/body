@@ -4,9 +4,8 @@
     private boolean isImmediateOp=true;
     @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException {
       final UUID uuid=UUID.fromString(entitlementId);
-      final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
       final Entitlement current=entitlementApi.getEntitlementForId(uuid,callContext);
-      final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),inputDate,callContext);
+      final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
       final Entitlement newEntitlement;
       if (policyString == null) {
         newEntitlement=current.changePlan(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,ctx);

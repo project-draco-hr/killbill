@@ -5,8 +5,7 @@
     @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException {
       final UUID uuid=UUID.fromString(entitlementId);
       final Entitlement current=entitlementApi.getEntitlementForId(uuid,ctx);
-      final DateTime inputDate=(requestedDate != null) ? DATE_TIME_FORMATTER.parseDateTime(requestedDate) : null;
-      final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),inputDate,callContext);
+      final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
       final Entitlement newEntitlement;
       if (policyString == null) {
         newEntitlement=current.cancelEntitlementWithDate(inputLocalDate,ctx);
