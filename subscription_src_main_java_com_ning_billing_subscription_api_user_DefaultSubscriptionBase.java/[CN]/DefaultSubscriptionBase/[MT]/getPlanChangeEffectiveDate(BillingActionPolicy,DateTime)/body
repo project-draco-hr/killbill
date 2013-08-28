@@ -1,6 +1,6 @@
 {
   if (policy == BillingActionPolicy.IMMEDIATE) {
-    return requestedDate;
+    return requestedDate.compareTo(clock.getUTCNow()) < 0 ? requestedDate : clock.getUTCNow();
   }
   if (policy != BillingActionPolicy.END_OF_TERM) {
     throw new SubscriptionBaseError(String.format("Unexpected policy type %s",policy.toString()));
