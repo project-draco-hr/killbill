@@ -1,3 +1,9 @@
 {
-  install(new ClockModule());
+  if (isTestModeEnabled) {
+    bind(Clock.class).to(ClockMock.class).asEagerSingleton();
+    bind(TestResource.class).asEagerSingleton();
+  }
+ else {
+    install(new ClockModule());
+  }
 }

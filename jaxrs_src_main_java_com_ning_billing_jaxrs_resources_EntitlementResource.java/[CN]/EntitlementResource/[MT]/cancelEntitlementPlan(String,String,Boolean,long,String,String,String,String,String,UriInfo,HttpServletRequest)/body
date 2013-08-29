@@ -7,12 +7,21 @@
       final Entitlement current=entitlementApi.getEntitlementForId(uuid,ctx);
       final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
       final Entitlement newEntitlement;
-      if (policyString == null) {
+      if (billingPolicyString == null && entitlementPolicyString == null) {
         newEntitlement=current.cancelEntitlementWithDate(inputLocalDate,ctx);
       }
+ else       if (billingPolicyString == null && entitlementPolicyString != null) {
+        final EntitlementActionPolicy entitlementPolicy=EntitlementActionPolicy.valueOf(entitlementPolicyString);
+        newEntitlement=current.cancelEntitlementWithPolicy(entitlementPolicy,ctx);
+      }
+ else       if (billingPolicyString != null && entitlementPolicyString == null) {
+        final BillingActionPolicy billingPolicy=BillingActionPolicy.valueOf(billingPolicyString.toUpperCase());
+        newEntitlement=current.cancelEntitlementWithDateOverrideBillingPolicy(inputLocalDate,billingPolicy,ctx);
+      }
  else {
-        final BillingActionPolicy policy=BillingActionPolicy.valueOf(policyString.toUpperCase());
-        newEntitlement=current.cancelEntitlementWithDateOverrideBillingPolicy(inputLocalDate,policy,ctx);
+        final EntitlementActionPolicy entitlementPolicy=EntitlementActionPolicy.valueOf(entitlementPolicyString);
+        final BillingActionPolicy billingPolicy=BillingActionPolicy.valueOf(billingPolicyString.toUpperCase());
+        newEntitlement=current.cancelEntitlementWithPolicyOverrideBillingPolicy(entitlementPolicy,billingPolicy,ctx);
       }
       isImmediateOp=newEntitlement.getState() == EntitlementState.ACTIVE;
       return Response.status(Status.OK).build();
