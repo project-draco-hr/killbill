@@ -11,7 +11,7 @@
     entitlement.cancelEntitlementWithDate(cancelDate,callContext);
     final Entitlement entitlement2=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
     assertEquals(entitlement2.getState(),EntitlementState.ACTIVE);
-    assertNull(entitlement2.getEffectiveEndDate());
+    assertEquals(entitlement2.getEffectiveEndDate(),cancelDate);
     clock.addDays(1);
     final Entitlement entitlement3=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
     assertEquals(entitlement3.getState(),EntitlementState.CANCELLED);
