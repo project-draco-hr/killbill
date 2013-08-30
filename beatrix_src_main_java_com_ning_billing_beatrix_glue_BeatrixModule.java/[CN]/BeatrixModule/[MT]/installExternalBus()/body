@@ -1,7 +1,8 @@
 {
   bind(BeatrixService.class).to(DefaultBeatrixService.class);
   bind(DefaultBeatrixService.class).asEagerSingleton();
-  bind(BusProvider.class).annotatedWith(Names.named(EXTERNAL_BUS)).toInstance(new BusProvider(EXTERNAL_BUS_TABLE_NAME,EXTERNAL_BUS_HISTORY_TABLE_NAME));
+  final PersistentBusConfig extBusConfig=new ConfigurationObjectFactory(configSource).buildWithReplacements(PersistentBusConfig.class,ImmutableMap.<String,String>of("instanceName","external"));
+  bind(BusProvider.class).annotatedWith(Names.named(EXTERNAL_BUS)).toInstance(new BusProvider(extBusConfig));
   bind(PersistentBus.class).annotatedWith(Names.named(EXTERNAL_BUS)).toProvider(Key.get(BusProvider.class,Names.named(EXTERNAL_BUS))).asEagerSingleton();
   bind(BeatrixListener.class).asEagerSingleton();
 }
