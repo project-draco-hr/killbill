@@ -37,7 +37,7 @@ final String baseProductName=(futureBaseEvent instanceof ApiEventChange) ? ((Api
 final boolean createCancelEvent=(futureBaseEvent != null && targetAddOnPlan != null) && ((futureBaseEvent instanceof ApiEventCancel) || ((!addonUtils.isAddonAvailableFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan)) || (addonUtils.isAddonIncludedFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan))));
 if (createCancelEvent && reloaded.getFutureEndDate() == null) {
 final DateTime now=clock.getUTCNow();
-final SubscriptionBaseEvent addOnCancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(reloaded.getId()).setActiveVersion(((DefaultSubscriptionBase)reloaded).getActiveVersion()).setProcessedDate(now).setEffectiveDate(futureBaseEvent.getEffectiveDate()).setRequestedDate(now).setFromDisk(false));
+final SubscriptionBaseEvent addOnCancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(reloaded.getId()).setActiveVersion(((DefaultSubscriptionBase)reloaded).getActiveVersion()).setProcessedDate(now).setEffectiveDate(futureBaseEvent.getEffectiveDate()).setRequestedDate(now).setCreatedDate(futureBaseEvent.getCreatedDate()).setFromDisk(false));
 events.add(addOnCancelEvent);
 reloaded=createSubscriptionForInternalUse(cur,events);
 }
