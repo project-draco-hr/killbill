@@ -1,7 +1,9 @@
 {
   final JDBCSessionDao jdbcSessionDao=new JDBCSessionDao(dbi);
   if (sessionManager instanceof DefaultSessionManager) {
-    ((DefaultSessionManager)sessionManager).setSessionDAO(jdbcSessionDao);
+    final DefaultSessionManager defaultSessionManager=(DefaultSessionManager)sessionManager;
+    defaultSessionManager.setSessionDAO(jdbcSessionDao);
+    defaultSessionManager.setGlobalSessionTimeout(rbacConfig.getGlobalSessionTimeout().getMillis());
   }
   return jdbcSessionDao;
 }
