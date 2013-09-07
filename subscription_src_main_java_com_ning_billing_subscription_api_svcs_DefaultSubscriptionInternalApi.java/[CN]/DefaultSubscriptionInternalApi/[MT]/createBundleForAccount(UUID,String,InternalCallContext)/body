@@ -1,4 +1,8 @@
 {
-  final DefaultSubscriptionBaseBundle bundle=new DefaultSubscriptionBaseBundle(bundleName,accountId,clock.getUTCNow());
+  final SubscriptionBaseBundle result=getActiveBundleForKeyNotException(bundleKey,context);
+  if (result != null) {
+    throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_ACTIVE_BUNDLE_KEY_EXISTS,bundleKey);
+  }
+  final DefaultSubscriptionBaseBundle bundle=new DefaultSubscriptionBaseBundle(bundleKey,accountId,clock.getUTCNow());
   return dao.createSubscriptionBundle(bundle,context);
 }

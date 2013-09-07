@@ -1,0 +1,15 @@
+{
+  final List<SubscriptionBaseBundle> existingBundles=dao.getSubscriptionBundlesForKey(bundleKey,context);
+  for (  SubscriptionBaseBundle cur : existingBundles) {
+    final List<SubscriptionBase> subscriptions=dao.getSubscriptions(cur.getId(),context);
+    for (    SubscriptionBase s : subscriptions) {
+      if (s.getCategory() == ProductCategory.ADD_ON) {
+        continue;
+      }
+      if (s.getEndDate() == null || s.getEndDate().compareTo(clock.getUTCNow()) > 0) {
+        return cur;
+      }
+    }
+  }
+  return null;
+}
