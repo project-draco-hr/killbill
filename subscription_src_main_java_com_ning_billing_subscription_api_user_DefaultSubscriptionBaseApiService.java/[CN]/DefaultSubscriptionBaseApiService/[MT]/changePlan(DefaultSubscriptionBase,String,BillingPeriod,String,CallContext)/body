@@ -1,0 +1,14 @@
+{
+  final DateTime now=clock.getUTCNow();
+  final DateTime requestedDate=now;
+  validateRequestedDate(subscription,now,requestedDate);
+  validateEntitlementState(subscription);
+  final PlanChangeResult planChangeResult=getPlanChangeResult(subscription,productName,term,priceList,requestedDate);
+  final DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(planChangeResult.getPolicy());
+  try {
+    return doChangePlan(subscription,productName,term,planChangeResult.getNewPriceList().getName(),now,requestedDate,effectiveDate,context);
+  }
+ catch (  CatalogApiException e) {
+    throw new SubscriptionBaseApiException(e);
+  }
+}

@@ -12,9 +12,9 @@
     final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
     subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
     subscription=subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
-    subscription.cancel(clock.getUTCNow(),callContext);
+    subscription.cancelWithPolicy(BillingActionPolicy.END_OF_TERM,callContext);
     try {
-      subscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);
+      subscription.changePlanWithDate("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);
     }
  catch (    SubscriptionBaseApiException e) {
       assertEquals(e.getCode(),ErrorCode.SUB_CHANGE_FUTURE_CANCELLED.getCode());

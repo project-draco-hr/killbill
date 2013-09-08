@@ -6,7 +6,7 @@
   final LocalDate effectiveLocalDate=new LocalDate(localCancelDate,accountTimeZone);
   final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(effectiveLocalDate,subscriptionBase.getStartDate(),contextWithValidAccountRecordId);
   try {
-    subscriptionBase.cancelWithPolicy(null,billingPolicy,callContext);
+    subscriptionBase.cancelWithPolicy(billingPolicy,callContext);
     blockingStateDao.setBlockingState(new DefaultBlockingState(getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveDate),clock,contextWithValidAccountRecordId);
     return entitlementApi.getEntitlementForId(getId(),callContext);
   }

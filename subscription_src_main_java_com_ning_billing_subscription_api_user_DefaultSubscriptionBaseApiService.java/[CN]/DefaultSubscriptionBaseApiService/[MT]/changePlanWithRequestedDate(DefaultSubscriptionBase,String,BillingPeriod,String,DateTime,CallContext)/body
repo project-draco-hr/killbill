@@ -1,0 +1,12 @@
+{
+  final DateTime now=clock.getUTCNow();
+  final DateTime requestedDate=(requestedDateWithMs != null) ? DefaultClock.truncateMs(requestedDateWithMs) : now;
+  validateRequestedDate(subscription,now,requestedDate);
+  validateEntitlementState(subscription);
+  try {
+    return doChangePlan(subscription,productName,term,priceList,now,requestedDate,requestedDate,context);
+  }
+ catch (  CatalogApiException e) {
+    throw new SubscriptionBaseApiException(e);
+  }
+}

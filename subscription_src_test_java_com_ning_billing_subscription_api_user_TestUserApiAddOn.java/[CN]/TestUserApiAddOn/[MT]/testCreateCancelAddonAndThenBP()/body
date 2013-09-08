@@ -25,11 +25,11 @@
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(1));
     clock.addDeltaFromReality(it.toDurationMillis());
-    aoSubscription.cancel(clock.getUTCNow(),callContext);
+    aoSubscription.cancel(callContext);
     aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
     assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
     assertTrue(aoSubscription.isSubscriptionFutureCancelled());
-    baseSubscription.cancel(clock.getUTCNow(),callContext);
+    baseSubscription.cancel(callContext);
     baseSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
     assertEquals(baseSubscription.getState(),EntitlementState.ACTIVE);
     assertTrue(baseSubscription.isSubscriptionFutureCancelled());

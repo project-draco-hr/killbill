@@ -16,11 +16,11 @@
     subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
     testListener.setNonExpectedMode();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",clock.getUTCNow(),callContext);
+    subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",callContext);
     assertFalse(testListener.isCompleted(3000));
     testListener.reset();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
-    subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",clock.getUTCNow(),callContext);
+    subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",callContext);
     assertTrue(testListener.isCompleted(5000));
     final Plan currentPlan=subscription.getCurrentPlan();
     assertNotNull(currentPlan);

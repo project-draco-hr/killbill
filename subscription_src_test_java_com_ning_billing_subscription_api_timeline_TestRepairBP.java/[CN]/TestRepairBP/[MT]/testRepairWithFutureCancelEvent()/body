@@ -8,8 +8,7 @@
   final DateTime newChargedThroughDate=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
   subscriptionInternalApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,internalCallContext);
   baseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
-  final DateTime requestedChange=clock.getUTCNow();
-  baseSubscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,requestedChange,callContext);
+  baseSubscription.changePlan("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,callContext);
   Plan currentPlan=baseSubscription.getCurrentPlan();
   assertNotNull(currentPlan);
   assertEquals(currentPlan.getProduct().getName(),"Shotgun");
