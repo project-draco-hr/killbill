@@ -5,7 +5,12 @@
   final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
   final DateTime effectiveCancelDate=dateHelper.fromLocalDateAndReferenceTime(localCancelDate,subscriptionBase.getStartDate(),contextWithValidAccountRecordId);
   try {
-    subscriptionBase.cancel(callContext);
+    if (overrideBillingEffectiveDate) {
+      subscriptionBase.cancelWithDate(effectiveCancelDate,callContext);
+    }
+ else {
+      subscriptionBase.cancel(callContext);
+    }
     blockingStateDao.setBlockingState(new DefaultBlockingState(getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveCancelDate),clock,contextWithValidAccountRecordId);
     return entitlementApi.getEntitlementForId(getId(),callContext);
   }

@@ -7,8 +7,11 @@
       final Entitlement current=entitlementApi.getEntitlementForId(uuid,callContext);
       final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
       final Entitlement newEntitlement;
-      if (policyString == null) {
-        newEntitlement=current.changePlan(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,ctx);
+      if (requestedDate == null && policyString == null) {
+        newEntitlement=current.changePlan(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),ctx);
+      }
+ else       if (policyString == null) {
+        newEntitlement=current.changePlanWithDate(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,ctx);
       }
  else {
         final BillingActionPolicy policy=BillingActionPolicy.valueOf(policyString.toUpperCase());
