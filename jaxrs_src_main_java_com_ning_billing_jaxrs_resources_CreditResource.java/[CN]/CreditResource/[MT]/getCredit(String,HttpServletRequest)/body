@@ -1,7 +1,7 @@
 {
   final TenantContext tenantContext=context.createContext(request);
   final InvoiceItem credit=invoiceUserApi.getCreditById(UUID.fromString(creditId),tenantContext);
-  final Account account=accountUserApi.getAccountById(credit.getAccountId(),tenantContext);
-  final CreditJson creditJson=new CreditJson(credit,account.getTimeZone());
+  final Invoice invoice=invoiceUserApi.getInvoice(credit.getInvoiceId(),tenantContext);
+  final CreditJson creditJson=new CreditJson(invoice,credit);
   return Response.status(Response.Status.OK).entity(creditJson).build();
 }
