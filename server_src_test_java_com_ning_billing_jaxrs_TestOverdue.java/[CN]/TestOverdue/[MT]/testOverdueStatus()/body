@@ -1,6 +1,6 @@
 {
   final AccountJson accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
-  final List<InvoiceJsonWithItems> invoices=getInvoicesWithItemsForAccount(accountJson.getAccountId());
+  final List<InvoiceJson> invoices=getInvoicesWithItemsForAccount(accountJson.getAccountId());
   assertEquals(invoices.size(),2);
   final String bundleId=invoices.get(1).getItems().get(0).getBundleId();
   Assert.assertTrue(getOverdueStateForAccount(accountJson.getAccountId()).isClearState());
@@ -13,7 +13,7 @@
   clock.addDays(10);
   crappyWaitForLackOfProperSynchonization();
   Assert.assertEquals(getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD3");
-  for (  final InvoiceJsonSimple invoice : getInvoicesForAccount(accountJson.getAccountId())) {
+  for (  final InvoiceJson invoice : getInvoicesForAccount(accountJson.getAccountId())) {
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
       createExternalPayment(accountJson,invoice.getInvoiceId(),invoice.getBalance());
     }

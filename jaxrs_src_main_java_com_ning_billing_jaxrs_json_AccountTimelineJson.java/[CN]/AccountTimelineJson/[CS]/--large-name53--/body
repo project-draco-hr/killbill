@@ -6,7 +6,7 @@
     final BundleJson jsonWithSubscriptions=new BundleJson(bundle,bundleAuditLogs,subscriptionsAuditLogs,subscriptionEventsAuditLogs);
     this.bundles.add(jsonWithSubscriptions);
   }
-  this.invoices=new LinkedList<InvoiceJsonWithBundleKeys>();
+  this.invoices=new LinkedList<InvoiceJson>();
   final List<CreditJson> credits=new ArrayList<CreditJson>();
   for (  final Invoice invoice : invoices) {
     for (    final InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
@@ -18,7 +18,7 @@
   }
   for (  final Invoice invoice : invoices) {
     final List<AuditLog> auditLogs=invoiceAuditLogs.get(invoice.getId());
-    this.invoices.add(new InvoiceJsonWithBundleKeys(invoice,getBundleExternalKey(invoice,bundles),credits,auditLogs));
+    this.invoices.add(new InvoiceJson(invoice,getBundleExternalKey(invoice,bundles),credits,auditLogs));
   }
   this.payments=new LinkedList<PaymentJson>();
   for (  final Payment payment : payments) {

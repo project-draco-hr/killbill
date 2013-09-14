@@ -4,16 +4,16 @@
   final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(UUID.fromString(accountId),tenantContext);
   final AuditLogsForInvoices invoicesAuditLogs=auditUserApi.getAuditLogsForInvoices(invoices,auditMode.getLevel(),tenantContext);
   if (withItems) {
-    final List<InvoiceJsonWithItems> result=new LinkedList<InvoiceJsonWithItems>();
+    final List<InvoiceJson> result=new LinkedList<InvoiceJson>();
     for (    final Invoice invoice : invoices) {
-      result.add(new InvoiceJsonWithItems(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId()),invoicesAuditLogs.getInvoiceItemsAuditLogs()));
+      result.add(new InvoiceJson(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId()),invoicesAuditLogs.getInvoiceItemsAuditLogs()));
     }
     return Response.status(Status.OK).entity(result).build();
   }
  else {
-    final List<InvoiceJsonSimple> result=new LinkedList<InvoiceJsonSimple>();
+    final List<InvoiceJson> result=new LinkedList<InvoiceJson>();
     for (    final Invoice invoice : invoices) {
-      result.add(new InvoiceJsonSimple(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId())));
+      result.add(new InvoiceJson(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId())));
     }
     return Response.status(Status.OK).entity(result).build();
   }

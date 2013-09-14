@@ -1,13 +1,13 @@
 {
   final AccountJson accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
-  final List<InvoiceJsonWithItems> invoices=getInvoicesWithItemsForAccount(accountJson.getAccountId());
+  final List<InvoiceJson> invoices=getInvoicesWithItemsForAccount(accountJson.getAccountId());
   assertEquals(invoices.size(),2);
-  final InvoiceJsonWithItems invoice=invoices.get(1);
+  final InvoiceJson invoice=invoices.get(1);
   assertEquals(invoice.getAmount().compareTo(BigDecimal.ZERO),1);
   final InvoiceItemJson invoiceItem=invoice.getItems().get(0);
   assertEquals(invoiceItem.getAmount().compareTo(BigDecimal.ZERO),1);
   adjustInvoiceItem(accountJson.getAccountId(),invoice.getInvoiceId(),invoiceItem.getInvoiceItemId(),null,null,null);
-  final InvoiceJsonWithItems adjustedInvoice=getInvoiceWithItemsWithAudits(invoice.getInvoiceId(),AuditLevel.FULL);
+  final InvoiceJson adjustedInvoice=getInvoiceWithItemsWithAudits(invoice.getInvoiceId(),AuditLevel.FULL);
   assertEquals(adjustedInvoice.getAmount().compareTo(BigDecimal.ZERO),0);
   Assert.assertEquals(adjustedInvoice.getAuditLogs().size(),1);
   final AuditLogJson invoiceAuditLogJson=adjustedInvoice.getAuditLogs().get(0);

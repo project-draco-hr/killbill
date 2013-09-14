@@ -2,11 +2,11 @@
   final DateTime initialDate=new DateTime(2012,4,25,0,3,42,0);
   clock.setDeltaFromReality(initialDate.getMillis() - clock.getUTCNow().getMillis());
   final AccountJson accountJson=createAccountWithPMBundleAndSubscriptionAndWaitForFirstInvoice();
-  final List<InvoiceJsonSimple> invoices=getInvoicesForAccountWithAudits(accountJson.getAccountId(),AuditLevel.FULL);
+  final List<InvoiceJson> invoices=getInvoicesForAccountWithAudits(accountJson.getAccountId(),AuditLevel.FULL);
   assertEquals(invoices.size(),2);
-  for (  final InvoiceJsonSimple invoiceJsonSimple : invoices) {
-    Assert.assertEquals(invoiceJsonSimple.getAuditLogs().size(),1);
-    final AuditLogJson auditLogJson=invoiceJsonSimple.getAuditLogs().get(0);
+  for (  final InvoiceJson invoiceJson : invoices) {
+    Assert.assertEquals(invoiceJson.getAuditLogs().size(),1);
+    final AuditLogJson auditLogJson=invoiceJson.getAuditLogs().get(0);
     Assert.assertEquals(auditLogJson.getChangeType(),"INSERT");
     Assert.assertEquals(auditLogJson.getChangedBy(),"SubscriptionBaseTransition");
     Assert.assertFalse(auditLogJson.getChangeDate().isBefore(initialDate));
@@ -14,14 +14,14 @@
     Assert.assertNull(auditLogJson.getReasonCode());
     Assert.assertNull(auditLogJson.getComments());
   }
-  final InvoiceJsonSimple invoiceJsonSimple=invoices.get(0);
-  final InvoiceJsonSimple firstInvoiceJson=getInvoice(invoiceJsonSimple.getInvoiceId());
-  assertEquals(firstInvoiceJson,invoiceJsonSimple);
-  final InvoiceJsonSimple firstInvoiceByNumberJson=getInvoice(invoiceJsonSimple.getInvoiceNumber());
-  assertEquals(firstInvoiceByNumberJson,invoiceJsonSimple);
+  final InvoiceJson invoiceJson=invoices.get(0);
+  final InvoiceJson firstInvoiceJson=getInvoice(invoiceJson.getInvoiceId());
+  assertEquals(firstInvoiceJson,invoiceJson);
+  final InvoiceJson firstInvoiceByNumberJson=getInvoice(invoiceJson.getInvoiceNumber());
+  assertEquals(firstInvoiceByNumberJson,invoiceJson);
   final DateTime futureDate=clock.getUTCNow().plusMonths(1).plusDays(3);
   createDryRunInvoice(accountJson.getAccountId(),futureDate);
   createInvoice(accountJson.getAccountId(),futureDate);
-  final List<InvoiceJsonSimple> newInvoiceList=getInvoicesForAccount(accountJson.getAccountId());
+  final List<InvoiceJson> newInvoiceList=getInvoicesForAccount(accountJson.getAccountId());
   assertEquals(newInvoiceList.size(),3);
 }

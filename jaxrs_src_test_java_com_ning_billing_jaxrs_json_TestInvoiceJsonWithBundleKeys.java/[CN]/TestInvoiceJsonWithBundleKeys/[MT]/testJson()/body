@@ -12,7 +12,7 @@
   final CreditJson creditJson=createCreditJson();
   final List<CreditJson> credits=ImmutableList.<CreditJson>of(creditJson);
   final List<AuditLogJson> auditLogs=createAuditLogsJson(clock.getUTCNow());
-  final InvoiceJsonWithBundleKeys invoiceJsonSimple=new InvoiceJsonWithBundleKeys(amount,Currency.USD.toString(),creditAdj,refundAdj,invoiceId,invoiceDate,targetDate,invoiceNumber,balance,accountId,bundleKeys,credits,auditLogs);
+  final InvoiceJson invoiceJsonSimple=new InvoiceJson(amount,Currency.USD.toString(),creditAdj,refundAdj,invoiceId,invoiceDate,targetDate,invoiceNumber,balance,accountId,bundleKeys,credits,null,auditLogs);
   Assert.assertEquals(invoiceJsonSimple.getAmount(),amount);
   Assert.assertEquals(invoiceJsonSimple.getCreditAdj(),creditAdj);
   Assert.assertEquals(invoiceJsonSimple.getRefundAdj(),refundAdj);
@@ -26,6 +26,6 @@
   Assert.assertEquals(invoiceJsonSimple.getCredits(),credits);
   Assert.assertEquals(invoiceJsonSimple.getAuditLogs(),auditLogs);
   final String asJson=mapper.writeValueAsString(invoiceJsonSimple);
-  final InvoiceJsonWithBundleKeys fromJson=mapper.readValue(asJson,InvoiceJsonWithBundleKeys.class);
+  final InvoiceJson fromJson=mapper.readValue(asJson,InvoiceJson.class);
   Assert.assertEquals(fromJson,invoiceJsonSimple);
 }
