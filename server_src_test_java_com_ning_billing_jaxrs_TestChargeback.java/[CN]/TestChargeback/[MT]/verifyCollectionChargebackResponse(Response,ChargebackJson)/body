@@ -1,8 +1,10 @@
 {
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  final ChargebackCollectionJson objFromJson=mapper.readValue(response.getResponseBody(),ChargebackCollectionJson.class);
-  assertEquals(objFromJson.getChargebacks().size(),1);
-  final ChargebackJson chargeBack=objFromJson.getChargebacks().get(0);
+  final List<ChargebackJson> chargebackJson=mapper.readValue(response.getResponseBody(),new TypeReference<List<ChargebackJson>>(){
+  }
+);
+  assertEquals(chargebackJson.size(),1);
+  final ChargebackJson chargeBack=chargebackJson.get(0);
   assertTrue(chargeBack.getAmount().compareTo(input.getAmount()) == 0);
   assertEquals(chargeBack.getPaymentId(),input.getPaymentId());
 }

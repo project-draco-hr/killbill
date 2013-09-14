@@ -1,6 +1,6 @@
 {
   final PaymentJsonSimple payment=createAccountWithInvoiceAndPayment();
-  final ChargebackJson input=new ChargebackJson(null,null,new BigDecimal("50.00"),payment.getPaymentId(),null,null);
+  final ChargebackJson input=new ChargebackJson(null,null,null,new BigDecimal("50.00"),payment.getPaymentId(),null,null);
   final String jsonInput=mapper.writeValueAsString(input);
   int count=4;
   Response response;
@@ -12,15 +12,19 @@
   assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode(),response.getResponseBody());
   response=doGet(JaxrsResource.ACCOUNTS_PATH + "/" + payment.getAccountId()+ "/"+ JaxrsResource.CHARGEBACKS,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
-  ChargebackCollectionJson objFromJson=mapper.readValue(response.getResponseBody(),ChargebackCollectionJson.class);
-  assertEquals(objFromJson.getChargebacks().size(),4);
-  for (int i=0; i < objFromJson.getChargebacks().size(); i++) {
-    final ChargebackJson chargeBack=objFromJson.getChargebacks().get(i);
+  List<ChargebackJson> chargebacks=mapper.readValue(response.getResponseBody(),new TypeReference<List<ChargebackJson>>(){
+  }
+);
+  assertEquals(chargebacks.size(),4);
+  for (int i=0; i < chargebacks.size(); i++) {
+    final ChargebackJson chargeBack=chargebacks.get(i);
     assertTrue(chargeBack.getAmount().compareTo(input.getAmount()) == 0);
     assertEquals(chargeBack.getPaymentId(),input.getPaymentId());
   }
   response=doGet(JaxrsResource.PAYMENTS_PATH + "/" + payment.getPaymentId()+ "/"+ JaxrsResource.CHARGEBACKS,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
-  objFromJson=mapper.readValue(response.getResponseBody(),ChargebackCollectionJson.class);
-  assertEquals(objFromJson.getChargebacks().size(),4);
+  chargebacks=mapper.readValue(response.getResponseBody(),new TypeReference<List<ChargebackJson>>(){
+  }
+);
+  assertEquals(chargebacks.size(),4);
 }
