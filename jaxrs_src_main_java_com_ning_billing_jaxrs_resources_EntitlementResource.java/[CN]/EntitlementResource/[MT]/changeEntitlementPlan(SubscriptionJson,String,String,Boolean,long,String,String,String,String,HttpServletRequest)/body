@@ -1,0 +1,36 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final EntitlementCallCompletionCallback<Response> callback=new EntitlementCallCompletionCallback<Response>(){
+    private boolean isImmediateOp=true;
+    @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException {
+      final UUID uuid=UUID.fromString(entitlementId);
+      final Entitlement current=entitlementApi.getEntitlementForId(uuid,callContext);
+      final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
+      final Entitlement newEntitlement;
+      if (requestedDate == null && policyString == null) {
+        newEntitlement=current.changePlan(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),ctx);
+      }
+ else       if (policyString == null) {
+        newEntitlement=current.changePlanWithDate(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,ctx);
+      }
+ else {
+        final BillingActionPolicy policy=BillingActionPolicy.valueOf(policyString.toUpperCase());
+        newEntitlement=current.changePlanOverrideBillingPolicy(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),inputLocalDate,policy,ctx);
+      }
+      isImmediateOp=newEntitlement.getLastActiveProduct().getName().equals(entitlement.getProductName()) && newEntitlement.getLastActivePlan().getBillingPeriod() == BillingPeriod.valueOf(entitlement.getBillingPeriod()) && newEntitlement.getLastActivePriceList().getName().equals(entitlement.getPriceList());
+      return Response.status(Status.OK).build();
+    }
+    @Override public boolean isImmOperation(){
+      return isImmediateOp;
+    }
+    @Override public Response doResponseOk(    final Response operationResponse) throws SubscriptionApiException {
+      if (operationResponse.getStatus() != Status.OK.getStatusCode()) {
+        return operationResponse;
+      }
+      return getEntitlement(entitlementId,request);
+    }
+  }
+;
+  final EntitlementCallCompletion<Response> callCompletionCreation=new EntitlementCallCompletion<Response>();
+  return callCompletionCreation.withSynchronization(callback,timeoutSec,callCompletion,callContext);
+}

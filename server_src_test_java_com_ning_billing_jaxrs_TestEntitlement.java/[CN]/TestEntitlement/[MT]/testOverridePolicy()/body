@@ -4,21 +4,21 @@
   final AccountJson accountJson=createAccountWithDefaultPaymentMethod("xil","shdxilhkkl","xil@yahoo.com");
   final String productName="Shotgun";
   final BillingPeriod term=BillingPeriod.ANNUAL;
-  final EntitlementJsonNoEvents entitlementJsonNoEvents=createEntitlement(accountJson.getAccountId(),"99999",productName,ProductCategory.BASE.toString(),term.toString(),true);
-  final String uri=JaxrsResource.ENTITLEMENTS_PATH + "/" + entitlementJsonNoEvents.getSubscriptionId();
+  final SubscriptionJson SubscriptionJson=createEntitlement(accountJson.getAccountId(),"99999",productName,ProductCategory.BASE.toString(),term.toString(),true);
+  final String uri=JaxrsResource.ENTITLEMENTS_PATH + "/" + SubscriptionJson.getSubscriptionId();
   Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   String baseJson=response.getResponseBody();
-  EntitlementJsonNoEvents objFromJson=mapper.readValue(baseJson,EntitlementJsonNoEvents.class);
-  Assert.assertTrue(objFromJson.equals(entitlementJsonNoEvents));
+  SubscriptionJson objFromJson=mapper.readValue(baseJson,SubscriptionJson.class);
+  Assert.assertTrue(objFromJson.equals(SubscriptionJson));
   assertEquals(objFromJson.getBillingPeriod(),BillingPeriod.ANNUAL.toString());
-  final EntitlementJsonNoEvents newInput=new EntitlementJsonNoEvents(null,null,entitlementJsonNoEvents.getSubscriptionId(),null,null,entitlementJsonNoEvents.getProductName(),entitlementJsonNoEvents.getProductCategory(),BillingPeriod.MONTHLY.toString(),entitlementJsonNoEvents.getPriceList(),entitlementJsonNoEvents.getCancelledDate(),null);
+  final SubscriptionJson newInput=new SubscriptionJson(null,null,SubscriptionJson.getSubscriptionId(),null,null,SubscriptionJson.getProductName(),SubscriptionJson.getProductCategory(),BillingPeriod.MONTHLY.toString(),SubscriptionJson.getPriceList(),SubscriptionJson.getCancelledDate(),null,null,null,null,null,null,null);
   baseJson=mapper.writeValueAsString(newInput);
   final Map<String,String> queryParams=getQueryParamsForCallCompletion(CALL_COMPLETION_TIMEOUT_SEC);
   queryParams.put(JaxrsResource.QUERY_BILLING_POLICY,"immediate");
   response=doPut(uri,baseJson,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   baseJson=response.getResponseBody();
-  objFromJson=mapper.readValue(baseJson,EntitlementJsonNoEvents.class);
+  objFromJson=mapper.readValue(baseJson,SubscriptionJson.class);
   assertEquals(objFromJson.getBillingPeriod(),BillingPeriod.MONTHLY.toString());
 }

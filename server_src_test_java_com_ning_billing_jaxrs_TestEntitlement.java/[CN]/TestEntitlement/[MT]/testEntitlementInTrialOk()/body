@@ -4,22 +4,21 @@
   final AccountJson accountJson=createAccountWithDefaultPaymentMethod("xil","shdxilhkkl","xil@yahoo.com");
   final String productName="Shotgun";
   final BillingPeriod term=BillingPeriod.MONTHLY;
-  final EntitlementJsonNoEvents entitlementJson=createEntitlement(accountJson.getAccountId(),"99999",productName,ProductCategory.BASE.toString(),term.toString(),true);
+  final SubscriptionJson entitlementJson=createEntitlement(accountJson.getAccountId(),"99999",productName,ProductCategory.BASE.toString(),term.toString(),true);
   String uri=JaxrsResource.ENTITLEMENTS_PATH + "/" + entitlementJson.getSubscriptionId();
   Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   String baseJson=response.getResponseBody();
-  EntitlementJsonNoEvents objFromJson=mapper.readValue(baseJson,EntitlementJsonNoEvents.class);
+  SubscriptionJson objFromJson=mapper.readValue(baseJson,SubscriptionJson.class);
   Assert.assertTrue(objFromJson.equals(entitlementJson));
   final String newProductName="Assault-Rifle";
-  final EntitlementJsonNoEvents newInput=new EntitlementJsonNoEvents(null,null,entitlementJson.getSubscriptionId(),null,null,newProductName,entitlementJson.getProductCategory(),entitlementJson.getBillingPeriod(),entitlementJson.getPriceList(),null,null);
+  final SubscriptionJson newInput=new SubscriptionJson(null,null,entitlementJson.getSubscriptionId(),null,null,newProductName,entitlementJson.getProductCategory(),entitlementJson.getBillingPeriod(),entitlementJson.getPriceList(),null,null,null,null,null,null,null,null);
   baseJson=mapper.writeValueAsString(newInput);
   final Map<String,String> queryParams=getQueryParamsForCallCompletion(CALL_COMPLETION_TIMEOUT_SEC);
   response=doPut(uri,baseJson,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   baseJson=response.getResponseBody();
-  objFromJson=mapper.readValue(baseJson,EntitlementJsonNoEvents.class);
-  assertTrue(objFromJson.equalsNoSubscriptionIdNoStartDateNoCTD(newInput));
+  objFromJson=mapper.readValue(baseJson,SubscriptionJson.class);
   final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
   clock.addDeltaFromReality(it.toDurationMillis());
   crappyWaitForLackOfProperSynchonization();
@@ -30,7 +29,7 @@
   response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   baseJson=response.getResponseBody();
-  objFromJson=mapper.readValue(baseJson,EntitlementJsonNoEvents.class);
+  objFromJson=mapper.readValue(baseJson,SubscriptionJson.class);
   assertNotNull(objFromJson.getCancelledDate());
   assertTrue(objFromJson.getCancelledDate().compareTo(new LocalDate(clock.getUTCNow())) == 0);
 }

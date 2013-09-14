@@ -4,14 +4,14 @@
   accountUserApi.getAccountById(uuid,tenantContext);
   if (externalKey != null) {
     final SubscriptionBundle bundle=subscriptionApi.getSubscriptionBundleForAccountIdAndExternalKey(uuid,externalKey,tenantContext);
-    final BundleJsonNoSubscriptions json=new BundleJsonNoSubscriptions(bundle);
+    final BundleJson json=new BundleJson(bundle,null,null,null);
     return Response.status(Status.OK).entity(json).build();
   }
  else {
     final List<SubscriptionBundle> bundles=subscriptionApi.getSubscriptionBundlesForAccountId(uuid,tenantContext);
-    final Collection<BundleJsonNoSubscriptions> result=Collections2.transform(bundles,new Function<SubscriptionBundle,BundleJsonNoSubscriptions>(){
-      @Override public BundleJsonNoSubscriptions apply(      final SubscriptionBundle input){
-        return new BundleJsonNoSubscriptions(input);
+    final Collection<BundleJson> result=Collections2.transform(bundles,new Function<SubscriptionBundle,BundleJson>(){
+      @Override public BundleJson apply(      final SubscriptionBundle input){
+        return new BundleJson(input,null,null,null);
       }
     }
 );
