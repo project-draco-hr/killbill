@@ -6,7 +6,10 @@
   }
   final UUID invoicePaymentId=chargebacks.get(0).getId();
   final String accountId=invoicePaymentApi.getAccountIdFromInvoicePaymentId(invoicePaymentId,tenantContext).toString();
-  final List<ChargebackJson> chargebacksJson=convertToJson(chargebacks);
+  final List<ChargebackJson> chargebacksJson=new ArrayList<ChargebackJson>();
+  for (  final InvoicePayment chargeback : chargebacks) {
+    chargebacksJson.add(new ChargebackJson(chargeback));
+  }
   final ChargebackCollectionJson json=new ChargebackCollectionJson(accountId,chargebacksJson);
   return Response.status(Response.Status.OK).entity(json).build();
 }
