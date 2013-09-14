@@ -1,8 +1,8 @@
 {
   final String uri=JaxrsResource.PAYMENTS_PATH + "/" + paymentId+ "/"+ JaxrsResource.REFUNDS;
-  final List<InvoiceItemJsonSimple> adjustments=new ArrayList<InvoiceItemJsonSimple>();
+  final List<InvoiceItemJson> adjustments=new ArrayList<InvoiceItemJson>();
   for (  final String itemId : itemAdjustments.keySet()) {
-    adjustments.add(new InvoiceItemJsonSimple(itemId,null,null,null,null,null,null,null,null,null,null,itemAdjustments.get(itemId),null,null));
+    adjustments.add(new InvoiceItemJson(itemId,null,null,null,null,null,null,null,null,null,null,itemAdjustments.get(itemId),null,null));
   }
   final RefundJson refundJson=new RefundJson(null,paymentId,amount,DEFAULT_CURRENCY,adjusted,null,null,adjustments,null);
   final String baseJson=mapper.writeValueAsString(refundJson);
@@ -16,8 +16,8 @@
   final RefundJson retrievedRefundJson=mapper.readValue(retrievedBaseJson,RefundJson.class);
   assertNotNull(retrievedRefundJson);
   if (retrievedRefundJson.getAdjustments() != null) {
-    final Set<String> allLinkedItemIds=new HashSet<String>(Collections2.transform(retrievedRefundJson.getAdjustments(),new Function<InvoiceItemJsonSimple,String>(){
-      @Override public String apply(      @Nullable final InvoiceItemJsonSimple input){
+    final Set<String> allLinkedItemIds=new HashSet<String>(Collections2.transform(retrievedRefundJson.getAdjustments(),new Function<InvoiceItemJson,String>(){
+      @Override public String apply(      @Nullable final InvoiceItemJson input){
         if (input != null) {
           return input.getLinkedInvoiceItemId();
         }

@@ -20,7 +20,7 @@
     final List<AuditLog> auditLogs=invoiceAuditLogs.get(invoice.getId());
     this.invoices.add(new InvoiceJsonWithBundleKeys(invoice,getBundleExternalKey(invoice,bundles),credits,auditLogs));
   }
-  this.payments=new LinkedList<PaymentJsonWithBundleKeys>();
+  this.payments=new LinkedList<PaymentJson>();
   for (  final Payment payment : payments) {
     final List<RefundJson> refunds=new ArrayList<RefundJson>();
     for (    final Refund refund : refundsByPayment.get(payment.getId())) {
@@ -35,6 +35,6 @@
     final int nbOfPaymentAttempts=payment.getAttempts().size();
     final String status=payment.getPaymentStatus().toString();
     final List<AuditLog> auditLogs=paymentsAuditLogs.get(payment.getId());
-    this.payments.add(new PaymentJsonWithBundleKeys(payment,status,nbOfPaymentAttempts,getBundleExternalKey(payment.getInvoiceId(),invoices,bundles),account.getId(),refunds,chargebacks,auditLogs));
+    this.payments.add(new PaymentJson(payment,getBundleExternalKey(payment.getInvoiceId(),invoices,bundles),refunds,chargebacks,auditLogs));
   }
 }

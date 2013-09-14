@@ -1,0 +1,30 @@
+{
+  Assert.assertEquals(refundJsonCheck.getPaymentId(),paymentJson.getPaymentId());
+  Assert.assertEquals(refundJsonCheck.getAmount().setScale(2,RoundingMode.HALF_UP),refundAmount.setScale(2,RoundingMode.HALF_UP));
+  Assert.assertEquals(refundJsonCheck.getCurrency(),DEFAULT_CURRENCY);
+  Assert.assertEquals(refundJsonCheck.getEffectiveDate().getYear(),clock.getUTCNow().getYear());
+  Assert.assertEquals(refundJsonCheck.getEffectiveDate().getMonthOfYear(),clock.getUTCNow().getMonthOfYear());
+  Assert.assertEquals(refundJsonCheck.getEffectiveDate().getDayOfMonth(),clock.getUTCNow().getDayOfMonth());
+  Assert.assertEquals(refundJsonCheck.getRequestedDate().getYear(),clock.getUTCNow().getYear());
+  Assert.assertEquals(refundJsonCheck.getRequestedDate().getMonthOfYear(),clock.getUTCNow().getMonthOfYear());
+  Assert.assertEquals(refundJsonCheck.getRequestedDate().getDayOfMonth(),clock.getUTCNow().getDayOfMonth());
+  final List<RefundJson> retrievedRefunds=getRefundsForPayment(paymentJson.getPaymentId());
+  Assert.assertEquals(retrievedRefunds.size(),1);
+  final PaymentJson retrievedPaymentJson=getPaymentWithRefundsAndChargebacks(paymentJson.getPaymentId());
+  Assert.assertEquals(retrievedPaymentJson.getPaymentId(),paymentJson.getPaymentId());
+  Assert.assertEquals(retrievedPaymentJson.getPaidAmount().setScale(2,RoundingMode.HALF_UP),paymentJson.getPaidAmount().add(refundAmount.negate()).setScale(2,RoundingMode.HALF_UP));
+  Assert.assertEquals(retrievedPaymentJson.getAmount().setScale(2,RoundingMode.HALF_UP),paymentJson.getAmount().setScale(2,RoundingMode.HALF_UP));
+  Assert.assertEquals(retrievedPaymentJson.getAccountId(),paymentJson.getAccountId());
+  Assert.assertEquals(retrievedPaymentJson.getInvoiceId(),paymentJson.getInvoiceId());
+  Assert.assertEquals(retrievedPaymentJson.getRequestedDate(),paymentJson.getRequestedDate());
+  Assert.assertEquals(retrievedPaymentJson.getEffectiveDate(),paymentJson.getEffectiveDate());
+  Assert.assertEquals(retrievedPaymentJson.getRetryCount(),paymentJson.getRetryCount());
+  Assert.assertEquals(retrievedPaymentJson.getCurrency(),paymentJson.getCurrency());
+  Assert.assertEquals(retrievedPaymentJson.getStatus(),paymentJson.getStatus());
+  Assert.assertEquals(retrievedPaymentJson.getGatewayErrorCode(),paymentJson.getGatewayErrorCode());
+  Assert.assertEquals(retrievedPaymentJson.getGatewayErrorMsg(),paymentJson.getGatewayErrorMsg());
+  Assert.assertEquals(retrievedPaymentJson.getPaymentMethodId(),paymentJson.getPaymentMethodId());
+  Assert.assertEquals(retrievedPaymentJson.getChargebacks().size(),0);
+  Assert.assertEquals(retrievedPaymentJson.getRefunds().size(),1);
+  Assert.assertEquals(retrievedPaymentJson.getRefunds().get(0),refundJsonCheck);
+}

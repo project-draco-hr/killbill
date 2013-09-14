@@ -1,13 +1,13 @@
 {
   final AccountJson accountJson=createAccountWithPMBundleAndSubscriptionAndWaitForFirstInvoice();
-  final List<PaymentJsonSimple> firstPaymentForAccount=getPaymentsForAccount(accountJson.getAccountId());
+  final List<PaymentJson> firstPaymentForAccount=getPaymentsForAccount(accountJson.getAccountId());
   Assert.assertEquals(firstPaymentForAccount.size(),1);
-  final PaymentJsonSimple paymentJsonSimple=firstPaymentForAccount.get(0);
-  final String paymentMethodId=paymentJsonSimple.getPaymentMethodId();
+  final PaymentJson paymentJson=firstPaymentForAccount.get(0);
+  final String paymentMethodId=paymentJson.getPaymentMethodId();
   final PaymentMethodJson paymentMethodJson=getPaymentMethodWithPluginInfo(paymentMethodId);
   Assert.assertEquals(paymentMethodJson.getPaymentMethodId(),paymentMethodId);
   Assert.assertEquals(paymentMethodJson.getAccountId(),accountJson.getAccountId());
-  final List<RefundJson> objRefundFromJson=getRefundsForPayment(paymentJsonSimple.getPaymentId());
+  final List<RefundJson> objRefundFromJson=getRefundsForPayment(paymentJson.getPaymentId());
   Assert.assertEquals(objRefundFromJson.size(),0);
-  return paymentJsonSimple;
+  return paymentJson;
 }
