@@ -1,0 +1,19 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Long tenantRecordId=recordIdApi.getRecordId(tenantContext.getTenantId(),ObjectType.TENANT,tenantContext);
+  final List<NotificationQueue> queues=notificationQueueService.getNotificationQueues();
+  int nbTryLeft=timeoutSec != null ? timeoutSec.intValue() : 0;
+  try {
+    boolean areAllNotificationsProcessed=false;
+    while (!areAllNotificationsProcessed && nbTryLeft > 0) {
+      areAllNotificationsProcessed=areAllNotificationsProcessed(queues,tenantRecordId);
+      if (!areAllNotificationsProcessed) {
+        Thread.sleep(MILLIS_IN_SEC);
+        nbTryLeft--;
+      }
+    }
+    ;
+  }
+ catch (  InterruptedException ignore) {
+  }
+}
