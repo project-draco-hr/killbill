@@ -1,9 +1,16 @@
 {
-  final List<Entitlement> result=new LinkedList<Entitlement>();
   final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(tenantContext);
+  final Account account;
+  try {
+    account=accountApi.getAccountById(accountId,context);
+  }
+ catch (  AccountApiException e) {
+    throw new EntitlementApiException(e);
+  }
   final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(accountId,context);
+  final List<Entitlement> result=new LinkedList<Entitlement>();
   for (  final SubscriptionBaseBundle bundle : bundles) {
-    final List<Entitlement> entitlements=getAllEntitlementsForBundleId(bundle.getId(),bundle.getAccountId(),bundle.getExternalKey(),context);
+    final List<Entitlement> entitlements=getAllEntitlementsForBundleId(bundle.getId(),bundle.getAccountId(),account.getTimeZone(),bundle.getExternalKey(),context);
     result.addAll(entitlements);
   }
   return result;
