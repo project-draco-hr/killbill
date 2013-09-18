@@ -9,14 +9,22 @@
   }
 ));
   final Account account=accountApi.getAccountById(baseBundle.getAccountId(),internalTenantContext);
+  final InternalTenantContext internalTenantContextWithAccountRecordId=internalCallContextFactory.createInternalTenantContext(account.getId(),context);
   final DateTimeZone accountTimeZone=account.getTimeZone();
-  final List<BlockingState> allBlockingStates=new ArrayList<BlockingState>();
-  allBlockingStates.addAll(blockingStateDao.getBlockingAll(account.getId(),internalTenantContext));
-  allBlockingStates.addAll(blockingStateDao.getBlockingAll(bundleId,internalTenantContext));
-  for (  Entitlement cur : entitlements) {
-    allBlockingStates.addAll(blockingStateDao.getBlockingAll(cur.getId(),internalTenantContext));
+  final List<BlockingState> allBlockingStatesPerAccountRecordId=blockingStateDao.getBlockingAllForAccountRecordId(internalTenantContextWithAccountRecordId);
+  final Set<UUID> allEntitlementIds=new HashSet<UUID>(Collections2.<Entitlement,UUID>transform(entitlements,new Function<Entitlement,UUID>(){
+    @Override public UUID apply(    final Entitlement input){
+      return input.getId();
+    }
   }
-  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,account.getId(),bundleId,baseBundle.getExternalKey(),entitlements,allBlockingStates);
+));
+  final List<BlockingState> filteredBlockingStates=new LinkedList<BlockingState>(Collections2.filter(allBlockingStatesPerAccountRecordId,new Predicate<BlockingState>(){
+    @Override public boolean apply(    final BlockingState input){
+      return input.getType() == BlockingStateType.ACCOUNT || (input.getType() == BlockingStateType.SUBSCRIPTION_BUNDLE && input.getBlockedId().equals(bundleId)) || (input.getType() == BlockingStateType.SUBSCRIPTION && allEntitlementIds.contains(input.getBlockedId()));
+    }
+  }
+));
+  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,account.getId(),bundleId,baseBundle.getExternalKey(),entitlements,filteredBlockingStates);
   final DefaultSubscriptionBundle bundle=new DefaultSubscriptionBundle(bundleId,baseBundle.getAccountId(),baseBundle.getExternalKey(),subscriptions,timeline,baseBundle.getCreatedDate(),baseBundle.getUpdatedDate());
   return bundle;
 }
