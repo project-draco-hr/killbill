@@ -2,7 +2,7 @@
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final EntitlementCallCompletionCallback<Response> callback=new EntitlementCallCompletionCallback<Response>(){
     private boolean isImmediateOp=true;
-    @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException {
+    @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException, SubscriptionApiException {
       final UUID uuid=UUID.fromString(entitlementId);
       final Entitlement current=entitlementApi.getEntitlementForId(uuid,ctx);
       final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
@@ -23,7 +23,9 @@
         final BillingActionPolicy billingPolicy=BillingActionPolicy.valueOf(billingPolicyString.toUpperCase());
         newEntitlement=current.cancelEntitlementWithPolicyOverrideBillingPolicy(entitlementPolicy,billingPolicy,ctx);
       }
-      isImmediateOp=newEntitlement.getState() == EntitlementState.ACTIVE;
+      final Subscription subscription=subscriptionApi.getSubscriptionForEntitlementId(newEntitlement.getId(),ctx);
+      final LocalDate nowInAccountTimeZone=new LocalDate(clock.getUTCNow(),subscription.getBillingEndDate().getChronology().getZone());
+      isImmediateOp=subscription.getBillingEndDate() != null && !subscription.getBillingEndDate().isAfter(nowInAccountTimeZone);
       return Response.status(Status.OK).build();
     }
     @Override public boolean isImmOperation(){

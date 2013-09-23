@@ -1,0 +1,26 @@
+{
+  if (state == EntitlementState.CANCELLED || subscriptionBase.getState() == EntitlementState.CANCELLED) {
+    throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
+  }
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
+  final List<BlockingState> blockingStates=blockingStateDao.getBlockingHistoryForService(getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,contextWithValidAccountRecordId);
+  final Collection<BlockingState> filtered=Collections2.filter(blockingStates,new Predicate<BlockingState>(){
+    @Override public boolean apply(    final BlockingState input){
+      return EntitlementService.ENTITLEMENT_SERVICE_NAME.equals(input.getService()) && input.getEffectiveDate().isAfter(clock.getUTCNow());
+    }
+  }
+);
+  final BlockingState futureCancellation=filtered.iterator().hasNext() ? filtered.iterator().next() : null;
+  if (futureCancellation == null) {
+    return;
+  }
+  blockingStateDao.unactiveBlockingState(futureCancellation.getId(),contextWithValidAccountRecordId);
+  if (subscriptionBase.getFutureEndDate() != null) {
+    try {
+      subscriptionBase.uncancel(callContext);
+    }
+ catch (    SubscriptionBaseApiException e) {
+      throw new EntitlementApiException(e);
+    }
+  }
+}

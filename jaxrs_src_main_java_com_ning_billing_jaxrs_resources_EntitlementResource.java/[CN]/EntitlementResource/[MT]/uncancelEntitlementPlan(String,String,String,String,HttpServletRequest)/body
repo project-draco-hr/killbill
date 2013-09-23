@@ -1,3 +1,6 @@
 {
-  throw new UnsupportedOperationException("Call not implemented");
+  final UUID uuid=UUID.fromString(entitlementId);
+  final Entitlement current=entitlementApi.getEntitlementForId(uuid,context.createContext(createdBy,reason,comment,request));
+  current.uncancelEntitlement(context.createContext(createdBy,reason,comment,request));
+  return Response.status(Status.OK).build();
 }
