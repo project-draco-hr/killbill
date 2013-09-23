@@ -1,8 +1,8 @@
 {
-  final UUID accountId=UUID.randomUUID();
+  final UUID accountId=account.getId();
   final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),clock.getUTCToday(),Currency.USD);
-  invoiceUtil.createInvoice(invoice,true,internalCallContext);
-  final InvoiceModelDao retrievedInvoice=invoiceDao.getById(invoice.getId(),internalCallContext);
+  invoiceUtil.createInvoice(invoice,true,context);
+  final InvoiceModelDao retrievedInvoice=invoiceDao.getById(invoice.getId(),context);
   invoiceUtil.checkInvoicesEqual(retrievedInvoice,invoice);
-  invoiceUtil.checkInvoicesEqual(invoiceDao.getByNumber(retrievedInvoice.getInvoiceNumber(),internalCallContext),invoice);
+  invoiceUtil.checkInvoicesEqual(invoiceDao.getByNumber(retrievedInvoice.getInvoiceNumber(),context),invoice);
 }

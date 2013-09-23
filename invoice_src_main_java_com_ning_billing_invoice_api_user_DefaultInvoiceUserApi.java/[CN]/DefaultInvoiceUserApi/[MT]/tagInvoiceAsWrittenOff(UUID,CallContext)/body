@@ -1,6 +1,6 @@
 {
-  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(context);
+  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(invoiceId,ObjectType.INVOICE,context);
   tagApi.addTag(invoiceId,ObjectType.INVOICE,ControlTagType.WRITTEN_OFF.getId(),internalContext);
   final Invoice invoice=new DefaultInvoice(dao.getById(invoiceId,internalContext));
-  notifyBusOfInvoiceAdjustment(invoiceId,invoice.getAccountId(),internalCallContextFactory.createInternalCallContext(invoice.getAccountId(),context));
+  notifyBusOfInvoiceAdjustment(invoiceId,invoice.getAccountId(),internalContext);
 }

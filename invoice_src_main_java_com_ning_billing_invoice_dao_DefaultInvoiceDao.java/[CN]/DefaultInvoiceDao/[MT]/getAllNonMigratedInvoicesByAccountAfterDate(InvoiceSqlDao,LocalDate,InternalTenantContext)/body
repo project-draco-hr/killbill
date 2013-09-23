@@ -1,0 +1,8 @@
+{
+  return ImmutableList.<InvoiceModelDao>copyOf(INVOICE_MODEL_DAO_ORDERING.sortedCopy(Iterables.<InvoiceModelDao>filter(invoiceSqlDao.getByAccountRecordId(context),new Predicate<InvoiceModelDao>(){
+    @Override public boolean apply(    final InvoiceModelDao invoice){
+      return !invoice.isMigrated() && invoice.getTargetDate().compareTo(fromDate) >= 0;
+    }
+  }
+)));
+}

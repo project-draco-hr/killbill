@@ -1,12 +1,12 @@
 {
+  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(accountId,context);
   final Account account;
   try {
-    account=accountUserApi.getAccountById(accountId,internalCallContextFactory.createInternalTenantContext(context));
+    account=accountUserApi.getAccountById(accountId,internalContext);
   }
  catch (  AccountApiException e) {
     throw new InvoiceApiException(e,ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,e.toString());
   }
-  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(accountId,context);
   final DateTime processingDateTime=targetDate.toDateTimeAtCurrentTime(account.getTimeZone());
   final Invoice result=dispatcher.processAccount(accountId,processingDateTime,dryRun,internalContext);
   if (result == null) {

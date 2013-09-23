@@ -15,13 +15,13 @@
   events.add(event1);
   Invoice invoice1=generator.generateInvoice(UUID.randomUUID(),events,invoices,new LocalDate(targetDate1),Currency.USD);
   invoices.add(invoice1);
-  invoiceUtil.createInvoice(invoice1,true,internalCallContext);
-  invoice1=new DefaultInvoice(invoiceDao.getById(invoice1.getId(),internalCallContext));
+  invoiceUtil.createInvoice(invoice1,true,context);
+  invoice1=new DefaultInvoice(invoiceDao.getById(invoice1.getId(),context));
   assertNotNull(invoice1.getInvoiceNumber());
   final BillingEvent event2=invoiceUtil.createMockBillingEvent(null,subscription,targetDate1,plan,phase2,null,TWENTY,currency,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"testEvent2",2L,SubscriptionBaseTransitionType.CHANGE);
   events.add(event2);
   Invoice invoice2=generator.generateInvoice(UUID.randomUUID(),events,invoices,new LocalDate(targetDate2),Currency.USD);
-  invoiceUtil.createInvoice(invoice2,true,internalCallContext);
-  invoice2=new DefaultInvoice(invoiceDao.getById(invoice2.getId(),internalCallContext));
+  invoiceUtil.createInvoice(invoice2,true,context);
+  invoice2=new DefaultInvoice(invoiceDao.getById(invoice2.getId(),context));
   assertNotNull(invoice2.getInvoiceNumber());
 }

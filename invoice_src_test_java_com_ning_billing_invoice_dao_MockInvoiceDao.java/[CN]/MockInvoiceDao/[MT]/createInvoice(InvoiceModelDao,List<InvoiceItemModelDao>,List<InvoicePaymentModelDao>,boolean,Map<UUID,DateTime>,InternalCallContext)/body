@@ -7,6 +7,7 @@ synchronized (monitor) {
     for (    final InvoicePaymentModelDao paymentModelDao : invoicePayments) {
       payments.put(paymentModelDao.getId(),paymentModelDao);
     }
+    accountRecordIds.put(invoice.getAccountId(),context.getAccountRecordId());
   }
   try {
     eventBus.post(new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),InvoiceModelDaoHelper.getBalance(invoice),invoice.getCurrency(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken()));

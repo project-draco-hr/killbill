@@ -1,5 +1,5 @@
 {
-  final UUID accountId=UUID.randomUUID();
+  final UUID accountId=account.getId();
   final List<Invoice> invoiceList=new ArrayList<Invoice>();
   final LocalDate targetDate=new LocalDate(2011,2,16);
   final Currency currency=Currency.USD;
@@ -25,10 +25,10 @@
   final Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,targetDate,Currency.USD);
   assertEquals(invoice2.getBalance(),FIVE);
   invoiceList.add(invoice2);
-  invoiceUtil.createInvoice(invoice1,true,internalCallContext);
-  invoiceUtil.createInvoice(invoice2,true,internalCallContext);
-  final InvoiceModelDao savedInvoice1=invoiceDao.getById(invoice1.getId(),internalCallContext);
+  invoiceUtil.createInvoice(invoice1,true,context);
+  invoiceUtil.createInvoice(invoice2,true,context);
+  final InvoiceModelDao savedInvoice1=invoiceDao.getById(invoice1.getId(),context);
   assertEquals(InvoiceModelDaoHelper.getBalance(savedInvoice1),FIVE);
-  final InvoiceModelDao savedInvoice2=invoiceDao.getById(invoice2.getId(),internalCallContext);
+  final InvoiceModelDao savedInvoice2=invoiceDao.getById(invoice2.getId(),context);
   assertEquals(InvoiceModelDaoHelper.getBalance(savedInvoice2),TEN);
 }

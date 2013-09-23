@@ -22,7 +22,7 @@
         if (accountCBA.compareTo(cbaItem.getAmount().negate()) < 0) {
           throw new IllegalStateException("The account balance can't be lower than the amount adjusted");
         }
-        final List<InvoiceModelDao> invoicesFollowing=transactional.getInvoicesByAccountAfterDate(accountId.toString(),invoice.getInvoiceDate().toDateTimeAtStartOfDay().toDate(),context);
+        final List<InvoiceModelDao> invoicesFollowing=getAllNonMigratedInvoicesByAccountAfterDate(transactional,invoice.getInvoiceDate(),context);
         invoiceDaoHelper.populateChildren(invoicesFollowing,entitySqlDaoWrapperFactory,context);
         BigDecimal positiveRemainderToAdjust=accountCBA.negate();
         for (        final InvoiceModelDao invoiceFollowing : invoicesFollowing) {

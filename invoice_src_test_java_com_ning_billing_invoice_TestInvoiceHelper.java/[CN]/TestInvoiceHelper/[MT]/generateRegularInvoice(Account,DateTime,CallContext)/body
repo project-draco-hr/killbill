@@ -1,0 +1,25 @@
+{
+  final SubscriptionBase subscription=Mockito.mock(SubscriptionBase.class);
+  Mockito.when(subscription.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(subscription.getBundleId()).thenReturn(new UUID(0L,0L));
+  final BillingEventSet events=new MockBillingEventSet();
+  final Plan plan=MockPlan.createBicycleNoTrialEvergreen1USD();
+  final PlanPhase planPhase=MockPlanPhase.create1USDMonthlyEvergreen();
+  final DateTime effectiveDate=new DateTime().minusDays(1);
+  final Currency currency=Currency.USD;
+  final BigDecimal fixedPrice=null;
+  events.add(createMockBillingEvent(account,subscription,effectiveDate,plan,planPhase,fixedPrice,BigDecimal.ONE,currency,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"",1L,SubscriptionBaseTransitionType.CREATE));
+  Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(Mockito.<UUID>any(),Mockito.<InternalCallContext>any())).thenReturn(events);
+  final InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
+  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,subscriptionApi,invoiceDao,nonEntityDao,invoiceNotifier,locker,busService.getBus(),clock);
+  Invoice invoice=dispatcher.processAccount(account.getId(),targetDate,true,internalCallContext);
+  Assert.assertNotNull(invoice);
+  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
+  List<InvoiceModelDao> invoices=invoiceDao.getInvoicesByAccount(context);
+  Assert.assertEquals(invoices.size(),0);
+  invoice=dispatcher.processAccount(account.getId(),targetDate,false,context);
+  Assert.assertNotNull(invoice);
+  invoices=invoiceDao.getInvoicesByAccount(context);
+  Assert.assertEquals(invoices.size(),1);
+  return invoice.getId();
+}

@@ -5,7 +5,7 @@
     final DateAndTimeZoneContext dateAndTimeZoneContext=billingEvents.iterator().hasNext() ? new DateAndTimeZoneContext(billingEvents.iterator().next().getEffectiveDate(),account.getTimeZone(),clock) : new DateAndTimeZoneContext(null,account.getTimeZone(),clock);
     List<Invoice> invoices=new ArrayList<Invoice>();
     if (!billingEvents.isAccountAutoInvoiceOff()) {
-      invoices=ImmutableList.<Invoice>copyOf(Collections2.transform(invoiceDao.getInvoicesByAccount(accountId,context),new Function<InvoiceModelDao,Invoice>(){
+      invoices=ImmutableList.<Invoice>copyOf(Collections2.transform(invoiceDao.getInvoicesByAccount(context),new Function<InvoiceModelDao,Invoice>(){
         @Override public Invoice apply(        final InvoiceModelDao input){
           return new DefaultInvoice(input);
         }

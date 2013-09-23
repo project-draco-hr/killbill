@@ -1,6 +1,6 @@
 {
   try {
-    invoiceDao.getById(UUID.randomUUID(),internalCallContext);
+    invoiceDao.getById(UUID.randomUUID(),context);
     Assert.fail();
   }
  catch (  TransactionFailedException e) {
@@ -8,35 +8,35 @@
     Assert.assertEquals(((InvoiceApiException)e.getCause()).getCode(),ErrorCode.INVOICE_NOT_FOUND.getCode());
   }
   try {
-    invoiceDao.getByNumber(null,internalCallContext);
+    invoiceDao.getByNumber(null,context);
     Assert.fail();
   }
  catch (  InvoiceApiException e) {
     Assert.assertEquals(e.getCode(),ErrorCode.INVOICE_INVALID_NUMBER.getCode());
   }
   try {
-    invoiceDao.getByNumber(Integer.MIN_VALUE,internalCallContext);
+    invoiceDao.getByNumber(Integer.MIN_VALUE,context);
     Assert.fail();
   }
  catch (  InvoiceApiException e) {
     Assert.assertEquals(e.getCode(),ErrorCode.INVOICE_NUMBER_NOT_FOUND.getCode());
   }
   try {
-    invoiceDao.getChargebackById(UUID.randomUUID(),internalCallContext);
+    invoiceDao.getChargebackById(UUID.randomUUID(),context);
     Assert.fail();
   }
  catch (  InvoiceApiException e) {
     Assert.assertEquals(e.getCode(),ErrorCode.CHARGE_BACK_DOES_NOT_EXIST.getCode());
   }
   try {
-    invoiceDao.getExternalChargeById(UUID.randomUUID(),internalCallContext);
+    invoiceDao.getExternalChargeById(UUID.randomUUID(),context);
     Assert.fail();
   }
  catch (  InvoiceApiException e) {
     Assert.assertEquals(e.getCode(),ErrorCode.INVOICE_ITEM_NOT_FOUND.getCode());
   }
   try {
-    invoiceDao.getCreditById(UUID.randomUUID(),internalCallContext);
+    invoiceDao.getCreditById(UUID.randomUUID(),context);
     Assert.fail();
   }
  catch (  InvoiceApiException e) {

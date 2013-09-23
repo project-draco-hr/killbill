@@ -3,7 +3,7 @@
   if (invoice == null) {
     throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
   }
-  final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(context);
+  final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(invoiceId,ObjectType.INVOICE,context);
   final Account account=accountUserApi.getAccountById(invoice.getAccountId(),internalContext);
   boolean manualPay=false;
   final List<Tag> accountTags=tagApi.getTags(account.getId(),ObjectType.ACCOUNT,internalContext);

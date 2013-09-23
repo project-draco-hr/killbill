@@ -1,0 +1,12 @@
+{
+  final List<InvoiceModelDao> result=new ArrayList<InvoiceModelDao>();
+synchronized (monitor) {
+    final UUID accountId=accountRecordIds.inverse().get(context.getAccountRecordId());
+    for (    final InvoiceModelDao invoice : invoices.values()) {
+      if (accountId.equals(invoice.getAccountId())) {
+        result.add(invoice);
+      }
+    }
+  }
+  return result;
+}

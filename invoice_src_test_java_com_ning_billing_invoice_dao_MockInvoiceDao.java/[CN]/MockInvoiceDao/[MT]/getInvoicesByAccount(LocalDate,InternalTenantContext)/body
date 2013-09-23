@@ -1,0 +1,12 @@
+{
+  final List<InvoiceModelDao> invoicesForAccount=new ArrayList<InvoiceModelDao>();
+synchronized (monitor) {
+    final UUID accountId=accountRecordIds.inverse().get(context.getAccountRecordId());
+    for (    final InvoiceModelDao invoice : get(context)) {
+      if (accountId.equals(invoice.getAccountId()) && !invoice.getTargetDate().isBefore(fromDate) && !invoice.isMigrated()) {
+        invoicesForAccount.add(invoice);
+      }
+    }
+  }
+  return invoicesForAccount;
+}

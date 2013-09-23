@@ -1,5 +1,5 @@
 {
-  final UUID accountId=UUID.randomUUID();
+  final UUID accountId=account.getId();
   final UUID subscriptionId=UUID.randomUUID();
   final UUID bundleId=UUID.randomUUID();
   final LocalDate startDate=new LocalDate(2010,1,1);
@@ -11,16 +11,16 @@
   final UUID invoiceId=invoice.getId();
   final InvoiceItem invoiceItem=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test-plan","test-phase-rec",recuringStartDate,recuringEndDate,new BigDecimal("239.00"),new BigDecimal("239.00"),Currency.USD);
   invoice.addInvoiceItem(invoiceItem);
-  invoiceUtil.createInvoice(invoice,true,internalCallContext);
+  invoiceUtil.createInvoice(invoice,true,context);
   ((ClockMock)clock).addDays(1);
   final BigDecimal paymentAmount=new BigDecimal("239.00");
   final UUID paymentId=UUID.randomUUID();
   final DefaultInvoicePayment defaultInvoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoiceId,clock.getUTCNow(),paymentAmount,Currency.USD);
-  invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment),internalCallContext);
+  invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment),context);
   final Map<UUID,BigDecimal> invoiceItemMap=new HashMap<UUID,BigDecimal>();
   invoiceItemMap.put(invoiceItem.getId(),new BigDecimal("239.00"));
-  invoiceDao.createRefund(paymentId,paymentAmount,true,invoiceItemMap,UUID.randomUUID(),internalCallContext);
-  final InvoiceModelDao savedInvoice=invoiceDao.getById(invoiceId,internalCallContext);
+  invoiceDao.createRefund(paymentId,paymentAmount,true,invoiceItemMap,UUID.randomUUID(),context);
+  final InvoiceModelDao savedInvoice=invoiceDao.getById(invoiceId,context);
   assertNotNull(savedInvoice);
   assertEquals(savedInvoice.getInvoiceItems().size(),2);
   final List<Invoice> invoices=new ArrayList<Invoice>();
@@ -36,8 +36,8 @@
   final BillingEvent event1=invoiceUtil.createMockBillingEvent(null,subscription,recuringStartDate.toDateTimeAtStartOfDay(),plan,phase1,null,TEN,Currency.USD,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"new-event",1L,SubscriptionBaseTransitionType.CREATE);
   events.add(event1);
   final Invoice newInvoice=generator.generateInvoice(UUID.randomUUID(),events,invoices,targetDate,Currency.USD);
-  invoiceUtil.createInvoice(newInvoice,true,internalCallContext);
-  final Invoice firstInvoice=new DefaultInvoice(invoiceDao.getById(invoiceId,internalCallContext));
+  invoiceUtil.createInvoice(newInvoice,true,context);
+  final Invoice firstInvoice=new DefaultInvoice(invoiceDao.getById(invoiceId,context));
   assertNotNull(firstInvoice);
   assertEquals(firstInvoice.getInvoiceItems().size(),2);
 }
