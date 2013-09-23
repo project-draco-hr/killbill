@@ -1,5 +1,5 @@
 {
-  final UUID accountId=UUID.randomUUID();
+  final UUID accountId=account.getId();
   final UUID invoiceId=UUID.randomUUID();
   final UUID bundleId=UUID.randomUUID();
   final LocalDate startDate=new LocalDate(2011,3,1);
@@ -8,8 +8,8 @@
     final UUID subscriptionId=UUID.randomUUID();
     final BigDecimal amount=rate.multiply(new BigDecimal(i + 1));
     final RecurringInvoiceItem item=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"test plan","test phase",startDate,startDate.plusMonths(1),amount,amount,Currency.USD);
-    invoiceUtil.createInvoiceItem(item,internalCallContext);
+    invoiceUtil.createInvoiceItem(item,context);
   }
-  final List<InvoiceItemModelDao> items=invoiceUtil.getInvoiceItemByInvoiceId(invoiceId,internalCallContext);
+  final List<InvoiceItemModelDao> items=invoiceUtil.getInvoiceItemByInvoiceId(invoiceId,context);
   assertEquals(items.size(),5);
 }

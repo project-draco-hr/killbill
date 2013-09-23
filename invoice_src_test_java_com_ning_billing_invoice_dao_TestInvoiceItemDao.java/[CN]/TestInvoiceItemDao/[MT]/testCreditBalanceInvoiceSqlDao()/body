@@ -1,9 +1,9 @@
 {
   final UUID invoiceId=UUID.randomUUID();
-  final UUID accountId=UUID.randomUUID();
+  final UUID accountId=account.getId();
   final LocalDate creditDate=new LocalDate(2012,4,1);
   final InvoiceItem creditInvoiceItem=new CreditBalanceAdjInvoiceItem(invoiceId,accountId,creditDate,TEN,Currency.USD);
-  invoiceUtil.createInvoiceItem(creditInvoiceItem,internalCallContext);
-  final InvoiceItemModelDao savedItem=invoiceUtil.getInvoiceItemById(creditInvoiceItem.getId(),internalCallContext);
+  invoiceUtil.createInvoiceItem(creditInvoiceItem,context);
+  final InvoiceItemModelDao savedItem=invoiceUtil.getInvoiceItemById(creditInvoiceItem.getId(),context);
   assertSameInvoiceItem(creditInvoiceItem,savedItem);
 }
