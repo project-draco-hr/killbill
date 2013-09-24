@@ -4,17 +4,7 @@
     if (entitlements.isEmpty()) {
       return Collections.emptyList();
     }
-    final ListMultimap<UUID,Entitlement> perBundleEntitlements=LinkedListMultimap.create();
-    for (    Entitlement cur : entitlements) {
-      perBundleEntitlements.put(cur.getBundleId(),cur);
-    }
-    final List<SubscriptionBundle> result=new ArrayList<SubscriptionBundle>(perBundleEntitlements.keySet().size());
-    for (    UUID bundleId : perBundleEntitlements.keySet()) {
-      final List<Entitlement> e=perBundleEntitlements.get(bundleId);
-      final SubscriptionBundle b=getSubscriptionBundleFromEntitlements(bundleId,e,context);
-      result.add(b);
-    }
-    return result;
+    return getSubscriptionBundles(entitlements,context);
   }
  catch (  EntitlementApiException e) {
     throw new SubscriptionApiException(e);
