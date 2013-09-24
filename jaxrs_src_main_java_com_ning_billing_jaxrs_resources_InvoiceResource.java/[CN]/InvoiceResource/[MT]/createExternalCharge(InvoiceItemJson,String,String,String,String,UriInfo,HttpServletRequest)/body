@@ -1,14 +1,7 @@
 {
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final Account account=accountUserApi.getAccountById(UUID.fromString(externalChargeJson.getAccountId()),callContext);
-  final LocalDate requestedDate;
-  if (requestedDateTimeString == null) {
-    requestedDate=clock.getUTCToday();
-  }
- else {
-    final DateTime requestedDateTime=DATE_TIME_FORMATTER.parseDateTime(requestedDateTimeString);
-    requestedDate=requestedDateTime.toDateTime(account.getTimeZone()).toLocalDate();
-  }
+  final LocalDate requestedDate=toLocalDate(account,requestedDateTimeString,callContext);
   final Currency currency=Objects.firstNonNull(externalChargeJson.getCurrency(),account.getCurrency());
   final InvoiceItem externalCharge;
   if (externalChargeJson.getBundleId() != null) {

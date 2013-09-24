@@ -1,8 +1,6 @@
 {
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),callContext);
-  final DateTime inputDateTime=targetDateTime != null ? DATE_TIME_FORMATTER.parseDateTime(targetDateTime) : clock.getUTCNow();
-  final LocalDate inputDate=inputDateTime.toDateTime(account.getTimeZone()).toLocalDate();
+  final LocalDate inputDate=toLocalDate(UUID.fromString(accountId),targetDateTime,callContext);
   final Invoice generatedInvoice=invoiceApi.triggerInvoiceGeneration(UUID.fromString(accountId),inputDate,dryRun,callContext);
   if (dryRun) {
     return Response.status(Status.OK).entity(new InvoiceJson(generatedInvoice,null)).build();
