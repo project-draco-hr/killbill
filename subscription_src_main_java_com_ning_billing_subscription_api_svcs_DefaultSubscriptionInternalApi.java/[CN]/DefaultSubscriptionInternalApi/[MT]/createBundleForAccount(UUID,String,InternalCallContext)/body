@@ -1,8 +1,11 @@
 {
-  final SubscriptionBaseBundle result=getActiveBundleForKeyNotException(bundleKey,context);
+  final List<SubscriptionBaseBundle> existingBundles=dao.getSubscriptionBundlesForKey(bundleKey,context);
+  final SubscriptionBaseBundle result=getActiveBundleForKeyNotException(existingBundles,dao,clock,context);
   if (result != null) {
     throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_ACTIVE_BUNDLE_KEY_EXISTS,bundleKey);
   }
-  final DefaultSubscriptionBaseBundle bundle=new DefaultSubscriptionBaseBundle(bundleKey,accountId,clock.getUTCNow());
+  final DateTime now=clock.getUTCNow();
+  final DateTime originalCreatedDate=existingBundles.size() > 0 ? existingBundles.get(0).getCreatedDate() : now;
+  final DefaultSubscriptionBaseBundle bundle=new DefaultSubscriptionBaseBundle(bundleKey,accountId,now,originalCreatedDate,now,now);
   return dao.createSubscriptionBundle(bundle,context);
 }

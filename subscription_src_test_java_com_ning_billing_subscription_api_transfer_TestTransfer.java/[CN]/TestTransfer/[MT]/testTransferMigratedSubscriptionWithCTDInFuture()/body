@@ -11,6 +11,7 @@
     final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
     assertEquals(bundles.size(),1);
     final SubscriptionBaseBundle bundle=bundles.get(0);
+    final DateTime bundleCreatedDate=bundle.getCreatedDate();
     final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
     assertEquals(subscriptions.size(),1);
     final SubscriptionBase subscription=subscriptions.get(0);
@@ -34,6 +35,9 @@
     final SubscriptionBase oldBaseSubscription=subscriptionInternalApi.getBaseSubscription(bundle.getId(),internalCallContext);
     assertTrue(oldBaseSubscription.getState() == EntitlementState.CANCELLED);
     assertEquals(subscriptionInternalApi.getBillingTransitions(oldBaseSubscription,internalCallContext).size(),0);
+    final SubscriptionBaseBundle newBundle=subscriptionInternalApi.getActiveBundleForKey(bundle.getExternalKey(),internalCallContext);
+    assertNotEquals(newBundle.getId(),bundle.getId());
+    assertEquals(newBundle.getOriginalCreatedDate().compareTo(bundleCreatedDate),0);
   }
  catch (  SubscriptionBaseMigrationApiException e) {
     Assert.fail("",e);

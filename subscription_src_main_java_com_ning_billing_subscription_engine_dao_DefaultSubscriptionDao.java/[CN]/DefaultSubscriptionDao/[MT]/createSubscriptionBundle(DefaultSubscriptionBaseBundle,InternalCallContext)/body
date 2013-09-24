@@ -3,7 +3,8 @@
     @Override public SubscriptionBaseBundle inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws EntityPersistenceException {
       final SubscriptionBundleModelDao model=new SubscriptionBundleModelDao(bundle);
       entitySqlDaoWrapperFactory.become(BundleSqlDao.class).create(model,context);
-      return bundle;
+      final SubscriptionBundleModelDao result=entitySqlDaoWrapperFactory.become(BundleSqlDao.class).getById(bundle.getId().toString(),context);
+      return SubscriptionBundleModelDao.toSubscriptionbundle(result);
     }
   }
 );

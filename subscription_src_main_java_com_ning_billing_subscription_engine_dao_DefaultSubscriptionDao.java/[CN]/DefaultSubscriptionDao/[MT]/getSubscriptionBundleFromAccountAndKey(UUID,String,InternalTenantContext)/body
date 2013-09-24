@@ -1,8 +1,13 @@
 {
-  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<SubscriptionBaseBundle>(){
-    @Override public SubscriptionBaseBundle inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
-      final SubscriptionBundleModelDao bundle=entitySqlDaoWrapperFactory.become(BundleSqlDao.class).getBundleFromAccountAndKey(accountId.toString(),bundleKey,context);
-      return SubscriptionBundleModelDao.toSubscriptionbundle(bundle);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<SubscriptionBaseBundle>>(){
+    @Override public List<SubscriptionBaseBundle> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final List<SubscriptionBundleModelDao> models=entitySqlDaoWrapperFactory.become(BundleSqlDao.class).getBundleFromAccountAndKey(accountId.toString(),bundleKey,context);
+      return new ArrayList<SubscriptionBaseBundle>(Collections2.transform(models,new Function<SubscriptionBundleModelDao,SubscriptionBaseBundle>(){
+        @Override public SubscriptionBaseBundle apply(        @Nullable final SubscriptionBundleModelDao input){
+          return SubscriptionBundleModelDao.toSubscriptionbundle(input);
+        }
+      }
+));
     }
   }
 );

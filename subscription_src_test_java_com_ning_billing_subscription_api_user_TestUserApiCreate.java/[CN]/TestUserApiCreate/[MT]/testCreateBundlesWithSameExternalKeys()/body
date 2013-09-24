@@ -17,6 +17,7 @@
     subscription.cancelWithDate(clock.getUTCNow(),callContext);
     final SubscriptionBaseBundle newBundle=subscriptionInternalApi.createBundleForAccount(bundle.getAccountId(),DefaultSubscriptionTestInitializer.DEFAULT_BUNDLE_KEY,internalCallContext);
     assertNotNull(newBundle);
+    assertEquals(newBundle.getOriginalCreatedDate().compareTo(bundle.getCreatedDate()),0);
     final DefaultSubscriptionBase newSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.createSubscription(newBundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,internalCallContext);
     assertNotNull(newSubscription);
   }

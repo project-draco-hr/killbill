@@ -2,8 +2,8 @@
   final SubscriptionSqlDao transSubDao=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
   final BundleSqlDao transBundleDao=entitySqlDaoWrapperFactory.become(BundleSqlDao.class);
   final DefaultSubscriptionBaseBundle bundleData=bundleTransferData.getData();
-  final SubscriptionBundleModelDao existingBundleModel=transBundleDao.getBundleFromAccountAndKey(bundleData.getAccountId().toString(),bundleData.getExternalKey(),context);
-  if (existingBundleModel != null) {
+  final List<SubscriptionBundleModelDao> existingBundleModels=transBundleDao.getBundleFromAccountAndKey(bundleData.getAccountId().toString(),bundleData.getExternalKey(),context);
+  if (existingBundleModels.size() != 0) {
     log.error(String.format("Attempted to create a bundle for account %s and key %s that already existed, skip...",bundleData.getAccountId().toString(),bundleData.getExternalKey()));
     return;
   }
