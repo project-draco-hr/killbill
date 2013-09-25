@@ -4,7 +4,7 @@
       final PaymentAttemptSqlDao transactional=entitySqlDaoWrapperFactory.become(PaymentAttemptSqlDao.class);
       transactional.create(attempt,context);
       final PaymentAttemptModelDao savedAttempt=transactional.getById(attempt.getId().toString(),context);
-      entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).updatePaymentAmount(paymentId.toString(),savedAttempt.getRequestedAmount(),context);
+      entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).updatePaymentForNewAttempt(paymentId.toString(),attempt.getPaymentMethodId().toString(),savedAttempt.getRequestedAmount(),attempt.getEffectiveDate().toDate(),context);
       return savedAttempt;
     }
   }

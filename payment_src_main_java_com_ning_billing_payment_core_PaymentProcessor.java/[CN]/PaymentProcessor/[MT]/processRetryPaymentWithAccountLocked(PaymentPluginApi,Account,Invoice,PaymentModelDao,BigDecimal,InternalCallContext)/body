@@ -1,5 +1,5 @@
 {
-  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),payment.getId(),clock.getUTCNow(),requestedAmount);
-  paymentDao.insertNewAttemptForPayment(payment.getId(),attempt,context);
+  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),payment.getId(),account.getPaymentMethodId(),clock.getUTCNow(),requestedAmount);
+  paymentDao.updatePaymentWithNewAttempt(payment.getId(),attempt,context);
   return processPaymentWithAccountLocked(plugin,account,invoice,payment,attempt,false,context);
 }

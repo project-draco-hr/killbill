@@ -1,6 +1,6 @@
 {
   final PaymentModelDao payment=new PaymentModelDao(account.getId(),invoice.getId(),paymentMethodId,requestedAmount.setScale(2,RoundingMode.HALF_UP),invoice.getCurrency(),clock.getUTCNow());
-  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),payment.getId(),clock.getUTCNow(),requestedAmount);
-  final PaymentModelDao savedPayment=paymentDao.insertPaymentWithAttempt(payment,attempt,context);
+  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),payment.getId(),paymentMethodId,clock.getUTCNow(),requestedAmount);
+  final PaymentModelDao savedPayment=paymentDao.insertPaymentWithFirstAttempt(payment,attempt,context);
   return processPaymentWithAccountLocked(plugin,account,invoice,savedPayment,attempt,isInstantPayment,context);
 }

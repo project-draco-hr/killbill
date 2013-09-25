@@ -12,9 +12,9 @@ case AUTO_PAY_OFF:
 default :
 throw new IllegalStateException("Unexpected payment status for retry " + payment.getPaymentStatus());
 }
-final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),payment.getId(),clock.getUTCNow(),requestedAmount);
-paymentDao.insertNewAttemptForPayment(payment.getId(),attempt,context);
-paymentDao.updateStatusAndEffectiveDateForPaymentWithAttempt(payment.getId(),paymentStatus,clock.getUTCNow(),attempt.getId(),null,terminalStateReason,context);
+final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),payment.getId(),account.getPaymentMethodId(),clock.getUTCNow(),requestedAmount);
+paymentDao.updatePaymentWithNewAttempt(payment.getId(),attempt,context);
+paymentDao.updatePaymentAndAttemptOnCompletion(payment.getId(),paymentStatus,attempt.getId(),null,terminalStateReason,context);
 final List<PaymentAttemptModelDao> allAttempts=paymentDao.getAttemptsForPayment(payment.getId(),context);
 return new DefaultPayment(payment,null,allAttempts,Collections.<RefundModelDao>emptyList());
 }
