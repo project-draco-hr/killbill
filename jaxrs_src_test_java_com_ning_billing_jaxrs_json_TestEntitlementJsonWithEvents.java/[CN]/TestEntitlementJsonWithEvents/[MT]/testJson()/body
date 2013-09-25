@@ -2,14 +2,14 @@
   final String someUUID=UUID.randomUUID().toString();
   final String accountId=UUID.randomUUID().toString();
   final String bundleId=UUID.randomUUID().toString();
-  final String entitlementId=UUID.randomUUID().toString();
+  final String subscriptionId=UUID.randomUUID().toString();
   final String externalKey=UUID.randomUUID().toString();
   final DateTime requestedDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
   final DateTime effectiveDate=DefaultClock.toUTCDateTime(new DateTime(DateTimeZone.UTC));
   final UUID eventId=UUID.randomUUID();
   final List<AuditLogJson> auditLogs=createAuditLogsJson(clock.getUTCNow());
   final EventSubscriptionJson newEvent=new EventSubscriptionJson(eventId.toString(),BillingPeriod.NO_BILLING_PERIOD.toString(),requestedDate.toLocalDate(),effectiveDate.toLocalDate(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),SubscriptionBaseTransitionType.CREATE.toString(),PhaseType.DISCOUNT.toString(),auditLogs);
-  final SubscriptionJson entitlementJsonWithEvents=new SubscriptionJson(accountId,bundleId,entitlementId,externalKey,new LocalDate(),someUUID,someUUID,someUUID,someUUID,new LocalDate(),new LocalDate(),new LocalDate(),new LocalDate(),null,null,null,null);
+  final SubscriptionJson entitlementJsonWithEvents=new SubscriptionJson(accountId,bundleId,subscriptionId,externalKey,new LocalDate(),someUUID,someUUID,someUUID,someUUID,new LocalDate(),new LocalDate(),new LocalDate(),new LocalDate(),null,null,null,null);
   final String asJson=mapper.writeValueAsString(entitlementJsonWithEvents);
   final SubscriptionJson fromJson=mapper.readValue(asJson,SubscriptionJson.class);
   Assert.assertEquals(fromJson,entitlementJsonWithEvents);

@@ -5,7 +5,7 @@
   final String productName="Shotgun";
   final BillingPeriod term=BillingPeriod.MONTHLY;
   final SubscriptionJson entitlementJson=createEntitlement(accountJson.getAccountId(),"99999",productName,ProductCategory.BASE.toString(),term.toString(),true);
-  String uri=JaxrsResource.ENTITLEMENTS_PATH + "/" + entitlementJson.getSubscriptionId();
+  String uri=JaxrsResource.SUBSCRIPTIONS_PATH + "/" + entitlementJson.getSubscriptionId();
   Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   String baseJson=response.getResponseBody();
@@ -22,10 +22,10 @@
   final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
   clock.addDeltaFromReality(it.toDurationMillis());
   crappyWaitForLackOfProperSynchonization();
-  uri=JaxrsResource.ENTITLEMENTS_PATH + "/" + entitlementJson.getSubscriptionId();
+  uri=JaxrsResource.SUBSCRIPTIONS_PATH + "/" + entitlementJson.getSubscriptionId();
   response=doDelete(uri,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  uri=JaxrsResource.ENTITLEMENTS_PATH + "/" + entitlementJson.getSubscriptionId();
+  uri=JaxrsResource.SUBSCRIPTIONS_PATH + "/" + entitlementJson.getSubscriptionId();
   response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
   assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
   baseJson=response.getResponseBody();

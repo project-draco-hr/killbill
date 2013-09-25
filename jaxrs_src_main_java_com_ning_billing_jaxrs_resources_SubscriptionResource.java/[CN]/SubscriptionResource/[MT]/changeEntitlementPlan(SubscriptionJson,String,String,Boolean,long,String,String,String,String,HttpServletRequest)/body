@@ -3,7 +3,7 @@
   final EntitlementCallCompletionCallback<Response> callback=new EntitlementCallCompletionCallback<Response>(){
     private boolean isImmediateOp=true;
     @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException {
-      final UUID uuid=UUID.fromString(entitlementId);
+      final UUID uuid=UUID.fromString(subscriptionId);
       final Entitlement current=entitlementApi.getEntitlementForId(uuid,callContext);
       final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
       final Entitlement newEntitlement;
@@ -27,7 +27,7 @@
       if (operationResponse.getStatus() != Status.OK.getStatusCode()) {
         return operationResponse;
       }
-      return getEntitlement(entitlementId,request);
+      return getEntitlement(subscriptionId,request);
     }
   }
 ;
