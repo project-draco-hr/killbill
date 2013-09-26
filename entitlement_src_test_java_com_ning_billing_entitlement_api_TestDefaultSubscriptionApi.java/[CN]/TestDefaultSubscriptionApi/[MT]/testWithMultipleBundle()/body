@@ -34,6 +34,8 @@
     assertNull(secondbundle.getSubscriptions().get(0).getEffectiveEndDate());
     assertNull(secondbundle.getSubscriptions().get(0).getBillingEndDate());
     assertEquals(secondbundle.getOriginalCreatedDate().compareTo(firstbundle.getCreatedDate()),0);
+    final List<SubscriptionBundle> bundles2Again=subscriptionApi.getSubscriptionBundlesForAccountIdAndExternalKey(account.getId(),externalKey,callContext);
+    assertEquals(bundles2Again.size(),2);
     clock.addDays(3);
     final Account account2=accountApi.createAccount(getAccountData(7),callContext);
     entitlementApi.transferEntitlements(account.getId(),account2.getId(),externalKey,new LocalDate(clock.getUTCNow(),account.getTimeZone()),callContext);

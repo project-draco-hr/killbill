@@ -1,18 +1,10 @@
 {
   try {
-    try {
-      final SubscriptionBundle activeBundleForkey=getActiveSubscriptionBundleForExternalKey(externalKey,context);
-      if (activeBundleForkey.getAccountId().equals(accountId)) {
-        return activeBundleForkey;
-      }
-    }
- catch (    SubscriptionApiException ignore) {
-    }
     final List<Entitlement> entitlements=entitlementApi.getAllEntitlementsForAccountIdAndExternalKey(accountId,externalKey,context);
     if (entitlements.isEmpty()) {
       throw new SubscriptionApiException(ErrorCode.SUB_GET_INVALID_BUNDLE_KEY,externalKey);
     }
-    return getSubscriptionBundleFromEntitlements(entitlements.get(0).getBundleId(),entitlements,context);
+    return getSubscriptionBundles(entitlements,context);
   }
  catch (  EntitlementApiException e) {
     throw new SubscriptionApiException(e);
