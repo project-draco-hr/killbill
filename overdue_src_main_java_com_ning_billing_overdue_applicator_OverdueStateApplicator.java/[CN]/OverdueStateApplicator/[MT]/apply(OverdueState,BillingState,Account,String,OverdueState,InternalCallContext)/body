@@ -11,6 +11,9 @@
       createFutureNotification(overdueable,clock.getUTCNow().plus(reevaluationInterval),context);
       log.debug("OverdueStateApplicator <notificationQ> : inserting notification for time = " + clock.getUTCNow().plus(reevaluationInterval));
     }
+ else     if (nextOverdueState.isClearState()) {
+      clearFutureNotification(overdueable,context);
+    }
     if (previousOverdueStateName.equals(nextOverdueState.getName())) {
       return;
     }
@@ -22,9 +25,6 @@
     if (e.getCode() != ErrorCode.OVERDUE_NO_REEVALUATION_INTERVAL.getCode()) {
       throw new OverdueException(e);
     }
-  }
-  if (nextOverdueState.isClearState()) {
-    clearFutureNotification(overdueable,context);
   }
   try {
     bus.post(createOverdueEvent(overdueable,previousOverdueStateName,nextOverdueState.getName(),context));
