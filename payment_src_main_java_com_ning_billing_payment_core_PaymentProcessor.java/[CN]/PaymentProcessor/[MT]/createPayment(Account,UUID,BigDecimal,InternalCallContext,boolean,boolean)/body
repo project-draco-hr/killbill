@@ -29,6 +29,7 @@
             }
           }
  catch (          PaymentApiException e) {
+            processNewPaymentForMissingDefaultPaymentMethodWithAccountLocked(account,invoice,requestedAmount,context);
             final PaymentErrorInternalEvent event=new DefaultPaymentErrorEvent(account.getId(),invoiceId,null,ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD.toString(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
             postPaymentEvent(event,account.getId(),context);
             throw e;
