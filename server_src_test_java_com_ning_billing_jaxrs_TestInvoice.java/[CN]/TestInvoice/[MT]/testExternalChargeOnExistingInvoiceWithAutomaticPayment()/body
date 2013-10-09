@@ -1,15 +1,14 @@
 {
-  final AccountJson accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
+  final AccountJson accountJson=createAccountWithPMBundleAndSubscriptionAndWaitForFirstInvoice();
   final List<InvoiceJson> invoices=getInvoicesWithItemsForAccount(accountJson.getAccountId());
   assertEquals(invoices.size(),2);
   final String invoiceId=invoices.get(1).getInvoiceId();
   final BigDecimal originalInvoiceAmount=invoices.get(1).getAmount();
   final int originalNumberOfItemsForInvoice=invoices.get(1).getItems().size();
   final BigDecimal chargeAmount=BigDecimal.TEN;
-  final InvoiceJson invoiceWithItems=createExternalChargeForInvoice(accountJson.getAccountId(),invoiceId,null,chargeAmount,null,null,false);
+  final InvoiceJson invoiceWithItems=createExternalChargeForInvoice(accountJson.getAccountId(),invoiceId,null,chargeAmount,null,null,true);
   assertEquals(invoiceWithItems.getItems().size(),originalNumberOfItemsForInvoice + 1);
   assertNull(invoiceWithItems.getItems().get(originalNumberOfItemsForInvoice).getBundleId());
   final InvoiceJson adjustedInvoice=getInvoice(invoiceId);
-  final BigDecimal adjustedInvoiceBalance=originalInvoiceAmount.add(chargeAmount.setScale(2,RoundingMode.HALF_UP));
-  assertEquals(adjustedInvoice.getBalance().compareTo(adjustedInvoiceBalance),0);
+  assertEquals(adjustedInvoice.getBalance().compareTo(BigDecimal.ZERO),0);
 }
