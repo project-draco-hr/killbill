@@ -23,7 +23,6 @@
       }
     }
  else {
-      log.info("Generated invoice {} with {} items for accountId {} and targetDate {} (targetDateTime {})",new Object[]{invoice.getId(),invoice.getNumberOfItems(),accountId,targetDate,targetDateTime});
       if (!dryRun) {
         final Set<UUID> adjustedUniqueOtherInvoiceId=new TreeSet<UUID>();
         adjustedUniqueOtherInvoiceId.addAll(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,UUID>(){
@@ -33,6 +32,14 @@
         }
 ));
         final boolean isRealInvoiceWithItems=adjustedUniqueOtherInvoiceId.remove(invoice.getId());
+        if (isRealInvoiceWithItems) {
+          log.info("Generated invoice {} with {} items for accountId {} and targetDate {} (targetDateTime {})",new Object[]{invoice.getId(),invoice.getNumberOfItems(),accountId,targetDate,targetDateTime});
+        }
+ else {
+          final Joiner joiner=Joiner.on(",");
+          final String adjustedInvoices=joiner.join(adjustedUniqueOtherInvoiceId.toArray(new UUID[adjustedUniqueOtherInvoiceId.size()]));
+          log.info("Adjusting existing invoices {} with {} items for accountId {} and targetDate {} (targetDateTime {})",new Object[]{adjustedInvoices,invoice.getNumberOfItems(),accountId,targetDate,targetDateTime});
+        }
         final InvoiceModelDao invoiceModelDao=new InvoiceModelDao(invoice);
         final List<InvoiceItemModelDao> invoiceItemModelDaos=ImmutableList.<InvoiceItemModelDao>copyOf(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,InvoiceItemModelDao>(){
           @Override public InvoiceItemModelDao apply(          final InvoiceItem input){
