@@ -3,6 +3,9 @@
   if (requestedDate != null) {
     queryParams.put(JaxrsResource.QUERY_REQUESTED_DT,requestedDate.toDateTimeISO().toString());
   }
+  if (autoPay) {
+    queryParams.put(JaxrsResource.QUERY_PAY_INVOICE,"true");
+  }
   final InvoiceItemJson externalCharge=new InvoiceItemJson(null,invoiceId,null,accountId,bundleId,null,null,null,null,null,null,null,amount,currency,null);
   final String externalChargeJson=mapper.writeValueAsString(externalCharge);
   final Response response=doPost(uri,externalChargeJson,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);

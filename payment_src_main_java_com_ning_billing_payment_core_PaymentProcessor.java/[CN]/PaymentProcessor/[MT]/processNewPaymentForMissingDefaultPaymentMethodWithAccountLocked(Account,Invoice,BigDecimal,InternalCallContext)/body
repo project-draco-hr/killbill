@@ -1,0 +1,7 @@
+{
+  final PaymentStatus paymentStatus=PaymentStatus.PAYMENT_FAILURE_ABORTED;
+  final PaymentModelDao paymentInfo=new PaymentModelDao(account.getId(),invoice.getId(),MISSING_PAYMENT_METHOD_ID,requestedAmount,invoice.getCurrency(),clock.getUTCNow(),paymentStatus);
+  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),paymentInfo.getId(),MISSING_PAYMENT_METHOD_ID,paymentStatus,clock.getUTCNow(),requestedAmount);
+  paymentDao.insertPaymentWithFirstAttempt(paymentInfo,attempt,context);
+  return fromPaymentModelDao(paymentInfo,null,context);
+}

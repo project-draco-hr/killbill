@@ -1,16 +1,25 @@
 {
   final AccountJson accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
   final List<PaymentJson> noPaymentsFromJson=getPaymentsForAccount(accountJson.getAccountId());
-  assertEquals(noPaymentsFromJson.size(),0);
+  assertEquals(noPaymentsFromJson.size(),1);
+  final String initialPaymentId=noPaymentsFromJson.get(0).getPaymentId();
   final List<InvoiceJson> invoices=getInvoicesForAccount(accountJson.getAccountId());
   assertEquals(invoices.size(),2);
   final String invoiceId=invoices.get(1).getInvoiceId();
   final BigDecimal paidAmount=BigDecimal.TEN;
   createExternalPayment(accountJson,invoiceId,paidAmount);
   final List<PaymentJson> paymentsFromJson=getPaymentsForAccount(accountJson.getAccountId());
-  assertEquals(paymentsFromJson.size(),1);
-  assertEquals(paymentsFromJson.get(0).getPaidAmount().compareTo(paidAmount),0);
-  final String paymentMethodId=paymentsFromJson.get(0).getPaymentMethodId();
+  assertEquals(paymentsFromJson.size(),2);
+  PaymentJson secondPayment=null;
+  for (  PaymentJson cur : paymentsFromJson) {
+    if (!cur.getPaymentId().equals(initialPaymentId)) {
+      secondPayment=cur;
+      break;
+    }
+  }
+  assertNotNull(secondPayment);
+  assertEquals(secondPayment.getPaidAmount().compareTo(paidAmount),0);
+  final String paymentMethodId=secondPayment.getPaymentMethodId();
   final PaymentMethodJson paymentMethodJson=getPaymentMethod(paymentMethodId);
   assertEquals(paymentMethodJson.getPaymentMethodId(),paymentMethodId);
   assertEquals(paymentMethodJson.getAccountId(),accountJson.getAccountId());
