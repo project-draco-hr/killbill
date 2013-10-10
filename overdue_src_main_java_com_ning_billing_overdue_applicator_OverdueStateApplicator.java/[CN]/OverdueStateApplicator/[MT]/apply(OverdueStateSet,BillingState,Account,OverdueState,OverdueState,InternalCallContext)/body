@@ -6,7 +6,7 @@
     }
     log.debug("OverdueStateApplicator:apply <enter> : time = " + clock.getUTCNow() + ", previousState = "+ previousOverdueState.getName()+ ", nextState = "+ nextOverdueState);
     final OverdueState firstOverdueState=overdueStateSet.getFirstState();
-    final Period initialReevaluationPeriod=overdueStateSet.getInitialReevaluationInterval() != null ? overdueStateSet.getInitialReevaluationInterval() : new Period(24,0,0,0);
+    final Period initialReevaluationPeriod=overdueStateSet.getInitialReevaluationInterval() != null ? overdueStateSet.getInitialReevaluationInterval() : ONE_DAY;
     final boolean conditionForNextNotfication=!nextOverdueState.isClearState() || (firstOverdueState != null && billingState != null && billingState.getDateOfEarliestUnpaidInvoice() != null);
     if (conditionForNextNotfication) {
       final Period reevaluationInterval=nextOverdueState.isClearState() ? initialReevaluationPeriod : nextOverdueState.getReevaluationInterval();
