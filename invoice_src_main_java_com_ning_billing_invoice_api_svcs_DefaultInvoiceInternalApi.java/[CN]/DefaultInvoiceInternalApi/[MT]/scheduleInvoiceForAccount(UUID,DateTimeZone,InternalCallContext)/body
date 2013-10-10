@@ -15,8 +15,11 @@
       }
     }
   }
-  if (targetSubscription != null) {
-    final DateAndTimeZoneContext timeZoneContext=new DateAndTimeZoneContext(targetSubscription.getStartDate(),accountTimeZone,clock);
-    nextBillingDatePoster.insertNextBillingNotification(accountId,targetSubscription.getId(),timeZoneContext.computeUTCDateTimeFromNow(),context.getUserToken());
+  if (targetSubscription == null) {
+    log.info("scheduleInvoiceForAccount : no active subscriptions for account {}",accountId);
+    return;
   }
+  final DateAndTimeZoneContext timeZoneContext=new DateAndTimeZoneContext(targetSubscription.getStartDate(),accountTimeZone,clock);
+  final DateTime futureNotificationTime=timeZoneContext.computeUTCDateTimeFromNow();
+  nextBillingDatePoster.insertNextBillingNotification(accountId,targetSubscription.getId(),futureNotificationTime,context.getUserToken());
 }
