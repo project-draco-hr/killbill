@@ -15,7 +15,7 @@
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   checkODState("OD1");
-  checkChangePlanWithOverdueState(baseEntitlement,true);
+  checkChangePlanWithOverdueState(baseEntitlement,true,true);
   final Invoice firstNonZeroInvoice=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext).iterator().next();
   fullyAdjustInvoiceItemAndCheckForCompletion(account,firstNonZeroInvoice,1,NextEvent.INVOICE_ADJUSTMENT);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
@@ -27,7 +27,7 @@
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(15,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
   checkODState("OD1");
-  checkChangePlanWithOverdueState(baseEntitlement,true);
+  checkChangePlanWithOverdueState(baseEntitlement,true,true);
   invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,8,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   final Collection<Invoice> invoices=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
   for (  final Invoice invoice : invoices) {

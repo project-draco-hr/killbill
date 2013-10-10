@@ -16,24 +16,34 @@
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(8,NextEvent.PAYMENT_ERROR);
   checkODState("OD1");
-  addDaysAndCheckForCompletion(8,NextEvent.PAYMENT_ERROR);
+  addDaysAndCheckForCompletion(8,NextEvent.INVOICE_ADJUSTMENT,NextEvent.PAYMENT_ERROR);
   checkODState("OD2");
+  invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2013,5,31),InvoiceItemType.RECURRING,new BigDecimal("2399.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,10),new LocalDate(2013,5,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-2136.92")));
   addDaysAndCheckForCompletion(8,NextEvent.PAYMENT_ERROR);
   checkODState("OD2");
   addDaysAndCheckForCompletion(5);
   checkODState("OD3");
   paymentPlugin.makeAllInvoicesFailWithError(false);
   final Collection<Invoice> invoices=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
+  int remainingUnpaidInvoices=invoices.size();
   for (  final Invoice invoice : invoices) {
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-      createPaymentAndCheckForCompletion(account,invoice,NextEvent.PAYMENT);
+      remainingUnpaidInvoices--;
+      if (remainingUnpaidInvoices > 0) {
+        createPaymentAndCheckForCompletion(account,invoice,NextEvent.PAYMENT);
+      }
+ else {
+        createPaymentAndCheckForCompletion(account,invoice,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.PAYMENT);
+      }
     }
   }
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
-  addDaysAndCheckForCompletion(8);
-  checkChangePlanWithOverdueState(baseEntitlement,false);
-  invoiceChecker.checkRepairedInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2013,5,31),InvoiceItemType.RECURRING,new BigDecimal("2399.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,10),new LocalDate(2012,7,23),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-85.4588")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2013,5,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-1998.9012")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,7,31),InvoiceItemType.CBA_ADJ,new BigDecimal("2084.36")));
-  invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,8,31),InvoiceItemType.RECURRING,new BigDecimal("599.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,7,31),InvoiceItemType.CBA_ADJ,new BigDecimal("-599.95")));
+  invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,23),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("52.56")));
+  addDaysAndCheckForCompletion(8,NextEvent.INVOICE,NextEvent.PAYMENT);
+  invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2013,7,31),InvoiceItemType.RECURRING,new BigDecimal("2399.95")));
+  checkChangePlanWithOverdueState(baseEntitlement,false,false);
+  invoiceChecker.checkRepairedInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2013,7,31),InvoiceItemType.RECURRING,new BigDecimal("2399.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2013,7,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-2399.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,7,31),InvoiceItemType.CBA_ADJ,new BigDecimal("2399.95")));
+  invoiceChecker.checkInvoice(account.getId(),5,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,8,31),InvoiceItemType.RECURRING,new BigDecimal("599.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,7,31),InvoiceItemType.CBA_ADJ,new BigDecimal("-599.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,8,31),callContext);
-  assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(new BigDecimal("-1484.41")),0);
+  assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(new BigDecimal("-1800")),0);
 }

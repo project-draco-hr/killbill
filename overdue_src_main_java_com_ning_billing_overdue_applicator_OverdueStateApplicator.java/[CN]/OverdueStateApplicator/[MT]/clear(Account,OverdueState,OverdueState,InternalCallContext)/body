@@ -1,0 +1,11 @@
+{
+  log.debug("OverdueStateApplicator:clear : time = " + clock.getUTCNow() + ", previousState = "+ previousOverdueState.getName());
+  storeNewState(overdueable,clearState,context);
+  clearFutureNotification(overdueable,context);
+  try {
+    bus.post(createOverdueEvent(overdueable,previousOverdueState.getName(),clearState.getName(),isBlockBillingTransition(previousOverdueState,clearState),isUnblockBillingTransition(previousOverdueState,clearState),context));
+  }
+ catch (  Exception e) {
+    log.error("Error posting overdue change event to bus",e);
+  }
+}

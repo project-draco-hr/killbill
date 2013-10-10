@@ -1,0 +1,18 @@
+{
+  if (shouldFail) {
+    try {
+      entitlement.changePlan("Pistol",term,PriceListSet.DEFAULT_PRICELIST_NAME,callContext);
+    }
+ catch (    EntitlementApiException e) {
+      assertTrue(e.getCause() instanceof BlockingApiException);
+    }
+  }
+ else {
+    if (expectedPayment) {
+      changeEntitlementAndCheckForCompletion(entitlement,"Assault-Rifle",BillingPeriod.MONTHLY,null,NextEvent.CHANGE,NextEvent.INVOICE_ADJUSTMENT,NextEvent.INVOICE,NextEvent.PAYMENT);
+    }
+ else {
+      changeEntitlementAndCheckForCompletion(entitlement,"Assault-Rifle",BillingPeriod.MONTHLY,null,NextEvent.CHANGE,NextEvent.INVOICE_ADJUSTMENT,NextEvent.INVOICE);
+    }
+  }
+}
