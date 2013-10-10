@@ -23,30 +23,16 @@
   checkODState("OD1");
   addDaysAndCheckForCompletion(7,NextEvent.PAYMENT_ERROR);
   checkODState("OD1");
-  addDaysAndCheckForCompletion(1,NextEvent.PAYMENT_ERROR);
-  checkODState("OD2");
-  addDaysAndCheckForCompletion(7,NextEvent.INVOICE_ADJUSTMENT,NextEvent.PAYMENT_ERROR);
+  addDaysAndCheckForCompletion(1,NextEvent.INVOICE_ADJUSTMENT,NextEvent.PAYMENT_ERROR);
   checkODState("OD2");
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,10),new LocalDate(2012,7,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-166.64")));
+  addDaysAndCheckForCompletion(7,NextEvent.PAYMENT_ERROR);
+  checkODState("OD2");
   addDaysAndCheckForCompletion(1,NextEvent.PAYMENT_ERROR);
   checkODState("OD2");
   addDaysAndCheckForCompletion(5);
   checkODState("OD3");
-  paymentPlugin.makeAllInvoicesFailWithError(false);
-  final Collection<Invoice> invoices=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
-  int remainingUnpaidInvoices=invoices.size();
-  for (  final Invoice invoice : invoices) {
-    if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-      remainingUnpaidInvoices--;
-      if (remainingUnpaidInvoices > 0) {
-        createPaymentAndCheckForCompletion(account,invoice,NextEvent.PAYMENT);
-      }
- else {
-        createPaymentAndCheckForCompletion(account,invoice,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.PAYMENT);
-      }
-    }
-  }
-  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
+  allowPaymentsAndResetOverdueToClearByPayingAllUnpaidInvoices();
   invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,23),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("64.51")));
   checkChangePlanWithOverdueState(baseEntitlement,false,true);
   invoiceChecker.checkRepairedInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,23),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("64.51")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,23),new LocalDate(2012,7,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-64.51")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,23),new LocalDate(2012,7,23),InvoiceItemType.CBA_ADJ,new BigDecimal("64.51")));
