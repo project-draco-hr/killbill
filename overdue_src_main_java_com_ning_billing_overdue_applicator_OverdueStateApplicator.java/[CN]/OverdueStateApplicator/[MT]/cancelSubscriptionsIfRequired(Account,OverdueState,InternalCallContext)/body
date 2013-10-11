@@ -21,6 +21,8 @@ cur.cancelEntitlementWithDateOverrideBillingPolicy(new LocalDate(clock.getUTCNow
 }
 }
  catch (EntitlementApiException e) {
+if (e.getCode() != ErrorCode.SUB_CANCEL_BAD_STATE.getCode()) {
 throw new OverdueException(e);
+}
 }
 }
