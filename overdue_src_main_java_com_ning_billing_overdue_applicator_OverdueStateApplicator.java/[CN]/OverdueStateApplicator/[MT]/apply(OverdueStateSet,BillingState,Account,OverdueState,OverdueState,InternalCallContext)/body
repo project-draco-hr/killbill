@@ -6,12 +6,16 @@
     }
     log.debug("OverdueStateApplicator:apply <enter> : time = " + clock.getUTCNow() + ", previousState = "+ previousOverdueState.getName()+ ", nextState = "+ nextOverdueState);
     final OverdueState firstOverdueState=overdueStateSet.getFirstState();
-    final Period initialReevaluationPeriod=overdueStateSet.getInitialReevaluationInterval() != null ? overdueStateSet.getInitialReevaluationInterval() : ONE_DAY;
     final boolean conditionForNextNotfication=!nextOverdueState.isClearState() || (firstOverdueState != null && billingState != null && billingState.getDateOfEarliestUnpaidInvoice() != null);
     if (conditionForNextNotfication) {
-      final Period reevaluationInterval=nextOverdueState.isClearState() ? initialReevaluationPeriod : nextOverdueState.getReevaluationInterval();
-      createFutureNotification(account,clock.getUTCNow().plus(reevaluationInterval),context);
-      log.debug("OverdueStateApplicator <notificationQ> : inserting notification for time = " + clock.getUTCNow().plus(reevaluationInterval));
+      final Period reevaluationInterval=nextOverdueState.isClearState() ? overdueStateSet.getInitialReevaluationInterval() : nextOverdueState.getReevaluationInterval();
+      if (reevaluationInterval == null) {
+        log.debug("OverdueStateApplicator <notificationQ> : Missing InitialReevaluationInterval from config, NOT inserting notification for account " + account.getId());
+      }
+ else {
+        log.debug("OverdueStateApplicator <notificationQ> : inserting notification for account " + account.getId() + ", time = "+ clock.getUTCNow().plus(reevaluationInterval));
+        createFutureNotification(account,clock.getUTCNow().plus(reevaluationInterval),context);
+      }
     }
  else     if (nextOverdueState.isClearState()) {
       clearFutureNotification(account,context);
