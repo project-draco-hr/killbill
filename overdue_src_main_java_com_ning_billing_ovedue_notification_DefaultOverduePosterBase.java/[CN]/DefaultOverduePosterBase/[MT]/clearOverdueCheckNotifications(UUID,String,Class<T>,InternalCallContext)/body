@@ -1,0 +1,18 @@
+{
+  try {
+    final NotificationQueue checkOverdueQueue=notificationQueueService.getNotificationQueue(DefaultOverdueService.OVERDUE_SERVICE_NAME,overdueQueueName);
+    transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+      @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+        final Collection<NotificationEventWithMetadata<T>> futureNotifications=getFutureNotificationsForAccountInTransaction(entitySqlDaoWrapperFactory,checkOverdueQueue,accountId,clazz,context);
+        for (        final NotificationEventWithMetadata<T> notification : futureNotifications) {
+          checkOverdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),notification.getRecordId());
+        }
+        return null;
+      }
+    }
+);
+  }
+ catch (  NoSuchNotificationQueue e) {
+    log.error("Attempting to clear items from a non-existent queue (DefaultOverdueCheck).",e);
+  }
+}

@@ -1,6 +1,7 @@
 {
   if (event.getTagDefinition().getName().equals(ControlTagType.OVERDUE_ENFORCEMENT_OFF.toString()) && event.getObjectType() == ObjectType.ACCOUNT) {
     final UUID accountId=event.getObjectId();
-    dispatcher.processOverdueForAccount(accountId,createCallContext(event.getUserToken(),event.getSearchKey1(),event.getSearchKey2()));
+    final OverdueAsyncBusNotificationKey notificationKey=new OverdueAsyncBusNotificationKey(accountId,OverdueAsyncBusNotificationAction.REFRESH);
+    asyncPoster.insertOverdueNotification(accountId,clock.getUTCNow(),OverdueAsyncBusNotifier.OVERDUE_ASYNC_BUS_NOTIFIER_QUEUE,notificationKey,createCallContext(event.getUserToken(),event.getSearchKey1(),event.getSearchKey2()));
   }
 }

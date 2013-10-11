@@ -1,0 +1,13 @@
+{
+  try {
+    if (!(notificationKey instanceof OverdueCheckNotificationKey)) {
+      getLogger().error("Overdue service received Unexpected notificationKey {}",notificationKey.getClass().getName());
+      return;
+    }
+    final OverdueCheckNotificationKey key=(OverdueCheckNotificationKey)notificationKey;
+    listener.handleProcessOverdueForAccount(key.getUuidKey(),userToken,accountRecordId,tenantRecordId);
+  }
+ catch (  IllegalArgumentException e) {
+    log.error("The key returned from the NextBillingNotificationQueue is not a valid UUID",e);
+  }
+}

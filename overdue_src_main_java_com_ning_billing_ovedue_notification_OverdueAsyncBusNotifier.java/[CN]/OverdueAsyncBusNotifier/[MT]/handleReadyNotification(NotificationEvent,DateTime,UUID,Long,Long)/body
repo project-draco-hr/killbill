@@ -1,0 +1,22 @@
+{
+  try {
+    if (!(notificationKey instanceof OverdueAsyncBusNotificationKey)) {
+      getLogger().error("Overdue service received Unexpected notificationKey {}",notificationKey.getClass().getName());
+      return;
+    }
+    final OverdueAsyncBusNotificationKey key=(OverdueAsyncBusNotificationKey)notificationKey;
+switch (key.getAction()) {
+case CLEAR:
+      listener.handleClearOverdueForAccount(key.getUuidKey(),userToken,accountRecordId,tenantRecordId);
+    break;
+case REFRESH:
+  listener.handleProcessOverdueForAccount(key.getUuidKey(),userToken,accountRecordId,tenantRecordId);
+break;
+default :
+throw new RuntimeException("Unexpected action " + key.getAction() + " for account "+ key.getUuidKey());
+}
+}
+ catch (IllegalArgumentException e) {
+log.error("The key returned from the queue " + OVERDUE_ASYNC_BUS_NOTIFIER_QUEUE + " does not contain a valid UUID",e);
+}
+}

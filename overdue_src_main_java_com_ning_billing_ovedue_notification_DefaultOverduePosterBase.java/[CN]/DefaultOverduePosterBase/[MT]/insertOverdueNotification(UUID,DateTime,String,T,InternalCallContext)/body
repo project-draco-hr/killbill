@@ -1,0 +1,25 @@
+{
+  try {
+    final NotificationQueue overdueQueue=notificationQueueService.getNotificationQueue(DefaultOverdueService.OVERDUE_SERVICE_NAME,overdueQueueName);
+    transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+      @Override public Void inTransaction(      final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+        final Class<T> clazz=(Class<T>)notificationKey.getClass();
+        final Collection<NotificationEventWithMetadata<T>> futureNotifications=getFutureNotificationsForAccountInTransaction(entitySqlDaoWrapperFactory,overdueQueue,accountId,clazz,context);
+        boolean shouldInsertNewNotification=cleanupFutureNotificationsFormTransaction(entitySqlDaoWrapperFactory,futureNotifications,futureNotificationTime,overdueQueue);
+        if (shouldInsertNewNotification) {
+          log.debug("Queuing overdue check notification. Account id: {}, timestamp: {}",accountId.toString(),futureNotificationTime.toString());
+          overdueQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),futureNotificationTime,notificationKey,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+        }
+ else {
+          log.debug("Skipping queuing overdue check notification. Account id: {}, timestamp: {}",accountId.toString(),futureNotificationTime.toString());
+        }
+        return null;
+      }
+    }
+);
+  }
+ catch (  NoSuchNotificationQueue e) {
+    log.error("Attempting to put items on a non-existent queue (DefaultOverdueCheck).",e);
+    return;
+  }
+}

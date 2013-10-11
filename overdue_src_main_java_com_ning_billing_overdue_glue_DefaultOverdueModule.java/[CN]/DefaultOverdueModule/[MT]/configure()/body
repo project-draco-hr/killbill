@@ -5,6 +5,8 @@
   installOverdueEmail();
   final OverdueProperties config=new ConfigurationObjectFactory(configSource).build(OverdueProperties.class);
   bind(OverdueProperties.class).toInstance(config);
-  bind(OverdueCheckNotifier.class).to(DefaultOverdueCheckNotifier.class).asEagerSingleton();
-  bind(OverdueCheckPoster.class).to(DefaultOverdueCheckPoster.class).asEagerSingleton();
+  bind(OverdueNotifier.class).annotatedWith(Names.named(OVERDUE_NOTIFIER_CHECK_NAMED)).to(OverdueCheckNotifier.class).asEagerSingleton();
+  bind(OverdueNotifier.class).annotatedWith(Names.named(OVERDUE_NOTIFIER_ASYNC_BUS_NAMED)).to(OverdueAsyncBusNotifier.class).asEagerSingleton();
+  bind(OverduePoster.class).annotatedWith(Names.named(OVERDUE_NOTIFIER_CHECK_NAMED)).to(OverdueCheckPoster.class).asEagerSingleton();
+  bind(OverduePoster.class).annotatedWith(Names.named(OVERDUE_NOTIFIER_ASYNC_BUS_NAMED)).to(OverdueAsyncBusPoster.class).asEagerSingleton();
 }

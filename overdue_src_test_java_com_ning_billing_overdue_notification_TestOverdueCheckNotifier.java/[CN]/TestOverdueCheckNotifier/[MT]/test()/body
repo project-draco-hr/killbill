@@ -1,10 +1,11 @@
 {
-  final UUID subscriptionId=new UUID(0L,1L);
-  final Account blockable=Mockito.mock(Account.class);
-  Mockito.when(blockable.getId()).thenReturn(subscriptionId);
+  final UUID accountId=new UUID(0L,1L);
+  final Account account=Mockito.mock(Account.class);
+  Mockito.when(account.getId()).thenReturn(accountId);
   final DateTime now=clock.getUTCNow();
   final DateTime readyTime=now.plusMillis(2000);
-  poster.insertOverdueCheckNotification(blockable,readyTime,internalCallContext);
+  final OverdueCheckNotificationKey notificationKey=new OverdueCheckNotificationKey(accountId);
+  checkPoster.insertOverdueNotification(accountId,readyTime,OverdueCheckNotifier.OVERDUE_CHECK_NOTIFIER_QUEUE,notificationKey,internalCallContext);
   clock.setDeltaFromReality(3000);
   await().atMost(5,SECONDS).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {
@@ -13,5 +14,5 @@
   }
 );
   Assert.assertEquals(mockListener.getEventCount(),1);
-  Assert.assertEquals(mockListener.getLatestSubscriptionId(),subscriptionId);
+  Assert.assertEquals(mockListener.getLatestAccountId(),accountId);
 }
