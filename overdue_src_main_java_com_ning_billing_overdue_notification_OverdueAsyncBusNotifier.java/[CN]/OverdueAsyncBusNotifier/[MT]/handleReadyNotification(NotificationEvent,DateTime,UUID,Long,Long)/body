@@ -1,16 +1,16 @@
 {
   try {
     if (!(notificationKey instanceof OverdueAsyncBusNotificationKey)) {
-      getLogger().error("Overdue service received Unexpected notificationKey {}",notificationKey.getClass().getName());
+      log.error("Overdue service received Unexpected notificationKey {}",notificationKey.getClass().getName());
       return;
     }
     final OverdueAsyncBusNotificationKey key=(OverdueAsyncBusNotificationKey)notificationKey;
 switch (key.getAction()) {
 case CLEAR:
-      listener.handleClearOverdueForAccount(key.getUuidKey(),userToken,accountRecordId,tenantRecordId);
+      dispatcher.clearOverdueForAccount(key.getUuidKey(),createCallContext(userToken,accountRecordId,tenantRecordId));
     break;
 case REFRESH:
-  listener.handleProcessOverdueForAccount(key.getUuidKey(),userToken,accountRecordId,tenantRecordId);
+  dispatcher.processOverdueForAccount(key.getUuidKey(),createCallContext(userToken,accountRecordId,tenantRecordId));
 break;
 default :
 throw new RuntimeException("Unexpected action " + key.getAction() + " for account "+ key.getUuidKey());
