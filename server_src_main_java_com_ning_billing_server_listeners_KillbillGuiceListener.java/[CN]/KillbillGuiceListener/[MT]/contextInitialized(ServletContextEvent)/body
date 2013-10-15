@@ -1,7 +1,7 @@
 {
-  final boolean multitenant=Boolean.parseBoolean(System.getProperty(KILLBILL_MULTITENANT_PROPERTY,"true"));
+  config=new ConfigurationObjectFactory(System.getProperties()).build(KillbillServerConfig.class);
   final ServerModuleBuilder builder=new ServerModuleBuilder().addConfig(KillbillServerConfig.class).addHealthCheck(KillbillHealthcheck.class).addJMXExport(KillbillHealthcheck.class).addJMXExport(NotificationQueueService.class).addJMXExport(PersistentBus.class).addModule(getModule(event.getServletContext())).setJerseyUriPattern("(" + JaxRsResourceBase.PREFIX + "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*").addJerseyResource("com.ning.billing.jaxrs.mappers").addJerseyResource("com.ning.billing.jaxrs.resources");
-  if (multitenant) {
+  if (config.isMultiTenancyEnabled()) {
     builder.addFilter("/*",TenantFilter.class);
   }
   guiceModule=builder.build();
