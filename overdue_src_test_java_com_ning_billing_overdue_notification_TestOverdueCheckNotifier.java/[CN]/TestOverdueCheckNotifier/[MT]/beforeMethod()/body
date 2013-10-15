@@ -1,8 +1,8 @@
 {
   final Account account=Mockito.mock(Account.class);
   Mockito.when(accountApi.getAccountById(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(account);
-  mockListener=new OverdueListenerMock(internalCallContextFactory);
-  notifierForMock=new OverdueCheckNotifier(notificationQueueService,overdueProperties,mockListener);
+  mockDispatcher=new OverdueDispatcherMock(internalCallContextFactory);
+  notifierForMock=new OverdueCheckNotifier(notificationQueueService,overdueProperties,internalCallContextFactory,mockDispatcher);
   notifierForMock.initialize();
   notifierForMock.start();
 }
