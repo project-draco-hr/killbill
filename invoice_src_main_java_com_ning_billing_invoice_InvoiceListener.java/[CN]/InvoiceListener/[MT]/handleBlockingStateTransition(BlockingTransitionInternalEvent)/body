@@ -1,0 +1,16 @@
+{
+  if (!event.isTransitionedToUnblockedBilling() && !(event.isTransitionedToBlockedBilling() && invoiceConfig.isTriggerInvoiceOnBlockingEvent())) {
+    return;
+  }
+  try {
+    final InternalCallContext context=internalCallContextFactory.createInternalCallContext(event.getSearchKey2(),event.getSearchKey1(),"SubscriptionBaseTransition",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken());
+    final UUID accountId=accountApi.getByRecordId(event.getSearchKey1(),context);
+    dispatcher.processAccount(accountId,clock.getUTCNow(),false,context);
+  }
+ catch (  InvoiceApiException e) {
+    log.error(e.getMessage());
+  }
+catch (  AccountApiException e) {
+    log.error(e.getMessage());
+  }
+}

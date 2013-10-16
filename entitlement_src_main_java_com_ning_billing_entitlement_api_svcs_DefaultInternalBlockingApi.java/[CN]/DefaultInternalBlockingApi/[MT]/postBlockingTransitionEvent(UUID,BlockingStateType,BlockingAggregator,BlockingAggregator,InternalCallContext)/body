@@ -1,0 +1,13 @@
+{
+  try {
+    final boolean isTransitionToBlockedBilling=!previousState.isBlockBilling() && currentState.isBlockBilling();
+    final boolean isTransitionToUnblockedBilling=previousState.isBlockBilling() && !currentState.isBlockBilling();
+    final boolean isTransitionToBlockedEntitlement=!previousState.isBlockEntitlement() && currentState.isBlockEntitlement();
+    final boolean isTransitionToUnblockedEntitlement=previousState.isBlockEntitlement() && !currentState.isBlockEntitlement();
+    final BlockingTransitionInternalEvent event=new DefaultBlockingTransitionInternalEvent(blockableId,type,isTransitionToBlockedBilling,isTransitionToUnblockedBilling,isTransitionToBlockedEntitlement,isTransitionToUnblockedEntitlement,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+    eventBus.post(event);
+  }
+ catch (  EventBusException e) {
+    log.warn("Failed to post event {}",e);
+  }
+}

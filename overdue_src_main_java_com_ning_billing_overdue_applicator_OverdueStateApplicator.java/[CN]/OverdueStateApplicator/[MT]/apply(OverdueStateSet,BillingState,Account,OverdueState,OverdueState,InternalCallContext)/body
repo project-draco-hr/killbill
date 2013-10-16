@@ -25,16 +25,12 @@
     }
     storeNewState(account,nextOverdueState,context);
     cancelSubscriptionsIfRequired(account,nextOverdueState,context);
-    scheduleInvoiceIfNeeded(account,previousOverdueState,nextOverdueState,context);
     sendEmailIfRequired(billingState,account,nextOverdueState,context);
   }
  catch (  OverdueApiException e) {
     if (e.getCode() != ErrorCode.OVERDUE_NO_REEVALUATION_INTERVAL.getCode()) {
       throw new OverdueException(e);
     }
-  }
-catch (  InvoiceApiException e) {
-    throw new OverdueException(e);
   }
   try {
     bus.post(createOverdueEvent(account,previousOverdueState.getName(),nextOverdueState.getName(),isBlockBillingTransition(previousOverdueState,nextOverdueState),isUnblockBillingTransition(previousOverdueState,nextOverdueState),context));
