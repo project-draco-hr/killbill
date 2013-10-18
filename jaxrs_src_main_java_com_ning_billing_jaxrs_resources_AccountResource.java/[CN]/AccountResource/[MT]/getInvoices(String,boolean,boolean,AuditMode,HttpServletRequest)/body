@@ -1,7 +1,7 @@
 {
   final TenantContext tenantContext=context.createContext(request);
   accountUserApi.getAccountById(UUID.fromString(accountId),tenantContext);
-  final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(UUID.fromString(accountId),tenantContext);
+  final List<Invoice> invoices=unpaidInvoicesOnly ? new ArrayList<Invoice>(invoiceApi.getUnpaidInvoicesByAccountId(UUID.fromString(accountId),null,tenantContext)) : invoiceApi.getInvoicesByAccount(UUID.fromString(accountId),tenantContext);
   final AuditLogsForInvoices invoicesAuditLogs=auditUserApi.getAuditLogsForInvoices(invoices,auditMode.getLevel(),tenantContext);
   if (withItems) {
     final List<InvoiceJson> result=new LinkedList<InvoiceJson>();
