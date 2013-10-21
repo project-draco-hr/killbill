@@ -1,0 +1,36 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Pagination<PaymentMethod> paymentMethods;
+  if (Strings.isNullOrEmpty(pluginName)) {
+    paymentMethods=paymentApi.searchPaymentMethods(searchKey,offset,limit,tenantContext);
+  }
+ else {
+    paymentMethods=paymentApi.searchPaymentMethods(searchKey,offset,limit,pluginName,tenantContext);
+  }
+  final Map<UUID,Account> accounts=new HashMap<UUID,Account>();
+  final StreamingOutput json=new StreamingOutput(){
+    @Override public void write(    final OutputStream output) throws IOException, WebApplicationException {
+      final JsonGenerator generator=mapper.getFactory().createJsonGenerator(output);
+      generator.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET,false);
+      generator.writeStartArray();
+      for (      final PaymentMethod paymentMethod : paymentMethods) {
+        if (accounts.get(paymentMethod.getAccountId()) == null) {
+          final Account account;
+          try {
+            account=accountUserApi.getAccountById(paymentMethod.getAccountId(),tenantContext);
+            accounts.put(paymentMethod.getAccountId(),account);
+          }
+ catch (          AccountApiException e) {
+            throw new RuntimeException(e);
+          }
+        }
+        final PaymentMethodJson asJson=PaymentMethodJson.toPaymentMethodJson(accounts.get(paymentMethod.getAccountId()),paymentMethod);
+        generator.writeObject(asJson);
+      }
+      generator.writeEndArray();
+      generator.close();
+    }
+  }
+;
+  return Response.status(Status.OK).entity(json).header(HDR_PAGINATION_CURRENT_OFFSET,paymentMethods.getCurrentOffset()).header(HDR_PAGINATION_NEXT_OFFSET,paymentMethods.getNextOffset()).header(HDR_PAGINATION_TOTAL_NB_RESULTS,paymentMethods.getTotalNbResults()).header(HDR_PAGINATION_NB_RESULTS,paymentMethods.getNbResults()).header(HDR_PAGINATION_NB_RESULTS_FROM_OFFSET,paymentMethods.getNbResultsFromOffset()).build();
+}

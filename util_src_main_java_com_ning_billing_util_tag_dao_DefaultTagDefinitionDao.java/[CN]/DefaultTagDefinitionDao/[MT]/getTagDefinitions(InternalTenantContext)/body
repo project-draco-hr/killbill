@@ -1,8 +1,10 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<TagDefinitionModelDao>>(){
     @Override public List<TagDefinitionModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final TagDefinitionSqlDao tagDefinitionSqlDao=entitySqlDaoWrapperFactory.become(TagDefinitionSqlDao.class);
+      final Iterator<TagDefinitionModelDao> all=tagDefinitionSqlDao.getAll(context);
       final List<TagDefinitionModelDao> definitionList=new LinkedList<TagDefinitionModelDao>();
-      definitionList.addAll(entitySqlDaoWrapperFactory.become(TagDefinitionSqlDao.class).get(context));
+      Iterators.addAll(definitionList,all);
       for (      final ControlTagType controlTag : ControlTagType.values()) {
         definitionList.add(new TagDefinitionModelDao(controlTag));
       }

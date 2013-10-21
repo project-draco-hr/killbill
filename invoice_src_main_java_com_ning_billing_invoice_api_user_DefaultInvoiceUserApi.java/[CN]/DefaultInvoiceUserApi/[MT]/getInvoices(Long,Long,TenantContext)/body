@@ -1,0 +1,9 @@
+{
+  final Pagination<InvoiceModelDao> invoiceModelDaos=dao.get(offset,limit,internalCallContextFactory.createInternalTenantContext(context));
+  return new DefaultPagination<Invoice>(invoiceModelDaos,Iterators.<InvoiceModelDao,Invoice>transform(invoiceModelDaos.iterator(),new Function<InvoiceModelDao,Invoice>(){
+    @Override public Invoice apply(    final InvoiceModelDao input){
+      return new DefaultInvoice(input);
+    }
+  }
+));
+}
