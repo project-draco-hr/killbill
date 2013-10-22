@@ -1,6 +1,17 @@
 {
+  final Long count=transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Long>(){
+    @Override public Long inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final AccountSqlDao accountSqlDao=entitySqlDaoWrapperFactory.become(AccountSqlDao.class);
+      final Iterator<AccountModelDao> dumbIterator=accountSqlDao.searchAccounts(searchKey,offset,1L,context);
+      while (dumbIterator.hasNext()) {
+        dumbIterator.next();
+      }
+      return accountSqlDao.getFoundRows(context);
+    }
+  }
+);
   final AccountSqlDao accountSqlDao=transactionalSqlDao.onDemand(AccountSqlDao.class);
-  final Long count=null;
+  final Long totalCount=accountSqlDao.getCount(context);
   final Iterator<AccountModelDao> results=accountSqlDao.searchAccounts(searchKey,offset,rowCount,context);
-  return new DefaultPagination<AccountModelDao>(offset,rowCount,count,results);
+  return new DefaultPagination<AccountModelDao>(offset,count,totalCount,results);
 }
