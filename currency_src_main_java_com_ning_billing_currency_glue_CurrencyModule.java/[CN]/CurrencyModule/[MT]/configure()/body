@@ -1,0 +1,10 @@
+{
+  final ConfigurationObjectFactory factory=new ConfigurationObjectFactory(configSource);
+  final CurrencyConfig currencyConfig=factory.build(CurrencyConfig.class);
+  bind(CurrencyConfig.class).toInstance(currencyConfig);
+  bind(new TypeLiteral<OSGIServiceRegistration<CurrencyPluginApi>>(){
+  }
+).toProvider(DefaultCurrencyProviderPluginRegistryProvider.class).asEagerSingleton();
+  bind(CurrencyConversionApi.class).to(DefaultCurrencyConversionApi.class).asEagerSingleton();
+  bind(CurrencyService.class).to(DefaultCurrencyService.class).asEagerSingleton();
+}
