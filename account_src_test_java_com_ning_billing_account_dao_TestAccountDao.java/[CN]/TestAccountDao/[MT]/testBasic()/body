@@ -5,7 +5,8 @@
   checkAccountsEqual(retrievedAccount,account);
   retrievedAccount=accountDao.getById(retrievedAccount.getId(),internalCallContext);
   checkAccountsEqual(retrievedAccount,account);
-  final List<AccountModelDao> all=accountDao.get(internalCallContext);
+  final Pagination<AccountModelDao> allAccounts=accountDao.getAll(internalCallContext);
+  final List<AccountModelDao> all=ImmutableList.<AccountModelDao>copyOf(allAccounts);
   Assert.assertNotNull(all);
   Assert.assertEquals(all.size(),1);
   checkAccountsEqual(all.get(0),account);

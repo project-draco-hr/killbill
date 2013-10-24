@@ -1,0 +1,12 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Pagination<PaymentMethod> paymentMethods;
+  if (Strings.isNullOrEmpty(pluginName)) {
+    paymentMethods=paymentApi.searchPaymentMethods(searchKey,offset,limit,tenantContext);
+  }
+ else {
+    paymentMethods=paymentApi.searchPaymentMethods(searchKey,offset,limit,pluginName,tenantContext);
+  }
+  final URI nextPageUri=uriBuilder.nextPage(AccountResource.class,"searchPaymentMethods",paymentMethods.getNextOffset(),limit,ImmutableMap.<String,String>of());
+  return buildStreamingPaymentMethodsResponse(paymentMethods,nextPageUri,tenantContext);
+}

@@ -1,0 +1,35 @@
+{
+  final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
+  final List<PaymentMethodPlugin> paymentMethods=new LinkedList<PaymentMethodPlugin>();
+  final Pagination<Account> accounts=accountInternalApi.getAccounts(0L,Long.MAX_VALUE,internalTenantContext);
+  for (  final Account account : accounts) {
+    try {
+      final List<PaymentMethodInfoPlugin> paymentMethodInfos=pluginApi.getPaymentMethods(account.getId(),true,callContext);
+      for (      final PaymentMethodInfoPlugin paymentMethodInfoPlugin : paymentMethodInfos) {
+        final PaymentMethodPlugin paymentMethodDetail=pluginApi.getPaymentMethodDetail(account.getId(),paymentMethodInfoPlugin.getPaymentMethodId(),tenantContext);
+        paymentMethods.add(paymentMethodDetail);
+        if (paymentMethods.size() > offset + limit) {
+          break;
+        }
+      }
+    }
+ catch (    PaymentPluginApiException e) {
+      throw new PaymentApiException(e,ErrorCode.PAYMENT_PLUGIN_GET_PAYMENT_METHODS,pluginName);
+    }
+  }
+  return new DefaultPagination<PaymentMethod>(DefaultPagination.<PaymentMethodPlugin>build(offset,limit,paymentMethods),limit,Iterators.<PaymentMethod>filter(Iterators.<PaymentMethodPlugin,PaymentMethod>transform(paymentMethods.iterator(),new Function<PaymentMethodPlugin,PaymentMethod>(){
+    @Override public PaymentMethod apply(    final PaymentMethodPlugin paymentMethodPlugin){
+      if (paymentMethodPlugin.getKbPaymentMethodId() == null) {
+        log.debug("Plugin {} returned a payment method without a kbPaymentMethodId",pluginName);
+        return null;
+      }
+      final PaymentMethodModelDao paymentMethodModelDao=paymentDao.getPaymentMethodIncludedDeleted(paymentMethodPlugin.getKbPaymentMethodId(),internalTenantContext);
+      if (paymentMethodModelDao == null) {
+        log.warn("Unable to find payment method id " + paymentMethodPlugin.getKbPaymentMethodId() + " present in plugin "+ pluginName);
+        return null;
+      }
+      return new DefaultPaymentMethod(paymentMethodModelDao,paymentMethodPlugin);
+    }
+  }
+),Predicates.<PaymentMethod>notNull()));
+}
