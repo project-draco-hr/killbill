@@ -7,11 +7,11 @@
     try {
       final Pagination<PaymentMethod> paymentMethods;
       if (allResults.size() >= limit) {
-        paymentMethods=searchPaymentMethods(searchKey,firstSearch ? offset : 0L,1L,pluginName,internalTenantContext);
+        paymentMethods=getPaymentMethods(firstSearch ? offset : 0L,1L,pluginName,tenantContext,internalTenantContext);
         ImmutableList.<PaymentMethod>copyOf(paymentMethods);
       }
  else {
-        paymentMethods=searchPaymentMethods(searchKey,firstSearch ? offset : 0L,limit - allResults.size(),pluginName,internalTenantContext);
+        paymentMethods=getPaymentMethods(firstSearch ? offset : 0L,limit - allResults.size(),pluginName,tenantContext,internalTenantContext);
         allResults.addAll(ImmutableList.<PaymentMethod>copyOf(paymentMethods));
       }
       firstSearch=false;

@@ -13,7 +13,8 @@
             accounts.put(paymentMethod.getAccountId(),account);
           }
  catch (          AccountApiException e) {
-            throw new RuntimeException(e);
+            log.warn("Unable to retrieve account",e);
+            continue;
           }
         }
         final PaymentMethodJson asJson=PaymentMethodJson.toPaymentMethodJson(accounts.get(paymentMethod.getAccountId()),paymentMethod);
