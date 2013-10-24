@@ -1,0 +1,9 @@
+{
+  final Pagination<AccountModelDao> accountModelDaos=accountDao.get(offset,limit,context);
+  return new DefaultPagination<Account>(accountModelDaos,limit,Iterators.<AccountModelDao,Account>transform(accountModelDaos.iterator(),new Function<AccountModelDao,Account>(){
+    @Override public Account apply(    final AccountModelDao input){
+      return new DefaultAccount(input);
+    }
+  }
+));
+}
