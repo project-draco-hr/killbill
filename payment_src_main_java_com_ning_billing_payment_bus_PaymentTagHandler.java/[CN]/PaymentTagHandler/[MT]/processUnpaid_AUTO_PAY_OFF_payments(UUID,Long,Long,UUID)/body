@@ -1,8 +1,6 @@
 {
   try {
-    final CallContext context=new DefaultCallContext(null,"PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,userToken,clock);
-    final InternalCallContext tmp=internalCallContextFactory.createInternalCallContext(accountId,context);
-    final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(tenantRecordId,accountRecordId,tmp);
+    final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(tenantRecordId,accountRecordId,"PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,userToken);
     final Account account=accountApi.getAccountById(accountId,internalCallContext);
     paymentProcessor.process_AUTO_PAY_OFF_removal(account,internalCallContext);
   }
