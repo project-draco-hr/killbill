@@ -1,0 +1,17 @@
+{
+  final Long count=transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Long>(){
+    @Override public Long inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final PaymentMethodSqlDao sqlDao=entitySqlDaoWrapperFactory.become(PaymentMethodSqlDao.class);
+      final Iterator<PaymentMethodModelDao> dumbIterator=sqlDao.getByPluginName(pluginName,offset,1L,context);
+      while (dumbIterator.hasNext()) {
+        dumbIterator.next();
+      }
+      return sqlDao.getFoundRows(context);
+    }
+  }
+);
+  final PaymentMethodSqlDao paymentMethodSqlDao=transactionalSqlDao.onDemand(PaymentMethodSqlDao.class);
+  final Long totalCount=paymentMethodSqlDao.getCount(context);
+  final Iterator<PaymentMethodModelDao> results=paymentMethodSqlDao.getByPluginName(pluginName,offset,limit,context);
+  return new DefaultPagination<PaymentMethodModelDao>(offset,limit,count,totalCount,results);
+}

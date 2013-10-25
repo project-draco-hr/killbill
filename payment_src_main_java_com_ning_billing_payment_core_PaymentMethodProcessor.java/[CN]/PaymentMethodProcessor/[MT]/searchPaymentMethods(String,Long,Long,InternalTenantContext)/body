@@ -1,16 +1,26 @@
 {
   final List<PaymentMethod> allResults=new LinkedList<PaymentMethod>();
+  Long totalNbRecords=0L;
+  Long maxNbRecords=0L;
+  boolean firstSearch=true;
   for (  final String pluginName : getAvailablePlugins()) {
     try {
-      final Pagination<PaymentMethod> paymentMethods=searchPaymentMethods(searchKey,0L,Long.MAX_VALUE,pluginName,internalTenantContext);
-      allResults.addAll(ImmutableList.<PaymentMethod>copyOf(paymentMethods));
-      if (allResults.size() > offset + limit) {
-        break;
+      final Pagination<PaymentMethod> paymentMethods;
+      if (allResults.size() >= limit) {
+        paymentMethods=searchPaymentMethods(searchKey,firstSearch ? offset : 0L,1L,pluginName,internalTenantContext);
+        ImmutableList.<PaymentMethod>copyOf(paymentMethods);
       }
+ else {
+        paymentMethods=searchPaymentMethods(searchKey,firstSearch ? offset : 0L,limit - allResults.size(),pluginName,internalTenantContext);
+        allResults.addAll(ImmutableList.<PaymentMethod>copyOf(paymentMethods));
+      }
+      firstSearch=false;
+      totalNbRecords+=paymentMethods.getTotalNbRecords();
+      maxNbRecords+=paymentMethods.getMaxNbRecords();
     }
  catch (    PaymentApiException e) {
       log.warn("Error while searching plugin " + pluginName,e);
     }
   }
-  return DefaultPagination.<PaymentMethod>build(offset,limit,allResults);
+  return new DefaultPagination<PaymentMethod>(offset,limit,totalNbRecords,maxNbRecords,allResults.iterator());
 }
