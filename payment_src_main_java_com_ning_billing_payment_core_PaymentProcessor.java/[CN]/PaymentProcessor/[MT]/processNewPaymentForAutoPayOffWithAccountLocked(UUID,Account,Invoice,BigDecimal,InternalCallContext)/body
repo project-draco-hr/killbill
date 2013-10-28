@@ -1,7 +1,7 @@
 {
   final PaymentStatus paymentStatus=PaymentStatus.AUTO_PAY_OFF;
   final PaymentModelDao paymentInfo=new PaymentModelDao(account.getId(),invoice.getId(),paymentMethodId,requestedAmount,invoice.getCurrency(),clock.getUTCNow(),paymentStatus);
-  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),paymentInfo.getId(),paymentMethodId,paymentStatus,clock.getUTCNow(),requestedAmount);
+  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),invoice.getId(),paymentInfo.getId(),paymentMethodId,paymentStatus,clock.getUTCNow(),requestedAmount,invoice.getCurrency());
   paymentDao.insertPaymentWithFirstAttempt(paymentInfo,attempt,context);
   return fromPaymentModelDao(paymentInfo,null,context);
 }

@@ -6,7 +6,7 @@
   final Currency currency=Currency.USD;
   final DateTime effectiveDate=clock.getUTCNow();
   final PaymentModelDao payment=new PaymentModelDao(accountId,invoiceId,paymentMethodId,amount,currency,effectiveDate);
-  final PaymentAttemptModelDao firstAttempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),paymentMethodId,effectiveDate,amount);
+  final PaymentAttemptModelDao firstAttempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),paymentMethodId,effectiveDate,amount,currency);
   PaymentModelDao savedPayment=paymentDao.insertPaymentWithFirstAttempt(payment,firstAttempt,internalCallContext);
   final PaymentModelDao lastPayment=paymentDao.getLastPaymentForPaymentMethod(accountId,paymentMethodId,internalCallContext);
   assertNotNull(lastPayment);
@@ -22,7 +22,7 @@
   final DateTime newEffectiveDate=clock.getUTCNow();
   final UUID newPaymentMethodId=UUID.randomUUID();
   final BigDecimal newAmount=new BigDecimal(15.23).setScale(2,RoundingMode.HALF_EVEN);
-  final PaymentAttemptModelDao secondAttempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),newPaymentMethodId,newEffectiveDate,newAmount);
+  final PaymentAttemptModelDao secondAttempt=new PaymentAttemptModelDao(accountId,invoiceId,payment.getId(),newPaymentMethodId,newEffectiveDate,newAmount,currency);
   paymentDao.updatePaymentWithNewAttempt(payment.getId(),secondAttempt,internalCallContext);
   final List<PaymentModelDao> payments=paymentDao.getPaymentsForInvoice(invoiceId,internalCallContext);
   assertEquals(payments.size(),1);

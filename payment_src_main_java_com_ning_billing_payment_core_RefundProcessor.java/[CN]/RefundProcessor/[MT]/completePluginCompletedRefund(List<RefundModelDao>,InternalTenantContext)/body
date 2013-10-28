@@ -16,7 +16,7 @@
         try {
           for (          final RefundModelDao cur : refundsToBeFixed) {
             invoiceApi.createRefund(cur.getPaymentId(),cur.getAmount(),cur.isAdjusted(),ImmutableMap.<UUID,BigDecimal>of(),cur.getId(),context);
-            paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,context);
+            paymentDao.updateRefundStatus(cur.getId(),RefundStatus.COMPLETED,cur.getProcessedAmount(),cur.getProcessedCurrency(),context);
           }
         }
  catch (        InvoiceApiException e) {
