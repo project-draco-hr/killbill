@@ -10,11 +10,9 @@
     }
   }
 );
-  final BlockingState futureCancellation=filtered.iterator().hasNext() ? filtered.iterator().next() : null;
-  if (futureCancellation == null) {
-    return;
+  for (  final BlockingState futureCancellation : filtered) {
+    blockingStateDao.unactiveBlockingState(futureCancellation.getId(),contextWithValidAccountRecordId);
   }
-  blockingStateDao.unactiveBlockingState(futureCancellation.getId(),contextWithValidAccountRecordId);
   if (subscriptionBase.getFutureEndDate() != null) {
     try {
       subscriptionBase.uncancel(callContext);
