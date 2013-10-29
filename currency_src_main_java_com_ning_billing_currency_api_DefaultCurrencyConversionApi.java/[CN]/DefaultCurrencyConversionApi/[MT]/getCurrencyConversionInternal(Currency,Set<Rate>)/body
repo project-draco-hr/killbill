@@ -1,11 +1,4 @@
 {
-  final Map<Currency,BigDecimal> rateMap=new HashMap<Currency,BigDecimal>();
-  DateTime conversionDate=null;
-  for (  Rate cur : allRates) {
-    conversionDate=(conversionDate == null || conversionDate.isAfter(cur.getConversionDate())) ? cur.getConversionDate() : conversionDate;
-    rateMap.put(cur.getCurrency(),cur.getValue());
-  }
-  final Rates rates=new DefaultRates(rateMap);
-  final CurrencyConversion result=new DefaultCurrencyConversion(conversionDate,baseCurrency,rates);
+  final CurrencyConversion result=new DefaultCurrencyConversion(baseCurrency,allRates);
   return result;
 }
