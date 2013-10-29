@@ -3,7 +3,7 @@
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final BlockingStateModelDao newBlockingStateModelDao=new BlockingStateModelDao(state,context);
       final BlockingStateSqlDao sqlDao=entitySqlDaoWrapperFactory.become(BlockingStateSqlDao.class);
-      final List<BlockingStateModelDao> allForBlockedItAndService=sqlDao.getBlockingHistoryForService(state.getBlockedId(),state.getService(),clock.getUTCNow().toDate(),context);
+      final List<BlockingStateModelDao> allForBlockedItAndService=sqlDao.getBlockingHistoryForService(state.getBlockedId(),state.getService(),context);
       allForBlockedItAndService.add(newBlockingStateModelDao);
       final List<BlockingStateModelDao> allForBlockedItAndServiceOrdered=Ordering.<BlockingStateModelDao>from(new Comparator<BlockingStateModelDao>(){
         @Override public int compare(        final BlockingStateModelDao o1,        final BlockingStateModelDao o2){
