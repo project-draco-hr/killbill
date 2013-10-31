@@ -1,18 +1,13 @@
 {
   final LinkedList<SubscriptionEvent> result=new LinkedList<SubscriptionEvent>();
-  for (  Entitlement cur : entitlements) {
+  for (  final Entitlement cur : entitlements) {
     final SubscriptionBase base=((DefaultEntitlement)cur).getSubscriptionBase();
     final List<SubscriptionBaseTransition> baseTransitions=base.getAllTransitions();
-    for (    SubscriptionBaseTransition tr : baseTransitions) {
-      final SubscriptionEventType eventType=toEventType(tr.getTransitionType());
-      if (eventType == null) {
-        continue;
-      }
-      final SubscriptionEvent event=toSubscriptionEvent(tr,eventType,accountTimeZone);
-      insertSubscriptionEvent(event,result);
-      if (tr.getTransitionType() == SubscriptionBaseTransitionType.CREATE || tr.getTransitionType() == SubscriptionBaseTransitionType.TRANSFER) {
-        final SubscriptionEvent billingEvent=toSubscriptionEvent(tr,SubscriptionEventType.START_BILLING,accountTimeZone);
-        insertSubscriptionEvent(billingEvent,result);
+    for (    final SubscriptionBaseTransition tr : baseTransitions) {
+      final List<SubscriptionEventType> eventTypes=toEventTypes(tr.getTransitionType());
+      for (      final SubscriptionEventType eventType : eventTypes) {
+        final SubscriptionEvent event=toSubscriptionEvent(tr,eventType,accountTimeZone);
+        insertSubscriptionEvent(event,result);
       }
     }
   }

@@ -3,18 +3,16 @@
     throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
   }
   final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
-  final List<BlockingState> blockingStates=blockingStateDao.getBlockingHistoryForService(getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,contextWithValidAccountRecordId);
-  final Collection<BlockingState> filtered=Collections2.filter(blockingStates,new Predicate<BlockingState>(){
+  final List<BlockingState> blockingStatesForAccount=blockingStateDao.getBlockingAllForAccountRecordId(contextWithValidAccountRecordId);
+  final Collection<BlockingState> futureEntitlementCancellationEvents=Collections2.filter(blockingStatesForAccount,new Predicate<BlockingState>(){
     @Override public boolean apply(    final BlockingState input){
-      return EntitlementService.ENTITLEMENT_SERVICE_NAME.equals(input.getService()) && input.getEffectiveDate().isAfter(clock.getUTCNow());
+      return EntitlementService.ENTITLEMENT_SERVICE_NAME.equals(input.getService()) && DefaultEntitlementApi.ENT_STATE_CANCELLED.equals(input.getStateName()) && input.getEffectiveDate().isAfter(clock.getUTCNow())&& (BlockingStateType.SUBSCRIPTION.equals(input.getType()) && input.getBlockedId().equals(getId()) || BlockingStateType.SUBSCRIPTION.equals(input.getType()) && input.getBlockedId().equals(getBaseEntitlementId()) || BlockingStateType.SUBSCRIPTION_BUNDLE.equals(input.getType()) && input.getBlockedId().equals(getBundleId()) || BlockingStateType.ACCOUNT.equals(input.getType()) && input.getBlockedId().equals(getAccountId()));
     }
   }
 );
-  final BlockingState futureCancellation=filtered.iterator().hasNext() ? filtered.iterator().next() : null;
-  if (futureCancellation == null) {
-    return;
+  for (  final BlockingState futureCancellation : futureEntitlementCancellationEvents) {
+    blockingStateDao.unactiveBlockingState(futureCancellation.getId(),contextWithValidAccountRecordId);
   }
-  blockingStateDao.unactiveBlockingState(futureCancellation.getId(),contextWithValidAccountRecordId);
   if (subscriptionBase.getFutureEndDate() != null) {
     try {
       subscriptionBase.uncancel(callContext);
