@@ -1,0 +1,39 @@
+{
+  final LocalDate initialDate=new LocalDate(2013,8,7);
+  clock.setDay(initialDate);
+  final Account account=accountApi.createAccount(getAccountData(7),callContext);
+  final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),initialDate,callContext);
+  final PlanPhaseSpecifier addOnSpec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  final Entitlement addOnEntitlement=entitlementApi.addEntitlement(entitlement.getBundleId(),addOnSpec,initialDate,callContext);
+  clock.addDays(3);
+  entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,callContext);
+  try {
+    entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,callContext);
+    Assert.fail("Entitlement is already cancelled");
+  }
+ catch (  final EntitlementApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.SUB_CANCEL_BAD_STATE.getCode());
+  }
+  try {
+    addOnEntitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,callContext);
+    Assert.fail("Add-On Entitlement is already cancelled");
+  }
+ catch (  final EntitlementApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.SUB_CANCEL_BAD_STATE.getCode());
+  }
+  try {
+    entitlement.uncancelEntitlement(callContext);
+    Assert.fail("Entitlement is already cancelled");
+  }
+ catch (  final EntitlementApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.SUB_CANCEL_BAD_STATE.getCode());
+  }
+  try {
+    addOnEntitlement.uncancelEntitlement(callContext);
+    Assert.fail("Add-On Entitlement is already cancelled");
+  }
+ catch (  final EntitlementApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.SUB_CANCEL_BAD_STATE.getCode());
+  }
+}

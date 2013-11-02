@@ -1,8 +1,9 @@
 {
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
+  refresh(callContext,contextWithValidAccountRecordId);
   if (state == EntitlementState.CANCELLED || subscriptionBase.getState() == EntitlementState.CANCELLED) {
     throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
   }
-  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
   final List<BlockingState> blockingStatesForAccount=blockingStateDao.getBlockingAllForAccountRecordId(contextWithValidAccountRecordId);
   final Collection<BlockingState> futureEntitlementCancellationEvents=Collections2.filter(blockingStatesForAccount,new Predicate<BlockingState>(){
     @Override public boolean apply(    final BlockingState input){

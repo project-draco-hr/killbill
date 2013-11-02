@@ -1,0 +1,24 @@
+{
+  try {
+    final Account account=accountApi.getAccountById(accountId,internalCallContext);
+    accountTimeZone=account.getTimeZone();
+  }
+ catch (  AccountApiException e) {
+    throw new EntitlementApiException(e);
+  }
+  final Entitlement refreshedEntitlement=entitlementApi.getEntitlementForId(getId(),context);
+  state=refreshedEntitlement.getState();
+  effectiveEndDate=refreshedEntitlement.getEffectiveEndDate();
+  externalKey=refreshedEntitlement.getExternalKey();
+  if (refreshedEntitlement instanceof DefaultEntitlement) {
+    subscriptionBase=((DefaultEntitlement)refreshedEntitlement).getSubscriptionBase();
+  }
+ else {
+    try {
+      subscriptionBase=subscriptionInternalApi.getBaseSubscription(refreshedEntitlement.getBundleId(),internalCallContext);
+    }
+ catch (    SubscriptionBaseApiException e) {
+      throw new EntitlementApiException(e);
+    }
+  }
+}

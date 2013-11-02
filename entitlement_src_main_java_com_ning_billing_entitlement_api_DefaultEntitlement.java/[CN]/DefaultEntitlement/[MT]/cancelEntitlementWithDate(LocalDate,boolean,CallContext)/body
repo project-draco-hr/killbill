@@ -1,8 +1,9 @@
 {
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
+  refresh(callContext,contextWithValidAccountRecordId);
   if (state == EntitlementState.CANCELLED) {
     throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
   }
-  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
   final DateTime effectiveCancelDate=dateHelper.fromLocalDateAndReferenceTime(localCancelDate,subscriptionBase.getStartDate(),contextWithValidAccountRecordId);
   try {
     if (overrideBillingEffectiveDate) {
