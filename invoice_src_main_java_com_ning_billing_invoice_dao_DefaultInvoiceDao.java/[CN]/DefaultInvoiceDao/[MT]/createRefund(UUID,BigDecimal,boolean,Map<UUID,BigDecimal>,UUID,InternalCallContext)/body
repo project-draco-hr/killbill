@@ -14,7 +14,7 @@
       if (existingRefund != null) {
         return existingRefund;
       }
-      final InvoicePaymentModelDao refund=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.REFUND,payment.getInvoiceId(),paymentId,context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),paymentCookieId,payment.getId());
+      final InvoicePaymentModelDao refund=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.REFUND,payment.getInvoiceId(),paymentId,context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),payment.getProcessedCurrency(),paymentCookieId,payment.getId());
       transactional.create(refund,context);
       final InvoiceModelDao invoice=transInvoiceDao.getById(payment.getInvoiceId().toString(),context);
       if (invoice != null) {

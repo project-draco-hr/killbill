@@ -12,12 +12,12 @@
   invoice.addInvoiceItem(creditAdjInvoiceItem);
   invoice.addInvoiceItem(creditBalanceAdjInvoiceItem2);
   invoice.addInvoiceItem(refundAdjInvoiceItem);
-  invoice.addPayment(new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice.getId(),clock.getUTCNow(),BigDecimal.TEN,Currency.USD));
-  invoice.addPayment(new DefaultInvoicePayment(InvoicePaymentType.REFUND,UUID.randomUUID(),invoice.getId(),clock.getUTCNow(),BigDecimal.ONE.negate(),Currency.USD));
+  invoice.addPayment(new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice.getId(),clock.getUTCNow(),BigDecimal.TEN,Currency.USD,Currency.USD));
+  invoice.addPayment(new DefaultInvoicePayment(InvoicePaymentType.REFUND,UUID.randomUUID(),invoice.getId(),clock.getUTCNow(),BigDecimal.ONE.negate(),Currency.USD,Currency.USD));
   Assert.assertEquals(invoice.getBalance().doubleValue(),0.00);
   Assert.assertEquals(invoice.getCreditedAmount().doubleValue(),11.00);
   Assert.assertEquals(invoice.getRefundedAmount().doubleValue(),-1.00);
-  final InvoiceFormatter formatter=new DefaultInvoiceFormatter(config,invoice,Locale.US);
+  final InvoiceFormatter formatter=new DefaultInvoiceFormatter(config,invoice,Locale.US,null);
   final List<InvoiceItem> invoiceItems=formatter.getInvoiceItems();
   Assert.assertEquals(invoiceItems.size(),4);
   Assert.assertEquals(invoiceItems.get(0).getInvoiceItemType(),InvoiceItemType.FIXED);
