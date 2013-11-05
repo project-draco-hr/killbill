@@ -5,30 +5,5 @@
   install(new InMemoryBusModule(configSource));
   bind(AccountInternalApi.class).toInstance(Mockito.mock(AccountInternalApi.class));
   bind(AccountUserApi.class).toInstance(Mockito.mock(AccountUserApi.class));
-  final CurrencyConversionApi currencyConversionApi=Mockito.mock(CurrencyConversionApi.class);
-  final CurrencyConversion currencyConversion=Mockito.mock(CurrencyConversion.class);
-  final Set<Rate> rates=new TreeSet<Rate>();
-  rates.add(new Rate(){
-    @Override public Currency getBaseCurrency(){
-      return Currency.USD;
-    }
-    @Override public Currency getCurrency(){
-      return Currency.BRL;
-    }
-    @Override public BigDecimal getValue(){
-      return new BigDecimal("0.4234");
-    }
-    @Override public DateTime getConversionDate(){
-      return new DateTime(DateTimeZone.UTC);
-    }
-  }
-);
-  Mockito.when(currencyConversion.getRates()).thenReturn(rates);
-  try {
-    Mockito.when(currencyConversionApi.getCurrencyConversion(Mockito.<Currency>any(),Mockito.<DateTime>any())).thenReturn(currencyConversion);
-  }
- catch (  CurrencyConversionException e) {
-    e.printStackTrace();
-  }
-  bind(CurrencyConversionApi.class).toInstance(currencyConversionApi);
+  installCurrencyConversionApi();
 }
