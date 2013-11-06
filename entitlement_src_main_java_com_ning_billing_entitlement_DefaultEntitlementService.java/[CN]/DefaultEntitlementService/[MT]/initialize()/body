@@ -1,0 +1,27 @@
+{
+  try {
+    final NotificationQueueHandler queueHandler=new NotificationQueueHandler(){
+      @Override public void handleReadyNotification(      final NotificationEvent inputKey,      final DateTime eventDateTime,      final UUID fromNotificationQueueUserToken,      final Long accountRecordId,      final Long tenantRecordId){
+        final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(tenantRecordId,accountRecordId,"EntitlementQueue",CallOrigin.INTERNAL,UserType.SYSTEM,fromNotificationQueueUserToken);
+        if (inputKey instanceof EntitlementNotificationKey) {
+          final UUID tenantId=nonEntityDao.retrieveIdFromObject(tenantRecordId,ObjectType.TENANT);
+          processEntitlementNotification((EntitlementNotificationKey)inputKey,tenantId,internalCallContext);
+        }
+ else         if (inputKey instanceof BlockingTransitionNotificationKey) {
+          processBlockingNotification((BlockingTransitionNotificationKey)inputKey,internalCallContext);
+        }
+ else         if (inputKey != null) {
+          log.error("Entitlement service received an unexpected event type {}" + inputKey.getClass());
+        }
+ else {
+          log.error("Entitlement service received an unexpected null event");
+        }
+      }
+    }
+;
+    entitlementEventQueue=notificationQueueService.createNotificationQueue(ENTITLEMENT_SERVICE_NAME,NOTIFICATION_QUEUE_NAME,queueHandler);
+  }
+ catch (  final NotificationQueueAlreadyExists e) {
+    throw new RuntimeException(e);
+  }
+}

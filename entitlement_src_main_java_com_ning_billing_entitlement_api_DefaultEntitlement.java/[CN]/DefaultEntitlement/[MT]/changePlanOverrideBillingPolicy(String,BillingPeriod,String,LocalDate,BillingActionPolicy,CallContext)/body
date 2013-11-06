@@ -6,13 +6,17 @@
   }
   try {
     checker.checkBlockedChange(subscriptionBase,context);
-    subscriptionBase.changePlanWithPolicy(productName,billingPeriod,priceList,actionPolicy,callContext);
-    return entitlementApi.getEntitlementForId(getId(),callContext);
   }
  catch (  BlockingApiException e) {
     throw new EntitlementApiException(e,e.getCode(),e.getMessage());
   }
-catch (  SubscriptionBaseApiException e) {
+  final DateTime effectiveChangeDate;
+  try {
+    effectiveChangeDate=subscriptionBase.changePlanWithPolicy(productName,billingPeriod,priceList,actionPolicy,callContext);
+  }
+ catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);
   }
+  blockAddOnsIfRequired(effectiveChangeDate,callContext,context);
+  return entitlementApi.getEntitlementForId(getId(),callContext);
 }

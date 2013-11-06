@@ -6,7 +6,7 @@
     final DateTime referenceTime=clock.getUTCNow();
     final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,referenceTime,contextWithValidAccountRecordId);
     final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(bundle.getId(),planPhaseSpecifier,requestedDate,contextWithValidAccountRecordId);
-    return new DefaultEntitlement(dateHelper,subscription,accountId,bundle.getExternalKey(),EntitlementState.ACTIVE,null,account.getTimeZone(),accountApi,this,subscriptionInternalApi,internalCallContextFactory,blockingStateDao,clock,checker);
+    return new DefaultEntitlement(dateHelper,subscription,accountId,bundle.getExternalKey(),EntitlementState.ACTIVE,null,account.getTimeZone(),accountApi,this,subscriptionInternalApi,internalCallContextFactory,blockingStateDao,clock,checker,notificationQueueService,entitlementUtils);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

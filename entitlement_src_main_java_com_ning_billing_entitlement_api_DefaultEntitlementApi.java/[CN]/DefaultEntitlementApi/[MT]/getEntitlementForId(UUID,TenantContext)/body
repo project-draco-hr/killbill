@@ -7,7 +7,7 @@
     final InternalTenantContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalTenantContext(account.getId(),tenantContext);
     final LocalDate entitlementEffectiveEndDate=getEffectiveEndDate(bundle.getAccountId(),subscription,account.getTimeZone(),contextWithValidAccountRecordId);
     final EntitlementState entitlementState=getStateForEntitlement(entitlementEffectiveEndDate,subscription,account.getTimeZone(),contextWithValidAccountRecordId);
-    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),entitlementState,entitlementEffectiveEndDate,account.getTimeZone(),accountApi,this,subscriptionInternalApi,internalCallContextFactory,blockingStateDao,clock,checker);
+    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),entitlementState,entitlementEffectiveEndDate,account.getTimeZone(),accountApi,this,subscriptionInternalApi,internalCallContextFactory,blockingStateDao,clock,checker,notificationQueueService,entitlementUtils);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

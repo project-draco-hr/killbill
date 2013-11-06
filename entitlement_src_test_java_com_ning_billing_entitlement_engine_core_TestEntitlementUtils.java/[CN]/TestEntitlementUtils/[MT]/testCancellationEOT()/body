@@ -1,0 +1,17 @@
+{
+  final DefaultEntitlement cancelledBaseEntitlement=(DefaultEntitlement)baseEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.END_OF_TERM,BillingActionPolicy.END_OF_TERM,callContext);
+  assertTrue(testListener.isCompleted(DELAY));
+  checkFutureBlockingStatesToCancel(addOnEntitlement,null,null);
+  checkFutureBlockingStatesToCancel(cancelledBaseEntitlement,addOnEntitlement,baseEffectiveEOTCancellationOrChangeDateTime);
+  checkActualBlockingStatesToCancel(cancelledBaseEntitlement,addOnEntitlement,null);
+  checkBlockingStatesDAO(baseEntitlement,addOnEntitlement,baseEffectiveCancellationOrChangeDate,true);
+  testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.BLOCK);
+  clock.addDays(30);
+  assertTrue(testListener.isCompleted(DELAY));
+  final DefaultEntitlement cancelledAddOnEntitlement=(DefaultEntitlement)entitlementApi.getEntitlementForId(addOnEntitlement.getId(),callContext);
+  checkFutureBlockingStatesToCancel(cancelledBaseEntitlement,null,null);
+  checkFutureBlockingStatesToCancel(cancelledAddOnEntitlement,null,null);
+  checkFutureBlockingStatesToCancel(cancelledBaseEntitlement,cancelledAddOnEntitlement,null);
+  checkActualBlockingStatesToCancel(cancelledBaseEntitlement,cancelledAddOnEntitlement,baseEffectiveEOTCancellationOrChangeDateTime);
+  checkBlockingStatesDAO(cancelledBaseEntitlement,cancelledAddOnEntitlement,baseEffectiveCancellationOrChangeDate,true);
+}

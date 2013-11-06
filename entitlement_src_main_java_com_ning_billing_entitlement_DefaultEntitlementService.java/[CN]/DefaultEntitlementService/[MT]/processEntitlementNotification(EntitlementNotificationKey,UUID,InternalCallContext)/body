@@ -1,0 +1,23 @@
+{
+  final Entitlement entitlement;
+  try {
+    entitlement=entitlementApi.getEntitlementForId(key.getEntitlementId(),internalCallContext.toTenantContext(tenantId));
+  }
+ catch (  final EntitlementApiException e) {
+    log.error("Error retrieving entitlement for id " + key.getEntitlementId(),e);
+    return;
+  }
+  if (!(entitlement instanceof DefaultEntitlement)) {
+    log.error("Entitlement service received an unexpected entitlement class type {}" + entitlement.getClass().getName());
+    return;
+  }
+  final EntitlementNotificationKeyAction entitlementNotificationKeyAction=key.getEntitlementNotificationKeyAction();
+  if (EntitlementNotificationKeyAction.CHANGE.equals(entitlementNotificationKeyAction) || EntitlementNotificationKeyAction.CANCEL.equals(entitlementNotificationKeyAction)) {
+    try {
+      ((DefaultEntitlement)entitlement).blockAddOnsIfRequired(key.getEffectiveDate(),internalCallContext.toTenantContext(tenantId),internalCallContext);
+    }
+ catch (    EntitlementApiException e) {
+      log.error("Error processing event for entitlement {}" + entitlement.getId(),e);
+    }
+  }
+}

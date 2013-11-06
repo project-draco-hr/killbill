@@ -1,0 +1,35 @@
+{
+  final Collection<String> includedAddonsForProduct;
+  final Collection<String> availableAddonsForProduct;
+  if (baseTransitionTriggerNextProduct == null) {
+    includedAddonsForProduct=ImmutableList.<String>of();
+    availableAddonsForProduct=ImmutableList.<String>of();
+  }
+ else {
+    includedAddonsForProduct=Collections2.<Product,String>transform(ImmutableSet.<Product>copyOf(baseTransitionTriggerNextProduct.getIncluded()),new Function<Product,String>(){
+      @Override public String apply(      final Product product){
+        return product.getName();
+      }
+    }
+);
+    availableAddonsForProduct=Collections2.<Product,String>transform(ImmutableSet.<Product>copyOf(baseTransitionTriggerNextProduct.getAvailable()),new Function<Product,String>(){
+      @Override public String apply(      final Product product){
+        return product.getName();
+      }
+    }
+);
+  }
+  final List<SubscriptionBase> subscriptionsForBundle=subscriptionInternalApi.getSubscriptionsForBundle(bundleId,internalTenantContext);
+  final Collection<SubscriptionBase> futureBlockedAddons=Collections2.<SubscriptionBase>filter(subscriptionsForBundle,new Predicate<SubscriptionBase>(){
+    @Override public boolean apply(    final SubscriptionBase subscription){
+      return ProductCategory.ADD_ON.equals(subscription.getCategory()) && (baseTransitionTriggerNextProduct == null || (includedAddonsForProduct.contains(subscription.getLastActivePlan().getProduct().getName()) || !availableAddonsForProduct.contains(subscription.getLastActivePlan().getProduct().getName())));
+    }
+  }
+);
+  return Collections2.<SubscriptionBase,BlockingState>transform(futureBlockedAddons,new Function<SubscriptionBase,BlockingState>(){
+    @Override public BlockingState apply(    final SubscriptionBase input){
+      return new DefaultBlockingState(input.getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,baseTransitionTriggerEffectiveTransitionTime);
+    }
+  }
+);
+}

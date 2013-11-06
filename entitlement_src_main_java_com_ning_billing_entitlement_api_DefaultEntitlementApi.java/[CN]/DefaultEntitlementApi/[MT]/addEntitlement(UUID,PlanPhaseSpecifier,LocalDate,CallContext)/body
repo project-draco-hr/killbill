@@ -16,7 +16,7 @@
     }
     final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
     final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(baseSubscription.getBundleId(),planPhaseSpecifier,requestedDate,context);
-    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),EntitlementState.ACTIVE,null,account.getTimeZone(),accountApi,this,subscriptionInternalApi,internalCallContextFactory,blockingStateDao,clock,checker);
+    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),EntitlementState.ACTIVE,null,account.getTimeZone(),accountApi,this,subscriptionInternalApi,internalCallContextFactory,blockingStateDao,clock,checker,notificationQueueService,entitlementUtils);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

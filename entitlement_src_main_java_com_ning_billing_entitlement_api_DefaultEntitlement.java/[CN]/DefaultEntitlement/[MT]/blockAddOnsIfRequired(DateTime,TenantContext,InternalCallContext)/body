@@ -1,0 +1,18 @@
+{
+  if (!ProductCategory.BASE.equals(subscriptionBase.getCategory())) {
+    return;
+  }
+  refresh(context,internalCallContext);
+  final DateTime effectiveDate=effectiveDateOrNull == null ? clock.getUTCNow() : effectiveDateOrNull;
+  final boolean isBaseEntitlementCancelled=EntitlementState.CANCELLED.equals(state);
+  final DateTime now=clock.getUTCNow();
+  if (effectiveDate.compareTo(now) > 0) {
+    final NotificationEvent notificationEvent=new EntitlementNotificationKey(getId(),isBaseEntitlementCancelled ? EntitlementNotificationKeyAction.CANCEL : EntitlementNotificationKeyAction.CHANGE,effectiveDate);
+    recordFutureNotification(effectiveDate,notificationEvent,internalCallContext);
+    return;
+  }
+  final Collection<BlockingState> addOnsBlockingStates=entitlementUtils.computeBlockingStatesForAssociatedAddons(subscriptionBase,effectiveDate,internalCallContext);
+  for (  final BlockingState addOnBlockingState : addOnsBlockingStates) {
+    entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(addOnBlockingState,internalCallContext);
+  }
+}

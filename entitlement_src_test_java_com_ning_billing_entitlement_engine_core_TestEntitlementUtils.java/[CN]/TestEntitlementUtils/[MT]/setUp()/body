@@ -1,0 +1,21 @@
+{
+  sqlDao=dbi.onDemand(BlockingStateSqlDao.class);
+  final LocalDate initialDate=new LocalDate(2013,8,8);
+  clock.setDay(initialDate);
+  final Account account=accountApi.createAccount(getAccountData(7),callContext);
+  testListener.pushExpectedEvents(NextEvent.CREATE,NextEvent.CREATE);
+  final PlanPhaseSpecifier baseSpec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  baseEntitlement=(DefaultEntitlement)entitlementApi.createBaseEntitlement(account.getId(),baseSpec,account.getExternalKey(),initialDate,callContext);
+  final PlanPhaseSpecifier addOnSpec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  addOnEntitlement=(DefaultEntitlement)entitlementApi.addEntitlement(baseEntitlement.getBundleId(),addOnSpec,initialDate,callContext);
+  checkFutureBlockingStatesToCancel(baseEntitlement,null,null);
+  checkFutureBlockingStatesToCancel(addOnEntitlement,null,null);
+  checkFutureBlockingStatesToCancel(baseEntitlement,addOnEntitlement,null);
+  testListener.pushExpectedEvents(NextEvent.PHASE,NextEvent.PHASE);
+  clock.setDay(new LocalDate(2013,9,8));
+  assertTrue(testListener.isCompleted(DELAY));
+  baseEffectiveEOTCancellationOrChangeDateTime=baseEntitlement.getSubscriptionBase().getAllTransitions().get(1).getEffectiveTransitionTime().plusMonths(1);
+  Assert.assertEquals(baseEffectiveEOTCancellationOrChangeDateTime.toLocalDate(),new LocalDate(2013,10,7));
+  baseEffectiveCancellationOrChangeDate=baseEffectiveEOTCancellationOrChangeDateTime.toLocalDate();
+  subscriptionInternalApi.setChargedThroughDate(baseEntitlement.getId(),baseEffectiveEOTCancellationOrChangeDateTime,internalCallContext);
+}

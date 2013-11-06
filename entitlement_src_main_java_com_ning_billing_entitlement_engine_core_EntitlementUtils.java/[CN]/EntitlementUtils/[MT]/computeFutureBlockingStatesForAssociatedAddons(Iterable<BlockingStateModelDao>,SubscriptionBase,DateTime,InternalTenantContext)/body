@@ -1,0 +1,28 @@
+{
+  if (!ProductCategory.BASE.equals(subscriptionBase.getCategory())) {
+    return ImmutableList.<BlockingState>of();
+  }
+  final BlockingStateModelDao futureEntitlementCancelEvent=Iterables.<BlockingStateModelDao>tryFind(blockingStates,new Predicate<BlockingStateModelDao>(){
+    @Override public boolean apply(    final BlockingStateModelDao input){
+      return input.getEffectiveDate().isAfter(now) && EntitlementService.ENTITLEMENT_SERVICE_NAME.equals(input.getService()) && DefaultEntitlementApi.ENT_STATE_CANCELLED.equals(input.getState());
+    }
+  }
+).orNull();
+  if (futureEntitlementCancelEvent != null) {
+    return computeBlockingStatesForAssociatedAddons(subscriptionBase.getBundleId(),null,futureEntitlementCancelEvent.getEffectiveDate(),internalTenantContext);
+  }
+ else {
+    final SubscriptionBaseTransition futureSubscriptionBaseChangeEvent=Iterables.<SubscriptionBaseTransition>tryFind(subscriptionBase.getAllTransitions(),new Predicate<SubscriptionBaseTransition>(){
+      @Override public boolean apply(      final SubscriptionBaseTransition input){
+        return input.getEffectiveTransitionTime().isAfter(now) && (SubscriptionBaseTransitionType.CHANGE.equals(input.getTransitionType()) || SubscriptionBaseTransitionType.CANCEL.equals(input.getTransitionType()));
+      }
+    }
+).orNull();
+    if (futureSubscriptionBaseChangeEvent == null) {
+      return ImmutableList.<BlockingState>of();
+    }
+    final Plan nextPlan=futureSubscriptionBaseChangeEvent.getNextPlan();
+    final Product product=nextPlan == null ? futureSubscriptionBaseChangeEvent.getPreviousPlan().getProduct() : nextPlan.getProduct();
+    return computeBlockingStatesForAssociatedAddons(subscriptionBase.getBundleId(),product,futureSubscriptionBaseChangeEvent.getEffectiveTransitionTime(),internalTenantContext);
+  }
+}

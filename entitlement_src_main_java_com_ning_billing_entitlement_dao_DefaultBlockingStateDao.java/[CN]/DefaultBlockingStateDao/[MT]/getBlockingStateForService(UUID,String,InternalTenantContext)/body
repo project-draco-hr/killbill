@@ -1,7 +1,8 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<BlockingState>(){
     @Override public BlockingState inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
-      final BlockingStateModelDao model=entitySqlDaoWrapperFactory.become(BlockingStateSqlDao.class).getBlockingStateForService(blockableId,serviceName,clock.getUTCNow().toDate(),context);
+      final Date upTo=clock.getUTCNow().toDate();
+      final BlockingStateModelDao model=entitySqlDaoWrapperFactory.become(BlockingStateSqlDao.class).getBlockingStateForService(blockableId,serviceName,upTo,context);
       return BlockingStateModelDao.toBlockingState(model);
     }
   }
