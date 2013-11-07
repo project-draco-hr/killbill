@@ -23,7 +23,7 @@ case PROCESSED:
     paymentDao.updatePaymentAndAttemptOnCompletion(paymentInput.getId(),paymentStatus,paymentPluginInfo.getAmount(),paymentPluginInfo.getCurrency(),attemptInput.getId(),paymentPluginInfo.getGatewayErrorCode(),null,context);
   allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId(),context);
 payment=paymentDao.getPayment(paymentInput.getId(),context);
-invoiceApi.notifyOfPayment(invoice.getId(),payment.getAmount(),payment.getCurrency(),payment.getId(),payment.getEffectiveDate(),context);
+invoiceApi.notifyOfPayment(invoice.getId(),payment.getAmount(),payment.getCurrency(),paymentPluginInfo.getCurrency(),payment.getId(),payment.getEffectiveDate(),context);
 event=new DefaultPaymentInfoEvent(account.getId(),invoice.getId(),payment.getId(),payment.getAmount(),payment.getPaymentNumber(),paymentStatus,payment.getEffectiveDate(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
 break;
 case ERROR:

@@ -1,0 +1,28 @@
+{
+  final CurrencyConversionApi currencyConversionApi=Mockito.mock(CurrencyConversionApi.class);
+  final CurrencyConversion currencyConversion=Mockito.mock(CurrencyConversion.class);
+  final Set<Rate> rates=new HashSet<Rate>();
+  rates.add(new Rate(){
+    @Override public Currency getBaseCurrency(){
+      return Currency.USD;
+    }
+    @Override public Currency getCurrency(){
+      return Currency.BRL;
+    }
+    @Override public BigDecimal getValue(){
+      return new BigDecimal("0.4234");
+    }
+    @Override public DateTime getConversionDate(){
+      return new DateTime(DateTimeZone.UTC);
+    }
+  }
+);
+  Mockito.when(currencyConversion.getRates()).thenReturn(rates);
+  try {
+    Mockito.when(currencyConversionApi.getCurrencyConversion(Mockito.<Currency>any(),Mockito.<DateTime>any())).thenReturn(currencyConversion);
+  }
+ catch (  CurrencyConversionException e) {
+    throw new RuntimeException(e);
+  }
+  bind(CurrencyConversionApi.class).toInstance(currencyConversionApi);
+}

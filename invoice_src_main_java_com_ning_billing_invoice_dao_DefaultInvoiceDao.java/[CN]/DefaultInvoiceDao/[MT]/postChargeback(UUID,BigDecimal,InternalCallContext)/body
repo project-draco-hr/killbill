@@ -14,7 +14,7 @@
       if (payment == null) {
         throw new InvoiceApiException(ErrorCode.INVOICE_PAYMENT_NOT_FOUND,invoicePaymentId.toString());
       }
-      final InvoicePaymentModelDao chargeBack=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.CHARGED_BACK,payment.getInvoiceId(),payment.getPaymentId(),context.getCreatedDate(),requestedChargedBackAmount.negate(),payment.getCurrency(),null,payment.getId());
+      final InvoicePaymentModelDao chargeBack=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.CHARGED_BACK,payment.getInvoiceId(),payment.getPaymentId(),context.getCreatedDate(),requestedChargedBackAmount.negate(),payment.getCurrency(),payment.getProcessedCurrency(),null,payment.getId());
       transactional.create(chargeBack,context);
       final UUID accountId=transactional.getAccountIdFromInvoicePaymentId(chargeBack.getId().toString(),context);
       cbaDao.doCBAComplexity(accountId,entitySqlDaoWrapperFactory,context);
