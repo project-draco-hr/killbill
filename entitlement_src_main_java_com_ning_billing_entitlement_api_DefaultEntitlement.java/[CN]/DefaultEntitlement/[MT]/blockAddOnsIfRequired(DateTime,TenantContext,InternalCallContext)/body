@@ -3,9 +3,9 @@
     return;
   }
   refresh(context,internalCallContext);
-  final DateTime effectiveDate=effectiveDateOrNull == null ? clock.getUTCNow() : effectiveDateOrNull;
-  final boolean isBaseEntitlementCancelled=EntitlementState.CANCELLED.equals(state);
   final DateTime now=clock.getUTCNow();
+  final DateTime effectiveDate=effectiveDateOrNull == null ? now : effectiveDateOrNull;
+  final boolean isBaseEntitlementCancelled=EntitlementState.CANCELLED.equals(state);
   if (effectiveDate.compareTo(now) > 0) {
     final NotificationEvent notificationEvent=new EntitlementNotificationKey(getId(),isBaseEntitlementCancelled ? EntitlementNotificationKeyAction.CANCEL : EntitlementNotificationKeyAction.CHANGE,effectiveDate);
     recordFutureNotification(effectiveDate,notificationEvent,internalCallContext);
