@@ -11,13 +11,13 @@
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(15,NextEvent.PAYMENT_ERROR);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
-  addDaysAndCheckForCompletion(20,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.PAYMENT_ERROR);
+  addDaysAndCheckForCompletion(20,NextEvent.BLOCK,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.PAYMENT_ERROR);
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseEntitlement,true,true);
   final Invoice firstNonZeroInvoice=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext).iterator().next();
-  fullyAdjustInvoiceItemAndCheckForCompletion(account,firstNonZeroInvoice,1,NextEvent.INVOICE_ADJUSTMENT);
+  fullyAdjustInvoiceItemAndCheckForCompletion(account,firstNonZeroInvoice,1,NextEvent.BLOCK,NextEvent.INVOICE_ADJUSTMENT);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   invoiceChecker.checkRepairedInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,5,31),InvoiceItemType.ITEM_ADJ,new BigDecimal("-249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
@@ -25,14 +25,17 @@
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(10,NextEvent.PAYMENT_ERROR);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
-  addDaysAndCheckForCompletion(15,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
+  addDaysAndCheckForCompletion(15,NextEvent.BLOCK,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseEntitlement,true,true);
   invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,8,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
-  final Collection<Invoice> invoices=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
-  for (  final Invoice invoice : invoices) {
-    if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-      fullyAdjustInvoiceAndCheckForCompletion(account,invoice,NextEvent.INVOICE_ADJUSTMENT);
+  final List<Invoice> invoicesToAdjust=ImmutableList.<Invoice>copyOf(invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext));
+  for (int i=0; i < invoicesToAdjust.size(); i++) {
+    if (i == invoicesToAdjust.size() - 1) {
+      fullyAdjustInvoiceAndCheckForCompletion(account,invoicesToAdjust.get(i),NextEvent.BLOCK,NextEvent.INVOICE_ADJUSTMENT);
+    }
+ else {
+      fullyAdjustInvoiceAndCheckForCompletion(account,invoicesToAdjust.get(i),NextEvent.INVOICE_ADJUSTMENT);
     }
   }
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);

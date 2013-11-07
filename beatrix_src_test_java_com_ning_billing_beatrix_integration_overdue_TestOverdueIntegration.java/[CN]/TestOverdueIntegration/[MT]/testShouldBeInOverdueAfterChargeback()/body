@@ -15,7 +15,7 @@
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   final InvoicePayment payment=invoicePaymentApi.getInvoicePayments(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).get(1).getPayments().get(0).getPaymentId(),callContext).get(0);
-  createChargeBackAndCheckForCompletion(payment,NextEvent.INVOICE_ADJUSTMENT);
+  createChargeBackAndCheckForCompletion(payment,NextEvent.BLOCK,NextEvent.INVOICE_ADJUSTMENT);
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseEntitlement,true,true);
 }

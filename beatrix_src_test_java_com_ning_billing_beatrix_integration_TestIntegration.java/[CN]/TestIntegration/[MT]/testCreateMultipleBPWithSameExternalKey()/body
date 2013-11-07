@@ -7,7 +7,7 @@
   final BillingPeriod term=BillingPeriod.MONTHLY;
   final DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   final SubscriptionBundle initialBundle=subscriptionApi.getActiveSubscriptionBundleForExternalKey("bundleKey",callContext);
-  busHandler.pushExpectedEvent(NextEvent.CANCEL);
+  busHandler.pushExpectedEvents(NextEvent.BLOCK,NextEvent.CANCEL);
   baseEntitlement.cancelEntitlementWithPolicy(EntitlementActionPolicy.IMMEDIATE,callContext);
   assertTrue(busHandler.isCompleted(DELAY));
   final String newProductName="Pistol";
