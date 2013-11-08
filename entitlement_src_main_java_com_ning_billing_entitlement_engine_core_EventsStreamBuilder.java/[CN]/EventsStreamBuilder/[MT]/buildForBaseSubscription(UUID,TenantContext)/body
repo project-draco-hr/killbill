@@ -1,0 +1,13 @@
+{
+  final SubscriptionBaseBundle bundle;
+  final SubscriptionBase subscription;
+  try {
+    final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(tenantContext);
+    bundle=subscriptionInternalApi.getBundleFromId(bundleId,internalTenantContext);
+    subscription=subscriptionInternalApi.getBaseSubscription(bundleId,internalTenantContext);
+  }
+ catch (  SubscriptionBaseApiException e) {
+    throw new EntitlementApiException(e);
+  }
+  return buildForEntitlement(bundle,subscription,tenantContext);
+}

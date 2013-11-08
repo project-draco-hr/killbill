@@ -1,30 +1,18 @@
 {
-  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(callContext);
+  final EventsStream eventsStreamForBaseSubscription=eventsStreamBuilder.buildForBaseSubscription(bundleId,callContext);
+  if (!eventsStreamForBaseSubscription.isEntitlementActive()) {
+    throw new EntitlementApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,bundleId);
+  }
+  if (eventsStreamForBaseSubscription.getCurrentBlockingAggregator().isBlockChange()) {
+    throw new EntitlementApiException(new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,BlockingChecker.ACTION_CHANGE,BlockingChecker.TYPE_SUBSCRIPTION,eventsStreamForBaseSubscription.getSubscription().getId().toString()));
+  }
+  final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,eventsStreamForBaseSubscription.getSubscription().getStartDate(),eventsStreamForBaseSubscription.getInternalTenantContext());
   try {
-    final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleFromId(bundleId,context);
-    final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundleId,context);
-    final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundle.getAccountId(),callContext);
-    final Account account=accountApi.getAccountById(bundle.getAccountId(),context);
-    final LocalDate baseEntitlementEffectiveEndDate=getEffectiveEndDate(bundle.getAccountId(),baseSubscription,account.getTimeZone(),contextWithValidAccountRecordId);
-    final EntitlementState baseEntitlementState=getStateForEntitlement(baseEntitlementEffectiveEndDate,baseSubscription,account.getTimeZone(),contextWithValidAccountRecordId);
-    if (baseSubscription.getCategory() != ProductCategory.BASE || baseEntitlementState != EntitlementState.ACTIVE) {
-      throw new EntitlementApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,baseSubscription.getBundleId());
-    }
-    final BlockingAggregator blocking=checker.getBlockedStatus(baseSubscription,contextWithValidAccountRecordId);
-    if (blocking.isBlockChange()) {
-      throw new EntitlementApiException(new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,BlockingChecker.ACTION_CHANGE,BlockingChecker.TYPE_SUBSCRIPTION,baseSubscription.getId().toString()));
-    }
-    final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
-    final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(baseSubscription.getBundleId(),planPhaseSpecifier,requestedDate,context);
-    return new DefaultEntitlement(dateHelper,subscription,bundle.getAccountId(),bundle.getExternalKey(),EntitlementState.ACTIVE,null,account.getTimeZone(),accountApi,this,subscriptionInternalApi,internalCallContextFactory,blockingStateDao,clock,checker,notificationQueueService,entitlementUtils);
+    final InternalCallContext context=internalCallContextFactory.createInternalCallContext(callContext);
+    final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(bundleId,planPhaseSpecifier,requestedDate,context);
+    return new DefaultEntitlement(dateHelper,subscription,eventsStreamForBaseSubscription.getAccount().getId(),eventsStreamForBaseSubscription.getBundle().getExternalKey(),EntitlementState.ACTIVE,null,eventsStreamForBaseSubscription.getAccount().getTimeZone(),accountApi,this,subscriptionInternalApi,internalCallContextFactory,blockingStateDao,clock,checker,notificationQueueService,entitlementUtils);
   }
  catch (  SubscriptionBaseApiException e) {
-    throw new EntitlementApiException(e);
-  }
-catch (  BlockingApiException e) {
-    throw new EntitlementApiException(e);
-  }
-catch (  AccountApiException e) {
     throw new EntitlementApiException(e);
   }
 }

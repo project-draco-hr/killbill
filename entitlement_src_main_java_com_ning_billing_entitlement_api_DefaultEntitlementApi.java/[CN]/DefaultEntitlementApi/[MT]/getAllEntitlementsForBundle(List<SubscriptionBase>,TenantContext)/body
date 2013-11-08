@@ -1,0 +1,13 @@
+{
+  return Lists.transform(subscriptions,new Function<SubscriptionBase,Entitlement>(){
+    @Override public Entitlement apply(    final SubscriptionBase input){
+      try {
+        return getEntitlementForId(input.getId(),context);
+      }
+ catch (      EntitlementApiException e) {
+        throw new RuntimeException("Failed to extract blocking state for subscription " + input.getId().toString());
+      }
+    }
+  }
+);
+}

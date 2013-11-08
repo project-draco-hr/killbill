@@ -1,17 +1,8 @@
 {
-  final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(accountId,tenantContext);
-  try {
-    final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccountAndKey(accountId,externalKey,context);
-    if (bundles.size() == 0) {
-      return Collections.emptyList();
+  return ImmutableList.<Entitlement>copyOf(Iterables.<Entitlement>filter(getAllEntitlementsForAccountId(accountId,tenantContext),new Predicate<Entitlement>(){
+    @Override public boolean apply(    final Entitlement input){
+      return externalKey.equals(input.getExternalKey());
     }
-    final Account account=accountApi.getAccountById(bundles.get(0).getAccountId(),context);
-    return getEntitlementsForBundles(bundles,account,context);
   }
- catch (  SubscriptionBaseApiException e) {
-    throw new EntitlementApiException(e);
-  }
-catch (  AccountApiException e) {
-    throw new EntitlementApiException(e);
-  }
+));
 }

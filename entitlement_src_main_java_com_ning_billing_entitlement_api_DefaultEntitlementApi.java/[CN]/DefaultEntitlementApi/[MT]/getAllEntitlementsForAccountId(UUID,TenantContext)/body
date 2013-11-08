@@ -1,12 +1,10 @@
 {
   final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(accountId,tenantContext);
-  final Account account;
-  try {
-    account=accountApi.getAccountById(accountId,context);
+  final Map<UUID,List<SubscriptionBase>> subscriptionsPerBundle=subscriptionInternalApi.getSubscriptionsForAccount(context);
+  final List<Entitlement> result=new LinkedList<Entitlement>();
+  for (  final UUID bundleId : subscriptionsPerBundle.keySet()) {
+    final List<Entitlement> entitlements=getAllEntitlementsForBundle(subscriptionsPerBundle.get(bundleId),tenantContext);
+    result.addAll(entitlements);
   }
- catch (  AccountApiException e) {
-    throw new EntitlementApiException(e);
-  }
-  final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(account.getId(),context);
-  return getEntitlementsForBundles(bundles,account,context);
+  return result;
 }
