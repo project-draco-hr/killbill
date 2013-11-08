@@ -1,0 +1,9 @@
+{
+  final List<String> typeList=ImmutableList.<String>copyOf(types);
+  return Iterables.<BlockingState>filter(subscriptionEntitlementStates,new Predicate<BlockingState>(){
+    @Override public boolean apply(    final BlockingState input){
+      return input.getEffectiveDate().isAfter(utcNow) && typeList.contains(input.getStateName()) && (BlockingStateType.SUBSCRIPTION.equals(input.getType()) && input.getBlockedId().equals(subscription.getId()) || BlockingStateType.SUBSCRIPTION.equals(input.getType()) && input.getBlockedId().equals(baseSubscription.getId()) || BlockingStateType.SUBSCRIPTION_BUNDLE.equals(input.getType()) && input.getBlockedId().equals(bundle.getId()) || BlockingStateType.ACCOUNT.equals(input.getType()) && input.getBlockedId().equals(account.getId()));
+    }
+  }
+);
+}

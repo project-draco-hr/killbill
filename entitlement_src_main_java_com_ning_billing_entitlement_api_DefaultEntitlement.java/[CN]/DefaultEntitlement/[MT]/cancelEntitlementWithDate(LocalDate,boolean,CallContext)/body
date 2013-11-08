@@ -1,16 +1,16 @@
 {
-  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
-  refresh(callContext,contextWithValidAccountRecordId);
-  if (state == EntitlementState.CANCELLED) {
+  refresh(callContext);
+  if (eventsStream.isEntitlementCancelled()) {
     throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
   }
-  final DateTime effectiveCancelDate=dateHelper.fromLocalDateAndReferenceTime(localCancelDate,subscriptionBase.getStartDate(),contextWithValidAccountRecordId);
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(getAccountId(),callContext);
+  final DateTime effectiveCancelDate=dateHelper.fromLocalDateAndReferenceTime(localCancelDate,getSubscriptionBase().getStartDate(),contextWithValidAccountRecordId);
   try {
     if (overrideBillingEffectiveDate) {
-      subscriptionBase.cancelWithDate(effectiveCancelDate,callContext);
+      getSubscriptionBase().cancelWithDate(effectiveCancelDate,callContext);
     }
  else {
-      subscriptionBase.cancel(callContext);
+      getSubscriptionBase().cancel(callContext);
     }
   }
  catch (  SubscriptionBaseApiException e) {

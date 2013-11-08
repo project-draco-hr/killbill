@@ -1,17 +1,17 @@
 {
-  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
-  refresh(callContext,contextWithValidAccountRecordId);
-  if (state == EntitlementState.CANCELLED) {
+  refresh(callContext);
+  if (eventsStream.isEntitlementCancelled()) {
     throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
   }
   try {
-    subscriptionBase.cancelWithPolicy(billingPolicy,callContext);
+    getSubscriptionBase().cancelWithPolicy(billingPolicy,callContext);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);
   }
-  final LocalDate effectiveLocalDate=new LocalDate(localCancelDate,accountTimeZone);
-  final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(effectiveLocalDate,subscriptionBase.getStartDate(),contextWithValidAccountRecordId);
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(getAccountId(),callContext);
+  final LocalDate effectiveLocalDate=new LocalDate(localCancelDate,eventsStream.getAccount().getTimeZone());
+  final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(effectiveLocalDate,getSubscriptionBase().getStartDate(),contextWithValidAccountRecordId);
   final BlockingState newBlockingState=new DefaultBlockingState(getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveDate);
   entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(newBlockingState,contextWithValidAccountRecordId);
   blockAddOnsIfRequired(effectiveDate,callContext,contextWithValidAccountRecordId);

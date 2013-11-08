@@ -1,18 +1,18 @@
 {
-  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(accountId,callContext);
-  refresh(callContext,context);
-  if (state != EntitlementState.ACTIVE) {
-    throw new EntitlementApiException(ErrorCode.SUB_CHANGE_NON_ACTIVE,getId(),state);
+  refresh(callContext);
+  if (!eventsStream.isEntitlementActive()) {
+    throw new EntitlementApiException(ErrorCode.SUB_CHANGE_NON_ACTIVE,getId(),getState());
   }
+  final InternalCallContext context=internalCallContextFactory.createInternalCallContext(getAccountId(),callContext);
   try {
-    checker.checkBlockedChange(subscriptionBase,context);
+    checker.checkBlockedChange(getSubscriptionBase(),context);
   }
  catch (  BlockingApiException e) {
     throw new EntitlementApiException(e,e.getCode(),e.getMessage());
   }
-  final DateTime effectiveChangeDate=dateHelper.fromLocalDateAndReferenceTime(localDate,subscriptionBase.getStartDate(),context);
+  final DateTime effectiveChangeDate=dateHelper.fromLocalDateAndReferenceTime(localDate,getSubscriptionBase().getStartDate(),context);
   try {
-    subscriptionBase.changePlanWithDate(productName,billingPeriod,priceList,effectiveChangeDate,callContext);
+    getSubscriptionBase().changePlanWithDate(productName,billingPeriod,priceList,effectiveChangeDate,callContext);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

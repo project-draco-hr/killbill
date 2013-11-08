@@ -2,10 +2,10 @@
   final LocalDate cancellationDate;
 switch (entitlementPolicy) {
 case IMMEDIATE:
-    cancellationDate=new LocalDate(clock.getUTCNow(),accountTimeZone);
+    cancellationDate=new LocalDate(clock.getUTCNow(),eventsStream.getAccount().getTimeZone());
   break;
 case END_OF_TERM:
-cancellationDate=subscriptionBase.getChargedThroughDate() != null ? new LocalDate(subscriptionBase.getChargedThroughDate(),accountTimeZone) : new LocalDate(clock.getUTCNow(),accountTimeZone);
+cancellationDate=getSubscriptionBase().getChargedThroughDate() != null ? new LocalDate(getSubscriptionBase().getChargedThroughDate(),eventsStream.getAccount().getTimeZone()) : new LocalDate(clock.getUTCNow(),eventsStream.getAccount().getTimeZone());
 break;
 default :
 throw new RuntimeException("Unsupported policy " + entitlementPolicy);

@@ -10,7 +10,7 @@
   try {
     final InternalCallContext context=internalCallContextFactory.createInternalCallContext(callContext);
     final SubscriptionBase subscription=subscriptionInternalApi.createSubscription(bundleId,planPhaseSpecifier,requestedDate,context);
-    return new DefaultEntitlement(dateHelper,subscription,eventsStreamForBaseSubscription.getAccount().getId(),eventsStreamForBaseSubscription.getBundle().getExternalKey(),EntitlementState.ACTIVE,null,eventsStreamForBaseSubscription.getAccount().getTimeZone(),accountApi,this,subscriptionInternalApi,internalCallContextFactory,blockingStateDao,clock,checker,notificationQueueService,entitlementUtils);
+    return new DefaultEntitlement(subscription.getId(),eventsStreamBuilder,this,blockingStateDao,subscriptionInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,internalCallContextFactory,callContext);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);

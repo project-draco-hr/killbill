@@ -1,22 +1,15 @@
 {
-  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
-  refresh(callContext,contextWithValidAccountRecordId);
-  if (state == EntitlementState.CANCELLED || subscriptionBase.getState() == EntitlementState.CANCELLED) {
+  refresh(callContext);
+  if (eventsStream.isEntitlementCancelled() || eventsStream.isSubscriptionCancelled()) {
     throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
   }
-  final List<BlockingState> blockingStatesForAccount=blockingStateDao.getBlockingAllForAccountRecordId(contextWithValidAccountRecordId);
-  final Collection<BlockingState> futureEntitlementCancellationEvents=Collections2.filter(blockingStatesForAccount,new Predicate<BlockingState>(){
-    @Override public boolean apply(    final BlockingState input){
-      return EntitlementService.ENTITLEMENT_SERVICE_NAME.equals(input.getService()) && DefaultEntitlementApi.ENT_STATE_CANCELLED.equals(input.getStateName()) && input.getEffectiveDate().isAfter(clock.getUTCNow())&& (BlockingStateType.SUBSCRIPTION.equals(input.getType()) && input.getBlockedId().equals(getId()) || BlockingStateType.SUBSCRIPTION.equals(input.getType()) && input.getBlockedId().equals(getBaseEntitlementId()) || BlockingStateType.SUBSCRIPTION_BUNDLE.equals(input.getType()) && input.getBlockedId().equals(getBundleId()) || BlockingStateType.ACCOUNT.equals(input.getType()) && input.getBlockedId().equals(getAccountId()));
-    }
-  }
-);
-  for (  final BlockingState futureCancellation : futureEntitlementCancellationEvents) {
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(getAccountId(),callContext);
+  for (  final BlockingState futureCancellation : eventsStream.getPendingEntitlementCancellationEvents()) {
     blockingStateDao.unactiveBlockingState(futureCancellation.getId(),contextWithValidAccountRecordId);
   }
-  if (subscriptionBase.getFutureEndDate() != null) {
+  if (getSubscriptionBase().getFutureEndDate() != null) {
     try {
-      subscriptionBase.uncancel(callContext);
+      getSubscriptionBase().uncancel(callContext);
     }
  catch (    SubscriptionBaseApiException e) {
       throw new EntitlementApiException(e);
