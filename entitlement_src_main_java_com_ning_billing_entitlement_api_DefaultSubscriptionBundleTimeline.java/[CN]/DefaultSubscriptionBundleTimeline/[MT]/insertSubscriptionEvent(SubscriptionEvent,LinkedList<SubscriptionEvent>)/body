@@ -6,19 +6,18 @@
       break;
     }
  else     if (compEffectiveDate == 0) {
-      int compCreatedDate=((DefaultSubscriptionEvent)event).getCreatedDate().compareTo(((DefaultSubscriptionEvent)cur).getCreatedDate());
-      if (compCreatedDate < 0) {
+      int compUUID=event.getEntitlementId().compareTo(cur.getEntitlementId());
+      if (compUUID < 0) {
         break;
       }
- else       if (compCreatedDate == 0) {
-        int compUUID=event.getId().compareTo(cur.getId());
-        if (compUUID < 0) {
+ else       if (compUUID == 0) {
+        int eventOrder=event.getSubscriptionEventType().ordinal() - cur.getSubscriptionEventType().ordinal();
+        if (eventOrder < 0) {
           break;
         }
- else         if (compUUID == 0) {
-          if (event.getSubscriptionEventType().ordinal() < cur.getSubscriptionEventType().ordinal()) {
-            break;
-          }
+        if (eventOrder == 0) {
+          logger.warn("Detected identical events type = " + event.getSubscriptionEventType() + " ids = "+ event.getId()+ ", "+ cur.getId()+ " for subscription "+ cur.getEntitlementId());
+          break;
         }
       }
     }
