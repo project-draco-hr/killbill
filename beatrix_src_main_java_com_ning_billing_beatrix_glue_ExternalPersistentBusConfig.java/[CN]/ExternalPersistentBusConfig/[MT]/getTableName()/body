@@ -1,0 +1,14 @@
+{
+  if (internalPersistentBusConfig.getTableName().equals(externalPersistentBusConfig.getTableName())) {
+    if (TABLE_NAME_DEFAULT_VALUE.equals(externalPersistentBusConfig.getTableName())) {
+      logger.debug("Overriding default value for the external bus table name");
+      return TABLE_NAME_ALTERNATE_DEFAULT_VALUE;
+    }
+ else {
+      throw new IllegalArgumentException("The external and internal buses cannot share the same table name " + externalPersistentBusConfig.getTableName());
+    }
+  }
+ else {
+    return externalPersistentBusConfig.getTableName();
+  }
+}
