@@ -1,0 +1,8 @@
+{
+  final Iterable<SubscriptionBaseTransition> pendingSubscriptionBaseTransitions=getPendingSubscriptionEvents(effectiveDate,SubscriptionBaseTransitionType.CHANGE,SubscriptionBaseTransitionType.CANCEL);
+  if (!pendingSubscriptionBaseTransitions.iterator().hasNext()) {
+    return ImmutableList.<BlockingState>of();
+  }
+  final SubscriptionBaseTransition subscriptionBaseTransitionTrigger=pendingSubscriptionBaseTransitions.iterator().next();
+  return computeAddonsBlockingStatesForSubscriptionBaseEvent(subscriptionBaseTransitionTrigger);
+}

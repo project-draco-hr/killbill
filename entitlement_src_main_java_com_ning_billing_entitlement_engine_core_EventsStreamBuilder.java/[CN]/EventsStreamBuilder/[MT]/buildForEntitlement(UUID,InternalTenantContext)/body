@@ -1,0 +1,21 @@
+{
+  final SubscriptionBaseBundle bundle;
+  final SubscriptionBase subscription;
+  final List<SubscriptionBase> allSubscriptionsForBundle;
+  final SubscriptionBase baseSubscription;
+  try {
+    subscription=subscriptionInternalApi.getSubscriptionFromId(entitlementId,internalTenantContext);
+    bundle=subscriptionInternalApi.getBundleFromId(subscription.getBundleId(),internalTenantContext);
+    allSubscriptionsForBundle=subscriptionInternalApi.getSubscriptionsForBundle(subscription.getBundleId(),internalTenantContext);
+    baseSubscription=Iterables.<SubscriptionBase>tryFind(allSubscriptionsForBundle,new Predicate<SubscriptionBase>(){
+      @Override public boolean apply(      final SubscriptionBase input){
+        return ProductCategory.BASE.equals(input.getLastActiveProduct().getCategory());
+      }
+    }
+).orNull();
+  }
+ catch (  SubscriptionBaseApiException e) {
+    throw new EntitlementApiException(e);
+  }
+  return buildForEntitlement(bundle,baseSubscription,subscription,allSubscriptionsForBundle,internalTenantContext);
+}

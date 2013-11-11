@@ -1,0 +1,12 @@
+{
+  if (!ProductCategory.BASE.equals(subscription.getCategory())) {
+    return ImmutableList.of();
+  }
+  if (isEntitlementFutureCancelled()) {
+    final BlockingState futureEntitlementCancelEvent=getEntitlementCancellationEvent(subscription.getId());
+    return computeAddonsBlockingStatesForNextSubscriptionBaseEvent(futureEntitlementCancelEvent.getEffectiveDate());
+  }
+ else {
+    return computeAddonsBlockingStatesForNextSubscriptionBaseEvent(utcNow);
+  }
+}

@@ -1,0 +1,20 @@
+{
+  final Account account;
+  try {
+    account=accountInternalApi.getAccountById(bundle.getAccountId(),internalTenantContext);
+  }
+ catch (  AccountApiException e) {
+    throw new EntitlementApiException(e);
+  }
+  final List<BlockingState> subscriptionEntitlementStates=blockingStateDao.getBlockingHistoryForService(subscription.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext);
+  final List<BlockingState> bundleEntitlementStates=blockingStateDao.getBlockingHistoryForService(bundle.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext);
+  final List<BlockingState> accountEntitlementStates=blockingStateDao.getBlockingHistoryForService(account.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext);
+  final BlockingAggregator blockingAggregator;
+  try {
+    blockingAggregator=checker.getBlockedStatus(subscription,internalTenantContext);
+  }
+ catch (  BlockingApiException e) {
+    throw new EntitlementApiException(e);
+  }
+  return new EventsStream(account,bundle,subscriptionEntitlementStates,bundleEntitlementStates,accountEntitlementStates,blockingAggregator,baseSubscription,subscription,allSubscriptionsForBundle,internalTenantContext,clock.getUTCNow());
+}

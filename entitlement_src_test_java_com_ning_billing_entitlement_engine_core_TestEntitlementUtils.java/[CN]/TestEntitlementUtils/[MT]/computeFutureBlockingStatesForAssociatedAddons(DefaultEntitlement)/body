@@ -1,3 +1,4 @@
 {
-  return entitlementUtils.computeFutureBlockingStatesForAssociatedAddons(sqlDao.getBlockingHistoryForService(baseEntitlement.getId(),EntitlementService.ENTITLEMENT_SERVICE_NAME,internalCallContext),baseEntitlement.getSubscriptionBase(),clock.getUTCNow(),internalCallContext);
+  final EventsStream eventsStream=eventsStreamBuilder.buildForEntitlement(baseEntitlement.getId(),callContext);
+  return eventsStream.computeAddonsBlockingStatesForFutureSubscriptionBaseEvents();
 }

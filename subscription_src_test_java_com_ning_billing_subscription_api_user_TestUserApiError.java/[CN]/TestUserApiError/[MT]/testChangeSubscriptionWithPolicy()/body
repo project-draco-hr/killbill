@@ -8,6 +8,6 @@
     assertTrue(true);
     assertEquals(subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext).getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
   }
-  assertNull(subscription.changePlanWithPolicy("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,BillingActionPolicy.IMMEDIATE,callContext));
+  assertEquals(DefaultClock.truncateMs(subscription.changePlanWithPolicy("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,BillingActionPolicy.IMMEDIATE,callContext)),DefaultClock.truncateMs(clock.getUTCNow()));
   assertEquals(subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext).getCurrentPlan().getBillingPeriod(),BillingPeriod.MONTHLY);
 }

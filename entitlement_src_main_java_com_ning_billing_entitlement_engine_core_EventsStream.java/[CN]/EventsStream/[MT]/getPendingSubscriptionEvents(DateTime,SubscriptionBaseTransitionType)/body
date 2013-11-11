@@ -1,0 +1,9 @@
+{
+  final List<SubscriptionBaseTransitionType> typeList=ImmutableList.<SubscriptionBaseTransitionType>copyOf(types);
+  return Iterables.<SubscriptionBaseTransition>filter(subscription.getAllTransitions(),new Predicate<SubscriptionBaseTransition>(){
+    @Override public boolean apply(    final SubscriptionBaseTransition input){
+      return !input.getEffectiveTransitionTime().isBefore(effectiveDatetime) && typeList.contains(input.getTransitionType());
+    }
+  }
+);
+}
