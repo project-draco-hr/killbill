@@ -1,0 +1,24 @@
+{
+  final int size=events.size();
+  for (int i=0; i < size; i++) {
+    final DefaultSubscriptionEvent cur=(DefaultSubscriptionEvent)events.get(i);
+    final DefaultSubscriptionEvent next=(i < (size - 1)) ? (DefaultSubscriptionEvent)events.get(i + 1) : null;
+    final boolean shouldSwap=(next != null && shouldSwap(cur,next,true));
+    final boolean shouldReverseSort=(next == null || shouldSwap);
+    int currentIndex=i;
+    if (shouldSwap) {
+      Collections.swap(events,i,i + 1);
+    }
+    if (shouldReverseSort) {
+      while (currentIndex >= 1) {
+        final DefaultSubscriptionEvent revCur=(DefaultSubscriptionEvent)events.get(currentIndex);
+        final DefaultSubscriptionEvent other=(DefaultSubscriptionEvent)events.get(currentIndex - 1);
+        if (!shouldSwap(revCur,other,false)) {
+          break;
+        }
+        Collections.swap(events,currentIndex,currentIndex - 1);
+        currentIndex--;
+      }
+    }
+  }
+}

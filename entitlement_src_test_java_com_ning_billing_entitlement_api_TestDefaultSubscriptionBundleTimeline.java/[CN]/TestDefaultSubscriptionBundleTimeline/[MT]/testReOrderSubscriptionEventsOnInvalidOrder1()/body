@@ -1,0 +1,15 @@
+{
+  TestSubscriptionBundleTimeline timeline=new TestSubscriptionBundleTimeline(null,null,null,null,new ArrayList<Entitlement>(),new ArrayList<BlockingState>());
+  final List<SubscriptionEvent> events=new ArrayList<SubscriptionEvent>();
+  final UUID subscriptionId=UUID.randomUUID();
+  final DateTime effectiveDate=clock.getUTCNow();
+  events.add(timeline.createEvent(subscriptionId,SubscriptionEventType.START_BILLING,effectiveDate));
+  events.add(timeline.createEvent(subscriptionId,SubscriptionEventType.START_ENTITLEMENT,effectiveDate));
+  events.add(timeline.createEvent(subscriptionId,SubscriptionEventType.STOP_ENTITLEMENT,effectiveDate));
+  events.add(timeline.createEvent(subscriptionId,SubscriptionEventType.STOP_BILLING,effectiveDate));
+  timeline.reOrderSubscriptionEventsOnSameDateByType(events);
+  Assert.assertEquals(events.get(0).getSubscriptionEventType(),SubscriptionEventType.START_ENTITLEMENT);
+  Assert.assertEquals(events.get(1).getSubscriptionEventType(),SubscriptionEventType.START_BILLING);
+  Assert.assertEquals(events.get(2).getSubscriptionEventType(),SubscriptionEventType.STOP_ENTITLEMENT);
+  Assert.assertEquals(events.get(3).getSubscriptionEventType(),SubscriptionEventType.STOP_BILLING);
+}
