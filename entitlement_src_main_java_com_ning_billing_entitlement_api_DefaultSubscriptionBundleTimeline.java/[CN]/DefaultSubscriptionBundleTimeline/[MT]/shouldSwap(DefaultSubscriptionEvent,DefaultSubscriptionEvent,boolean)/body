@@ -1,3 +1,4 @@
 {
-  return (cur.getEffectiveDateTime().compareTo(other.getEffectiveDateTime()) == 0 && cur.getEntitlementId().equals(other.getEntitlementId()) && ((isAscending && cur.getSubscriptionEventType().ordinal() > other.getSubscriptionEventType().ordinal()) || (!isAscending && cur.getSubscriptionEventType().ordinal() < other.getSubscriptionEventType().ordinal())));
+  final int idComp=cur.getEntitlementId().compareTo(other.getEntitlementId());
+  return (cur.getEffectiveDate().compareTo(other.getEffectiveDate()) == 0 && ((isAscending && ((idComp > 0) || (idComp == 0 && cur.getSubscriptionEventType().ordinal() > other.getSubscriptionEventType().ordinal()))) || (!isAscending && ((idComp < 0) || (idComp == 0 && cur.getSubscriptionEventType().ordinal() < other.getSubscriptionEventType().ordinal())))));
 }

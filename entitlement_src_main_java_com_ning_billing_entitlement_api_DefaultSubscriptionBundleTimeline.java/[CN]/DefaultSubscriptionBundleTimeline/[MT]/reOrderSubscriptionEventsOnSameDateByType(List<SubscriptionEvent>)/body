@@ -13,10 +13,12 @@
       while (currentIndex >= 1) {
         final DefaultSubscriptionEvent revCur=(DefaultSubscriptionEvent)events.get(currentIndex);
         final DefaultSubscriptionEvent other=(DefaultSubscriptionEvent)events.get(currentIndex - 1);
-        if (!shouldSwap(revCur,other,false)) {
+        if (shouldSwap(revCur,other,false)) {
+          Collections.swap(events,currentIndex,currentIndex - 1);
+        }
+        if (revCur.getEffectiveDate().compareTo(other.getEffectiveDate()) != 0) {
           break;
         }
-        Collections.swap(events,currentIndex,currentIndex - 1);
         currentIndex--;
       }
     }
