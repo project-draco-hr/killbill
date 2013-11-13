@@ -5,15 +5,15 @@
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
   final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),initialDate,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   testListener.pushExpectedEvent(NextEvent.CHANGE);
   entitlement.changePlan("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   final Entitlement entitlement2=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
   assertEquals(entitlement2.getLastActivePhase().getPlan().getProduct().getName(),"Assault-Rifle");
   testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK);
   final Entitlement cancelledEntitlement=entitlement.cancelEntitlementWithPolicy(EntitlementActionPolicy.END_OF_TERM,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   assertEquals(cancelledEntitlement.getState(),EntitlementState.CANCELLED);
   assertEquals(cancelledEntitlement.getEffectiveEndDate(),initialDate);
   final Subscription subscription=subscriptionApi.getSubscriptionForEntitlementId(entitlement.getBaseEntitlementId(),callContext);

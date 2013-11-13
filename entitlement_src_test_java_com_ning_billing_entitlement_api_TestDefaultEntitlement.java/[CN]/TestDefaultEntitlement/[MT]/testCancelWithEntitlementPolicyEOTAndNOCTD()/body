@@ -5,10 +5,10 @@
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
   final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),initialDate,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK);
   final Entitlement cancelledEntitlement=entitlement.cancelEntitlementWithPolicy(EntitlementActionPolicy.END_OF_TERM,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   assertEquals(cancelledEntitlement.getState(),EntitlementState.CANCELLED);
   assertEquals(cancelledEntitlement.getEffectiveEndDate(),initialDate);
   final Subscription subscription=subscriptionApi.getSubscriptionForEntitlementId(entitlement.getBaseEntitlementId(),callContext);

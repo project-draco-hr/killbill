@@ -5,7 +5,7 @@
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
   final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),initialDate,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   assertEquals(entitlement.getState(),EntitlementState.ACTIVE);
   clock.addDays(5);
   final LocalDate cancelDate=new LocalDate(clock.getUTCToday().plusDays(1));
@@ -15,7 +15,7 @@
   assertEquals(entitlement2.getEffectiveEndDate(),cancelDate);
   clock.addDays(1);
   testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   final Entitlement entitlement3=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
   assertEquals(entitlement3.getState(),EntitlementState.CANCELLED);
   assertEquals(entitlement3.getEffectiveEndDate(),cancelDate);

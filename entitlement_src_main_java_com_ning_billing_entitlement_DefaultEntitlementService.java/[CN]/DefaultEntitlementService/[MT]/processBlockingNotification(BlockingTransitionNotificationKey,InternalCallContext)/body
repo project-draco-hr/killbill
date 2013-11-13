@@ -1,4 +1,8 @@
 {
+  if (blockingStateDao.getById(key.getBlockingStateId(),internalCallContext) == null) {
+    log.debug("BlockingState {} has been deleted, not sending a bus event",key.getBlockingStateId());
+    return;
+  }
   final BusEvent event=new DefaultBlockingTransitionInternalEvent(key.getBlockableId(),key.getBlockingType(),key.isTransitionedToBlockedBilling(),key.isTransitionedToUnblockedBilling(),key.isTransitionedToBlockedEntitlement(),key.isTransitionToUnblockedEntitlement(),internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId(),internalCallContext.getUserToken());
   try {
     eventBus.post(event);

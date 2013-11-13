@@ -6,7 +6,7 @@
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
   final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,externalKey,initialDate,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   assertEquals(entitlement.getAccountId(),account.getId());
   assertEquals(entitlement.getExternalKey(),externalKey);
   assertEquals(entitlement.getEffectiveStartDate(),initialDate);
@@ -16,12 +16,12 @@
   clock.addDays(3);
   testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK);
   entitlement.cancelEntitlementWithDate(new LocalDate(clock.getUTCNow(),account.getTimeZone()),true,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   clock.addDays(1);
   final PlanPhaseSpecifier spec2=new PlanPhaseSpecifier("Pistol",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
   final Entitlement entitlement2=entitlementApi.createBaseEntitlement(account.getId(),spec2,externalKey,new LocalDate(clock.getUTCNow(),account.getTimeZone()),callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   assertEquals(entitlement2.getAccountId(),account.getId());
   assertEquals(entitlement2.getExternalKey(),externalKey);
   final List<SubscriptionBundle> bundles2=subscriptionApi.getSubscriptionBundlesForExternalKey(externalKey,callContext);
@@ -45,7 +45,7 @@
   final Account account2=accountApi.createAccount(getAccountData(7),callContext);
   testListener.pushExpectedEvents(NextEvent.TRANSFER,NextEvent.CANCEL,NextEvent.BLOCK);
   entitlementApi.transferEntitlements(account.getId(),account2.getId(),externalKey,new LocalDate(clock.getUTCNow(),account.getTimeZone()),callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   final List<SubscriptionBundle> bundles3=subscriptionApi.getSubscriptionBundlesForExternalKey(externalKey,callContext);
   assertEquals(bundles3.size(),3);
   firstbundle=bundles3.get(0);

@@ -3,7 +3,7 @@
   final LocalDate changeDate=clock.getUTCToday();
   testListener.pushExpectedEvents(NextEvent.CHANGE,NextEvent.CANCEL,NextEvent.BLOCK);
   final DefaultEntitlement changedBaseEntitlement=(DefaultEntitlement)baseEntitlement.changePlan("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   final DefaultEntitlement cancelledAddOnEntitlement=(DefaultEntitlement)entitlementApi.getEntitlementForId(addOnEntitlement.getId(),callContext);
   checkFutureBlockingStatesToCancel(changedBaseEntitlement,null,null);
   checkFutureBlockingStatesToCancel(cancelledAddOnEntitlement,null,null);
@@ -11,7 +11,7 @@
   checkActualBlockingStatesToCancel(changedBaseEntitlement,cancelledAddOnEntitlement,changeDateTime,true);
   checkBlockingStatesDAO(changedBaseEntitlement,cancelledAddOnEntitlement,changeDate,false);
   clock.addDays(30);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   checkFutureBlockingStatesToCancel(changedBaseEntitlement,null,null);
   checkFutureBlockingStatesToCancel(cancelledAddOnEntitlement,null,null);
   checkFutureBlockingStatesToCancel(changedBaseEntitlement,cancelledAddOnEntitlement,null);

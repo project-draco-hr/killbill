@@ -3,7 +3,7 @@
   final LocalDate cancellationDate=clock.getUTCToday();
   testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.BLOCK);
   final DefaultEntitlement cancelledBaseEntitlement=(DefaultEntitlement)baseEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.IMMEDIATE,BillingActionPolicy.IMMEDIATE,callContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   final DefaultEntitlement cancelledAddOnEntitlement=(DefaultEntitlement)entitlementApi.getEntitlementForId(addOnEntitlement.getId(),callContext);
   checkFutureBlockingStatesToCancel(cancelledBaseEntitlement,null,null);
   checkFutureBlockingStatesToCancel(cancelledAddOnEntitlement,null,null);
@@ -11,7 +11,7 @@
   checkActualBlockingStatesToCancel(cancelledBaseEntitlement,cancelledAddOnEntitlement,cancellationDateTime,true);
   checkBlockingStatesDAO(cancelledBaseEntitlement,cancelledAddOnEntitlement,cancellationDate,true);
   clock.addDays(30);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   checkFutureBlockingStatesToCancel(cancelledBaseEntitlement,null,null);
   checkFutureBlockingStatesToCancel(cancelledAddOnEntitlement,null,null);
   checkFutureBlockingStatesToCancel(cancelledBaseEntitlement,cancelledAddOnEntitlement,null);

@@ -8,13 +8,13 @@
   testListener.pushExpectedEvent(NextEvent.BLOCK);
   final BlockingState state1=new DefaultBlockingState(uuid,BlockingStateType.ACCOUNT,overdueStateName,service,blockChange,blockEntitlement,blockBilling,clock.getUTCNow());
   blockingInternalApi.setBlockingState(state1,internalCallContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   clock.setDeltaFromReality(1000 * 3600 * 24);
   testListener.pushExpectedEvent(NextEvent.BLOCK);
   final String overdueStateName2="NoReallyThisCantGoOn";
   final BlockingState state2=new DefaultBlockingState(uuid,BlockingStateType.ACCOUNT,overdueStateName2,service,blockChange,blockEntitlement,blockBilling,clock.getUTCNow());
   blockingInternalApi.setBlockingState(state2,internalCallContext);
-  assertTrue(testListener.isCompleted(DELAY));
+  assertListenerStatus();
   final SubscriptionBaseBundle bundle=Mockito.mock(SubscriptionBaseBundle.class);
   Mockito.when(bundle.getId()).thenReturn(uuid);
   Assert.assertEquals(blockingInternalApi.getBlockingStateForService(bundle,service,internalCallContext).getStateName(),overdueStateName2);
