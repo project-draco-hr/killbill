@@ -3,11 +3,17 @@
   clock.setDay(initialDate);
   final Account account=accountApi.createAccount(getAccountData(7),callContext);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  testListener.pushExpectedEvent(NextEvent.CREATE);
   final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),initialDate,callContext);
+  assertTrue(testListener.isCompleted(DELAY));
   final PlanPhaseSpecifier addOnSpec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  testListener.pushExpectedEvent(NextEvent.CREATE);
   final Entitlement addOnEntitlement=entitlementApi.addEntitlement(entitlement.getBundleId(),addOnSpec,initialDate,callContext);
+  assertTrue(testListener.isCompleted(DELAY));
   clock.addDays(3);
+  testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.BLOCK);
   entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,callContext);
+  assertTrue(testListener.isCompleted(DELAY));
   try {
     entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,callContext);
     Assert.fail("Entitlement is already cancelled");

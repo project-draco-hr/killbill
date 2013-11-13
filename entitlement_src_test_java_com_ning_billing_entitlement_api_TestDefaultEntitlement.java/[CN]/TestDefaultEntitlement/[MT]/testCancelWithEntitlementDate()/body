@@ -3,11 +3,15 @@
   clock.setDay(initialDate);
   final Account account=accountApi.createAccount(getAccountData(7),callContext);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  testListener.pushExpectedEvent(NextEvent.CREATE);
   final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),initialDate,callContext);
+  assertTrue(testListener.isCompleted(DELAY));
   assertEquals(entitlement.getState(),EntitlementState.ACTIVE);
   clock.addDays(5);
+  testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK);
   final LocalDate cancelDate=new LocalDate(clock.getUTCNow());
   entitlement.cancelEntitlementWithDate(cancelDate,true,callContext);
+  assertTrue(testListener.isCompleted(DELAY));
   final Entitlement entitlement2=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
   assertEquals(entitlement2.getState(),EntitlementState.CANCELLED);
   assertEquals(entitlement2.getEffectiveEndDate(),cancelDate);
