@@ -20,20 +20,20 @@
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
-  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,3,2),new LocalDate(2012,4,2),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   DefaultEntitlement entitlement=(DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
-  busHandler.pushExpectedEvent(NextEvent.PAUSE);
+  busHandler.pushExpectedEvents(NextEvent.PAUSE,NextEvent.BLOCK);
   busHandler.pushExpectedEvent(NextEvent.INVOICE_ADJUSTMENT);
   entitlementApi.pause(entitlement.getBundleId(),clock.getUTCNow().toLocalDate(),callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,3,2),new LocalDate(2012,4,2),InvoiceItemType.RECURRING,new BigDecimal("249.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,3,4),new LocalDate(2012,4,2),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-233.83")),new ExpectedInvoiceItemCheck(new LocalDate(2012,3,4),new LocalDate(2012,3,4),InvoiceItemType.CBA_ADJ,new BigDecimal("233.83")));
   entitlement=(DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   Assert.assertEquals(entitlement.getState(),EntitlementState.BLOCKED);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
-  busHandler.pushExpectedEvent(NextEvent.RESUME);
+  busHandler.pushExpectedEvents(NextEvent.RESUME,NextEvent.BLOCK);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   entitlementApi.resume(entitlement.getBundleId(),clock.getUTCNow().toLocalDate(),callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,4,5),new LocalDate(2012,5,2),InvoiceItemType.RECURRING,new BigDecimal("224.96")),new ExpectedInvoiceItemCheck(new LocalDate(2012,4,5),new LocalDate(2012,4,5),InvoiceItemType.CBA_ADJ,new BigDecimal("-224.96")));
 }

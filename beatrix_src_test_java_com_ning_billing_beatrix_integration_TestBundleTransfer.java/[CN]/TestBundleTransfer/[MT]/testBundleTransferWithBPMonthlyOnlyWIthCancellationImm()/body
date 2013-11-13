@@ -15,7 +15,6 @@
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDays(32);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   final Account newAccount=createAccountWithNonOsgiPaymentMethod(getAccountData(15));
   busHandler.pushExpectedEvent(NextEvent.CANCEL);
@@ -24,7 +23,6 @@
   busHandler.pushExpectedEvent(NextEvent.INVOICE_ADJUSTMENT);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   transferApi.transferBundle(account.getId(),newAccount.getId(),"externalKey",clock.getUTCNow(),false,true,callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),2);

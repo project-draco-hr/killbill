@@ -10,13 +10,13 @@
   Assert.assertEquals(invoice.getAccountId(),account.getId());
   busHandler.pushExpectedEvents(NextEvent.TAG_DEFINITION);
   final TagDefinition tagDefinition=tagUserApi.createTagDefinition("foo","foo desc",callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
   busHandler.pushExpectedEvents(NextEvent.TAG);
   tagUserApi.addTag(invoice.getId(),ObjectType.INVOICE,ControlTagType.WRITTEN_OFF.getId(),callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
   busHandler.pushExpectedEvents(NextEvent.TAG);
   tagUserApi.addTag(invoice.getId(),ObjectType.INVOICE,tagDefinition.getId(),callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
   List<Tag> tags=tagUserApi.getTagsForAccount(account.getId(),callContext);
   Assert.assertEquals(tags.size(),2);
   checkTagsExists(tags);
@@ -28,7 +28,7 @@
   checkTagsExists(tags);
   busHandler.pushExpectedEvents(NextEvent.TAG);
   tagUserApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_PAY_OFF.getId(),callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
   tags=tagUserApi.getTagsForAccount(account.getId(),callContext);
   Assert.assertEquals(tags.size(),3);
   checkTagsExists(tags);

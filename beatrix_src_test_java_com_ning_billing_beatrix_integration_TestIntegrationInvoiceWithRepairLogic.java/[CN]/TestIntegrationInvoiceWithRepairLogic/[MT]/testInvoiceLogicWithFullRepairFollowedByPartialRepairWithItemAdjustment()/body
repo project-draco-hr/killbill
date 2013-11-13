@@ -12,7 +12,6 @@
   assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
   busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
   clock.addDays(40);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),2);
@@ -26,7 +25,6 @@
   iias.put(invoice1.getInvoiceItems().get(0).getId(),new BigDecimal("10.00"));
   busHandler.pushExpectedEvents(NextEvent.INVOICE_ADJUSTMENT);
   paymentApi.createRefundWithItemsAdjustments(account,payment1.getId(),iias,callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),2);
@@ -42,7 +40,6 @@
   invoiceGenerator.setDefaultRepairLogic(REPAIR_INVOICE_LOGIC.PARTIAL_REPAIR);
   busHandler.pushExpectedEvents(NextEvent.INVOICE);
   clock.addMonths(1);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),4);

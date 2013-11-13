@@ -12,7 +12,6 @@
   ImmutableList<ExpectedInvoiceItemCheck> toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2012,4,1),null,InvoiceItemType.FIXED,BigDecimal.ZERO));
   invoiceChecker.checkInvoice(invoices.get(0).getId(),callContext,toBeChecked);
   clock.addDays(3);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   changeEntitlementAndCheckForCompletion(bpEntitlement,"Assault-Rifle",term,BillingActionPolicy.IMMEDIATE,NextEvent.CHANGE,NextEvent.INVOICE);
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
@@ -23,7 +22,6 @@
   invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,toBeChecked);
   busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
   clock.addDays(28);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),3);
@@ -61,7 +59,6 @@
   invoiceChecker.checkInvoice(invoices.get(4).getId(),callContext,toBeChecked);
   busHandler.pushExpectedEvents(NextEvent.INVOICE);
   clock.addMonths(1);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),6);
@@ -79,7 +76,6 @@
   invoiceChecker.checkInvoice(invoices.get(5).getId(),callContext,toBeChecked);
   busHandler.pushExpectedEvents(NextEvent.INVOICE);
   clock.addMonths(1);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),7);

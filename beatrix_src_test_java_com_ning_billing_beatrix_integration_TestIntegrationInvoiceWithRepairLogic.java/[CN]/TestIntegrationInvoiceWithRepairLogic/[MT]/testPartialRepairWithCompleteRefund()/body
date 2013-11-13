@@ -11,7 +11,6 @@
   assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
   busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
   clock.addDays(30);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),2);
@@ -27,7 +26,6 @@
   invoiceChecker.checkInvoice(invoices.get(2).getId(),callContext,toBeChecked);
   busHandler.pushExpectedEvents(NextEvent.INVOICE);
   clock.addMonths(1);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),4);
@@ -39,7 +37,6 @@
   invoiceChecker.checkInvoice(invoices.get(3).getId(),callContext,toBeChecked);
   busHandler.pushExpectedEvents(NextEvent.INVOICE);
   clock.addMonths(1);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),5);

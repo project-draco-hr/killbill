@@ -14,14 +14,12 @@
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDays(32);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   final Account newAccount=createAccountWithNonOsgiPaymentMethod(getAccountData(0));
   busHandler.pushExpectedEvent(NextEvent.TRANSFER);
   busHandler.pushExpectedEvent(NextEvent.INVOICE);
   busHandler.pushExpectedEvent(NextEvent.PAYMENT);
   transferApi.transferBundle(account.getId(),newAccount.getId(),"externalKey",clock.getUTCNow(),false,false,callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
   assertListenerStatus();
   final Integer oldBCD=accountUserApi.getAccountById(account.getId(),callContext).getBillCycleDayLocal();
   final Integer newBCD=accountUserApi.getAccountById(newAccount.getId(),callContext).getBillCycleDayLocal();

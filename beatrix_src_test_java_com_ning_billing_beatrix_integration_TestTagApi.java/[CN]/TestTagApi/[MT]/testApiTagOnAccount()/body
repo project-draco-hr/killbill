@@ -1,10 +1,10 @@
 {
   busHandler.pushExpectedEvents(NextEvent.TAG);
   tagUserApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_INVOICING_OFF.getId(),callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
   busHandler.pushExpectedEvents(NextEvent.TAG);
   tagUserApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_PAY_OFF.getId(),callContext);
-  assertTrue(busHandler.isCompleted(DELAY));
+  assertListenerStatus();
   List<Tag> tags=tagUserApi.getTagsForAccount(account.getId(),callContext);
   Assert.assertEquals(tags.size(),2);
   checkTagsExists(tags);
