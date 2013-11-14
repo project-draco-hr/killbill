@@ -6,7 +6,7 @@
   SubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
   testListener.pushExpectedEvent(NextEvent.PHASE);
   clock.addDays(30);
-  assertTrue(testListener.isCompleted(3000));
+  assertListenerStatus();
   final DateTime ctd=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
   subscriptionInternalApi.setChargedThroughDate(baseSubscription.getId(),ctd,internalCallContext);
   baseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
@@ -14,12 +14,12 @@
   clock.addDays(1);
   testListener.pushExpectedEvent(NextEvent.UNCANCEL);
   baseSubscription.uncancel(callContext);
-  assertTrue(testListener.isCompleted(3000));
+  assertListenerStatus();
   clock.addDays(1);
   final DateTime transferRequestedDate=clock.getUTCNow();
   testListener.pushExpectedEvent(NextEvent.TRANSFER);
   transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getExternalKey(),transferRequestedDate,true,false,callContext);
-  assertTrue(testListener.isCompleted(3000));
+  assertListenerStatus();
   final List<SubscriptionBaseBundle> bundlesForAccountAndKey=subscriptionInternalApi.getBundlesForAccountAndKey(newAccountId,bundle.getExternalKey(),internalCallContext);
   assertEquals(bundlesForAccountAndKey.size(),1);
   final SubscriptionBaseBundle newBundle=bundlesForAccountAndKey.get(0);

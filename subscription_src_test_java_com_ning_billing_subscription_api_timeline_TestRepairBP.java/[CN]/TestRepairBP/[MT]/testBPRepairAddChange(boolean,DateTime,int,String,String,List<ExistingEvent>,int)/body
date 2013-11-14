@@ -6,7 +6,7 @@
   final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(clockShift));
   clock.addDeltaFromReality(it.toDurationMillis());
   if (!inTrial) {
-    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
   }
   final BundleBaseTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
   testUtil.sortEventsOnBundle(bundleRepair);
@@ -51,7 +51,7 @@
   dryRun=false;
   testListener.pushExpectedEvent(NextEvent.REPAIR_BUNDLE);
   final BundleBaseTimeline realRunBundleRepair=repairApi.repairBundle(bRepair,dryRun,callContext);
-  assertTrue(testListener.isCompleted(5000));
+  assertListenerStatus();
   subscriptionRepair=realRunBundleRepair.getSubscriptions();
   assertEquals(subscriptionRepair.size(),1);
   cur=subscriptionRepair.get(0);

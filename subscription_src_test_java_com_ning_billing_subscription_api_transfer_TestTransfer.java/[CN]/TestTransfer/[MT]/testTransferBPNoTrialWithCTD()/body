@@ -6,13 +6,13 @@
   final SubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
   testListener.pushExpectedEvent(NextEvent.PHASE);
   clock.addDays(40);
-  assertTrue(testListener.isCompleted(3000));
+  assertListenerStatus();
   final DateTime ctd=baseSubscription.getStartDate().plusDays(30).plusMonths(1);
   subscriptionInternalApi.setChargedThroughDate(baseSubscription.getId(),ctd,internalCallContext);
   final DateTime transferRequestedDate=clock.getUTCNow();
   testListener.pushExpectedEvent(NextEvent.TRANSFER);
   transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getExternalKey(),transferRequestedDate,false,false,callContext);
-  assertTrue(testListener.isCompleted(3000));
+  assertListenerStatus();
   final SubscriptionBase oldBaseSubscription=subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
   assertNotNull(oldBaseSubscription.getFutureEndDate());
   assertTrue(oldBaseSubscription.getFutureEndDate().compareTo(ctd) == 0);
@@ -31,7 +31,9 @@
   final String newBaseProduct1="Assault-Rifle";
   final BillingPeriod newBaseTerm1=BillingPeriod.ANNUAL;
   final DateTime changeDate1=clock.getUTCNow();
+  testListener.pushExpectedEvent(NextEvent.CHANGE);
   newBaseSubscription.changePlan(newBaseProduct1,newBaseTerm1,basePriceList,callContext);
+  assertListenerStatus();
   newPlan=newBaseSubscription.getCurrentPlan();
   assertEquals(newPlan.getProduct().getName(),newBaseProduct1);
   assertEquals(newBaseSubscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);

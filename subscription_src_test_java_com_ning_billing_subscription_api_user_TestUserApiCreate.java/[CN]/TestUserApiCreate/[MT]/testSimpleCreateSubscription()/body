@@ -19,7 +19,7 @@
     final PlanPhase currentPhase=subscription.getCurrentPhase();
     assertNotNull(currentPhase);
     assertEquals(currentPhase.getPhaseType(),PhaseType.TRIAL);
-    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
     final List<SubscriptionBaseEvent> events=dao.getPendingEventsForSubscription(subscription.getId(),internalCallContext);
     assertNotNull(events);
     testUtil.printEvents(events);
@@ -33,7 +33,7 @@
     clock.addDeltaFromReality(it.toDurationMillis());
     final DateTime futureNow=clock.getUTCNow();
     assertTrue(futureNow.isAfter(nextPhaseChange));
-    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
     assertListenerStatus();
   }
  catch (  SubscriptionBaseApiException e) {

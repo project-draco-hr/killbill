@@ -6,11 +6,11 @@
       testListener.pushExpectedEvent(NextEvent.CHANGE);
       final DateTime changeTime=clock.getUTCNow();
       baseSubscription.changePlanWithDate("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,changeTime,callContext);
-      assertTrue(testListener.isCompleted(5000));
+      assertListenerStatus();
       testListener.pushExpectedEvent(NextEvent.PHASE);
       it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(40));
       clock.addDeltaFromReality(it.toDurationMillis());
-      assertTrue(testListener.isCompleted(5000));
+      assertListenerStatus();
       final BundleBaseTimeline bundleRepair=repairApi.getBundleTimeline(bundle.getId(),callContext);
       testUtil.sortEventsOnBundle(bundleRepair);
       final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Assault-Rifle",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,PhaseType.EVERGREEN);

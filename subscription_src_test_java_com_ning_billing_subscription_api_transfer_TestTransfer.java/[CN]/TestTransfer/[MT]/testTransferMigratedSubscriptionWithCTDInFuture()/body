@@ -7,7 +7,7 @@
     final DateTime afterMigration=clock.getUTCNow();
     testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
     migrationApi.migrate(toBeMigrated,callContext);
-    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
     final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
     assertEquals(bundles.size(),1);
     final SubscriptionBaseBundle bundle=bundles.get(0);
@@ -31,7 +31,7 @@
     testListener.pushExpectedEvent(NextEvent.TRANSFER);
     testListener.pushExpectedEvent(NextEvent.CANCEL);
     transferApi.transferBundle(bundle.getAccountId(),newAccountId,bundle.getExternalKey(),transferRequestedDate,false,true,callContext);
-    assertTrue(testListener.isCompleted(3000));
+    assertListenerStatus();
     final SubscriptionBase oldBaseSubscription=subscriptionInternalApi.getBaseSubscription(bundle.getId(),internalCallContext);
     assertTrue(oldBaseSubscription.getState() == EntitlementState.CANCELLED);
     assertEquals(subscriptionInternalApi.getBillingTransitions(oldBaseSubscription,internalCallContext).size(),0);

@@ -10,7 +10,7 @@
     Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
     clock.addDeltaFromReality(it.toDurationMillis());
     currentTime=clock.getUTCNow();
-    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
     final Duration ctd=testUtil.getDurationMonth(1);
     final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
     subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
@@ -29,7 +29,7 @@
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
     clock.addDeltaFromReality(it.toDurationMillis());
     currentTime=clock.getUTCNow();
-    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
     final String currentProduct=subscription.getCurrentPlan().getProduct().getName();
     assertNotNull(currentProduct);
     assertEquals(currentProduct,toProd);
@@ -49,7 +49,7 @@
     it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
     clock.addDeltaFromReality(it.toDurationMillis());
     currentTime=clock.getUTCNow();
-    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
     assertListenerStatus();
   }
  catch (  SubscriptionBaseApiException e) {

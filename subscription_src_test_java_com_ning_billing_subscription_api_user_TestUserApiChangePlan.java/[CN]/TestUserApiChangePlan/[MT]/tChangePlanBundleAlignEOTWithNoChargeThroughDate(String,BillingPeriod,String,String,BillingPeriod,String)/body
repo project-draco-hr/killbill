@@ -8,10 +8,10 @@
     final DateTime futureNow=clock.getUTCNow();
     final DateTime nextExpectedPhaseChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),currentPhase.getDuration());
     assertTrue(futureNow.isAfter(nextExpectedPhaseChange));
-    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
     testListener.pushExpectedEvent(NextEvent.CHANGE);
     subscription.changePlan(toProd,toTerm,toPlanSet,callContext);
-    assertTrue(testListener.isCompleted(5000));
+    assertListenerStatus();
     currentPhase=subscription.getCurrentPhase();
     checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.EVERGREEN);
     assertListenerStatus();
