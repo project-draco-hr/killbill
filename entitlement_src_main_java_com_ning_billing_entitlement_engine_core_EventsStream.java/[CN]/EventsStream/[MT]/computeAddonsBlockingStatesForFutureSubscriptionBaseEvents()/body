@@ -4,9 +4,12 @@
   }
   if (isEntitlementFutureCancelled()) {
     final BlockingState futureEntitlementCancelEvent=getEntitlementCancellationEvent(subscription.getId());
-    return computeAddonsBlockingStatesForNextSubscriptionBaseEvent(futureEntitlementCancelEvent.getEffectiveDate());
+    return computeAddonsBlockingStatesForNextSubscriptionBaseEvent(futureEntitlementCancelEvent.getEffectiveDate(),false);
+  }
+ else   if (isEntitlementFutureChanged()) {
+    return computeAddonsBlockingStatesForNextSubscriptionBaseEvent(utcNow,true);
   }
  else {
-    return computeAddonsBlockingStatesForNextSubscriptionBaseEvent(utcNow);
+    return ImmutableList.of();
   }
 }
