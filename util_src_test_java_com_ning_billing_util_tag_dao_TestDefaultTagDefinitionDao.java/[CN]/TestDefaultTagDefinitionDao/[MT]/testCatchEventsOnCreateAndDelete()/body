@@ -5,11 +5,11 @@
   final TagDefinitionModelDao createdTagDefinition=tagDefinitionDao.create(definitionName,description,internalCallContext);
   Assert.assertEquals(createdTagDefinition.getName(),definitionName);
   Assert.assertEquals(createdTagDefinition.getDescription(),description);
-  Assert.assertTrue(eventsListener.isCompleted(2000));
+  assertListenerStatus();
   final TagDefinitionModelDao foundTagDefinition=tagDefinitionDao.getByName(definitionName,internalCallContext);
   Assert.assertEquals(foundTagDefinition,createdTagDefinition);
   eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
   tagDefinitionDao.deleteById(foundTagDefinition.getId(),internalCallContext);
-  Assert.assertTrue(eventsListener.isCompleted(2000));
+  assertListenerStatus();
   Assert.assertNull(tagDefinitionDao.getByName(definitionName,internalCallContext));
 }

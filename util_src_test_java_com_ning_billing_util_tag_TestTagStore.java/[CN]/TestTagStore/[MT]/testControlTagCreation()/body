@@ -1,7 +1,9 @@
 {
   final UUID accountId=UUID.randomUUID();
   final ControlTag tag=new DefaultControlTag(ControlTagType.AUTO_INVOICING_OFF,ObjectType.ACCOUNT,accountId,clock.getUTCNow());
+  eventsListener.pushExpectedEvent(NextEvent.TAG);
   tagDao.create(new TagModelDao(tag),internalCallContext);
+  assertListenerStatus();
   final TagModelDao savedTag=tagDao.getById(tag.getId(),internalCallContext);
   assertEquals(savedTag.getTagDefinitionId(),tag.getTagDefinitionId());
   assertEquals(savedTag.getId(),tag.getId());

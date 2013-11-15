@@ -1,21 +1,19 @@
 {
   final String definitionName="TestTag1234567";
-  try {
-    tagDefinitionDao.create(definitionName,"Some test tag",internalCallContext);
-  }
- catch (  TagDefinitionApiException e) {
-    fail("Could not create tag definition",e);
-  }
+  eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
+  tagDefinitionDao.create(definitionName,"Some test tag",internalCallContext);
+  assertListenerStatus();
   final TagDefinitionModelDao tagDefinition=tagDefinitionDao.getByName(definitionName,internalCallContext);
   assertNotNull(tagDefinition);
   final UUID objectId=UUID.randomUUID();
   final Tag tag=new DescriptiveTag(tagDefinition.getId(),ObjectType.ACCOUNT,objectId,internalCallContext.getCreatedDate());
+  eventsListener.pushExpectedEvent(NextEvent.TAG);
   tagDao.create(new TagModelDao(tag),internalCallContext);
+  assertListenerStatus();
+  eventsListener.pushExpectedEvent(NextEvent.TAG);
   tagDao.deleteTag(objectId,ObjectType.ACCOUNT,tagDefinition.getId(),internalCallContext);
-  try {
-    tagDefinitionDao.deleteById(tagDefinition.getId(),internalCallContext);
-  }
- catch (  TagDefinitionApiException e) {
-    fail("Could not delete tag definition",e);
-  }
+  assertListenerStatus();
+  eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
+  tagDefinitionDao.deleteById(tagDefinition.getId(),internalCallContext);
+  assertListenerStatus();
 }

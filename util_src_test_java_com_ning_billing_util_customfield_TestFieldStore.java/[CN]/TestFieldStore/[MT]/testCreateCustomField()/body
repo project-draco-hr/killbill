@@ -4,9 +4,13 @@
   String fieldName="TestField1";
   String fieldValue="Kitty Hawk";
   final CustomField field=new StringCustomField(fieldName,fieldValue,objectType,id,internalCallContext.getCreatedDate());
+  eventsListener.pushExpectedEvent(NextEvent.CUSTOM_FIELD);
   customFieldDao.create(new CustomFieldModelDao(field),internalCallContext);
+  assertListenerStatus();
   fieldName="TestField2";
   fieldValue="Cape Canaveral";
   final CustomField field2=new StringCustomField(fieldName,fieldValue,objectType,id,internalCallContext.getCreatedDate());
+  eventsListener.pushExpectedEvent(NextEvent.CUSTOM_FIELD);
   customFieldDao.create(new CustomFieldModelDao(field2),internalCallContext);
+  assertListenerStatus();
 }

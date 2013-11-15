@@ -1,9 +1,13 @@
 {
   final String definitionName="TestTag1234";
+  eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
   tagDefinitionDao.create(definitionName,"Some test tag",internalCallContext);
+  assertListenerStatus();
   TagDefinitionModelDao tagDefinition=tagDefinitionDao.getByName(definitionName,internalCallContext);
   assertNotNull(tagDefinition);
+  eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
   tagDefinitionDao.deleteById(tagDefinition.getId(),internalCallContext);
+  assertListenerStatus();
   tagDefinition=tagDefinitionDao.getByName(definitionName,internalCallContext);
   assertNull(tagDefinition);
 }

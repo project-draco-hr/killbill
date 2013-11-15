@@ -2,11 +2,17 @@
   final List<UUID> uuids=new ArrayList<UUID>();
   List<TagDefinitionModelDao> result=tagDefinitionDao.getByIds(uuids,internalCallContext);
   assertEquals(result.size(),0);
+  eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
   final TagDefinitionModelDao defYo=tagDefinitionDao.create(UUID.randomUUID().toString().substring(0,5),"defintion yo",internalCallContext);
+  assertListenerStatus();
   uuids.add(defYo.getId());
+  eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
   final TagDefinitionModelDao defBah=tagDefinitionDao.create(UUID.randomUUID().toString().substring(0,5),"defintion bah",internalCallContext);
+  assertListenerStatus();
   uuids.add(defBah.getId());
+  eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
   final TagDefinitionModelDao defZoo=tagDefinitionDao.create(UUID.randomUUID().toString().substring(0,5),"defintion zoo",internalCallContext);
+  assertListenerStatus();
   uuids.add(defZoo.getId());
   result=tagDefinitionDao.getByIds(uuids,internalCallContext);
   assertEquals(result.size(),3);

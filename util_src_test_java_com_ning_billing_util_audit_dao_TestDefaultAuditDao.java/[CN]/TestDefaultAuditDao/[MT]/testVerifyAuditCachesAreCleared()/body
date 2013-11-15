@@ -3,7 +3,9 @@
   final List<AuditLog> firstAuditLogs=auditDao.getAuditLogsForId(TableName.TAG,tag.getId(),AuditLevel.FULL,internalCallContext);
   Assert.assertEquals(firstAuditLogs.size(),1);
   Assert.assertEquals(firstAuditLogs.get(0).getChangeType(),ChangeType.INSERT);
+  eventsListener.pushExpectedEvent(NextEvent.TAG);
   tagDao.deleteTag(tag.getObjectId(),tag.getObjectType(),tag.getTagDefinitionId(),internalCallContext);
+  assertListenerStatus();
   final List<AuditLog> secondAuditLogs=auditDao.getAuditLogsForId(TableName.TAG,tag.getId(),AuditLevel.FULL,internalCallContext);
   Assert.assertEquals(secondAuditLogs.size(),2);
   Assert.assertEquals(secondAuditLogs.get(0).getChangeType(),ChangeType.INSERT);

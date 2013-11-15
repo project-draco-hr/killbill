@@ -1,10 +1,15 @@
 {
   final UUID accountId=UUID.randomUUID();
-  TagDefinitionModelDao testTagDefinition;
+  eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
   tagDefinitionDao.create("tag1","First tag",internalCallContext);
-  testTagDefinition=tagDefinitionDao.create("testTagDefinition","Second tag",internalCallContext);
+  assertListenerStatus();
+  eventsListener.pushExpectedEvent(NextEvent.TAG_DEFINITION);
+  final TagDefinitionModelDao testTagDefinition=tagDefinitionDao.create("testTagDefinition","Second tag",internalCallContext);
+  assertListenerStatus();
   final Tag tag=new DescriptiveTag(testTagDefinition.getId(),ObjectType.ACCOUNT,accountId,clock.getUTCNow());
+  eventsListener.pushExpectedEvent(NextEvent.TAG);
   tagDao.create(new TagModelDao(tag),internalCallContext);
+  assertListenerStatus();
   final TagModelDao savedTag=tagDao.getById(tag.getId(),internalCallContext);
   assertEquals(savedTag.getTagDefinitionId(),tag.getTagDefinitionId());
   assertEquals(savedTag.getId(),tag.getId());
