@@ -2,7 +2,7 @@
   clock.setTime(new DateTime(2012,5,1,0,3,42,0));
   busHandler.pushExpectedEvents(NextEvent.TAG,NextEvent.BLOCK);
   tagUserApi.addTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.OVERDUE_ENFORCEMENT_OFF.getId(),callContext);
-  busHandler.isCompleted(DELAY);
+  assertListenerStatus();
   paymentPlugin.makeAllInvoicesFailWithError(true);
   final DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   bundle=subscriptionApi.getSubscriptionBundle(baseEntitlement.getBundleId(),callContext);
@@ -13,8 +13,8 @@
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,6,30),callContext);
   addDaysAndCheckForCompletion(6);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
-  busHandler.pushExpectedEvent(NextEvent.TAG);
+  busHandler.pushExpectedEvents(NextEvent.TAG,NextEvent.BLOCK);
   tagUserApi.removeTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.OVERDUE_ENFORCEMENT_OFF.getId(),callContext);
-  busHandler.isCompleted(DELAY);
+  assertListenerStatus();
   checkODState("OD1");
 }
