@@ -1,33 +1,22 @@
 {
+  SubscriptionBase subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+  final PlanPhase trialPhase=subscription.getCurrentPhase();
+  final PlanPhase currentPhase=subscription.getCurrentPhase();
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  assertListenerStatus();
+  final DateTime expectedPhaseTrialChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+  final Duration ctd=testUtil.getDurationMonth(1);
+  final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
+  subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
+  subscription=subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
+  subscription.cancelWithPolicy(BillingActionPolicy.END_OF_TERM,callContext);
   try {
-    SubscriptionBase subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
-    final PlanPhase trialPhase=subscription.getCurrentPhase();
-    final PlanPhase currentPhase=subscription.getCurrentPhase();
-    testListener.pushExpectedEvent(NextEvent.PHASE);
-    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
-    clock.addDeltaFromReality(it.toDurationMillis());
-    assertListenerStatus();
-    final DateTime expectedPhaseTrialChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
-    final Duration ctd=testUtil.getDurationMonth(1);
-    final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
-    subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
-    subscription=subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
-    subscription.cancelWithPolicy(BillingActionPolicy.END_OF_TERM,callContext);
-    try {
-      subscription.changePlanWithDate("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);
-    }
- catch (    SubscriptionBaseApiException e) {
-      assertEquals(e.getCode(),ErrorCode.SUB_CHANGE_FUTURE_CANCELLED.getCode());
-      try {
-        log.info(e.getMessage());
-      }
- catch (      Throwable el) {
-        assertFalse(true);
-      }
-    }
-    assertListenerStatus();
+    subscription.changePlanWithDate("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);
   }
- catch (  Exception e) {
-    Assert.fail(e.toString());
+ catch (  SubscriptionBaseApiException e) {
+    assertEquals(e.getCode(),ErrorCode.SUB_CHANGE_FUTURE_CANCELLED.getCode());
   }
+  assertListenerStatus();
 }

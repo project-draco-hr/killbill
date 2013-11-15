@@ -1,22 +1,11 @@
 {
+  final SubscriptionBase subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  subscription.cancelWithDate(clock.getUTCNow(),callContext);
   try {
-    final SubscriptionBase subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME);
-    testListener.pushExpectedEvent(NextEvent.CANCEL);
-    subscription.cancelWithDate(clock.getUTCNow(),callContext);
-    try {
-      subscription.changePlanWithDate("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);
-    }
- catch (    SubscriptionBaseApiException e) {
-      assertEquals(e.getCode(),ErrorCode.SUB_CHANGE_NON_ACTIVE.getCode());
-      try {
-        log.info(e.getMessage());
-      }
- catch (      Throwable el) {
-        assertFalse(true);
-      }
-    }
+    subscription.changePlanWithDate("Pistol",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow(),callContext);
   }
- catch (  Exception e) {
-    Assert.fail(e.toString());
+ catch (  SubscriptionBaseApiException e) {
+    assertEquals(e.getCode(),ErrorCode.SUB_CHANGE_NON_ACTIVE.getCode());
   }
 }

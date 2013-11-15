@@ -1,21 +1,10 @@
 {
+  final SubscriptionBase subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
   try {
-    final SubscriptionBase subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
-    try {
-      subscription.uncancel(callContext);
-    }
- catch (    SubscriptionBaseApiException e) {
-      assertEquals(e.getCode(),ErrorCode.SUB_UNCANCEL_BAD_STATE.getCode());
-      try {
-        log.info(e.getMessage());
-      }
- catch (      Throwable el) {
-        assertFalse(true);
-      }
-    }
-    assertListenerStatus();
+    subscription.uncancel(callContext);
   }
- catch (  Exception e) {
-    Assert.fail(e.toString());
+ catch (  SubscriptionBaseApiException e) {
+    assertEquals(e.getCode(),ErrorCode.SUB_UNCANCEL_BAD_STATE.getCode());
   }
+  assertListenerStatus();
 }

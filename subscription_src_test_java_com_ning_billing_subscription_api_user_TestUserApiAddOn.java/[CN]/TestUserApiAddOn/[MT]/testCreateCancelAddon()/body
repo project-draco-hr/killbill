@@ -1,23 +1,18 @@
 {
-  try {
-    final String baseProduct="Shotgun";
-    final BillingPeriod baseTerm=BillingPeriod.ANNUAL;
-    final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-    DefaultSubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
-    final String aoProduct="Telescopic-Scope";
-    final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
-    final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
-    DefaultSubscriptionBase aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
-    assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
-    testListener.pushExpectedEvent(NextEvent.CANCEL);
-    final DateTime now=clock.getUTCNow();
-    aoSubscription.cancel(callContext);
-    assertListenerStatus();
-    aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
-    assertEquals(aoSubscription.getState(),EntitlementState.CANCELLED);
-    assertListenerStatus();
-  }
- catch (  Exception e) {
-    Assert.fail(e.getMessage());
-  }
+  final String baseProduct="Shotgun";
+  final BillingPeriod baseTerm=BillingPeriod.ANNUAL;
+  final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  DefaultSubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+  final String aoProduct="Telescopic-Scope";
+  final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
+  final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  DefaultSubscriptionBase aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
+  assertEquals(aoSubscription.getState(),EntitlementState.ACTIVE);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  final DateTime now=clock.getUTCNow();
+  aoSubscription.cancel(callContext);
+  assertListenerStatus();
+  aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
+  assertEquals(aoSubscription.getState(),EntitlementState.CANCELLED);
+  assertListenerStatus();
 }

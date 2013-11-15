@@ -1,35 +1,30 @@
 {
-  try {
-    final DateTime beforeMigration=clock.getUTCNow();
-    final AccountMigration toBeMigrated=testUtil.createAccountForMigrationFuturePendingChange();
-    final DateTime afterMigration=clock.getUTCNow();
-    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
-    migrationApi.migrate(toBeMigrated,callContext);
-    assertListenerStatus();
-    final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
-    assertEquals(bundles.size(),1);
-    final SubscriptionBaseBundle bundle=bundles.get(0);
-    final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
-    assertEquals(subscriptions.size(),1);
-    final SubscriptionBase subscription=subscriptions.get(0);
-    assertEquals(subscription.getEndDate(),null);
-    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
-    assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
-    assertEquals(subscription.getState(),EntitlementState.ACTIVE);
-    assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-monthly");
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
-    testListener.pushExpectedEvent(NextEvent.MIGRATE_BILLING);
-    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
-    clock.addDeltaFromReality(it.toDurationMillis());
-    assertListenerStatus();
-    assertEquals(subscription.getEndDate(),null);
-    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
-    assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
-    assertEquals(subscription.getState(),EntitlementState.ACTIVE);
-    assertEquals(subscription.getCurrentPlan().getName(),"shotgun-annual");
-    assertListenerStatus();
-  }
- catch (  SubscriptionBaseMigrationApiException e) {
-    Assert.fail("",e);
-  }
+  final DateTime beforeMigration=clock.getUTCNow();
+  final AccountMigration toBeMigrated=testUtil.createAccountForMigrationFuturePendingChange();
+  final DateTime afterMigration=clock.getUTCNow();
+  testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+  migrationApi.migrate(toBeMigrated,callContext);
+  assertListenerStatus();
+  final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
+  assertEquals(bundles.size(),1);
+  final SubscriptionBaseBundle bundle=bundles.get(0);
+  final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
+  assertEquals(subscriptions.size(),1);
+  final SubscriptionBase subscription=subscriptions.get(0);
+  assertEquals(subscription.getEndDate(),null);
+  assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
+  assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
+  assertEquals(subscription.getState(),EntitlementState.ACTIVE);
+  assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-monthly");
+  testListener.pushExpectedEvent(NextEvent.CHANGE);
+  testListener.pushExpectedEvent(NextEvent.MIGRATE_BILLING);
+  final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  assertListenerStatus();
+  assertEquals(subscription.getEndDate(),null);
+  assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
+  assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
+  assertEquals(subscription.getState(),EntitlementState.ACTIVE);
+  assertEquals(subscription.getCurrentPlan().getName(),"shotgun-annual");
+  assertListenerStatus();
 }

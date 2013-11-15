@@ -1,28 +1,23 @@
 {
-  try {
-    final DateTime startDate=clock.getUTCNow().minusMonths(2);
-    final DateTime beforeMigration=clock.getUTCNow();
-    final AccountMigration toBeMigrated=testUtil.createAccountForMigrationWithRegularBasePlan(startDate);
-    final DateTime afterMigration=clock.getUTCNow();
-    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
-    migrationApi.migrate(toBeMigrated,callContext);
-    assertListenerStatus();
-    final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
-    assertEquals(bundles.size(),1);
-    final SubscriptionBaseBundle bundle=bundles.get(0);
-    final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
-    assertEquals(subscriptions.size(),1);
-    final SubscriptionBase subscription=subscriptions.get(0);
-    assertTrue(subscription.getStartDate().compareTo(startDate) == 0);
-    assertEquals(subscription.getEndDate(),null);
-    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
-    assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
-    assertEquals(subscription.getState(),EntitlementState.ACTIVE);
-    assertEquals(subscription.getCurrentPlan().getName(),"shotgun-annual");
-    assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
-    assertListenerStatus();
-  }
- catch (  SubscriptionBaseMigrationApiException e) {
-    Assert.fail("",e);
-  }
+  final DateTime startDate=clock.getUTCNow().minusMonths(2);
+  final DateTime beforeMigration=clock.getUTCNow();
+  final AccountMigration toBeMigrated=testUtil.createAccountForMigrationWithRegularBasePlan(startDate);
+  final DateTime afterMigration=clock.getUTCNow();
+  testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+  migrationApi.migrate(toBeMigrated,callContext);
+  assertListenerStatus();
+  final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
+  assertEquals(bundles.size(),1);
+  final SubscriptionBaseBundle bundle=bundles.get(0);
+  final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
+  assertEquals(subscriptions.size(),1);
+  final SubscriptionBase subscription=subscriptions.get(0);
+  assertTrue(subscription.getStartDate().compareTo(startDate) == 0);
+  assertEquals(subscription.getEndDate(),null);
+  assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
+  assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
+  assertEquals(subscription.getState(),EntitlementState.ACTIVE);
+  assertEquals(subscription.getCurrentPlan().getName(),"shotgun-annual");
+  assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
+  assertListenerStatus();
 }

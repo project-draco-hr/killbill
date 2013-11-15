@@ -1,28 +1,23 @@
 {
-  try {
-    final String prod="Shotgun";
-    final BillingPeriod term=BillingPeriod.MONTHLY;
-    final String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
-    final DefaultSubscriptionBase subscription=testUtil.createSubscription(bundle,prod,term,planSet);
-    PlanPhase trialPhase=subscription.getCurrentPhase();
-    assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
-    final DateTime expectedPhaseTrialChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
-    testUtil.checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
-    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
-    clock.addDeltaFromReality(it.toDurationMillis());
-    assertListenerStatus();
-    trialPhase=subscription.getCurrentPhase();
-    assertEquals(trialPhase.getPhaseType(),PhaseType.EVERGREEN);
-    testListener.pushExpectedEvent(NextEvent.CANCEL);
-    subscription.cancel(callContext);
-    assertListenerStatus();
-    final PlanPhase currentPhase=subscription.getCurrentPhase();
-    assertNull(currentPhase);
-    testUtil.checkNextPhaseChange(subscription,0,null);
-    assertListenerStatus();
-  }
- catch (  SubscriptionBaseApiException e) {
-    Assert.fail(e.getMessage());
-  }
+  final String prod="Shotgun";
+  final BillingPeriod term=BillingPeriod.MONTHLY;
+  final String planSet=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final DefaultSubscriptionBase subscription=testUtil.createSubscription(bundle,prod,term,planSet);
+  PlanPhase trialPhase=subscription.getCurrentPhase();
+  assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
+  final DateTime expectedPhaseTrialChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),trialPhase.getDuration());
+  testUtil.checkNextPhaseChange(subscription,1,expectedPhaseTrialChange);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  assertListenerStatus();
+  trialPhase=subscription.getCurrentPhase();
+  assertEquals(trialPhase.getPhaseType(),PhaseType.EVERGREEN);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  subscription.cancel(callContext);
+  assertListenerStatus();
+  final PlanPhase currentPhase=subscription.getCurrentPhase();
+  assertNull(currentPhase);
+  testUtil.checkNextPhaseChange(subscription,0,null);
+  assertListenerStatus();
 }

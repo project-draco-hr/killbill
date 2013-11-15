@@ -30,7 +30,6 @@
   clock.addDays(5);
   final String newBaseProduct1="Assault-Rifle";
   final BillingPeriod newBaseTerm1=BillingPeriod.ANNUAL;
-  final DateTime changeDate1=clock.getUTCNow();
   testListener.pushExpectedEvent(NextEvent.CHANGE);
   newBaseSubscription.changePlan(newBaseProduct1,newBaseTerm1,basePriceList,callContext);
   assertListenerStatus();
@@ -43,11 +42,10 @@
   final SubscriptionBase newBaseSubscriptionWithCtd=subscriptionInternalApi.getSubscriptionFromId(newBaseSubscription.getId(),internalCallContext);
   final String newBaseProduct2="Pistol";
   final BillingPeriod newBaseTerm2=BillingPeriod.ANNUAL;
-  final DateTime changeDate2=clock.getUTCNow();
   newBaseSubscriptionWithCtd.changePlan(newBaseProduct2,newBaseTerm2,basePriceList,callContext);
   newPlan=newBaseSubscriptionWithCtd.getCurrentPlan();
   assertEquals(newPlan.getProduct().getName(),newBaseProduct1);
   assertEquals(newBaseSubscriptionWithCtd.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
-  assertNotNull(((DefaultSubscriptionBase)newBaseSubscriptionWithCtd).getPendingTransition());
-  assertEquals(((DefaultSubscriptionBase)newBaseSubscriptionWithCtd).getPendingTransition().getEffectiveTransitionTime(),newCtd);
+  assertNotNull(newBaseSubscriptionWithCtd.getPendingTransition());
+  assertEquals(newBaseSubscriptionWithCtd.getPendingTransition().getEffectiveTransitionTime(),newCtd);
 }

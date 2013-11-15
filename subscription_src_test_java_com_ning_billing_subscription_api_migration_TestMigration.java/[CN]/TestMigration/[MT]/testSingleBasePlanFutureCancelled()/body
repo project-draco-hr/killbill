@@ -1,37 +1,32 @@
 {
-  try {
-    final DateTime startDate=clock.getUTCNow().minusMonths(1);
-    final DateTime beforeMigration=clock.getUTCNow();
-    final AccountMigration toBeMigrated=testUtil.createAccountForMigrationWithRegularBasePlanFutreCancelled(startDate);
-    final DateTime afterMigration=clock.getUTCNow();
-    testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
-    migrationApi.migrate(toBeMigrated,callContext);
-    assertListenerStatus();
-    final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
-    assertEquals(bundles.size(),1);
-    final SubscriptionBaseBundle bundle=bundles.get(0);
-    final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
-    assertEquals(subscriptions.size(),1);
-    final SubscriptionBase subscription=subscriptions.get(0);
-    assertTrue(subscription.getStartDate().compareTo(startDate) == 0);
-    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
-    assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
-    assertEquals(subscription.getState(),EntitlementState.ACTIVE);
-    assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-annual");
-    assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
-    testListener.pushExpectedEvent(NextEvent.CANCEL);
-    final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusYears(1));
-    clock.addDeltaFromReality(it.toDurationMillis());
-    assertListenerStatus();
-    assertTrue(subscription.getStartDate().compareTo(startDate) == 0);
-    assertNotNull(subscription.getEndDate());
-    assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
-    assertEquals(subscription.getCurrentPhase(),null);
-    assertEquals(subscription.getState(),EntitlementState.CANCELLED);
-    assertNull(subscription.getCurrentPlan());
-    assertListenerStatus();
-  }
- catch (  SubscriptionBaseMigrationApiException e) {
-    Assert.fail("",e);
-  }
+  final DateTime startDate=clock.getUTCNow().minusMonths(1);
+  final DateTime beforeMigration=clock.getUTCNow();
+  final AccountMigration toBeMigrated=testUtil.createAccountForMigrationWithRegularBasePlanFutreCancelled(startDate);
+  final DateTime afterMigration=clock.getUTCNow();
+  testListener.pushExpectedEvent(NextEvent.MIGRATE_ENTITLEMENT);
+  migrationApi.migrate(toBeMigrated,callContext);
+  assertListenerStatus();
+  final List<SubscriptionBaseBundle> bundles=subscriptionInternalApi.getBundlesForAccount(toBeMigrated.getAccountKey(),internalCallContext);
+  assertEquals(bundles.size(),1);
+  final SubscriptionBaseBundle bundle=bundles.get(0);
+  final List<SubscriptionBase> subscriptions=subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),internalCallContext);
+  assertEquals(subscriptions.size(),1);
+  final SubscriptionBase subscription=subscriptions.get(0);
+  assertTrue(subscription.getStartDate().compareTo(startDate) == 0);
+  assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
+  assertEquals(subscription.getCurrentPhase().getPhaseType(),PhaseType.EVERGREEN);
+  assertEquals(subscription.getState(),EntitlementState.ACTIVE);
+  assertEquals(subscription.getCurrentPlan().getName(),"assault-rifle-annual");
+  assertEquals(subscription.getChargedThroughDate(),startDate.plusYears(1));
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusYears(1));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  assertListenerStatus();
+  assertTrue(subscription.getStartDate().compareTo(startDate) == 0);
+  assertNotNull(subscription.getEndDate());
+  assertEquals(subscription.getCurrentPriceList().getName(),PriceListSet.DEFAULT_PRICELIST_NAME);
+  assertEquals(subscription.getCurrentPhase(),null);
+  assertEquals(subscription.getState(),EntitlementState.CANCELLED);
+  assertNull(subscription.getCurrentPlan());
+  assertListenerStatus();
 }

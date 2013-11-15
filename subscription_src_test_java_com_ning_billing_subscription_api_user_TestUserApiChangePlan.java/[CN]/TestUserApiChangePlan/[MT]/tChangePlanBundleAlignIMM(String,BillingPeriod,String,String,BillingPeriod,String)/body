@@ -1,24 +1,18 @@
 {
-  try {
-    final DefaultSubscriptionBase subscription=testUtil.createSubscription(bundle,fromProd,fromTerm,fromPlanSet);
-    testListener.pushExpectedEvent(NextEvent.CHANGE);
-    Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
-    clock.addDeltaFromReality(it.toDurationMillis());
-    subscription.changePlan(toProd,toTerm,toPlanSet,callContext);
-    checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.TRIAL);
-    assertListenerStatus();
-    final PlanPhase currentPhase=subscription.getCurrentPhase();
-    final DateTime nextExpectedPhaseChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),currentPhase.getDuration());
-    testUtil.checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
-    testListener.pushExpectedEvent(NextEvent.PHASE);
-    it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
-    clock.addDeltaFromReality(it.toDurationMillis());
-    final DateTime futureNow=clock.getUTCNow();
-    assertTrue(futureNow.isAfter(nextExpectedPhaseChange));
-    assertListenerStatus();
-    assertListenerStatus();
-  }
- catch (  SubscriptionBaseApiException e) {
-    Assert.fail(e.getMessage());
-  }
+  final DefaultSubscriptionBase subscription=testUtil.createSubscription(bundle,fromProd,fromTerm,fromPlanSet);
+  testListener.pushExpectedEvent(NextEvent.CHANGE);
+  Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(3));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  subscription.changePlan(toProd,toTerm,toPlanSet,callContext);
+  checkChangePlan(subscription,toProd,ProductCategory.BASE,toTerm,PhaseType.TRIAL);
+  assertListenerStatus();
+  final PlanPhase currentPhase=subscription.getCurrentPhase();
+  final DateTime nextExpectedPhaseChange=TestSubscriptionHelper.addDuration(subscription.getStartDate(),currentPhase.getDuration());
+  testUtil.checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  final DateTime futureNow=clock.getUTCNow();
+  assertTrue(futureNow.isAfter(nextExpectedPhaseChange));
+  assertListenerStatus();
 }

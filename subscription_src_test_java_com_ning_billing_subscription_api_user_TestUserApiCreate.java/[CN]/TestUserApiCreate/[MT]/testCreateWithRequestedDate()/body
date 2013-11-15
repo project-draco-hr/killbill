@@ -1,30 +1,24 @@
 {
-  try {
-    final DateTime init=clock.getUTCNow();
-    final DateTime requestedDate=init.minusYears(1);
-    final String productName="Shotgun";
-    final BillingPeriod term=BillingPeriod.MONTHLY;
-    final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-    testListener.pushExpectedEvent(NextEvent.PHASE);
-    testListener.pushExpectedEvent(NextEvent.CREATE);
-    final DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)subscriptionInternalApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,internalCallContext);
-    assertNotNull(subscription);
-    final List<SubscriptionBaseEvent> events=subscription.getEvents();
-    Assert.assertEquals(events.size(),2);
-    final SubscriptionBaseEvent trialEvent=events.get(0);
-    final SubscriptionBaseEvent phaseEvent=events.get(1);
-    assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
-    assertEquals(subscription.getBundleId(),bundle.getId());
-    assertEquals(subscription.getStartDate(),requestedDate);
-    assertListenerStatus();
-    final SubscriptionBaseTransition transition=subscription.getPreviousTransition();
-    assertEquals(transition.getPreviousEventId(),trialEvent.getId());
-    assertEquals(transition.getNextEventId(),phaseEvent.getId());
-    assertEquals(transition.getPreviousEventCreatedDate().compareTo(trialEvent.getCreatedDate()),0);
-    assertEquals(transition.getNextEventCreatedDate().compareTo(phaseEvent.getCreatedDate()),0);
-  }
- catch (  SubscriptionBaseApiException e) {
-    log.error("Unexpected exception",e);
-    Assert.fail(e.getMessage());
-  }
+  final DateTime init=clock.getUTCNow();
+  final DateTime requestedDate=init.minusYears(1);
+  final String productName="Shotgun";
+  final BillingPeriod term=BillingPeriod.MONTHLY;
+  final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  testListener.pushExpectedEvent(NextEvent.CREATE);
+  final DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)subscriptionInternalApi.createSubscription(bundle.getId(),testUtil.getProductSpecifier(productName,planSetName,term,null),requestedDate,internalCallContext);
+  assertNotNull(subscription);
+  final List<SubscriptionBaseEvent> events=subscription.getEvents();
+  Assert.assertEquals(events.size(),2);
+  final SubscriptionBaseEvent trialEvent=events.get(0);
+  final SubscriptionBaseEvent phaseEvent=events.get(1);
+  assertEquals(subscription.getActiveVersion(),SubscriptionEvents.INITIAL_VERSION);
+  assertEquals(subscription.getBundleId(),bundle.getId());
+  assertEquals(subscription.getStartDate(),requestedDate);
+  assertListenerStatus();
+  final SubscriptionBaseTransition transition=subscription.getPreviousTransition();
+  assertEquals(transition.getPreviousEventId(),trialEvent.getId());
+  assertEquals(transition.getNextEventId(),phaseEvent.getId());
+  assertEquals(transition.getPreviousEventCreatedDate().compareTo(trialEvent.getCreatedDate()),0);
+  assertEquals(transition.getNextEventCreatedDate().compareTo(phaseEvent.getCreatedDate()),0);
 }
