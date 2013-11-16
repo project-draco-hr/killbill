@@ -15,14 +15,14 @@
   final BlockingState state2=new DefaultBlockingState(uuid,BlockingStateType.ACCOUNT,overdueStateName2,service,blockChange,blockEntitlement,blockBilling,clock.getUTCNow());
   blockingInternalApi.setBlockingState(state2,internalCallContext);
   assertListenerStatus();
-  final SubscriptionBaseBundle bundle=Mockito.mock(SubscriptionBaseBundle.class);
-  Mockito.when(bundle.getId()).thenReturn(uuid);
-  final List<BlockingState> history1=blockingInternalApi.getBlockingHistoryForService(bundle,service,internalCallContext);
-  final List<BlockingState> history2=blockingInternalApi.getBlockingHistoryForService(bundle.getId(),service,internalCallContext);
-  Assert.assertEquals(history1.size(),2);
-  Assert.assertEquals(history1.get(0).getStateName(),overdueStateName);
-  Assert.assertEquals(history1.get(1).getStateName(),overdueStateName2);
-  Assert.assertEquals(history2.size(),2);
-  Assert.assertEquals(history2.get(0).getStateName(),overdueStateName);
-  Assert.assertEquals(history2.get(1).getStateName(),overdueStateName2);
+  final List<BlockingState> blockingAll=blockingInternalApi.getBlockingAll(uuid,BlockingStateType.ACCOUNT,internalCallContext);
+  final List<BlockingState> history=ImmutableList.<BlockingState>copyOf(Collections2.<BlockingState>filter(blockingAll,new Predicate<BlockingState>(){
+    @Override public boolean apply(    final BlockingState input){
+      return input.getService().equals(service);
+    }
+  }
+));
+  Assert.assertEquals(history.size(),2);
+  Assert.assertEquals(history.get(0).getStateName(),overdueStateName);
+  Assert.assertEquals(history.get(1).getStateName(),overdueStateName2);
 }

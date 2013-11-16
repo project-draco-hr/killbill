@@ -1,0 +1,51 @@
+{
+  final Collection<BlockingState> blockingStatesOnDiskCopy=new LinkedList<BlockingState>(blockingStatesOnDisk);
+  final Iterable<SubscriptionBase> baseSubscriptionsToConsider;
+  try {
+    if (blockingStateType == null) {
+      final Iterable<SubscriptionBase> subscriptions=Iterables.<SubscriptionBase>concat(subscriptionInternalApi.getSubscriptionsForAccount(context).values());
+      baseSubscriptionsToConsider=Iterables.<SubscriptionBase>filter(subscriptions,new Predicate<SubscriptionBase>(){
+        @Override public boolean apply(        final SubscriptionBase input){
+          return ProductCategory.BASE.equals(input.getCategory()) && !EntitlementState.CANCELLED.equals(input.getState());
+        }
+      }
+);
+    }
+ else     if (BlockingStateType.SUBSCRIPTION.equals(blockingStateType)) {
+      final SubscriptionBase subscription=subscriptionInternalApi.getSubscriptionFromId(blockableId,context);
+      if (ProductCategory.ADD_ON.equals(subscription.getCategory())) {
+        final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(subscription.getBundleId(),context);
+        baseSubscriptionsToConsider=ImmutableList.<SubscriptionBase>of(baseSubscription);
+      }
+ else {
+        return blockingStatesOnDisk;
+      }
+    }
+ else {
+      return blockingStatesOnDisk;
+    }
+  }
+ catch (  SubscriptionBaseApiException e) {
+    log.error("Error retrieving subscriptions for account record id " + context.getAccountRecordId(),e);
+    throw new RuntimeException(e);
+  }
+  final DateTime now=clock.getUTCNow();
+  for (  final SubscriptionBase baseSubscription : baseSubscriptionsToConsider) {
+    final EventsStream eventsStream;
+    try {
+      eventsStream=eventsStreamBuilder.buildForEntitlement(baseSubscription.getId(),context);
+    }
+ catch (    EntitlementApiException e) {
+      log.error("Error computing blocking states for addons for account record id " + context.getAccountRecordId(),e);
+      throw new RuntimeException(e);
+    }
+    final Collection<BlockingState> blockingStatesNotOnDisk=eventsStream.computeAddonsBlockingStatesForFutureSubscriptionBaseEvents();
+    for (    final BlockingState blockingState : blockingStatesNotOnDisk) {
+      if (blockingStateType == null || (BlockingStateType.SUBSCRIPTION.equals(blockingStateType) && blockingState.getBlockedId().equals(blockableId))) {
+        final BlockingStateModelDao blockingStateModelDao=new BlockingStateModelDao(blockingState,now,now);
+        blockingStatesOnDiskCopy.add(BlockingStateModelDao.toBlockingState(blockingStateModelDao));
+      }
+    }
+  }
+  return BLOCKING_STATE_ORDERING.immutableSortedCopy(blockingStatesOnDiskCopy);
+}
