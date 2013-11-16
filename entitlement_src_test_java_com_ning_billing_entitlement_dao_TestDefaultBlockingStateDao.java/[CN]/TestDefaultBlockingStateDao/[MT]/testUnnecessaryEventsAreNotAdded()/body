@@ -1,11 +1,15 @@
 {
-  final UUID blockableId=UUID.randomUUID();
+  final Account account=accountApi.createAccount(getAccountData(7),callContext);
+  final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  testListener.pushExpectedEvent(NextEvent.CREATE);
+  final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),clock.getUTCToday(),callContext);
+  assertListenerStatus();
   final BlockingStateType type=BlockingStateType.SUBSCRIPTION;
   final String state="state";
   final String service="service";
-  Assert.assertEquals(blockingStateDao.getBlockingAll(blockableId,internalCallContext).size(),0);
+  Assert.assertEquals(blockingStateDao.getBlockingAll(entitlement.getId(),type,internalCallContext).size(),0);
   final DateTime stateDateTime=new DateTime(2013,5,6,10,11,12,DateTimeZone.UTC);
-  final BlockingState blockingState=new DefaultBlockingState(blockableId,type,state,service,false,false,false,stateDateTime);
+  final BlockingState blockingState=new DefaultBlockingState(entitlement.getId(),type,state,service,false,false,false,stateDateTime);
   blockingStateDao.setBlockingState(blockingState,clock,internalCallContext);
-  Assert.assertEquals(blockingStateDao.getBlockingAll(blockableId,internalCallContext).size(),1);
+  Assert.assertEquals(blockingStateDao.getBlockingAll(entitlement.getId(),type,internalCallContext).size(),1);
 }

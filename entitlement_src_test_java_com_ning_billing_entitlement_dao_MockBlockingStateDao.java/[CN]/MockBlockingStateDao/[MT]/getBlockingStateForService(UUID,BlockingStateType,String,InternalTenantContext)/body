@@ -1,0 +1,13 @@
+{
+  final List<BlockingState> states=getBlockingAll(blockableId,blockingStateType,context);
+  if (states == null) {
+    return null;
+  }
+  final ImmutableList<BlockingState> filtered=ImmutableList.<BlockingState>copyOf(Collections2.filter(states,new Predicate<BlockingState>(){
+    @Override public boolean apply(    @Nullable final BlockingState input){
+      return input.getService().equals(serviceName);
+    }
+  }
+));
+  return filtered.size() == 0 ? null : filtered.get(filtered.size() - 1);
+}
