@@ -1,0 +1,8 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID bundleId=UUID.fromString(id);
+  final SubscriptionBundle bundle=subscriptionApi.getSubscriptionBundle(bundleId,callContext);
+  final LocalDate inputLocalDate=toLocalDate(bundle.getAccountId(),requestedDate,callContext);
+  entitlementApi.resume(bundleId,inputLocalDate,callContext);
+  return Response.status(Status.OK).build();
+}
