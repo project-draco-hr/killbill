@@ -1,0 +1,8 @@
+{
+  final DefaultEntitlement cancelledBaseEntitlement=(DefaultEntitlement)baseEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.END_OF_TERM,BillingActionPolicy.END_OF_TERM,callContext);
+  assertListenerStatus();
+  testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK);
+  final DefaultEntitlement cancelledAddOnEntitlement=(DefaultEntitlement)addOnEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.IMMEDIATE,BillingActionPolicy.IMMEDIATE,callContext);
+  assertListenerStatus();
+  checkBlockingStatesDAO(cancelledBaseEntitlement,cancelledAddOnEntitlement,baseEffectiveCancellationOrChangeDate,clock.getUTCToday(),true);
+}

@@ -1,0 +1,8 @@
+{
+  return Iterables.<BlockingState>tryFind(blockingStates,new Predicate<BlockingState>(){
+    @Override public boolean apply(    final BlockingState input){
+      return input.getBlockedId().equals(blockedId) && BlockingStateType.SUBSCRIPTION.equals(input.getType()) && EntitlementService.ENTITLEMENT_SERVICE_NAME.equals(input.getService())&& DefaultEntitlementApi.ENT_STATE_CANCELLED.equals(input.getStateName());
+    }
+  }
+).orNull() != null;
+}

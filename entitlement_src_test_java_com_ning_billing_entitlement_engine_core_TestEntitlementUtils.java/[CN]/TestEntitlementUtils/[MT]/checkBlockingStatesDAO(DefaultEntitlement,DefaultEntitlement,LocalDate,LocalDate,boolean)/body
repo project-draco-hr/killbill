@@ -3,7 +3,7 @@
   Assert.assertEquals(blockingStatesForBaseEntitlement.size(),isBaseCancelled ? 1 : 0);
   if (isBaseCancelled) {
     Assert.assertEquals(blockingStatesForBaseEntitlement.get(0).getBlockedId(),baseEntitlement.getId());
-    Assert.assertEquals(blockingStatesForBaseEntitlement.get(0).getEffectiveDate().toLocalDate(),effectiveCancellationDate);
+    Assert.assertEquals(blockingStatesForBaseEntitlement.get(0).getEffectiveDate().toLocalDate(),effectiveBaseCancellationDate);
     Assert.assertEquals(blockingStatesForBaseEntitlement.get(0).getType(),BlockingStateType.SUBSCRIPTION);
     Assert.assertEquals(blockingStatesForBaseEntitlement.get(0).getService(),EntitlementService.ENTITLEMENT_SERVICE_NAME);
     Assert.assertEquals(blockingStatesForBaseEntitlement.get(0).getStateName(),DefaultEntitlementApi.ENT_STATE_CANCELLED);
@@ -11,7 +11,7 @@
   final List<BlockingState> blockingStatesForAddOn=blockingStateDao.getBlockingAll(addOnEntitlement.getId(),BlockingStateType.SUBSCRIPTION,internalCallContext);
   Assert.assertEquals(blockingStatesForAddOn.size(),1);
   Assert.assertEquals(blockingStatesForAddOn.get(0).getBlockedId(),addOnEntitlement.getId());
-  Assert.assertEquals(blockingStatesForAddOn.get(0).getEffectiveDate().toLocalDate(),effectiveCancellationDate);
+  Assert.assertEquals(blockingStatesForAddOn.get(0).getEffectiveDate().toLocalDate(),effectiveAddOnCancellationDate);
   Assert.assertEquals(blockingStatesForAddOn.get(0).getType(),BlockingStateType.SUBSCRIPTION);
   Assert.assertEquals(blockingStatesForAddOn.get(0).getService(),EntitlementService.ENTITLEMENT_SERVICE_NAME);
   Assert.assertEquals(blockingStatesForAddOn.get(0).getStateName(),DefaultEntitlementApi.ENT_STATE_CANCELLED);

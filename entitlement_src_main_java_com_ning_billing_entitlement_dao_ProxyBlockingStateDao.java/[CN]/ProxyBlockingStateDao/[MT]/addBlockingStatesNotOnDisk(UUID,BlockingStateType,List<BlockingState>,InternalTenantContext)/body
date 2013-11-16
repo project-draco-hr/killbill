@@ -41,7 +41,7 @@
     }
     final Collection<BlockingState> blockingStatesNotOnDisk=eventsStream.computeAddonsBlockingStatesForFutureSubscriptionBaseEvents();
     for (    final BlockingState blockingState : blockingStatesNotOnDisk) {
-      if (blockingStateType == null || (BlockingStateType.SUBSCRIPTION.equals(blockingStateType) && blockingState.getBlockedId().equals(blockableId))) {
+      if ((blockingStateType == null || (BlockingStateType.SUBSCRIPTION.equals(blockingStateType) && blockingState.getBlockedId().equals(blockableId))) && !isEntitlementCancelled(blockingState.getBlockedId(),blockingStatesOnDiskCopy)) {
         final BlockingStateModelDao blockingStateModelDao=new BlockingStateModelDao(blockingState,now,now);
         blockingStatesOnDiskCopy.add(BlockingStateModelDao.toBlockingState(blockingStateModelDao));
       }
