@@ -19,8 +19,10 @@ throw new EntitlementApiException(new SubscriptionBaseApiException(ErrorCode.SUB
 final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundle.getId(),contextWithValidAccountRecordId);
 final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
 final SubscriptionBaseBundle newBundle=subscriptionTransferApi.transferBundle(sourceAccountId,destAccountId,externalKey,requestedDate,true,cancelImm,context);
-final BlockingState newBlockingState=new DefaultBlockingState(bundle.getId(),BlockingStateType.SUBSCRIPTION_BUNDLE,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,requestedDate);
-entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(newBlockingState,contextWithValidAccountRecordId);
+for (final SubscriptionBase subscriptionBase : subscriptionInternalApi.getSubscriptionsForBundle(bundle.getId(),contextWithValidAccountRecordId)) {
+final BlockingState blockingState=new DefaultBlockingState(subscriptionBase.getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,requestedDate);
+entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(blockingState,contextWithValidAccountRecordId);
+}
 return newBundle.getId();
 }
  catch (SubscriptionBaseTransferApiException e) {
