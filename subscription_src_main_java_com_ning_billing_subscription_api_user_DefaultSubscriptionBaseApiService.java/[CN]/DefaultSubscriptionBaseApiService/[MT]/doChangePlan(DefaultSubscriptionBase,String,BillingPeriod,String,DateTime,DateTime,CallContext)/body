@@ -1,8 +1,8 @@
 {
   final Plan newPlan=catalogService.getFullCatalog().findPlan(newProductName,newBillingPeriod,newPriceList,effectiveDate,subscription.getStartDate());
-  final TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(subscription,newPlan,newPriceList,requestedDate,effectiveDate);
-  final SubscriptionBaseEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true));
-  final TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(subscription,newPlan,newPriceList,requestedDate,effectiveDate);
+  final TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(subscription,newPlan,newPriceList,now,effectiveDate);
+  final SubscriptionBaseEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now).setFromDisk(true));
+  final TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(subscription,newPlan,newPriceList,now,effectiveDate);
   final PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,now,nextTimedPhase.getStartPhase()) : null;
   final List<SubscriptionBaseEvent> changeEvents=new ArrayList<SubscriptionBaseEvent>();
   if (nextPhaseEvent != null && !nextPhaseEvent.getEffectiveDate().equals(changeEvent.getEffectiveDate())) {
