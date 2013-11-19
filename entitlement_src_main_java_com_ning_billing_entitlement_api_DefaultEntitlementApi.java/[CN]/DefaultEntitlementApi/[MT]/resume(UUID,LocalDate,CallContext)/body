@@ -1,16 +1,18 @@
 {
   try {
     final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundleId,ObjectType.BUNDLE,context);
-    final BlockingState currentState=blockingStateDao.getBlockingStateForService(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,EntitlementService.ENTITLEMENT_SERVICE_NAME,contextWithValidAccountRecordId);
-    if (currentState == null || currentState.getStateName().equals(ENT_STATE_CLEAR)) {
-      return;
-    }
     final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleFromId(bundleId,contextWithValidAccountRecordId);
     final Account account=accountApi.getAccountById(bundle.getAccountId(),contextWithValidAccountRecordId);
     final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundleId,contextWithValidAccountRecordId);
     final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(localEffectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
     if (!dateHelper.isBeforeOrEqualsToday(effectiveDate,account.getTimeZone())) {
-      throw new UnsupportedOperationException("Resuming with a future date has not been implemented yet");
+      recordPauseResumeNotificationEntry(baseSubscription.getId(),bundleId,effectiveDate,false,contextWithValidAccountRecordId);
+      return;
+    }
+    final BlockingState currentState=blockingStateDao.getBlockingStateForService(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,EntitlementService.ENTITLEMENT_SERVICE_NAME,contextWithValidAccountRecordId);
+    if (currentState == null || currentState.getStateName().equals(ENT_STATE_CLEAR)) {
+      log.warn("Current state is {}, nothing to resume",currentState);
+      return;
     }
     final BlockingState state=new DefaultBlockingState(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,ENT_STATE_CLEAR,EntitlementService.ENTITLEMENT_SERVICE_NAME,false,false,false,effectiveDate);
     entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(state,contextWithValidAccountRecordId);

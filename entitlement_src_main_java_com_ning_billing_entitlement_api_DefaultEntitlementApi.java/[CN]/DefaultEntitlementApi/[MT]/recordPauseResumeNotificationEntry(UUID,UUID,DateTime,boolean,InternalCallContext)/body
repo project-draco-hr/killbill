@@ -1,0 +1,13 @@
+{
+  final NotificationEvent notificationEvent=new EntitlementNotificationKey(entitlementId,bundleId,isPause ? EntitlementNotificationKeyAction.PAUSE : EntitlementNotificationKeyAction.RESUME,effectiveDate);
+  try {
+    final NotificationQueue subscriptionEventQueue=notificationQueueService.getNotificationQueue(DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME,DefaultEntitlementService.NOTIFICATION_QUEUE_NAME);
+    subscriptionEventQueue.recordFutureNotification(effectiveDate,notificationEvent,contextWithValidAccountRecordId.getUserToken(),contextWithValidAccountRecordId.getAccountRecordId(),contextWithValidAccountRecordId.getTenantRecordId());
+  }
+ catch (  final NoSuchNotificationQueue e) {
+    throw new EntitlementApiException(e,ErrorCode.__UNKNOWN_ERROR_CODE);
+  }
+catch (  final IOException e) {
+    throw new EntitlementApiException(e,ErrorCode.__UNKNOWN_ERROR_CODE);
+  }
+}
