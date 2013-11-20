@@ -15,8 +15,12 @@
   final List<TagModelDao> foundTags=tagDao.getTagsForObject(objectId,objectType,internalCallContext);
   Assert.assertEquals(foundTags.size(),1);
   Assert.assertEquals(foundTags.get(0).getTagDefinitionId(),createdTagDefinition.getId());
+  final List<TagModelDao> foundTagsForAccount=tagDao.getTagsForAccount(internalCallContext);
+  Assert.assertEquals(foundTagsForAccount.size(),1);
+  Assert.assertEquals(foundTagsForAccount.get(0).getTagDefinitionId(),createdTagDefinition.getId());
   eventsListener.pushExpectedEvent(NextEvent.TAG);
   tagDao.deleteTag(objectId,objectType,createdTagDefinition.getId(),internalCallContext);
   assertListenerStatus();
   Assert.assertEquals(tagDao.getTagsForObject(objectId,objectType,internalCallContext).size(),0);
+  Assert.assertEquals(tagDao.getTagsForAccount(internalCallContext).size(),0);
 }
