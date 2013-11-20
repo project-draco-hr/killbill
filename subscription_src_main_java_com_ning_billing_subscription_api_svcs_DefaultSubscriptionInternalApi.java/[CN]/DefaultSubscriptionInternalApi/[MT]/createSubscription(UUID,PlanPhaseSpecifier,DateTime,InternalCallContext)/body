@@ -47,7 +47,8 @@ break;
 default :
 throw new SubscriptionBaseError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
 }
-return apiService.createPlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(effectiveDate),plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,now,context.toCallContext());
+final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT);
+return apiService.createPlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(effectiveDate),plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,now,context.toCallContext(tenantId));
 }
  catch (CatalogApiException e) {
 throw new SubscriptionBaseApiException(e);

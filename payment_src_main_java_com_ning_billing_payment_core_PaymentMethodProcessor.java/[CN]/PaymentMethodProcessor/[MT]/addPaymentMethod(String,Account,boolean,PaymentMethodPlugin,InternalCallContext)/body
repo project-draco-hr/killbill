@@ -1,4 +1,5 @@
 {
+  final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT);
   return new WithAccountLock<UUID>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<UUID>(){
     @Override public UUID doOperation() throws PaymentApiException {
       PaymentMethod pm=null;
@@ -6,7 +7,7 @@
       try {
         pluginApi=getPaymentPluginApi(paymentPluginServiceName);
         pm=new DefaultPaymentMethod(account.getId(),paymentPluginServiceName,paymentMethodProps);
-        pluginApi.addPaymentMethod(account.getId(),pm.getId(),paymentMethodProps,setDefault,context.toCallContext());
+        pluginApi.addPaymentMethod(account.getId(),pm.getId(),paymentMethodProps,setDefault,context.toCallContext(tenantId));
         final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getCreatedDate(),pm.getUpdatedDate(),pm.getAccountId(),pm.getPluginName(),pm.isActive());
         paymentDao.insertPaymentMethod(pmModel,context);
         if (setDefault) {

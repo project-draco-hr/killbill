@@ -1,8 +1,9 @@
 {
+  final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT);
   final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
   final List<PaymentMethodInfoPlugin> pluginPms;
   try {
-    pluginPms=pluginApi.getPaymentMethods(account.getId(),true,context.toCallContext());
+    pluginPms=pluginApi.getPaymentMethods(account.getId(),true,context.toCallContext(tenantId));
     if (pluginPms == null) {
       log.debug("No payment methods defined on the account {} for plugin {}",account.getId(),pluginName);
       return ImmutableList.<PaymentMethod>of();

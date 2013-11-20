@@ -1,10 +1,12 @@
 {
+  final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT);
+  final CallContext callContext=context.toCallContext(tenantId);
   final SubscriptionBase subscription=subscriptionApi.getSubscriptionFromId(subscriptionId,context);
   Assert.assertNotNull(subscription);
-  auditChecker.checkSubscriptionCreated(subscription.getBundleId(),subscriptionId,context.toCallContext());
+  auditChecker.checkSubscriptionCreated(subscription.getBundleId(),subscriptionId,callContext);
   List<SubscriptionBaseTransition> subscriptionEvents=getSubscriptionEvents(subscription);
   Assert.assertTrue(subscriptionEvents.size() >= 1);
-  auditChecker.checkSubscriptionEventCreated(subscription.getBundleId(),((SubscriptionBaseTransitionData)subscriptionEvents.get(0)).getId(),context.toCallContext());
-  auditChecker.checkBundleCreated(subscription.getBundleId(),context.toCallContext());
+  auditChecker.checkSubscriptionEventCreated(subscription.getBundleId(),((SubscriptionBaseTransitionData)subscriptionEvents.get(0)).getId(),callContext);
+  auditChecker.checkBundleCreated(subscription.getBundleId(),callContext);
   return subscription;
 }

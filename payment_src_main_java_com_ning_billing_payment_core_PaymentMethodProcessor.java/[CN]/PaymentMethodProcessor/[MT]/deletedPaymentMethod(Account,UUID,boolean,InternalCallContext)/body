@@ -1,4 +1,5 @@
 {
+  final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT);
   new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
     @Override public Void doOperation() throws PaymentApiException {
       final PaymentMethodModelDao paymentMethodModel=paymentDao.getPaymentMethod(paymentMethodId,context);
@@ -20,7 +21,7 @@
           }
         }
         final PaymentPluginApi pluginApi=getPluginApi(paymentMethodId,context);
-        pluginApi.deletePaymentMethod(account.getId(),paymentMethodId,context.toCallContext());
+        pluginApi.deletePaymentMethod(account.getId(),paymentMethodId,context.toCallContext(tenantId));
         paymentDao.deletedPaymentMethod(paymentMethodId,context);
         return null;
       }

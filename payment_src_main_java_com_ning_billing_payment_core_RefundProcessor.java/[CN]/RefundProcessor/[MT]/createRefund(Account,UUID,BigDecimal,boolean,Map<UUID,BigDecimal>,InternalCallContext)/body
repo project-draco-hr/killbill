@@ -1,4 +1,5 @@
 {
+  final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT);
   return new WithAccountLock<Refund>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Refund>(){
     @Override public Refund doOperation() throws PaymentApiException {
       final BigDecimal refundAmount=computeRefundAmount(paymentId,specifiedRefundAmount,invoiceItemIdsWithAmounts,context);
@@ -10,7 +11,7 @@
         final RefundModelDao refundInfo=new RefundModelDao(account.getId(),paymentId,refundAmount,account.getCurrency(),refundAmount,account.getCurrency(),isAdjusted);
         paymentDao.insertRefund(refundInfo,context);
         final PaymentPluginApi plugin=getPaymentProviderPlugin(payment.getPaymentMethodId(),context);
-        final RefundInfoPlugin refundInfoPlugin=plugin.processRefund(account.getId(),paymentId,refundAmount,account.getCurrency(),context.toCallContext());
+        final RefundInfoPlugin refundInfoPlugin=plugin.processRefund(account.getId(),paymentId,refundAmount,account.getCurrency(),context.toCallContext(tenantId));
         if (refundInfoPlugin.getStatus() == RefundPluginStatus.PROCESSED) {
           paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.PLUGIN_COMPLETED,refundInfoPlugin.getAmount(),refundInfoPlugin.getCurrency(),context);
           invoiceApi.createRefund(paymentId,refundAmount,isAdjusted,invoiceItemIdsWithAmounts,refundInfo.getId(),context);
