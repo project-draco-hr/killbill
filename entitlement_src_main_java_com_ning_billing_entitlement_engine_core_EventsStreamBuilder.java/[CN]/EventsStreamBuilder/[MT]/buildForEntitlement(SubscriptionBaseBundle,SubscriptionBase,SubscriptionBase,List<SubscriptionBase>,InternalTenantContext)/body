@@ -6,8 +6,8 @@
  catch (  AccountApiException e) {
     throw new EntitlementApiException(e);
   }
-  final List<BlockingState> bundleEntitlementStates=BLOCKING_STATE_ORDERING.immutableSortedCopy(blockingStateDao.getBlockingHistoryForService(bundle.getId(),BlockingStateType.SUBSCRIPTION_BUNDLE,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext));
-  final List<BlockingState> accountEntitlementStates=BLOCKING_STATE_ORDERING.immutableSortedCopy(blockingStateDao.getBlockingHistoryForService(account.getId(),BlockingStateType.ACCOUNT,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext));
-  final List<BlockingState> subscriptionEntitlementStates=BLOCKING_STATE_ORDERING.immutableSortedCopy(blockingStateDao.getBlockingHistoryForService(subscription.getId(),BlockingStateType.SUBSCRIPTION,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext));
+  final List<BlockingState> bundleEntitlementStates=BLOCKING_STATE_ORDERING.immutableSortedCopy(defaultBlockingStateDao.getBlockingHistoryForService(bundle.getId(),BlockingStateType.SUBSCRIPTION_BUNDLE,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext));
+  final List<BlockingState> accountEntitlementStates=BLOCKING_STATE_ORDERING.immutableSortedCopy(defaultBlockingStateDao.getBlockingHistoryForService(account.getId(),BlockingStateType.ACCOUNT,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext));
+  final List<BlockingState> subscriptionEntitlementStates=subscription.getId().equals(baseSubscription.getId()) ? BLOCKING_STATE_ORDERING.immutableSortedCopy(defaultBlockingStateDao.getBlockingHistoryForService(subscription.getId(),BlockingStateType.SUBSCRIPTION,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext)) : BLOCKING_STATE_ORDERING.immutableSortedCopy(blockingStateDao.getBlockingHistoryForService(subscription.getId(),BlockingStateType.SUBSCRIPTION,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext));
   return buildForEntitlement(account,bundle,baseSubscription,subscription,allSubscriptionsForBundle,subscriptionEntitlementStates,bundleEntitlementStates,accountEntitlementStates,internalTenantContext);
 }

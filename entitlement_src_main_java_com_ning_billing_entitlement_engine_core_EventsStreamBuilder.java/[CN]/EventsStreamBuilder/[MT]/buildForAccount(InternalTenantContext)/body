@@ -16,7 +16,7 @@
   for (  final SubscriptionBaseBundle bundle : bundles) {
     bundlesPerId.put(bundle.getId(),bundle);
   }
-  final List<BlockingState> blockingStatesForAccount=BLOCKING_STATE_ORDERING.immutableSortedCopy(blockingStateDao.getBlockingAllForAccountRecordId(internalTenantContext));
+  final List<BlockingState> blockingStatesForAccount=BLOCKING_STATE_ORDERING.immutableSortedCopy(defaultBlockingStateDao.getBlockingAllForAccountRecordId(internalTenantContext));
   final List<BlockingState> accountEntitlementStates=ImmutableList.<BlockingState>copyOf(Iterables.<BlockingState>filter(blockingStatesForAccount,new Predicate<BlockingState>(){
     @Override public boolean apply(    final BlockingState input){
       return BlockingStateType.ACCOUNT.equals(input.getType()) && EntitlementService.ENTITLEMENT_SERVICE_NAME.equals(input.getService()) && accountId.equals(input.getBlockedId());
