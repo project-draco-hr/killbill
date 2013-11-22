@@ -1,10 +1,10 @@
 {
-  final DefaultBlockingAggregator result=new DefaultBlockingAggregator();
+  final List<BlockingState> blockableState;
   if (blockableId != null) {
-    final List<BlockingState> blockableState=dao.getBlockingState(blockableId,blockingStateType,context);
-    for (    BlockingState cur : blockableState) {
-      result.or(cur);
-    }
+    blockableState=dao.getBlockingState(blockableId,blockingStateType,context);
   }
-  return result;
+ else {
+    blockableState=ImmutableList.<BlockingState>of();
+  }
+  return getBlockedState(blockableState);
 }

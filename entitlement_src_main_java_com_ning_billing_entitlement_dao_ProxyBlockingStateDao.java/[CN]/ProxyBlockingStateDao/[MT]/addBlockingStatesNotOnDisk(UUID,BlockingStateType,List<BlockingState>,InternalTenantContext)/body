@@ -30,16 +30,27 @@
     throw new RuntimeException(e);
   }
   final BlockingState cancellationBlockingStateOnDisk=findEntitlementCancellationBlockingState(blockableId,blockingStatesOnDiskCopy);
+  final List<EventsStream> eventsStreams;
+  try {
+    if (blockingStateType == null) {
+      eventsStreams=eventsStreamBuilder.buildForAccount(context);
+    }
+ else {
+      eventsStreams=ImmutableList.<EventsStream>of(eventsStreamBuilder.buildForEntitlement(baseSubscriptionsToConsider.iterator().next().getId(),context));
+    }
+  }
+ catch (  EntitlementApiException e) {
+    log.error("Error computing blocking states for addons for account record id " + context.getAccountRecordId(),e);
+    throw new RuntimeException(e);
+  }
   final DateTime now=clock.getUTCNow();
   for (  final SubscriptionBase baseSubscription : baseSubscriptionsToConsider) {
-    final EventsStream eventsStream;
-    try {
-      eventsStream=eventsStreamBuilder.buildForEntitlement(baseSubscription.getId(),context);
+    final EventsStream eventsStream=Iterables.<EventsStream>find(eventsStreams,new Predicate<EventsStream>(){
+      @Override public boolean apply(      final EventsStream input){
+        return input.getSubscription().getId().equals(baseSubscription.getId());
+      }
     }
- catch (    EntitlementApiException e) {
-      log.error("Error computing blocking states for addons for account record id " + context.getAccountRecordId(),e);
-      throw new RuntimeException(e);
-    }
+);
     final Collection<BlockingState> blockingStatesNotOnDisk=eventsStream.computeAddonsBlockingStatesForFutureSubscriptionBaseEvents();
     for (    final BlockingState blockingState : blockingStatesNotOnDisk) {
       final boolean overrideCancellationBlockingStateOnDisk=cancellationBlockingStateOnDisk != null && isEntitlementCancellationBlockingState(blockingState) && blockingState.getEffectiveDate().isBefore(cancellationBlockingStateOnDisk.getEffectiveDate());

@@ -6,15 +6,8 @@
  catch (  AccountApiException e) {
     throw new EntitlementApiException(e);
   }
-  final List<BlockingState> subscriptionEntitlementStates=blockingStateDao.getBlockingHistoryForService(subscription.getId(),BlockingStateType.SUBSCRIPTION,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext);
   final List<BlockingState> bundleEntitlementStates=blockingStateDao.getBlockingHistoryForService(bundle.getId(),BlockingStateType.SUBSCRIPTION_BUNDLE,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext);
   final List<BlockingState> accountEntitlementStates=blockingStateDao.getBlockingHistoryForService(account.getId(),BlockingStateType.ACCOUNT,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext);
-  final BlockingAggregator blockingAggregator;
-  try {
-    blockingAggregator=checker.getBlockedStatus(subscription,internalTenantContext);
-  }
- catch (  BlockingApiException e) {
-    throw new EntitlementApiException(e);
-  }
-  return new EventsStream(account,bundle,subscriptionEntitlementStates,bundleEntitlementStates,accountEntitlementStates,blockingAggregator,baseSubscription,subscription,allSubscriptionsForBundle,internalTenantContext,clock.getUTCNow());
+  final List<BlockingState> subscriptionEntitlementStates=blockingStateDao.getBlockingHistoryForService(subscription.getId(),BlockingStateType.SUBSCRIPTION,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext);
+  return buildForEntitlement(account,bundle,baseSubscription,subscription,allSubscriptionsForBundle,subscriptionEntitlementStates,bundleEntitlementStates,accountEntitlementStates,internalTenantContext);
 }
