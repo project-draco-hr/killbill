@@ -39,14 +39,14 @@
       }
     }
 ));
-    for (    final SubscriptionBase subscriptionBase : allSubscriptionsForBundle) {
-      final List<BlockingState> subscriptionEntitlementStates=ImmutableList.<BlockingState>copyOf(Iterables.<BlockingState>filter(blockingStatesForAccount,new Predicate<BlockingState>(){
+    for (    final SubscriptionBase subscription : allSubscriptionsForBundle) {
+      final List<BlockingState> subscriptionEntitlementStates=(baseSubscription == null || subscription.getId().equals(baseSubscription.getId())) ? ImmutableList.<BlockingState>copyOf(Iterables.<BlockingState>filter(blockingStatesForAccount,new Predicate<BlockingState>(){
         @Override public boolean apply(        final BlockingState input){
-          return BlockingStateType.SUBSCRIPTION.equals(input.getType()) && EntitlementService.ENTITLEMENT_SERVICE_NAME.equals(input.getService()) && subscriptionBase.getId().equals(input.getBlockedId());
+          return BlockingStateType.SUBSCRIPTION.equals(input.getType()) && EntitlementService.ENTITLEMENT_SERVICE_NAME.equals(input.getService()) && subscription.getId().equals(input.getBlockedId());
         }
       }
-));
-      results.add(buildForEntitlement(account,bundle,baseSubscription,subscriptionBase,allSubscriptionsForBundle,subscriptionEntitlementStates,bundleEntitlementStates,accountEntitlementStates,internalTenantContext));
+)) : BLOCKING_STATE_ORDERING.immutableSortedCopy(blockingStateDao.getBlockingHistoryForService(subscription.getId(),BlockingStateType.SUBSCRIPTION,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalTenantContext));
+      results.add(buildForEntitlement(account,bundle,baseSubscription,subscription,allSubscriptionsForBundle,subscriptionEntitlementStates,bundleEntitlementStates,accountEntitlementStates,internalTenantContext));
     }
   }
   return results;

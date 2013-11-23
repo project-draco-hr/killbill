@@ -1,0 +1,14 @@
+{
+  if (addOnEntitlement == null || effectiveCancellationDateTime == null) {
+    Assert.assertEquals(blockingStatesForCancellation.size(),0);
+  }
+ else {
+    Assert.assertEquals(blockingStatesForCancellation.size(),1);
+    final BlockingState blockingState=blockingStatesForCancellation.iterator().next();
+    Assert.assertEquals(blockingState.getBlockedId(),addOnEntitlement.getId());
+    Assert.assertEquals(blockingState.getEffectiveDate(),effectiveCancellationDateTime);
+    Assert.assertEquals(blockingState.getType(),BlockingStateType.SUBSCRIPTION);
+    Assert.assertEquals(blockingState.getService(),EntitlementService.ENTITLEMENT_SERVICE_NAME);
+    Assert.assertEquals(blockingState.getStateName(),DefaultEntitlementApi.ENT_STATE_CANCELLED);
+  }
+}

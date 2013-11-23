@@ -1,0 +1,10 @@
+{
+  final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(baseEntitlement.getAccountId(),callContext);
+  final EventsStream eventsStream=Iterables.<EventsStream>find(eventsStreamBuilder.buildForAccount(context),new Predicate<EventsStream>(){
+    @Override public boolean apply(    final EventsStream input){
+      return input.getSubscription().getId().equals(baseEntitlement.getId());
+    }
+  }
+);
+  return eventsStream.computeAddonsBlockingStatesForNextSubscriptionBaseEvent(effectiveDate);
+}
