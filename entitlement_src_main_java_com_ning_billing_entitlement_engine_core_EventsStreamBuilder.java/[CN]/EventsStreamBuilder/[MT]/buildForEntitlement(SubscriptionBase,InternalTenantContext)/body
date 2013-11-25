@@ -1,0 +1,11 @@
+{
+  final SubscriptionBaseBundle bundle;
+  try {
+    bundle=subscriptionInternalApi.getBundleFromId(subscription.getBundleId(),internalTenantContext);
+  }
+ catch (  SubscriptionBaseApiException e) {
+    throw new EntitlementApiException(e);
+  }
+  final List<SubscriptionBase> allSubscriptionsForBundle=subscriptionInternalApi.getSubscriptionsForBundle(subscription.getBundleId(),internalTenantContext);
+  return buildForEntitlement(bundle,subscription,subscription,allSubscriptionsForBundle,internalTenantContext);
+}
