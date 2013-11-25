@@ -1,0 +1,21 @@
+{
+  final AccountEntitlements accountEntitlements;
+  try {
+    accountEntitlements=entitlementInternalApi.getAllEntitlementsForAccountId(accountId,tenantContext);
+  }
+ catch (  EntitlementApiException e) {
+    throw new SubscriptionApiException(e);
+  }
+  final Map<UUID,List<Subscription>> subscriptionsPerBundle=buildSubscriptionsFromEntitlements(accountEntitlements);
+  final DateTimeZone accountTimeZone=accountEntitlements.getAccount().getTimeZone();
+  final List<SubscriptionBundle> bundles=new LinkedList<SubscriptionBundle>();
+  for (  final UUID bundleId : subscriptionsPerBundle.keySet()) {
+    final List<Subscription> subscriptionsForBundle=subscriptionsPerBundle.get(bundleId);
+    final String externalKey=subscriptionsForBundle.get(0).getExternalKey();
+    final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,accountEntitlements.getEntitlements().get(bundleId));
+    final SubscriptionBaseBundle baseBundle=accountEntitlements.getBundles().get(bundleId);
+    final SubscriptionBundle subscriptionBundle=new DefaultSubscriptionBundle(bundleId,accountId,externalKey,subscriptionsForBundle,timeline,baseBundle.getOriginalCreatedDate(),baseBundle.getCreatedDate(),baseBundle.getUpdatedDate());
+    bundles.add(subscriptionBundle);
+  }
+  return bundles;
+}

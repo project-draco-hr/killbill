@@ -1,0 +1,15 @@
+{
+  final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(accountId,tenantContext);
+  final AccountEventsStreams accountEventsStreams=eventsStreamBuilder.buildForAccount(context);
+  final Map<UUID,Collection<Entitlement>> entitlementsPerBundle=new HashMap<UUID,Collection<Entitlement>>();
+  for (  final UUID bundleId : accountEventsStreams.getEventsStreams().keySet()) {
+    if (entitlementsPerBundle.get(bundleId) == null) {
+      entitlementsPerBundle.put(bundleId,new LinkedList<Entitlement>());
+    }
+    for (    final EventsStream eventsStream : accountEventsStreams.getEventsStreams().get(bundleId)) {
+      final Entitlement entitlement=new DefaultEntitlement(eventsStream,eventsStreamBuilder,entitlementApi,blockingStateDao,subscriptionInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,internalCallContextFactory);
+      entitlementsPerBundle.get(bundleId).add(entitlement);
+    }
+  }
+  return new DefaultAccountEntitlements(accountEventsStreams,entitlementsPerBundle);
+}

@@ -2,16 +2,9 @@
   final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(context);
   try {
     final SubscriptionBaseBundle baseBundle=subscriptionInternalApi.getActiveBundleForKey(externalKey,internalContext);
-    final List<Entitlement> allEntitlementsForBundle=entitlementApi.getAllEntitlementsForBundle(baseBundle.getId(),context);
-    return getSubscriptionBundleFromEntitlements(baseBundle.getId(),allEntitlementsForBundle,context);
+    return getSubscriptionBundle(baseBundle.getId(),context);
   }
  catch (  SubscriptionBaseApiException e) {
-    throw new SubscriptionApiException(e);
-  }
-catch (  EntitlementApiException e) {
-    throw new SubscriptionApiException(e);
-  }
-catch (  AccountApiException e) {
     throw new SubscriptionApiException(e);
   }
 }

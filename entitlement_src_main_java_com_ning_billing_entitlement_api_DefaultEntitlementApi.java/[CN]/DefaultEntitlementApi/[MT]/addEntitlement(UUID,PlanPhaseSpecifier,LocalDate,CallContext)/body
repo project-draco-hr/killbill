@@ -3,8 +3,8 @@
   if (!eventsStreamForBaseSubscription.isEntitlementActive()) {
     throw new EntitlementApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,bundleId);
   }
-  if (eventsStreamForBaseSubscription.getCurrentBlockingAggregator().isBlockChange()) {
-    throw new EntitlementApiException(new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,BlockingChecker.ACTION_CHANGE,BlockingChecker.TYPE_SUBSCRIPTION,eventsStreamForBaseSubscription.getSubscription().getId().toString()));
+  if (eventsStreamForBaseSubscription.isBlockChange()) {
+    throw new EntitlementApiException(new BlockingApiException(ErrorCode.BLOCK_BLOCKED_ACTION,BlockingChecker.ACTION_CHANGE,BlockingChecker.TYPE_SUBSCRIPTION,eventsStreamForBaseSubscription.getEntitlementId().toString()));
   }
   final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(effectiveDate,eventsStreamForBaseSubscription.getSubscription().getStartDate(),eventsStreamForBaseSubscription.getInternalTenantContext());
   try {
