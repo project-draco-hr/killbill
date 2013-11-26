@@ -6,27 +6,33 @@
     throw new InvalidDateSequenceException();
   }
   final List<RecurringInvoiceItemData> results=new ArrayList<RecurringInvoiceItemData>();
-  final BillingIntervalDetail billingIntervalDetail=new BillingIntervalDetail(startDate,endDate,targetDate,billingCycleDayLocal,billingPeriod);
+  final LocalDate firstBillingCycleDate=calculateBillingCycleDateOnOrAfter(startDate,billingCycleDayLocal);
   if (endDate != null && endDate.equals(startDate)) {
     return results;
   }
-  if (endDate != null && !endDate.isAfter(billingIntervalDetail.getFirstBillingCycleDate())) {
+  if (endDate != null && !endDate.isAfter(firstBillingCycleDate)) {
     final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,endDate,billingPeriod);
     final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(startDate,endDate,leadingProRationPeriods);
     results.add(itemData);
     return results;
   }
-  if (billingIntervalDetail.getFirstBillingCycleDate().isAfter(startDate)) {
-    final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,billingIntervalDetail.getFirstBillingCycleDate(),billingPeriod);
+  if (firstBillingCycleDate.isAfter(startDate)) {
+    final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,firstBillingCycleDate,billingPeriod);
     if (leadingProRationPeriods != null && leadingProRationPeriods.compareTo(BigDecimal.ZERO) > 0) {
-      final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(startDate,billingIntervalDetail.getFirstBillingCycleDate(),leadingProRationPeriods);
+      final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(startDate,firstBillingCycleDate,leadingProRationPeriods);
       log.info("Adding pro-ration: {}",itemData);
       results.add(itemData);
     }
   }
-  final LocalDate effectiveEndDate=billingIntervalDetail.getEffectiveEndDate();
-  final LocalDate lastBillingCycleDate=billingIntervalDetail.getLastBillingCycleDate();
-  final int numberOfWholeBillingPeriods=calculateNumberOfWholeBillingPeriods(billingIntervalDetail.getFirstBillingCycleDate(),lastBillingCycleDate,billingPeriod);
+  final LocalDate effectiveEndDate;
+  if (endDate != null) {
+    effectiveEndDate=calculateEffectiveEndDate(firstBillingCycleDate,targetDate,endDate,billingPeriod);
+  }
+ else {
+    effectiveEndDate=calculateEffectiveEndDate(firstBillingCycleDate,targetDate,billingPeriod);
+  }
+  final LocalDate lastBillingCycleDate=calculateLastBillingCycleDateBefore(effectiveEndDate,firstBillingCycleDate,billingCycleDayLocal,billingPeriod);
+  final int numberOfWholeBillingPeriods=calculateNumberOfWholeBillingPeriods(firstBillingCycleDate,lastBillingCycleDate,billingPeriod);
   final int numberOfMonthsPerBillingPeriod=billingPeriod.getNumberOfMonths();
   for (int i=0; i < numberOfWholeBillingPeriods; i++) {
     final LocalDate servicePeriodStartDate;
@@ -39,7 +45,7 @@
  else {
       throw new IllegalStateException("We should at least have one invoice item!");
     }
-    final LocalDate servicePeriodEndDate=billingIntervalDetail.getFirstBillingCycleDate().plusMonths((i + 1) * numberOfMonthsPerBillingPeriod);
+    final LocalDate servicePeriodEndDate=firstBillingCycleDate.plusMonths((i + 1) * numberOfMonthsPerBillingPeriod);
     results.add(new RecurringInvoiceItemData(servicePeriodStartDate,servicePeriodEndDate,BigDecimal.ONE));
   }
   if (effectiveEndDate.isAfter(lastBillingCycleDate)) {
