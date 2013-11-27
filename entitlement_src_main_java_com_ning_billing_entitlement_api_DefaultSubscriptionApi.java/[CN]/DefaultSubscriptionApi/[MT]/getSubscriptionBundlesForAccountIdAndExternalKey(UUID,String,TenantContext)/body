@@ -1,18 +1,8 @@
 {
-  try {
-    final List<Entitlement> entitlements=entitlementApi.getAllEntitlementsForAccountIdAndExternalKey(accountId,externalKey,context);
-    if (entitlements.isEmpty()) {
-      throw new SubscriptionApiException(ErrorCode.SUB_GET_INVALID_BUNDLE_KEY,externalKey);
+  return ImmutableList.<SubscriptionBundle>copyOf(Iterables.<SubscriptionBundle>filter(getSubscriptionBundlesForAccount(accountId,context),new Predicate<SubscriptionBundle>(){
+    @Override public boolean apply(    final SubscriptionBundle bundle){
+      return bundle.getExternalKey().equals(externalKey);
     }
-    return getSubscriptionBundles(entitlements,context);
   }
- catch (  EntitlementApiException e) {
-    throw new SubscriptionApiException(e);
-  }
-catch (  SubscriptionBaseApiException e) {
-    throw new SubscriptionApiException(e);
-  }
-catch (  AccountApiException e) {
-    throw new SubscriptionApiException(e);
-  }
+));
 }

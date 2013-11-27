@@ -1,11 +1,14 @@
 {
-  if (blockingStates == null) {
+  if (currentSubscriptionBlockingStatesForServices == null) {
     return null;
   }
-  for (  BlockingState cur : blockingStates) {
-    if (cur.getService().equals(serviceName)) {
-      return cur.getStateName();
+ else {
+    final BlockingState blockingState=Iterables.<BlockingState>tryFind(currentSubscriptionBlockingStatesForServices,new Predicate<BlockingState>(){
+      @Override public boolean apply(      final BlockingState input){
+        return serviceName.equals(input.getService());
+      }
     }
+).orNull();
+    return blockingState == null ? null : blockingState.getService();
   }
-  return null;
 }

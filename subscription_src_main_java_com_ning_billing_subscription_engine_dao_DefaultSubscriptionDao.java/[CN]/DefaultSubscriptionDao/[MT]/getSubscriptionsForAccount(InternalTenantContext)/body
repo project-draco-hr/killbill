@@ -1,8 +1,26 @@
 {
   final Map<UUID,List<SubscriptionBase>> subscriptionsFromAccountId=getSubscriptionsFromAccountId(context);
+  final List<SubscriptionBaseEvent> eventsForAccount=getEventsForAccountId(context);
   final Map<UUID,List<SubscriptionBase>> result=new HashMap<UUID,List<SubscriptionBase>>();
   for (  final UUID bundleId : subscriptionsFromAccountId.keySet()) {
-    result.put(bundleId,buildBundleSubscriptions(bundleId,subscriptionsFromAccountId.get(bundleId),context));
+    final List<SubscriptionBase> subscriptionsForBundle=subscriptionsFromAccountId.get(bundleId);
+    final Collection<UUID> subscriptionIdsForBundle=Collections2.transform(subscriptionsForBundle,new Function<SubscriptionBase,UUID>(){
+      @Override public UUID apply(      final SubscriptionBase input){
+        return input.getId();
+      }
+    }
+);
+    final Multimap<UUID,SubscriptionBaseEvent> eventsForSubscriptions=ArrayListMultimap.create();
+    for (    final SubscriptionBase cur : subscriptionsForBundle) {
+      final Collection<SubscriptionBaseEvent> events=Collections2.filter(eventsForAccount,new Predicate<SubscriptionBaseEvent>(){
+        @Override public boolean apply(        final SubscriptionBaseEvent input){
+          return input.getSubscriptionId().equals(cur.getId());
+        }
+      }
+);
+      eventsForSubscriptions.putAll(cur.getId(),ImmutableList.copyOf(events));
+    }
+    result.put(bundleId,buildBundleSubscriptions(subscriptionsForBundle,eventsForSubscriptions,context));
   }
   return result;
 }
