@@ -1,0 +1,16 @@
+{
+  final DisabledDuration lastOne;
+  if (!result.isEmpty()) {
+    lastOne=result.get(result.size() - 1);
+  }
+ else {
+    lastOne=null;
+  }
+  final DateTime endDate=firstNonBlocking == null ? null : firstNonBlocking.getEffectiveDate();
+  if (lastOne != null && lastOne.getEnd().compareTo(firstBlocking.getEffectiveDate()) == 0) {
+    lastOne.setEnd(endDate);
+  }
+ else {
+    result.add(new DisabledDuration(firstBlocking.getEffectiveDate(),endDate));
+  }
+}
