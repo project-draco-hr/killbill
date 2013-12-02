@@ -2,6 +2,7 @@
   sqlDao=dbi.onDemand(BlockingStateSqlDao.class);
   clock.setDay(initialDate);
   account=accountApi.createAccount(getAccountData(7),callContext);
+  internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   testListener.pushExpectedEvents(NextEvent.CREATE,NextEvent.CREATE);
   final PlanPhaseSpecifier baseSpec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   baseEntitlement=(DefaultEntitlement)entitlementApi.createBaseEntitlement(account.getId(),baseSpec,account.getExternalKey(),initialDate,callContext);
