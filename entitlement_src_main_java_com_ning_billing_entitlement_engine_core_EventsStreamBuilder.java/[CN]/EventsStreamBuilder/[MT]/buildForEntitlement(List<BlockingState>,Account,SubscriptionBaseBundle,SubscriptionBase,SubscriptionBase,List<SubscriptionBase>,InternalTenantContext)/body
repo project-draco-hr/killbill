@@ -1,0 +1,36 @@
+{
+  final Collection<BlockingState> accountBlockingStates=new LinkedList<BlockingState>();
+  final Map<UUID,List<BlockingState>> blockingStatesPerSubscription=new HashMap<UUID,List<BlockingState>>();
+  final Map<UUID,List<BlockingState>> blockingStatesPerBundle=new HashMap<UUID,List<BlockingState>>();
+  for (  final BlockingState blockingState : blockingStatesForAccount) {
+    if (BlockingStateType.SUBSCRIPTION.equals(blockingState.getType())) {
+      if (blockingStatesPerSubscription.get(blockingState.getBlockedId()) == null) {
+        blockingStatesPerSubscription.put(blockingState.getBlockedId(),new LinkedList<BlockingState>());
+      }
+      blockingStatesPerSubscription.get(blockingState.getBlockedId()).add(blockingState);
+    }
+ else     if (BlockingStateType.SUBSCRIPTION_BUNDLE.equals(blockingState.getType())) {
+      if (blockingStatesPerBundle.get(blockingState.getBlockedId()) == null) {
+        blockingStatesPerBundle.put(blockingState.getBlockedId(),new LinkedList<BlockingState>());
+      }
+      blockingStatesPerBundle.get(blockingState.getBlockedId()).add(blockingState);
+    }
+ else     if (BlockingStateType.ACCOUNT.equals(blockingState.getType()) && account.getId().equals(blockingState.getBlockedId())) {
+      accountBlockingStates.add(blockingState);
+    }
+  }
+  final List<BlockingState> bundleBlockingStates=Objects.firstNonNull(blockingStatesPerBundle.get(subscription.getBundleId()),ImmutableList.<BlockingState>of());
+  final List<BlockingState> subscriptionBlockingStatesOnDisk=Objects.firstNonNull(blockingStatesPerSubscription.get(subscription.getId()),ImmutableList.<BlockingState>of());
+  final Collection<BlockingState> subscriptionBlockingStates;
+  if (baseSubscription == null || subscription.getId().equals(baseSubscription.getId())) {
+    subscriptionBlockingStates=subscriptionBlockingStatesOnDisk;
+  }
+ else {
+    subscriptionBlockingStates=blockingStateDao.getBlockingHistory(ImmutableList.<BlockingState>copyOf(subscriptionBlockingStatesOnDisk),blockingStatesForAccount,account,bundle,baseSubscription,subscription,allSubscriptionsForBundle,internalTenantContext);
+  }
+  final Collection<BlockingState> blockingStateSet=new LinkedHashSet<BlockingState>(accountBlockingStates);
+  blockingStateSet.addAll(bundleBlockingStates);
+  blockingStateSet.addAll(subscriptionBlockingStates);
+  final List<BlockingState> blockingStates=BLOCKING_STATE_ORDERING.immutableSortedCopy(blockingStateSet);
+  return buildForEntitlement(account,bundle,baseSubscription,subscription,allSubscriptionsForBundle,blockingStates,internalTenantContext);
+}
