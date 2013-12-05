@@ -21,11 +21,11 @@
   final List<Entitlement> entitlements=new ArrayList<Entitlement>();
   final Entitlement entitlement=createEntitlement(entitlementId,allTransitions);
   entitlements.add(entitlement);
-  final DefaultSubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlements,Collections.<BlockingState>emptyList());
+  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlements,Collections.<BlockingState>emptyList());
   assertEquals(timeline.getAccountId(),accountId);
   assertEquals(timeline.getBundleId(),bundleId);
   assertEquals(timeline.getExternalKey(),externalKey);
-  List<SubscriptionEvent> events=timeline.getSubscriptionEvents();
+  final List<SubscriptionEvent> events=timeline.getSubscriptionEvents();
   assertEquals(events.size(),4);
   assertEquals(events.get(0).getEffectiveDate().compareTo(new LocalDate(tr1.getEffectiveTransitionTime(),accountTimeZone)),0);
   assertEquals(events.get(1).getEffectiveDate().compareTo(new LocalDate(tr1.getEffectiveTransitionTime(),accountTimeZone)),0);
