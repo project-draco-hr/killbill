@@ -35,8 +35,12 @@
   assertEquals(events.get(1).getSubscriptionEventType(),SubscriptionEventType.START_BILLING);
   assertEquals(events.get(2).getSubscriptionEventType(),SubscriptionEventType.PHASE);
   assertEquals(events.get(3).getSubscriptionEventType(),SubscriptionEventType.STOP_BILLING);
+  assertNull(events.get(0).getPrevPhase());
   assertEquals(events.get(0).getNextPhase().getName(),"trial");
+  assertNull(events.get(1).getPrevPhase());
   assertEquals(events.get(1).getNextPhase().getName(),"trial");
+  assertEquals(events.get(2).getPrevPhase().getName(),"trial");
   assertEquals(events.get(2).getNextPhase().getName(),"phase");
-  assertEquals(events.get(3).getNextPhase(),null);
+  assertEquals(events.get(3).getPrevPhase().getName(),"phase");
+  assertNull(events.get(3).getNextPhase());
 }

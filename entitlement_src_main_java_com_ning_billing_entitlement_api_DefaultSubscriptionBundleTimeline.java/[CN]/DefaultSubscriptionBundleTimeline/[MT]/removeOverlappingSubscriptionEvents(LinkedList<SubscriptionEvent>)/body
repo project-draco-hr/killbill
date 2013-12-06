@@ -1,0 +1,19 @@
+{
+  final Iterator<SubscriptionEvent> iterator=events.iterator();
+  final Map<String,DefaultSubscriptionEvent> prevPerService=new HashMap<String,DefaultSubscriptionEvent>();
+  while (iterator.hasNext()) {
+    final DefaultSubscriptionEvent current=(DefaultSubscriptionEvent)iterator.next();
+    final DefaultSubscriptionEvent prev=prevPerService.get(current.getServiceName());
+    if (prev != null) {
+      if (current.overlaps(prev)) {
+        iterator.remove();
+      }
+ else {
+        prevPerService.put(current.getServiceName(),current);
+      }
+    }
+ else {
+      prevPerService.put(current.getServiceName(),current);
+    }
+  }
+}
