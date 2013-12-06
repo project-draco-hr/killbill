@@ -16,8 +16,10 @@
           break;
         }
         if (eventOrder == 0) {
-          logger.warn(TIMELINE_WARN_LOG + "Detected identical events type = " + event.getSubscriptionEventType()+ " ids = "+ event.getId()+ ", "+ cur.getId()+ " for subscription "+ cur.getEntitlementId());
-          break;
+          final int compCreatedDate=(((DefaultSubscriptionEvent)event).getCreatedDate()).compareTo(((DefaultSubscriptionEvent)cur).getCreatedDate());
+          if (compCreatedDate <= 0) {
+            break;
+          }
         }
       }
     }
