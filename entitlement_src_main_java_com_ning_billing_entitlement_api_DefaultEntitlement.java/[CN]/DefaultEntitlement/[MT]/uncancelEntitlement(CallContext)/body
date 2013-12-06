@@ -1,11 +1,21 @@
 {
   refresh(callContext);
-  if (eventsStream.isEntitlementCancelled() || eventsStream.isSubscriptionCancelled()) {
+  if (eventsStream.isSubscriptionCancelled()) {
     throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
   }
   final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(getAccountId(),callContext);
-  for (  final BlockingState futureCancellation : eventsStream.getPendingEntitlementCancellationEvents()) {
-    blockingStateDao.unactiveBlockingState(futureCancellation.getId(),contextWithValidAccountRecordId);
+  final Collection<BlockingState> pendingEntitlementCancellationEvents=eventsStream.getPendingEntitlementCancellationEvents();
+  if (eventsStream.isEntitlementCancelled()) {
+    final BlockingState cancellationEvent=eventsStream.getEntitlementCancellationEvent();
+    blockingStateDao.unactiveBlockingState(cancellationEvent.getId(),contextWithValidAccountRecordId);
+  }
+ else   if (pendingEntitlementCancellationEvents.size() > 0) {
+    for (    final BlockingState futureCancellation : pendingEntitlementCancellationEvents) {
+      blockingStateDao.unactiveBlockingState(futureCancellation.getId(),contextWithValidAccountRecordId);
+    }
+  }
+ else {
+    throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
   }
   if (getSubscriptionBase().getFutureEndDate() != null) {
     try {

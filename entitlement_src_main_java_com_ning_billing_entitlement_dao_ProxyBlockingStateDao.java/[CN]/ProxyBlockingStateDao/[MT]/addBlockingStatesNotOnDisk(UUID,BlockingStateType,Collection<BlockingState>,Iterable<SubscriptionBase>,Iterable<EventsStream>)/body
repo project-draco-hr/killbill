@@ -1,5 +1,4 @@
 {
-  final BlockingState cancellationBlockingStateOnDisk=findEntitlementCancellationBlockingState(blockableId,blockingStatesOnDiskCopy);
   final DateTime now=clock.getUTCNow();
   for (  final SubscriptionBase baseSubscription : baseSubscriptionsToConsider) {
     final EventsStream eventsStream=Iterables.<EventsStream>find(eventsStreams,new Predicate<EventsStream>(){
@@ -10,7 +9,12 @@
 );
     final Collection<BlockingState> blockingStatesNotOnDisk=eventsStream.computeAddonsBlockingStatesForFutureSubscriptionBaseEvents();
     for (    final BlockingState blockingState : blockingStatesNotOnDisk) {
-      final boolean overrideCancellationBlockingStateOnDisk=cancellationBlockingStateOnDisk != null && isEntitlementCancellationBlockingState(blockingState) && blockingState.getEffectiveDate().isBefore(cancellationBlockingStateOnDisk.getEffectiveDate());
+      BlockingState cancellationBlockingStateOnDisk=null;
+      boolean overrideCancellationBlockingStateOnDisk=false;
+      if (isEntitlementCancellationBlockingState(blockingState)) {
+        cancellationBlockingStateOnDisk=findEntitlementCancellationBlockingState(blockingState.getBlockedId(),blockingStatesOnDiskCopy);
+        overrideCancellationBlockingStateOnDisk=cancellationBlockingStateOnDisk != null && blockingState.getEffectiveDate().isBefore(cancellationBlockingStateOnDisk.getEffectiveDate());
+      }
       if ((blockingStateType == null || (BlockingStateType.SUBSCRIPTION.equals(blockingStateType) && blockingState.getBlockedId().equals(blockableId))) && (cancellationBlockingStateOnDisk == null || overrideCancellationBlockingStateOnDisk)) {
         final BlockingStateModelDao blockingStateModelDao=new BlockingStateModelDao(blockingState,now,now);
         blockingStatesOnDiskCopy.add(BlockingStateModelDao.toBlockingState(blockingStateModelDao));
@@ -20,5 +24,5 @@
       }
     }
   }
-  return BLOCKING_STATE_ORDERING.immutableSortedCopy(blockingStatesOnDiskCopy);
+  return sortedCopy(blockingStatesOnDiskCopy);
 }

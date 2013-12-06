@@ -1,0 +1,39 @@
+{
+  final BlockingState prev;
+  if (prevBlocked && currentBlocked && nextBlocked) {
+    return null;
+  }
+ else   if (prevBlocked && currentBlocked && !nextBlocked) {
+    result.add(next);
+    result.add(current);
+    prev=current;
+  }
+ else   if (prevBlocked && !currentBlocked && nextBlocked) {
+    result.add(current);
+    result.add(next);
+    prev=next;
+  }
+ else   if (prevBlocked && !currentBlocked && !nextBlocked) {
+    return null;
+  }
+ else   if (!prevBlocked && currentBlocked && nextBlocked) {
+    return null;
+  }
+ else   if (!prevBlocked && currentBlocked && !nextBlocked) {
+    result.add(current);
+    result.add(next);
+    prev=next;
+  }
+ else   if (!prevBlocked && !currentBlocked && nextBlocked) {
+    result.add(next);
+    result.add(current);
+    prev=current;
+  }
+ else   if (!prevBlocked && !currentBlocked && !nextBlocked) {
+    return null;
+  }
+ else {
+    throw new ShouldntHappenException("Marker exception for code clarity");
+  }
+  return prev;
+}
