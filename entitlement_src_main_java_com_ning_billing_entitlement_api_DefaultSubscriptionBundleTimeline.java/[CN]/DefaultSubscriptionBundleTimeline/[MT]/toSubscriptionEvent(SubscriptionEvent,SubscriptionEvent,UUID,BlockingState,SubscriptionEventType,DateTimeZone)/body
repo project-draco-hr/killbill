@@ -53,5 +53,12 @@
     nextPriceList=next.getNextPriceList();
     nextBillingPeriod=next.getNextBillingPeriod();
   }
-  return new DefaultSubscriptionEvent(in.getId(),entitlementId,in.getEffectiveDate(),in.getCreatedDate(),eventType,in.isBlockEntitlement(),in.isBlockBilling(),in.getService(),in.getStateName(),prevProduct,prevPlan,prevPlanPhase,prevPriceList,prevBillingPeriod,nextProduct,nextPlan,nextPlanPhase,nextPriceList,nextBillingPeriod,in.getCreatedDate(),accountTimeZone);
+  final String serviceName;
+  if (DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME.equals(in.getService())) {
+    serviceName=getServiceName(eventType);
+  }
+ else {
+    serviceName=in.getService();
+  }
+  return new DefaultSubscriptionEvent(in.getId(),entitlementId,in.getEffectiveDate(),in.getCreatedDate(),eventType,in.isBlockEntitlement(),in.isBlockBilling(),serviceName,in.getStateName(),prevProduct,prevPlan,prevPlanPhase,prevPriceList,prevBillingPeriod,nextProduct,nextPlan,nextPlanPhase,nextPriceList,nextBillingPeriod,in.getCreatedDate(),accountTimeZone);
 }
