@@ -7,7 +7,13 @@
     return result;
   }
   final BlockingAggregator stateBefore=getState();
-  perServiceBlockingState.put(fixedBlockingState.getService(),fixedBlockingState);
+  if (DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME.equals(fixedBlockingState.getService())) {
+    perServiceBlockingState.put(DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME,fixedBlockingState);
+    perServiceBlockingState.put(DefaultSubscriptionBundleTimeline.BILLING_SERVICE_NAME,fixedBlockingState);
+  }
+ else {
+    perServiceBlockingState.put(fixedBlockingState.getService(),fixedBlockingState);
+  }
   final BlockingAggregator stateAfter=getState();
   final boolean shouldResumeEntitlement=isEntitlementStarted && !isEntitlementStopped && stateBefore.isBlockEntitlement()&& !stateAfter.isBlockEntitlement();
   if (shouldResumeEntitlement) {

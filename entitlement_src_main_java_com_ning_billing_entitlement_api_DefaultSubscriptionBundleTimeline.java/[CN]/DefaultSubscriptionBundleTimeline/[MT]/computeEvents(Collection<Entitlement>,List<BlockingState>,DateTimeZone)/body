@@ -36,16 +36,16 @@
       if (createdDateComp != 0) {
         return createdDateComp;
       }
-      logger.warn(TIMELINE_WARN_LOG + "Detected two identical blockingStates events for blockableId = " + o1.getBlockedId()+ ", type = "+ o1.getType()+ ", ");
       return 0;
     }
   }
 );
-  for (  BlockingState bs : allBlockingStates) {
+  for (  final BlockingState bs : allBlockingStates) {
     final List<SubscriptionEvent> newEvents=new ArrayList<SubscriptionEvent>();
-    int index=insertFromBlockingEvent(accountTimeZone,allEntitlementUUIDs,result,bs,bs.getEffectiveDate(),newEvents);
+    final int index=insertFromBlockingEvent(accountTimeZone,allEntitlementUUIDs,result,bs,bs.getEffectiveDate(),newEvents);
     insertAfterIndex(result,newEvents,index);
   }
   reOrderSubscriptionEventsOnSameDateByType(result);
+  removeOverlappingSubscriptionEvents(result);
   return result;
 }
