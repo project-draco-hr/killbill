@@ -1,0 +1,14 @@
+{
+  final Collection<SubscriptionEventModelDao> filteredModels=Collections2.filter(models,new Predicate<SubscriptionEventModelDao>(){
+    @Override public boolean apply(    @Nullable final SubscriptionEventModelDao input){
+      return input.getUserType() != ApiEventType.UNCANCEL;
+    }
+  }
+);
+  return new ArrayList<SubscriptionBaseEvent>(Collections2.transform(filteredModels,new Function<SubscriptionEventModelDao,SubscriptionBaseEvent>(){
+    @Override public SubscriptionBaseEvent apply(    @Nullable final SubscriptionEventModelDao input){
+      return SubscriptionEventModelDao.toSubscriptionEvent(input);
+    }
+  }
+));
+}

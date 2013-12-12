@@ -1,0 +1,9 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<SubscriptionBaseEvent>>(){
+    @Override public List<SubscriptionBaseEvent> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final List<SubscriptionEventModelDao> models=entitySqlDaoWrapperFactory.become(SubscriptionEventSqlDao.class).getByAccountRecordId(context);
+      return filterSubscriptionBaseEvents(models);
+    }
+  }
+);
+}

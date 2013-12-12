@@ -1,18 +1,16 @@
 {
-  try {
-    final List<Entitlement> entitlements=entitlementApi.getAllEntitlementsForBundle(bundleId,context);
-    if (entitlements.isEmpty()) {
-      throw new SubscriptionApiException(ErrorCode.SUB_GET_INVALID_BUNDLE_ID,bundleId);
+  final Long accountRecordId=nonEntityDao.retrieveAccountRecordIdFromObject(bundleId,ObjectType.BUNDLE,cacheControllerDispatcher.getCacheController(CacheType.ACCOUNT_RECORD_ID));
+  final UUID accountId=nonEntityDao.retrieveIdFromObject(accountRecordId,ObjectType.ACCOUNT);
+  final Optional<SubscriptionBundle> bundleOptional=Iterables.<SubscriptionBundle>tryFind(getSubscriptionBundlesForAccount(accountId,context),new Predicate<SubscriptionBundle>(){
+    @Override public boolean apply(    final SubscriptionBundle bundle){
+      return bundle.getId().equals(bundleId);
     }
-    return getSubscriptionBundleFromEntitlements(bundleId,entitlements,context);
   }
- catch (  EntitlementApiException e) {
-    throw new SubscriptionApiException(e);
+);
+  if (!bundleOptional.isPresent()) {
+    throw new SubscriptionApiException(ErrorCode.SUB_GET_INVALID_BUNDLE_ID,bundleId);
   }
-catch (  SubscriptionBaseApiException e) {
-    throw new SubscriptionApiException(e);
-  }
-catch (  AccountApiException e) {
-    throw new SubscriptionApiException(e);
+ else {
+    return bundleOptional.get();
   }
 }

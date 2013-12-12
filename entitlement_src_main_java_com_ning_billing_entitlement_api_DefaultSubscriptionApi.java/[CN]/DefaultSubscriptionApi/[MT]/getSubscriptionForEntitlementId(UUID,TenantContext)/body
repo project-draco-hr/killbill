@@ -1,10 +1,18 @@
 {
+  final Long accountRecordId=nonEntityDao.retrieveAccountRecordIdFromObject(entitlementId,ObjectType.SUBSCRIPTION,cacheControllerDispatcher.getCacheController(CacheType.ACCOUNT_RECORD_ID));
+  final UUID accountId=nonEntityDao.retrieveIdFromObject(accountRecordId,ObjectType.ACCOUNT);
+  final AccountEntitlements accountEntitlements;
   try {
-    final Entitlement entitlement=entitlementApi.getEntitlementForId(entitlementId,context);
-    final InternalTenantContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalTenantContext(entitlement.getAccountId(),context);
-    return fromEntitlement(entitlement,contextWithValidAccountRecordId);
+    accountEntitlements=entitlementInternalApi.getAllEntitlementsForAccountId(accountId,context);
   }
  catch (  EntitlementApiException e) {
     throw new SubscriptionApiException(e);
   }
+  final Iterable<Subscription> accountSubscriptions=Iterables.<Subscription>concat(buildSubscriptionsFromEntitlements(accountEntitlements).values());
+  return Iterables.<Subscription>find(accountSubscriptions,new Predicate<Subscription>(){
+    @Override public boolean apply(    final Subscription subscription){
+      return subscription.getId().equals(entitlementId);
+    }
+  }
+);
 }

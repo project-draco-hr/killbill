@@ -1,0 +1,27 @@
+{
+  final List<DisabledDuration> result=new ArrayList<BlockingCalculator.DisabledDuration>();
+  BlockingState first=null;
+  int blockedNesting=0;
+  BlockingState lastOne=null;
+  for (  final BlockingState e : overdueBundleEvents) {
+    lastOne=e;
+    if (e.isBlockBilling() && blockedNesting == 0) {
+      first=e;
+      blockedNesting++;
+    }
+ else     if (e.isBlockBilling() && blockedNesting > 0) {
+      blockedNesting++;
+    }
+ else     if (!e.isBlockBilling() && blockedNesting > 0) {
+      blockedNesting--;
+      if (blockedNesting == 0) {
+        addDisabledDuration(result,first,e);
+        first=null;
+      }
+    }
+  }
+  if (first != null) {
+    addDisabledDuration(result,first,lastOne.isBlockBilling() ? null : lastOne);
+  }
+  return result;
+}

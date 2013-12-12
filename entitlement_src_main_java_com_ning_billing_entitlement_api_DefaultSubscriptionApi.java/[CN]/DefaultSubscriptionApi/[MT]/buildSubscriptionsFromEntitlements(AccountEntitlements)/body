@@ -1,0 +1,17 @@
+{
+  final Map<UUID,List<Subscription>> subscriptionsPerBundle=new HashMap<UUID,List<Subscription>>();
+  for (  final UUID bundleId : accountEntitlements.getEntitlements().keySet()) {
+    if (subscriptionsPerBundle.get(bundleId) == null) {
+      subscriptionsPerBundle.put(bundleId,new LinkedList<Subscription>());
+    }
+    for (    final Entitlement entitlement : accountEntitlements.getEntitlements().get(bundleId)) {
+      if (entitlement instanceof DefaultEntitlement) {
+        subscriptionsPerBundle.get(bundleId).add(new DefaultSubscription((DefaultEntitlement)entitlement));
+      }
+ else {
+        throw new ShouldntHappenException("Entitlement should be a DefaultEntitlement instance");
+      }
+    }
+  }
+  return subscriptionsPerBundle;
+}

@@ -1,0 +1,10 @@
+{
+  final Collection<BlockingState> blockingStates=new HashSet<BlockingState>();
+  for (  final Entitlement entitlement : entitlements) {
+    blockingStates.addAll(((DefaultEntitlement)entitlement).getEventsStream().getBlockingStates());
+  }
+  this.accountId=accountId;
+  this.bundleId=bundleId;
+  this.externalKey=externalKey;
+  this.events=computeEvents(entitlements,new LinkedList<BlockingState>(blockingStates),accountTimeZone);
+}

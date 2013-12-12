@@ -1,4 +1,16 @@
 {
-  final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(tenantContext);
-  return getAllEntitlementsForBundle(subscriptionInternalApi.getSubscriptionsForBundle(bundleId,context),tenantContext);
+  final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(tenantContext);
+  final UUID accountId;
+  try {
+    accountId=subscriptionInternalApi.getBundleFromId(bundleId,internalContext).getAccountId();
+  }
+ catch (  SubscriptionBaseApiException e) {
+    throw new EntitlementApiException(e);
+  }
+  return ImmutableList.<Entitlement>copyOf(Iterables.<Entitlement>filter(getAllEntitlementsForAccountId(accountId,tenantContext),new Predicate<Entitlement>(){
+    @Override public boolean apply(    final Entitlement input){
+      return bundleId.equals(input.getBundleId());
+    }
+  }
+));
 }

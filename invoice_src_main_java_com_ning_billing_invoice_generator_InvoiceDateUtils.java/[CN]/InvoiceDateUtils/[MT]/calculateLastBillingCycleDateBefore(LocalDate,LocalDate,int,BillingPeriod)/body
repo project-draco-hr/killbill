@@ -1,0 +1,24 @@
+{
+  LocalDate proposedDate=previousBillCycleDate;
+  int numberOfPeriods=0;
+  while (!proposedDate.isAfter(date)) {
+    proposedDate=previousBillCycleDate.plusMonths(numberOfPeriods * billingPeriod.getNumberOfMonths());
+    numberOfPeriods+=1;
+  }
+  proposedDate=proposedDate.plusMonths(-billingPeriod.getNumberOfMonths());
+  if (proposedDate.dayOfMonth().get() < billingCycleDay) {
+    final int lastDayOfTheMonth=proposedDate.dayOfMonth().getMaximumValue();
+    if (lastDayOfTheMonth < billingCycleDay) {
+      proposedDate=new LocalDate(proposedDate.getYear(),proposedDate.getMonthOfYear(),lastDayOfTheMonth);
+    }
+ else {
+      proposedDate=new LocalDate(proposedDate.getYear(),proposedDate.getMonthOfYear(),billingCycleDay);
+    }
+  }
+  if (proposedDate.isBefore(previousBillCycleDate)) {
+    return previousBillCycleDate;
+  }
+ else {
+    return proposedDate;
+  }
+}

@@ -1,0 +1,20 @@
+{
+  final Collection<BlockingState> blockingStatesOnDiskCopy=new LinkedList<BlockingState>(blockingStatesOnDisk);
+  final Iterable<SubscriptionBase> baseSubscriptionsToConsider;
+  final Iterable<EventsStream> eventsStreams;
+  try {
+    final Map<UUID,List<SubscriptionBase>> subscriptions=subscriptionInternalApi.getSubscriptionsForAccount(context);
+    baseSubscriptionsToConsider=Iterables.<SubscriptionBase>filter(Iterables.<SubscriptionBase>concat(subscriptions.values()),new Predicate<SubscriptionBase>(){
+      @Override public boolean apply(      final SubscriptionBase input){
+        return ProductCategory.BASE.equals(input.getCategory());
+      }
+    }
+);
+    eventsStreams=Iterables.<EventsStream>concat(eventsStreamBuilder.buildForAccount(subscriptions,context).getEventsStreams().values());
+  }
+ catch (  EntitlementApiException e) {
+    log.error("Error computing blocking states for addons for account record id " + context.getAccountRecordId(),e);
+    throw new RuntimeException(e);
+  }
+  return addBlockingStatesNotOnDisk(null,null,blockingStatesOnDiskCopy,baseSubscriptionsToConsider,eventsStreams);
+}

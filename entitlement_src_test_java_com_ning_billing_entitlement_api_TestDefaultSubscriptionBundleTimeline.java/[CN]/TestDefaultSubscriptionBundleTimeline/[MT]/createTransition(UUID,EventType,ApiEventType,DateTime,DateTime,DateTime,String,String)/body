@@ -1,19 +1,45 @@
 {
-  final PlanPhase prevPhase=prevPhaseName != null ? Mockito.mock(PlanPhase.class) : null;
-  if (prevPhase != null) {
+  final PlanPhase prevPhase;
+  final Plan prevPlan;
+  final Product prevProduct;
+  final PriceList prevPriceList;
+  if (prevPhaseName == null) {
+    prevPhase=null;
+    prevPlan=null;
+    prevProduct=null;
+    prevPriceList=null;
+  }
+ else {
+    prevPhase=Mockito.mock(PlanPhase.class);
     Mockito.when(prevPhase.getName()).thenReturn(prevPhaseName);
+    prevProduct=Mockito.mock(Product.class);
+    Mockito.when(prevProduct.getName()).thenReturn("product");
+    prevPlan=Mockito.mock(Plan.class);
+    Mockito.when(prevPlan.getName()).thenReturn("plan");
+    Mockito.when(prevPlan.getProduct()).thenReturn(prevProduct);
+    prevPriceList=Mockito.mock(PriceList.class);
+    Mockito.when(prevPriceList.getName()).thenReturn("pricelist");
   }
-  final PlanPhase nextPhase=nextPhaseName != null ? Mockito.mock(PlanPhase.class) : null;
-  if (nextPhase != null) {
+  final PlanPhase nextPhase;
+  final Plan nextPlan;
+  final Product nextProduct;
+  final PriceList nextPriceList;
+  if (nextPhaseName == null) {
+    nextPhase=null;
+    nextPlan=null;
+    nextProduct=null;
+    nextPriceList=null;
+  }
+ else {
+    nextPhase=Mockito.mock(PlanPhase.class);
     Mockito.when(nextPhase.getName()).thenReturn(nextPhaseName);
+    nextProduct=Mockito.mock(Product.class);
+    Mockito.when(nextProduct.getName()).thenReturn("product");
+    nextPlan=Mockito.mock(Plan.class);
+    Mockito.when(nextPlan.getName()).thenReturn("plan");
+    Mockito.when(nextPlan.getProduct()).thenReturn(nextProduct);
+    nextPriceList=Mockito.mock(PriceList.class);
+    Mockito.when(nextPriceList.getName()).thenReturn("pricelist");
   }
-  final Plan plan=Mockito.mock(Plan.class);
-  Mockito.when(plan.getName()).thenReturn("plan");
-  final Product product=Mockito.mock(Product.class);
-  Mockito.when(product.getName()).thenReturn("product");
-  final PriceList priceList=Mockito.mock(PriceList.class);
-  Mockito.when(priceList.getName()).thenReturn("pricelist");
-  final BillingPeriod billingPeriod=BillingPeriod.MONTHLY;
-  final SubscriptionBaseTransition transition=new SubscriptionBaseTransitionData(UUID.randomUUID(),entitlementId,bundleId,eventType,apiEventType,requestedDate,effectiveDate,null,null,null,plan,prevPhase,priceList,null,null,null,plan,nextPhase,priceList,1L,createdDate,UUID.randomUUID(),true);
-  return transition;
+  return new SubscriptionBaseTransitionData(UUID.randomUUID(),entitlementId,bundleId,eventType,apiEventType,requestedDate,effectiveDate,null,null,null,prevPlan,prevPhase,prevPriceList,null,null,null,nextPlan,nextPhase,nextPriceList,1L,createdDate,UUID.randomUUID(),true);
 }

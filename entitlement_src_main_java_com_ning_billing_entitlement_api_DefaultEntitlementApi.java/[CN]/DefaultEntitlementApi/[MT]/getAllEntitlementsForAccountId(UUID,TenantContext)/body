@@ -1,10 +1,12 @@
 {
+  final EntitlementApi entitlementApi=this;
   final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(accountId,tenantContext);
-  final Map<UUID,List<SubscriptionBase>> subscriptionsPerBundle=subscriptionInternalApi.getSubscriptionsForAccount(context);
-  final List<Entitlement> result=new LinkedList<Entitlement>();
-  for (  final UUID bundleId : subscriptionsPerBundle.keySet()) {
-    final List<Entitlement> entitlements=getAllEntitlementsForBundle(subscriptionsPerBundle.get(bundleId),tenantContext);
-    result.addAll(entitlements);
+  final AccountEventsStreams accountEventsStreams=eventsStreamBuilder.buildForAccount(context);
+  final List<EventsStream> eventsStreams=ImmutableList.<EventsStream>copyOf(Iterables.<EventsStream>concat(accountEventsStreams.getEventsStreams().values()));
+  return Lists.<EventsStream,Entitlement>transform(eventsStreams,new Function<EventsStream,Entitlement>(){
+    @Override public Entitlement apply(    final EventsStream eventsStream){
+      return new DefaultEntitlement(eventsStream,eventsStreamBuilder,entitlementApi,blockingStateDao,subscriptionInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,internalCallContextFactory);
+    }
   }
-  return result;
+);
 }

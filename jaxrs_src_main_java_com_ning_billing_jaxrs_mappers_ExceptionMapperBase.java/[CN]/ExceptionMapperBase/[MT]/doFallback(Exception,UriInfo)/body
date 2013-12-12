@@ -1,0 +1,65 @@
+{
+  if (exception.getCause() == null || !(exception.getCause() instanceof BillingExceptionBase)) {
+    return buildBadRequestResponse(exception,uriInfo);
+  }
+  final BillingExceptionBase cause=(BillingExceptionBase)exception.getCause();
+  if (cause instanceof AccountApiException) {
+    final AccountApiExceptionMapper mapper=new AccountApiExceptionMapper(uriInfo);
+    return mapper.toResponse((AccountApiException)cause);
+  }
+ else   if (cause instanceof BlockingApiException) {
+    final BlockingApiExceptionMapper mapper=new BlockingApiExceptionMapper(uriInfo);
+    return mapper.toResponse((BlockingApiException)cause);
+  }
+ else   if (cause instanceof CatalogApiException) {
+    final CatalogApiExceptionMapper mapper=new CatalogApiExceptionMapper(uriInfo);
+    return mapper.toResponse((CatalogApiException)cause);
+  }
+ else   if (cause instanceof EmailApiException) {
+    final EmailApiExceptionMapper mapper=new EmailApiExceptionMapper(uriInfo);
+    return mapper.toResponse((EmailApiException)cause);
+  }
+ else   if (cause instanceof EntitlementApiException) {
+    final EntitlementApiExceptionMapper mapper=new EntitlementApiExceptionMapper(uriInfo);
+    return mapper.toResponse((EntitlementApiException)cause);
+  }
+ else   if (cause instanceof EntityPersistenceException) {
+    final EntityPersistenceExceptionMapper mapper=new EntityPersistenceExceptionMapper(uriInfo);
+    return mapper.toResponse((EntityPersistenceException)cause);
+  }
+ else   if (cause instanceof InvoiceApiException) {
+    final InvoiceApiExceptionMapper mapper=new InvoiceApiExceptionMapper(uriInfo);
+    return mapper.toResponse((InvoiceApiException)cause);
+  }
+ else   if (cause instanceof OverdueApiException) {
+    final OverdueApiExceptionMapper mapper=new OverdueApiExceptionMapper(uriInfo);
+    return mapper.toResponse((OverdueApiException)cause);
+  }
+ else   if (cause instanceof PaymentApiException) {
+    final PaymentApiExceptionMapper mapper=new PaymentApiExceptionMapper(uriInfo);
+    return mapper.toResponse((PaymentApiException)cause);
+  }
+ else   if (cause instanceof SubscriptionApiException) {
+    final SubscriptionApiExceptionMapper mapper=new SubscriptionApiExceptionMapper(uriInfo);
+    return mapper.toResponse((SubscriptionApiException)cause);
+  }
+ else   if (cause instanceof SubscriptionBillingApiException) {
+    final SubscriptionBillingApiExceptionMapper mapper=new SubscriptionBillingApiExceptionMapper(uriInfo);
+    return mapper.toResponse((SubscriptionBillingApiException)cause);
+  }
+ else   if (cause instanceof SubscriptionBaseRepairException) {
+    final SubscriptionRepairExceptionMapper mapper=new SubscriptionRepairExceptionMapper(uriInfo);
+    return mapper.toResponse((SubscriptionBaseRepairException)cause);
+  }
+ else   if (cause instanceof TagApiException) {
+    final TagApiExceptionMapper mapper=new TagApiExceptionMapper(uriInfo);
+    return mapper.toResponse((TagApiException)cause);
+  }
+ else   if (cause instanceof TagDefinitionApiException) {
+    final TagDefinitionApiExceptionMapper mapper=new TagDefinitionApiExceptionMapper(uriInfo);
+    return mapper.toResponse((TagDefinitionApiException)cause);
+  }
+ else {
+    return buildBadRequestResponse(cause,uriInfo);
+  }
+}

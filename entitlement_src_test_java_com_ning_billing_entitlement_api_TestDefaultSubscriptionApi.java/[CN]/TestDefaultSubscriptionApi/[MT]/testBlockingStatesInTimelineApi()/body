@@ -1,0 +1,21 @@
+{
+  final LocalDate initialDate=new LocalDate(2013,8,7);
+  clock.setDay(initialDate);
+  final Account account=accountApi.createAccount(getAccountData(7),callContext);
+  final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  testListener.pushExpectedEvents(NextEvent.CREATE,NextEvent.CREATE,NextEvent.BLOCK);
+  final Entitlement entitlement1=entitlementApi.createBaseEntitlement(account.getId(),spec,UUID.randomUUID().toString(),initialDate,callContext);
+  try {
+    Thread.sleep(1000);
+  }
+ catch (  InterruptedException ignore) {
+  }
+  ;
+  final Entitlement entitlement2=entitlementApi.createBaseEntitlement(account.getId(),spec,UUID.randomUUID().toString(),initialDate,callContext);
+  entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(new DefaultBlockingState(account.getId(),BlockingStateType.ACCOUNT,"stateName","service",false,false,false,clock.getUTCNow()),internalCallContextFactory.createInternalCallContext(account.getId(),callContext));
+  assertListenerStatus();
+  final List<SubscriptionBundle> bundles=subscriptionApi.getSubscriptionBundlesForAccountId(account.getId(),callContext);
+  Assert.assertEquals(bundles.size(),2);
+  subscriptionBundleChecker(bundles,initialDate,entitlement1,0);
+  subscriptionBundleChecker(bundles,initialDate,entitlement2,1);
+}
