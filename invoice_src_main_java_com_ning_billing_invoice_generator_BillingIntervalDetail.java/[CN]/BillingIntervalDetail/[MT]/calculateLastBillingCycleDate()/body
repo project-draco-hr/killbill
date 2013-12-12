@@ -1,0 +1,16 @@
+{
+  LocalDate proposedDate=firstBillingCycleDate;
+  int numberOfPeriods=0;
+  while (!proposedDate.isAfter(effectiveEndDate)) {
+    proposedDate=firstBillingCycleDate.plusMonths(numberOfPeriods * billingPeriod.getNumberOfMonths());
+    numberOfPeriods+=1;
+  }
+  proposedDate=proposedDate.plusMonths(-billingPeriod.getNumberOfMonths());
+  proposedDate=alignProposedBillCycleDate(proposedDate);
+  if (proposedDate.isBefore(firstBillingCycleDate)) {
+    lastBillingCycleDate=firstBillingCycleDate;
+  }
+ else {
+    lastBillingCycleDate=proposedDate;
+  }
+}
