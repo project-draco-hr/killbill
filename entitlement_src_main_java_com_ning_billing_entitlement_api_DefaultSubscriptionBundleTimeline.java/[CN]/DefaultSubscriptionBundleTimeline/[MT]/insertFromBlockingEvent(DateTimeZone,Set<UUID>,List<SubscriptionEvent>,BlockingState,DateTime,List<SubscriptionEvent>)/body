@@ -36,12 +36,12 @@ break;
 curInsertion=cur;
 }
 final List<UUID> targetEntitlementIds=bs.getType() == BlockingStateType.SUBSCRIPTION ? ImmutableList.<UUID>of(bs.getBlockedId()) : ImmutableList.<UUID>copyOf(allEntitlementUUIDs);
-for (final UUID target : targetEntitlementIds) {
-final SubscriptionEvent[] prevNext=findPrevNext(result,target,curInsertion);
-final TargetState curTargetState=targetStates.get(target);
+for (final UUID targetEntitlementId : targetEntitlementIds) {
+final SubscriptionEvent[] prevNext=findPrevNext(result,targetEntitlementId,curInsertion);
+final TargetState curTargetState=targetStates.get(targetEntitlementId);
 final List<SubscriptionEventType> eventTypes=curTargetState.addStateAndReturnEventTypes(bs);
 for (final SubscriptionEventType t : eventTypes) {
-newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],target,bs,t,accountTimeZone));
+newEvents.add(toSubscriptionEvent(prevNext[0],prevNext[1],targetEntitlementId,bs,t,accountTimeZone));
 }
 }
 return index;
