@@ -1,0 +1,31 @@
+{
+  final LocalDate startDate=new LocalDate(2013,12,1);
+  final LocalDate endDate=new LocalDate(2014,12,1);
+  final LocalDate endDateProposed1=new LocalDate(2014,1,1);
+  final LocalDate startDateProposed2=new LocalDate(2014,8,1);
+  final LocalDate endDateProposed2=new LocalDate(2014,9,1);
+  final LocalDate startDateProposed3=new LocalDate(2014,11,1);
+  final BigDecimal rate=new BigDecimal("120.00");
+  final BigDecimal amount=rate;
+  final InvoiceItem repairedItem=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount,rate,currency);
+  final RepairAdjInvoiceItem candidateRepairItem=new RepairAdjInvoiceItem(repairedItem.getInvoiceId(),repairedItem.getAccountId(),repairedItem.getStartDate(),repairedItem.getEndDate(),repairedItem.getAmount().negate(),repairedItem.getCurrency(),repairedItem.getId());
+  final List<InvoiceItem> proposed=new LinkedList<InvoiceItem>();
+  final InvoiceItem proposed1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDateProposed1,BigDecimal.TEN,rate,currency);
+  proposed.add(proposed1);
+  final InvoiceItem proposed2=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDateProposed2,endDateProposed2,BigDecimal.TEN,rate,currency);
+  proposed.add(proposed2);
+  final InvoiceItem proposed3=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDateProposed3,endDate,BigDecimal.TEN,rate,currency);
+  proposed.add(proposed3);
+  defaultInvoiceGenerator.addRepairItem(repairedItem,candidateRepairItem,proposed);
+  assertEquals(proposed.size(),2);
+  assertEquals(proposed.get(0).getStartDate(),endDateProposed1);
+  assertEquals(proposed.get(0).getEndDate(),startDateProposed2);
+  assertEquals(proposed.get(0).getLinkedItemId(),repairedItem.getId());
+  assertEquals(proposed.get(0).getAmount(),new BigDecimal("-69.894000"));
+  assertEquals(proposed.get(0).getInvoiceItemType(),InvoiceItemType.REPAIR_ADJ);
+  assertEquals(proposed.get(1).getStartDate(),endDateProposed2);
+  assertEquals(proposed.get(1).getEndDate(),startDateProposed3);
+  assertEquals(proposed.get(1).getLinkedItemId(),repairedItem.getId());
+  assertEquals(proposed.get(1).getAmount(),new BigDecimal("-20.106000"));
+  assertEquals(proposed.get(1).getInvoiceItemType(),InvoiceItemType.REPAIR_ADJ);
+}

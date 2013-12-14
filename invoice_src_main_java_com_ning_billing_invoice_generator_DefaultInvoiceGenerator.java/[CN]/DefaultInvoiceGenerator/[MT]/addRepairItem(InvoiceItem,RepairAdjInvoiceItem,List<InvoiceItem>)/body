@@ -26,10 +26,12 @@
   final Iterator<InvoiceItem> it=reparees.iterator();
   while (it.hasNext()) {
     final InvoiceItem nextReparee=it.next();
-    if (prevReparee != null) {
-      final BigDecimal repairItemAmount=(nextReparee.getEndDate().compareTo(candidateRepairItem.getEndDate()) != 0) ? InvoiceDateUtils.calculateProrationBetweenDates(prevReparee.getEndDate(),nextReparee.getStartDate(),nbTotalRepairedDays).multiply(totalRepareeItemAmount) : totalRepareeItemAmount.subtract(totalRepairItemAmount);
+    if (prevReparee != null || nextReparee.getStartDate().compareTo(repairedItem.getStartDate()) > 0) {
+      final LocalDate repairedStartDate=(prevReparee == null) ? repairedItem.getStartDate() : prevReparee.getEndDate();
+      final LocalDate repairedEndDateDate=nextReparee.getStartDate();
+      final BigDecimal repairItemAmount=(nextReparee.getEndDate().compareTo(candidateRepairItem.getEndDate()) != 0) ? InvoiceDateUtils.calculateProrationBetweenDates(repairedStartDate,repairedEndDateDate,nbTotalRepairedDays).multiply(totalRepareeItemAmount) : totalRepareeItemAmount.subtract(totalRepairItemAmount);
       totalRepairItemAmount=totalRepairItemAmount.add(repairItemAmount);
-      final RepairAdjInvoiceItem repairItem=new RepairAdjInvoiceItem(candidateRepairItem.getInvoiceId(),candidateRepairItem.getAccountId(),prevReparee.getEndDate(),nextReparee.getStartDate(),repairItemAmount,candidateRepairItem.getCurrency(),repairedItem.getId());
+      final RepairAdjInvoiceItem repairItem=new RepairAdjInvoiceItem(candidateRepairItem.getInvoiceId(),candidateRepairItem.getAccountId(),repairedStartDate,repairedEndDateDate,repairItemAmount,candidateRepairItem.getCurrency(),repairedItem.getId());
       repairedItems.add(repairItem);
     }
     prevReparee=nextReparee;
