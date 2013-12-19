@@ -1,9 +1,9 @@
 {
   try {
     final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundleId,ObjectType.BUNDLE,context);
-    final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleFromId(bundleId,contextWithValidAccountRecordId);
+    final SubscriptionBaseBundle bundle=subscriptionBaseInternalApi.getBundleFromId(bundleId,contextWithValidAccountRecordId);
     final Account account=accountApi.getAccountById(bundle.getAccountId(),contextWithValidAccountRecordId);
-    final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundleId,contextWithValidAccountRecordId);
+    final SubscriptionBase baseSubscription=subscriptionBaseInternalApi.getBaseSubscription(bundleId,contextWithValidAccountRecordId);
     final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(localEffectiveDate,baseSubscription.getStartDate(),contextWithValidAccountRecordId);
     if (!dateHelper.isBeforeOrEqualsToday(effectiveDate,account.getTimeZone())) {
       recordPauseResumeNotificationEntry(baseSubscription.getId(),bundleId,effectiveDate,false,contextWithValidAccountRecordId);

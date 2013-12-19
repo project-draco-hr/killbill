@@ -1,0 +1,30 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<UUID>>(){
+    @Override public List<UUID> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final BundleSqlDao bundleSqlDao=entitySqlDaoWrapperFactory.become(BundleSqlDao.class);
+      final List<SubscriptionBundleModelDao> bundles=bundleSqlDao.getBundlesForKey(bundleKey,context);
+      final List<UUID> result=new ArrayList<UUID>();
+      final SubscriptionSqlDao subscriptionSqlDao=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
+      for (      SubscriptionBundleModelDao cur : bundles) {
+        final List<SubscriptionModelDao> subscriptions=subscriptionSqlDao.getSubscriptionsFromBundleId(cur.getId().toString(),context);
+        final Iterable nonAddonSubscriptions=Iterables.filter(subscriptions,new Predicate<SubscriptionModelDao>(){
+          @Override public boolean apply(          final SubscriptionModelDao input){
+            return input.getCategory() != ProductCategory.ADD_ON;
+          }
+        }
+);
+        if (nonAddonSubscriptions.iterator().hasNext()) {
+          final Iterable nonAddonSubscriptionIds=Iterables.transform(nonAddonSubscriptions,new Function<SubscriptionModelDao,UUID>(){
+            @Override public UUID apply(            @Nullable final SubscriptionModelDao input){
+              return input.getId();
+            }
+          }
+);
+          result.addAll(Lists.newArrayList(nonAddonSubscriptionIds));
+        }
+      }
+      return result;
+    }
+  }
+);
+}

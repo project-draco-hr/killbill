@@ -1,0 +1,10 @@
+{
+  final List<UUID> nonAddonUUIDs=subscriptionBaseInternalApi.getNonAOSubscriptionIdsForKey(externalKey,tenantContext);
+  for (  final UUID cur : nonAddonUUIDs) {
+    final BlockingState state=dao.getBlockingStateForService(cur,BlockingStateType.SUBSCRIPTION,DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME,tenantContext);
+    if (state == null || !state.getStateName().equals(DefaultEntitlementApi.ENT_STATE_CANCELLED)) {
+      return cur;
+    }
+  }
+  return null;
+}
