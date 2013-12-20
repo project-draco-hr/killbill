@@ -13,10 +13,19 @@
   assertNull(entitlement.getEffectiveEndDate());
   final List<SubscriptionBundle> bundles=subscriptionApi.getSubscriptionBundlesForExternalKey(externalKey,callContext);
   assertEquals(bundles.size(),1);
+  final SubscriptionBundle activeBundle=subscriptionApi.getActiveSubscriptionBundleForExternalKey(externalKey,callContext);
+  assertEquals(activeBundle.getId(),entitlement.getBundleId());
   clock.addDays(3);
   testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK);
   entitlement.cancelEntitlementWithDate(new LocalDate(clock.getUTCNow(),account.getTimeZone()),true,callContext);
   assertListenerStatus();
+  try {
+    subscriptionApi.getActiveSubscriptionBundleForExternalKey(externalKey,callContext);
+    Assert.fail("Expected getActiveSubscriptionBundleForExternalKey to fail after cancellation");
+  }
+ catch (  SubscriptionApiException e) {
+    assertEquals(e.getCode(),ErrorCode.SUB_CREATE_ACTIVE_BUNDLE_KEY_EXISTS.getCode());
+  }
   clock.addDays(1);
   final PlanPhaseSpecifier spec2=new PlanPhaseSpecifier("Pistol",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);

@@ -25,7 +25,7 @@
   blockingStates.add(bs2);
   effectiveDate=effectiveDate.plusDays(15);
   clock.addDays(15);
-  final String service="boo";
+  final String service="boo-service-which-will-pause-billing";
   final BlockingState bs3=new DefaultBlockingState(UUID.randomUUID(),entitlementId,BlockingStateType.SUBSCRIPTION,"NothingUseful3",service,false,false,true,effectiveDate,clock.getUTCNow(),clock.getUTCNow());
   blockingStates.add(bs3);
   effectiveDate=effectiveDate.plusDays(15);
@@ -57,8 +57,8 @@
   assertEquals(events.get(4).getSubscriptionEventType(),SubscriptionEventType.PAUSE_BILLING);
   assertEquals(events.get(5).getSubscriptionEventType(),SubscriptionEventType.RESUME_ENTITLEMENT);
   assertEquals(events.get(6).getSubscriptionEventType(),SubscriptionEventType.RESUME_BILLING);
-  assertEquals(events.get(7).getSubscriptionEventType(),SubscriptionEventType.SERVICE_STATE_CHANGE);
-  assertEquals(events.get(8).getSubscriptionEventType(),SubscriptionEventType.SERVICE_STATE_CHANGE);
+  assertEquals(events.get(7).getSubscriptionEventType(),SubscriptionEventType.PAUSE_BILLING);
+  assertEquals(events.get(8).getSubscriptionEventType(),SubscriptionEventType.RESUME_BILLING);
   assertEquals(events.get(0).getServiceName(),DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME);
   assertEquals(events.get(1).getServiceName(),DefaultSubscriptionBundleTimeline.BILLING_SERVICE_NAME);
   assertEquals(events.get(2).getServiceName(),DefaultSubscriptionBundleTimeline.ENT_BILLING_SERVICE_NAME);

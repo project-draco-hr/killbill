@@ -1,4 +1,9 @@
 {
-  final BlockingState converted=new DefaultBlockingState(e.getEntitlementId(),BlockingStateType.SUBSCRIPTION,e.getServiceStateName(),e.getServiceName(),false,e.isBlockedEntitlement(),e.isBlockedBilling(),((DefaultSubscriptionEvent)e).getEffectiveDateTime());
+  final String serviceName=getRealServiceNameForEntitlementOrExternalServiceName(e.getServiceName(),e.getSubscriptionEventType());
+  final BlockingState lastBlockingStateForService=perServiceBlockingState.get(serviceName);
+  final boolean blockChange=lastBlockingStateForService != null && lastBlockingStateForService.isBlockChange();
+  final boolean blockedEntitlement=e.isBlockedEntitlement();
+  final boolean blockedBilling=e.isBlockedBilling();
+  final BlockingState converted=new DefaultBlockingState(e.getEntitlementId(),BlockingStateType.SUBSCRIPTION,e.getServiceStateName(),serviceName,blockChange,blockedEntitlement,blockedBilling,((DefaultSubscriptionEvent)e).getEffectiveDateTime());
   perServiceBlockingState.put(converted.getService(),converted);
 }

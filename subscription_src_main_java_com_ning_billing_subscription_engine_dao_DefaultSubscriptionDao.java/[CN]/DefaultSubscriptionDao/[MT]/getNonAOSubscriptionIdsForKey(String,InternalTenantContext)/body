@@ -1,0 +1,28 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Iterable<UUID>>(){
+    @Override public Iterable<UUID> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final BundleSqlDao bundleSqlDao=entitySqlDaoWrapperFactory.become(BundleSqlDao.class);
+      final List<SubscriptionBundleModelDao> bundles=bundleSqlDao.getBundlesForKey(bundleKey,context);
+      final SubscriptionSqlDao subscriptionSqlDao=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
+      return Iterables.concat(Iterables.transform(bundles,new Function<SubscriptionBundleModelDao,Iterable<UUID>>(){
+        @Override public Iterable<UUID> apply(        final SubscriptionBundleModelDao cur){
+          final List<SubscriptionModelDao> subscriptions=subscriptionSqlDao.getSubscriptionsFromBundleId(cur.getId().toString(),context);
+          final Iterable<SubscriptionModelDao> nonAddonSubscriptions=Iterables.filter(subscriptions,new Predicate<SubscriptionModelDao>(){
+            @Override public boolean apply(            final SubscriptionModelDao input){
+              return input.getCategory() != ProductCategory.ADD_ON;
+            }
+          }
+);
+          return Iterables.transform(nonAddonSubscriptions,new Function<SubscriptionModelDao,UUID>(){
+            @Override public UUID apply(            final SubscriptionModelDao input){
+              return input.getId();
+            }
+          }
+);
+        }
+      }
+));
+    }
+  }
+);
+}

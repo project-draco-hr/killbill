@@ -1,0 +1,9 @@
+{
+  final BillingActionPolicy policy=BillingActionPolicy.valueOf(policyString.toUpperCase());
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID bundleId=UUID.fromString(id);
+  final SubscriptionBundle bundle=subscriptionApi.getSubscriptionBundle(bundleId,callContext);
+  final LocalDate inputLocalDate=toLocalDate(bundle.getAccountId(),requestedDate,callContext);
+  final UUID newBundleId=entitlementApi.transferEntitlementsOverrideBillingPolicy(bundle.getAccountId(),UUID.fromString(json.getAccountId()),bundle.getExternalKey(),inputLocalDate,policy,callContext);
+  return uriBuilder.buildResponse(BundleResource.class,"getBundle",newBundleId,uriInfo.getBaseUri().toString());
+}
