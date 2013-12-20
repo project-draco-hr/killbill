@@ -1,3 +1,6 @@
 {
-  return super.getTags(UUID.fromString(id),auditMode,includedDeleted,context.createContext(request));
+  final UUID subscriptionId=UUID.fromString(subscriptionIdString);
+  final TenantContext tenantContext=context.createContext(request);
+  final Subscription subscription=subscriptionApi.getSubscriptionForEntitlementId(subscriptionId,tenantContext);
+  return super.getTags(subscription.getAccountId(),subscriptionId,auditMode,includedDeleted,tenantContext);
 }

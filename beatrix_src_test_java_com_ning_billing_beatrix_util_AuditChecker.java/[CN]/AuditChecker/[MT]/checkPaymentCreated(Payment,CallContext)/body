@@ -1,7 +1,6 @@
 {
-  AuditLogsForPayments result=getAuditLogsForPayment(payment,context);
-  Assert.assertEquals(result.getPaymentsAuditLogs().size(),1);
-  final List<AuditLog> paymentLogs=result.getPaymentsAuditLogs().get(payment.getId());
+  final AccountAuditLogs result=auditUserApi.getAccountAuditLogs(payment.getAccountId(),AuditLevel.FULL,context);
+  final List<AuditLog> paymentLogs=result.getAuditLogsForPayment(payment.getId());
   Assert.assertEquals(paymentLogs.size(),2);
   checkAuditLog(ChangeType.INSERT,context,paymentLogs.get(0),payment.getId(),PaymentSqlDao.class,true,false);
   checkAuditLog(ChangeType.UPDATE,context,paymentLogs.get(1),payment.getId(),PaymentSqlDao.class,true,false);

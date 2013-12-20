@@ -1,0 +1,7 @@
+{
+  final UUID accountId=nonEntitySqlDao.getIdFromObject(context.getAccountRecordId(),TableName.ACCOUNT.getTableName());
+  final EntitySqlDao auditSqlDao=transactionalSqlDao.onDemand(EntitySqlDao.class);
+  final Iterator<AuditLogModelDao> auditLogsForAccountRecordId=auditSqlDao.getAuditLogsForAccountRecordId(context);
+  final Iterator<AuditLog> allAuditLogs=buildAuditLogsFromModelDao(auditLogsForAccountRecordId);
+  return new DefaultAccountAuditLogs(accountId,auditLevel,allAuditLogs);
+}

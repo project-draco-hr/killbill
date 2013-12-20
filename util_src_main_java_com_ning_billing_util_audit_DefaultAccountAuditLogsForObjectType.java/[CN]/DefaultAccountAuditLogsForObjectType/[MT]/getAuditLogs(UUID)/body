@@ -1,0 +1,27 @@
+{
+switch (auditLevel) {
+case FULL:
+    cacheAllAuditLogs();
+  initializeIfNeeded(objectId);
+return auditLogsCache.get(objectId);
+case MINIMAL:
+if (auditLogsCache.get(objectId) == null) {
+final AuditLog candidate=Iterators.<AuditLog>tryFind(allAuditLogsForObjectType,new Predicate<AuditLog>(){
+  @Override public boolean apply(  final AuditLog auditLog){
+    cacheAuditLog(auditLog);
+    return objectId.equals(auditLog.getAuditedEntityId()) && ChangeType.INSERT.equals(auditLog.getChangeType());
+  }
+}
+).orNull();
+if (candidate == null) {
+  initializeIfNeeded(objectId);
+}
+}
+return auditLogsCache.get(objectId);
+case NONE:
+close();
+return ImmutableList.<AuditLog>of();
+default :
+throw new ShouldntHappenException("AuditLevel " + auditLevel + " unsupported");
+}
+}
