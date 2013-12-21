@@ -1,0 +1,15 @@
+{
+  final InvoiceItemSqlDao invoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
+  final List<InvoiceItemModelDao> invoiceItemsForAccount=invoiceItemSqlDao.getByAccountRecordId(context);
+  final Map<UUID,List<InvoiceItemModelDao>> invoiceItemsPerInvoiceId=new HashMap<UUID,List<InvoiceItemModelDao>>();
+  for (  final InvoiceItemModelDao item : invoiceItemsForAccount) {
+    if (invoiceItemsPerInvoiceId.get(item.getInvoiceId()) == null) {
+      invoiceItemsPerInvoiceId.put(item.getInvoiceId(),new LinkedList<InvoiceItemModelDao>());
+    }
+    invoiceItemsPerInvoiceId.get(item.getInvoiceId()).add(item);
+  }
+  for (  final InvoiceModelDao invoice : invoices) {
+    final List<InvoiceItemModelDao> invoiceItemsForInvoice=Objects.firstNonNull(invoiceItemsPerInvoiceId.get(invoice.getId()),ImmutableList.<InvoiceItemModelDao>of());
+    invoice.addInvoiceItems(invoiceItemsForInvoice);
+  }
+}

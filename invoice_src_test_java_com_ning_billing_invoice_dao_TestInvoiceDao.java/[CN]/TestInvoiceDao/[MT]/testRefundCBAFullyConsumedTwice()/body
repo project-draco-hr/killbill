@@ -25,12 +25,12 @@
   invoiceUtil.createInvoiceItem(fixedItem3,context);
   invoiceUtil.createInvoiceItem(creditBalanceAdjInvoiceItem3,context);
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,context).doubleValue(),0.00);
-  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00);
-  invoiceUtil.verifyInvoice(invoice2.getId(),0.00,-5.00);
-  invoiceUtil.verifyInvoice(invoice3.getId(),0.00,-5.00);
+  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00,context);
+  invoiceUtil.verifyInvoice(invoice2.getId(),0.00,-5.00,context);
+  invoiceUtil.verifyInvoice(invoice3.getId(),0.00,-5.00,context);
   invoiceDao.createRefund(paymentId,paymentAmount,false,ImmutableMap.<UUID,BigDecimal>of(),UUID.randomUUID(),context);
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,context).doubleValue(),0.00);
-  invoiceUtil.verifyInvoice(invoice1.getId(),10.00,10.00);
-  invoiceUtil.verifyInvoice(invoice2.getId(),0.00,-5.00);
-  invoiceUtil.verifyInvoice(invoice3.getId(),0.00,-5.00);
+  invoiceUtil.verifyInvoice(invoice1.getId(),10.00,10.00,context);
+  invoiceUtil.verifyInvoice(invoice2.getId(),0.00,-5.00,context);
+  invoiceUtil.verifyInvoice(invoice3.getId(),0.00,-5.00,context);
 }
