@@ -9,7 +9,8 @@
       if (invoice == null) {
         throw new InvoiceApiException(ErrorCode.INVOICE_NUMBER_NOT_FOUND,number.longValue());
       }
-      invoiceDaoHelper.populateChildren(invoice,entitySqlDaoWrapperFactory,context);
+      final InternalTenantContext contextWithAccountRecordId=internalCallContextFactory.createInternalTenantContext(invoice.getAccountId(),context);
+      invoiceDaoHelper.populateChildren(invoice,entitySqlDaoWrapperFactory,contextWithAccountRecordId);
       return invoice;
     }
   }

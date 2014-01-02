@@ -1,8 +1,10 @@
 {
-  super(toAuditLogJson(accountAuditLogs.getAuditLogsForInvoice(input.getId())));
+  super(toAuditLogJson(accountAuditLogs == null ? null : accountAuditLogs.getAuditLogsForInvoice(input.getId())));
   this.items=new ArrayList<InvoiceItemJson>(input.getInvoiceItems().size());
-  for (  final InvoiceItem item : input.getInvoiceItems()) {
-    this.items.add(new InvoiceItemJson(item,accountAuditLogs.getAuditLogsForInvoiceItem(item.getId())));
+  if (withItems) {
+    for (    final InvoiceItem item : input.getInvoiceItems()) {
+      this.items.add(new InvoiceItemJson(item,accountAuditLogs == null ? null : accountAuditLogs.getAuditLogsForInvoiceItem(item.getId())));
+    }
   }
   this.amount=input.getChargedAmount();
   this.currency=input.getCurrency().toString();
