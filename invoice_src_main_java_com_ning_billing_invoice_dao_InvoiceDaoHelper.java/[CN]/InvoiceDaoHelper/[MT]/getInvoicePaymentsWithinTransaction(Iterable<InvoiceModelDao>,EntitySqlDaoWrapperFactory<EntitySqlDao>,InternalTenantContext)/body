@@ -1,0 +1,21 @@
+{
+  final InvoicePaymentSqlDao invoicePaymentSqlDao=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
+  final List<InvoicePaymentModelDao> invoicePaymentsForAccount=invoicePaymentSqlDao.getByAccountRecordId(context);
+  final Map<UUID,List<InvoicePaymentModelDao>> invoicePaymentsPerInvoiceId=new HashMap<UUID,List<InvoicePaymentModelDao>>();
+  for (  final InvoicePaymentModelDao invoicePayment : invoicePaymentsForAccount) {
+    if (invoicePaymentsPerInvoiceId.get(invoicePayment.getInvoiceId()) == null) {
+      invoicePaymentsPerInvoiceId.put(invoicePayment.getInvoiceId(),new LinkedList<InvoicePaymentModelDao>());
+    }
+    invoicePaymentsPerInvoiceId.get(invoicePayment.getInvoiceId()).add(invoicePayment);
+  }
+  for (  final InvoiceModelDao invoice : invoices) {
+    final List<InvoicePaymentModelDao> invoicePaymentsForInvoice=Objects.firstNonNull(invoicePaymentsPerInvoiceId.get(invoice.getId()),ImmutableList.<InvoicePaymentModelDao>of());
+    invoice.addPayments(invoicePaymentsForInvoice);
+    for (    final InvoicePaymentModelDao invoicePayment : invoicePaymentsForInvoice) {
+      if (invoicePayment.getCurrency() != invoicePayment.getProcessedCurrency()) {
+        invoice.setProcessedCurrency(invoicePayment.getProcessedCurrency());
+        break;
+      }
+    }
+  }
+}

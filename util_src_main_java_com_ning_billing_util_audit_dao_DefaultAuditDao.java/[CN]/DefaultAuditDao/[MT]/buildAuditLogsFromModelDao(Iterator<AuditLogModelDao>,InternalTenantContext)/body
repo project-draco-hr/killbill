@@ -1,0 +1,47 @@
+{
+  final Map<TableName,Map<Long,UUID>> recordIdIdsCache=new HashMap<TableName,Map<Long,UUID>>();
+  final Map<TableName,Map<Long,UUID>> historyRecordIdIdsCache=new HashMap<TableName,Map<Long,UUID>>();
+  return Iterators.<AuditLogModelDao,AuditLog>transform(auditLogsForAccountRecordId,new Function<AuditLogModelDao,AuditLog>(){
+    @Override public AuditLog apply(    final AuditLogModelDao input){
+      final TableName originalTableNameForHistoryTableName=findTableNameForHistoryTableName(input.getTableName());
+      final ObjectType objectType;
+      final UUID auditedEntityId;
+      if (originalTableNameForHistoryTableName != null) {
+        objectType=originalTableNameForHistoryTableName.getObjectType();
+        if (historyRecordIdIdsCache.get(originalTableNameForHistoryTableName) == null) {
+          if (TableName.ACCOUNT.equals(originalTableNameForHistoryTableName)) {
+            final Iterable<RecordIdIdMappings> mappings=nonEntitySqlDao.getHistoryRecordIdIdMappingsForAccountsTable(originalTableNameForHistoryTableName.getTableName(),input.getTableName().getTableName(),tenantContext);
+            historyRecordIdIdsCache.put(originalTableNameForHistoryTableName,RecordIdIdMappings.toMap(mappings));
+          }
+ else           if (TableName.TAG_DEFINITIONS.equals(originalTableNameForHistoryTableName)) {
+            final Iterable<RecordIdIdMappings> mappings=nonEntitySqlDao.getHistoryRecordIdIdMappingsForTablesWithoutAccountRecordId(originalTableNameForHistoryTableName.getTableName(),input.getTableName().getTableName(),tenantContext);
+            historyRecordIdIdsCache.put(originalTableNameForHistoryTableName,RecordIdIdMappings.toMap(mappings));
+          }
+ else {
+            final Iterable<RecordIdIdMappings> mappings=nonEntitySqlDao.getHistoryRecordIdIdMappings(originalTableNameForHistoryTableName.getTableName(),input.getTableName().getTableName(),tenantContext);
+            historyRecordIdIdsCache.put(originalTableNameForHistoryTableName,RecordIdIdMappings.toMap(mappings));
+          }
+        }
+        auditedEntityId=historyRecordIdIdsCache.get(originalTableNameForHistoryTableName).get(input.getTargetRecordId());
+      }
+ else {
+        objectType=input.getTableName().getObjectType();
+        if (recordIdIdsCache.get(input.getTableName()) == null) {
+          final Iterable<RecordIdIdMappings> mappings=nonEntitySqlDao.getRecordIdIdMappings(input.getTableName().getTableName(),tenantContext);
+          recordIdIdsCache.put(input.getTableName(),RecordIdIdMappings.toMap(mappings));
+        }
+        auditedEntityId=recordIdIdsCache.get(input.getTableName()).get(input.getTargetRecordId());
+      }
+      return new DefaultAuditLog(input,objectType,auditedEntityId);
+    }
+    private TableName findTableNameForHistoryTableName(    final TableName historyTableName){
+      for (      final TableName tableName : TableName.values()) {
+        if (historyTableName.equals(tableName.getHistoryTableName())) {
+          return tableName;
+        }
+      }
+      return null;
+    }
+  }
+);
+}

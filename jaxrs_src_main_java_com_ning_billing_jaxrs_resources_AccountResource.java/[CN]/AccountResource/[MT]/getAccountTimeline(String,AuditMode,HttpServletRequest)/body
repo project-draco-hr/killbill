@@ -3,23 +3,19 @@
   final UUID accountId=UUID.fromString(accountIdString);
   final Account account=accountUserApi.getAccountById(accountId,tenantContext);
   final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId(),tenantContext);
-  final AuditLogsForInvoices invoicesAuditLogs=auditUserApi.getAuditLogsForInvoices(invoices,auditMode.getLevel(),tenantContext);
   final List<Payment> payments=paymentApi.getAccountPayments(accountId,tenantContext);
-  final AuditLogsForPayments paymentsAuditLogs=auditUserApi.getAuditLogsForPayments(payments,auditMode.getLevel(),tenantContext);
   final List<Refund> refunds=paymentApi.getAccountRefunds(account,tenantContext);
-  final AuditLogsForRefunds refundsAuditLogs=auditUserApi.getAuditLogsForRefunds(refunds,auditMode.getLevel(),tenantContext);
   final Multimap<UUID,Refund> refundsByPayment=ArrayListMultimap.<UUID,Refund>create();
   for (  final Refund refund : refunds) {
     refundsByPayment.put(refund.getPaymentId(),refund);
   }
   final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByAccountId(accountId,tenantContext);
-  final AuditLogsForInvoicePayments chargebacksAuditLogs=auditUserApi.getAuditLogsForInvoicePayments(chargebacks,auditMode.getLevel(),tenantContext);
   final Multimap<UUID,InvoicePayment> chargebacksByPayment=ArrayListMultimap.<UUID,InvoicePayment>create();
   for (  final InvoicePayment chargeback : chargebacks) {
     chargebacksByPayment.put(chargeback.getPaymentId(),chargeback);
   }
   final List<SubscriptionBundle> bundles=subscriptionApi.getSubscriptionBundlesForAccountId(account.getId(),tenantContext);
-  final AuditLogsForBundles bundlesAuditLogs=auditUserApi.getAuditLogsForBundles(bundles,auditMode.getLevel(),tenantContext);
-  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundles,refundsByPayment,chargebacksByPayment,invoicesAuditLogs,paymentsAuditLogs,refundsAuditLogs,chargebacksAuditLogs,bundlesAuditLogs);
+  final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
+  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundles,refundsByPayment,chargebacksByPayment,accountAuditLogs);
   return Response.status(Status.OK).entity(json).build();
 }

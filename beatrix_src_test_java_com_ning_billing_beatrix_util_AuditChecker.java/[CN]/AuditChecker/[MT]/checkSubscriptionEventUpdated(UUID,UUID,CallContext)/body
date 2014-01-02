@@ -1,5 +1,6 @@
 {
-  final AuditLogsForBundles auditLogsForBundles=getAuditLogsForBundle(bundleId,context);
-  checkAuditLog(ChangeType.INSERT,auditLogsForBundles.getSubscriptionEventsAuditLogs().get(subscriptionEventId).get(0));
-  checkAuditLog(ChangeType.UPDATE,context,auditLogsForBundles.getSubscriptionEventsAuditLogs().get(subscriptionEventId).get(1),subscriptionEventId,SubscriptionEventSqlDao.class,false,true);
+  final List<AuditLog> auditLogsForSubscriptionEvent=getAuditLogsForSubscriptionEvent(bundleId,subscriptionEventId,context);
+  Assert.assertEquals(auditLogsForSubscriptionEvent.size(),2);
+  checkAuditLog(ChangeType.INSERT,auditLogsForSubscriptionEvent.get(0));
+  checkAuditLog(ChangeType.UPDATE,context,auditLogsForSubscriptionEvent.get(1),subscriptionEventId,SubscriptionEventSqlDao.class,false,true);
 }

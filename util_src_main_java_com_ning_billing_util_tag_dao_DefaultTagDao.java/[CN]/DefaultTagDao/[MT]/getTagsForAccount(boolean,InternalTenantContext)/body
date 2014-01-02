@@ -1,0 +1,14 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<TagModelDao>>(){
+    @Override public List<TagModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final TagSqlDao tagSqlDao=entitySqlDaoWrapperFactory.become(TagSqlDao.class);
+      if (includedDeleted) {
+        return tagSqlDao.getByAccountRecordIdIncludedDeleted(internalTenantContext);
+      }
+ else {
+        return tagSqlDao.getByAccountRecordId(internalTenantContext);
+      }
+    }
+  }
+);
+}

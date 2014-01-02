@@ -1,12 +1,12 @@
 {
   final TenantContext tenantContext=context.createContext(request);
   final Invoice invoice=invoiceApi.getInvoiceByNumber(invoiceNumber,tenantContext);
-  final AuditLogsForInvoices invoicesAuditLogs=auditUserApi.getAuditLogsForInvoices(ImmutableList.<Invoice>of(invoice),auditMode.getLevel(),tenantContext);
+  final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(invoice.getAccountId(),auditMode.getLevel(),tenantContext);
   if (invoice == null) {
     throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceNumber);
   }
  else {
-    final InvoiceJson json=withItems ? new InvoiceJson(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId()),invoicesAuditLogs.getInvoiceItemsAuditLogs()) : new InvoiceJson(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId()));
+    final InvoiceJson json=new InvoiceJson(invoice,withItems,accountAuditLogs);
     return Response.status(Status.OK).entity(json).build();
   }
 }

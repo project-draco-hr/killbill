@@ -1,0 +1,10 @@
+{
+  final List<AuditLog> allAuditLogs=transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<AuditLog>>(){
+    @Override public List<AuditLog> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final List<AuditLogModelDao> auditLogsForTargetRecordId=entitySqlDaoWrapperFactory.become(EntitySqlDao.class).getAuditLogsForTargetRecordId(tableName.name(),targetRecordId,context);
+      return buildAuditLogsFromModelDao(auditLogsForTargetRecordId,tableName.getObjectType(),auditedEntityId);
+    }
+  }
+);
+  return filterAuditLogs(auditLevel,allAuditLogs);
+}

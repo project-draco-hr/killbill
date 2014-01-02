@@ -3,5 +3,9 @@
   for (  final AuditLevel level : AuditLevel.values()) {
     final List<AuditLog> auditLogs=auditDao.getAuditLogsForId(TableName.TAG,tag.getId(),level,internalCallContext);
     verifyAuditLogsForTag(auditLogs,level);
+    final AccountAuditLogs accountAuditLogs=auditDao.getAuditLogsForAccountRecordId(level,internalCallContext);
+    verifyAuditLogsForTag(accountAuditLogs.getAuditLogs(ObjectType.TAG).getAuditLogs(tag.getId()),level);
+    final AccountAuditLogsForObjectType accountAuditLogsForObjectType=auditDao.getAuditLogsForAccountRecordId(TableName.TAG,level,internalCallContext);
+    verifyAuditLogsForTag(accountAuditLogsForObjectType.getAuditLogs(tag.getId()),level);
   }
 }

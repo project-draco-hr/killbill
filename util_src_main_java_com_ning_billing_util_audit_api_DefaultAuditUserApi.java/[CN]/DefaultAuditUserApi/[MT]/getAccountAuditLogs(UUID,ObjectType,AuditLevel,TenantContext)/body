@@ -1,0 +1,10 @@
+{
+  if (AuditLevel.NONE.equals(auditLevel)) {
+    return new DefaultAccountAuditLogsForObjectType(auditLevel);
+  }
+  final TableName tableName=getTableNameFromObjectType(objectType);
+  if (tableName == null) {
+    return new DefaultAccountAuditLogsForObjectType(auditLevel);
+  }
+  return auditDao.getAuditLogsForAccountRecordId(tableName,auditLevel,internalCallContextFactory.createInternalTenantContext(accountId,tenantContext));
+}

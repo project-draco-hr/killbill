@@ -7,7 +7,7 @@
   invoiceUtil.createInvoiceItem(repairAdjInvoiceItem,context);
   invoiceUtil.createInvoiceItem(creditBalanceAdjInvoiceItem1,context);
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,context).doubleValue(),10.00);
-  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00);
+  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00,context);
   try {
     invoiceDao.deleteCBA(accountId,invoice1.getId(),creditBalanceAdjInvoiceItem1.getId(),context);
     Assert.fail();
@@ -16,5 +16,5 @@
     Assert.assertEquals(e.getCode(),ErrorCode.INVOICE_WOULD_BE_NEGATIVE.getCode());
   }
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,context).doubleValue(),10.00);
-  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00);
+  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00,context);
 }

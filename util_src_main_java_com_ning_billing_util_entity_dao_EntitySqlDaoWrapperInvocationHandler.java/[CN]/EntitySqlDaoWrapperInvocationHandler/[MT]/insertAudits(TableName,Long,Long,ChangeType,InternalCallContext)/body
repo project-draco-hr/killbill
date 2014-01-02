@@ -1,6 +1,13 @@
 {
   final TableName destinationTableName=Objects.firstNonNull(tableName.getHistoryTableName(),tableName);
   final EntityAudit audit=new EntityAudit(destinationTableName,historyRecordId,changeType,clock.getUTCNow());
+  final InternalCallContext context;
+  if (TableName.ACCOUNT.equals(tableName) && ChangeType.INSERT.equals(changeType)) {
+    context=new InternalCallContext(contextMaybeWithoutAccountRecordId,entityRecordId);
+  }
+ else {
+    context=contextMaybeWithoutAccountRecordId;
+  }
   sqlDao.insertAuditFromTransaction(audit,context);
   if (tableName.getHistoryTableName() != null) {
     final CacheController<Object,Object> cacheController=cacheControllerDispatcher.getCacheController(CacheType.AUDIT_LOG_VIA_HISTORY);

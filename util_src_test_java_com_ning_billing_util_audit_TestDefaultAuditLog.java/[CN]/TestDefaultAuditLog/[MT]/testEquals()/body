@@ -10,12 +10,12 @@
   final UUID userToken=UUID.randomUUID();
   final ClockMock clock=new ClockMock();
   final CallContext callContext=new DefaultCallContext(tenantId,userName,callOrigin,userType,userToken,clock);
-  final AuditLog auditLog=new DefaultAuditLog(entityAudit,callContext);
+  final AuditLogModelDao auditLog=new AuditLogModelDao(entityAudit,callContext);
   Assert.assertEquals(auditLog,auditLog);
-  final AuditLog sameAuditLog=new DefaultAuditLog(entityAudit,callContext);
+  final AuditLogModelDao sameAuditLog=new AuditLogModelDao(entityAudit,callContext);
   Assert.assertEquals(sameAuditLog,auditLog);
   clock.addMonths(1);
   final CallContext otherCallContext=new DefaultCallContext(tenantId,userName,callOrigin,userType,userToken,clock);
-  final AuditLog otherAuditLog=new DefaultAuditLog(entityAudit,otherCallContext);
+  final AuditLogModelDao otherAuditLog=new AuditLogModelDao(entityAudit,otherCallContext);
   Assert.assertNotEquals(otherAuditLog,auditLog);
 }

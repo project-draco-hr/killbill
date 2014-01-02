@@ -10,7 +10,7 @@
   final UUID userToken=UUID.randomUUID();
   final ClockMock clock=new ClockMock();
   final CallContext callContext=new DefaultCallContext(tenantId,userName,callOrigin,userType,userToken,clock);
-  final AuditLog auditLog=new DefaultAuditLog(entityAudit,callContext);
+  final AuditLog auditLog=new DefaultAuditLog(new AuditLogModelDao(entityAudit,callContext),ObjectType.ACCOUNT_EMAIL,UUID.randomUUID());
   Assert.assertEquals(auditLog.getChangeType(),changeType);
   Assert.assertNull(auditLog.getComment());
   Assert.assertNotNull(auditLog.getCreatedDate());

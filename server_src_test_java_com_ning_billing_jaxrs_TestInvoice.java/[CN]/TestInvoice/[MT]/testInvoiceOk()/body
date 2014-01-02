@@ -15,6 +15,10 @@
     Assert.assertNull(auditLogJson.getComments());
   }
   final InvoiceJson invoiceJson=invoices.get(0);
+  assertTrue(getInvoice(invoiceJson.getInvoiceId(),Boolean.FALSE).getItems().isEmpty());
+  assertTrue(getInvoice(invoiceJson.getInvoiceNumber(),Boolean.FALSE).getItems().isEmpty());
+  assertEquals(getInvoice(invoiceJson.getInvoiceId(),Boolean.TRUE).getItems().size(),invoiceJson.getItems().size());
+  assertEquals(getInvoice(invoiceJson.getInvoiceNumber(),Boolean.TRUE).getItems().size(),invoiceJson.getItems().size());
   final InvoiceJson firstInvoiceJson=getInvoice(invoiceJson.getInvoiceId());
   assertEquals(firstInvoiceJson,invoiceJson);
   final InvoiceJson firstInvoiceByNumberJson=getInvoice(invoiceJson.getInvoiceNumber());

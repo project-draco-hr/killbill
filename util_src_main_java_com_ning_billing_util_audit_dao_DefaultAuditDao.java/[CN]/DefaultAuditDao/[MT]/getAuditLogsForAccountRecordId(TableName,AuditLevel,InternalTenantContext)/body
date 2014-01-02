@@ -1,0 +1,13 @@
+{
+  final String actualTableName;
+  if (tableName.hasHistoryTable()) {
+    actualTableName=tableName.getHistoryTableName().name();
+  }
+ else {
+    actualTableName=tableName.getTableName();
+  }
+  final EntitySqlDao auditSqlDao=transactionalSqlDao.onDemand(EntitySqlDao.class);
+  final Iterator<AuditLogModelDao> auditLogsForTableNameAndAccountRecordId=auditSqlDao.getAuditLogsForTableNameAndAccountRecordId(actualTableName,context);
+  final Iterator<AuditLog> allAuditLogs=buildAuditLogsFromModelDao(auditLogsForTableNameAndAccountRecordId,context);
+  return new DefaultAccountAuditLogsForObjectType(auditLevel,allAuditLogs);
+}

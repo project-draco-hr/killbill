@@ -1,20 +1,12 @@
 {
   final TenantContext tenantContext=context.createContext(request);
-  accountUserApi.getAccountById(UUID.fromString(accountId),tenantContext);
-  final List<Invoice> invoices=unpaidInvoicesOnly ? new ArrayList<Invoice>(invoiceApi.getUnpaidInvoicesByAccountId(UUID.fromString(accountId),null,tenantContext)) : invoiceApi.getInvoicesByAccount(UUID.fromString(accountId),tenantContext);
-  final AuditLogsForInvoices invoicesAuditLogs=auditUserApi.getAuditLogsForInvoices(invoices,auditMode.getLevel(),tenantContext);
-  if (withItems) {
-    final List<InvoiceJson> result=new LinkedList<InvoiceJson>();
-    for (    final Invoice invoice : invoices) {
-      result.add(new InvoiceJson(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId()),invoicesAuditLogs.getInvoiceItemsAuditLogs()));
-    }
-    return Response.status(Status.OK).entity(result).build();
+  final UUID accountId=UUID.fromString(accountIdString);
+  accountUserApi.getAccountById(accountId,tenantContext);
+  final List<Invoice> invoices=unpaidInvoicesOnly ? new ArrayList<Invoice>(invoiceApi.getUnpaidInvoicesByAccountId(accountId,null,tenantContext)) : invoiceApi.getInvoicesByAccount(accountId,tenantContext);
+  final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
+  final List<InvoiceJson> result=new LinkedList<InvoiceJson>();
+  for (  final Invoice invoice : invoices) {
+    result.add(new InvoiceJson(invoice,withItems,accountAuditLogs));
   }
- else {
-    final List<InvoiceJson> result=new LinkedList<InvoiceJson>();
-    for (    final Invoice invoice : invoices) {
-      result.add(new InvoiceJson(invoice,invoicesAuditLogs.getInvoiceAuditLogs().get(invoice.getId())));
-    }
-    return Response.status(Status.OK).entity(result).build();
-  }
+  return Response.status(Status.OK).entity(result).build();
 }

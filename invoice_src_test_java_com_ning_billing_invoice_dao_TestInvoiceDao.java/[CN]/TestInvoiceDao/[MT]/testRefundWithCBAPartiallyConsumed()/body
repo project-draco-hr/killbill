@@ -18,10 +18,10 @@
   invoiceUtil.createInvoiceItem(fixedItem2,context);
   invoiceUtil.createInvoiceItem(creditBalanceAdjInvoiceItem2,context);
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,context).doubleValue(),5.00);
-  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00);
-  invoiceUtil.verifyInvoice(invoice2.getId(),0.00,-5.00);
+  invoiceUtil.verifyInvoice(invoice1.getId(),0.00,10.00,context);
+  invoiceUtil.verifyInvoice(invoice2.getId(),0.00,-5.00,context);
   invoiceDao.createRefund(paymentId,new BigDecimal("10.0"),false,ImmutableMap.<UUID,BigDecimal>of(),UUID.randomUUID(),context);
   Assert.assertEquals(invoiceDao.getAccountCBA(accountId,context).doubleValue(),0.00);
-  invoiceUtil.verifyInvoice(invoice1.getId(),5.00,5.00);
-  invoiceUtil.verifyInvoice(invoice2.getId(),0.00,-5.00);
+  invoiceUtil.verifyInvoice(invoice1.getId(),5.00,5.00,context);
+  invoiceUtil.verifyInvoice(invoice2.getId(),0.00,-5.00,context);
 }
