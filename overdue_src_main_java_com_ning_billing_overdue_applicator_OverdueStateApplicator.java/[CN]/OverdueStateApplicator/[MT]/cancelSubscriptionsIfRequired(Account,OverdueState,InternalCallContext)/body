@@ -18,12 +18,17 @@ final List<Entitlement> toBeCancelled=new LinkedList<Entitlement>();
 computeEntitlementsToCancel(account,toBeCancelled,context);
 final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT);
 for (final Entitlement cur : toBeCancelled) {
+try {
 cur.cancelEntitlementWithDateOverrideBillingPolicy(new LocalDate(clock.getUTCNow(),account.getTimeZone()),actionPolicy,context.toCallContext(tenantId));
-}
 }
  catch (EntitlementApiException e) {
 if (e.getCode() != ErrorCode.SUB_CANCEL_BAD_STATE.getCode()) {
 throw new OverdueException(e);
 }
+}
+}
+}
+ catch (EntitlementApiException e) {
+throw new OverdueException(e);
 }
 }

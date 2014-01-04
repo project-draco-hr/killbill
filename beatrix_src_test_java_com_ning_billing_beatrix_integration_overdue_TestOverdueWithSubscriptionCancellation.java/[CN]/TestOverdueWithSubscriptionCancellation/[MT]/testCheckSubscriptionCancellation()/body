@@ -5,12 +5,17 @@
   bundle=subscriptionApi.getSubscriptionBundle(baseEntitlement.getBundleId(),callContext);
   invoiceChecker.checkInvoice(account.getId(),1,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,5,1),callContext);
-  addDaysAndCheckForCompletion(30,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
-  invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
+  final DefaultEntitlement addOn1=addAOEntitlementAndCheckForCompletion(baseEntitlement.getBundleId(),"Holster",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
+  final DefaultEntitlement addOn2=addAOEntitlementAndCheckForCompletion(baseEntitlement.getBundleId(),"Holster",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
+  clock.addDays(1);
+  cancelEntitlementAndCheckForCompletion(addOn1,clock.getUTCNow(),NextEvent.BLOCK,NextEvent.CANCEL);
+  addDaysAndCheckForCompletion(29,NextEvent.PHASE,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,6,30),callContext);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
-  addDaysAndCheckForCompletion(6,NextEvent.BLOCK,NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.INVOICE_ADJUSTMENT);
+  addDaysAndCheckForCompletion(6,NextEvent.BLOCK,NextEvent.BLOCK,NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.CANCEL,NextEvent.INVOICE_ADJUSTMENT);
   checkODState("OD1");
   final SubscriptionBase cancelledBaseSubscription=((DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext)).getSubscriptionBase();
   assertTrue(cancelledBaseSubscription.getState() == EntitlementState.CANCELLED);
+  final SubscriptionBase cancelledAddon1=((DefaultEntitlement)entitlementApi.getEntitlementForId(addOn1.getId(),callContext)).getSubscriptionBase();
+  assertTrue(cancelledAddon1.getState() == EntitlementState.CANCELLED);
 }

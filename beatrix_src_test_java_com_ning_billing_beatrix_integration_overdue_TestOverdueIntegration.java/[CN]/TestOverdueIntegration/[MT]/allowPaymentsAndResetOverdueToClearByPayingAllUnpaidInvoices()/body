@@ -1,13 +1,6 @@
 {
   paymentPlugin.makeAllInvoicesFailWithError(false);
-  final Collection<Invoice> invoices=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
-  final List<Invoice> sortedInvoices=new LinkedList<Invoice>(invoices);
-  Collections.sort(sortedInvoices,new Comparator<Invoice>(){
-    @Override public int compare(    final Invoice i1,    final Invoice i2){
-      return i2.getInvoiceDate().compareTo(i1.getInvoiceDate());
-    }
-  }
-);
+  final List<Invoice> sortedInvoices=getUnpaidInvoicesOrderFromRecent();
   int remainingUnpaidInvoices=sortedInvoices.size();
   for (  final Invoice invoice : sortedInvoices) {
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
