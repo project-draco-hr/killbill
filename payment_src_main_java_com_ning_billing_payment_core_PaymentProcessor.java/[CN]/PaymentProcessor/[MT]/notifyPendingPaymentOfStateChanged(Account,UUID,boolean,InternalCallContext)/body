@@ -1,23 +1,19 @@
 {
-  try {
-    voidPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Void>(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
-      @Override public Void doOperation() throws PaymentApiException {
-        final PaymentModelDao payment=paymentDao.getPayment(paymentId,context);
-        if (payment == null) {
-          throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT,paymentId);
-        }
-        if (payment.getPaymentStatus() != PaymentStatus.PENDING) {
-          throw new PaymentApiException(ErrorCode.PAYMENT_NOT_PENDING,paymentId);
-        }
-        final List<PaymentAttemptModelDao> attempts=paymentDao.getAttemptsForPayment(paymentId,context);
-        final PaymentAttemptModelDao lastAttempt=attempts.get(attempts.size() - 1);
-        final PaymentStatus newPaymentStatus=isSuccess ? PaymentStatus.SUCCESS : PaymentStatus.PAYMENT_FAILURE_ABORTED;
-        paymentDao.updatePaymentAndAttemptOnCompletion(paymentId,newPaymentStatus,payment.getProcessedAmount(),payment.getProcessedCurrency(),lastAttempt.getId(),null,null,context);
-        return null;
+  new WithAccountLock<Void>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
+    @Override public Void doOperation() throws PaymentApiException {
+      final PaymentModelDao payment=paymentDao.getPayment(paymentId,context);
+      if (payment == null) {
+        throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT,paymentId);
       }
+      if (payment.getPaymentStatus() != PaymentStatus.PENDING) {
+        throw new PaymentApiException(ErrorCode.PAYMENT_NOT_PENDING,paymentId);
+      }
+      final List<PaymentAttemptModelDao> attempts=paymentDao.getAttemptsForPayment(paymentId,context);
+      final PaymentAttemptModelDao lastAttempt=attempts.get(attempts.size() - 1);
+      final PaymentStatus newPaymentStatus=isSuccess ? PaymentStatus.SUCCESS : PaymentStatus.PAYMENT_FAILURE_ABORTED;
+      paymentDao.updatePaymentAndAttemptOnCompletion(paymentId,newPaymentStatus,payment.getProcessedAmount(),payment.getProcessedCurrency(),lastAttempt.getId(),null,null,context);
+      return null;
     }
-));
   }
- catch (  TimeoutException e) {
-  }
+);
 }
