@@ -20,7 +20,8 @@
     }
 switch (paymentPluginInfo.getStatus()) {
 case PROCESSED:
-      paymentStatus=PaymentStatus.SUCCESS;
+case PENDING:
+      paymentStatus=paymentPluginInfo.getStatus() == PaymentPluginStatus.PROCESSED ? PaymentStatus.SUCCESS : PaymentStatus.PENDING;
     paymentDao.updatePaymentAndAttemptOnCompletion(paymentInput.getId(),paymentStatus,paymentPluginInfo.getAmount(),paymentPluginInfo.getCurrency(),attemptInput.getId(),paymentPluginInfo.getGatewayErrorCode(),null,context);
   allAttempts=paymentDao.getAttemptsForPayment(paymentInput.getId(),context);
 payment=paymentDao.getPayment(paymentInput.getId(),context);
