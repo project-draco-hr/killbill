@@ -1,0 +1,26 @@
+{
+  final List<Payment> allResults=new LinkedList<Payment>();
+  Long totalNbRecords=0L;
+  Long maxNbRecords=0L;
+  boolean firstSearch=true;
+  for (  final String pluginName : getAvailablePlugins()) {
+    try {
+      final Pagination<Payment> payments;
+      if (allResults.size() >= limit) {
+        payments=getPayments(firstSearch ? offset : 0L,1L,pluginName,tenantContext,internalTenantContext);
+        ImmutableList.<Payment>copyOf(payments);
+      }
+ else {
+        payments=getPayments(firstSearch ? offset : 0L,limit - allResults.size(),pluginName,tenantContext,internalTenantContext);
+        allResults.addAll(ImmutableList.<Payment>copyOf(payments));
+      }
+      firstSearch=false;
+      totalNbRecords+=payments.getTotalNbRecords();
+      maxNbRecords+=payments.getMaxNbRecords();
+    }
+ catch (    final PaymentApiException e) {
+      log.warn("Error while searching plugin " + pluginName,e);
+    }
+  }
+  return new DefaultPagination<Payment>(offset,limit,totalNbRecords,maxNbRecords,allResults.iterator());
+}

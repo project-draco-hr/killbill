@@ -1,0 +1,14 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Pagination<Payment> payments;
+  final Map<String,String> nextUriParams=new HashMap<String,String>();
+  if (Strings.isNullOrEmpty(pluginName)) {
+    payments=paymentApi.getPayments(offset,limit,tenantContext);
+  }
+ else {
+    payments=paymentApi.getPayments(offset,limit,pluginName,tenantContext);
+    nextUriParams.put(QUERY_PAYMENT_PLUGIN_NAME,pluginName);
+  }
+  final URI nextPageUri=uriBuilder.nextPage(PaymentResource.class,"getPayments",payments.getNextOffset(),limit,nextUriParams);
+  return buildStreamingPaymentsResponse(payments,nextPageUri);
+}

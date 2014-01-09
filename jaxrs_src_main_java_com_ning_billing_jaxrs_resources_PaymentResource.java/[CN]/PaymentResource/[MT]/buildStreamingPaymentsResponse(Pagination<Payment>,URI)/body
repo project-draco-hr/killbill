@@ -1,0 +1,17 @@
+{
+  final StreamingOutput json=new StreamingOutput(){
+    @Override public void write(    final OutputStream output) throws IOException, WebApplicationException {
+      final JsonGenerator generator=mapper.getFactory().createJsonGenerator(output);
+      generator.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET,false);
+      generator.writeStartArray();
+      for (      final Payment payment : payments) {
+        final PaymentJson asJson=new PaymentJson(payment,null);
+        generator.writeObject(asJson);
+      }
+      generator.writeEndArray();
+      generator.close();
+    }
+  }
+;
+  return Response.status(Status.OK).entity(json).header(HDR_PAGINATION_CURRENT_OFFSET,payments.getCurrentOffset()).header(HDR_PAGINATION_NEXT_OFFSET,payments.getNextOffset()).header(HDR_PAGINATION_TOTAL_NB_RECORDS,payments.getTotalNbRecords()).header(HDR_PAGINATION_MAX_NB_RECORDS,payments.getMaxNbRecords()).header(HDR_PAGINATION_NEXT_PAGE_URI,nextPageUri).build();
+}
