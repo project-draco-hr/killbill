@@ -29,7 +29,7 @@
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseEntitlement,true,true);
   invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,8,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
-  final List<Invoice> invoicesToAdjust=ImmutableList.<Invoice>copyOf(invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext));
+  final List<Invoice> invoicesToAdjust=getUnpaidInvoicesOrderFromRecent();
   for (int i=0; i < invoicesToAdjust.size(); i++) {
     if (i == invoicesToAdjust.size() - 1) {
       fullyAdjustInvoiceAndCheckForCompletion(account,invoicesToAdjust.get(i),NextEvent.BLOCK,NextEvent.INVOICE_ADJUSTMENT);

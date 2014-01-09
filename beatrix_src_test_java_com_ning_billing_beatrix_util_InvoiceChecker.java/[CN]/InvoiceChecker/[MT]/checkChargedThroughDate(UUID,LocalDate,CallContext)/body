@@ -6,11 +6,7 @@
       assertNull(subscription.getChargedThroughDate());
     }
  else {
-      final DateTime expectedCTD=expectedLocalCTD.toDateTime(new LocalTime(subscription.getStartDate().getMillis(),DateTimeZone.UTC),DateTimeZone.UTC);
-      final String msg=String.format("Checking CTD for entitlement %s : expectedLocalCTD = %s => expectedCTD = %s, got %s",entitlementId,expectedLocalCTD,expectedCTD,subscription.getChargedThroughDate());
-      log.info(msg);
-      assertNotNull(subscription.getChargedThroughDate());
-      assertTrue(subscription.getChargedThroughDate().compareTo(expectedCTD) == 0,msg);
+      assertTrue(expectedLocalCTD.compareTo(subscription.getChargedThroughDate().toLocalDate()) == 0);
     }
   }
  catch (  EntitlementApiException e) {

@@ -8,7 +8,12 @@
     recordFutureNotification(effectiveDate,notificationEvent,context);
   }
  else {
-    final BusEvent event=new DefaultBlockingTransitionInternalEvent(blockableId,type,isTransitionToBlockedBilling,isTransitionToUnblockedBilling,isTransitionToBlockedEntitlement,isTransitionToUnblockedEntitlement,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
-    postBusEvent(event);
+    if (!serviceName.equals(EntitlementService.ENTITLEMENT_SERVICE_NAME) || !previousState.equals(currentState)) {
+      final BusEvent event=new DefaultBlockingTransitionInternalEvent(blockableId,type,isTransitionToBlockedBilling,isTransitionToUnblockedBilling,isTransitionToBlockedEntitlement,isTransitionToUnblockedEntitlement,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+      postBusEvent(event);
+    }
+ else {
+      System.out.println("**********   SKIPPING EVENT ");
+    }
   }
 }
