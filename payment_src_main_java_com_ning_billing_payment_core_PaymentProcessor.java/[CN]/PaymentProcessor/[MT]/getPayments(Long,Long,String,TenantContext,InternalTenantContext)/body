@@ -3,17 +3,16 @@
   final Pagination<PaymentModelDao> paymentModelDaos=paymentDao.getPayments(pluginName,offset,limit,internalTenantContext);
   return new DefaultPagination<Payment>(paymentModelDaos,limit,Iterators.<Payment>filter(Iterators.<PaymentModelDao,Payment>transform(paymentModelDaos.iterator(),new Function<PaymentModelDao,Payment>(){
     @Override public Payment apply(    final PaymentModelDao paymentModelDao){
-      final PaymentInfoPlugin pluginInfo;
+      PaymentInfoPlugin pluginInfo=null;
       try {
         pluginInfo=pluginApi.getPaymentInfo(paymentModelDao.getAccountId(),paymentModelDao.getId(),tenantContext);
+        if (pluginInfo.getKbPaymentId() == null) {
+          log.debug("Plugin {} returned a payment without a kbPaymentId",pluginName);
+          pluginInfo=null;
+        }
       }
  catch (      final PaymentPluginApiException e) {
         log.warn("Unable to find payment  id " + paymentModelDao.getId() + " in plugin "+ pluginName);
-        return null;
-      }
-      if (pluginInfo.getKbPaymentId() == null) {
-        log.debug("Plugin {} returned a payment without a kbPaymentId",pluginName);
-        return null;
       }
       return fromPaymentModelDao(paymentModelDao,pluginInfo,internalTenantContext);
     }
