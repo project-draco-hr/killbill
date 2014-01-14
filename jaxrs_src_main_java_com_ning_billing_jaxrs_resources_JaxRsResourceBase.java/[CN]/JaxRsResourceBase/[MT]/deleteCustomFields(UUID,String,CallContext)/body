@@ -1,3 +1,24 @@
 {
+  final List<CustomField> fields=customFieldUserApi.getCustomFieldsForObject(id,getObjectType(),context);
+  final String[] requestedIds=customFieldList != null ? customFieldList.split("\\s*,\\s*") : null;
+  final Iterable inputIterable=Iterables.filter(fields,new Predicate<CustomField>(){
+    @Override public boolean apply(    final CustomField input){
+      if (customFieldList == null) {
+        return true;
+      }
+      for (      final String cur : requestedIds) {
+        final UUID curId=UUID.fromString(cur);
+        if (input.getId().equals(curId)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+);
+  if (inputIterable.iterator().hasNext()) {
+    final List<CustomField> input=ImmutableList.<CustomField>copyOf(inputIterable);
+    customFieldUserApi.removeCustomFields(input,context);
+  }
   return Response.status(Response.Status.OK).build();
 }
