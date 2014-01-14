@@ -1,9 +1,13 @@
 {
-  final Pagination<InvoiceModelDao> invoiceModelDaos=dao.get(offset,limit,internalCallContextFactory.createInternalTenantContext(context));
-  return new DefaultPagination<Invoice>(invoiceModelDaos,limit,Iterators.<InvoiceModelDao,Invoice>transform(invoiceModelDaos.iterator(),new Function<InvoiceModelDao,Invoice>(){
-    @Override public Invoice apply(    final InvoiceModelDao input){
-      return new DefaultInvoice(input);
+  return getEntityPaginationNoException(limit,new SourcePaginationBuilder<InvoiceModelDao,InvoiceApiException>(){
+    @Override public Pagination<InvoiceModelDao> build(){
+      return dao.get(offset,limit,internalCallContextFactory.createInternalTenantContext(context));
     }
   }
-));
+,new Function<InvoiceModelDao,Invoice>(){
+    @Override public Invoice apply(    final InvoiceModelDao invoiceModelDao){
+      return new DefaultInvoice(invoiceModelDao);
+    }
+  }
+);
 }

@@ -1,13 +1,16 @@
 {
   final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
-  final Pagination<PaymentMethodPlugin> paymentMethods;
-  try {
-    paymentMethods=pluginApi.searchPaymentMethods(searchKey,offset,limit,buildTenantContext(internalTenantContext));
+  return getEntityPagination(limit,new SourcePaginationBuilder<PaymentMethodPlugin,PaymentApiException>(){
+    @Override public Pagination<PaymentMethodPlugin> build() throws PaymentApiException {
+      try {
+        return pluginApi.searchPaymentMethods(searchKey,offset,limit,buildTenantContext(internalTenantContext));
+      }
+ catch (      final PaymentPluginApiException e) {
+        throw new PaymentApiException(e,ErrorCode.PAYMENT_PLUGIN_SEARCH_PAYMENT_METHODS,pluginName,searchKey);
+      }
+    }
   }
- catch (  PaymentPluginApiException e) {
-    throw new PaymentApiException(e,ErrorCode.PAYMENT_PLUGIN_SEARCH_PAYMENT_METHODS,pluginName,searchKey);
-  }
-  return new DefaultPagination<PaymentMethod>(paymentMethods,limit,Iterators.<PaymentMethod>filter(Iterators.<PaymentMethodPlugin,PaymentMethod>transform(paymentMethods.iterator(),new Function<PaymentMethodPlugin,PaymentMethod>(){
+,new Function<PaymentMethodPlugin,PaymentMethod>(){
     @Override public PaymentMethod apply(    final PaymentMethodPlugin paymentMethodPlugin){
       if (paymentMethodPlugin.getKbPaymentMethodId() == null) {
         log.debug("Plugin {} returned a payment method without a kbPaymentMethodId for searchKey {}",pluginName,searchKey);
@@ -21,5 +24,5 @@
       return new DefaultPaymentMethod(paymentMethodModelDao,paymentMethodPlugin);
     }
   }
-),Predicates.<PaymentMethod>notNull()));
+);
 }

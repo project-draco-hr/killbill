@@ -1,9 +1,13 @@
 {
-  final Pagination<AccountModelDao> accountModelDaos=accountDao.searchAccounts(searchKey,offset,limit,internalCallContextFactory.createInternalTenantContext(context));
-  return new DefaultPagination<Account>(accountModelDaos,limit,Iterators.<AccountModelDao,Account>transform(accountModelDaos.iterator(),new Function<AccountModelDao,Account>(){
-    @Override public Account apply(    final AccountModelDao input){
-      return new DefaultAccount(input);
+  return getEntityPaginationNoException(limit,new SourcePaginationBuilder<AccountModelDao,AccountApiException>(){
+    @Override public Pagination<AccountModelDao> build(){
+      return accountDao.searchAccounts(searchKey,offset,limit,internalCallContextFactory.createInternalTenantContext(context));
     }
   }
-));
+,new Function<AccountModelDao,Account>(){
+    @Override public Account apply(    final AccountModelDao accountModelDao){
+      return new DefaultAccount(accountModelDao);
+    }
+  }
+);
 }

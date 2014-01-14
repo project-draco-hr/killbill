@@ -1,26 +1,8 @@
 {
-  final List<Payment> allResults=new LinkedList<Payment>();
-  Long totalNbRecords=0L;
-  Long maxNbRecords=0L;
-  boolean firstSearch=true;
-  for (  final String pluginName : getAvailablePlugins()) {
-    try {
-      final Pagination<Payment> payments;
-      if (allResults.size() >= limit) {
-        payments=searchPayments(searchKey,firstSearch ? offset : 0L,1L,pluginName,internalTenantContext);
-        ImmutableList.<Payment>copyOf(payments);
-      }
- else {
-        payments=searchPayments(searchKey,firstSearch ? offset : 0L,limit - allResults.size(),pluginName,internalTenantContext);
-        allResults.addAll(ImmutableList.<Payment>copyOf(payments));
-      }
-      firstSearch=false;
-      totalNbRecords+=payments.getTotalNbRecords();
-      maxNbRecords+=payments.getMaxNbRecords();
-    }
- catch (    final PaymentApiException e) {
-      log.warn("Error while searching plugin " + pluginName,e);
+  return getEntityPaginationFromPlugins(getAvailablePlugins(),offset,limit,new EntityPaginationBuilder<Payment,PaymentApiException>(){
+    @Override public Pagination<Payment> build(    final Long offset,    final Long limit,    final String pluginName) throws PaymentApiException {
+      return searchPayments(searchKey,offset,limit,pluginName,internalTenantContext);
     }
   }
-  return new DefaultPagination<Payment>(offset,limit,totalNbRecords,maxNbRecords,allResults.iterator());
+);
 }

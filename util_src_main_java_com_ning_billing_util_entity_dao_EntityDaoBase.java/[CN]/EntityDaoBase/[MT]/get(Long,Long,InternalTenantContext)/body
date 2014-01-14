@@ -1,17 +1,8 @@
 {
-  final Long count=transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Long>(){
-    @Override public Long inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
-      final EntitySqlDao<M,E> sqlDao=entitySqlDaoWrapperFactory.become(realSqlDao);
-      final Iterator<M> dumbIterator=sqlDao.get(offset,1L,getNaturalOrderingColumns(),context);
-      while (dumbIterator.hasNext()) {
-        dumbIterator.next();
-      }
-      return sqlDao.getFoundRows(context);
+  return paginationHelper.getPagination(realSqlDao,new PaginationIteratorBuilder<M,E,EntitySqlDao<M,E>>(){
+    @Override public Iterator<M> build(    final EntitySqlDao<M,E> sqlDao,    final Long limit){
+      return sqlDao.get(offset,limit,getNaturalOrderingColumns(),context);
     }
   }
-);
-  final EntitySqlDao<M,E> sqlDao=transactionalSqlDao.onDemand(realSqlDao);
-  final Long totalCount=sqlDao.getCount(context);
-  final Iterator<M> results=sqlDao.get(offset,limit,getNaturalOrderingColumns(),context);
-  return new DefaultPagination<M>(offset,limit,count,totalCount,results);
+,offset,limit,context);
 }

@@ -1,0 +1,22 @@
+{
+  final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
+  return getEntityPagination(limit,new SourcePaginationBuilder<RefundModelDao,PaymentApiException>(){
+    @Override public Pagination<RefundModelDao> build(){
+      return paymentDao.getRefunds(pluginName,offset,limit,internalTenantContext);
+    }
+  }
+,new Function<RefundModelDao,Refund>(){
+    @Override public Refund apply(    final RefundModelDao refundModelDao){
+      List<RefundInfoPlugin> refundInfoPlugins=null;
+      try {
+        refundInfoPlugins=pluginApi.getRefundInfo(refundModelDao.getAccountId(),refundModelDao.getId(),tenantContext);
+      }
+ catch (      final PaymentPluginApiException e) {
+        log.warn("Unable to find refund id " + refundModelDao.getId() + " in plugin "+ pluginName);
+      }
+      final RefundInfoPlugin refundInfoPlugin=findRefundInfoPlugin(refundModelDao,refundInfoPlugins);
+      return new DefaultRefund(refundModelDao,refundInfoPlugin);
+    }
+  }
+);
+}

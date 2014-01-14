@@ -4,11 +4,28 @@
     throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_REFUND,refundId);
   }
   final List<RefundModelDao> filteredInput=filterUncompletedPluginRefund(Collections.singletonList(result));
-  if (filteredInput.size() == 0) {
+  if (filteredInput.isEmpty()) {
     throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_REFUND,refundId);
   }
   if (completePluginCompletedRefund(filteredInput,context)) {
     result=paymentDao.getRefund(refundId,context);
   }
-  return new DefaultRefund(result.getId(),result.getCreatedDate(),result.getUpdatedDate(),result.getPaymentId(),result.getAmount(),result.getCurrency(),result.isAdjusted(),result.getCreatedDate(),result.getRefundStatus());
+  final Account account;
+  try {
+    account=accountInternalApi.getAccountById(result.getAccountId(),context);
+  }
+ catch (  final AccountApiException e) {
+    throw new PaymentApiException(e);
+  }
+  final PaymentPluginApi plugin=withPluginInfo ? getPaymentProviderPlugin(account,context) : null;
+  List<RefundInfoPlugin> refundInfoPlugins=ImmutableList.<RefundInfoPlugin>of();
+  if (plugin != null) {
+    try {
+      refundInfoPlugins=plugin.getRefundInfo(account.getId(),result.getPaymentId(),buildTenantContext(context));
+    }
+ catch (    final PaymentPluginApiException e) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_GET_REFUND_INFO,refundId,e.toString());
+    }
+  }
+  return new DefaultRefund(result,findRefundInfoPlugin(result,refundInfoPlugins));
 }

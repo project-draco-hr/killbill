@@ -1,0 +1,9 @@
+{
+  final ImmutableList<RefundInfoPlugin> results=ImmutableList.<RefundInfoPlugin>copyOf(Iterables.<RefundInfoPlugin>filter(refunds.values(),new Predicate<RefundInfoPlugin>(){
+    @Override public boolean apply(    final RefundInfoPlugin input){
+      return (input.getKbPaymentId() != null && input.getKbPaymentId().toString().equals(searchKey)) || (input.getFirstRefundReferenceId() != null && input.getFirstRefundReferenceId().contains(searchKey)) || (input.getSecondRefundReferenceId() != null && input.getSecondRefundReferenceId().contains(searchKey));
+    }
+  }
+));
+  return DefaultPagination.<RefundInfoPlugin>build(offset,limit,results);
+}

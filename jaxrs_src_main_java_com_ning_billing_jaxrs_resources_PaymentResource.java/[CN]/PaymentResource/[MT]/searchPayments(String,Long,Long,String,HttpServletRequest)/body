@@ -8,5 +8,10 @@
     payments=paymentApi.searchPayments(searchKey,offset,limit,pluginName,tenantContext);
   }
   final URI nextPageUri=uriBuilder.nextPage(PaymentResource.class,"searchPayments",payments.getNextOffset(),limit,ImmutableMap.<String,String>of());
-  return buildStreamingPaymentsResponse(payments,nextPageUri);
+  return buildStreamingPaginationResponse(payments,new Function<Payment,PaymentJson>(){
+    @Override public PaymentJson apply(    final Payment payment){
+      return new PaymentJson(payment,null);
+    }
+  }
+,nextPageUri);
 }

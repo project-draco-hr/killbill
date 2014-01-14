@@ -1,0 +1,26 @@
+{
+  final List<E> allResults=new LinkedList<E>();
+  Long totalNbRecords=0L;
+  Long maxNbRecords=0L;
+  boolean firstSearch=true;
+  for (  final String pluginName : plugins) {
+    try {
+      final Pagination<E> pages;
+      if (allResults.size() >= limit) {
+        pages=entityPaginationBuilder.build(firstSearch ? offset : 0L,1L,pluginName);
+        ImmutableList.<E>copyOf(pages);
+      }
+ else {
+        pages=entityPaginationBuilder.build(firstSearch ? offset : 0L,limit - allResults.size(),pluginName);
+        allResults.addAll(ImmutableList.<E>copyOf(pages));
+      }
+      firstSearch=false;
+      totalNbRecords+=pages.getTotalNbRecords();
+      maxNbRecords+=pages.getMaxNbRecords();
+    }
+ catch (    final BillingExceptionBase e) {
+      log.warn("Error while searching plugin " + pluginName,e);
+    }
+  }
+  return new DefaultPagination<E>(offset,limit,totalNbRecords,maxNbRecords,allResults.iterator());
+}

@@ -10,5 +10,10 @@
     nextUriParams.put(QUERY_PAYMENT_PLUGIN_NAME,pluginName);
   }
   final URI nextPageUri=uriBuilder.nextPage(PaymentResource.class,"getPayments",payments.getNextOffset(),limit,nextUriParams);
-  return buildStreamingPaymentsResponse(payments,nextPageUri);
+  return buildStreamingPaginationResponse(payments,new Function<Payment,PaymentJson>(){
+    @Override public PaymentJson apply(    final Payment payment){
+      return new PaymentJson(payment,null);
+    }
+  }
+,nextPageUri);
 }

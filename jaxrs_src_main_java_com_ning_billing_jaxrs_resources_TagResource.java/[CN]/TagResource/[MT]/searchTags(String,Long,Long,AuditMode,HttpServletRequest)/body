@@ -1,0 +1,17 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Pagination<Tag> tags=tagUserApi.searchTags(searchKey,offset,limit,tenantContext);
+  final URI nextPageUri=uriBuilder.nextPage(TagResource.class,"searchTags",tags.getNextOffset(),limit,ImmutableMap.<String,String>of("searchKey",searchKey,QUERY_AUDIT,auditMode.toString()));
+  final Map<UUID,TagDefinition> tagDefinitionsCache=new HashMap<UUID,TagDefinition>();
+  for (  final TagDefinition tagDefinition : tagUserApi.getTagDefinitions(tenantContext)) {
+    tagDefinitionsCache.put(tagDefinition.getId(),tagDefinition);
+  }
+  return buildStreamingPaginationResponse(tags,new Function<Tag,TagJson>(){
+    @Override public TagJson apply(    final Tag tag){
+      final TagDefinition tagDefinition=tagDefinitionsCache.get(tag.getTagDefinitionId());
+      final List<AuditLog> auditLogs=auditUserApi.getAuditLogs(tag.getId(),ObjectType.TAG,auditMode.getLevel(),tenantContext);
+      return new TagJson(tag,tagDefinition,auditLogs);
+    }
+  }
+,nextPageUri);
+}

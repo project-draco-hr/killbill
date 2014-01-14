@@ -23,7 +23,7 @@ case PENDING:
 return new DefaultRefund(refundInfo.getId(),refundInfo.getCreatedDate(),refundInfo.getUpdatedDate(),paymentId,refundInfo.getAmount(),account.getCurrency(),isAdjusted,refundInfo.getCreatedDate(),RefundStatus.PENDING);
 default :
 paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.PLUGIN_ERRORED,refundAmount,account.getCurrency(),context);
-throw new PaymentPluginApiException("Refund error for RefundInfo: " + refundInfo.toString(),String.format("Gateway error: %s, Gateway error code: %s, Reference id: %s",refundInfoPlugin.getGatewayError(),refundInfoPlugin.getGatewayErrorCode(),refundInfoPlugin.getReferenceId()));
+throw new PaymentPluginApiException("Refund error for RefundInfo: " + refundInfo.toString(),String.format("Gateway error: %s, Gateway error code: %s, Reference ids: %s / %s",refundInfoPlugin.getGatewayError(),refundInfoPlugin.getGatewayErrorCode(),refundInfoPlugin.getFirstRefundReferenceId(),refundInfoPlugin.getSecondRefundReferenceId()));
 }
 }
  catch (PaymentPluginApiException e) {
