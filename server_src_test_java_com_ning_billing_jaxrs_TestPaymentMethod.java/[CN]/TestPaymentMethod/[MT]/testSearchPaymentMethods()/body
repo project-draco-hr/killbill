@@ -1,10 +1,10 @@
 {
-  Assert.assertEquals(searchPaymentMethodsByKey(UUID.randomUUID().toString()).size(),0);
-  Assert.assertEquals(searchPaymentMethodsByKeyAndPlugin(UUID.randomUUID().toString(),PLUGIN_NAME).size(),0);
-  final AccountJson accountJson=createAccountWithDefaultPaymentMethod();
-  final PaymentMethodJson paymentMethodJson=getPaymentMethodWithPluginInfo(accountJson.getPaymentMethodId());
-  Assert.assertEquals(searchPaymentMethodsByKey(UUID.randomUUID().toString()).size(),0);
-  Assert.assertEquals(searchPaymentMethodsByKeyAndPlugin(UUID.randomUUID().toString(),PLUGIN_NAME).size(),0);
+  Assert.assertEquals(killBillClient.searchPaymentMethodsByKey(UUID.randomUUID().toString()).size(),0);
+  Assert.assertEquals(killBillClient.searchPaymentMethodsByKeyAndPlugin(UUID.randomUUID().toString(),PLUGIN_NAME).size(),0);
+  final Account accountJson=createAccountWithDefaultPaymentMethod();
+  final PaymentMethod paymentMethodJson=killBillClient.getPaymentMethod(accountJson.getPaymentMethodId(),true);
+  Assert.assertEquals(killBillClient.searchPaymentMethodsByKey(UUID.randomUUID().toString()).size(),0);
+  Assert.assertEquals(killBillClient.searchPaymentMethodsByKeyAndPlugin(UUID.randomUUID().toString(),PLUGIN_NAME).size(),0);
   doSearch("Foo",paymentMethodJson);
   doSearch("4365",paymentMethodJson);
   doSearch("Bozo",paymentMethodJson);

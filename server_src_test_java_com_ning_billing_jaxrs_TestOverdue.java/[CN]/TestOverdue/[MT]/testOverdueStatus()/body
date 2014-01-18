@@ -1,23 +1,26 @@
 {
-  final AccountJson accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
-  final List<InvoiceJson> invoices=getInvoicesWithItemsForAccount(accountJson.getAccountId());
+  final Account accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
+  final List<Invoice> invoices=killBillClient.getInvoicesForAccount(accountJson.getAccountId());
   assertEquals(invoices.size(),2);
-  final String bundleId=invoices.get(1).getItems().get(0).getBundleId();
-  Assert.assertTrue(getOverdueStateForAccount(accountJson.getAccountId()).isClearState());
+  Assert.assertTrue(killBillClient.getOverdueStateForAccount(accountJson.getAccountId()).getIsClearState());
   clock.addDays(30);
   crappyWaitForLackOfProperSynchonization();
-  Assert.assertEquals(getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD1");
+  Assert.assertEquals(killBillClient.getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD1");
   clock.addDays(10);
   crappyWaitForLackOfProperSynchonization();
-  Assert.assertEquals(getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD2");
+  Assert.assertEquals(killBillClient.getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD2");
   clock.addDays(10);
   crappyWaitForLackOfProperSynchonization();
-  Assert.assertEquals(getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD3");
-  for (  final InvoiceJson invoice : getInvoicesForAccount(accountJson.getAccountId())) {
+  Assert.assertEquals(killBillClient.getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD3");
+  for (  final Invoice invoice : killBillClient.getInvoicesForAccount(accountJson.getAccountId())) {
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-      createExternalPayment(accountJson,invoice.getInvoiceId(),invoice.getBalance());
+      final Payment payment=new Payment();
+      payment.setAccountId(accountJson.getAccountId());
+      payment.setInvoiceId(invoice.getInvoiceId());
+      payment.setAmount(invoice.getBalance());
+      killBillClient.createPayment(payment,true,createdBy,reason,comment);
     }
   }
   crappyWaitForLackOfProperSynchonization();
-  Assert.assertTrue(getOverdueStateForAccount(accountJson.getAccountId()).isClearState());
+  Assert.assertTrue(killBillClient.getOverdueStateForAccount(accountJson.getAccountId()).getIsClearState());
 }

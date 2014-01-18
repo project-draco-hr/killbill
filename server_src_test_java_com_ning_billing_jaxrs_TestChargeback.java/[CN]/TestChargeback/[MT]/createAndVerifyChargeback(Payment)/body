@@ -1,0 +1,16 @@
+{
+  final Chargeback chargeback=new Chargeback();
+  chargeback.setPaymentId(payment.getPaymentId());
+  chargeback.setAmount(BigDecimal.TEN);
+  final Chargeback chargebackJson=killBillClient.createChargeBack(chargeback,createdBy,reason,comment);
+  assertEquals(chargebackJson.getAmount().compareTo(chargeback.getAmount()),0);
+  assertEquals(chargebackJson.getPaymentId(),chargeback.getPaymentId());
+  List<Chargeback> chargebacks=killBillClient.getChargebacksForAccount(payment.getAccountId());
+  assertEquals(chargebacks.size(),1);
+  assertEquals(chargebacks.get(0).getAmount().compareTo(chargeback.getAmount()),0);
+  assertEquals(chargebacks.get(0).getPaymentId(),chargeback.getPaymentId());
+  chargebacks=killBillClient.getChargebacksForPayment(payment.getPaymentId());
+  assertEquals(chargebacks.size(),1);
+  assertEquals(chargebacks.get(0).getAmount().compareTo(chargeback.getAmount()),0);
+  assertEquals(chargebacks.get(0).getPaymentId(),chargeback.getPaymentId());
+}

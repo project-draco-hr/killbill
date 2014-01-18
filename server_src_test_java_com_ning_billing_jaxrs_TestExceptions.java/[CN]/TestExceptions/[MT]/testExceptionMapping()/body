@@ -1,12 +1,16 @@
 {
-  final String uri=JaxrsResource.ACCOUNTS_PATH + "/99999999-b103-42f3-8b6e-dd244f1d0747";
-  final Response response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.NOT_FOUND.getStatusCode());
-  final BillingExceptionJson objFromJson=mapper.readValue(response.getResponseBody(),new TypeReference<BillingExceptionJson>(){
+  final Account account=createAccountWithPMBundleAndSubscriptionAndWaitForFirstInvoice();
+  final List<Payment> payments=killBillClient.getPaymentsForAccount(account.getAccountId());
+  final Chargeback input=new Chargeback();
+  input.setAmount(BigDecimal.TEN.negate());
+  input.setPaymentId(payments.get(0).getPaymentId());
+  try {
+    killBillClient.createChargeBack(input,createdBy,reason,comment);
+    fail();
   }
-);
-  Assert.assertNotNull(objFromJson);
-  Assert.assertEquals(objFromJson.getClassName(),AccountApiException.class.getName());
-  Assert.assertEquals(objFromJson.getCode(),(Integer)ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID.getCode());
-  Assert.assertTrue(objFromJson.getStackTrace().size() > 0);
+ catch (  final KillBillClientException e) {
+    Assert.assertEquals(e.getBillingException().getClassName(),InvoiceApiException.class.getName());
+    Assert.assertEquals(e.getBillingException().getCode(),(Integer)ErrorCode.CHARGE_BACK_AMOUNT_IS_NEGATIVE.getCode());
+    Assert.assertFalse(e.getBillingException().getStackTrace().isEmpty());
+  }
 }

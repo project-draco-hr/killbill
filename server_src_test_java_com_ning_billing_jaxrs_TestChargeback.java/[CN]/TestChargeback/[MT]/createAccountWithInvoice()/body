@@ -1,17 +1,11 @@
 {
-  final AccountJson accountJson=createAccountWithDefaultPaymentMethod(UUID.randomUUID().toString(),UUID.randomUUID().toString(),"nohup@yahoo.com");
-  final SubscriptionJson subscriptionJson=createEntitlement(accountJson.getAccountId(),"6253283","Shotgun",ProductCategory.BASE.toString(),BillingPeriod.MONTHLY.toString(),true);
+  final Account accountJson=createAccountWithDefaultPaymentMethod();
+  final Subscription subscriptionJson=createEntitlement(accountJson.getAccountId(),"6253283","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,true);
   assertNotNull(subscriptionJson);
   clock.addDays(32);
   crappyWaitForLackOfProperSynchonization();
-  final Response response=doGet(JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.INVOICES,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  final String baseJson=response.getResponseBody();
-  final List<InvoiceJson> objFromJson=mapper.readValue(baseJson,new TypeReference<List<InvoiceJson>>(){
-  }
-);
-  assertNotNull(objFromJson);
-  assertEquals(objFromJson.size(),2);
-  assertTrue(objFromJson.get(1).getAmount().doubleValue() > 0);
-  return objFromJson.get(1);
+  final List<Invoice> invoices=killBillClient.getInvoicesForAccount(accountJson.getAccountId());
+  assertEquals(invoices.size(),2);
+  assertTrue(invoices.get(1).getAmount().doubleValue() > 0);
+  return invoices.get(1);
 }

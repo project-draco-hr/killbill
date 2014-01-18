@@ -1,7 +1,12 @@
 {
   logout();
-  final Response anonResponse=doGet(JaxrsResource.SECURITY_PATH + "/permissions",DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(anonResponse.getStatusCode(),Status.UNAUTHORIZED.getStatusCode());
+  try {
+    killBillClient.getPermissions();
+    Assert.fail();
+  }
+ catch (  final KillBillClientException e) {
+    Assert.assertEquals(e.getResponse().getStatusCode(),Status.UNAUTHORIZED.getStatusCode());
+  }
   final List<String> pierresPermissions=getPermissions("pierre","password");
   Assert.assertEquals(pierresPermissions.size(),2);
   Assert.assertEquals(new HashSet<String>(pierresPermissions),ImmutableSet.<String>of(Permission.INVOICE_CAN_CREDIT.toString(),Permission.INVOICE_CAN_ITEM_ADJUST.toString()));

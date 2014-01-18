@@ -1,0 +1,18 @@
+{
+  for (  final AuditLevel auditLevel : AuditLevel.values()) {
+    final AccountTimeline timeline=killBillClient.getAccountTimeline(accountId,auditLevel);
+    Assert.assertEquals(timeline.getInvoices().size(),2);
+    final List<AuditLog> firstInvoiceAuditLogs=timeline.getInvoices().get(0).getAuditLogs();
+    final List<AuditLog> secondInvoiceAuditLogs=timeline.getInvoices().get(1).getAuditLogs();
+    if (AuditLevel.NONE.equals(auditLevel)) {
+      Assert.assertEquals(firstInvoiceAuditLogs.size(),0);
+      Assert.assertEquals(secondInvoiceAuditLogs.size(),0);
+    }
+ else {
+      Assert.assertEquals(firstInvoiceAuditLogs.size(),1);
+      verifyAuditLog(firstInvoiceAuditLogs.get(0),ChangeType.INSERT,null,null,TRANSITION,startTime,endTime);
+      Assert.assertEquals(secondInvoiceAuditLogs.size(),1);
+      verifyAuditLog(secondInvoiceAuditLogs.get(0),ChangeType.INSERT,null,null,TRANSITION,startTime,endTime);
+    }
+  }
+}

@@ -1,7 +1,4 @@
 {
-  final AccountJson input=getAccountJson();
-  final String baseJson=mapper.writeValueAsString(input);
-  final String uri=JaxrsResource.ACCOUNTS_PATH + "/" + input.getAccountId();
-  final Response response=doPut(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.NOT_FOUND.getStatusCode());
+  final Account input=getAccount();
+  Assert.assertNull(killBillClient.updateAccount(input,createdBy,reason,comment));
 }

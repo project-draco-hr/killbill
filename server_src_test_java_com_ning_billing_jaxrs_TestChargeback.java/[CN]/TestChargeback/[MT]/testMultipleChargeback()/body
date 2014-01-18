@@ -1,30 +1,24 @@
 {
-  final PaymentJson payment=createAccountWithInvoiceAndPayment();
-  final ChargebackJson input=new ChargebackJson(null,null,null,null,new BigDecimal("50.00"),payment.getPaymentId(),null,null);
-  final String jsonInput=mapper.writeValueAsString(input);
+  final Payment payment=createAccountWithInvoiceAndPayment();
+  final Chargeback input=new Chargeback();
+  input.setAmount(new BigDecimal("50.00"));
+  input.setPaymentId(payment.getPaymentId());
   int count=4;
-  Response response;
   while (count-- > 0) {
-    response=doPost(JaxrsResource.CHARGEBACKS_PATH,jsonInput,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-    assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.CREATED.getStatusCode(),response.getResponseBody());
+    assertNotNull(killBillClient.createChargeBack(input,createdBy,reason,comment));
   }
-  response=doPost(JaxrsResource.CHARGEBACKS_PATH,jsonInput,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode(),response.getResponseBody());
-  response=doGet(JaxrsResource.ACCOUNTS_PATH + "/" + payment.getAccountId()+ "/"+ JaxrsResource.CHARGEBACKS,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
-  List<ChargebackJson> chargebacks=mapper.readValue(response.getResponseBody(),new TypeReference<List<ChargebackJson>>(){
+  try {
+    killBillClient.createChargeBack(input,createdBy,reason,comment);
+    fail();
   }
-);
+ catch (  final KillBillClientException e) {
+  }
+  List<Chargeback> chargebacks=killBillClient.getChargebacksForAccount(payment.getAccountId());
   assertEquals(chargebacks.size(),4);
-  for (int i=0; i < chargebacks.size(); i++) {
-    final ChargebackJson chargeBack=chargebacks.get(i);
+  for (  final Chargeback chargeBack : chargebacks) {
     assertTrue(chargeBack.getAmount().compareTo(input.getAmount()) == 0);
     assertEquals(chargeBack.getPaymentId(),input.getPaymentId());
   }
-  response=doGet(JaxrsResource.PAYMENTS_PATH + "/" + payment.getPaymentId()+ "/"+ JaxrsResource.CHARGEBACKS,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
-  chargebacks=mapper.readValue(response.getResponseBody(),new TypeReference<List<ChargebackJson>>(){
-  }
-);
+  chargebacks=killBillClient.getChargebacksForPayment(payment.getPaymentId());
   assertEquals(chargebacks.size(),4);
 }

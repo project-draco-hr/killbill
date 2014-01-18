@@ -1,44 +1,19 @@
 {
-  Response response=doGet(JaxrsResource.TAG_DEFINITIONS_PATH,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  String baseJson=response.getResponseBody();
-  List<TagDefinitionJson> objFromJson=mapper.readValue(baseJson,new TypeReference<List<TagDefinitionJson>>(){
-  }
-);
-  final int sizeSystemTag=(objFromJson == null || objFromJson.size() == 0) ? 0 : objFromJson.size();
-  final TagDefinitionJson inputBlue=new TagDefinitionJson(null,false,"blue","relaxing color",ImmutableList.<String>of());
-  baseJson=mapper.writeValueAsString(inputBlue);
-  response=doPost(JaxrsResource.TAG_DEFINITIONS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  final TagDefinitionJson inputRed=new TagDefinitionJson(null,false,"red","hot color",ImmutableList.<String>of());
-  baseJson=mapper.writeValueAsString(inputRed);
-  response=doPost(JaxrsResource.TAG_DEFINITIONS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  final TagDefinitionJson inputYellow=new TagDefinitionJson(null,false,"yellow","vibrant color",ImmutableList.<String>of());
-  baseJson=mapper.writeValueAsString(inputYellow);
-  response=doPost(JaxrsResource.TAG_DEFINITIONS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  final TagDefinitionJson inputGreen=new TagDefinitionJson(null,false,"green","super relaxing color",ImmutableList.<String>of());
-  baseJson=mapper.writeValueAsString(inputGreen);
-  response=doPost(JaxrsResource.TAG_DEFINITIONS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  response=doGet(JaxrsResource.TAG_DEFINITIONS_PATH,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  baseJson=response.getResponseBody();
-  objFromJson=mapper.readValue(baseJson,new TypeReference<List<TagDefinitionJson>>(){
-  }
-);
+  List<TagDefinition> objFromJson=killBillClient.getTagDefinitions();
+  final int sizeSystemTag=objFromJson.isEmpty() ? 0 : objFromJson.size();
+  final TagDefinition inputBlue=new TagDefinition(null,false,"blue","relaxing color",ImmutableList.<String>of());
+  killBillClient.createTagDefinition(inputBlue,createdBy,reason,comment);
+  final TagDefinition inputRed=new TagDefinition(null,false,"red","hot color",ImmutableList.<String>of());
+  killBillClient.createTagDefinition(inputRed,createdBy,reason,comment);
+  final TagDefinition inputYellow=new TagDefinition(null,false,"yellow","vibrant color",ImmutableList.<String>of());
+  killBillClient.createTagDefinition(inputYellow,createdBy,reason,comment);
+  final TagDefinition inputGreen=new TagDefinition(null,false,"green","super relaxing color",ImmutableList.<String>of());
+  killBillClient.createTagDefinition(inputGreen,createdBy,reason,comment);
+  objFromJson=killBillClient.getTagDefinitions();
   assertNotNull(objFromJson);
   assertEquals(objFromJson.size(),4 + sizeSystemTag);
-  final String uri=JaxrsResource.TAG_DEFINITIONS_PATH + "/" + objFromJson.get(0).getId();
-  response=doDelete(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.NO_CONTENT.getStatusCode());
-  response=doGet(JaxrsResource.TAG_DEFINITIONS_PATH,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  baseJson=response.getResponseBody();
-  objFromJson=mapper.readValue(baseJson,new TypeReference<List<TagDefinitionJson>>(){
-  }
-);
+  killBillClient.deleteTagDefinition(objFromJson.get(0).getId(),createdBy,reason,comment);
+  objFromJson=killBillClient.getTagDefinitions();
   assertNotNull(objFromJson);
   assertEquals(objFromJson.size(),3 + sizeSystemTag);
 }

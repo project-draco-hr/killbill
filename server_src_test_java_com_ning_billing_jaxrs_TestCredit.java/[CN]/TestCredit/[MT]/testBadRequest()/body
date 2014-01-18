@@ -1,6 +1,11 @@
 {
-  final CreditJson input=new CreditJson(null,null,null,null,null,null);
-  final String jsonInput=mapper.writeValueAsString(input);
-  final Response response=doPost(JaxrsResource.CREDITS_PATH,jsonInput,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.BAD_REQUEST.getStatusCode(),response.getResponseBody());
+  final Credit credit=new Credit();
+  credit.setAccountId(accountJson.getAccountId());
+  credit.setCreditAmount(BigDecimal.TEN.negate());
+  try {
+    killBillClient.createCredit(credit,createdBy,reason,comment);
+    fail();
+  }
+ catch (  final KillBillClientException e) {
+  }
 }

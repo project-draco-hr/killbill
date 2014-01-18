@@ -1,7 +1,13 @@
 {
-  Assert.assertEquals(response.getStatusCode(),responseCode);
-  if (responseBytes != null) {
-    Assert.assertEquals(response.getResponseBodyAsBytes(),responseBytes);
+  if (responseCode == 404 || responseCode == 204) {
+    Assert.assertNull(response);
+  }
+ else {
+    Assert.assertNotNull(response);
+    Assert.assertEquals(response.getStatusCode(),responseCode);
+    if (responseBytes != null) {
+      Assert.assertEquals(response.getResponseBodyAsBytes(),responseBytes);
+    }
   }
   Assert.assertEquals(requestGETMarker.get(),get);
   Assert.assertEquals(requestHEADMarker.get(),head);

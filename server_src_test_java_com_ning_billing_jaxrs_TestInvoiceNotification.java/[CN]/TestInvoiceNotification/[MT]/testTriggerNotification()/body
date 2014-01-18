@@ -1,14 +1,7 @@
 {
-  final AccountJson accountJson=createScenarioWithOneInvoice();
-  final String uri=JaxrsResource.INVOICES_PATH;
-  final Response response=doGet(JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.INVOICES,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
-  final String baseJson=response.getResponseBody();
-  final List<InvoiceJson> objFromJson=mapper.readValue(baseJson,new TypeReference<List<InvoiceJson>>(){
-  }
-);
-  Assert.assertEquals(objFromJson.size(),1);
-  final InvoiceJson invoice=objFromJson.get(0);
-  final Response triggerResponse=doPost(uri + "/" + invoice.getInvoiceId()+ "/"+ JaxrsResource.EMAIL_NOTIFICATIONS,null,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(triggerResponse.getStatusCode(),javax.ws.rs.core.Response.Status.OK.getStatusCode());
+  final Account accountJson=createScenarioWithOneInvoice();
+  final List<Invoice> invoices=killBillClient.getInvoicesForAccount(accountJson.getAccountId());
+  Assert.assertEquals(invoices.size(),1);
+  final Invoice invoice=invoices.get(0);
+  killBillClient.triggerInvoiceNotification(invoice.getInvoiceId(),createdBy,reason,comment);
 }

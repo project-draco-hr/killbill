@@ -1,16 +1,20 @@
 {
-  final AccountJson accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
-  final List<InvoiceJson> invoices=getInvoicesWithItemsForAccount(accountJson.getAccountId());
+  final Account accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
+  final List<Invoice> invoices=killBillClient.getInvoicesForAccount(accountJson.getAccountId(),true);
   assertEquals(invoices.size(),2);
-  final InvoiceJson invoice=invoices.get(1);
+  final Invoice invoice=invoices.get(1);
   assertEquals(invoice.getAmount().compareTo(BigDecimal.ZERO),1);
-  final InvoiceItemJson invoiceItem=invoice.getItems().get(0);
+  final InvoiceItem invoiceItem=invoice.getItems().get(0);
   assertEquals(invoiceItem.getAmount().compareTo(BigDecimal.ZERO),1);
-  adjustInvoiceItem(accountJson.getAccountId(),invoice.getInvoiceId(),invoiceItem.getInvoiceItemId(),null,null,null);
-  final InvoiceJson adjustedInvoice=getInvoiceWithItemsWithAudits(invoice.getInvoiceId(),AuditLevel.FULL);
+  final InvoiceItem adjustmentInvoiceItem=new InvoiceItem();
+  adjustmentInvoiceItem.setAccountId(accountJson.getAccountId());
+  adjustmentInvoiceItem.setInvoiceId(invoice.getInvoiceId());
+  adjustmentInvoiceItem.setInvoiceItemId(invoiceItem.getInvoiceItemId());
+  killBillClient.adjustInvoiceItem(invoiceItem,createdBy,reason,comment);
+  final Invoice adjustedInvoice=killBillClient.getInvoice(invoice.getInvoiceId(),true,AuditLevel.FULL);
   assertEquals(adjustedInvoice.getAmount().compareTo(BigDecimal.ZERO),0);
   Assert.assertEquals(adjustedInvoice.getAuditLogs().size(),1);
-  final AuditLogJson invoiceAuditLogJson=adjustedInvoice.getAuditLogs().get(0);
+  final AuditLog invoiceAuditLogJson=adjustedInvoice.getAuditLogs().get(0);
   Assert.assertEquals(invoiceAuditLogJson.getChangeType(),"INSERT");
   Assert.assertEquals(invoiceAuditLogJson.getChangedBy(),"SubscriptionBaseTransition");
   Assert.assertNotNull(invoiceAuditLogJson.getChangeDate());
@@ -19,7 +23,7 @@
   Assert.assertNull(invoiceAuditLogJson.getComments());
   Assert.assertEquals(adjustedInvoice.getItems().size(),2);
   Assert.assertEquals(adjustedInvoice.getItems().get(0).getAuditLogs().size(),1);
-  final AuditLogJson itemAuditLogJson=adjustedInvoice.getItems().get(0).getAuditLogs().get(0);
+  final AuditLog itemAuditLogJson=adjustedInvoice.getItems().get(0).getAuditLogs().get(0);
   Assert.assertEquals(itemAuditLogJson.getChangeType(),"INSERT");
   Assert.assertEquals(itemAuditLogJson.getChangedBy(),"SubscriptionBaseTransition");
   Assert.assertNotNull(itemAuditLogJson.getChangeDate());
@@ -27,7 +31,7 @@
   Assert.assertNull(itemAuditLogJson.getReasonCode());
   Assert.assertNull(itemAuditLogJson.getComments());
   Assert.assertEquals(adjustedInvoice.getItems().get(1).getAuditLogs().size(),1);
-  final AuditLogJson adjustedItemAuditLogJson=adjustedInvoice.getItems().get(1).getAuditLogs().get(0);
+  final AuditLog adjustedItemAuditLogJson=adjustedInvoice.getItems().get(1).getAuditLogs().get(0);
   Assert.assertEquals(adjustedItemAuditLogJson.getChangeType(),"INSERT");
   Assert.assertEquals(adjustedItemAuditLogJson.getChangedBy(),createdBy);
   Assert.assertEquals(adjustedItemAuditLogJson.getReasonCode(),reason);

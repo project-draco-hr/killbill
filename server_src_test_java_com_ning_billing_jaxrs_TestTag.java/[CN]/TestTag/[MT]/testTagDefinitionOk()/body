@@ -1,14 +1,6 @@
 {
-  final TagDefinitionJson input=new TagDefinitionJson(null,false,"blue","relaxing color",ImmutableList.<String>of());
-  String baseJson=mapper.writeValueAsString(input);
-  Response response=doPost(JaxrsResource.TAG_DEFINITIONS_PATH,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  final String location=response.getHeader("Location");
-  assertNotNull(location);
-  response=doGetWithUrl(location,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  baseJson=response.getResponseBody();
-  final TagDefinitionJson objFromJson=mapper.readValue(baseJson,TagDefinitionJson.class);
+  final TagDefinition input=new TagDefinition(null,false,"blue","relaxing color",ImmutableList.<String>of());
+  final TagDefinition objFromJson=killBillClient.createTagDefinition(input,createdBy,reason,comment);
   assertNotNull(objFromJson);
   assertEquals(objFromJson.getName(),input.getName());
   assertEquals(objFromJson.getDescription(),input.getDescription());

@@ -1,9 +1,14 @@
 {
-  final InvoiceJson invoice=getInvoicesForAccount(accountJson.getAccountId()).get(1);
+  final Invoice invoice=killBillClient.getInvoicesForAccount(accountJson.getAccountId()).get(1);
   final DateTime effectiveDate=clock.getUTCNow();
   final BigDecimal creditAmount=BigDecimal.ONE;
-  final CreditJson objFromJson=createCreditForInvoice(accountJson.getAccountId(),invoice.getInvoiceId(),creditAmount,clock.getUTCNow(),effectiveDate);
+  final Credit credit=new Credit();
+  credit.setAccountId(accountJson.getAccountId());
+  credit.setInvoiceId(invoice.getInvoiceId());
+  credit.setCreditAmount(creditAmount);
+  final Credit objFromJson=killBillClient.createCredit(credit,createdBy,reason,comment);
   assertEquals(objFromJson.getAccountId(),accountJson.getAccountId());
+  assertEquals(objFromJson.getInvoiceId(),invoice.getInvoiceId());
   assertEquals(objFromJson.getCreditAmount().compareTo(creditAmount),0);
   assertEquals(objFromJson.getEffectiveDate().compareTo(effectiveDate.toLocalDate()),0);
 }

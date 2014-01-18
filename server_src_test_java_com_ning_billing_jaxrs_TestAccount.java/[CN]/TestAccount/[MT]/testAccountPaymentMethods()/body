@@ -1,87 +1,44 @@
 {
-  final AccountJson accountJson=createAccount("qwerty","ytrewq","qwerty@yahoo.com");
+  final Account accountJson=createAccount();
   assertNotNull(accountJson);
-  String uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.PAYMENT_METHODS;
-  PaymentMethodJson paymentMethodJson=getPaymentMethodJson(accountJson.getAccountId(),getPaymentMethodCCProperties());
-  String baseJson=mapper.writeValueAsString(paymentMethodJson);
-  Map<String,String> queryParams=new HashMap<String,String>();
-  queryParams.put(JaxrsResource.QUERY_PAYMENT_METHOD_IS_DEFAULT,"true");
-  Response response=doPost(uri,baseJson,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  final String locationCC=response.getHeader("Location");
-  Assert.assertNotNull(locationCC);
-  response=doGetWithUrl(locationCC,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  baseJson=response.getResponseBody();
-  final PaymentMethodJson paymentMethodCC=mapper.readValue(baseJson,PaymentMethodJson.class);
-  assertTrue(paymentMethodCC.isDefault());
-  uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.PAYMENT_METHODS;
-  paymentMethodJson=getPaymentMethodJson(accountJson.getAccountId(),getPaymentMethodPaypalProperties());
-  baseJson=mapper.writeValueAsString(paymentMethodJson);
-  response=doPost(uri,baseJson,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.CREATED.getStatusCode());
-  final String locationPP=response.getHeader("Location");
-  assertNotNull(locationPP);
-  response=doGetWithUrl(locationPP,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  baseJson=response.getResponseBody();
-  final PaymentMethodJson paymentMethodPP=mapper.readValue(baseJson,PaymentMethodJson.class);
-  assertFalse(paymentMethodPP.isDefault());
-  queryParams=new HashMap<String,String>();
-  response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  baseJson=response.getResponseBody();
-  List<PaymentMethodJson> paymentMethods=mapper.readValue(baseJson,new TypeReference<List<PaymentMethodJson>>(){
-  }
-);
+  final PaymentMethodPluginDetail info=new PaymentMethodPluginDetail();
+  info.setProperties(getPaymentMethodCCProperties());
+  PaymentMethod paymentMethodJson=new PaymentMethod(null,accountJson.getAccountId(),true,PLUGIN_NAME,info);
+  final PaymentMethod paymentMethodCC=killBillClient.createPaymentMethod(paymentMethodJson,createdBy,reason,comment);
+  assertTrue(paymentMethodCC.getIsDefault());
+  final PaymentMethodPluginDetail info2=new PaymentMethodPluginDetail();
+  info2.setProperties(getPaymentMethodPaypalProperties());
+  paymentMethodJson=new PaymentMethod(null,accountJson.getAccountId(),false,PLUGIN_NAME,info2);
+  final PaymentMethod paymentMethodPP=killBillClient.createPaymentMethod(paymentMethodJson,createdBy,reason,comment);
+  assertFalse(paymentMethodPP.getIsDefault());
+  List<PaymentMethod> paymentMethods=killBillClient.getPaymentMethodsForAccount(accountJson.getAccountId());
   assertEquals(paymentMethods.size(),2);
-  uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.PAYMENT_METHODS+ "/"+ paymentMethodPP.getPaymentMethodId()+ "/"+ JaxrsResource.PAYMENT_METHODS_DEFAULT_PATH_POSTFIX;
-  response=doPut(uri,"{}",DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  response=doGetWithUrl(locationPP,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  baseJson=response.getResponseBody();
-  final PaymentMethodJson paymentMethodPPDefault=mapper.readValue(baseJson,PaymentMethodJson.class);
-  assertTrue(paymentMethodPPDefault.isDefault());
-  uri=JaxrsResource.PAYMENT_METHODS_PATH + "/" + paymentMethodCC.getPaymentMethodId();
-  response=doDelete(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.PAYMENT_METHODS;
-  queryParams=new HashMap<String,String>();
-  response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  baseJson=response.getResponseBody();
-  paymentMethods=mapper.readValue(baseJson,new TypeReference<List<PaymentMethodJson>>(){
-  }
-);
+  assertTrue(killBillClient.getPaymentMethod(paymentMethodCC.getPaymentMethodId()).getIsDefault());
+  assertFalse(killBillClient.getPaymentMethod(paymentMethodPP.getPaymentMethodId()).getIsDefault());
+  killBillClient.updateDefaultPaymentMethod(accountJson.getAccountId(),paymentMethodPP.getPaymentMethodId(),createdBy,reason,comment);
+  assertTrue(killBillClient.getPaymentMethod(paymentMethodPP.getPaymentMethodId()).getIsDefault());
+  assertFalse(killBillClient.getPaymentMethod(paymentMethodCC.getPaymentMethodId()).getIsDefault());
+  killBillClient.deletePaymentMethod(paymentMethodCC.getPaymentMethodId(),false,createdBy,reason,comment);
+  paymentMethods=killBillClient.getPaymentMethodsForAccount(accountJson.getAccountId());
   assertEquals(paymentMethods.size(),1);
-  uri=JaxrsResource.PAYMENT_METHODS_PATH + "/" + paymentMethodPP.getPaymentMethodId();
-  response=doDelete(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.BAD_REQUEST.getStatusCode());
-  uri=JaxrsResource.PAYMENT_METHODS_PATH + "/" + paymentMethodPP.getPaymentMethodId();
-  queryParams=new HashMap<String,String>();
-  queryParams.put(JaxrsResource.QUERY_DELETE_DEFAULT_PM_WITH_AUTO_PAY_OFF,"true");
-  response=doDelete(uri,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.TAGS;
-  response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.OK.getStatusCode());
-  baseJson=response.getResponseBody();
-  List<TagJson> tagsJson=mapper.readValue(baseJson,new TypeReference<List<TagJson>>(){
+  try {
+    killBillClient.deletePaymentMethod(paymentMethodPP.getPaymentMethodId(),false,createdBy,reason,comment);
+    fail();
   }
-);
+ catch (  final KillBillClientException e) {
+  }
+  killBillClient.deletePaymentMethod(paymentMethodPP.getPaymentMethodId(),true,createdBy,reason,comment);
+  final List<Tag> tagsJson=killBillClient.getAccountTags(accountJson.getAccountId());
   Assert.assertEquals(tagsJson.size(),1);
-  TagJson tagJson=tagsJson.get(0);
+  final Tag tagJson=tagsJson.get(0);
   Assert.assertEquals(tagJson.getTagDefinitionName(),"AUTO_PAY_OFF");
-  Assert.assertEquals(tagJson.getTagDefinitionId(),new UUID(0,1).toString());
-  uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId();
-  response=doGet(uri,DEFAULT_EMPTY_QUERY,DEFAULT_HTTP_TIMEOUT_SEC);
-  AccountJson updatedAccountJson=mapper.readValue(response.getResponseBody(),AccountJson.class);
-  Assert.assertEquals(updatedAccountJson.getAccountId(),accountJson.getAccountId());
-  Assert.assertNull(updatedAccountJson.getPaymentMethodId());
-  uri=JaxrsResource.ACCOUNTS_PATH + "/" + accountJson.getAccountId()+ "/"+ JaxrsResource.TAGS;
-  queryParams=new HashMap<String,String>();
-  queryParams.put(JaxrsResource.QUERY_TAGS,new UUID(0,1).toString());
-  response=doDelete(uri,queryParams,DEFAULT_HTTP_TIMEOUT_SEC);
-  Assert.assertEquals(response.getStatusCode(),Status.BAD_REQUEST.getStatusCode());
+  Assert.assertEquals(tagJson.getTagDefinitionId(),new UUID(0,1));
+  final Account updatedAccount=killBillClient.getAccount(accountJson.getAccountId());
+  Assert.assertEquals(updatedAccount.getAccountId(),accountJson.getAccountId());
+  Assert.assertNull(updatedAccount.getPaymentMethodId());
+  try {
+    killBillClient.deleteAccountTag(accountJson.getAccountId(),new UUID(0,1),createdBy,reason,comment);
+  }
+ catch (  final KillBillClientException e) {
+  }
 }
