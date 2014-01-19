@@ -1,7 +1,7 @@
 {
   final TenantContext tenantContext=context.createContext(request);
   final Pagination<Invoice> invoices=invoiceApi.getInvoices(offset,limit,tenantContext);
-  final URI nextPageUri=uriBuilder.nextPage(InvoiceResource.class,"getInvoices",invoices.getNextOffset(),limit,ImmutableMap.<String,String>of(QUERY_INVOICE_WITH_ITEMS,withItems.toString(),QUERY_AUDIT,auditMode.toString()));
+  final URI nextPageUri=uriBuilder.nextPage(InvoiceResource.class,"getInvoices",invoices.getNextOffset(),limit,ImmutableMap.<String,String>of(QUERY_INVOICE_WITH_ITEMS,withItems.toString(),QUERY_AUDIT,auditMode.getLevel().toString()));
   final AtomicReference<Map<UUID,AccountAuditLogs>> accountsAuditLogs=new AtomicReference<Map<UUID,AccountAuditLogs>>(new HashMap<UUID,AccountAuditLogs>());
   return buildStreamingPaginationResponse(invoices,new Function<Invoice,InvoiceJson>(){
     @Override public InvoiceJson apply(    final Invoice invoice){

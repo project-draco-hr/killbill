@@ -1,9 +1,0 @@
-{
-  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  final InvoicePayment invoicePayment=invoicePaymentApi.getInvoicePaymentForAttempt(UUID.fromString(json.getPaymentId()),callContext);
-  if (invoicePayment == null) {
-    throw new InvoiceApiException(ErrorCode.INVOICE_PAYMENT_NOT_FOUND,json.getPaymentId());
-  }
-  final InvoicePayment chargeBack=invoicePaymentApi.createChargeback(invoicePayment.getId(),json.getAmount(),callContext);
-  return uriBuilder.buildResponse(ChargebackResource.class,"getChargeback",chargeBack.getId());
-}

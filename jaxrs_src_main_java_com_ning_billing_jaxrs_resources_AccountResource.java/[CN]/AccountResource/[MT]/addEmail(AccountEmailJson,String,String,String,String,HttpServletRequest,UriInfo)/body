@@ -1,0 +1,15 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID accountId=UUID.fromString(id);
+  accountUserApi.getAccountById(accountId,callContext);
+  final AccountEmail existingEmail=Iterables.<AccountEmail>tryFind(accountUserApi.getEmails(accountId,callContext),new Predicate<AccountEmail>(){
+    @Override public boolean apply(    final AccountEmail input){
+      return input.getEmail().equals(json.getEmail());
+    }
+  }
+).orNull();
+  if (existingEmail == null) {
+    accountUserApi.addEmail(accountId,json.toAccountEmail(UUID.randomUUID()),callContext);
+  }
+  return uriBuilder.buildResponse(uriInfo,AccountResource.class,"getEmails",json.getAccountId());
+}

@@ -7,7 +7,7 @@
  else {
     refunds=paymentApi.getRefunds(offset,limit,pluginName,tenantContext);
   }
-  final URI nextPageUri=uriBuilder.nextPage(RefundResource.class,"getRefunds",refunds.getNextOffset(),limit,ImmutableMap.<String,String>of(QUERY_PAYMENT_METHOD_PLUGIN_NAME,Strings.nullToEmpty(pluginName),QUERY_AUDIT,auditMode.toString()));
+  final URI nextPageUri=uriBuilder.nextPage(RefundResource.class,"getRefunds",refunds.getNextOffset(),limit,ImmutableMap.<String,String>of(QUERY_PAYMENT_METHOD_PLUGIN_NAME,Strings.nullToEmpty(pluginName),QUERY_AUDIT,auditMode.getLevel().toString()));
   final AtomicReference<Map<UUID,AccountAuditLogs>> accountsAuditLogs=new AtomicReference<Map<UUID,AccountAuditLogs>>(new HashMap<UUID,AccountAuditLogs>());
   final Map<UUID,UUID> paymentIdAccountIdMappings=new HashMap<UUID,UUID>();
   return buildStreamingPaginationResponse(refunds,new Function<Refund,RefundJson>(){

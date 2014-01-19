@@ -1,7 +1,7 @@
 {
   final TenantContext tenantContext=context.createContext(request);
   final Pagination<CustomField> customFields=customFieldUserApi.searchCustomFields(searchKey,offset,limit,tenantContext);
-  final URI nextPageUri=uriBuilder.nextPage(CustomFieldResource.class,"searchCustomFields",customFields.getNextOffset(),limit,ImmutableMap.<String,String>of("searchKey",searchKey,QUERY_AUDIT,auditMode.toString()));
+  final URI nextPageUri=uriBuilder.nextPage(CustomFieldResource.class,"searchCustomFields",customFields.getNextOffset(),limit,ImmutableMap.<String,String>of("searchKey",searchKey,QUERY_AUDIT,auditMode.getLevel().toString()));
   return buildStreamingPaginationResponse(customFields,new Function<CustomField,CustomFieldJson>(){
     @Override public CustomFieldJson apply(    final CustomField customField){
       final List<AuditLog> auditLogs=auditUserApi.getAuditLogs(customField.getId(),ObjectType.CUSTOM_FIELD,auditMode.getLevel(),tenantContext);

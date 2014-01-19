@@ -1,0 +1,30 @@
+{
+  final Account account=createAccount();
+  for (int i=0; i < 5; i++) {
+    final TagDefinition tagDefinition=new TagDefinition(null,false,UUID.randomUUID().toString().substring(0,5),UUID.randomUUID().toString(),ImmutableList.<ObjectType>of(ObjectType.ACCOUNT));
+    final UUID tagDefinitionId=killBillClient.createTagDefinition(tagDefinition,createdBy,reason,comment).getId();
+    killBillClient.createAccountTag(account.getAccountId(),tagDefinitionId,createdBy,reason,comment);
+  }
+  final Tags allTags=killBillClient.getTags();
+  Assert.assertEquals(allTags.size(),5);
+  Tags page=killBillClient.getTags(0L,1L);
+  for (int i=0; i < 5; i++) {
+    Assert.assertNotNull(page);
+    Assert.assertEquals(page.size(),1);
+    Assert.assertEquals(page.get(0),allTags.get(i));
+    page=page.getNext();
+  }
+  Assert.assertNull(page);
+  for (  final Tag tag : allTags) {
+    doSearchTag(UUID.randomUUID().toString(),null);
+    doSearchTag(tag.getTagId().toString(),tag);
+    doSearchTag(tag.getTagDefinitionName(),tag);
+    final TagDefinition tagDefinition=killBillClient.getTagDefinition(tag.getTagDefinitionId());
+    doSearchTag(tagDefinition.getDescription(),tag);
+  }
+  final Tags tags=killBillClient.searchTags(ObjectType.ACCOUNT.toString());
+  Assert.assertEquals(tags.size(),5);
+  Assert.assertEquals(tags.getPaginationCurrentOffset(),0);
+  Assert.assertEquals(tags.getPaginationTotalNbRecords(),5);
+  Assert.assertEquals(tags.getPaginationMaxNbRecords(),5);
+}

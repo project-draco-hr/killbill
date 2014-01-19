@@ -1,0 +1,29 @@
+{
+  final Account account=createAccount();
+  for (int i=0; i < 5; i++) {
+    final CustomField customField=new CustomField();
+    customField.setName(UUID.randomUUID().toString().substring(0,5));
+    customField.setValue(UUID.randomUUID().toString().substring(0,5));
+    killBillClient.createAccountCustomField(account.getAccountId(),customField,createdBy,reason,comment);
+  }
+  final CustomFields allCustomFields=killBillClient.getCustomFields();
+  Assert.assertEquals(allCustomFields.size(),5);
+  CustomFields page=killBillClient.getCustomFields(0L,1L);
+  for (int i=0; i < 5; i++) {
+    Assert.assertNotNull(page);
+    Assert.assertEquals(page.size(),1);
+    Assert.assertEquals(page.get(0),allCustomFields.get(i));
+    page=page.getNext();
+  }
+  Assert.assertNull(page);
+  for (  final CustomField customField : allCustomFields) {
+    doSearchCustomField(UUID.randomUUID().toString(),null);
+    doSearchCustomField(customField.getName(),customField);
+    doSearchCustomField(customField.getValue(),customField);
+  }
+  final CustomFields customFields=killBillClient.searchCustomFields(ObjectType.ACCOUNT.toString());
+  Assert.assertEquals(customFields.size(),5);
+  Assert.assertEquals(customFields.getPaginationCurrentOffset(),0);
+  Assert.assertEquals(customFields.getPaginationTotalNbRecords(),5);
+  Assert.assertEquals(customFields.getPaginationMaxNbRecords(),5);
+}

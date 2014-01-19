@@ -1,0 +1,11 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final LocalDate inputDate=toLocalDate(UUID.fromString(accountId),targetDateTime,callContext);
+  final Invoice generatedInvoice=invoiceApi.triggerInvoiceGeneration(UUID.fromString(accountId),inputDate,dryRun,callContext);
+  if (dryRun) {
+    return Response.status(Status.OK).entity(new InvoiceJson(generatedInvoice)).build();
+  }
+ else {
+    return uriBuilder.buildResponse(uriInfo,InvoiceResource.class,"getInvoice",generatedInvoice.getId());
+  }
+}
