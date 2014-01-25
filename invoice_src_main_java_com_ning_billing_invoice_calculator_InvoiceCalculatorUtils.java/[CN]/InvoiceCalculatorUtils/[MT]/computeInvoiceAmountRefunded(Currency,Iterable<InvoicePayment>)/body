@@ -1,0 +1,12 @@
+{
+  BigDecimal amountRefunded=BigDecimal.ZERO;
+  if (invoicePayments == null || !invoicePayments.iterator().hasNext()) {
+    return amountRefunded;
+  }
+  for (  final InvoicePayment invoicePayment : invoicePayments) {
+    if (InvoicePaymentType.REFUND.equals(invoicePayment.getType()) || InvoicePaymentType.CHARGED_BACK.equals(invoicePayment.getType())) {
+      amountRefunded=amountRefunded.add(invoicePayment.getAmount());
+    }
+  }
+  return KillBillMoney.of(amountRefunded,currency);
+}

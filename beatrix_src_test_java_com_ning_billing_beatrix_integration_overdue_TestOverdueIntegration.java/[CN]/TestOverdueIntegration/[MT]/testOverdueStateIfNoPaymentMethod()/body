@@ -28,11 +28,11 @@
   checkChangePlanWithOverdueState(baseEntitlement,true,true);
   paymentApi.addPaymentMethod(BeatrixIntegrationModule.NON_OSGI_PLUGIN_NAME,account,true,paymentMethodPlugin,callContext);
   allowPaymentsAndResetOverdueToClearByPayingAllUnpaidInvoices();
-  invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("48.37")));
+  invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("48.38")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   checkChangePlanWithOverdueState(baseEntitlement,false,true);
-  invoiceChecker.checkRepairedInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("48.37")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-48.37")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,25),InvoiceItemType.CBA_ADJ,new BigDecimal("48.37")));
-  invoiceChecker.checkInvoice(account.getId(),5,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("116.09")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,25),InvoiceItemType.CBA_ADJ,new BigDecimal("-48.37")));
+  invoiceChecker.checkRepairedInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("48.38")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-48.38")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,25),InvoiceItemType.CBA_ADJ,new BigDecimal("48.38")));
+  invoiceChecker.checkInvoice(account.getId(),5,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("116.12")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,25),new LocalDate(2012,7,25),InvoiceItemType.CBA_ADJ,new BigDecimal("-48.38")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(BigDecimal.ZERO),0);
 }

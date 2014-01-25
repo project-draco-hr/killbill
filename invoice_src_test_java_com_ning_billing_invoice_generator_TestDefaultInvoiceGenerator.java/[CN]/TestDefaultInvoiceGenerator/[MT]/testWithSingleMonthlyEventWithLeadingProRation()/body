@@ -13,7 +13,7 @@
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
   final BigDecimal expectedNumberOfBillingCycles;
-  expectedNumberOfBillingCycles=ONE.add(FOURTEEN.divide(THIRTY_ONE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD));
-  final BigDecimal expectedAmount=expectedNumberOfBillingCycles.multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
+  expectedNumberOfBillingCycles=ONE.add(FOURTEEN.divide(THIRTY_ONE,KillBillMoney.ROUNDING_METHOD));
+  final BigDecimal expectedAmount=KillBillMoney.of(expectedNumberOfBillingCycles.multiply(rate),invoice.getCurrency());
   assertEquals(invoice.getBalance(),expectedAmount);
 }

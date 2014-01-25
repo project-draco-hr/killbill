@@ -1,0 +1,12 @@
+{
+  BigDecimal amountPaid=BigDecimal.ZERO;
+  if (invoicePayments == null || !invoicePayments.iterator().hasNext()) {
+    return amountPaid;
+  }
+  for (  final InvoicePayment invoicePayment : invoicePayments) {
+    if (InvoicePaymentType.ATTEMPT.equals(invoicePayment.getType())) {
+      amountPaid=amountPaid.add(invoicePayment.getAmount());
+    }
+  }
+  return KillBillMoney.of(amountPaid,currency);
+}

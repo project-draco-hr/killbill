@@ -16,11 +16,11 @@
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),4);
   final BigDecimal numberOfCyclesEvent1;
-  numberOfCyclesEvent1=ONE.add(FOURTEEN.divide(THIRTY_ONE,2 * NUMBER_OF_DECIMALS,ROUNDING_METHOD));
+  numberOfCyclesEvent1=ONE.add(FOURTEEN.divide(THIRTY_ONE,KillBillMoney.ROUNDING_METHOD));
   final BigDecimal numberOfCyclesEvent2=TWO;
   BigDecimal expectedValue;
   expectedValue=numberOfCyclesEvent1.multiply(rate1);
   expectedValue=expectedValue.add(numberOfCyclesEvent2.multiply(rate2));
-  expectedValue=expectedValue.setScale(NUMBER_OF_DECIMALS,ROUNDING_METHOD);
+  expectedValue=KillBillMoney.of(expectedValue,invoice.getCurrency());
   assertEquals(invoice.getBalance(),expectedValue);
 }
