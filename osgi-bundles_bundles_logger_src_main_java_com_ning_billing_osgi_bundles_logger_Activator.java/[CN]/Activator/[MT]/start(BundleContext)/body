@@ -1,19 +1,13 @@
 {
-  final ServiceTracker logReaderTracker=new ServiceTracker(context,LogReaderService.class.getName(),null);
-  logReaderTracker.open();
-  final Object[] readers=logReaderTracker.getServices();
-  if (readers != null) {
-    for (    final Object reader : readers) {
-      final LogReaderService service=(LogReaderService)reader;
-      registerLogReaderService(service);
-    }
-  }
-  logReaderTracker.close();
   final String filter="(objectclass=" + LogReaderService.class.getName() + ")";
   try {
     context.addServiceListener(logReaderServiceListener,filter);
   }
- catch (  InvalidSyntaxException e) {
+ catch (  final InvalidSyntaxException e) {
     logger.warn("Unable to register the killbill LogReaderService listener",e);
+  }
+  final ServiceReference[] serviceReferences=context.getServiceReferences((String)null,filter);
+  for (int i=0; serviceReferences != null && i < serviceReferences.length; i++) {
+    logReaderServiceListener.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED,serviceReferences[i]));
   }
 }
