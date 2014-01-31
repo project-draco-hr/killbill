@@ -1,0 +1,7 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),tenantContext);
+  final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(account.getId(),auditMode.getLevel(),tenantContext);
+  final AccountJson accountJson=getAccount(account,accountWithBalance,accountWithBalanceAndCBA,accountAuditLogs,tenantContext);
+  return Response.status(Status.OK).entity(accountJson).build();
+}

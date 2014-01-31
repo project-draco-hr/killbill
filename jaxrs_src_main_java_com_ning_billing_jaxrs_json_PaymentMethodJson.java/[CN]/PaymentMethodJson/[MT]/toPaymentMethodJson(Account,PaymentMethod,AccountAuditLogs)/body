@@ -1,0 +1,18 @@
+{
+  final boolean isDefault=account.getPaymentMethodId() != null && account.getPaymentMethodId().equals(in.getId());
+  final PaymentMethodPlugin pluginDetail=in.getPluginDetail();
+  PaymentMethodPluginDetailJson pluginDetailJson=null;
+  if (pluginDetail != null) {
+    List<PaymentMethodProperties> properties=null;
+    if (pluginDetail.getProperties() != null) {
+      properties=new ArrayList<PaymentMethodJson.PaymentMethodProperties>(Collections2.transform(pluginDetail.getProperties(),new Function<PaymentMethodKVInfo,PaymentMethodProperties>(){
+        @Override public PaymentMethodProperties apply(        final PaymentMethodKVInfo input){
+          return new PaymentMethodProperties(input.getKey(),input.getValue() == null ? null : input.getValue().toString(),input.getIsUpdatable());
+        }
+      }
+));
+    }
+    pluginDetailJson=new PaymentMethodPluginDetailJson(pluginDetail.getExternalPaymentMethodId(),pluginDetail.isDefaultPaymentMethod(),pluginDetail.getType(),pluginDetail.getCCName(),pluginDetail.getCCType(),pluginDetail.getCCExpirationMonth(),pluginDetail.getCCExpirationYear(),pluginDetail.getCCLast4(),pluginDetail.getAddress1(),pluginDetail.getAddress2(),pluginDetail.getCity(),pluginDetail.getState(),pluginDetail.getZip(),pluginDetail.getCountry(),properties);
+  }
+  return new PaymentMethodJson(in.getId().toString(),account.getId().toString(),isDefault,in.getPluginName(),pluginDetailJson,toAuditLogJson(accountAuditLogs == null ? null : accountAuditLogs.getAuditLogsForPaymentMethod(in.getId())));
+}

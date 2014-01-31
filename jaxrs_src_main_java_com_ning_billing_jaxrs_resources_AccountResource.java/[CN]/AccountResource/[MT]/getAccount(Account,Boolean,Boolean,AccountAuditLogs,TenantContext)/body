@@ -1,0 +1,14 @@
+{
+  if (accountWithBalanceAndCBA) {
+    final BigDecimal accountBalance=invoiceApi.getAccountBalance(account.getId(),tenantContext);
+    final BigDecimal accountCBA=invoiceApi.getAccountCBA(account.getId(),tenantContext);
+    return new AccountJson(account,accountBalance,accountCBA,auditLogs);
+  }
+ else   if (accountWithBalance) {
+    final BigDecimal accountBalance=invoiceApi.getAccountBalance(account.getId(),tenantContext);
+    return new AccountJson(account,accountBalance,null,auditLogs);
+  }
+ else {
+    return new AccountJson(account,null,null,auditLogs);
+  }
+}
