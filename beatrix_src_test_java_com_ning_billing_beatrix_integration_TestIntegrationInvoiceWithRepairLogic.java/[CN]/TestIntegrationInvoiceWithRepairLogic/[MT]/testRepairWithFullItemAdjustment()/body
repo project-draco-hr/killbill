@@ -1,0 +1,44 @@
+{
+  invoiceGenerator.setDefaultRepairLogic(REPAIR_INVOICE_LOGIC.PARTIAL_REPAIR);
+  final LocalDate today=new LocalDate(2013,7,19);
+  final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(1));
+  clock.setDeltaFromReality(today.toDateTimeAtCurrentTime(DateTimeZone.UTC).getMillis() - clock.getUTCNow().getMillis());
+  final String productName="Shotgun";
+  final BillingPeriod term=BillingPeriod.ANNUAL;
+  final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  DefaultEntitlement bpEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
+  assertNotNull(bpEntitlement);
+  assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).size(),1);
+  assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  clock.addDays(30);
+  assertListenerStatus();
+  List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
+  assertEquals(invoices.size(),2);
+  ImmutableList<ExpectedInvoiceItemCheck> toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2013,8,18),new LocalDate(2014,8,18),InvoiceItemType.RECURRING,new BigDecimal("2399.95")));
+  invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,toBeChecked);
+  clock.addDays(30);
+  busHandler.pushExpectedEvents(NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.INVOICE_ADJUSTMENT);
+  bpEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.IMMEDIATE,BillingActionPolicy.IMMEDIATE,callContext);
+  assertListenerStatus();
+  invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
+  assertEquals(invoices.size(),2);
+  toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2013,8,18),new LocalDate(2014,8,18),InvoiceItemType.RECURRING,new BigDecimal("2399.95")),new ExpectedInvoiceItemCheck(new LocalDate(2013,9,17),new LocalDate(2014,8,18),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-2202.67")),new ExpectedInvoiceItemCheck(new LocalDate(2013,9,17),new LocalDate(2013,9,17),InvoiceItemType.CBA_ADJ,new BigDecimal("2202.67")));
+  invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,toBeChecked);
+  final Invoice invoice1=invoices.get(1);
+  final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),callContext);
+  final ExpectedPaymentCheck expectedPaymentCheck=new ExpectedPaymentCheck(clock.getUTCNow().toLocalDate(),new BigDecimal("2399.95"),PaymentStatus.SUCCESS,invoice1.getId(),Currency.USD);
+  final Payment payment1=payments.get(0);
+  final Map<UUID,BigDecimal> iias=new HashMap<UUID,BigDecimal>();
+  iias.put(invoice1.getInvoiceItems().get(0).getId(),new BigDecimal("197.28"));
+  busHandler.pushExpectedEvents(NextEvent.INVOICE_ADJUSTMENT);
+  paymentApi.createRefundWithItemsAdjustments(account,payment1.getId(),iias,callContext);
+  assertListenerStatus();
+  try {
+    invoiceUserApi.triggerInvoiceGeneration(account.getId(),new LocalDate(clock.getUTCToday()),false,callContext);
+    Assert.fail("Should not gnenerated an new invoice");
+  }
+ catch (  InvoiceApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.INVOICE_NOTHING_TO_DO.getCode());
+  }
+}

@@ -1,0 +1,21 @@
+{
+  final Account accountJson=createAccount();
+  for (int i=0; i < 5; i++) {
+    createEntitlement(accountJson.getAccountId(),UUID.randomUUID().toString(),"Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,true);
+  }
+  final Bundles allBundles=killBillClient.getBundles();
+  Assert.assertEquals(allBundles.size(),5);
+  for (  final Bundle bundle : allBundles) {
+    Assert.assertEquals(killBillClient.searchBundles(bundle.getBundleId().toString()).size(),1);
+    Assert.assertEquals(killBillClient.searchBundles(bundle.getAccountId().toString()).size(),5);
+    Assert.assertEquals(killBillClient.searchBundles(bundle.getExternalKey()).size(),1);
+  }
+  Bundles page=killBillClient.getBundles(0L,1L);
+  for (int i=0; i < 5; i++) {
+    Assert.assertNotNull(page);
+    Assert.assertEquals(page.size(),1);
+    Assert.assertEquals(page.get(0),allBundles.get(i));
+    page=page.getNext();
+  }
+  Assert.assertNull(page);
+}

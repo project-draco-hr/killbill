@@ -1,0 +1,12 @@
+{
+  final Account account=createAccount();
+  for (  final ControlTagType controlTagType : ControlTagType.values()) {
+    killBillClient.createAccountTag(account.getAccountId(),controlTagType.getId(),createdBy,reason,comment);
+  }
+  final Tags allTags=killBillClient.getTags();
+  Assert.assertEquals(allTags.size(),ControlTagType.values().length);
+  for (  final ControlTagType controlTagType : ControlTagType.values()) {
+    Assert.assertEquals(killBillClient.searchTags(controlTagType.toString()).size(),1);
+    Assert.assertEquals(killBillClient.searchTags(controlTagType.getDescription()).size(),1);
+  }
+}

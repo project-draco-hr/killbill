@@ -1,0 +1,20 @@
+{
+  final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(context);
+  return getEntityPaginationNoException(limit,new SourcePaginationBuilder<SubscriptionBaseBundle,SubscriptionApiException>(){
+    @Override public Pagination<SubscriptionBaseBundle> build(){
+      return subscriptionBaseInternalApi.searchBundles(searchKey,offset,limit,internalContext);
+    }
+  }
+,new Function<SubscriptionBaseBundle,SubscriptionBundle>(){
+    @Override public SubscriptionBundle apply(    final SubscriptionBaseBundle subscriptionBaseBundle){
+      try {
+        return getSubscriptionBundle(subscriptionBaseBundle.getId(),context);
+      }
+ catch (      final SubscriptionApiException e) {
+        log.warn("Error retrieving subscription",e);
+        return null;
+      }
+    }
+  }
+);
+}

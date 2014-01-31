@@ -1,0 +1,21 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Pagination<Payment> payments;
+  if (Strings.isNullOrEmpty(pluginName)) {
+    payments=paymentApi.getPayments(offset,limit,tenantContext);
+  }
+ else {
+    payments=paymentApi.getPayments(offset,limit,pluginName,tenantContext);
+  }
+  final URI nextPageUri=uriBuilder.nextPage(PaymentResource.class,"getPayments",payments.getNextOffset(),limit,ImmutableMap.<String,String>of(QUERY_PAYMENT_METHOD_PLUGIN_NAME,Strings.nullToEmpty(pluginName),QUERY_AUDIT,auditMode.getLevel().toString()));
+  final AtomicReference<Map<UUID,AccountAuditLogs>> accountsAuditLogs=new AtomicReference<Map<UUID,AccountAuditLogs>>(new HashMap<UUID,AccountAuditLogs>());
+  return buildStreamingPaginationResponse(payments,new Function<Payment,PaymentJson>(){
+    @Override public PaymentJson apply(    final Payment payment){
+      if (accountsAuditLogs.get().get(payment.getAccountId()) == null) {
+        accountsAuditLogs.get().put(payment.getAccountId(),auditUserApi.getAccountAuditLogs(payment.getAccountId(),auditMode.getLevel(),tenantContext));
+      }
+      return new PaymentJson(payment,accountsAuditLogs.get().get(payment.getAccountId()).getAuditLogsForPayment(payment.getId()));
+    }
+  }
+,nextPageUri);
+}
