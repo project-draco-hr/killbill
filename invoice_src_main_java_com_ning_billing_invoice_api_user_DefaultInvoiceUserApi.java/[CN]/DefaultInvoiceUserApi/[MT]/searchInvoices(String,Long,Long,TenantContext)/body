@@ -1,0 +1,13 @@
+{
+  return getEntityPaginationNoException(limit,new SourcePaginationBuilder<InvoiceModelDao,AccountApiException>(){
+    @Override public Pagination<InvoiceModelDao> build(){
+      return dao.searchInvoices(searchKey,offset,limit,internalCallContextFactory.createInternalTenantContext(context));
+    }
+  }
+,new Function<InvoiceModelDao,Invoice>(){
+    @Override public Invoice apply(    final InvoiceModelDao invoiceModelDao){
+      return new DefaultInvoice(invoiceModelDao);
+    }
+  }
+);
+}
