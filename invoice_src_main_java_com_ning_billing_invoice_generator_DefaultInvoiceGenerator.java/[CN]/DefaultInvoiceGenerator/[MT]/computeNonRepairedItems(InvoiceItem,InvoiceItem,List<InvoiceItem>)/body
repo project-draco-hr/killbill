@@ -1,0 +1,34 @@
+{
+  final List<InvoiceItem> result=new LinkedList<InvoiceItem>();
+  if (removedReparees.size() == 0 || repairedItem.getInvoiceItemType() != InvoiceItemType.RECURRING) {
+    return result;
+  }
+  final List<InvoiceItem> repairAndReparees=new ArrayList<InvoiceItem>(removedReparees);
+  repairAndReparees.add(repairItem);
+  Collections.sort(repairAndReparees,new Comparator<InvoiceItem>(){
+    @Override public int compare(    final InvoiceItem o1,    final InvoiceItem o2){
+      return o1.getStartDate().compareTo(o2.getStartDate());
+    }
+  }
+);
+  int nbTotalRepairedDays=Days.daysBetween(repairedItem.getStartDate(),repairedItem.getEndDate()).getDays();
+  LocalDate prevEnd=null;
+  final LocalDate startDate=repairedItem.getStartDate();
+  for (  InvoiceItem cur : repairAndReparees) {
+    if (prevEnd == null) {
+      if (cur.getStartDate().compareTo(startDate) > 0) {
+        result.add(createRecurringInvoiceItemForRepair(repairedItem.getStartDate(),cur.getStartDate(),repairedItem,nbTotalRepairedDays));
+      }
+    }
+ else {
+      if (prevEnd.compareTo(cur.getStartDate()) < 0) {
+        result.add(createRecurringInvoiceItemForRepair(prevEnd,cur.getStartDate(),repairedItem,nbTotalRepairedDays));
+      }
+    }
+    prevEnd=cur.getEndDate();
+  }
+  if (prevEnd.compareTo(repairedItem.getEndDate()) < 0) {
+    result.add(createRecurringInvoiceItemForRepair(prevEnd,repairedItem.getEndDate(),repairedItem,nbTotalRepairedDays));
+  }
+  return result;
+}
