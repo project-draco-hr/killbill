@@ -1,0 +1,11 @@
+{
+  Iterator<InvoiceItem> it=items.iterator();
+  while (it.hasNext()) {
+    final InvoiceItem cur=it.next();
+    if (cur.getInvoiceItemType() == InvoiceItemType.RECURRING) {
+      final BigDecimal amount=BigDecimal.ONE;
+      return new RecurringInvoiceItem(cur.getInvoiceId(),cur.getAccountId(),cur.getBundleId(),cur.getSubscriptionId(),cur.getPlanName(),cur.getPhaseName(),startDate,endDate,amount,cur.getRate(),cur.getCurrency());
+    }
+  }
+  return null;
+}

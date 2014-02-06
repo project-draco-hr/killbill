@@ -1,0 +1,27 @@
+{
+  boolean foundRecuring=false;
+  Iterator<InvoiceItem> it=items.iterator();
+  while (it.hasNext()) {
+    final InvoiceItem cur=it.next();
+switch (cur.getInvoiceItemType()) {
+case FIXED:
+      break;
+case RECURRING:
+    foundRecuring=true;
+  output.add(cur);
+break;
+case REPAIR_ADJ:
+if (!foundRecuring) {
+output.add(cur);
+}
+break;
+case ITEM_ADJ:
+break;
+case EXTERNAL_CHARGE:
+case CBA_ADJ:
+case CREDIT_ADJ:
+case REFUND_ADJ:
+default :
+}
+}
+}

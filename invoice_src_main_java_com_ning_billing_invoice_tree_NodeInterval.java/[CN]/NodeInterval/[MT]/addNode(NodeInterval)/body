@@ -1,0 +1,33 @@
+{
+  final InvoiceItem item=newNode.getItems().get(0);
+  if (leftChild == null) {
+    leftChild=newNode;
+    return;
+  }
+  NodeInterval prevChild=null;
+  NodeInterval curChild=leftChild;
+  do {
+    if (curChild.isItemContained(item)) {
+      curChild.addItem(item);
+      return;
+    }
+    if (curChild.isItemOverlap(item)) {
+      rebalance(newNode);
+      return;
+    }
+    if (item.getStartDate().compareTo(curChild.getStart()) < 0) {
+      newNode.rightSibling=curChild;
+      if (prevChild == null) {
+        leftChild=newNode;
+      }
+ else {
+        prevChild.rightSibling=newNode;
+      }
+      return;
+    }
+    prevChild=curChild;
+    curChild=curChild.rightSibling;
+  }
+ while (curChild != null);
+  prevChild.rightSibling=newNode;
+}

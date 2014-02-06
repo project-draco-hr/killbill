@@ -1,0 +1,38 @@
+{
+  final LocalDate startDate=new LocalDate(2014,1,1);
+  final LocalDate endDate=new LocalDate(2014,2,1);
+  final LocalDate repairDate=new LocalDate(2014,1,23);
+  final BigDecimal rate1=new BigDecimal("12.00");
+  final BigDecimal amount1=rate1;
+  final BigDecimal rate2=new BigDecimal("14.85");
+  final BigDecimal amount2=rate2;
+  final InvoiceItem initial=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,amount1,rate1,currency);
+  final InvoiceItem newItem=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"someelse","someelse",repairDate,endDate,amount2,rate2,currency);
+  final InvoiceItem repair=new RepairAdjInvoiceItem(invoiceId,accountId,repairDate,endDate,amount1.negate(),currency,initial.getId());
+  final List<InvoiceItem> expectedResult=Lists.newLinkedList();
+  final InvoiceItem expected1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,repairDate,BigDecimal.ONE,rate1,currency);
+  expectedResult.add(expected1);
+  final InvoiceItem expected2=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,"someelse","someelse",repairDate,endDate,amount2,rate2,currency);
+  expectedResult.add(expected2);
+  List<InvoiceItem> result=Lists.newLinkedList();
+  SubscriptionItemTree tree=new SubscriptionItemTree(subscriptionId);
+  tree.addItem(initial);
+  tree.addItem(newItem);
+  tree.addItem(repair);
+  tree.build(result);
+  verifyResult(result,expectedResult);
+  result=Lists.newLinkedList();
+  tree=new SubscriptionItemTree(subscriptionId);
+  tree.addItem(repair);
+  tree.addItem(newItem);
+  tree.addItem(initial);
+  tree.build(result);
+  verifyResult(result,expectedResult);
+  result=Lists.newLinkedList();
+  tree=new SubscriptionItemTree(subscriptionId);
+  tree.addItem(repair);
+  tree.addItem(initial);
+  tree.addItem(newItem);
+  tree.build(result);
+  verifyResult(result,expectedResult);
+}

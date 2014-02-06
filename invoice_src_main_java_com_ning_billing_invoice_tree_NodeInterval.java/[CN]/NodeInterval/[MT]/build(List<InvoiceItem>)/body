@@ -1,0 +1,19 @@
+{
+  if (leftChild == null) {
+    items.build(output);
+    return;
+  }
+  LocalDate curDate=start;
+  NodeInterval curChild=leftChild;
+  while (curChild != null) {
+    if (curChild.getStart().compareTo(curDate) > 0) {
+      output.add(items.createRecuringItem(curDate,curChild.getStart()));
+    }
+    curChild.build(output);
+    curDate=curChild.getEnd();
+    curChild=curChild.getRightSibling();
+  }
+  if (curDate.compareTo(end) < 0) {
+    output.add(items.createRecuringItem(curDate,end));
+  }
+}
