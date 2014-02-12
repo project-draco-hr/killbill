@@ -1,19 +1,17 @@
 {
-  boolean foundRecuring=false;
-  Iterator<InvoiceItem> it=items.iterator();
-  while (it.hasNext()) {
-    final InvoiceItem cur=it.next();
+  final Set<UUID> repairedIds=new HashSet<UUID>();
+  ListIterator<InvoiceItem> it=items.listIterator(items.size());
+  while (it.hasPrevious()) {
+    final InvoiceItem cur=it.previous();
 switch (cur.getInvoiceItemType()) {
 case FIXED:
-      break;
 case RECURRING:
-    foundRecuring=true;
-  output.add(cur);
-break;
+      if (!repairedIds.contains(cur.getId())) {
+        output.add(cur);
+      }
+    break;
 case REPAIR_ADJ:
-if (!foundRecuring) {
-output.add(cur);
-}
+  repairedIds.add(cur.getLinkedItemId());
 break;
 case ITEM_ADJ:
 break;

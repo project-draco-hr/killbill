@@ -11,11 +11,13 @@
   final InvoiceItem block1=new RepairAdjInvoiceItem(invoiceId,accountId,blockStart1,unblockStart1,amount1.negate(),currency,initial.getId());
   final InvoiceItem block2=new RepairAdjInvoiceItem(invoiceId,accountId,blockStart2,unblockStart2,amount1.negate(),currency,initial.getId());
   final List<InvoiceItem> expectedResult=Lists.newLinkedList();
-  final InvoiceItem expected1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,blockStart1,new BigDecimal("2.71"),rate1,currency);
+  final InvoiceItem expected1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,blockStart1,BigDecimal.ONE,rate1,currency);
   expectedResult.add(expected1);
-  final InvoiceItem expected2=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,unblockStart1,blockStart2,new BigDecimal("2.71"),rate1,currency);
+  expectedResult.add(block1);
+  final InvoiceItem expected2=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,unblockStart1,blockStart2,BigDecimal.ONE,rate1,currency);
   expectedResult.add(expected2);
-  final InvoiceItem expected3=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,unblockStart2,endDate,new BigDecimal("3.48"),rate1,currency);
+  expectedResult.add(block2);
+  final InvoiceItem expected3=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,unblockStart2,endDate,BigDecimal.ONE,rate1,currency);
   expectedResult.add(expected3);
   SubscriptionItemTree tree=new SubscriptionItemTree(subscriptionId);
   tree.addItem(initial);

@@ -3,7 +3,8 @@
   while (it.hasNext()) {
     final InvoiceItem cur=it.next();
     if (cur.getInvoiceItemType() == InvoiceItemType.RECURRING) {
-      final BigDecimal amount=BigDecimal.ONE;
+      int nbTotalRepairedDays=Days.daysBetween(cur.getStartDate(),cur.getEndDate()).getDays();
+      final BigDecimal amount=InvoiceDateUtils.calculateProrationBetweenDates(startDate,endDate,nbTotalRepairedDays).multiply(cur.getRate()).setScale(NUMBER_OF_DECIMALS,ROUNDING_MODE);
       return new RecurringInvoiceItem(cur.getInvoiceId(),cur.getAccountId(),cur.getBundleId(),cur.getSubscriptionId(),cur.getPlanName(),cur.getPhaseName(),startDate,endDate,amount,cur.getRate(),cur.getCurrency());
     }
   }
