@@ -1,0 +1,10 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final List<TagDefinition> tagDefinitions=tagUserApi.getTagDefinitions(tenantContext);
+  final Collection<TagDefinitionJson> result=new LinkedList<TagDefinitionJson>();
+  for (  final TagDefinition tagDefinition : tagDefinitions) {
+    final List<AuditLog> auditLogs=auditUserApi.getAuditLogs(tagDefinition.getId(),ObjectType.TAG_DEFINITION,auditMode.getLevel(),tenantContext);
+    result.add(new TagDefinitionJson(tagDefinition,auditLogs));
+  }
+  return Response.status(Status.OK).entity(result).build();
+}

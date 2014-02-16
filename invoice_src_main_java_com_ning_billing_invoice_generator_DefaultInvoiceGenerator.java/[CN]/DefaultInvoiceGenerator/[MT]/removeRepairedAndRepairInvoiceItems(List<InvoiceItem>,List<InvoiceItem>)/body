@@ -1,12 +1,14 @@
 {
   final List<UUID> itemsToRemove=new ArrayList<UUID>();
+  List<InvoiceItem> itemsToAdd=Lists.newLinkedList();
   for (  final InvoiceItem item : existingItems) {
     if (item.getInvoiceItemType() == InvoiceItemType.REPAIR_ADJ) {
       final InvoiceItem repairItem=item;
+      final InvoiceItem repairedItem=getRepairedInvoiceItem(repairItem.getLinkedItemId(),existingItems);
+      final List<InvoiceItem> removedReparees=removeProposedRepareesForPartialrepair(repairedItem,repairItem,proposedItems);
+      itemsToAdd.addAll((computeNonRepairedItems(repairedItem,repairItem,removedReparees)));
       itemsToRemove.add(repairItem.getId());
       itemsToRemove.add(repairItem.getLinkedItemId());
-      final InvoiceItem repairedItem=getRepairedInvoiceItem(repairItem.getLinkedItemId(),existingItems);
-      removeProposedRepareesForPartialrepair(repairedItem,repairItem,proposedItems);
     }
   }
   final Iterator<InvoiceItem> iterator=existingItems.iterator();
@@ -16,4 +18,5 @@
       iterator.remove();
     }
   }
+  existingItems.addAll(itemsToAdd);
 }

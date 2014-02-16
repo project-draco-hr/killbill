@@ -1,0 +1,22 @@
+{
+  paymentPlugin.makeAllInvoicesFailWithError(false);
+  final List<Invoice> sortedInvoices=getUnpaidInvoicesOrderFromRecent();
+  int remainingUnpaidInvoices=sortedInvoices.size();
+  for (  final Invoice invoice : sortedInvoices) {
+    if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+      remainingUnpaidInvoices--;
+      if (remainingUnpaidInvoices > 0) {
+        createPaymentAndCheckForCompletion(account,invoice,NextEvent.PAYMENT);
+      }
+ else {
+        if (extraInvoice) {
+          createPaymentAndCheckForCompletion(account,invoice,NextEvent.BLOCK,NextEvent.TAG,NextEvent.INVOICE_ADJUSTMENT,NextEvent.PAYMENT,NextEvent.INVOICE,NextEvent.PAYMENT);
+        }
+ else {
+          createPaymentAndCheckForCompletion(account,invoice,NextEvent.BLOCK,NextEvent.TAG,NextEvent.INVOICE_ADJUSTMENT,NextEvent.PAYMENT);
+        }
+      }
+    }
+  }
+  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
+}
