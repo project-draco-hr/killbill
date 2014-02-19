@@ -5,7 +5,7 @@
   final LocalDate startDate=new LocalDate(2010,1,1);
   ((ClockMock)clock).setDay(startDate);
   final LocalDate recuringStartDate=clock.getUTCNow().plusDays(30).toLocalDate();
-  final LocalDate recuringEndDate=clock.getUTCNow().plusDays(30).toLocalDate();
+  final LocalDate recuringEndDate=recuringStartDate.plusMonths(1);
   final LocalDate targetDate=recuringStartDate.plusDays(1);
   final Invoice invoice=new DefaultInvoice(accountId,targetDate,targetDate,Currency.USD);
   final UUID invoiceId=invoice.getId();
@@ -26,14 +26,12 @@
   final List<Invoice> invoices=new ArrayList<Invoice>();
   invoices.add(new DefaultInvoice(savedInvoice));
   final BillingEventSet events=new MockBillingEventSet();
-  final SubscriptionBase subscription=getZombieSubscription();
+  final SubscriptionBase subscription=getZombieSubscription(subscriptionId);
   final Plan plan=Mockito.mock(Plan.class);
   Mockito.when(plan.getName()).thenReturn("plan");
   final PlanPhase phase1=Mockito.mock(PlanPhase.class);
   Mockito.when(phase1.getName()).thenReturn("plan-phase1");
-  final PlanPhase phase2=Mockito.mock(PlanPhase.class);
-  Mockito.when(phase2.getName()).thenReturn("plan-phase2");
-  final BillingEvent event1=invoiceUtil.createMockBillingEvent(null,subscription,recuringStartDate.toDateTimeAtStartOfDay(),plan,phase1,null,TEN,Currency.USD,BillingPeriod.MONTHLY,1,BillingModeType.IN_ADVANCE,"new-event",1L,SubscriptionBaseTransitionType.CREATE);
+  final BillingEvent event1=invoiceUtil.createMockBillingEvent(null,subscription,recuringStartDate.toDateTimeAtStartOfDay(),plan,phase1,null,TEN,Currency.USD,BillingPeriod.MONTHLY,31,BillingModeType.IN_ADVANCE,"new-event",1L,SubscriptionBaseTransitionType.CREATE);
   events.add(event1);
   final Invoice newInvoice=generator.generateInvoice(UUID.randomUUID(),events,invoices,targetDate,Currency.USD);
   invoiceUtil.createInvoice(newInvoice,true,context);

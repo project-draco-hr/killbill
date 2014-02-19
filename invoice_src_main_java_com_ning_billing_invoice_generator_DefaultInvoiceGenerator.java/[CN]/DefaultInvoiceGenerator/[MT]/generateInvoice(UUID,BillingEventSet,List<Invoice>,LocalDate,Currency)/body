@@ -3,21 +3,33 @@
     return null;
   }
   validateTargetDate(targetDate);
+  final AccountItemTree tree=new AccountItemTree(accountId);
   final List<InvoiceItem> existingItems=new ArrayList<InvoiceItem>();
   if (existingInvoices != null) {
     for (    final Invoice invoice : existingInvoices) {
+      final List<InvoiceItem> allSeenItems=new LinkedList<InvoiceItem>();
+      allSeenItems.addAll(invoice.getInvoiceItems());
       for (      final InvoiceItem item : invoice.getInvoiceItems()) {
         if (item.getSubscriptionId() == null || !events.getSubscriptionIdsWithAutoInvoiceOff().contains(item.getSubscriptionId())) {
-          existingItems.add(item);
+          if (item.getInvoiceItemType() == InvoiceItemType.FIXED || item.getInvoiceItemType() == InvoiceItemType.ITEM_ADJ) {
+            existingItems.add(item);
+          }
+ else {
+            tree.addItem(item,allSeenItems);
+          }
         }
       }
     }
+  }
+  tree.build();
+  final List<InvoiceItem> recurringExistingItems=tree.getCurrentExistingItemsView();
+  if (recurringExistingItems.size() > 0) {
+    existingItems.addAll(recurringExistingItems);
   }
   final LocalDate adjustedTargetDate=adjustTargetDate(existingInvoices,targetDate);
   final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),adjustedTargetDate,targetCurrency);
   final UUID invoiceId=invoice.getId();
   final List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,adjustedTargetDate,targetCurrency);
-  removeRepairedAndRepairInvoiceItems(existingItems,proposedItems);
   removeMatchingInvoiceItems(existingItems,proposedItems);
   removeRemainingFixedItemsFromExisting(existingItems);
   addRepairItems(existingItems,proposedItems);
