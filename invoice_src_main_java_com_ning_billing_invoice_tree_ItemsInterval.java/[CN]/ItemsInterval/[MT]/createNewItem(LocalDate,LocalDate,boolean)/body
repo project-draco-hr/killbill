@@ -1,0 +1,17 @@
+{
+  final List<Item> itemToConsider=new LinkedList<Item>();
+  buildFromItems(itemToConsider,addRepair);
+  Iterator<Item> it=itemToConsider.iterator();
+  while (it.hasNext()) {
+    final Item cur=it.next();
+    if (cur.getAction() == ItemAction.CANCEL && !addRepair) {
+      continue;
+    }
+    final Item result=new Item(cur.toProratedInvoiceItem(startDate,endDate),cur.getAction());
+    if (cur.getAction() == ItemAction.CANCEL) {
+      cur.incrementCurrentRepairedAmount(result.getAmount());
+    }
+    return result;
+  }
+  return null;
+}

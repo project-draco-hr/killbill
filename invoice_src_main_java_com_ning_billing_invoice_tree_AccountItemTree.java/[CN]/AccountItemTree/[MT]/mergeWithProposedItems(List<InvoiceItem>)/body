@@ -1,0 +1,17 @@
+{
+  for (  SubscriptionItemTree tree : subscriptionItemTree.values()) {
+    tree.flatten(true);
+  }
+  for (  InvoiceItem item : proposedItems) {
+    final UUID subscriptionId=getSubscriptionId(item,null);
+    SubscriptionItemTree tree=subscriptionItemTree.get(subscriptionId);
+    if (tree == null) {
+      tree=new SubscriptionItemTree(subscriptionId);
+      subscriptionItemTree.put(subscriptionId,tree);
+    }
+    tree.mergeProposedItem(item);
+  }
+  for (  SubscriptionItemTree tree : subscriptionItemTree.values()) {
+    tree.buildForMerge();
+  }
+}

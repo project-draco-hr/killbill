@@ -1,0 +1,24 @@
+{
+  Preconditions.checkState(!isBuilt);
+switch (invoiceItem.getInvoiceItemType()) {
+case RECURRING:
+    final boolean result=root.mergeProposedItem(new NodeInterval(root,new Item(invoiceItem,ItemAction.ADD)));
+  if (!result) {
+    items.add(new Item(invoiceItem,ItemAction.ADD));
+  }
+break;
+case FIXED:
+final InvoiceItem existingItem=Iterables.tryFind(existingFixedItems,new Predicate<InvoiceItem>(){
+@Override public boolean apply(final InvoiceItem input){
+  return input.matches(invoiceItem);
+}
+}
+).orNull();
+if (existingItem == null) {
+remainingFixedItems.add(invoiceItem);
+}
+break;
+default :
+Preconditions.checkState(false,"Unexpected proposed item " + invoiceItem);
+}
+}

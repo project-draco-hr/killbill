@@ -1,0 +1,30 @@
+{
+  final LocalDate startDate=new LocalDate(2014,1,1);
+  final LocalDate blockDate1=new LocalDate(2014,1,7);
+  final LocalDate unblockDate1=new LocalDate(2014,1,13);
+  final LocalDate blockDate2=new LocalDate(2014,1,17);
+  final LocalDate unblockDate2=new LocalDate(2014,1,25);
+  final LocalDate endDate=new LocalDate(2014,2,1);
+  final BigDecimal monthlyRate=new BigDecimal("12.00");
+  final BigDecimal monthlyAmount=monthlyRate;
+  final SubscriptionItemTree tree=new SubscriptionItemTree(subscriptionId);
+  final InvoiceItem monthly=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,monthlyAmount,monthlyRate,currency);
+  tree.addItem(monthly);
+  tree.flatten(true);
+  final InvoiceItem proposed1=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,blockDate1,monthlyAmount,monthlyRate,currency);
+  final InvoiceItem proposed2=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,unblockDate1,blockDate2,monthlyAmount,monthlyRate,currency);
+  final InvoiceItem proposed3=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,unblockDate2,endDate,monthlyAmount,monthlyRate,currency);
+  tree.mergeProposedItem(proposed1);
+  tree.mergeProposedItem(proposed2);
+  tree.mergeProposedItem(proposed3);
+  tree.buildForMerge();
+  final List<InvoiceItem> expectedResult=Lists.newLinkedList();
+  final InvoiceItem repair1=new RepairAdjInvoiceItem(invoiceId,accountId,blockDate1,unblockDate1,new BigDecimal("-2.32"),currency,monthly.getId());
+  final InvoiceItem repair2=new RepairAdjInvoiceItem(invoiceId,accountId,blockDate2,unblockDate2,new BigDecimal("-3.10"),currency,monthly.getId());
+  expectedResult.add(proposed1);
+  expectedResult.add(repair1);
+  expectedResult.add(proposed2);
+  expectedResult.add(repair2);
+  expectedResult.add(proposed3);
+  verifyResult(tree.getView(),expectedResult);
+}

@@ -1,6 +1,19 @@
 {
-  if (item.getInvoiceItemType() != InvoiceItemType.RECURRING && item.getInvoiceItemType() != InvoiceItemType.REPAIR_ADJ) {
-    return;
-  }
-  root.addItem(item);
+  Preconditions.checkState(!isBuilt);
+switch (invoiceItem.getInvoiceItemType()) {
+case RECURRING:
+    root.addNodeInterval(new NodeInterval(root,new Item(invoiceItem,ItemAction.ADD)));
+  break;
+case REPAIR_ADJ:
+root.addNodeInterval(new NodeInterval(root,new Item(invoiceItem,ItemAction.CANCEL)));
+break;
+case FIXED:
+existingFixedItems.add(invoiceItem);
+break;
+case ITEM_ADJ:
+pendingItemAdj.add(invoiceItem);
+break;
+default :
+break;
+}
 }
