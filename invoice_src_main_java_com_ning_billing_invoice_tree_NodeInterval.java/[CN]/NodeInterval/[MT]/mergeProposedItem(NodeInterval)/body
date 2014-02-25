@@ -7,13 +7,17 @@
   }
   computeRootInterval(newNode);
   if (leftChild == null) {
-    leftChild=newNode;
-    return true;
+    if (isRoot()) {
+      return false;
+    }
+ else {
+      leftChild=newNode;
+      return true;
+    }
   }
   NodeInterval prevChild=null;
   NodeInterval curChild=leftChild;
   do {
-    Preconditions.checkState(!curChild.isItemOverlap(newNodeItem),"Item " + newNodeItem + " overlaps "+ curChild);
     if (curChild.isItemContained(newNodeItem)) {
       final Item existingNodeItem=curChild.getItems().get(0);
       Preconditions.checkState(curChild.getItems().size() == 1,"Expected existing node to have only one item");
@@ -39,6 +43,11 @@
     curChild=curChild.rightSibling;
   }
  while (curChild != null);
-  prevChild.rightSibling=newNode;
-  return true;
+  if (isRoot()) {
+    return false;
+  }
+ else {
+    prevChild.rightSibling=newNode;
+    return true;
+  }
 }

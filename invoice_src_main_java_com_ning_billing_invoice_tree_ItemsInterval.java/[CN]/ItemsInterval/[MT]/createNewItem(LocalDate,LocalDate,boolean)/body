@@ -1,17 +1,15 @@
 {
   final List<Item> itemToConsider=new LinkedList<Item>();
-  buildFromItems(itemToConsider,true,mergeMode);
-  Iterator<Item> it=itemToConsider.iterator();
-  while (it.hasNext()) {
-    final Item cur=it.next();
-    if (cur.getAction() == ItemAction.CANCEL && !mergeMode) {
-      continue;
-    }
-    final Item result=new Item(cur.toProratedInvoiceItem(startDate,endDate),cur.getAction());
-    if (cur.getAction() == ItemAction.CANCEL && result != null) {
-      cur.incrementCurrentRepairedAmount(result.getAmount());
-    }
-    return result;
+  buildFromItems(itemToConsider,mergeMode);
+  if (itemToConsider.size() == 0) {
+    return null;
   }
-  return null;
+  Preconditions.checkState(itemToConsider.size() == 1);
+  final Item item=itemToConsider.size() == 1 ? itemToConsider.get(0) : null;
+  Preconditions.checkState((!mergeMode && item.getAction() == ItemAction.ADD) || (mergeMode && item.getAction() == ItemAction.CANCEL));
+  final Item result=new Item(item.toProratedInvoiceItem(startDate,endDate),item.getAction());
+  if (item.getAction() == ItemAction.CANCEL && result != null) {
+    item.incrementCurrentRepairedAmount(result.getAmount());
+  }
+  return result;
 }

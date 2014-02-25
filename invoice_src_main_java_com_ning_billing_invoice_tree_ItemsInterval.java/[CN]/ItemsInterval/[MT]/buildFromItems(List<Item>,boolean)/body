@@ -5,19 +5,18 @@
     final Item cur=it.previous();
 switch (cur.getAction()) {
 case ADD:
-      if (!mergeMode && !repairedIds.contains(cur.getId())) {
-        output.add(cur);
+      if (!mergeMode) {
+        if (!repairedIds.contains(cur.getId())) {
+          output.add(cur);
+        }
       }
-    if (mergeMode && !isParentRepair) {
-      output.add(cur);
-    }
-  break;
+    break;
 case CANCEL:
+  if (mergeMode) {
+    output.add(cur);
+  }
 if (cur.getLinkedId() != null) {
   repairedIds.add(cur.getLinkedId());
-}
-if (mergeMode) {
-output.add(cur);
 }
 break;
 }
