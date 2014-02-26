@@ -1,0 +1,24 @@
+{
+  final NodeInterval root=new NodeInterval();
+  final NodeInterval top=createNodeInterval("2014-01-01","2014-02-01");
+  root.addExistingItem(top);
+  final NodeInterval firstChildLevel1=createNodeInterval("2014-01-01","2014-01-07");
+  final NodeInterval secondChildLevel1=createNodeInterval("2014-01-08","2014-01-15");
+  final NodeInterval thirdChildLevel1=createNodeInterval("2014-01-16","2014-02-01");
+  root.addExistingItem(firstChildLevel1);
+  root.addExistingItem(secondChildLevel1);
+  root.addExistingItem(thirdChildLevel1);
+  final NodeInterval firstChildLevel2=createNodeInterval("2014-01-01","2014-01-03");
+  final NodeInterval secondChildLevel2=createNodeInterval("2014-01-03","2014-01-5");
+  final NodeInterval thirdChildLevel2=createNodeInterval("2014-01-16","2014-01-17");
+  root.addExistingItem(firstChildLevel2);
+  root.addExistingItem(secondChildLevel2);
+  root.addExistingItem(thirdChildLevel2);
+  checkNode(top,3,root,firstChildLevel1,null);
+  checkNode(firstChildLevel1,2,top,firstChildLevel2,secondChildLevel1);
+  checkNode(secondChildLevel1,0,top,null,thirdChildLevel1);
+  checkNode(thirdChildLevel1,1,top,thirdChildLevel2,null);
+  checkNode(firstChildLevel2,0,firstChildLevel1,null,secondChildLevel2);
+  checkNode(secondChildLevel2,0,firstChildLevel1,null,null);
+  checkNode(thirdChildLevel2,0,thirdChildLevel1,null,null);
+}

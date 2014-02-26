@@ -16,7 +16,10 @@
     curChild=curChild.rightSibling;
   }
  while (curChild != null);
-  newNode.rightSibling=toBeRebalanced.get(toBeRebalanced.size() - 1).rightSibling;
+  newNode.parent=this;
+  final NodeInterval lastNodeToRebalance=toBeRebalanced.get(toBeRebalanced.size() - 1);
+  newNode.rightSibling=lastNodeToRebalance.rightSibling;
+  lastNodeToRebalance.rightSibling=null;
   if (prevRebalanced == null) {
     leftChild=newNode;
   }
@@ -25,6 +28,7 @@
   }
   NodeInterval prev=null;
   for (  NodeInterval cur : toBeRebalanced) {
+    cur.parent=newNode;
     if (prev == null) {
       newNode.leftChild=cur;
     }
