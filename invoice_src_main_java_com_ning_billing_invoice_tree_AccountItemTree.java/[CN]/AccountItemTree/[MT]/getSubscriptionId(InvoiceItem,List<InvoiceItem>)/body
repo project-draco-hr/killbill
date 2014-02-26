@@ -1,0 +1,14 @@
+{
+  if (item.getInvoiceItemType() == InvoiceItemType.RECURRING || item.getInvoiceItemType() == InvoiceItemType.FIXED) {
+    return item.getSubscriptionId();
+  }
+ else {
+    final InvoiceItem linkedItem=Iterables.tryFind(allItems,new Predicate<InvoiceItem>(){
+      @Override public boolean apply(      final InvoiceItem input){
+        return item.getLinkedItemId().equals(input.getId());
+      }
+    }
+).get();
+    return linkedItem.getSubscriptionId();
+  }
+}

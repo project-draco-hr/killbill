@@ -5,6 +5,24 @@
   Assert.assertEquals(actual.size(),expected.size());
   for (  final ExpectedInvoiceItemCheck cur : expected) {
     boolean found=false;
+    final InvoiceItem foundItem=Iterables.tryFind(actual,new Predicate<InvoiceItem>(){
+      @Override public boolean apply(      final InvoiceItem input){
+        if (input.getInvoiceItemType() != cur.getType() || (cur.shouldCheckDates() && input.getStartDate().compareTo(cur.getStartDate()) != 0)) {
+          return false;
+        }
+        if (input.getAmount().compareTo(cur.getAmount()) != 0) {
+          return false;
+        }
+        if (!cur.shouldCheckDates() || (cur.getEndDate() == null && input.getEndDate() == null) || (cur.getEndDate() != null && input.getEndDate() != null && cur.getEndDate().compareTo(input.getEndDate()) == 0)) {
+          return true;
+        }
+        return false;
+      }
+    }
+).orNull();
+    if (foundItem != null) {
+      continue;
+    }
     for (    final InvoiceItem in : actual) {
       if (in.getInvoiceItemType() != cur.getType() || (cur.shouldCheckDates() && in.getStartDate().compareTo(cur.getStartDate()) != 0)) {
         continue;

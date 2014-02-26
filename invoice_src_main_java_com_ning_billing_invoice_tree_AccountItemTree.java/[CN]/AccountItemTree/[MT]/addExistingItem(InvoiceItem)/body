@@ -1,0 +1,14 @@
+{
+  Preconditions.checkState(!isBuilt);
+  if (existingItem.getInvoiceItemType() != InvoiceItemType.RECURRING && existingItem.getInvoiceItemType() != InvoiceItemType.REPAIR_ADJ && existingItem.getInvoiceItemType() != InvoiceItemType.FIXED && existingItem.getInvoiceItemType() != InvoiceItemType.ITEM_ADJ) {
+    return;
+  }
+  allExistingItems.add(existingItem);
+  final UUID subscriptionId=getSubscriptionId(existingItem,allExistingItems);
+  Preconditions.checkNotNull(subscriptionId);
+  if (!subscriptionItemTree.containsKey(subscriptionId)) {
+    subscriptionItemTree.put(subscriptionId,new SubscriptionItemTree(subscriptionId));
+  }
+  final SubscriptionItemTree tree=subscriptionItemTree.get(subscriptionId);
+  tree.addItem(existingItem);
+}

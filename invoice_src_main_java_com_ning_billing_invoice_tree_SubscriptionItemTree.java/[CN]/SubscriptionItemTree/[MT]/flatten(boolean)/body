@@ -1,0 +1,12 @@
+{
+  if (!isBuilt) {
+    build();
+  }
+  root=new NodeInterval();
+  for (  Item item : items) {
+    Preconditions.checkState(item.getAction() == ItemAction.ADD);
+    root.addExistingItem(new NodeInterval(root,new Item(item,reverse ? ItemAction.CANCEL : ItemAction.ADD)));
+  }
+  items.clear();
+  isBuilt=false;
+}
