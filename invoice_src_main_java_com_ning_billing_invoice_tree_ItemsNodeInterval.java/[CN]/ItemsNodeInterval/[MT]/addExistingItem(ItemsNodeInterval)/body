@@ -1,0 +1,16 @@
+{
+  return addNode(newNode,new AddNodeCallback(){
+    @Override public boolean onExistingNode(    final NodeInterval existingNode){
+      if (!existingNode.isRoot() && newNode.getStart().compareTo(existingNode.getStart()) == 0 && newNode.getEnd().compareTo(existingNode.getEnd()) == 0) {
+        final Item item=newNode.getItems().getItems().get(0);
+        final ItemsInterval existingOrNewNodeItems=((ItemsNodeInterval)existingNode).getItems();
+        existingOrNewNodeItems.insertSortedItem(item);
+      }
+      return false;
+    }
+    @Override public boolean shouldInsertNode(    final NodeInterval insertionNode){
+      return true;
+    }
+  }
+);
+}
