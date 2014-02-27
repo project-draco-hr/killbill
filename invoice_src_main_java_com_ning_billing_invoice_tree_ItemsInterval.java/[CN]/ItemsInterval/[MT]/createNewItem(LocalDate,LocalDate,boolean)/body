@@ -1,12 +1,8 @@
 {
-  final List<Item> itemToConsider=new LinkedList<Item>();
-  buildFromItems(itemToConsider,mergeMode);
-  if (itemToConsider.size() == 0) {
+  final Item item=getResultingItem(mergeMode);
+  if (item == null) {
     return null;
   }
-  Preconditions.checkState(itemToConsider.size() == 1);
-  final Item item=itemToConsider.size() == 1 ? itemToConsider.get(0) : null;
-  Preconditions.checkState((!mergeMode && item.getAction() == ItemAction.ADD) || (mergeMode && item.getAction() == ItemAction.CANCEL));
   final Item result=new Item(item.toProratedInvoiceItem(startDate,endDate),item.getAction());
   if (item.getAction() == ItemAction.CANCEL && result != null) {
     item.incrementCurrentRepairedAmount(result.getAmount());
