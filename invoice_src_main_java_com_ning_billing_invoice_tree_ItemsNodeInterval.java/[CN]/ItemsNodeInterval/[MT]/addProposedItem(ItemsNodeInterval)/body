@@ -5,8 +5,8 @@
         return false;
       }
       Preconditions.checkState(newNode.getStart().compareTo(existingNode.getStart()) == 0 && newNode.getEnd().compareTo(existingNode.getEnd()) == 0);
-      final Item item=newNode.getItems().getItems().get(0);
-      final ItemsInterval existingOrNewNodeItems=((ItemsNodeInterval)existingNode).getItems();
+      final Item item=newNode.getItems().get(0);
+      final ItemsInterval existingOrNewNodeItems=((ItemsNodeInterval)existingNode).getItemsInterval();
       existingOrNewNodeItems.cancelItems(item);
       return true;
     }
@@ -14,10 +14,10 @@
       if (insertionNode.isRoot()) {
         return false;
       }
-      final ItemsInterval insertionNodeItems=((ItemsNodeInterval)insertionNode).getItems();
+      final ItemsInterval insertionNodeItems=((ItemsNodeInterval)insertionNode).getItemsInterval();
       Preconditions.checkState(insertionNodeItems.getItems().size() == 1,"Expected existing node to have only one item");
       final Item insertionNodeItem=insertionNodeItems.getItems().get(0);
-      final Item newNodeItem=newNode.getItems().getItems().get(0);
+      final Item newNodeItem=newNode.getItems().get(0);
       if (insertionNodeItem.isSameKind(newNodeItem)) {
         return true;
       }

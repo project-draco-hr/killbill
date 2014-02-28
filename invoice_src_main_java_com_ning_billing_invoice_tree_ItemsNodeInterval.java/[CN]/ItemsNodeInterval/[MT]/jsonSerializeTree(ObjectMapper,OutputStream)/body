@@ -1,0 +1,29 @@
+{
+  final JsonGenerator generator=mapper.getFactory().createJsonGenerator(output);
+  generator.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET,false);
+  walkTree(new WalkCallback(){
+    private int curDepth=0;
+    @Override public void onCurrentNode(    final int depth,    final NodeInterval curNode,    final NodeInterval parent){
+      final ItemsNodeInterval node=(ItemsNodeInterval)curNode;
+      if (node.isRoot()) {
+        return;
+      }
+      try {
+        if (curDepth < depth) {
+          generator.writeStartArray();
+          curDepth=depth;
+        }
+ else         if (curDepth > depth) {
+          generator.writeEndArray();
+          curDepth=depth;
+        }
+        generator.writeObject(node);
+      }
+ catch (      IOException e) {
+        throw new RuntimeException("Failed to deserialize tree",e);
+      }
+    }
+  }
+);
+  generator.close();
+}
