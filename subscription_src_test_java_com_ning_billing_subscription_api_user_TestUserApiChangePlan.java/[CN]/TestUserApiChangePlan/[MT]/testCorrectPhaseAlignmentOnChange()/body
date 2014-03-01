@@ -4,11 +4,9 @@
   assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
   Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(2));
   clock.addDeltaFromReality(it.toDurationMillis());
-  testListener.reset();
   testListener.pushExpectedEvent(NextEvent.CHANGE);
   subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",callContext);
   assertListenerStatus();
-  testListener.reset();
   final Plan currentPlan=subscription.getCurrentPlan();
   assertNotNull(currentPlan);
   assertEquals(currentPlan.getProduct().getName(),"Assault-Rifle");

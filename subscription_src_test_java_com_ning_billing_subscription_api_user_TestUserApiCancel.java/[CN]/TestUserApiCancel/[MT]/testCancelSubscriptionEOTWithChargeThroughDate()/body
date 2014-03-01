@@ -21,11 +21,8 @@
   assertEquals(subscription.getLastActivePriceList().getName(),planSet);
   assertEquals(subscription.getLastActiveBillingPeriod(),term);
   assertEquals(subscription.getLastActiveCategory(),ProductCategory.BASE);
-  testListener.setNonExpectedMode();
-  testListener.pushExpectedEvent(NextEvent.CANCEL);
   subscription.cancel(callContext);
-  assertFalse(testListener.isCompleted(3000));
-  testListener.reset();
+  assertListenerStatus();
   assertEquals(subscription.getLastActiveProduct().getName(),prod);
   assertEquals(subscription.getLastActivePriceList().getName(),planSet);
   assertEquals(subscription.getLastActiveBillingPeriod(),term);

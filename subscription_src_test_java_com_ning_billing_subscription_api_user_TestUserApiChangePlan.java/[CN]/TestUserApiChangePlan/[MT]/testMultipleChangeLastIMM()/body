@@ -13,11 +13,8 @@
   final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(startDiscountPhase,ctd);
   subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
   subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
-  testListener.setNonExpectedMode();
-  testListener.pushExpectedEvent(NextEvent.CHANGE);
   subscription.changePlan("Pistol",BillingPeriod.MONTHLY,"gunclubDiscount",callContext);
-  assertFalse(testListener.isCompleted(3000));
-  testListener.reset();
+  assertListenerStatus();
   testListener.pushExpectedEvent(NextEvent.CHANGE);
   subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",callContext);
   assertListenerStatus();
