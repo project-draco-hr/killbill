@@ -1,0 +1,21 @@
+{
+  Preconditions.checkNotNull(callback);
+  Preconditions.checkNotNull(targetDate);
+  if (targetDate.compareTo(getStart()) < 0 || targetDate.compareTo(getEnd()) > 0) {
+    return null;
+  }
+  NodeInterval curChild=leftChild;
+  while (curChild != null) {
+    if (curChild.getStart().compareTo(targetDate) <= 0 && curChild.getEnd().compareTo(targetDate) >= 0) {
+      if (callback.isMatch(curChild)) {
+        return curChild;
+      }
+      NodeInterval result=curChild.findNode(targetDate,callback);
+      if (result != null) {
+        return result;
+      }
+    }
+    curChild=curChild.getRightSibling();
+  }
+  return null;
+}

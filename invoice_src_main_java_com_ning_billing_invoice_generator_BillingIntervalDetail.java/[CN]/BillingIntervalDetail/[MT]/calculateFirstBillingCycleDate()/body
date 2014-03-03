@@ -7,9 +7,10 @@
  else {
     billingCycleDate=new LocalDate(startDate.getYear(),startDate.getMonthOfYear(),billingCycleDay,startDate.getChronology());
   }
+  final int numberOfMonthsInPeriod=billingPeriod.getNumberOfMonths();
   LocalDate proposedDate=billingCycleDate;
   while (proposedDate.isBefore(startDate)) {
-    proposedDate=proposedDate.plusMonths(1);
+    proposedDate=proposedDate.plusMonths(numberOfMonthsInPeriod);
   }
-  firstBillingCycleDate=proposedDate;
+  firstBillingCycleDate=alignProposedBillCycleDate(proposedDate);
 }

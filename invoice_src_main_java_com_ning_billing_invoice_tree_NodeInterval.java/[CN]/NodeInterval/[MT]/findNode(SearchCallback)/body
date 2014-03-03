@@ -1,0 +1,15 @@
+{
+  Preconditions.checkNotNull(callback);
+  if (callback.isMatch(this)) {
+    return this;
+  }
+  NodeInterval curChild=leftChild;
+  while (curChild != null) {
+    final NodeInterval result=curChild.findNode(callback);
+    if (result != null) {
+      return result;
+    }
+    curChild=curChild.getRightSibling();
+  }
+  return null;
+}

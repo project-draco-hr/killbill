@@ -1,24 +1,6 @@
 {
-  final Set<UUID> repairedIds=new HashSet<UUID>();
-  final ListIterator<Item> it=items.listIterator(items.size());
-  while (it.hasPrevious()) {
-    final Item cur=it.previous();
-switch (cur.getAction()) {
-case ADD:
-      if (!mergeMode) {
-        if (!repairedIds.contains(cur.getId())) {
-          output.add(cur);
-        }
-      }
-    break;
-case CANCEL:
-  if (mergeMode) {
-    output.add(cur);
+  final Item item=getResultingItem(mergeMode);
+  if (item != null) {
+    output.add(item);
   }
-if (cur.getLinkedId() != null) {
-  repairedIds.add(cur.getLinkedId());
-}
-break;
-}
-}
 }
