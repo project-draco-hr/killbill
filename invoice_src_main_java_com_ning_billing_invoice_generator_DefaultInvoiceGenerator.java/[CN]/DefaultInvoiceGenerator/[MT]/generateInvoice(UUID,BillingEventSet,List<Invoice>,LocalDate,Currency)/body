@@ -3,12 +3,12 @@
     return null;
   }
   validateTargetDate(targetDate);
-  final List<InvoiceItem> existingItems=new ArrayList<InvoiceItem>();
+  final AccountItemTree tree=new AccountItemTree(accountId);
   if (existingInvoices != null) {
     for (    final Invoice invoice : existingInvoices) {
       for (      final InvoiceItem item : invoice.getInvoiceItems()) {
         if (item.getSubscriptionId() == null || !events.getSubscriptionIdsWithAutoInvoiceOff().contains(item.getSubscriptionId())) {
-          existingItems.add(item);
+          tree.addExistingItem(item);
         }
       }
     }
@@ -17,10 +17,8 @@
   final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),adjustedTargetDate,targetCurrency);
   final UUID invoiceId=invoice.getId();
   final List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,adjustedTargetDate,targetCurrency);
-  removeRepairedAndRepairInvoiceItems(existingItems,proposedItems);
-  removeMatchingInvoiceItems(existingItems,proposedItems);
-  removeRemainingFixedItemsFromExisting(existingItems);
-  addRepairItems(existingItems,proposedItems);
-  invoice.addInvoiceItems(proposedItems);
-  return proposedItems.size() != 0 ? invoice : null;
+  tree.mergeWithProposedItems(proposedItems);
+  final List<InvoiceItem> finalItems=tree.getResultingItemList();
+  invoice.addInvoiceItems(finalItems);
+  return finalItems.size() != 0 ? invoice : null;
 }

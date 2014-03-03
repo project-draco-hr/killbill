@@ -1,0 +1,58 @@
+{
+  Preconditions.checkNotNull(newNode);
+  Preconditions.checkNotNull(callback);
+  if (!isRoot() && newNode.getStart().compareTo(start) == 0 && newNode.getEnd().compareTo(end) == 0) {
+    return callback.onExistingNode(this);
+  }
+  computeRootInterval(newNode);
+  newNode.parent=this;
+  if (leftChild == null) {
+    if (callback.shouldInsertNode(this)) {
+      leftChild=newNode;
+      return true;
+    }
+ else {
+      return false;
+    }
+  }
+  NodeInterval prevChild=null;
+  NodeInterval curChild=leftChild;
+  while (curChild != null) {
+    if (curChild.isItemContained(newNode)) {
+      return curChild.addNode(newNode,callback);
+    }
+    if (curChild.isItemOverlap(newNode)) {
+      if (callback.shouldInsertNode(this)) {
+        rebalance(newNode);
+        return true;
+      }
+ else {
+        return false;
+      }
+    }
+    if (newNode.getStart().compareTo(curChild.getStart()) < 0) {
+      if (callback.shouldInsertNode(this)) {
+        newNode.rightSibling=curChild;
+        if (prevChild == null) {
+          leftChild=newNode;
+        }
+ else {
+          prevChild.rightSibling=newNode;
+        }
+        return true;
+      }
+ else {
+        return false;
+      }
+    }
+    prevChild=curChild;
+    curChild=curChild.rightSibling;
+  }
+  if (callback.shouldInsertNode(this)) {
+    prevChild.rightSibling=newNode;
+    return true;
+  }
+ else {
+    return false;
+  }
+}

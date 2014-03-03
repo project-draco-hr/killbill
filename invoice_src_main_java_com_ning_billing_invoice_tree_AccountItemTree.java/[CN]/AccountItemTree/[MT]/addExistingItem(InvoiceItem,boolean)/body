@@ -1,0 +1,29 @@
+{
+  Preconditions.checkState(!isBuilt);
+switch (existingItem.getInvoiceItemType()) {
+case EXTERNAL_CHARGE:
+case CBA_ADJ:
+case CREDIT_ADJ:
+case REFUND_ADJ:
+    return;
+case RECURRING:
+case REPAIR_ADJ:
+case FIXED:
+case ITEM_ADJ:
+  break;
+default :
+Preconditions.checkState(false,"Unknown invoice item type " + existingItem.getInvoiceItemType());
+}
+allExistingItems.add(existingItem);
+final UUID subscriptionId=getSubscriptionId(existingItem,allExistingItems);
+Preconditions.checkState(subscriptionId != null || !failOnMissingSubscription);
+if (subscriptionId == null && existingItem.getInvoiceItemType() == InvoiceItemType.ITEM_ADJ) {
+pendingItemAdj.add(existingItem);
+return;
+}
+if (!subscriptionItemTree.containsKey(subscriptionId)) {
+subscriptionItemTree.put(subscriptionId,new SubscriptionItemTree(subscriptionId));
+}
+final SubscriptionItemTree tree=subscriptionItemTree.get(subscriptionId);
+tree.addItem(existingItem);
+}

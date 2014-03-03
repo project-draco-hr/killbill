@@ -1,0 +1,20 @@
+{
+  Preconditions.checkNotNull(callback);
+  if (leftChild == null) {
+    callback.onLastNode(this);
+    return;
+  }
+  LocalDate curDate=start;
+  NodeInterval curChild=leftChild;
+  while (curChild != null) {
+    if (curChild.getStart().compareTo(curDate) > 0) {
+      callback.onMissingInterval(this,curDate,curChild.getStart());
+    }
+    curChild.build(callback);
+    curDate=curChild.getEnd();
+    curChild=curChild.getRightSibling();
+  }
+  if (curDate.compareTo(end) < 0) {
+    callback.onMissingInterval(this,curDate,end);
+  }
+}

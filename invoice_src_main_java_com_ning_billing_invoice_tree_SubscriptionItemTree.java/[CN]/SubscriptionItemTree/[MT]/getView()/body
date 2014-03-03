@@ -1,0 +1,18 @@
+{
+  final List<InvoiceItem> tmp=new LinkedList<InvoiceItem>();
+  tmp.addAll(remainingFixedItems);
+  tmp.addAll(Collections2.filter(Collections2.transform(items,new Function<Item,InvoiceItem>(){
+    @Override public InvoiceItem apply(    final Item input){
+      return input.toInvoiceItem();
+    }
+  }
+),new Predicate<InvoiceItem>(){
+    @Override public boolean apply(    @Nullable final InvoiceItem input){
+      return input != null;
+    }
+  }
+));
+  final List<InvoiceItem> result=Ordering.<InvoiceItem>from(INVOICE_ITEM_COMPARATOR).sortedCopy(tmp);
+  checkItemsListState(result);
+  return result;
+}

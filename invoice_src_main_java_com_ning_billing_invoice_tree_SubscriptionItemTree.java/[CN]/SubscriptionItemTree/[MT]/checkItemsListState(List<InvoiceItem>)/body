@@ -1,0 +1,24 @@
+{
+  LocalDate prevRecurringEndDate=null;
+  LocalDate prevRepairEndDate=null;
+  for (  InvoiceItem cur : orderedList) {
+switch (cur.getInvoiceItemType()) {
+case FIXED:
+      break;
+case RECURRING:
+    if (prevRecurringEndDate != null) {
+      Preconditions.checkState(prevRecurringEndDate.compareTo(cur.getStartDate()) <= 0);
+    }
+  prevRecurringEndDate=cur.getEndDate();
+break;
+case REPAIR_ADJ:
+if (prevRepairEndDate != null) {
+Preconditions.checkState(prevRepairEndDate.compareTo(cur.getStartDate()) <= 0);
+}
+prevRepairEndDate=cur.getEndDate();
+break;
+default :
+Preconditions.checkState(false,"Unexpected item type " + cur.getInvoiceItemType());
+}
+}
+}

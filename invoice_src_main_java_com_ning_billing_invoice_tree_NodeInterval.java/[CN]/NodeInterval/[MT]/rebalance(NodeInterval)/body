@@ -1,0 +1,39 @@
+{
+  NodeInterval prevRebalanced=null;
+  NodeInterval curChild=leftChild;
+  List<NodeInterval> toBeRebalanced=Lists.newLinkedList();
+  do {
+    if (curChild.isItemOverlap(newNode)) {
+      toBeRebalanced.add(curChild);
+    }
+ else {
+      if (toBeRebalanced.size() > 0) {
+        break;
+      }
+      prevRebalanced=curChild;
+    }
+    curChild=curChild.rightSibling;
+  }
+ while (curChild != null);
+  newNode.parent=this;
+  final NodeInterval lastNodeToRebalance=toBeRebalanced.get(toBeRebalanced.size() - 1);
+  newNode.rightSibling=lastNodeToRebalance.rightSibling;
+  lastNodeToRebalance.rightSibling=null;
+  if (prevRebalanced == null) {
+    leftChild=newNode;
+  }
+ else {
+    prevRebalanced.rightSibling=newNode;
+  }
+  NodeInterval prev=null;
+  for (  NodeInterval cur : toBeRebalanced) {
+    cur.parent=newNode;
+    if (prev == null) {
+      newNode.leftChild=cur;
+    }
+ else {
+      prev.rightSibling=cur;
+    }
+    prev=cur;
+  }
+}

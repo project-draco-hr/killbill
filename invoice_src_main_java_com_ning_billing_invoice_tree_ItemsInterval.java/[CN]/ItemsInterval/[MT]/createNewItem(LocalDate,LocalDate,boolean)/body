@@ -1,0 +1,11 @@
+{
+  final Item item=getResultingItem(mergeMode);
+  if (item == null) {
+    return null;
+  }
+  final Item result=new Item(item.toProratedInvoiceItem(startDate,endDate),item.getAction());
+  if (item.getAction() == ItemAction.CANCEL && result != null) {
+    item.incrementCurrentRepairedAmount(result.getAmount());
+  }
+  return result;
+}
