@@ -21,7 +21,7 @@
       for (      final RecurringInvoiceItemData itemDatum : itemData) {
         final BigDecimal rate=thisEvent.getRecurringPrice();
         if (rate != null) {
-          final BigDecimal amount=itemDatum.getNumberOfCycles().multiply(rate).setScale(NUMBER_OF_DECIMALS,ROUNDING_MODE);
+          final BigDecimal amount=KillBillMoney.of(itemDatum.getNumberOfCycles().multiply(rate),currency);
           final RecurringInvoiceItem recurringItem=new RecurringInvoiceItem(invoiceId,accountId,thisEvent.getSubscription().getBundleId(),thisEvent.getSubscription().getId(),thisEvent.getPlan().getName(),thisEvent.getPlanPhase().getName(),itemDatum.getStartDate(),itemDatum.getEndDate(),amount,rate,currency);
           items.add(recurringItem);
         }

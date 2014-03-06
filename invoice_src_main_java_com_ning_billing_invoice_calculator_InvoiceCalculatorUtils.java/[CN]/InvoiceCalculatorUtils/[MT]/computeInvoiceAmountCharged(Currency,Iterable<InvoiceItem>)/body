@@ -1,0 +1,18 @@
+{
+  BigDecimal amountCharged=BigDecimal.ZERO;
+  if (invoiceItems == null || !invoiceItems.iterator().hasNext()) {
+    return amountCharged;
+  }
+  for (  final InvoiceItem invoiceItem : invoiceItems) {
+    final Iterable<InvoiceItem> otherInvoiceItems=Iterables.filter(invoiceItems,new Predicate<InvoiceItem>(){
+      @Override public boolean apply(      final InvoiceItem input){
+        return !input.getId().equals(invoiceItem.getId());
+      }
+    }
+);
+    if (isCharge(invoiceItem) || isInvoiceAdjustmentItem(invoiceItem,otherInvoiceItems) || isInvoiceItemAdjustmentItem(invoiceItem)) {
+      amountCharged=amountCharged.add(invoiceItem.getAmount());
+    }
+  }
+  return KillBillMoney.of(amountCharged,currency);
+}

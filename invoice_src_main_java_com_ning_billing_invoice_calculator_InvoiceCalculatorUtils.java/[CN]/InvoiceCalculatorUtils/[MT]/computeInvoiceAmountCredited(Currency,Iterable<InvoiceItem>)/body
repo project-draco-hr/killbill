@@ -1,0 +1,12 @@
+{
+  BigDecimal amountCredited=BigDecimal.ZERO;
+  if (invoiceItems == null || !invoiceItems.iterator().hasNext()) {
+    return amountCredited;
+  }
+  for (  final InvoiceItem invoiceItem : invoiceItems) {
+    if (isAccountCreditItem(invoiceItem)) {
+      amountCredited=amountCredited.add(invoiceItem.getAmount());
+    }
+  }
+  return KillBillMoney.of(amountCredited,currency);
+}

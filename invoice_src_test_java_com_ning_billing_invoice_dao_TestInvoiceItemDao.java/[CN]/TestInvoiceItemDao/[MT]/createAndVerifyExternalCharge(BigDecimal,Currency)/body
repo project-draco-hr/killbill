@@ -1,0 +1,7 @@
+{
+  final InvoiceItem externalChargeInvoiceItem=new ExternalChargeInvoiceItem(UUID.randomUUID(),account.getId(),UUID.randomUUID(),UUID.randomUUID().toString(),new LocalDate(2012,4,1),amount,currency);
+  invoiceUtil.createInvoiceItem(externalChargeInvoiceItem,context);
+  final InvoiceItemModelDao savedItem=invoiceUtil.getInvoiceItemById(externalChargeInvoiceItem.getId(),context);
+  assertSameInvoiceItem(externalChargeInvoiceItem,savedItem);
+  Assert.assertEquals(externalChargeInvoiceItem.getAmount().compareTo(amount),0);
+}

@@ -5,6 +5,24 @@
   Assert.assertEquals(actual.size(),expected.size());
   for (  final ExpectedInvoiceItemCheck cur : expected) {
     boolean found=false;
+    final InvoiceItem foundItem=Iterables.tryFind(actual,new Predicate<InvoiceItem>(){
+      @Override public boolean apply(      final InvoiceItem input){
+        if (input.getInvoiceItemType() != cur.getType() || (cur.shouldCheckDates() && input.getStartDate().compareTo(cur.getStartDate()) != 0)) {
+          return false;
+        }
+        if (input.getAmount().compareTo(cur.getAmount()) != 0) {
+          return false;
+        }
+        if (!cur.shouldCheckDates() || (cur.getEndDate() == null && input.getEndDate() == null) || (cur.getEndDate() != null && input.getEndDate() != null && cur.getEndDate().compareTo(input.getEndDate()) == 0)) {
+          return true;
+        }
+        return false;
+      }
+    }
+).orNull();
+    if (foundItem != null) {
+      continue;
+    }
     for (    final InvoiceItem in : actual) {
       if (in.getInvoiceItemType() != cur.getType() || (cur.shouldCheckDates() && in.getStartDate().compareTo(cur.getStartDate()) != 0)) {
         continue;
@@ -20,7 +38,13 @@
       log.info(String.format("Found item type = %s and startDate = %s, amount = %s but endDate differ (actual = %s, expected = %s) ",cur.getType(),cur.getStartDate(),in.getAmount(),in.getEndDate(),cur.getEndDate()));
     }
     if (!found) {
-      Assert.fail(String.format("Failed to find invoice item type = %s and startDate = %s, amount = %s, endDate = %s for invoice id %s",cur.getType(),cur.getStartDate(),cur.getAmount(),cur.getEndDate(),invoice.getId()));
+      final StringBuilder debugBuilder=new StringBuilder();
+      debugBuilder.append(String.format("Invoice id=[%s], targetDate=[%s]",invoice.getId(),invoice.getTargetDate()));
+      for (      final InvoiceItem actualInvoiceItem : actual) {
+        debugBuilder.append(String.format("\n    type=[%s] startDate=[%s] endDate=[%s] amount=[%s]",actualInvoiceItem.getInvoiceItemType(),actualInvoiceItem.getStartDate(),actualInvoiceItem.getEndDate(),actualInvoiceItem.getAmount()));
+      }
+      final String failureMessage=String.format("Failed to find invoice item type = %s and startDate = %s, amount = %s, endDate = %s for invoice id %s\n%s",cur.getType(),cur.getStartDate(),cur.getAmount(),cur.getEndDate(),invoice.getId(),debugBuilder.toString());
+      Assert.fail(failureMessage);
     }
   }
   auditChecker.checkInvoiceCreated(invoice,context);
