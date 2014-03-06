@@ -7,21 +7,13 @@ synchronized (this) {
       if (ev == received) {
         it.remove();
         foundIt=true;
-        if (!nonExpectedMode) {
-          log.debug("Found expected event {}. Yeah!",received);
-        }
- else {
-          log.error("Found non expected event {}. Boohh! ",received);
-        }
+        log.debug("Found expected event {}. Yeah!",received);
         break;
       }
     }
-    if (!foundIt && !nonExpectedMode) {
-      final Joiner joiner=Joiner.on(" ");
-      log.error("Received unexpected event " + received + "; remaining expected events ["+ joiner.join(nextExpectedEvent)+ "]");
-      if (testStatus != null) {
-        testStatus.failed("TestApiListener [ApiListenerStatus]: Received unexpected event " + received + "; remaining expected events ["+ joiner.join(nextExpectedEvent)+ "]");
-      }
+    if (!foundIt) {
+      log.error("Received unexpected event " + received + "; remaining expected events ["+ SPACE_JOINER.join(nextExpectedEvent)+ "]");
+      failed("TestApiListener [ApiListenerStatus]: Received unexpected event " + received + "; remaining expected events ["+ SPACE_JOINER.join(nextExpectedEvent)+ "]");
     }
   }
 }

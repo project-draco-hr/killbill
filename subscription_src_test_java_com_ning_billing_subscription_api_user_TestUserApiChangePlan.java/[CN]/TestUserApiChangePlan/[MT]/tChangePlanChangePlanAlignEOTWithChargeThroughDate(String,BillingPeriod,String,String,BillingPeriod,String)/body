@@ -20,10 +20,7 @@
   currentTime=clock.getUTCNow();
   subscription.changePlan(toProd,toTerm,toPlanSet,callContext);
   checkChangePlan(subscription,fromProd,ProductCategory.BASE,fromTerm,PhaseType.EVERGREEN);
-  testListener.setNonExpectedMode();
-  testListener.pushExpectedEvent(NextEvent.CHANGE);
-  assertFalse(testListener.isCompleted(3000));
-  testListener.reset();
+  assertListenerStatus();
   testListener.pushExpectedEvent(NextEvent.CHANGE);
   it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(1));
   clock.addDeltaFromReality(it.toDurationMillis());
@@ -35,13 +32,10 @@
   currentPhase=subscription.getCurrentPhase();
   assertNotNull(currentPhase);
   assertEquals(currentPhase.getPhaseType(),PhaseType.DISCOUNT);
-  testListener.setNonExpectedMode();
-  testListener.pushExpectedEvent(NextEvent.PHASE);
   it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(11));
   clock.addDeltaFromReality(it.toDurationMillis());
   currentTime=clock.getUTCNow();
-  assertFalse(testListener.isCompleted(3000));
-  testListener.reset();
+  assertListenerStatus();
   final DateTime nextExpectedPhaseChange=TestSubscriptionHelper.addDuration(newChargedThroughDate,currentPhase.getDuration());
   testUtil.checkNextPhaseChange(subscription,1,nextExpectedPhaseChange);
   testListener.pushExpectedEvent(NextEvent.PHASE);

@@ -9,7 +9,7 @@ synchronized (this) {
         final DateTime before=new DateTime();
         wait(500);
         if (completed) {
-          await().atMost(10,SECONDS).until(new Callable<Boolean>(){
+          await().atMost(timeout,TimeUnit.MILLISECONDS).until(new Callable<Boolean>(){
             @Override public Boolean call() throws Exception {
               final long inProcessingBusEvents=idbi.withHandle(new HandleCallback<Long>(){
                 @Override public Long withHandle(                final Handle handle) throws Exception {
@@ -27,14 +27,14 @@ synchronized (this) {
         final DateTime after=new DateTime();
         waitTimeMs-=after.getMillis() - before.getMillis();
       }
- catch (      Exception ignore) {
+ catch (      final Exception ignore) {
         log.error("isCompleted got interrupted ",ignore);
         return false;
       }
     }
  while (waitTimeMs > 0 && !completed);
   }
-  if (!completed && !nonExpectedMode) {
+  if (!completed) {
     final Joiner joiner=Joiner.on(" ");
     log.error("TestApiListener did not complete in " + timeout + " ms, remaining events are "+ joiner.join(nextExpectedEvent));
   }

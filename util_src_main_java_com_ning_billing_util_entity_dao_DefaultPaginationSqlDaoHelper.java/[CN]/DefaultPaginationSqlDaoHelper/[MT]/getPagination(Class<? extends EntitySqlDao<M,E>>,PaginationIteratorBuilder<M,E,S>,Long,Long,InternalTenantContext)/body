@@ -2,16 +2,12 @@
   final Long count=transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Long>(){
     @Override public Long inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final EntitySqlDao<M,E> sqlDao=entitySqlDaoWrapperFactory.become(sqlDaoClazz);
-      final Iterator<M> dumbIterator=paginationIteratorBuilder.build((S)sqlDao,1L);
-      while (dumbIterator.hasNext()) {
-        dumbIterator.next();
-      }
-      return sqlDao.getFoundRows(context);
+      return paginationIteratorBuilder.getCount((S)sqlDao,context);
     }
   }
 );
   final EntitySqlDao<M,E> sqlDao=transactionalSqlDao.onDemand(sqlDaoClazz);
   final Long totalCount=sqlDao.getCount(context);
-  final Iterator<M> results=paginationIteratorBuilder.build((S)sqlDao,limit);
+  final Iterator<M> results=paginationIteratorBuilder.build((S)sqlDao,limit,context);
   return new DefaultPagination<M>(offset,limit,count,totalCount,results);
 }

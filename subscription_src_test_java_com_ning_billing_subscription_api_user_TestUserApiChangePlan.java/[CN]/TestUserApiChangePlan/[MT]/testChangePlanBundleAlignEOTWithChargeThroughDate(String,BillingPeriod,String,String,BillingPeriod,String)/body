@@ -12,12 +12,9 @@
   final Duration ctd=testUtil.getDurationMonth(1);
   final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,ctd);
   subscriptionInternalApi.setChargedThroughDate(subscription.getId(),newChargedThroughDate,internalCallContext);
-  testListener.setNonExpectedMode();
-  testListener.pushExpectedEvent(NextEvent.CHANGE);
   subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
   subscription.changePlan(toProd,toTerm,toPlanSet,callContext);
-  assertFalse(testListener.isCompleted(3000));
-  testListener.reset();
+  assertListenerStatus();
   currentPhase=subscription.getCurrentPhase();
   checkChangePlan(subscription,fromProd,ProductCategory.BASE,fromTerm,PhaseType.DISCOUNT);
   final DateTime nextExpectedPhaseChange=TestSubscriptionHelper.addDuration(expectedPhaseTrialChange,currentPhase.getDuration());

@@ -7,7 +7,6 @@
   final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
   final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
   DefaultSubscriptionBase aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
-  testListener.reset();
   testListener.pushExpectedEvent(NextEvent.PHASE);
   testListener.pushExpectedEvent(NextEvent.PHASE);
   final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(2));
@@ -29,7 +28,6 @@
   assertEquals(aoStatus.get(0).getPhaseType(),aoSubscription.getCurrentPhase().getPhaseType());
   assertEquals(aoStatus.get(0).getPriceList(),aoSubscription.getCurrentPriceList().getName());
   assertEquals(aoStatus.get(0).getReason(),DryRunChangeReason.AO_INCLUDED_IN_NEW_PLAN);
-  testListener.reset();
   testListener.pushExpectedEvent(NextEvent.CHANGE);
   testListener.pushExpectedEvent(NextEvent.CANCEL);
   baseSubscription.changePlan(newBaseProduct,newBaseTerm,newBasePriceList,callContext);

@@ -23,10 +23,10 @@
     if (previousOverdueState.getName().equals(nextOverdueState.getName())) {
       return;
     }
-    storeNewState(account,nextOverdueState,context);
     cancelSubscriptionsIfRequired(account,nextOverdueState,context);
     sendEmailIfRequired(billingState,account,nextOverdueState,context);
     avoid_extra_credit_by_toggling_AUTO_INVOICE_OFF(account,previousOverdueState,nextOverdueState,context);
+    storeNewState(account,nextOverdueState,context);
   }
  catch (  OverdueApiException e) {
     if (e.getCode() != ErrorCode.OVERDUE_NO_REEVALUATION_INTERVAL.getCode()) {
