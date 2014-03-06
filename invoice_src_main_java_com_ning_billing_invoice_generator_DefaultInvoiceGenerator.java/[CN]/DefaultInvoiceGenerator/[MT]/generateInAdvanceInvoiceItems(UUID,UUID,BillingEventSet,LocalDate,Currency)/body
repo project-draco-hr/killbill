@@ -11,10 +11,10 @@
     nextEvent=eventIt.next();
     if (!events.getSubscriptionIdsWithAutoInvoiceOff().contains(thisEvent.getSubscription().getId())) {
       final BillingEvent adjustedNextEvent=(thisEvent.getSubscription().getId() == nextEvent.getSubscription().getId()) ? nextEvent : null;
-      items.addAll(processEvents(invoiceId,accountId,thisEvent,adjustedNextEvent,targetDate,currency,logStringBuilder));
+      items.addAll(processInAdvanceEvents(invoiceId,accountId,thisEvent,adjustedNextEvent,targetDate,currency,logStringBuilder));
     }
   }
-  items.addAll(processEvents(invoiceId,accountId,nextEvent,null,targetDate,currency,logStringBuilder));
+  items.addAll(processInAdvanceEvents(invoiceId,accountId,nextEvent,null,targetDate,currency,logStringBuilder));
   log.info(logStringBuilder.toString());
   return items;
 }

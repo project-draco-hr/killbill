@@ -3,22 +3,10 @@
     return null;
   }
   validateTargetDate(targetDate);
-  final AccountItemTree tree=new AccountItemTree(accountId);
-  if (existingInvoices != null) {
-    for (    final Invoice invoice : existingInvoices) {
-      for (      final InvoiceItem item : invoice.getInvoiceItems()) {
-        if (item.getSubscriptionId() == null || !events.getSubscriptionIdsWithAutoInvoiceOff().contains(item.getSubscriptionId())) {
-          tree.addExistingItem(item);
-        }
-      }
-    }
-  }
   final LocalDate adjustedTargetDate=adjustTargetDate(existingInvoices,targetDate);
   final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),adjustedTargetDate,targetCurrency);
   final UUID invoiceId=invoice.getId();
-  final List<InvoiceItem> proposedItems=generateInvoiceItems(invoiceId,accountId,events,adjustedTargetDate,targetCurrency);
-  tree.mergeWithProposedItems(proposedItems);
-  final List<InvoiceItem> finalItems=tree.getResultingItemList();
-  invoice.addInvoiceItems(finalItems);
-  return finalItems.size() != 0 ? invoice : null;
+  final List<InvoiceItem> inAdvanceItems=generateInAdvanceInvoiceItems(accountId,invoiceId,events,existingInvoices,adjustedTargetDate,targetCurrency);
+  invoice.addInvoiceItems(inAdvanceItems);
+  return inAdvanceItems.size() != 0 ? invoice : null;
 }
