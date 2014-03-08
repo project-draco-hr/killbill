@@ -1,0 +1,12 @@
+{
+  super.beforeClass();
+  final ConfigSource configSource=new ConfigSource(){
+    private final Map<String,String> properties=ImmutableMap.<String,String>of("killbill.template.invoiceFormatterFactoryClass","org.killbill.billing.mock.MockInvoiceFormatterFactory");
+    @Override public String getString(    final String propertyName){
+      return properties.get(propertyName);
+    }
+  }
+;
+  final TranslatorConfig config=new ConfigurationObjectFactory(configSource).build(TranslatorConfig.class);
+  translation=new DefaultCatalogTranslator(config);
+}

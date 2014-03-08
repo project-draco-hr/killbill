@@ -1,0 +1,25 @@
+{
+  config=new ConfigurationObjectFactory(System.getProperties()).build(KillbillServerConfig.class);
+  final ServerModuleBuilder builder=new ServerModuleBuilder().addConfig(KillbillServerConfig.class).addHealthCheck(KillbillHealthcheck.class).addJMXExport(KillbillHealthcheck.class).addJMXExport(NotificationQueueService.class).addJMXExport(PersistentBus.class).addModule(getModule(event.getServletContext())).setJerseyUriPattern("(" + JaxRsResourceBase.PREFIX + "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*").addJerseyResource("org.killbill.billing.jaxrs.mappers").addJerseyResource("org.killbill.billing.jaxrs.resources");
+  if (config.isMultiTenancyEnabled()) {
+    builder.addFilter("/*",TenantFilter.class);
+  }
+  guiceModule=builder.build();
+  super.contextInitialized(event);
+  logger.info("KillbillLifecycleListener : contextInitialized");
+  injector=injector(event);
+  event.getServletContext().setAttribute(Injector.class.getName(),injector);
+  killbillLifecycle=injector.getInstance(DefaultLifecycle.class);
+  killbillBusService=injector.getInstance(BusService.class);
+  killbilleventHandler=injector.getInstance(KillbillEventHandler.class);
+  registerMBeansForCache(injector.getInstance(CacheManager.class));
+  killbillLifecycle.fireStartupSequencePriorEventRegistration();
+  try {
+    killbillBusService.getBus().register(killbilleventHandler);
+  }
+ catch (  PersistentBus.EventBusException e) {
+    logger.error("Failed to register for event notifications, this is bad exiting!",e);
+    System.exit(1);
+  }
+  killbillLifecycle.fireStartupSequencePostEventRegistration();
+}
