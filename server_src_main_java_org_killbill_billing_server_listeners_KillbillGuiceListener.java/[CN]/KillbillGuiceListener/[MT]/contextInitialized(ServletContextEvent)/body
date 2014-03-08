@@ -4,7 +4,7 @@
   if (config.isMultiTenancyEnabled()) {
     builder.addFilter("/*",TenantFilter.class);
   }
-  guiceModules=ImmutableList.<Module>of(builder.build(),new ConfigModule(KillbillServerConfig.class),new JaxrsJacksonModule(new ObjectMapper()),new JMXModule(KillbillHealthcheck.class,NotificationQueueService.class,PersistentBus.class),new StatsModule(KillbillHealthcheck.class),getModule(event.getServletContext()));
+  guiceModules=ImmutableList.<Module>of(builder.build(),new ConfigModule(KillbillServerConfig.class,DaoConfig.class),new JaxrsJacksonModule(new ObjectMapper()),new JMXModule(KillbillHealthcheck.class,NotificationQueueService.class,PersistentBus.class),new StatsModule(KillbillHealthcheck.class),getModule(event.getServletContext()));
   super.contextInitialized(event);
   logger.info("KillbillLifecycleListener : contextInitialized");
   injector=injector(event);
