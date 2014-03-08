@@ -1,14 +1,16 @@
 {
   config=new ConfigurationObjectFactory(System.getProperties()).build(KillbillServerConfig.class);
-  final ServerModuleBuilder builder=new ServerModuleBuilder().addConfig(KillbillServerConfig.class).addHealthCheck(KillbillHealthcheck.class).addJMXExport(KillbillHealthcheck.class).addJMXExport(NotificationQueueService.class).addJMXExport(PersistentBus.class).addModule(getModule(event.getServletContext())).setJerseyUriPattern("(" + JaxRsResourceBase.PREFIX + "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*").addJerseyResource("org.killbill.billing.jaxrs.mappers").addJerseyResource("org.killbill.billing.jaxrs.resources");
+  final BaseServerModuleBuilder builder=new BaseServerModuleBuilder().setJaxrsUriPattern("(" + JaxRsResourceBase.PREFIX + "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*").addJaxrsResource("com.ning.billing.jaxrs.mappers").addJaxrsResource("com.ning.billing.jaxrs.resources");
   if (config.isMultiTenancyEnabled()) {
     builder.addFilter("/*",TenantFilter.class);
   }
-  guiceModule=builder.build();
+  guiceModules=ImmutableList.<Module>of(builder.build(),new ConfigModule(KillbillServerConfig.class),new JaxrsJacksonModule(new ObjectMapper()),new JMXModule(KillbillHealthcheck.class,NotificationQueueService.class,PersistentBus.class),new StatsModule(KillbillHealthcheck.class),getModule(event.getServletContext()));
   super.contextInitialized(event);
   logger.info("KillbillLifecycleListener : contextInitialized");
   injector=injector(event);
   event.getServletContext().setAttribute(Injector.class.getName(),injector);
+  event.getServletContext().setAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY,injector.getInstance(HealthCheckRegistry.class));
+  event.getServletContext().setAttribute(MetricsServlet.METRICS_REGISTRY,injector.getInstance(MetricRegistry.class));
   killbillLifecycle=injector.getInstance(DefaultLifecycle.class);
   killbillBusService=injector.getInstance(BusService.class);
   killbilleventHandler=injector.getInstance(KillbillEventHandler.class);

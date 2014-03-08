@@ -1,0 +1,21 @@
+{
+  final ServletContextHandler context=new ServletContextHandler(server,"/",ServletContextHandler.NO_SESSIONS);
+  context.setContextPath("/");
+  if (resourceBase != null) {
+    final String webapp=this.getClass().getClassLoader().getResource(resourceBase).toExternalForm();
+    context.setResourceBase(webapp);
+  }
+  final EventListener listener=new JULServletContextListener();
+  context.addEventListener(listener);
+  for (  final EventListener eventListener : eventListeners) {
+    context.addEventListener(eventListener);
+  }
+  for (  final FilterHolder filterHolder : filterHolders.keySet()) {
+    context.addFilter(filterHolder,filterHolders.get(filterHolder),EnumSet.of(DispatcherType.REQUEST,DispatcherType.ASYNC));
+  }
+  final FilterHolder filterHolder=new FilterHolder(GuiceFilter.class);
+  context.addFilter(filterHolder,"/*",EnumSet.of(DispatcherType.REQUEST,DispatcherType.ASYNC));
+  final ServletHolder sh=new ServletHolder(DefaultServlet.class);
+  context.addServlet(sh,"/*");
+  return context;
+}
