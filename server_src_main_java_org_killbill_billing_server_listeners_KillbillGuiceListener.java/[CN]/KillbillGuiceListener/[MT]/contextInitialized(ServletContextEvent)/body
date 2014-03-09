@@ -1,5 +1,6 @@
 {
   config=new ConfigurationObjectFactory(System.getProperties()).build(KillbillServerConfig.class);
+  daoConfig=new ConfigurationObjectFactory(System.getProperties()).build(DaoConfig.class);
   final BaseServerModuleBuilder builder=new BaseServerModuleBuilder().setJaxrsUriPattern("(" + JaxRsResourceBase.PREFIX + "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*").addJaxrsResource("org.killbill.billing.jaxrs.mappers").addJaxrsResource("org.killbill.billing.jaxrs.resources");
   if (config.isMultiTenancyEnabled()) {
     builder.addFilter("/*",TenantFilter.class);
@@ -14,6 +15,7 @@
   killbillLifecycle=injector.getInstance(DefaultLifecycle.class);
   killbillBusService=injector.getInstance(BusService.class);
   killbilleventHandler=injector.getInstance(KillbillEventHandler.class);
+  embeddedDB=injector.getInstance(EmbeddedDB.class);
   registerMBeansForCache(injector.getInstance(CacheManager.class));
   killbillLifecycle.fireStartupSequencePriorEventRegistration();
   try {

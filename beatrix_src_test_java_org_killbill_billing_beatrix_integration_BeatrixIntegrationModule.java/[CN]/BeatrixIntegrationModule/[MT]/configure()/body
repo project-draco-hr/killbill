@@ -1,12 +1,7 @@
 {
   loadSystemPropertiesFromClasspath("/beatrix.properties");
   install(new GuicyKillbillTestWithEmbeddedDBModule());
-  if (EmbeddedDB.DBEngine.MYSQL.equals(DBTestingHelper.get().getDBEngine())) {
-    install(new GlobalLockerModule());
-  }
- else {
-    install(new MockGlobalLockerModule());
-  }
+  install(new GlobalLockerModule(DBTestingHelper.get().getDBEngine()));
   install(new CacheModule(configSource));
   install(new EmailModule(configSource));
   install(new CallContextModule());

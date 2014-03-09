@@ -1,3 +1,8 @@
 {
-  bind(GlobalLocker.class).toProvider(MySqlGlobalLockerProvider.class).asEagerSingleton();
+  if (EmbeddedDB.DBEngine.MYSQL.equals(engine)) {
+    install(new MySqlGlobalLockerModule());
+  }
+ else {
+    install(new MemoryGlobalLockerModule());
+  }
 }

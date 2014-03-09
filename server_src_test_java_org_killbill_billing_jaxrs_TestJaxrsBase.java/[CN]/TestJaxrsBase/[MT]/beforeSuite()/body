@@ -2,7 +2,7 @@
   super.beforeSuite();
   loadSystemPropertiesFromClasspath("/killbill.properties");
   loadConfig();
-  listener=new TestKillbillGuiceListener(helper);
+  listener=new TestKillbillGuiceListener(new ConfigurationObjectFactory(System.getProperties()).build(DaoConfig.class));
   server=new HttpServer();
   server.configure(config,getListeners(),getFilters());
   server.start();

@@ -1,8 +1,11 @@
 {
   final ConfigSource configSource=new SimplePropertyConfigSource(System.getProperties());
+  final EmbeddedDBProvider embeddedDBProvider=new EmbeddedDBProvider(daoConfig);
+  final EmbeddedDB embeddedDB=embeddedDBProvider.get();
+  bind(EmbeddedDB.class).toInstance(embeddedDB);
   install(new EmailModule(configSource));
   install(new CacheModule(configSource));
-  install(new GlobalLockerModule());
+  install(new GlobalLockerModule(embeddedDB.getDBEngine()));
   install(new CustomFieldModule());
   install(new AuditModule());
   install(new CatalogModule(configSource));
