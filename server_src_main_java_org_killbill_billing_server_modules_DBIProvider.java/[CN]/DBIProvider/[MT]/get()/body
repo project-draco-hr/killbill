@@ -1,0 +1,27 @@
+{
+  final DBI dbi=new DBI(ds);
+  dbi.registerArgumentFactory(new UUIDArgumentFactory());
+  dbi.registerArgumentFactory(new DateTimeZoneArgumentFactory());
+  dbi.registerArgumentFactory(new DateTimeArgumentFactory());
+  dbi.registerArgumentFactory(new LocalDateArgumentFactory());
+  dbi.registerArgumentFactory(new EnumArgumentFactory());
+  dbi.registerMapper(new UuidMapper());
+  dbi.registerMapper(new AuditLogModelDaoMapper());
+  dbi.registerMapper(new RecordIdIdMappingsMapper());
+  if (sqlLog != null) {
+    dbi.setSQLLog(sqlLog);
+  }
+  if (config.getTransactionHandlerClass() != null) {
+    logger.info("Using " + config.getTransactionHandlerClass() + " as a transaction handler class");
+    try {
+      dbi.setTransactionHandler((TransactionHandler)Class.forName(config.getTransactionHandlerClass()).newInstance());
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  final BasicSqlNameStrategy basicSqlNameStrategy=new BasicSqlNameStrategy();
+  final TimingCollector timingCollector=new InstrumentedTimingCollector(metricsRegistry,basicSqlNameStrategy);
+  dbi.setTimingCollector(timingCollector);
+  return dbi;
+}

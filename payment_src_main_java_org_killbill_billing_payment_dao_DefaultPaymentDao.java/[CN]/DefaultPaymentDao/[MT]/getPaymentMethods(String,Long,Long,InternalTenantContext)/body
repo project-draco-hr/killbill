@@ -1,0 +1,11 @@
+{
+  return paginationHelper.getPagination(PaymentMethodSqlDao.class,new PaginationIteratorBuilder<PaymentMethodModelDao,PaymentMethod,PaymentMethodSqlDao>(){
+    @Override public Long getCount(    final PaymentMethodSqlDao paymentMethodSqlDao,    final InternalTenantContext context){
+      return paymentMethodSqlDao.getCountByPluginName(pluginName,context);
+    }
+    @Override public Iterator<PaymentMethodModelDao> build(    final PaymentMethodSqlDao paymentMethodSqlDao,    final Long limit,    final InternalTenantContext context){
+      return paymentMethodSqlDao.getByPluginName(pluginName,offset,limit,context);
+    }
+  }
+,offset,limit,context);
+}

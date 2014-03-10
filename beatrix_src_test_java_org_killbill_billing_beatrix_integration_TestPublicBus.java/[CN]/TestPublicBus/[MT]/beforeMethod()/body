@@ -1,0 +1,12 @@
+{
+  super.beforeMethod();
+  publicListener=new PublicListener();
+  log.debug("RESET TEST FRAMEWORK");
+  clock.resetDeltaFromReality();
+  busHandler.reset();
+  lifecycle.fireStartupSequencePriorEventRegistration();
+  busService.getBus().register(busHandler);
+  externalBus.register(publicListener);
+  lifecycle.fireStartupSequencePostEventRegistration();
+  this.externalBusCount=new AtomicInteger(0);
+}

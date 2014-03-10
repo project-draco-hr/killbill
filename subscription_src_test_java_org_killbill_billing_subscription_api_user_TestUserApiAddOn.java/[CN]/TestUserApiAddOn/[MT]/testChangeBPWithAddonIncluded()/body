@@ -1,0 +1,38 @@
+{
+  final String baseProduct="Shotgun";
+  final BillingPeriod baseTerm=BillingPeriod.MONTHLY;
+  final String basePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  DefaultSubscriptionBase baseSubscription=testUtil.createSubscription(bundle,baseProduct,baseTerm,basePriceList);
+  final String aoProduct="Telescopic-Scope";
+  final BillingPeriod aoTerm=BillingPeriod.MONTHLY;
+  final String aoPriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  DefaultSubscriptionBase aoSubscription=testUtil.createSubscription(bundle,aoProduct,aoTerm,aoPriceList);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusMonths(2));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  assertListenerStatus();
+  final DateTime now=clock.getUTCNow();
+  final Duration ctd=testUtil.getDurationMonth(1);
+  final DateTime newChargedThroughDate=TestSubscriptionHelper.addDuration(now,ctd);
+  subscriptionInternalApi.setChargedThroughDate(baseSubscription.getId(),newChargedThroughDate,internalCallContext);
+  baseSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(baseSubscription.getId(),internalCallContext);
+  final String newBaseProduct="Assault-Rifle";
+  final BillingPeriod newBaseTerm=BillingPeriod.MONTHLY;
+  final String newBasePriceList=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final List<EntitlementAOStatusDryRun> aoStatus=subscriptionInternalApi.getDryRunChangePlanStatus(baseSubscription.getId(),newBaseProduct,now,internalCallContext);
+  assertEquals(aoStatus.size(),1);
+  assertEquals(aoStatus.get(0).getId(),aoSubscription.getId());
+  assertEquals(aoStatus.get(0).getProductName(),aoProduct);
+  assertEquals(aoStatus.get(0).getBillingPeriod(),aoTerm);
+  assertEquals(aoStatus.get(0).getPhaseType(),aoSubscription.getCurrentPhase().getPhaseType());
+  assertEquals(aoStatus.get(0).getPriceList(),aoSubscription.getCurrentPriceList().getName());
+  assertEquals(aoStatus.get(0).getReason(),DryRunChangeReason.AO_INCLUDED_IN_NEW_PLAN);
+  testListener.pushExpectedEvent(NextEvent.CHANGE);
+  testListener.pushExpectedEvent(NextEvent.CANCEL);
+  baseSubscription.changePlan(newBaseProduct,newBaseTerm,newBasePriceList,callContext);
+  assertListenerStatus();
+  aoSubscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(aoSubscription.getId(),internalCallContext);
+  assertEquals(aoSubscription.getState(),EntitlementState.CANCELLED);
+  assertListenerStatus();
+}

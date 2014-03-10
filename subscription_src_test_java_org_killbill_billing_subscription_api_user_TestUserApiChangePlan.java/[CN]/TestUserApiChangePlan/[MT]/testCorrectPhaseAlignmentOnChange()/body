@@ -1,0 +1,29 @@
+{
+  DefaultSubscriptionBase subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME);
+  PlanPhase trialPhase=subscription.getCurrentPhase();
+  assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
+  Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(2));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  testListener.pushExpectedEvent(NextEvent.CHANGE);
+  subscription.changePlan("Assault-Rifle",BillingPeriod.ANNUAL,"gunclubDiscount",callContext);
+  assertListenerStatus();
+  final Plan currentPlan=subscription.getCurrentPlan();
+  assertNotNull(currentPlan);
+  assertEquals(currentPlan.getProduct().getName(),"Assault-Rifle");
+  assertEquals(currentPlan.getProduct().getCategory(),ProductCategory.BASE);
+  assertEquals(currentPlan.getBillingPeriod(),BillingPeriod.ANNUAL);
+  trialPhase=subscription.getCurrentPhase();
+  assertEquals(trialPhase.getPhaseType(),PhaseType.TRIAL);
+  testListener.pushExpectedEvent(NextEvent.PHASE);
+  it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(30));
+  clock.addDeltaFromReality(it.toDurationMillis());
+  assertListenerStatus();
+  trialPhase=subscription.getCurrentPhase();
+  assertEquals(trialPhase.getPhaseType(),PhaseType.DISCOUNT);
+  subscription=(DefaultSubscriptionBase)subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext);
+  final DateTime expectedNextPhaseDate=subscription.getStartDate().plusDays(30).plusMonths(6);
+  final SubscriptionBaseTransition nextPhase=subscription.getPendingTransition();
+  final DateTime nextPhaseEffectiveDate=nextPhase.getEffectiveTransitionTime();
+  assertEquals(nextPhaseEffectiveDate,expectedNextPhaseDate);
+  assertListenerStatus();
+}

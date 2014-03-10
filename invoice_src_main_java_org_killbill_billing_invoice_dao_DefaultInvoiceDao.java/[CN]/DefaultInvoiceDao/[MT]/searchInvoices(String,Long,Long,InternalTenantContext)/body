@@ -1,0 +1,23 @@
+{
+  Integer invoiceNumberParsed=null;
+  try {
+    invoiceNumberParsed=Integer.parseInt(searchKey);
+  }
+ catch (  final NumberFormatException ignored) {
+  }
+  final Integer invoiceNumber=invoiceNumberParsed;
+  return paginationHelper.getPagination(InvoiceSqlDao.class,new PaginationIteratorBuilder<InvoiceModelDao,Invoice,InvoiceSqlDao>(){
+    @Override public Long getCount(    final InvoiceSqlDao invoiceSqlDao,    final InternalTenantContext context){
+      return invoiceNumber != null ? 1L : invoiceSqlDao.getSearchCount(searchKey,String.format("%%%s%%",searchKey),context);
+    }
+    @Override public Iterator<InvoiceModelDao> build(    final InvoiceSqlDao invoiceSqlDao,    final Long limit,    final InternalTenantContext context){
+      try {
+        return invoiceNumber != null ? ImmutableList.<InvoiceModelDao>of(getByNumber(invoiceNumber,context)).iterator() : invoiceSqlDao.search(searchKey,String.format("%%%s%%",searchKey),offset,limit,context);
+      }
+ catch (      final InvoiceApiException ignored) {
+        return Iterators.<InvoiceModelDao>emptyIterator();
+      }
+    }
+  }
+,offset,limit,context);
+}

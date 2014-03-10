@@ -1,0 +1,25 @@
+{
+  final Properties props=new Properties();
+  props.setProperty("org.killbill.security.ldap.userDnTemplate","uid={0},ou=users,dc=mycompany,dc=com");
+  props.setProperty("org.killbill.security.ldap.searchBase","ou=groups,dc=mycompany,dc=com");
+  props.setProperty("org.killbill.security.ldap.groupSearchFilter","memberOf=uid={0},ou=users,dc=mycompany,dc=com");
+  props.setProperty("org.killbill.security.ldap.groupNameId","cn");
+  props.setProperty("org.killbill.security.ldap.url","ldap://ldap:389");
+  props.setProperty("org.killbill.security.ldap.disableSSLCheck","true");
+  props.setProperty("org.killbill.security.ldap.systemUsername","cn=root");
+  props.setProperty("org.killbill.security.ldap.systemPassword","password");
+  props.setProperty("org.killbill.security.ldap.authenticationMechanism","simple");
+  props.setProperty("org.killbill.security.ldap.permissionsByGroup","support-group: entitlement:*\n" + "finance-group: invoice:*, payment:*\n" + "ops-group: *:*");
+  final ConfigSource customConfigSource=new SimplePropertyConfigSource(props);
+  final SecurityConfig securityConfig=new ConfigurationObjectFactory(customConfigSource).build(SecurityConfig.class);
+  final KillBillJndiLdapRealm ldapRealm=new KillBillJndiLdapRealm(securityConfig);
+  final String username="pierre";
+  final String password="password";
+  final UsernamePasswordToken token=new UsernamePasswordToken(username,password);
+  final AuthenticationInfo authenticationInfo=ldapRealm.getAuthenticationInfo(token);
+  System.out.println(authenticationInfo);
+  final SimplePrincipalCollection principals=new SimplePrincipalCollection(username,username);
+  final AuthorizationInfo authorizationInfo=ldapRealm.queryForAuthorizationInfo(principals,ldapRealm.getContextFactory());
+  System.out.println("Roles: " + authorizationInfo.getRoles());
+  System.out.println("Permissions: " + authorizationInfo.getStringPermissions());
+}

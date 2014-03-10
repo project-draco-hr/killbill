@@ -1,0 +1,17 @@
+{
+  server.setStopAtShutdown(true);
+  configureJMX(ManagementFactory.getPlatformMBeanServer());
+  configureMainConnector(config.isJettyStatsOn(),config.getServerHost(),config.getServerPort());
+  if (config.isSSLEnabled()) {
+    configureSslConnector(config.isJettyStatsOn(),config.getServerSslPort(),config.getSSLkeystoreLocation(),config.getSSLkeystorePassword());
+  }
+  configureThreadPool(config);
+  final HandlerCollection handlers=new HandlerCollection();
+  final ServletContextHandler servletContextHandler=createServletContextHandler(config.getResourceBase(),eventListeners,filterHolders);
+  handlers.addHandler(servletContextHandler);
+  final RequestLogHandler logHandler=createLogHandler(config);
+  handlers.addHandler(logHandler);
+  final HandlerList rootHandlers=new HandlerList();
+  rootHandlers.addHandler(handlers);
+  server.setHandler(rootHandlers);
+}
