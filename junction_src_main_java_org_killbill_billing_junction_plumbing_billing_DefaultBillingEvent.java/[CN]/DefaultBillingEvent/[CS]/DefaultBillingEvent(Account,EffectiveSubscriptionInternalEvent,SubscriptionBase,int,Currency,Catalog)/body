@@ -11,12 +11,12 @@
   final PlanPhase nextPhase=(nextPhaseName != null) ? catalog.findPhase(nextPhaseName,transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
   final String prevPhaseName=transition.getPreviousPhase();
   final PlanPhase prevPhase=(prevPhaseName != null) ? catalog.findPhase(prevPhaseName,transition.getEffectiveTransitionTime(),transition.getSubscriptionStartDate()) : null;
-  fixedPrice=(nextPhase != null && nextPhase.getFixedPrice() != null) ? nextPhase.getFixedPrice().getPrice(currency) : null;
-  recurringPrice=(nextPhase != null && nextPhase.getRecurringPrice() != null) ? nextPhase.getRecurringPrice().getPrice(currency) : null;
+  fixedPrice=getFixedPrice(nextPhase,currency);
+  recurringPrice=getRecurringPrice(nextPhase,currency);
   this.currency=currency;
   description=transition.getTransitionType().toString();
   billingModeType=BillingModeType.IN_ADVANCE;
-  billingPeriod=(transition.getTransitionType() != SubscriptionBaseTransitionType.CANCEL) ? nextPhase.getBillingPeriod() : prevPhase.getBillingPeriod();
+  billingPeriod=getRecurringBillingPeriod((transition.getTransitionType() != SubscriptionBaseTransitionType.CANCEL) ? nextPhase : prevPhase);
   type=transition.getTransitionType();
   totalOrdering=transition.getTotalOrdering();
   timeZone=account.getTimeZone();

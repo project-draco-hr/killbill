@@ -8,7 +8,7 @@
   DefaultEntitlement bpEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   assertNotNull(bpEntitlement);
   assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).size(),1);
-  assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
+  assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getRecurringBillingPeriod(),BillingPeriod.ANNUAL);
   busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
   clock.addDays(30);
   assertListenerStatus();
