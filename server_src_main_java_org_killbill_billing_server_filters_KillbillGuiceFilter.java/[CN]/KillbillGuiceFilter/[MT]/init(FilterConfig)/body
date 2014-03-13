@@ -1,6 +1,8 @@
 {
   super.init(filterConfig);
   log.info("Kill Bill server has started");
+  final Injector injector=(Injector)filterConfig.getServletContext().getAttribute(Injector.class.getName());
+  final ConfigSource configSource=injector.getInstance(ConfigSource.class);
   final UpdateChecker checker=new UpdateChecker(configSource);
   checker.check(filterConfig.getServletContext());
 }
