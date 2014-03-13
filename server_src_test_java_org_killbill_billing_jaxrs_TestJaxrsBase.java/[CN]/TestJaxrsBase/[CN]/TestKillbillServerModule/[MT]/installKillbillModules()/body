@@ -1,5 +1,7 @@
 {
-  final KillbillConfigSource configSource=new KillbillConfigSource(System.getProperties());
+  bind(ConfigSource.class).toInstance(configSource);
+  bind(KillbillServerConfig.class).toInstance(serverConfig);
+  bind(DaoConfig.class).toInstance(daoConfig);
   install(new GuicyKillbillTestWithEmbeddedDBModule());
   install(new EmailModule(configSource));
   install(new CacheModule(configSource));
@@ -30,5 +32,5 @@
   installClock();
   install(new KillBillShiroWebModule(servletContext,configSource));
   install(new KillBillShiroAopModule());
-  install(new SecurityModule());
+  install(new SecurityModule(configSource));
 }
