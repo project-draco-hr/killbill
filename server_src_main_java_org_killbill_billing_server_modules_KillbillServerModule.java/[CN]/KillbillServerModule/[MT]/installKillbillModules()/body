@@ -1,5 +1,8 @@
 {
-  final ConfigSource configSource=new SimplePropertyConfigSource(System.getProperties());
+  bind(ConfigSource.class).toInstance(configSource);
+  bind(KillbillServerConfig.class).toInstance(serverConfig);
+  final DaoConfig daoConfig=new ConfigurationObjectFactory(configSource).build(DaoConfig.class);
+  bind(DaoConfig.class).toInstance(daoConfig);
   final EmbeddedDBProvider embeddedDBProvider=new EmbeddedDBProvider(daoConfig);
   final EmbeddedDB embeddedDB=embeddedDBProvider.get();
   bind(EmbeddedDB.class).toInstance(embeddedDB);
@@ -31,6 +34,6 @@
   install(new RecordIdModule());
   install(new KillBillShiroWebModule(servletContext,configSource));
   install(new KillBillShiroAopModule());
-  install(new SecurityModule());
+  install(new SecurityModule(configSource));
   installClock();
 }

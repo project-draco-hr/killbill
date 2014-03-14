@@ -1,0 +1,17 @@
+{
+  final String propertiesFileLocation=System.getProperty(PROPERTIES_FILE);
+  if (propertiesFileLocation != null) {
+    try {
+      final Properties properties=new Properties();
+      properties.load(UriAccessor.accessUri(propertiesFileLocation));
+      return properties;
+    }
+ catch (    final IOException e) {
+      logger.warn("Unable to access properties file, defaulting to system properties",e);
+    }
+catch (    final URISyntaxException e) {
+      logger.warn("Unable to access properties file, defaulting to system properties",e);
+    }
+  }
+  return System.getProperties();
+}
