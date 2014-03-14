@@ -12,7 +12,14 @@
   clock.addDays(10);
   crappyWaitForLackOfProperSynchonization();
   Assert.assertEquals(killBillClient.getOverdueStateForAccount(accountJson.getAccountId()).getName(),"OD3");
-  for (  final Invoice invoice : killBillClient.getInvoicesForAccount(accountJson.getAccountId())) {
+  final Invoices invoicesForAccount=killBillClient.getInvoicesForAccount(accountJson.getAccountId());
+  final List<Invoice> mostRecentInvoiceFirst=Ordering.<Invoice>from(new Comparator<Invoice>(){
+    @Override public int compare(    final Invoice invoice1,    final Invoice invoice2){
+      return invoice1.getInvoiceDate().compareTo(invoice2.getInvoiceDate());
+    }
+  }
+).reverse().sortedCopy(invoicesForAccount);
+  for (  final Invoice invoice : mostRecentInvoiceFirst) {
     if (invoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
       final Payment payment=new Payment();
       payment.setAccountId(accountJson.getAccountId());
