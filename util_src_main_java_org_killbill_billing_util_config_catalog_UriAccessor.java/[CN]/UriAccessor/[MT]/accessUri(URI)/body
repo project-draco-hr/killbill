@@ -5,7 +5,12 @@
     uri=new URI(Resources.getResource(uri.toString()).toExternalForm());
   }
  else   if (scheme.equals(URI_SCHEME_FOR_CLASSPATH)) {
-    return UriAccessor.class.getResourceAsStream(uri.getPath());
+    if (uri.toString().startsWith(URI_SCHEME_FOR_ARCHIVE_FILE)) {
+      return getInputStreamFromJarFile(uri.toString());
+    }
+ else {
+      return UriAccessor.class.getResourceAsStream(uri.getPath());
+    }
   }
  else   if (scheme.equals(URI_SCHEME_FOR_FILE) && !uri.getSchemeSpecificPart().startsWith("/")) {
     uri=new File(uri.getSchemeSpecificPart()).toURI();
