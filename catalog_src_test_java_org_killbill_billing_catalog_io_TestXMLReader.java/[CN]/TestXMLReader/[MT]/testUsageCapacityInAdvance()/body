@@ -1,0 +1,22 @@
+{
+  try {
+    final StandaloneCatalog catalog=XMLLoader.getObjectFromString(Resources.getResource("UsageExperimental.xml").toExternalForm(),StandaloneCatalog.class);
+    final Usage[] usages=getUsages(catalog,"capacity-in-advance-monthly");
+    assertEquals(usages.length,1);
+    final Usage usage=usages[0];
+    assertEquals(usage.getBillingPeriod(),BillingPeriod.MONTHLY);
+    assertEquals(usage.getUsageType(),UsageType.CAPACITY);
+    assertEquals(usage.getBillingMode(),BillingMode.IN_ADVANCE);
+    assertEquals(usage.getBlocks().length,0);
+    assertEquals(usage.getTiers().length,0);
+    assertEquals(usage.getLimits().length,1);
+    assertEquals(usage.getLimits()[0].getUnit().getName(),"members");
+    assertEquals(usage.getLimits()[0].getMax(),new Double("100"));
+    assertEquals(usage.getRecurringPrice().getPrices().length,1);
+    assertEquals(usage.getRecurringPrice().getPrices()[0].getCurrency(),Currency.BTC);
+    assertEquals(usage.getRecurringPrice().getPrices()[0].getValue(),new BigDecimal("100.00"));
+  }
+ catch (  Exception e) {
+    Assert.fail(e.toString());
+  }
+}

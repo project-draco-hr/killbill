@@ -1,0 +1,38 @@
+{
+  try {
+    final StandaloneCatalog catalog=XMLLoader.getObjectFromString(Resources.getResource("UsageExperimental.xml").toExternalForm(),StandaloneCatalog.class);
+    final Usage[] usages=getUsages(catalog,"capacity-in-arrear");
+    assertEquals(usages.length,1);
+    final Usage usage=usages[0];
+    assertEquals(usage.getBillingPeriod(),BillingPeriod.MONTHLY);
+    assertEquals(usage.getUsageType(),UsageType.CAPACITY);
+    assertEquals(usage.getBillingMode(),BillingMode.IN_ARREAR);
+    assertEquals(usage.getLimits().length,0);
+    assertEquals(usage.getBlocks().length,0);
+    assertEquals(usage.getTiers().length,2);
+    assertEquals(usage.getTiers()[0].getLimits().length,2);
+    assertEquals(usage.getTiers()[0].getLimits()[0].getUnit().getName(),"bandwith-meg-sec");
+    assertEquals(usage.getTiers()[0].getLimits()[0].getMax(),new Double("100"));
+    assertEquals(usage.getTiers()[0].getLimits()[1].getUnit().getName(),"members");
+    assertEquals(usage.getTiers()[0].getLimits()[1].getMax(),new Double("500"));
+    assertEquals(usage.getTiers()[0].getFixedPrice().getPrices().length,1);
+    assertEquals(usage.getTiers()[0].getFixedPrice().getPrices()[0].getCurrency(),Currency.BTC);
+    assertEquals(usage.getTiers()[0].getFixedPrice().getPrices()[0].getValue(),new BigDecimal("0.007"));
+    assertEquals(usage.getTiers()[0].getRecurringPrice().getPrices().length,1);
+    assertEquals(usage.getTiers()[0].getRecurringPrice().getPrices()[0].getCurrency(),Currency.BTC);
+    assertEquals(usage.getTiers()[0].getRecurringPrice().getPrices()[0].getValue(),new BigDecimal("0.8"));
+    assertEquals(usage.getTiers()[1].getLimits()[0].getUnit().getName(),"bandwith-meg-sec");
+    assertEquals(usage.getTiers()[1].getLimits()[0].getMax(),new Double("100"));
+    assertEquals(usage.getTiers()[1].getLimits()[1].getUnit().getName(),"members");
+    assertEquals(usage.getTiers()[1].getLimits()[1].getMax(),new Double("1000"));
+    assertEquals(usage.getTiers()[1].getFixedPrice().getPrices().length,1);
+    assertEquals(usage.getTiers()[1].getFixedPrice().getPrices()[0].getCurrency(),Currency.BTC);
+    assertEquals(usage.getTiers()[1].getFixedPrice().getPrices()[0].getValue(),new BigDecimal("0.4"));
+    assertEquals(usage.getTiers()[1].getRecurringPrice().getPrices().length,1);
+    assertEquals(usage.getTiers()[1].getRecurringPrice().getPrices()[0].getCurrency(),Currency.BTC);
+    assertEquals(usage.getTiers()[1].getRecurringPrice().getPrices()[0].getValue(),new BigDecimal("1.2"));
+  }
+ catch (  Exception e) {
+    Assert.fail(e.toString());
+  }
+}

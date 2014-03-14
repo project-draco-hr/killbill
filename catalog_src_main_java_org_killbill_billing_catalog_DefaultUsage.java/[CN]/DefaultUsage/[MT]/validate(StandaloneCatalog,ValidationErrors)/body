@@ -1,4 +1,14 @@
 {
-  validateCollection(root,errors,limits);
+  if (billingMode == BillingMode.IN_ADVANCE && usageType == UsageType.CAPACITY && limits.length == 0) {
+    errors.add(new ValidationError(String.format("Usage [IN_ADVANCE CAPACITY] section of phase %s needs to define some limits",phase.toString()),catalog.getCatalogURI(),DefaultUsage.class,""));
+  }
+  if (billingMode == BillingMode.IN_ADVANCE && usageType == UsageType.CONSUMABLE && blocks.length == 0) {
+    errors.add(new ValidationError(String.format("Usage [IN_ADVANCE CONSUMABLE] section of phase %s needs to define some blocks",phase.toString()),catalog.getCatalogURI(),DefaultUsage.class,""));
+  }
+  if (billingMode == BillingMode.IN_ARREAR && tiers.length == 0) {
+    errors.add(new ValidationError(String.format("Usage [IN_ARREAR] section of phase %s needs to define some tiers",phase.toString()),catalog.getCatalogURI(),DefaultUsage.class,""));
+  }
+  validateCollection(catalog,errors,limits);
+  validateCollection(catalog,errors,tiers);
   return errors;
 }
