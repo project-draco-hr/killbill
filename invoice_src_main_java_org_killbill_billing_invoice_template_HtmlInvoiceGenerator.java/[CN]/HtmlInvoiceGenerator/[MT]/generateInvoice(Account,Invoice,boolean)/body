@@ -4,7 +4,8 @@
   }
   final Map<String,Object> data=new HashMap<String,Object>();
   final DefaultInvoiceTranslator invoiceTranslator=new DefaultInvoiceTranslator(config);
-  final Locale locale=LocaleUtils.toLocale(account.getLocale());
+  final String accountLocale=Strings.emptyToNull(account.getLocale());
+  final Locale locale=accountLocale == null ? Locale.getDefault() : LocaleUtils.toLocale(accountLocale);
   invoiceTranslator.setLocale(locale);
   data.put("text",invoiceTranslator);
   data.put("account",account);
