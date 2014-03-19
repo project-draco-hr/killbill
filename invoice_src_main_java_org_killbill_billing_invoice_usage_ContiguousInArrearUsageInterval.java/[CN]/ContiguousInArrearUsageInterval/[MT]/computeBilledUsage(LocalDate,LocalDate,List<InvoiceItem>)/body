@@ -1,0 +1,13 @@
+{
+  final Iterable<InvoiceItem> filteredUsageForInterval=Iterables.filter(existingUsage,new Predicate<InvoiceItem>(){
+    @Override public boolean apply(    final InvoiceItem input){
+      return input.getInvoiceItemType() == InvoiceItemType.USAGE && input.getStartDate().compareTo(startDate) >= 0 && input.getEndDate().compareTo(endDate) <= 0;
+    }
+  }
+);
+  final BigDecimal billedAmount=BigDecimal.ZERO;
+  for (  InvoiceItem ii : filteredUsageForInterval) {
+    billedAmount.add(ii.getAmount());
+  }
+  return billedAmount;
+}

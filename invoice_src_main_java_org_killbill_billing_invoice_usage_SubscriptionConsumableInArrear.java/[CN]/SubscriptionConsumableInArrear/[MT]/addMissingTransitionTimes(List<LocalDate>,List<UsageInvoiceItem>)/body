@@ -1,0 +1,24 @@
+{
+  Preconditions.checkArgument(transitionTimes.size() > 0);
+  final LocalDate startDate=transitionTimes.get(0);
+  final LocalDate endDate=transitionTimes.get(transitionTimes.size() - 1);
+  for (  UsageInvoiceItem ii : existingUsage) {
+    if (ii.getEndDate().compareTo(startDate) <= 0 || ii.getStartDate().compareTo(endDate) >= 0) {
+      continue;
+    }
+    if (ii.getStartDate().compareTo(startDate) < 0 && ii.getEndDate().compareTo(endDate) <= 0) {
+      transitionTimes.add(ii.getEndDate());
+    }
+ else     if (ii.getStartDate().compareTo(startDate) >= 0 && ii.getEndDate().compareTo(endDate) > 0) {
+      transitionTimes.add(ii.getStartDate());
+    }
+ else {
+      transitionTimes.add(ii.getStartDate());
+      transitionTimes.add(ii.getEndDate());
+    }
+  }
+  final Set<LocalDate> uniqueTransitions=new HashSet<LocalDate>(transitionTimes);
+  transitionTimes.clear();
+  transitionTimes.addAll(uniqueTransitions);
+  Collections.sort(transitionTimes);
+}

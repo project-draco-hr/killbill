@@ -1,0 +1,11 @@
+{
+  final int blockSize=0x1000;
+  final int nbBlocks=units.intValue() / blockSize + ((units.intValue() % blockSize == 0) ? 0 : 1);
+  final List<TieredBlock> tieredBlocks=getTieredBlocks(usage,unitType);
+  for (  TieredBlock tier : tieredBlocks) {
+    if (tier.getMax() >= units.doubleValue()) {
+      return tier.getPrice().getPrice(getCurrency());
+    }
+  }
+  return tieredBlocks.get(tieredBlocks.size() - 1).getPrice().getPrice(getCurrency());
+}

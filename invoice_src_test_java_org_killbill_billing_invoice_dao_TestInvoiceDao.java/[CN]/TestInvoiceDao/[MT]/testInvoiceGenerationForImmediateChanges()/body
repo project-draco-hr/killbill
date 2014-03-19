@@ -12,7 +12,7 @@
   final BillingEvent event1=invoiceUtil.createMockBillingEvent(null,subscription,effectiveDate1,plan1,phase1,null,recurringPrice.getPrice(currency),currency,BillingPeriod.MONTHLY,1,BillingMode.IN_ADVANCE,"testEvent1",1L,SubscriptionBaseTransitionType.CREATE);
   final BillingEventSet events=new MockBillingEventSet();
   events.add(event1);
-  final Invoice invoice1=generator.generateInvoice(accountId,events,invoiceList,targetDate,Currency.USD);
+  final Invoice invoice1=generator.generateInvoice(accountId,events,invoiceList,targetDate,Currency.USD,context);
   assertEquals(invoice1.getBalance(),KillBillMoney.of(TEN,invoice1.getCurrency()));
   invoiceList.add(invoice1);
   final DefaultPrice price2=new DefaultPrice(TWENTY,Currency.USD);
@@ -22,7 +22,7 @@
   final DateTime effectiveDate2=new DateTime(2011,2,15,0,0,0);
   final BillingEvent event2=invoiceUtil.createMockBillingEvent(null,subscription,effectiveDate2,plan2,phase2,null,recurringPrice2.getPrice(currency),currency,BillingPeriod.MONTHLY,1,BillingMode.IN_ADVANCE,"testEvent2",2L,SubscriptionBaseTransitionType.CREATE);
   events.add(event2);
-  final Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,targetDate,Currency.USD);
+  final Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,targetDate,Currency.USD,context);
   assertEquals(invoice2.getBalance(),KillBillMoney.of(FIVE,invoice2.getCurrency()));
   invoiceList.add(invoice2);
   invoiceUtil.createInvoice(invoice1,true,context);

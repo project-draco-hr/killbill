@@ -1,0 +1,15 @@
+{
+  final List<InvoiceItem> result=Lists.newLinkedList();
+  final List<RolledUpUsage> rolledUpUsages=getRolledUpUsage();
+  for (  RolledUpUsage ru : rolledUpUsages) {
+    final LocalDate startRolledUpDate=new LocalDate(ru.getStartTime(),getAccountTimeZone());
+    final LocalDate endRolledUpDate=new LocalDate(ru.getEndTime(),getAccountTimeZone());
+    final BigDecimal billedUsage=computeBilledUsage(startRolledUpDate,endRolledUpDate,existingUsage);
+    final BigDecimal toBeBilledUsage=computeToBeBilledUsage(ru.getAmount());
+    if (billedUsage.compareTo(toBeBilledUsage) < 0) {
+      InvoiceItem item=new UsageInvoiceItem(invoiceId,getAccountId(),getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),startRolledUpDate,endRolledUpDate,toBeBilledUsage.subtract(billedUsage),getCurrency(),unitType);
+      result.add(item);
+    }
+  }
+  return result;
+}

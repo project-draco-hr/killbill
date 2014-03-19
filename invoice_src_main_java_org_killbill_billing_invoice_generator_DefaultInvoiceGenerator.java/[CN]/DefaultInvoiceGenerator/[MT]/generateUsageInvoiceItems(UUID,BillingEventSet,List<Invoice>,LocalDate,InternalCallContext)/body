@@ -1,0 +1,24 @@
+{
+  try {
+    final List<InvoiceItem> items=Lists.newArrayList();
+    final Iterator<BillingEvent> events=eventSet.iterator();
+    final List<BillingEvent> curEvents=Lists.newArrayList();
+    UUID curSubscriptionId=null;
+    while (events.hasNext()) {
+      final BillingEvent event=events.next();
+      final UUID subscriptionId=event.getSubscription().getId();
+      if (curSubscriptionId != null && !curSubscriptionId.equals(subscriptionId)) {
+        final UUID tenantId=UUID.randomUUID();
+        SubscriptionConsumableInArrear foo=new SubscriptionConsumableInArrear(invoiceId,"foo",curEvents,usageApi,targetDate,context.toTenantContext(tenantId));
+        items.addAll(foo.computeMissingUsageInvoiceItems(extractUsageItemsForSubscription(subscriptionId,existingInvoices)));
+        curEvents.clear();
+      }
+      curSubscriptionId=subscriptionId;
+      curEvents.add(event);
+    }
+    return items;
+  }
+ catch (  CatalogApiException e) {
+    throw new InvoiceApiException(e);
+  }
+}
