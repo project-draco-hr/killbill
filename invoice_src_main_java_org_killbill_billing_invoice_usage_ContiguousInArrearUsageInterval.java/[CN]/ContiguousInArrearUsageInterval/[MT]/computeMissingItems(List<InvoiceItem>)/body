@@ -1,14 +1,17 @@
 {
   final List<InvoiceItem> result=Lists.newLinkedList();
-  final List<RolledUpUsage> rolledUpUsages=getRolledUpUsage();
-  for (  RolledUpUsage ru : rolledUpUsages) {
-    final LocalDate startRolledUpDate=new LocalDate(ru.getStartTime(),getAccountTimeZone());
-    final LocalDate endRolledUpDate=new LocalDate(ru.getEndTime(),getAccountTimeZone());
-    final BigDecimal billedUsage=computeBilledUsage(startRolledUpDate,endRolledUpDate,existingUsage);
-    final BigDecimal toBeBilledUsage=computeToBeBilledUsage(ru.getAmount());
-    if (billedUsage.compareTo(toBeBilledUsage) < 0) {
-      InvoiceItem item=new UsageInvoiceItem(invoiceId,getAccountId(),getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),startRolledUpDate,endRolledUpDate,toBeBilledUsage.subtract(billedUsage),getCurrency(),unitType);
-      result.add(item);
+  final RolledUpUsageForUnitTypesFactory factory=new RolledUpUsageForUnitTypesFactory(getRolledUpUsage(),unitTypes,getAccountTimeZone());
+  for (  RolledUpUsageForUnitTypes ru : factory.getOrderedRolledUpUsageForUnitTypes()) {
+    final BigDecimal billedUsage=computeBilledUsage(ru.getStartDate(),ru.getEndDate(),existingUsage);
+    final BigDecimal toBeBilledUsage=BigDecimal.ZERO;
+    for (    final String unitType : unitTypes) {
+      final BigDecimal usageAmountForUnitType=ru.getUsageAmountForUnitType(unitType);
+      final BigDecimal toBeBilledForUnit=computeToBeBilledUsage(usageAmountForUnitType,unitType);
+      toBeBilledUsage.add(toBeBilledForUnit);
+      if (billedUsage.compareTo(toBeBilledUsage) < 0) {
+        InvoiceItem item=new UsageInvoiceItem(invoiceId,getAccountId(),getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),ru.getStartDate(),ru.getEndDate(),toBeBilledUsage.subtract(billedUsage),getCurrency(),usage.getName());
+        result.add(item);
+      }
     }
   }
   return result;

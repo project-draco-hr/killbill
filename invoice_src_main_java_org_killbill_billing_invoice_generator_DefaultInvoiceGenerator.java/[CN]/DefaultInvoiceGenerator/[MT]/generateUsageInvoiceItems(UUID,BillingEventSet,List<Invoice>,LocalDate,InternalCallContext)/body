@@ -1,4 +1,5 @@
 {
+  final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT);
   try {
     final List<InvoiceItem> items=Lists.newArrayList();
     final Iterator<BillingEvent> events=eventSet.iterator();
@@ -8,9 +9,8 @@
       final BillingEvent event=events.next();
       final UUID subscriptionId=event.getSubscription().getId();
       if (curSubscriptionId != null && !curSubscriptionId.equals(subscriptionId)) {
-        final UUID tenantId=UUID.randomUUID();
-        SubscriptionConsumableInArrear foo=new SubscriptionConsumableInArrear(invoiceId,"foo",curEvents,usageApi,targetDate,context.toTenantContext(tenantId));
-        items.addAll(foo.computeMissingUsageInvoiceItems(extractUsageItemsForSubscription(subscriptionId,existingInvoices)));
+        final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,usageApi,targetDate,context.toTenantContext(tenantId));
+        items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(extractUsageItemsForSubscription(subscriptionId,existingInvoices)));
         curEvents.clear();
       }
       curSubscriptionId=subscriptionId;
