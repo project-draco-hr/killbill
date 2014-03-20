@@ -29,7 +29,7 @@
         final BigDecimal maxBalanceToAdjust=(invoiceBalanceAfterRefund.compareTo(BigDecimal.ZERO) <= 0) ? BigDecimal.ZERO : invoiceBalanceAfterRefund;
         final BigDecimal requestedPositiveAmountToAdjust=requestedPositiveAmount.compareTo(maxBalanceToAdjust) > 0 ? maxBalanceToAdjust : requestedPositiveAmount;
         if (requestedPositiveAmountToAdjust.compareTo(BigDecimal.ZERO) > 0) {
-          final InvoiceItemModelDao adjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.REFUND_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,context.getCreatedDate().toLocalDate(),null,requestedPositiveAmountToAdjust.negate(),null,invoice.getCurrency(),null);
+          final InvoiceItemModelDao adjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.REFUND_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,null,context.getCreatedDate().toLocalDate(),null,requestedPositiveAmountToAdjust.negate(),null,invoice.getCurrency(),null);
           transInvoiceItemDao.create(adjItem,context);
         }
       }
