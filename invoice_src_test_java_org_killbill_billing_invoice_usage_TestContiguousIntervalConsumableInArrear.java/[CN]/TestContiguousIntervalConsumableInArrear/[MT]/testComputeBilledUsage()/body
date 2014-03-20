@@ -1,0 +1,11 @@
+{
+  final DefaultTieredBlock block1=createDefaultTieredBlock("unit",100,10,BigDecimal.ONE);
+  final DefaultTier tier1=createDefaultTier(block1);
+  final DefaultTieredBlock block2=createDefaultTieredBlock("unit",1000,100,BigDecimal.ONE);
+  final DefaultTier tier2=createDefaultTier(block2);
+  final DefaultUsage usage=createDefaultUsage(usageName,tier1,tier2);
+  final LocalDate targetDate=new LocalDate(2014,03,20);
+  final ContiguousIntervalConsumableInArrear intervalConsumableInArrear=createContiguousIntervalConsumableInArrear(usage,targetDate,false,createMockBillingEvent(targetDate.toDateTimeAtStartOfDay(DateTimeZone.UTC)));
+  final BigDecimal result=intervalConsumableInArrear.computeToBeBilledUsage(new BigDecimal("5325"),"unit");
+  assertEquals(result,new BigDecimal("15"));
+}

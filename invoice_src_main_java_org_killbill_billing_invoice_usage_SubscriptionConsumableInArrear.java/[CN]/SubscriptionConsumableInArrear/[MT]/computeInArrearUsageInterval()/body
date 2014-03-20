@@ -1,13 +1,13 @@
 {
-  final List<ContiguousInArrearUsageInterval> usageIntervals=Lists.newLinkedList();
-  final Map<String,ContiguousInArrearUsageInterval> inFlightInArrearUsageIntervals=new HashMap<String,ContiguousInArrearUsageInterval>();
+  final List<ContiguousIntervalConsumableInArrear> usageIntervals=Lists.newLinkedList();
+  final Map<String,ContiguousIntervalConsumableInArrear> inFlightInArrearUsageIntervals=new HashMap<String,ContiguousIntervalConsumableInArrear>();
   for (  BillingEvent event : subscriptionBillingEvents) {
     final Set<String> toBeClosed=inFlightInArrearUsageIntervals.keySet();
     final List<Usage> usages=findConsumableInArrearUsages(event);
     for (    Usage usage : usages) {
-      ContiguousInArrearUsageInterval existingInterval=inFlightInArrearUsageIntervals.get(usage.getName());
+      ContiguousIntervalConsumableInArrear existingInterval=inFlightInArrearUsageIntervals.get(usage.getName());
       if (existingInterval == null) {
-        existingInterval=new ContiguousInArrearUsageInterval(usage,invoiceId,usageApi,targetDate,context);
+        existingInterval=new ContiguousIntervalConsumableInArrear(usage,invoiceId,usageApi,targetDate,context);
         inFlightInArrearUsageIntervals.put(usage.getName(),existingInterval);
       }
       existingInterval.addBillingEvent(event);
