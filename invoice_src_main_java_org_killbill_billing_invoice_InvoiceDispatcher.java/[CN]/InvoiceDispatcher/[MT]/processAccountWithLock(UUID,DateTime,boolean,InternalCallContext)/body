@@ -54,7 +54,7 @@
           }
         }
 ));
-        final Map<UUID,DateTime> callbackDateTimePerSubscriptions=createNextFutureNotificationDate(invoiceItemModelDaos,dateAndTimeZoneContext);
+        final Map<UUID,List<DateTime>> callbackDateTimePerSubscriptions=createNextFutureNotificationDate(invoiceItemModelDaos,UsageUtils.getKnownUsages(billingEvents,null),dateAndTimeZoneContext);
         invoiceDao.createInvoice(invoiceModelDao,invoiceItemModelDaos,invoicePaymentModelDaos,isRealInvoiceWithItems,callbackDateTimePerSubscriptions,context);
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
