@@ -1,0 +1,17 @@
+{
+  if (existingInvoices == null) {
+    return Collections.emptyList();
+  }
+  final Iterable usageItems=Iterables.concat(Iterables.transform(existingInvoices,new Function<Invoice,Iterable<InvoiceItem>>(){
+    @Override public Iterable<InvoiceItem> apply(    final Invoice input){
+      return Iterables.filter(input.getInvoiceItems(),new Predicate<InvoiceItem>(){
+        @Override public boolean apply(        final InvoiceItem input){
+          return input.getInvoiceItemType() == InvoiceItemType.USAGE && input.getSubscriptionId().equals(subscriptionId);
+        }
+      }
+);
+    }
+  }
+));
+  return ImmutableList.<InvoiceItem>copyOf(usageItems);
+}

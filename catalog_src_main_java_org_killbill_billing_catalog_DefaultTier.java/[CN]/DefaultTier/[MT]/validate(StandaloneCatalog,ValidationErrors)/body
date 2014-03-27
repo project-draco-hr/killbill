@@ -1,0 +1,10 @@
+{
+  if (usage.getBillingMode() == BillingMode.IN_ARREAR && usage.getUsageType() == UsageType.CAPACITY && limits.length == 0) {
+    errors.add(new ValidationError(String.format("Usage [IN_ARREAR CAPACITY] section of phase %s needs to define some limits",usage.getPhase().toString()),catalog.getCatalogURI(),DefaultUsage.class,""));
+  }
+  if (usage.getBillingMode() == BillingMode.IN_ARREAR && usage.getUsageType() == UsageType.CONSUMABLE && blocks.length == 0) {
+    errors.add(new ValidationError(String.format("Usage [IN_ARREAR CONSUMABLE] section of phase %s needs to define some blocks",usage.getPhase().toString()),catalog.getCatalogURI(),DefaultUsage.class,""));
+  }
+  validateCollection(catalog,errors,limits);
+  return errors;
+}

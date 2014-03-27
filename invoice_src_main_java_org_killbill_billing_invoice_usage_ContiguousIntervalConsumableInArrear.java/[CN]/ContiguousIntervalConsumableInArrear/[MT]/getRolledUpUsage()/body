@@ -1,0 +1,9 @@
+{
+  final Iterable<DateTime> transitions=Iterables.transform(transitionTimes,new Function<LocalDate,DateTime>(){
+    @Override public DateTime apply(    final LocalDate input){
+      return localDateToEndOfDayInAccountTimezone(input,getAccountTimeZone());
+    }
+  }
+);
+  return usageApi.getAllUsageForSubscription(getSubscriptionId(),unitTypes,ImmutableList.copyOf(transitions),context);
+}

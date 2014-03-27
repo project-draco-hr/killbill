@@ -6,14 +6,14 @@
   }
   final BillingPeriod billingPeriod=thisEvent.getBillingPeriod();
   if (billingPeriod != BillingPeriod.NO_BILLING_PERIOD) {
-    final BillingMode billingMode=instantiateBillingMode(thisEvent.getBillingMode());
+    final BillingModeGenerator billingModeGenerator=instantiateBillingMode(thisEvent.getBillingMode());
     final LocalDate startDate=new LocalDate(thisEvent.getEffectiveDate(),thisEvent.getTimeZone());
     if (!startDate.isAfter(targetDate)) {
       final LocalDate endDate=(nextEvent == null) ? null : new LocalDate(nextEvent.getEffectiveDate(),nextEvent.getTimeZone());
       final int billCycleDayLocal=thisEvent.getBillCycleDayLocal();
       final List<RecurringInvoiceItemData> itemData;
       try {
-        itemData=billingMode.calculateInvoiceItemData(startDate,endDate,targetDate,billCycleDayLocal,billingPeriod);
+        itemData=billingModeGenerator.generateInvoiceItemData(startDate,endDate,targetDate,billCycleDayLocal,billingPeriod);
       }
  catch (      InvalidDateSequenceException e) {
         throw new InvoiceApiException(ErrorCode.INVOICE_INVALID_DATE_SEQUENCE,startDate,endDate,targetDate);

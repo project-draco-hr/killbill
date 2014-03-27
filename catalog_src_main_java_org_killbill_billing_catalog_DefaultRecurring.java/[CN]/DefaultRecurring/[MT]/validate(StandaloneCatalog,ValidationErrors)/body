@@ -1,0 +1,12 @@
+{
+  if (billingPeriod == null) {
+    errors.add(new ValidationError(String.format("Recurring section of Phase %s of plan %s has a recurring price but no billing period",phase.getPhaseType().toString(),phase.getPlan().getName()),catalog.getCatalogURI(),DefaultPlanPhase.class,phase.getPhaseType().toString()));
+  }
+  if ((recurringPrice != null) && (billingPeriod == null || billingPeriod == BillingPeriod.NO_BILLING_PERIOD)) {
+    errors.add(new ValidationError(String.format("Recurring section of Phase %s of plan %s has a recurring price but no billing period",phase.getPhaseType().toString(),phase.getPlan().getName()),catalog.getCatalogURI(),DefaultPlanPhase.class,phase.getPhaseType().toString()));
+  }
+  if ((recurringPrice == null) && billingPeriod != BillingPeriod.NO_BILLING_PERIOD) {
+    errors.add(new ValidationError(String.format("Recurring section of Phase %s of plan %s has no recurring price but does have a billing period. The billing period should be set to '%s'",phase.getPhaseType().toString(),phase.getPlan().getName(),BillingPeriod.NO_BILLING_PERIOD),catalog.getCatalogURI(),DefaultPlanPhase.class,phase.getPhaseType().toString()));
+  }
+  return errors;
+}
