@@ -1,6 +1,6 @@
 {
   Preconditions.checkState(isBuilt.get());
-  final Iterable<InvoiceItem> filteredUsageForInterval=Iterables.filter(existingUsage,new Predicate<InvoiceItem>(){
+  return Iterables.filter(existingUsage,new Predicate<InvoiceItem>(){
     @Override public boolean apply(    final InvoiceItem input){
       if (input.getInvoiceItemType() != InvoiceItemType.USAGE) {
         return false;
@@ -10,9 +10,4 @@
     }
   }
 );
-  BigDecimal billedAmount=BigDecimal.ZERO;
-  for (  InvoiceItem ii : filteredUsageForInterval) {
-    billedAmount=billedAmount.add(ii.getAmount());
-  }
-  return billedAmount;
 }

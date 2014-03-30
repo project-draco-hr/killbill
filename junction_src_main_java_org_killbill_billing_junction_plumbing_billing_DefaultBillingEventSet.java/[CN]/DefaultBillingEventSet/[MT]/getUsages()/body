@@ -1,0 +1,16 @@
+{
+  final Iterable<Usage> allUsages=Iterables.concat(Iterables.transform(this,new Function<BillingEvent,List<Usage>>(){
+    @Override public List<Usage> apply(    final BillingEvent input){
+      return input.getUsages();
+    }
+  }
+));
+  if (!allUsages.iterator().hasNext()) {
+    return Collections.emptyMap();
+  }
+  final Map<String,Usage> result=new HashMap<String,Usage>();
+  for (  Usage cur : Sets.<Usage>newHashSet(allUsages)) {
+    result.put(cur.getName(),cur);
+  }
+  return result;
+}
