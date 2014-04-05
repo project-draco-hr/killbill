@@ -1,0 +1,31 @@
+{
+  try {
+    final StandaloneCatalog catalog=XMLLoader.getObjectFromString(Resources.getResource("UsageExperimental.xml").toExternalForm(),StandaloneCatalog.class);
+    final Usage[] usages=getUsages(catalog,"consumable-in-arrear");
+    assertEquals(usages.length,1);
+    final Usage usage=usages[0];
+    assertEquals(usage.getName(),"consumable-in-arrear-usage1");
+    assertEquals(usage.getBillingPeriod(),BillingPeriod.MONTHLY);
+    assertEquals(usage.getUsageType(),UsageType.CONSUMABLE);
+    assertEquals(usage.getBillingMode(),BillingMode.IN_ARREAR);
+    assertEquals(usage.getLimits().length,0);
+    assertEquals(usage.getBlocks().length,0);
+    assertEquals(usage.getTiers().length,1);
+    assertEquals(usage.getTiers()[0].getTieredBlocks().length,2);
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[0].getUnit().getName(),"cell-phone-minutes");
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[0].getSize(),new Double("1000"));
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[0].getMax(),new Double("10000"));
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[0].getPrice().getPrices().length,1);
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[0].getPrice().getPrices()[0].getCurrency(),Currency.BTC);
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[0].getPrice().getPrices()[0].getValue(),new BigDecimal("0.5"));
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[1].getUnit().getName(),"Mbytes");
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[1].getSize(),new Double("512"));
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[1].getMax(),new Double("512000"));
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[1].getPrice().getPrices().length,1);
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[1].getPrice().getPrices()[0].getCurrency(),Currency.BTC);
+    assertEquals(usage.getTiers()[0].getTieredBlocks()[1].getPrice().getPrices()[0].getValue(),new BigDecimal("0.3"));
+  }
+ catch (  Exception e) {
+    Assert.fail(e.toString());
+  }
+}

@@ -8,7 +8,7 @@
   DefaultEntitlement bpEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   assertNotNull(bpEntitlement);
   assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).size(),1);
-  assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getBillingPeriod(),BillingPeriod.ANNUAL);
+  assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getRecurringBillingPeriod(),BillingPeriod.ANNUAL);
   busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
   clock.addDays(30);
   assertListenerStatus();
@@ -17,7 +17,7 @@
   ImmutableList<ExpectedInvoiceItemCheck> toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),new LocalDate(2013,5,1),InvoiceItemType.RECURRING,new BigDecimal("2399.95")));
   invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,toBeChecked);
   bpEntitlement=changeEntitlementAndCheckForCompletion(bpEntitlement,productName,BillingPeriod.MONTHLY,BillingActionPolicy.IMMEDIATE,NextEvent.CHANGE,NextEvent.INVOICE,NextEvent.INVOICE_ADJUSTMENT);
-  assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getBillingPeriod(),BillingPeriod.MONTHLY);
+  assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getRecurringBillingPeriod(),BillingPeriod.MONTHLY);
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),3);
   toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),new LocalDate(2013,5,1),InvoiceItemType.RECURRING,new BigDecimal("2399.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),new LocalDate(2013,5,1),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-2399.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),new LocalDate(2012,5,1),InvoiceItemType.CBA_ADJ,new BigDecimal("2399.95")));

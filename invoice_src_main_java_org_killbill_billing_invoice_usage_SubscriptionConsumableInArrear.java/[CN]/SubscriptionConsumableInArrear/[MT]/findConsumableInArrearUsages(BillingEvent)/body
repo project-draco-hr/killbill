@@ -1,0 +1,13 @@
+{
+  if (event.getUsages().size() == 0) {
+    return Collections.emptyList();
+  }
+  final List<Usage> result=Lists.newArrayList();
+  for (  Usage usage : event.getUsages()) {
+    if (usage.getUsageType() != UsageType.CONSUMABLE || usage.getBillingMode() != BillingMode.IN_ARREAR) {
+      continue;
+    }
+    result.add(usage);
+  }
+  return result;
+}

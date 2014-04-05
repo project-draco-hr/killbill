@@ -1,0 +1,36 @@
+{
+  final List<ContiguousIntervalConsumableInArrear> usageIntervals=Lists.newLinkedList();
+  final Map<String,ContiguousIntervalConsumableInArrear> inFlightInArrearUsageIntervals=new HashMap<String,ContiguousIntervalConsumableInArrear>();
+  final Set<String> allSeenUsage=new HashSet<String>();
+  for (  BillingEvent event : subscriptionBillingEvents) {
+    final List<Usage> usages=findConsumableInArrearUsages(event);
+    allSeenUsage.addAll(Collections2.transform(usages,new Function<Usage,String>(){
+      @Override public String apply(      final Usage input){
+        return input.getName();
+      }
+    }
+));
+    final Set<String> toBeClosed=new HashSet<String>(allSeenUsage);
+    for (    Usage usage : usages) {
+      ContiguousIntervalConsumableInArrear existingInterval=inFlightInArrearUsageIntervals.get(usage.getName());
+      if (existingInterval == null) {
+        existingInterval=new ContiguousIntervalConsumableInArrear(usage,invoiceId,usageApi,targetDate,context);
+        inFlightInArrearUsageIntervals.put(usage.getName(),existingInterval);
+      }
+      existingInterval.addBillingEvent(event);
+      toBeClosed.remove(usage.getName());
+    }
+    for (    String usageName : toBeClosed) {
+      final ContiguousIntervalConsumableInArrear interval=inFlightInArrearUsageIntervals.remove(usageName);
+      if (interval != null) {
+        interval.addBillingEvent(event);
+        usageIntervals.add(interval.build(true));
+      }
+    }
+  }
+  for (  String usageName : inFlightInArrearUsageIntervals.keySet()) {
+    usageIntervals.add(inFlightInArrearUsageIntervals.get(usageName).build(false));
+  }
+  inFlightInArrearUsageIntervals.clear();
+  return usageIntervals;
+}

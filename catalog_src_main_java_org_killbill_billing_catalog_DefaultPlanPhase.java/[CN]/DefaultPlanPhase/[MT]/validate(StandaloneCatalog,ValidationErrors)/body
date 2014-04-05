@@ -1,18 +1,13 @@
 {
-  if (billingPeriod == null) {
-    errors.add(new ValidationError(String.format("Phase %s of plan %s has a recurring price but no billing period",type.toString(),plan.getName()),catalog.getCatalogURI(),DefaultPlanPhase.class,type.toString()));
+  if (fixed == null && recurring == null && usages.length == 0) {
+    errors.add(new ValidationError(String.format("Phase %s of plan %s need to define at least either a fixed or recurrring or usage section.",type.toString(),plan.getName()),catalog.getCatalogURI(),DefaultPlanPhase.class,type.toString()));
   }
-  if ((recurringPrice != null) && (billingPeriod == null || billingPeriod == BillingPeriod.NO_BILLING_PERIOD)) {
-    errors.add(new ValidationError(String.format("Phase %s of plan %s has a recurring price but no billing period",type.toString(),plan.getName()),catalog.getCatalogURI(),DefaultPlanPhase.class,type.toString()));
+  if (fixed != null) {
+    fixed.validate(catalog,errors);
   }
-  if ((recurringPrice == null) && billingPeriod != BillingPeriod.NO_BILLING_PERIOD) {
-    errors.add(new ValidationError(String.format("Phase %s of plan %s has no recurring price but does have a billing period. The billing period should be set to '%s'",type.toString(),plan.getName(),BillingPeriod.NO_BILLING_PERIOD),catalog.getCatalogURI(),DefaultPlanPhase.class,type.toString()));
+  if (recurring != null) {
+    recurring.validate(catalog,errors);
   }
-  if ((billingPeriod == BillingPeriod.NO_BILLING_PERIOD && fixedPrice == null)) {
-    errors.add(new ValidationError(String.format("Phase %s of plan %s has no billing period. It must have a fixed price set.",type.toString(),plan.getName()),catalog.getCatalogURI(),DefaultPlanPhase.class,type.toString()));
-  }
-  if ((recurringPrice == null) && fixedPrice == null) {
-    errors.add(new ValidationError(String.format("Phase %s of plan %s has neither a recurring price or a fixed price.",type.toString(),plan.getName()),catalog.getCatalogURI(),DefaultPlanPhase.class,type.toString()));
-  }
+  validateCollection(catalog,errors,usages);
   return errors;
 }

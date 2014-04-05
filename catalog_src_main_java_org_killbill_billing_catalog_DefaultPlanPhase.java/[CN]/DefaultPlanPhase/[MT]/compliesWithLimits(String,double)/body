@@ -1,7 +1,8 @@
 {
-  Limit l=findLimit(unit);
-  if (l == null) {
-    return getPlan().getProduct().compliesWithLimits(unit,value);
+  for (  DefaultUsage usage : usages) {
+    if (!usage.compliesWithLimits(unit,value)) {
+      return false;
+    }
   }
-  return l.compliesWith(value);
+  return plan.getProduct().compliesWithLimits(unit,value);
 }

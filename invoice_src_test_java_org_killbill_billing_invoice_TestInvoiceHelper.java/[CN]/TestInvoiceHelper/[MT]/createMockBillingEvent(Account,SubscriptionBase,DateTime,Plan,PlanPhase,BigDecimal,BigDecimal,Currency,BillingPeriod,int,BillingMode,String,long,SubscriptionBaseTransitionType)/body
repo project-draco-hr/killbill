@@ -1,0 +1,69 @@
+{
+  final Account mockAccount=Mockito.mock(Account.class);
+  Mockito.when(mockAccount.getTimeZone()).thenReturn(DateTimeZone.UTC);
+  final Account accountOrMockAcount=account != null ? account : mockAccount;
+  return new BillingEvent(){
+    @Override public Account getAccount(){
+      return accountOrMockAcount;
+    }
+    @Override public int getBillCycleDayLocal(){
+      return billCycleDayLocal;
+    }
+    @Override public SubscriptionBase getSubscription(){
+      return subscription;
+    }
+    @Override public DateTime getEffectiveDate(){
+      return effectiveDate;
+    }
+    @Override public PlanPhase getPlanPhase(){
+      return planPhase;
+    }
+    @Override public Plan getPlan(){
+      return plan;
+    }
+    @Override public BillingPeriod getBillingPeriod(){
+      return billingPeriod;
+    }
+    @Override public BillingMode getBillingMode(){
+      return billingMode;
+    }
+    @Override public String getDescription(){
+      return description;
+    }
+    @Override public BigDecimal getFixedPrice(){
+      return fixedPrice;
+    }
+    @Override public BigDecimal getRecurringPrice(){
+      return recurringPrice;
+    }
+    @Override public Currency getCurrency(){
+      return currency;
+    }
+    @Override public SubscriptionBaseTransitionType getTransitionType(){
+      return type;
+    }
+    @Override public Long getTotalOrdering(){
+      return totalOrdering;
+    }
+    @Override public DateTimeZone getTimeZone(){
+      return DateTimeZone.UTC;
+    }
+    @Override public List<Usage> getUsages(){
+      return Collections.emptyList();
+    }
+    @Override public int compareTo(    final BillingEvent e1){
+      if (!getSubscription().getId().equals(e1.getSubscription().getId())) {
+        return getSubscription().getId().compareTo(e1.getSubscription().getId());
+      }
+ else {
+        if (!getEffectiveDate().equals(e1.getEffectiveDate())) {
+          return getEffectiveDate().compareTo(e1.getEffectiveDate());
+        }
+ else {
+          return getTotalOrdering().compareTo(e1.getTotalOrdering());
+        }
+      }
+    }
+  }
+;
+}

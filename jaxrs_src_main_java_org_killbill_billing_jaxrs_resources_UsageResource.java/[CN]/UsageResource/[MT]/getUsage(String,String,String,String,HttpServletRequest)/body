@@ -1,0 +1,8 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final DateTime usageStartTime=DATE_TIME_FORMATTER.parseDateTime(startTime);
+  final DateTime usageEndTime=DATE_TIME_FORMATTER.parseDateTime(endTime);
+  final RolledUpUsage usage=usageUserApi.getUsageForSubscription(UUID.fromString(subscriptionId),unitType,usageStartTime,usageEndTime,tenantContext);
+  final UsageJson result=new UsageJson(usage);
+  return Response.status(Status.OK).entity(result).build();
+}

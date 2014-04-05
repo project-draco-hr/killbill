@@ -1,0 +1,22 @@
+{
+  Preconditions.checkState(!isBuilt.get());
+  Preconditions.checkState((!closedInterval && billingEvents.size() >= 1) || (closedInterval && billingEvents.size() >= 2));
+  final LocalDate startDate=new LocalDate(billingEvents.get(0).getEffectiveDate(),getAccountTimeZone());
+  if (targetDate.isBefore(startDate)) {
+    return this;
+  }
+  final LocalDate endDate=closedInterval ? new LocalDate(billingEvents.get(billingEvents.size() - 1).getEffectiveDate(),getAccountTimeZone()) : targetDate;
+  final BillingIntervalDetail bid=new BillingIntervalDetail(startDate,endDate,targetDate,getBCD(),usage.getBillingPeriod());
+  int numberOfPeriod=0;
+  LocalDate nextBillCycleDate=bid.getFutureBillingDateFor(numberOfPeriod);
+  transitionTimes.add(startDate);
+  while (!nextBillCycleDate.isAfter(endDate)) {
+    if (nextBillCycleDate.isAfter(startDate)) {
+      transitionTimes.add(nextBillCycleDate);
+    }
+    numberOfPeriod++;
+    nextBillCycleDate=bid.getFutureBillingDateFor(numberOfPeriod);
+  }
+  isBuilt.set(true);
+  return this;
+}

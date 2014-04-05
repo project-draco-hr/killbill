@@ -1,0 +1,14 @@
+{
+  if ((events == null) || (events.size() == 0) || events.isAccountAutoInvoiceOff()) {
+    return null;
+  }
+  validateTargetDate(targetDate);
+  final LocalDate adjustedTargetDate=adjustTargetDate(existingInvoices,targetDate);
+  final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),adjustedTargetDate,targetCurrency);
+  final UUID invoiceId=invoice.getId();
+  final List<InvoiceItem> inAdvanceItems=generateInAdvanceInvoiceItems(accountId,invoiceId,events,existingInvoices,adjustedTargetDate,targetCurrency);
+  invoice.addInvoiceItems(inAdvanceItems);
+  final List<InvoiceItem> usageItems=generateUsageInvoiceItems(invoiceId,events,existingInvoices,targetDate,context);
+  invoice.addInvoiceItems(usageItems);
+  return invoice.getInvoiceItems().size() != 0 ? invoice : null;
+}

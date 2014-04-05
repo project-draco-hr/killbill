@@ -1,0 +1,13 @@
+{
+  Preconditions.checkState(isBuilt.get());
+  return Iterables.filter(existingUsage,new Predicate<InvoiceItem>(){
+    @Override public boolean apply(    final InvoiceItem input){
+      if (input.getInvoiceItemType() != InvoiceItemType.USAGE) {
+        return false;
+      }
+      final UsageInvoiceItem usageInput=(UsageInvoiceItem)input;
+      return usageInput.getUsageName().equals(usage.getName()) && usageInput.getStartDate().compareTo(startDate) >= 0 && usageInput.getEndDate().compareTo(endDate) <= 0;
+    }
+  }
+);
+}
