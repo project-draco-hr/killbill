@@ -1,9 +1,13 @@
 {
   final CacheManager cacheManager;
   try {
-    cacheManager=CacheManager.create(EhCacheCacheManagerProvider.class.getResource(cacheConfig.getCacheConfigLocation()).openStream());
+    final InputStream inputStream=UriAccessor.accessUri(cacheConfig.getCacheConfigLocation());
+    cacheManager=CacheManager.create(inputStream);
   }
  catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+catch (  URISyntaxException e) {
     throw new RuntimeException(e);
   }
   for (  final BaseCacheLoader cacheLoader : cacheLoaders) {
