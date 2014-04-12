@@ -1,21 +1,3 @@
 {
-  return (DefaultEntitlement)doCallAndCheckForCompletion(new Function<Void,Entitlement>(){
-    @Override public Entitlement apply(    @Nullable final Void dontcare){
-      try {
-        Entitlement refreshedEntitlement=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
-        if (billingPolicy == null) {
-          refreshedEntitlement=refreshedEntitlement.changePlan(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,callContext);
-        }
- else {
-          refreshedEntitlement=refreshedEntitlement.changePlanOverrideBillingPolicy(productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,clock.getUTCNow().toLocalDate(),billingPolicy,callContext);
-        }
-        return refreshedEntitlement;
-      }
- catch (      EntitlementApiException e) {
-        fail(e.getMessage());
-        return null;
-      }
-    }
-  }
-,events);
+  return changeEntitlementAndCheckForCompletion(entitlement,productName,billingPeriod,PriceListSet.DEFAULT_PRICELIST_NAME,billingPolicy,events);
 }
