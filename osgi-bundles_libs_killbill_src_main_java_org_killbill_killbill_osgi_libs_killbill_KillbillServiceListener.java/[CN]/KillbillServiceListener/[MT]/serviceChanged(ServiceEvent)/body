@@ -1,0 +1,19 @@
+{
+  final ServiceReference serviceReference=event.getServiceReference();
+  if (serviceReference == null || serviceReference.getBundle() == null) {
+    return;
+  }
+  final BundleContext bundleContext=serviceReference.getBundle().getBundleContext();
+  if (bundleContext == null) {
+    return;
+  }
+  final Object service=bundleContext.getService(serviceReference);
+  if (service != null) {
+    if (event.getType() == ServiceEvent.REGISTERED) {
+      killbillServiceListenerCallback.isRegistered(context);
+    }
+ else     if (event.getType() == ServiceEvent.UNREGISTERING) {
+      killbillServiceListenerCallback.isUnRegistering(context);
+    }
+  }
+}
