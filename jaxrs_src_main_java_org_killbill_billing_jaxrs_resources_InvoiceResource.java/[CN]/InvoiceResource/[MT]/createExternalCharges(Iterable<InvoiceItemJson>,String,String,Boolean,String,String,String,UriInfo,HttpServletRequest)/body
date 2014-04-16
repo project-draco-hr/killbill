@@ -1,0 +1,23 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),callContext);
+  final LocalDate requestedDate=toLocalDate(account,requestedDateTimeString,callContext);
+  final Iterable<InvoiceItem> externalCharges=Iterables.<InvoiceItemJson,InvoiceItem>transform(externalChargesJson,new Function<InvoiceItemJson,InvoiceItem>(){
+    @Override public InvoiceItem apply(    final InvoiceItemJson invoiceItemJson){
+      return invoiceItemJson.toInvoiceItem();
+    }
+  }
+);
+  final List<InvoiceItem> createdExternalCharges=invoiceApi.insertExternalCharges(account.getId(),requestedDate,externalCharges,callContext);
+  if (payInvoice) {
+    final Collection<UUID> paidInvoices=new HashSet<UUID>();
+    for (    final InvoiceItem externalCharge : createdExternalCharges) {
+      if (!paidInvoices.contains(externalCharge.getInvoiceId())) {
+        paidInvoices.add(externalCharge.getInvoiceId());
+        final Invoice invoice=invoiceApi.getInvoice(externalCharge.getInvoiceId(),callContext);
+        paymentApi.createPayment(account,invoice.getId(),invoice.getBalance(),callContext);
+      }
+    }
+  }
+  return Response.status(Status.CREATED).build();
+}
