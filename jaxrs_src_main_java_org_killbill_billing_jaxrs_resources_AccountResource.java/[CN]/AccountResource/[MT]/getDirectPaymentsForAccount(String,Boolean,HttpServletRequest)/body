@@ -1,0 +1,11 @@
+{
+  final UUID accountId=UUID.fromString(accountIdStr);
+  final List<DirectPayment> payments=directPaymentApi.getAccountPayments(accountId,withPluginInfo,context.createContext(request));
+  final List<DirectPaymentJson> result=ImmutableList.copyOf(Iterables.transform(payments,new Function<DirectPayment,DirectPaymentJson>(){
+    @Override public DirectPaymentJson apply(    final DirectPayment input){
+      return new DirectPaymentJson(input,null,null);
+    }
+  }
+));
+  return Response.status(Response.Status.OK).entity(result).build();
+}

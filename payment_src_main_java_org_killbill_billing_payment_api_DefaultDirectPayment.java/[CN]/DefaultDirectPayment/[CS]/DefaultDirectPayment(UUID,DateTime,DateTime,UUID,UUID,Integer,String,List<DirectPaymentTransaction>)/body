@@ -1,0 +1,13 @@
+{
+  super(id,createdDate,updatedDate);
+  this.accountId=accountId;
+  this.paymentMethodId=paymentMethodId;
+  this.paymentNumber=paymentNumber;
+  this.externalKey=externalKey;
+  this.transactions=transactions;
+  this.authAmount=getAmountForType(transactions,TransactionType.AUTHORIZE);
+  this.captureAmount=getAmountForType(transactions,TransactionType.CAPTURE);
+  this.refundAmount=getAmountForType(transactions,TransactionType.CREDIT);
+  this.currency=(transactions != null && transactions.size() > 0) ? transactions.get(0).getCurrency() : null;
+  this.paymentStatus=(transactions != null && transactions.size() > 0) ? transactions.get(transactions.size() - 1).getPaymentStatus() : null;
+}

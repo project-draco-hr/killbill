@@ -1,0 +1,11 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<DirectPaymentModelDao>(){
+    @Override public DirectPaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final DirectPaymentSqlDao directPaymentSqlDao=entitySqlDaoWrapperFactory.become(DirectPaymentSqlDao.class);
+      directPaymentSqlDao.create(directPayment,context);
+      entitySqlDaoWrapperFactory.become(DirectTransactionSqlDao.class).create(directPaymentTransaction,context);
+      return directPaymentSqlDao.getById(directPayment.getId().toString(),context);
+    }
+  }
+);
+}
