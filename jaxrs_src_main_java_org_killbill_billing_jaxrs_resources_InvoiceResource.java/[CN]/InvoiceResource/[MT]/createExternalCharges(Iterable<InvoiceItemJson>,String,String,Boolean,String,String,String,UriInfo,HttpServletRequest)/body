@@ -1,6 +1,15 @@
 {
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),callContext);
+  final Set<Currency> currencies=new HashSet<Currency>(Lists.<InvoiceItemJson,Currency>transform(ImmutableList.<InvoiceItemJson>copyOf(externalChargesJson),new Function<InvoiceItemJson,Currency>(){
+    @Override public Currency apply(    final InvoiceItemJson input){
+      return input.getCurrency();
+    }
+  }
+));
+  if (currencies.size() != 1 || !currencies.iterator().next().equals(account.getCurrency())) {
+    throw new InvoiceApiException(ErrorCode.EXTERNAL_CHARGE_CURRENCY_INVALID,account.getCurrency());
+  }
   final LocalDate requestedDate=toLocalDate(account,requestedDateTimeString,callContext);
   final Iterable<InvoiceItem> externalCharges=Iterables.<InvoiceItemJson,InvoiceItem>transform(externalChargesJson,new Function<InvoiceItemJson,InvoiceItem>(){
     @Override public InvoiceItem apply(    final InvoiceItemJson invoiceItemJson){
