@@ -1,3 +1,6 @@
 {
-  return null;
+  final DirectPaymentModelDao paymentModelDao=paymentDao.getDirectPayment(directPaymentId,tenantContext);
+  final InternalTenantContext tenantContextWithAccountRecordId=internalCallContextFactory.createInternalTenantContext(paymentModelDao.getAccountId(),tenantContext);
+  final List<DirectPaymentTransactionModelDao> transactionsForAccount=paymentDao.getDirectTransactionsForAccount(paymentModelDao.getAccountId(),tenantContextWithAccountRecordId);
+  return toDirectPayment(paymentModelDao,transactionsForAccount);
 }

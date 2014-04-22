@@ -1,0 +1,22 @@
+{
+  final Ordering<DirectPaymentTransaction> perPaymentTransactionOrdering=Ordering.<DirectPaymentTransaction>from(new Comparator<DirectPaymentTransaction>(){
+    @Override public int compare(    final DirectPaymentTransaction o1,    final DirectPaymentTransaction o2){
+      return o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
+    }
+  }
+);
+  final Iterable<DirectPaymentTransactionModelDao> filteredTransactions=Iterables.filter(transactionsModelDao,new Predicate<DirectPaymentTransactionModelDao>(){
+    @Override public boolean apply(    final DirectPaymentTransactionModelDao curDirectPaymentTransactionModelDao){
+      return curDirectPaymentTransactionModelDao.getDirectPaymentId().equals(curDirectPaymentModelDao.getId());
+    }
+  }
+);
+  final Iterable<DirectPaymentTransaction> transactions=Iterables.transform(filteredTransactions,new Function<DirectPaymentTransactionModelDao,DirectPaymentTransaction>(){
+    @Override public DirectPaymentTransaction apply(    final DirectPaymentTransactionModelDao input){
+      return new DefaultDirectPaymentTransaction(input.getId(),input.getCreatedDate(),input.getUpdatedDate(),input.getDirectPaymentId(),input.getTransactionType(),input.getEffectiveDate(),0,input.getPaymentStatus(),input.getAmount(),input.getCurrency(),input.getGatewayErrorCode(),input.getGatewayErrorMsg(),null);
+    }
+  }
+);
+  final List<DirectPaymentTransaction> sortedTransactions=perPaymentTransactionOrdering.immutableSortedCopy(transactions);
+  return new DefaultDirectPayment(curDirectPaymentModelDao.getId(),curDirectPaymentModelDao.getCreatedDate(),curDirectPaymentModelDao.getUpdatedDate(),curDirectPaymentModelDao.getAccountId(),curDirectPaymentModelDao.getPaymentMethodId(),curDirectPaymentModelDao.getPaymentNumber(),curDirectPaymentModelDao.getExternalKey(),sortedTransactions);
+}

@@ -8,20 +8,11 @@ switch (transactionType) {
 case AUTHORIZE:
     result=directPaymentApi.createAuthorization(account,json.getAmount(),json.getExternalKey(),callContext);
   break;
-case CAPTURE:
-result=directPaymentApi.createCapture(account,UUID.fromString(json.getDirectPaymentId()),json.getAmount(),callContext);
-break;
-case CREDIT:
-result=directPaymentApi.createCredit(account,UUID.fromString(json.getDirectPaymentId()),callContext);
-break;
 case PURCHASE:
 result=directPaymentApi.createPurchase(account,json.getAmount(),json.getExternalKey(),callContext);
 break;
-case VOID:
-result=directPaymentApi.createVoid(account,UUID.fromString(json.getDirectPaymentId()),callContext);
-break;
 default :
-return Response.status(Status.PRECONDITION_FAILED).entity("Unknown transactionType " + transactionType).build();
+return Response.status(Status.PRECONDITION_FAILED).entity("TransactionType " + transactionType + " is not allowed for an account").build();
 }
-return Response.status(Response.Status.OK).entity(new DirectPaymentJson(result,null,null)).build();
+return uriBuilder.buildResponse(DirectPaymentResource.class,"getDirectPayment",result.getId(),uriInfo.getBaseUri().toString());
 }
