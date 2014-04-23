@@ -9,7 +9,7 @@
           }
         }
 );
-        for (        PaymentModelDao cur : paymentsToBeCompleted) {
+        for (        final PaymentModelDao cur : paymentsToBeCompleted) {
 switch (cur.getPaymentStatus()) {
 case AUTO_PAY_OFF:
             autoPayoffRetryService.scheduleRetry(cur.getId(),clock.getUTCNow());
@@ -30,7 +30,7 @@ return null;
 }
 ));
 }
- catch (TimeoutException e) {
+ catch (final TimeoutException e) {
 throw new PaymentApiException(ErrorCode.UNEXPECTED_ERROR,"Unexpected timeout for payment creation (AUTO_PAY_OFF)");
 }
 }

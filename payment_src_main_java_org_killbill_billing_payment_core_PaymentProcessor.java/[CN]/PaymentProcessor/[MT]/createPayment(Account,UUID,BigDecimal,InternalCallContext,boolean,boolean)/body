@@ -28,7 +28,7 @@
               paymentMethodId=account.getPaymentMethodId();
             }
           }
- catch (          PaymentApiException e) {
+ catch (          final PaymentApiException e) {
             processNewPaymentForMissingDefaultPaymentMethodWithAccountLocked(account,invoice,requestedAmount,context);
             final PaymentErrorInternalEvent event=new DefaultPaymentErrorEvent(account.getId(),invoiceId,null,ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD.toString(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
             postPaymentEvent(event,account.getId(),context);
@@ -43,14 +43,14 @@
             return processNewPaymentWithAccountLocked(paymentMethodId,plugin,account,invoice,requestedAmount,isInstantPayment,context);
           }
         }
- catch (        InvoiceApiException e) {
+ catch (        final InvoiceApiException e) {
           throw new PaymentApiException(e);
         }
       }
     }
 ));
   }
- catch (  TimeoutException e) {
+ catch (  final TimeoutException e) {
     if (isInstantPayment) {
       throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,account.getId(),invoiceId);
     }
@@ -59,7 +59,7 @@
       return null;
     }
   }
-catch (  RuntimeException e) {
+catch (  final RuntimeException e) {
     log.error("Failure when dispatching payment for invoice " + invoiceId,e);
     if (isInstantPayment) {
       throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,invoiceId);

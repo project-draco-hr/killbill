@@ -1,0 +1,16 @@
+{
+  final PaymentInfoPlugin paymentInfoPlugin=getPaymentInfo(kbAccountId,kbPaymentId,properties,context);
+  if (paymentInfoPlugin == null) {
+    throw new PaymentPluginApiException("",String.format("No payment found for payment id %s (plugin %s)",kbPaymentId.toString(),PLUGIN_NAME));
+  }
+  BigDecimal maxAmountRefundable=paymentInfoPlugin.getAmount();
+  for (  final RefundInfoPlugin refund : refunds.get(kbPaymentId.toString())) {
+    maxAmountRefundable=maxAmountRefundable.add(refund.getAmount().negate());
+  }
+  if (maxAmountRefundable.compareTo(refundAmount) < 0) {
+    throw new PaymentPluginApiException("",String.format("Refund amount of %s for payment id %s is bigger than the payment amount %s (plugin %s)",refundAmount,kbPaymentId.toString(),paymentInfoPlugin.getAmount(),PLUGIN_NAME));
+  }
+  final DefaultNoOpRefundInfoPlugin refundInfoPlugin=new DefaultNoOpRefundInfoPlugin(kbPaymentId,refundAmount,currency,clock.getUTCNow(),clock.getUTCNow(),RefundPluginStatus.PROCESSED,null);
+  refunds.put(kbPaymentId.toString(),refundInfoPlugin);
+  return refundInfoPlugin;
+}

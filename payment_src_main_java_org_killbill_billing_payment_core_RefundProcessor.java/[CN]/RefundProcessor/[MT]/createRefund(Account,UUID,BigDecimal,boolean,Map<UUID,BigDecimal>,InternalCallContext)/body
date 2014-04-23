@@ -11,7 +11,7 @@
         final RefundModelDao refundInfo=new RefundModelDao(account.getId(),paymentId,refundAmount,account.getCurrency(),refundAmount,account.getCurrency(),isAdjusted);
         paymentDao.insertRefund(refundInfo,context);
         final PaymentPluginApi plugin=getPaymentProviderPlugin(payment.getPaymentMethodId(),context);
-        final RefundInfoPlugin refundInfoPlugin=plugin.processRefund(account.getId(),paymentId,refundAmount,account.getCurrency(),context.toCallContext(tenantId));
+        final RefundInfoPlugin refundInfoPlugin=plugin.processRefund(account.getId(),paymentId,refundAmount,account.getCurrency(),ImmutableList.<PluginProperty>of(),context.toCallContext(tenantId));
 switch (refundInfoPlugin.getStatus()) {
 case PROCESSED:
           paymentDao.updateRefundStatus(refundInfo.getId(),RefundStatus.PLUGIN_COMPLETED,refundInfoPlugin.getAmount(),refundInfoPlugin.getCurrency(),context);

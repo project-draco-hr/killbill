@@ -4,10 +4,10 @@
     final PaymentPluginApiWithTestControl paymentPluginApi=getTestPluginPaymentApi();
     final PaymentPluginApiException e=new PaymentPluginApiException("test-error","foo");
     paymentPluginApi.setPaymentPluginApiExceptionOnNextCalls(e);
-    paymentPluginApi.processPayment(UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),BigDecimal.TEN,Currency.USD,callContext);
+    paymentPluginApi.processPayment(UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),BigDecimal.TEN,Currency.USD,ImmutableList.<PluginProperty>of(),callContext);
     Assert.fail("Expected to fail with " + e.toString());
   }
- catch (  PaymentPluginApiException e) {
+ catch (  final PaymentPluginApiException e) {
     gotException=true;
   }
   Assert.assertTrue(gotException);

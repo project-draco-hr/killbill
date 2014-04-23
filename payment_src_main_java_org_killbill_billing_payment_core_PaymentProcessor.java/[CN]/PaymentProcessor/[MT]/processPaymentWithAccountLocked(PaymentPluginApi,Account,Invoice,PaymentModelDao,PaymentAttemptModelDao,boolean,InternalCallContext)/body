@@ -12,9 +12,9 @@
   final PaymentInfoPlugin paymentPluginInfo;
   try {
     try {
-      paymentPluginInfo=plugin.processPayment(account.getId(),paymentInput.getId(),attemptInput.getPaymentMethodId(),attemptInput.getRequestedAmount(),account.getCurrency(),context.toCallContext(tenantId));
+      paymentPluginInfo=plugin.processPayment(account.getId(),paymentInput.getId(),attemptInput.getPaymentMethodId(),attemptInput.getRequestedAmount(),account.getCurrency(),ImmutableList.<PluginProperty>of(),context.toCallContext(tenantId));
     }
- catch (    RuntimeException e) {
+ catch (    final RuntimeException e) {
       final String formatError=String.format("Plugin threw RuntimeException for payment %s",paymentInput.getId());
       throw new PaymentPluginApiException(formatError,e);
     }
@@ -45,13 +45,13 @@ final String formatError=String.format("Plugin return status %s for payment %s",
 throw new PaymentPluginApiException("",formatError);
 }
 }
- catch (PaymentPluginApiException e) {
+ catch (final PaymentPluginApiException e) {
 paymentStatus=isInstantPayment ? PaymentStatus.PAYMENT_FAILURE_ABORTED : scheduleRetryOnPluginFailure(paymentInput.getId(),context);
 paymentDao.updatePaymentAndAttemptOnCompletion(paymentInput.getId(),paymentStatus,attemptInput.getRequestedAmount(),account.getCurrency(),attemptInput.getId(),null,e.getMessage(),context);
 event=new DefaultPaymentPluginErrorEvent(account.getId(),invoice.getId(),paymentInput.getId(),e.getMessage(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
 throw new PaymentApiException(ErrorCode.PAYMENT_CREATE_PAYMENT,account.getId(),e.toString());
 }
-catch (InvoiceApiException e) {
+catch (final InvoiceApiException e) {
 throw new PaymentApiException(ErrorCode.INVOICE_NOT_FOUND,invoice.getId(),e.toString());
 }
  finally {

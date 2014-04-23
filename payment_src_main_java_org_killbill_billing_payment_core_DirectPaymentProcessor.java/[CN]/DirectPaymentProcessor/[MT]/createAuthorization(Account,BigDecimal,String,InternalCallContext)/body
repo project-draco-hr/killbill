@@ -1,6 +1,6 @@
 {
   final PaymentPluginApi plugin=getPaymentProviderPlugin(account,callContext);
-  DateTime utcNow=clock.getUTCNow();
+  final DateTime utcNow=clock.getUTCNow();
   final DirectPaymentModelDao pmd=new DirectPaymentModelDao(utcNow,utcNow,account.getId(),account.getPaymentMethodId(),externalKey);
   final DirectPaymentTransactionModelDao ptmd=new DirectPaymentTransactionModelDao(utcNow,utcNow,pmd.getId(),TransactionType.AUTHORIZE,utcNow,PaymentStatus.UNKNOWN,amount,account.getCurrency(),null,null);
   final DirectPaymentModelDao inserted=paymentDao.insertDirectPaymentWithFirstTransaction(pmd,ptmd,callContext);
@@ -9,9 +9,9 @@
   PaymentInfoPlugin infoPlugin;
   try {
     try {
-      infoPlugin=plugin.authorizePayment(account.getId(),pmd.getId(),ptmd.getId(),amount,account.getCurrency(),callContext.toCallContext(tenantId));
+      infoPlugin=plugin.authorizePayment(account.getId(),pmd.getId(),ptmd.getId(),amount,account.getCurrency(),ImmutableList.<PluginProperty>of(),callContext.toCallContext(tenantId));
     }
- catch (    RuntimeException e) {
+ catch (    final RuntimeException e) {
       final String formatError=String.format("Plugin threw RuntimeException for payment %s",pmd.getId());
       throw new PaymentPluginApiException(formatError,e);
     }
@@ -31,14 +31,14 @@ final String formatError=String.format("Plugin return status %s for payment %s",
 throw new PaymentPluginApiException("",formatError);
 }
 }
- catch (PaymentPluginApiException e) {
+ catch (final PaymentPluginApiException e) {
 paymentStatus=PaymentStatus.PAYMENT_FAILURE_ABORTED;
 infoPlugin=null;
 paymentDao.updateDirectPaymentAndTransactionOnCompletion(pmd.getId(),paymentStatus,amount,account.getCurrency(),ptmd.getId(),null,e.getMessage(),callContext);
 }
  finally {
 }
-DirectPaymentTransaction transaction=new DefaultDirectPaymentTransaction(ptmd.getId(),utcNow,utcNow,pmd.getId(),ptmd.getTransactionType(),utcNow,0,paymentStatus,amount,account.getCurrency(),((infoPlugin != null) ? infoPlugin.getGatewayErrorCode() : null),((infoPlugin != null) ? infoPlugin.getGatewayError() : null),infoPlugin);
+final DirectPaymentTransaction transaction=new DefaultDirectPaymentTransaction(ptmd.getId(),utcNow,utcNow,pmd.getId(),ptmd.getTransactionType(),utcNow,0,paymentStatus,amount,account.getCurrency(),((infoPlugin != null) ? infoPlugin.getGatewayErrorCode() : null),((infoPlugin != null) ? infoPlugin.getGatewayError() : null),infoPlugin);
 final List<DirectPaymentTransaction> transactions=Collections.singletonList(transaction);
 final DirectPayment result=new DefaultDirectPayment(inserted.getId(),utcNow,utcNow,account.getId(),account.getPaymentMethodId(),inserted.getPaymentNumber(),externalKey,transactions);
 return result;

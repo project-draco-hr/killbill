@@ -38,20 +38,20 @@
           processRetryPaymentWithAccountLocked(plugin,account,invoice,payment,invoice.getBalance(),context);
           return null;
         }
- catch (        InvoiceApiException e) {
+ catch (        final InvoiceApiException e) {
           throw new PaymentApiException(e);
         }
       }
     }
 ));
   }
- catch (  AccountApiException e) {
+ catch (  final AccountApiException e) {
     log.error(String.format("Failed to retry payment for paymentId %s",paymentId),e);
   }
-catch (  PaymentApiException e) {
+catch (  final PaymentApiException e) {
     log.info(String.format("Failed to retry payment for paymentId %s",paymentId),e);
   }
-catch (  TimeoutException e) {
+catch (  final TimeoutException e) {
     log.warn(String.format("Retry for payment %s timedout",paymentId));
   }
 }

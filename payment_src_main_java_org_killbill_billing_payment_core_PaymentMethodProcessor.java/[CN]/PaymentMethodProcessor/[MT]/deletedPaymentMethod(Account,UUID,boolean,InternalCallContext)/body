@@ -21,15 +21,15 @@
           }
         }
         final PaymentPluginApi pluginApi=getPluginApi(paymentMethodId,context);
-        pluginApi.deletePaymentMethod(account.getId(),paymentMethodId,context.toCallContext(tenantId));
+        pluginApi.deletePaymentMethod(account.getId(),paymentMethodId,ImmutableList.<PluginProperty>of(),context.toCallContext(tenantId));
         paymentDao.deletedPaymentMethod(paymentMethodId,context);
         return null;
       }
- catch (      PaymentPluginApiException e) {
+ catch (      final PaymentPluginApiException e) {
         log.warn("Error deleting payment method " + paymentMethodId,e);
         throw new PaymentApiException(ErrorCode.PAYMENT_DEL_PAYMENT_METHOD,account.getId(),e.getErrorMessage());
       }
-catch (      AccountApiException e) {
+catch (      final AccountApiException e) {
         throw new PaymentApiException(e);
       }
     }
