@@ -9,8 +9,10 @@
   final InvoiceItem externalCharge=new InvoiceItem();
   externalCharge.setAccountId(accountJson.getAccountId());
   externalCharge.setAmount(chargeAmount);
+  externalCharge.setCurrency(Currency.valueOf(accountJson.getCurrency()));
   externalCharge.setInvoiceId(invoiceId);
-  final Invoice invoiceWithItems=killBillClient.createExternalCharge(externalCharge,clock.getUTCNow(),false,createdBy,reason,comment);
+  final InvoiceItem createdExternalCharge=killBillClient.createExternalCharge(externalCharge,clock.getUTCNow(),false,createdBy,reason,comment);
+  final Invoice invoiceWithItems=killBillClient.getInvoice(createdExternalCharge.getInvoiceId(),true);
   assertEquals(invoiceWithItems.getItems().size(),originalNumberOfItemsForInvoice + 1);
   assertNull(invoiceWithItems.getItems().get(originalNumberOfItemsForInvoice).getBundleId());
   final Invoice adjustedInvoice=killBillClient.getInvoice(invoiceId);
