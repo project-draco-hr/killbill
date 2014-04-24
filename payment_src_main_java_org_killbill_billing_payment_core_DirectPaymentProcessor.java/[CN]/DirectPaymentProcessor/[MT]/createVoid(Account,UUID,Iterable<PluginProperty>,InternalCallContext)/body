@@ -1,3 +1,8 @@
 {
-  return null;
+  return createDirectPayment(TransactionType.VOID,new PluginWrapper(){
+    @Override public PaymentInfoPlugin doPluginOperation(    final PaymentPluginApi plugin,    final Account account,    final BigDecimal amount,    final UUID directPaymentId,    final Iterable<PluginProperty> properties,    final CallContext callContext) throws PaymentPluginApiException {
+      return plugin.voidPayment(account.getId(),directPaymentId,account.getPaymentMethodId(),properties,callContext);
+    }
+  }
+,directPaymentId,account,null,properties,callContext);
 }

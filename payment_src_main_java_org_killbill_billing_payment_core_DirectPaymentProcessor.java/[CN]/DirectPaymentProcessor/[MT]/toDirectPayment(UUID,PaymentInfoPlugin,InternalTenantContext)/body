@@ -1,0 +1,10 @@
+{
+  final DirectPaymentModelDao paymentModelDao=paymentDao.getDirectPayment(directPaymentId,tenantContext);
+  if (paymentModelDao == null) {
+    log.warn("Unable to find direct payment id " + directPaymentId);
+    return null;
+  }
+  final InternalTenantContext tenantContextWithAccountRecordId=internalCallContextFactory.createInternalTenantContext(paymentModelDao.getAccountId(),tenantContext);
+  final List<DirectPaymentTransactionModelDao> transactionsForAccount=paymentDao.getDirectTransactionsForAccount(paymentModelDao.getAccountId(),tenantContextWithAccountRecordId);
+  return toDirectPayment(paymentModelDao,transactionsForAccount,pluginInfo);
+}

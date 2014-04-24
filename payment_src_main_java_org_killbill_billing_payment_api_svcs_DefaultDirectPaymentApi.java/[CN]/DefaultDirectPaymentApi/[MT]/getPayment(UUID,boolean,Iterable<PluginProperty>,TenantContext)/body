@@ -1,3 +1,7 @@
 {
-  return directPaymentProcessor.getPayment(directPaymentId,withPluginInfo,internalCallContextFactory.createInternalTenantContext(tenantContext));
+  final DirectPayment payment=directPaymentProcessor.getPayment(paymentId,withPluginInfo,properties,internalCallContextFactory.createInternalTenantContext(context));
+  if (payment == null) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT,paymentId);
+  }
+  return payment;
 }
