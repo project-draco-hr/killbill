@@ -1,0 +1,17 @@
+{
+  final PaymentModelDao model=paymentDao.getPayment(paymentId,context);
+  if (model == null) {
+    return null;
+  }
+  final PaymentPluginApi plugin=withPluginInfo ? getPaymentProviderPlugin(model.getPaymentMethodId(),context) : null;
+  PaymentInfoPlugin pluginInfo=null;
+  if (plugin != null) {
+    try {
+      pluginInfo=plugin.getPaymentInfo(model.getAccountId(),paymentId,properties,buildTenantContext(context));
+    }
+ catch (    final PaymentPluginApiException e) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_GET_PAYMENT_INFO,paymentId,e.toString());
+    }
+  }
+  return fromPaymentModelDao(model,pluginInfo,context);
+}

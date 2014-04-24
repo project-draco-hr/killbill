@@ -9,7 +9,7 @@
   final InvoiceItem item1=invoiceUserApi.insertExternalCharges(account.getId(),clock.getUTCToday(),ImmutableList.<InvoiceItem>of(externalCharge),callContext).get(0);
   assertListenerStatus();
   busHandler.pushExpectedEvents(NextEvent.PAYMENT);
-  final Payment payment1=paymentApi.createPayment(account,item1.getInvoiceId(),new BigDecimal("4.00"),callContext);
+  final Payment payment1=paymentApi.createPayment(account,item1.getInvoiceId(),new BigDecimal("4.00"),PLUGIN_PROPERTIES,callContext);
   assertListenerStatus();
   Invoice invoice1=invoiceUserApi.getInvoice(item1.getInvoiceId(),callContext);
   assertTrue(invoice1.getBalance().compareTo(new BigDecimal("6.00")) == 0);
@@ -18,7 +18,7 @@
   BigDecimal accountBalance=invoiceUserApi.getAccountBalance(account.getId(),callContext);
   assertTrue(accountBalance.compareTo(new BigDecimal("6.00")) == 0);
   busHandler.pushExpectedEvents(NextEvent.PAYMENT);
-  final Payment payment2=paymentApi.createPayment(account,item1.getInvoiceId(),new BigDecimal("6.00"),callContext);
+  final Payment payment2=paymentApi.createPayment(account,item1.getInvoiceId(),new BigDecimal("6.00"),PLUGIN_PROPERTIES,callContext);
   assertListenerStatus();
   invoice1=invoiceUserApi.getInvoice(item1.getInvoiceId(),callContext);
   assertTrue(invoice1.getBalance().compareTo(BigDecimal.ZERO) == 0);
@@ -26,7 +26,7 @@
   assertTrue(invoice1.getChargedAmount().compareTo(BigDecimal.TEN) == 0);
   accountBalance=invoiceUserApi.getAccountBalance(account.getId(),callContext);
   assertTrue(accountBalance.compareTo(BigDecimal.ZERO) == 0);
-  paymentApi.createRefund(account,payment2.getId(),new BigDecimal("5.00"),callContext);
+  paymentApi.createRefund(account,payment2.getId(),new BigDecimal("5.00"),PLUGIN_PROPERTIES,callContext);
   invoice1=invoiceUserApi.getInvoice(item1.getInvoiceId(),callContext);
   assertTrue(invoice1.getBalance().compareTo(new BigDecimal("5.00")) == 0);
   accountBalance=invoiceUserApi.getAccountBalance(account.getId(),callContext);
