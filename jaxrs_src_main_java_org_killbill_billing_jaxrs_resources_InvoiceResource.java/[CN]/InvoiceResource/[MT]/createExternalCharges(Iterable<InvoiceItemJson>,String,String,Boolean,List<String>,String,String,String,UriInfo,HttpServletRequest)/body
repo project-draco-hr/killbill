@@ -1,0 +1,39 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),callContext);
+  final Set<Currency> currencies=new HashSet<Currency>(Lists.<InvoiceItemJson,Currency>transform(ImmutableList.<InvoiceItemJson>copyOf(externalChargesJson),new Function<InvoiceItemJson,Currency>(){
+    @Override public Currency apply(    final InvoiceItemJson input){
+      return input.getCurrency();
+    }
+  }
+));
+  if (currencies.size() != 1 || !currencies.iterator().next().equals(account.getCurrency())) {
+    throw new InvoiceApiException(ErrorCode.EXTERNAL_CHARGE_CURRENCY_INVALID,account.getCurrency());
+  }
+  final LocalDate requestedDate=toLocalDate(account,requestedDateTimeString,callContext);
+  final Iterable<InvoiceItem> externalCharges=Iterables.<InvoiceItemJson,InvoiceItem>transform(externalChargesJson,new Function<InvoiceItemJson,InvoiceItem>(){
+    @Override public InvoiceItem apply(    final InvoiceItemJson invoiceItemJson){
+      return invoiceItemJson.toInvoiceItem();
+    }
+  }
+);
+  final List<InvoiceItem> createdExternalCharges=invoiceApi.insertExternalCharges(account.getId(),requestedDate,externalCharges,callContext);
+  if (payInvoice) {
+    final Collection<UUID> paidInvoices=new HashSet<UUID>();
+    for (    final InvoiceItem externalCharge : createdExternalCharges) {
+      if (!paidInvoices.contains(externalCharge.getInvoiceId())) {
+        paidInvoices.add(externalCharge.getInvoiceId());
+        final Invoice invoice=invoiceApi.getInvoice(externalCharge.getInvoiceId(),callContext);
+        paymentApi.createPayment(account,invoice.getId(),invoice.getBalance(),pluginProperties,callContext);
+      }
+    }
+  }
+  final List<InvoiceItemJson> createdExternalChargesJson=Lists.<InvoiceItem,InvoiceItemJson>transform(createdExternalCharges,new Function<InvoiceItem,InvoiceItemJson>(){
+    @Override public InvoiceItemJson apply(    final InvoiceItem input){
+      return new InvoiceItemJson(input);
+    }
+  }
+);
+  return Response.status(Status.OK).entity(createdExternalChargesJson).build();
+}

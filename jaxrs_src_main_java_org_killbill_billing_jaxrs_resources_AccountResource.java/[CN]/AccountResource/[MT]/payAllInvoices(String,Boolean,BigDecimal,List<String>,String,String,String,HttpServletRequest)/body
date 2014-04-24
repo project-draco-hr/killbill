@@ -1,0 +1,32 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),callContext);
+  final Collection<Invoice> unpaidInvoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
+  BigDecimal remainingRequestPayment=paymentAmount;
+  if (remainingRequestPayment == null) {
+    remainingRequestPayment=BigDecimal.ZERO;
+    for (    final Invoice invoice : unpaidInvoices) {
+      remainingRequestPayment=remainingRequestPayment.add(invoice.getBalance());
+    }
+  }
+  for (  final Invoice invoice : unpaidInvoices) {
+    final BigDecimal amountToPay=(remainingRequestPayment.compareTo(invoice.getBalance()) >= 0) ? invoice.getBalance() : remainingRequestPayment;
+    if (amountToPay.compareTo(BigDecimal.ZERO) > 0) {
+      if (externalPayment) {
+        paymentApi.createExternalPayment(account,invoice.getId(),amountToPay,callContext);
+      }
+ else {
+        paymentApi.createPayment(account,invoice.getId(),amountToPay,pluginProperties,callContext);
+      }
+    }
+    remainingRequestPayment=remainingRequestPayment.subtract(amountToPay);
+    if (remainingRequestPayment.compareTo(BigDecimal.ZERO) == 0) {
+      break;
+    }
+  }
+  if (externalPayment && remainingRequestPayment.compareTo(BigDecimal.ZERO) > 0) {
+    invoiceApi.insertCredit(account.getId(),remainingRequestPayment,clock.getUTCToday(),account.getCurrency(),callContext);
+  }
+  return Response.status(Status.OK).build();
+}

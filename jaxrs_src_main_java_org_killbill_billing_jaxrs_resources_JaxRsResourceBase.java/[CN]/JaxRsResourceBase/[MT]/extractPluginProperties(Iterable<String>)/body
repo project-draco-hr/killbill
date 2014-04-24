@@ -1,0 +1,20 @@
+{
+  final Collection<PluginProperty> properties=new LinkedList<PluginProperty>();
+  if (pluginProperties == null) {
+    return properties;
+  }
+  for (  final String pluginProperty : pluginProperties) {
+    final String keyValue;
+    try {
+      keyValue=URLDecoder.decode(pluginProperty,"UTF-8");
+    }
+ catch (    final UnsupportedEncodingException e) {
+      throw new IllegalStateException("UTF-8 should be available on any Kill Bill platform");
+    }
+    final List<String> property=ImmutableList.<String>copyOf(keyValue.split("="));
+    final String key=property.get(0);
+    final String value=property.size() == 1 ? null : Joiner.on("=").join(property.subList(1,property.size()));
+    properties.add(new PluginProperty(key,value,false));
+  }
+  return properties;
+}
