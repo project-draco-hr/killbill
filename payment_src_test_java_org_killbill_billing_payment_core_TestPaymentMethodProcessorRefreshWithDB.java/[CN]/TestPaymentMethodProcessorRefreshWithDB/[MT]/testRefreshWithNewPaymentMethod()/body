@@ -1,11 +1,10 @@
 {
-  final ImmutableList<PluginProperty> pluginProperties=ImmutableList.<PluginProperty>of();
   final Account account=testHelper.createTestAccount("foo@bar.com",true);
-  Assert.assertEquals(getPluginApi().getPaymentMethods(account.getId(),true,pluginProperties,callContext).size(),1);
+  Assert.assertEquals(getPluginApi().getPaymentMethods(account.getId(),true,PLUGIN_PROPERTIES,callContext).size(),1);
   final UUID existingPMId=account.getPaymentMethodId();
   final UUID newPmId=UUID.randomUUID();
-  getPluginApi().addPaymentMethod(account.getId(),newPmId,new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),false,ImmutableList.<PluginProperty>of()),false,pluginProperties,callContext);
-  final List<PaymentMethod> methods=paymentMethodProcessor.refreshPaymentMethods(MockPaymentProviderPlugin.PLUGIN_NAME,account,internalCallContext);
+  getPluginApi().addPaymentMethod(account.getId(),newPmId,new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),false,ImmutableList.<PluginProperty>of()),false,PLUGIN_PROPERTIES,callContext);
+  final List<PaymentMethod> methods=paymentMethodProcessor.refreshPaymentMethods(MockPaymentProviderPlugin.PLUGIN_NAME,account,PLUGIN_PROPERTIES,internalCallContext);
   Assert.assertEquals(methods.size(),2);
   checkPaymentMethodExistsWithStatus(methods,existingPMId,true);
   checkPaymentMethodExistsWithStatus(methods,newPmId,true);

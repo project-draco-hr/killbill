@@ -5,7 +5,7 @@
   final UUID bundleId=UUID.randomUUID();
   invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),invoiceAmount,new BigDecimal("1.0"),Currency.USD));
   try {
-    final Payment paymentInfo=paymentApi.createPayment(account,invoice.getId(),requestedAmount,callContext);
+    final Payment paymentInfo=paymentApi.createPayment(account,invoice.getId(),requestedAmount,PLUGIN_PROPERTIES,callContext);
     if (expectedAmount == null) {
       fail("Expected to fail because requested amount > invoice amount");
     }
@@ -20,7 +20,7 @@
     assertNotNull(paymentAttempt);
     assertNotNull(paymentAttempt.getId());
   }
- catch (  PaymentApiException e) {
+ catch (  final PaymentApiException e) {
     if (expectedAmount != null) {
       fail("Failed to create payment",e);
     }

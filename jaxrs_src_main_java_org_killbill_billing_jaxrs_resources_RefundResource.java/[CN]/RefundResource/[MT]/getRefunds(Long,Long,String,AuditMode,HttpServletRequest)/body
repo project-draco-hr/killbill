@@ -2,10 +2,10 @@
   final TenantContext tenantContext=context.createContext(request);
   final Pagination<Refund> refunds;
   if (Strings.isNullOrEmpty(pluginName)) {
-    refunds=paymentApi.getRefunds(offset,limit,tenantContext);
+    refunds=paymentApi.getRefunds(offset,limit,pluginProperties,tenantContext);
   }
  else {
-    refunds=paymentApi.getRefunds(offset,limit,pluginName,tenantContext);
+    refunds=paymentApi.getRefunds(offset,limit,pluginName,pluginProperties,tenantContext);
   }
   final URI nextPageUri=uriBuilder.nextPage(RefundResource.class,"getRefunds",refunds.getNextOffset(),limit,ImmutableMap.<String,String>of(QUERY_PAYMENT_METHOD_PLUGIN_NAME,Strings.nullToEmpty(pluginName),QUERY_AUDIT,auditMode.getLevel().toString()));
   final AtomicReference<Map<UUID,AccountAuditLogs>> accountsAuditLogs=new AtomicReference<Map<UUID,AccountAuditLogs>>(new HashMap<UUID,AccountAuditLogs>());
@@ -15,7 +15,7 @@
       UUID kbAccountId=null;
       if (!AuditLevel.NONE.equals(auditMode.getLevel()) && paymentIdAccountIdMappings.get(refund.getPaymentId()) == null) {
         try {
-          kbAccountId=paymentApi.getPayment(refund.getPaymentId(),false,tenantContext).getAccountId();
+          kbAccountId=paymentApi.getPayment(refund.getPaymentId(),false,pluginProperties,tenantContext).getAccountId();
           paymentIdAccountIdMappings.put(refund.getPaymentId(),kbAccountId);
         }
  catch (        final PaymentApiException e) {

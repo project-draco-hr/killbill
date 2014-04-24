@@ -1,0 +1,52 @@
+{
+  final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
+  final Map<UUID,List<RefundInfoPlugin>> refundsByPaymentId=new HashMap<UUID,List<RefundInfoPlugin>>();
+  final Map<UUID,List<RefundModelDao>> refundModelDaosByPaymentId=new HashMap<UUID,List<RefundModelDao>>();
+  return getEntityPagination(limit,new SourcePaginationBuilder<RefundInfoPlugin,PaymentApiException>(){
+    @Override public Pagination<RefundInfoPlugin> build() throws PaymentApiException {
+      final Pagination<RefundInfoPlugin> refunds;
+      try {
+        refunds=pluginApi.searchRefunds(searchKey,offset,limit,properties,buildTenantContext(internalTenantContext));
+      }
+ catch (      final PaymentPluginApiException e) {
+        throw new PaymentApiException(e,ErrorCode.PAYMENT_PLUGIN_SEARCH_REFUNDS,pluginName,searchKey);
+      }
+      for (      final RefundInfoPlugin refundInfoPlugin : refunds) {
+        if (refundInfoPlugin.getKbPaymentId() == null) {
+          log.debug("Plugin {} returned a refund without a kbPaymentId for searchKey {}",pluginName,searchKey);
+          continue;
+        }
+        if (refundsByPaymentId.get(refundInfoPlugin.getKbPaymentId()) == null) {
+          refundsByPaymentId.put(refundInfoPlugin.getKbPaymentId(),new LinkedList<RefundInfoPlugin>());
+        }
+        refundsByPaymentId.get(refundInfoPlugin.getKbPaymentId()).add(refundInfoPlugin);
+      }
+      return refunds;
+    }
+  }
+,new Function<RefundInfoPlugin,Refund>(){
+    @Override public Refund apply(    final RefundInfoPlugin refundInfoPlugin){
+      if (refundInfoPlugin.getKbPaymentId() == null) {
+        log.debug("Plugin {} returned a refund without a kbPaymentId for searchKey {}",pluginName,searchKey);
+        return null;
+      }
+      List<RefundModelDao> modelCandidates=refundModelDaosByPaymentId.get(refundInfoPlugin.getKbPaymentId());
+      if (modelCandidates == null) {
+        refundModelDaosByPaymentId.put(refundInfoPlugin.getKbPaymentId(),paymentDao.getRefundsForPayment(refundInfoPlugin.getKbPaymentId(),internalTenantContext));
+        modelCandidates=refundModelDaosByPaymentId.get(refundInfoPlugin.getKbPaymentId());
+      }
+      final RefundModelDao model=Iterables.<RefundModelDao>tryFind(modelCandidates,new Predicate<RefundModelDao>(){
+        @Override public boolean apply(        final RefundModelDao refundModelDao){
+          return refundObjectsMatch(refundModelDao,refundInfoPlugin);
+        }
+      }
+).orNull();
+      if (model == null) {
+        log.warn("Unable to find refund for payment id " + refundInfoPlugin.getKbPaymentId() + " present in plugin "+ pluginName);
+        return null;
+      }
+      return new DefaultRefund(model,refundInfoPlugin);
+    }
+  }
+);
+}

@@ -2,10 +2,10 @@
   final TenantContext tenantContext=context.createContext(request);
   final Pagination<PaymentMethod> paymentMethods;
   if (Strings.isNullOrEmpty(pluginName)) {
-    paymentMethods=paymentApi.getPaymentMethods(offset,limit,tenantContext);
+    paymentMethods=paymentApi.getPaymentMethods(offset,limit,pluginProperties,tenantContext);
   }
  else {
-    paymentMethods=paymentApi.getPaymentMethods(offset,limit,pluginName,tenantContext);
+    paymentMethods=paymentApi.getPaymentMethods(offset,limit,pluginName,pluginProperties,tenantContext);
   }
   final URI nextPageUri=uriBuilder.nextPage(PaymentMethodResource.class,"getPaymentMethods",paymentMethods.getNextOffset(),limit,ImmutableMap.<String,String>of(QUERY_PAYMENT_METHOD_PLUGIN_NAME,Strings.nullToEmpty(pluginName),QUERY_AUDIT,auditMode.getLevel().toString()));
   final AtomicReference<Map<UUID,AccountAuditLogs>> accountsAuditLogs=new AtomicReference<Map<UUID,AccountAuditLogs>>(new HashMap<UUID,AccountAuditLogs>());
