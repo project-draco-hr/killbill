@@ -1,0 +1,6 @@
+{
+  super(pluginRegistry,accountUserApi,eventBus,paymentDao,nonEntityDao,tagUserApi,locker,executor,invoiceApi);
+  final long paymentPluginTimeoutSec=TimeUnit.SECONDS.convert(paymentConfig.getPaymentPluginTimeout().getPeriod(),paymentConfig.getPaymentPluginTimeout().getUnit());
+  this.paymentPluginFormDispatcher=new PluginDispatcher<HostedPaymentPageFormDescriptor>(paymentPluginTimeoutSec,executor);
+  this.paymentPluginNotificationDispatcher=new PluginDispatcher<GatewayNotification>(paymentPluginTimeoutSec,executor);
+}

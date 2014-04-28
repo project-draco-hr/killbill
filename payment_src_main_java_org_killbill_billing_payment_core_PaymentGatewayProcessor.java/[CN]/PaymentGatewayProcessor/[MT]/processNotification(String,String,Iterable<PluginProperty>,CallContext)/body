@@ -1,0 +1,17 @@
+{
+  try {
+    return paymentPluginNotificationDispatcher.dispatchWithTimeout(new Callable<GatewayNotification>(){
+      @Override public GatewayNotification call() throws Exception {
+        final PaymentPluginApi plugin=getPaymentPluginApi(pluginName);
+        return plugin.processNotification(notification,properties,callContext);
+      }
+    }
+);
+  }
+ catch (  final TimeoutException e) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,null,null);
+  }
+catch (  final RuntimeException e) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,null);
+  }
+}

@@ -7,7 +7,7 @@
     externalPaymentPlugin=null;
   }
   try {
-    return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
+    return paymentPluginDispatcher.dispatchWithTimeout(new CallableWithAccountLock<Payment>(locker,account.getExternalKey(),new WithAccountLockCallback<Payment>(){
       @Override public Payment doOperation() throws PaymentApiException {
         try {
           final Invoice invoice=rebalanceAndGetInvoice(account.getId(),invoiceId,context);

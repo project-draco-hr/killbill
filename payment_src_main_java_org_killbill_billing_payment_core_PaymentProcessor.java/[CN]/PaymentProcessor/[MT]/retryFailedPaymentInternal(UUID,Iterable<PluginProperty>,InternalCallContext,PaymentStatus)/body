@@ -11,7 +11,7 @@
     }
     final Account account=accountInternalApi.getAccountById(payment.getAccountId(),context);
     final PaymentPluginApi plugin=getPaymentProviderPlugin(account,context);
-    voidPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Void>(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
+    voidPluginDispatcher.dispatchWithTimeout(new CallableWithAccountLock<Void>(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
       @Override public Void doOperation() throws PaymentApiException {
         try {
           final PaymentModelDao payment=paymentDao.getPayment(paymentId,context);

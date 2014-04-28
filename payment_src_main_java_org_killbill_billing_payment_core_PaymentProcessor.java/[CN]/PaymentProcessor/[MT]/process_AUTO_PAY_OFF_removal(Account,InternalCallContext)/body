@@ -1,6 +1,6 @@
 {
   try {
-    voidPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<Void>(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
+    voidPluginDispatcher.dispatchWithTimeout(new CallableWithAccountLock<Void>(locker,account.getExternalKey(),new WithAccountLockCallback<Void>(){
       @Override public Void doOperation() throws PaymentApiException {
         final List<PaymentModelDao> payments=paymentDao.getPaymentsForAccount(account.getId(),context);
         final Collection<PaymentModelDao> paymentsToBeCompleted=Collections2.filter(payments,new Predicate<PaymentModelDao>(){

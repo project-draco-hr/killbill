@@ -1,7 +1,7 @@
 {
   Preconditions.checkArgument(account.getCurrency().equals(currency),String.format("Currency %s doesn't match the one on the account (%s)",currency,currency));
   try {
-    return paymentPluginDispatcher.dispatchWithAccountLock(new CallableWithAccountLock<DirectPayment>(locker,account.getExternalKey(),new WithAccountLockCallback<DirectPayment>(){
+    return paymentPluginDispatcher.dispatchWithTimeout(new CallableWithAccountLock<DirectPayment>(locker,account.getExternalKey(),new WithAccountLockCallback<DirectPayment>(){
       @Override public DirectPayment doOperation() throws PaymentApiException {
         final DateTime utcNow=clock.getUTCNow();
         final DirectPaymentModelDao paymentModelDao;
