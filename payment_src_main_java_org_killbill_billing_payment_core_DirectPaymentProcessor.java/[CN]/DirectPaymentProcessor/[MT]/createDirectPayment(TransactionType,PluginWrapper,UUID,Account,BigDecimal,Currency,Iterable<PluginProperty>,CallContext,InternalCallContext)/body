@@ -1,0 +1,20 @@
+{
+  Preconditions.checkArgument((amount == null && currency == null) || account.getCurrency().equals(currency),String.format("Currency %s doesn't match the one on the account (%s)",currency,currency));
+  try {
+    return paymentPluginDispatcher.dispatchWithTimeout(new CallableWithAccountLock<DirectPayment>(locker,account.getExternalKey(),new WithAccountLockCallback<DirectPayment>(){
+      @Override public DirectPayment doOperation() throws PaymentApiException {
+        final DateTime utcNow=clock.getUTCNow();
+        final DirectPaymentTransactionModelDao ptmd=new DirectPaymentTransactionModelDao(utcNow,utcNow,directPaymentId,transactionType,utcNow,PaymentStatus.UNKNOWN,amount,currency,null,null);
+        final DirectPaymentTransactionModelDao inserted=paymentDao.updateDirectPaymentWithNewTransaction(directPaymentId,ptmd,callContext);
+        return getDirectPayment(pluginWrapper,account,amount,currency,directPaymentId,inserted.getId(),properties,context,callContext);
+      }
+    }
+));
+  }
+ catch (  final TimeoutException e) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,account.getId(),null);
+  }
+catch (  final RuntimeException e) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,null);
+  }
+}

@@ -1,7 +1,3 @@
 {
-  final PaymentMethodModelDao paymentMethodModel=includedDeleted ? paymentDao.getPaymentMethodIncludedDeleted(paymentMethodId,context) : paymentDao.getPaymentMethod(paymentMethodId,context);
-  if (paymentMethodModel == null) {
-    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,paymentMethodId);
-  }
-  return buildDefaultPaymentMethod(paymentMethodModel,withPluginInfo,properties,context);
+  return getPaymentMethodById(paymentMethodId,includedDeleted,withPluginInfo,properties,buildTenantContext(context),context);
 }

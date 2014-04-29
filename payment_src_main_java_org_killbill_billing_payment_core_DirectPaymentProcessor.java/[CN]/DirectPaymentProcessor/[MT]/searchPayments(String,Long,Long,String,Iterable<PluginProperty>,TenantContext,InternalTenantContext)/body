@@ -1,0 +1,23 @@
+{
+  final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
+  return getEntityPagination(limit,new SourcePaginationBuilder<PaymentInfoPlugin,PaymentApiException>(){
+    @Override public Pagination<PaymentInfoPlugin> build() throws PaymentApiException {
+      try {
+        return pluginApi.searchPayments(searchKey,offset,limit,properties,tenantContext);
+      }
+ catch (      final PaymentPluginApiException e) {
+        throw new PaymentApiException(e,ErrorCode.PAYMENT_PLUGIN_SEARCH_PAYMENTS,pluginName,searchKey);
+      }
+    }
+  }
+,new Function<PaymentInfoPlugin,DirectPayment>(){
+    @Override public DirectPayment apply(    final PaymentInfoPlugin paymentInfoPlugin){
+      if (paymentInfoPlugin.getKbPaymentId() == null) {
+        log.debug("Plugin {} returned a payment without a kbPaymentId for searchKey {}",pluginName,searchKey);
+        return null;
+      }
+      return toDirectPayment(paymentInfoPlugin.getKbPaymentId(),paymentInfoPlugin,internalTenantContext);
+    }
+  }
+);
+}
