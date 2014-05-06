@@ -6,15 +6,17 @@
 switch (cur.getAction()) {
 case ADD:
       if (!repairedIds.contains(cur.getId())) {
-        return cur;
+        return new ItemWithResult(cur,true);
       }
-    break;
+ else {
+        repairedIds.remove(cur.getId());
+      }
 case CANCEL:
-  if (cur.getLinkedId() != null) {
-    repairedIds.add(cur.getLinkedId());
-  }
-break;
+    if (cur.getLinkedId() != null) {
+      repairedIds.add(cur.getLinkedId());
+    }
+  break;
 }
 }
-return null;
+return repairedIds.size() > 0 ? new ItemWithResult(null,true) : new ItemWithResult(null,false);
 }

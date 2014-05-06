@@ -33,11 +33,5 @@
   busHandler.pushExpectedEvents(NextEvent.INVOICE_ADJUSTMENT);
   paymentApi.createRefundWithItemsAdjustments(account,payment1.getId(),iias,PLUGIN_PROPERTIES,callContext);
   assertListenerStatus();
-  try {
-    invoiceUserApi.triggerInvoiceGeneration(account.getId(),new LocalDate(clock.getUTCToday()),false,callContext);
-    Assert.fail("Should not gnenerated an new invoice");
-  }
- catch (  final InvoiceApiException e) {
-    Assert.assertEquals(e.getCode(),ErrorCode.INVOICE_NOTHING_TO_DO.getCode());
-  }
+  checkNoMoreInvoiceToGenerate(account);
 }

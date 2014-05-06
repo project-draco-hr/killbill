@@ -1,8 +1,7 @@
 {
   Preconditions.checkNotNull(callback);
   if (leftChild == null) {
-    callback.onLastNode(this);
-    return;
+    return callback.onLastNode(this);
   }
   LocalDate curDate=start;
   NodeInterval curChild=leftChild;
@@ -10,11 +9,14 @@
     if (curChild.getStart().compareTo(curDate) > 0) {
       callback.onMissingInterval(this,curDate,curChild.getStart());
     }
-    curChild.build(callback);
-    curDate=curChild.getEnd();
+    boolean ignorePeriod=curChild.build(callback);
+    if (ignorePeriod) {
+      curDate=curChild.getEnd();
+    }
     curChild=curChild.getRightSibling();
   }
   if (curDate.compareTo(end) < 0) {
     callback.onMissingInterval(this,curDate,end);
   }
+  return true;
 }
