@@ -1,0 +1,44 @@
+{
+  walkTree(new WalkCallback(){
+    @Override public void onCurrentNode(    final int depth,    final NodeInterval curNode,    final NodeInterval parent){
+      if (curNode.isRoot()) {
+        return;
+      }
+      final ItemsInterval curNodeItems=((ItemsNodeInterval)curNode).getItemsInterval();
+      final boolean isEmpty=curNodeItems.mergeCancellingPairs();
+      if (isEmpty && curNode.getLeftChild() == null) {
+        curNode.getParent().removeChild(curNode);
+      }
+      if (!curNode.isPartitionedByChildren()) {
+        return;
+      }
+      final Iterator<Item> it=curNodeItems.get_ADD_items().iterator();
+      while (it.hasNext()) {
+        final Item curAddItem=it.next();
+        NodeInterval curChild=curNode.getLeftChild();
+        Map<ItemsInterval,Item> toBeRemoved=new HashMap<ItemsInterval,Item>();
+        boolean foundFullRepairByParts=true;
+        while (curChild != null) {
+          final ItemsInterval curChildItems=((ItemsNodeInterval)curChild).getItemsInterval();
+          Item cancellingItem=curChildItems.getCancelledItemIfExists(curAddItem.getId());
+          if (cancellingItem == null) {
+            foundFullRepairByParts=false;
+            break;
+          }
+          toBeRemoved.put(curChildItems,cancellingItem);
+          curChild=curChild.getRightSibling();
+        }
+        if (foundFullRepairByParts) {
+          for (          ItemsInterval curItemsInterval : toBeRemoved.keySet()) {
+            curItemsInterval.remove(toBeRemoved.get(curItemsInterval));
+            if (curItemsInterval.size() == 0) {
+              curNode.removeChild(curItemsInterval.getNodeInterval());
+            }
+          }
+          curNodeItems.remove(curAddItem);
+        }
+      }
+    }
+  }
+);
+}

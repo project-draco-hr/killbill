@@ -1,0 +1,19 @@
+{
+  final Map<UUID,List<Item>> tmp=new HashMap<UUID,List<Item>>();
+  for (  Item cur : items) {
+    final UUID idToConsider=(cur.getAction() == ItemAction.ADD) ? cur.getId() : cur.getLinkedId();
+    List<Item> listForItem=tmp.get(idToConsider);
+    if (listForItem == null) {
+      listForItem=new ArrayList<Item>(2);
+      tmp.put(idToConsider,listForItem);
+    }
+    listForItem.add(cur);
+  }
+  for (  List<Item> listForIds : tmp.values()) {
+    if (listForIds.size() == 2) {
+      items.remove(listForIds.get(0));
+      items.remove(listForIds.get(1));
+    }
+  }
+  return items.size() == 0;
+}
