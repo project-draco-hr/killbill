@@ -25,6 +25,14 @@
     }
  else {
       if (!dryRun) {
+        List<InvoicePluginApi> invoicePlugins=this.getInvoicePlugins();
+        CallContext callContext=buildCallContext(context);
+        for (        InvoicePluginApi invoicePlugin : invoicePlugins) {
+          List<InvoiceItem> items=invoicePlugin.getAdditionalInvoiceItems(invoice,ImmutableList.<PluginProperty>of(),callContext);
+          if (items != null) {
+            invoice.addInvoiceItems(items);
+          }
+        }
         final Set<UUID> adjustedUniqueOtherInvoiceId=new TreeSet<UUID>();
         adjustedUniqueOtherInvoiceId.addAll(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,UUID>(){
           @Nullable @Override public UUID apply(          @Nullable final InvoiceItem input){
