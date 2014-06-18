@@ -1,8 +1,6 @@
 {
-  bind(FailedPaymentRetryService.class).asEagerSingleton();
-  bind(PluginFailureRetryService.class).asEagerSingleton();
-  bind(AutoPayRetryService.class).asEagerSingleton();
-  bind(FailedPaymentRetryServiceScheduler.class).asEagerSingleton();
-  bind(PluginFailureRetryServiceScheduler.class).asEagerSingleton();
-  bind(AutoPayRetryServiceScheduler.class).asEagerSingleton();
+  bind(DefaultRetryService.class).asEagerSingleton();
+  bind(RetryService.class).annotatedWith(Names.named(RETRYABLE_NAMED)).to(DefaultRetryService.class);
+  bind(DefaultRetryServiceScheduler.class).asEagerSingleton();
+  bind(RetryServiceScheduler.class).annotatedWith(Names.named(RETRYABLE_NAMED)).to(DefaultRetryServiceScheduler.class);
 }

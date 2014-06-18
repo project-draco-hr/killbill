@@ -1,0 +1,25 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID accountId=UUID.fromString(accountIdStr);
+  final Account account=accountUserApi.getAccountById(accountId,callContext);
+  final UUID paymentMethodId=paymentMethodIdStr == null ? account.getPaymentMethodId() : UUID.fromString(paymentMethodIdStr);
+  final Currency currency=json.getCurrency() == null ? account.getCurrency() : Currency.valueOf(json.getCurrency());
+  final UUID directPaymentId=json.getDirectPaymentId() == null ? null : UUID.fromString(json.getDirectPaymentId());
+  final TransactionType transactionType=TransactionType.valueOf(json.getTransactionType());
+  final DirectPayment result;
+switch (transactionType) {
+case AUTHORIZE:
+    result=directPaymentApi.createAuthorization(account,paymentMethodId,directPaymentId,json.getAmount(),currency,json.getDirectPaymentExternalKey(),json.getDirectTransactionExternalKey(),pluginProperties,callContext);
+  break;
+case PURCHASE:
+result=directPaymentApi.createPurchase(account,paymentMethodId,directPaymentId,json.getAmount(),currency,json.getDirectPaymentExternalKey(),json.getDirectTransactionExternalKey(),pluginProperties,callContext);
+break;
+case CREDIT:
+result=directPaymentApi.createCredit(account,paymentMethodId,directPaymentId,json.getAmount(),currency,json.getDirectPaymentExternalKey(),json.getDirectTransactionExternalKey(),pluginProperties,callContext);
+break;
+default :
+return Response.status(Status.PRECONDITION_FAILED).entity("TransactionType " + transactionType + " is not allowed for an account").build();
+}
+return uriBuilder.buildResponse(DirectPaymentResource.class,"getDirectPayment",result.getId(),uriInfo.getBaseUri().toString());
+}

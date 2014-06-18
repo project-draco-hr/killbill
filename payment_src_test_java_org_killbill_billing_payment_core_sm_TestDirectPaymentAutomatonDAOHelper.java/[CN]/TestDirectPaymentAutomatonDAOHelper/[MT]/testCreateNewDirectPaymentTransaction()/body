@@ -1,0 +1,29 @@
+{
+  final DirectPaymentAutomatonDAOHelper daoHelper=createDAOHelper(null,directPaymentExternalKey,directPaymentTransactionExternalKey,amount,currency);
+  daoHelper.createNewDirectPaymentTransaction();
+  final DirectPaymentModelDao directPayment1=daoHelper.getDirectPayment();
+  Assert.assertEquals(directPayment1.getExternalKey(),directPaymentExternalKey);
+  Assert.assertNull(directPayment1.getCurrentStateName());
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getTransactionExternalKey(),directPaymentTransactionExternalKey);
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getAmount().compareTo(amount),0);
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getCurrency(),currency);
+  final PaymentTransactionInfoPlugin paymentInfoPlugin=Mockito.mock(PaymentTransactionInfoPlugin.class);
+  Mockito.when(paymentInfoPlugin.getAmount()).thenReturn(new BigDecimal("82010.222"));
+  Mockito.when(paymentInfoPlugin.getCurrency()).thenReturn(Currency.CAD);
+  Mockito.when(paymentInfoPlugin.getStatus()).thenReturn(PaymentPluginStatus.PROCESSED);
+  Mockito.when(paymentInfoPlugin.getGatewayErrorCode()).thenReturn(UUID.randomUUID().toString().substring(0,5));
+  Mockito.when(paymentInfoPlugin.getGatewayError()).thenReturn(UUID.randomUUID().toString());
+  daoHelper.processPaymentInfoPlugin(PaymentStatus.SUCCESS,paymentInfoPlugin,"SOME_STATE");
+  final DirectPaymentModelDao directPayment2=daoHelper.getDirectPayment();
+  Assert.assertEquals(directPayment2.getExternalKey(),directPaymentExternalKey);
+  Assert.assertEquals(directPayment2.getCurrentStateName(),"SOME_STATE");
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getDirectPaymentId(),directPayment2.getId());
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getTransactionExternalKey(),directPaymentTransactionExternalKey);
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getPaymentStatus(),PaymentStatus.SUCCESS);
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getAmount().compareTo(amount),0);
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getCurrency(),currency);
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getProcessedAmount().compareTo(paymentInfoPlugin.getAmount()),0);
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getProcessedCurrency(),paymentInfoPlugin.getCurrency());
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getGatewayErrorCode(),paymentInfoPlugin.getGatewayErrorCode());
+  Assert.assertEquals(directPaymentStateContext.getDirectPaymentTransactionModelDao().getGatewayErrorMsg(),paymentInfoPlugin.getGatewayError());
+}

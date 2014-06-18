@@ -1,0 +1,11 @@
+{
+  final InternalPaymentInfo info=payments.get(kbPaymentId.toString());
+  if (info == null) {
+    throw new PaymentPluginApiException("",String.format("No payment found for payment id %s (plugin %s)",kbPaymentId.toString(),PLUGIN_NAME));
+  }
+  BigDecimal maxAmountRefundable=info.getCaptureAmount().add(info.getPurchasedAmount());
+  if (maxAmountRefundable.compareTo(info.getRefundAmount()) < 0) {
+    throw new PaymentPluginApiException("",String.format("Refund amount of %s for payment id %s is bigger than the payment amount %s (plugin %s)",refundAmount,kbPaymentId.toString(),maxAmountRefundable,PLUGIN_NAME));
+  }
+  return getPaymentTransactionInfoPluginResult(kbPaymentId,kbTransactionId,TransactionType.REFUND,refundAmount,currency);
+}

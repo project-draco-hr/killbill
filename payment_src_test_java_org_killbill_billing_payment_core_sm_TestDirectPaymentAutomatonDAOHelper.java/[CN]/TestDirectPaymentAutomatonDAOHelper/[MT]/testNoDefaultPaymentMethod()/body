@@ -1,0 +1,10 @@
+{
+  final DirectPaymentAutomatonDAOHelper daoHelper=createDAOHelper(UUID.randomUUID(),directPaymentExternalKey,directPaymentTransactionExternalKey,amount,currency);
+  try {
+    daoHelper.getDefaultPaymentMethodId();
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD.getCode());
+  }
+}

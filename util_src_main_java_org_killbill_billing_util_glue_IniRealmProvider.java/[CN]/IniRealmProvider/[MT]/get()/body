@@ -1,8 +1,11 @@
 {
   try {
-    return new IniRealm(securityConfig.getShiroResourcePath());
+    final Factory<SecurityManager> factory=new IniSecurityManagerFactory(securityConfig.getShiroResourcePath());
+    final DefaultSecurityManager securityManager=(DefaultSecurityManager)factory.getInstance();
+    final Collection<Realm> realms=securityManager.getRealms();
+    return realms == null ? new IniRealm(securityConfig.getShiroResourcePath()) : realms.iterator().next();
   }
- catch (  ConfigurationException e) {
+ catch (  final ConfigurationException e) {
     log.warn("Unable to configure RBAC",e);
     return new IniRealm();
   }

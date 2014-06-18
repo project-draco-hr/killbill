@@ -1,0 +1,25 @@
+{
+  if (paymentInfoPlugin == null) {
+    if (OperationResult.EXCEPTION.equals(operationResult)) {
+      return PaymentStatus.PLUGIN_FAILURE_ABORTED;
+    }
+ else {
+      return PaymentStatus.UNKNOWN;
+    }
+  }
+  if (paymentInfoPlugin.getStatus() == null) {
+    return PaymentStatus.UNKNOWN;
+  }
+switch (paymentInfoPlugin.getStatus()) {
+case UNDEFINED:
+    return PaymentStatus.UNKNOWN;
+case PROCESSED:
+  return PaymentStatus.SUCCESS;
+case PENDING:
+return PaymentStatus.PENDING;
+case ERROR:
+return PaymentStatus.PAYMENT_FAILURE_ABORTED;
+default :
+return PaymentStatus.UNKNOWN;
+}
+}

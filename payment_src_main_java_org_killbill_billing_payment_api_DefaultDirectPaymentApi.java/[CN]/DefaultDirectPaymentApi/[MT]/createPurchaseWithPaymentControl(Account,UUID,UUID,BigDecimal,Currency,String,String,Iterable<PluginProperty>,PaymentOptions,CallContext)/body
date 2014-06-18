@@ -1,0 +1,6 @@
+{
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
+  Preconditions.checkArgument(paymentMethodId != null || paymentOptions.isExternalPayment());
+  final UUID nonNulPaymentMethodId=(paymentMethodId != null) ? paymentMethodId : paymentMethodProcessor.createOrGetExternalPaymentMethod(account,properties,callContext,internalCallContext);
+  return pluginControlledPaymentProcessor.createPurchase(true,account,nonNulPaymentMethodId,directPaymentId,amount,currency,directPaymentExternalKey,directPaymentTransactionExternalKey,properties,paymentOptions.getPaymentControlPluginName(),callContext,internalCallContext);
+}

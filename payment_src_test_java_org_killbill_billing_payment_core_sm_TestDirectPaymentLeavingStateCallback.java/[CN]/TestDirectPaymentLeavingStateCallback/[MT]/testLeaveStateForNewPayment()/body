@@ -1,0 +1,9 @@
+{
+  setUp(null);
+  callback.leavingState(state);
+  verifyDirectPaymentTransaction();
+  final DirectPaymentModelDao directPayment=paymentDao.getDirectPayment(directPaymentStateContext.getDirectPaymentTransactionModelDao().getDirectPaymentId(),internalCallContext);
+  Assert.assertEquals(directPayment.getExternalKey(),directPaymentStateContext.getDirectPaymentExternalKey());
+  Assert.assertNull(directPayment.getCurrentStateName());
+  Assert.assertEquals(paymentDao.getDirectTransactionsForDirectPayment(directPayment.getId(),internalCallContext).size(),1);
+}

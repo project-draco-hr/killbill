@@ -1,19 +1,7 @@
 {
-  final DirectPaymentModelDao paymentModelDao=paymentDao.getDirectPayment(directPaymentId,tenantContext);
+  final DirectPaymentModelDao paymentModelDao=paymentDao.getDirectPayment(directPaymentId,internalTenantContext);
   if (paymentModelDao == null) {
     return null;
   }
-  final InternalTenantContext tenantContextWithAccountRecordId=internalCallContextFactory.createInternalTenantContext(paymentModelDao.getAccountId(),tenantContext);
-  final List<DirectPaymentTransactionModelDao> transactionsForAccount=paymentDao.getDirectTransactionsForAccount(paymentModelDao.getAccountId(),tenantContextWithAccountRecordId);
-  final PaymentPluginApi plugin=withPluginInfo ? getPaymentProviderPlugin(paymentModelDao.getPaymentMethodId(),tenantContext) : null;
-  PaymentInfoPlugin pluginInfo=null;
-  if (plugin != null) {
-    try {
-      pluginInfo=plugin.getPaymentInfo(paymentModelDao.getAccountId(),directPaymentId,properties,context);
-    }
- catch (    final PaymentPluginApiException e) {
-      throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_GET_PAYMENT_INFO,directPaymentId,e.toString());
-    }
-  }
-  return toDirectPayment(paymentModelDao,transactionsForAccount,pluginInfo);
+  return getDirectPayment(paymentModelDao,withPluginInfo,properties,tenantContext,internalTenantContext);
 }

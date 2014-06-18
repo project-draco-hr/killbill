@@ -1,0 +1,34 @@
+{
+  final String directPaymentExternalKey=UUID.randomUUID().toString();
+  final String authorizationKey=UUID.randomUUID().toString();
+  final DirectPayment authorization=directPaymentProcessor.createAuthorization(account,null,null,TEN,CURRENCY,directPaymentExternalKey,authorizationKey,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  verifyDirectPayment(authorization,directPaymentExternalKey,TEN,ZERO,ZERO,1);
+  final UUID directPaymentId=authorization.getId();
+  verifyDirectPaymentTransaction(authorization.getTransactions().get(0),authorizationKey,TransactionType.AUTHORIZE,TEN,directPaymentId);
+  paymentBusListener.verify(1,account.getId(),directPaymentId,TEN);
+  final String authorizationPost3DSKey=UUID.randomUUID().toString();
+  final DirectPayment authorizationPost3DS=directPaymentProcessor.createAuthorization(account,null,directPaymentId,TEN,CURRENCY,directPaymentExternalKey,authorizationPost3DSKey,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  verifyDirectPayment(authorizationPost3DS,directPaymentExternalKey,TEN,ZERO,ZERO,2);
+  verifyDirectPaymentTransaction(authorizationPost3DS.getTransactions().get(1),authorizationPost3DSKey,TransactionType.AUTHORIZE,TEN,directPaymentId);
+  paymentBusListener.verify(2,account.getId(),directPaymentId,TEN);
+  final String capture1Key=UUID.randomUUID().toString();
+  final DirectPayment partialCapture1=directPaymentProcessor.createCapture(account,directPaymentId,FIVE,CURRENCY,capture1Key,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  verifyDirectPayment(partialCapture1,directPaymentExternalKey,TEN,FIVE,ZERO,3);
+  verifyDirectPaymentTransaction(partialCapture1.getTransactions().get(2),capture1Key,TransactionType.CAPTURE,FIVE,directPaymentId);
+  paymentBusListener.verify(3,account.getId(),directPaymentId,FIVE);
+  final String capture2Key=UUID.randomUUID().toString();
+  final DirectPayment partialCapture2=directPaymentProcessor.createCapture(account,directPaymentId,FIVE,CURRENCY,capture2Key,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  verifyDirectPayment(partialCapture2,directPaymentExternalKey,TEN,TEN,ZERO,4);
+  verifyDirectPaymentTransaction(partialCapture2.getTransactions().get(3),capture2Key,TransactionType.CAPTURE,FIVE,directPaymentId);
+  paymentBusListener.verify(4,account.getId(),directPaymentId,FIVE);
+  final String refund1Key=UUID.randomUUID().toString();
+  final DirectPayment partialRefund1=directPaymentProcessor.createRefund(account,directPaymentId,FIVE,CURRENCY,refund1Key,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  verifyDirectPayment(partialRefund1,directPaymentExternalKey,TEN,TEN,FIVE,5);
+  verifyDirectPaymentTransaction(partialRefund1.getTransactions().get(4),refund1Key,TransactionType.REFUND,FIVE,directPaymentId);
+  paymentBusListener.verify(5,account.getId(),directPaymentId,FIVE);
+  final String refund2Key=UUID.randomUUID().toString();
+  final DirectPayment partialRefund2=directPaymentProcessor.createRefund(account,directPaymentId,FIVE,CURRENCY,refund2Key,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  verifyDirectPayment(partialRefund2,directPaymentExternalKey,TEN,TEN,TEN,6);
+  verifyDirectPaymentTransaction(partialRefund2.getTransactions().get(5),refund2Key,TransactionType.REFUND,FIVE,directPaymentId);
+  paymentBusListener.verify(6,account.getId(),directPaymentId,FIVE);
+}

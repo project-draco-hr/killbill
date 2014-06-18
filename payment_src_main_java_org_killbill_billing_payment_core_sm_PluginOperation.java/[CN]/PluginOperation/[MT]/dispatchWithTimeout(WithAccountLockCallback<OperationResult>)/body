@@ -1,0 +1,23 @@
+{
+  final Account account=directPaymentStateContext.getAccount();
+  logger.debug("Dispatching plugin call for account {}",account.getExternalKey());
+  try {
+    final Callable<OperationResult> task=new CallableWithAccountLock<OperationResult>(locker,account.getExternalKey(),callback);
+    final OperationResult operationResult=paymentPluginDispatcher.dispatchWithTimeout(task);
+    logger.debug("Successful plugin call for account {} with result {}",account.getExternalKey(),operationResult);
+    return operationResult;
+  }
+ catch (  final PaymentApiException e) {
+    final Throwable realException=Objects.firstNonNull(e.getCause(),e);
+    logger.warn("Unsuccessful plugin call for account {}",account.getExternalKey(),realException);
+    throw new OperationException(realException,OperationResult.FAILURE);
+  }
+catch (  final TimeoutException e) {
+    logger.error("Plugin call TIMEOUT for account {}: {}",account.getExternalKey(),e.getMessage());
+    throw new OperationException(e,OperationResult.EXCEPTION);
+  }
+catch (  final RuntimeException e) {
+    logger.warn("Plugin call threw an exception for account {}",account.getExternalKey(),e);
+    throw new OperationException(e,OperationResult.EXCEPTION);
+  }
+}

@@ -1,7 +1,7 @@
 {
   final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
   final TenantContext tenantContext=context.createContext(request);
-  final Refund refund=paymentApi.getRefund(UUID.fromString(refundId),false,pluginProperties,tenantContext);
+  final DirectPayment refund=paymentApi.getRefund(UUID.fromString(refundId),false,pluginProperties,tenantContext);
   final List<AuditLog> auditLogs=auditUserApi.getAuditLogs(refund.getId(),ObjectType.REFUND,auditMode.getLevel(),tenantContext);
   return Response.status(Status.OK).entity(new RefundJson(refund,null,auditLogs)).build();
 }

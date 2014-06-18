@@ -1,0 +1,28 @@
+{
+  final InternalCallContext accountCallContext=new InternalCallContext(internalCallContext,(long)accountNb);
+  final DirectPaymentModelDao specifiedFirstDirectPaymentModelDao=generateDirectPaymentModelDao(accountId);
+  final DirectPaymentTransactionModelDao specifiedFirstDirectPaymentTransactionModelDao=generateDirectPaymentTransactionModelDao(specifiedFirstDirectPaymentModelDao.getId());
+  final DirectPaymentModelDao firstDirectPaymentModelDao=paymentDao.insertDirectPaymentWithFirstTransaction(specifiedFirstDirectPaymentModelDao,specifiedFirstDirectPaymentTransactionModelDao,accountCallContext);
+  verifyDirectPayment(firstDirectPaymentModelDao,specifiedFirstDirectPaymentModelDao);
+  verifyDirectPaymentAndTransactions(accountCallContext,specifiedFirstDirectPaymentModelDao,specifiedFirstDirectPaymentTransactionModelDao);
+  final DirectPaymentTransactionModelDao specifiedSecondDirectPaymentTransactionModelDao=generateDirectPaymentTransactionModelDao(specifiedFirstDirectPaymentModelDao.getId());
+  final DirectPaymentTransactionModelDao secondDirectTransactionModelDao=paymentDao.updateDirectPaymentWithNewTransaction(specifiedFirstDirectPaymentTransactionModelDao.getDirectPaymentId(),specifiedSecondDirectPaymentTransactionModelDao,accountCallContext);
+  verifyDirectPaymentTransaction(secondDirectTransactionModelDao,specifiedSecondDirectPaymentTransactionModelDao);
+  verifyDirectPaymentAndTransactions(accountCallContext,specifiedFirstDirectPaymentModelDao,specifiedFirstDirectPaymentTransactionModelDao,specifiedSecondDirectPaymentTransactionModelDao);
+  final BigDecimal processedAmount=new BigDecimal("902341.23232");
+  final Currency processedCurrency=Currency.USD;
+  final String gatewayErrorCode=UUID.randomUUID().toString().substring(0,5);
+  final String gatewayErrorMsg=UUID.randomUUID().toString();
+  paymentDao.updateDirectPaymentAndTransactionOnCompletion(specifiedSecondDirectPaymentTransactionModelDao.getDirectPaymentId(),"SOME_ERRORED_STATE",specifiedSecondDirectPaymentTransactionModelDao.getId(),PaymentStatus.PAYMENT_FAILURE_ABORTED,processedAmount,processedCurrency,gatewayErrorCode,gatewayErrorMsg,accountCallContext);
+  final DirectPaymentTransactionModelDao updatedSecondDirectPaymentTransactionModelDao=paymentDao.getDirectPaymentTransaction(specifiedSecondDirectPaymentTransactionModelDao.getId(),accountCallContext);
+  Assert.assertEquals(updatedSecondDirectPaymentTransactionModelDao.getPaymentStatus(),PaymentStatus.PAYMENT_FAILURE_ABORTED);
+  Assert.assertEquals(updatedSecondDirectPaymentTransactionModelDao.getGatewayErrorMsg(),gatewayErrorMsg);
+  Assert.assertEquals(updatedSecondDirectPaymentTransactionModelDao.getGatewayErrorMsg(),gatewayErrorMsg);
+  for (int i=0; i < 3; i++) {
+    final DirectPaymentModelDao directPaymentModelDao=generateDirectPaymentModelDao(accountId);
+    final DirectPaymentTransactionModelDao directPaymentTransactionModelDao=generateDirectPaymentTransactionModelDao(directPaymentModelDao.getId());
+    final DirectPaymentModelDao insertedDirectPaymentModelDao=paymentDao.insertDirectPaymentWithFirstTransaction(directPaymentModelDao,directPaymentTransactionModelDao,accountCallContext);
+    verifyDirectPayment(insertedDirectPaymentModelDao,directPaymentModelDao);
+  }
+  Assert.assertEquals(paymentDao.getDirectPaymentsForAccount(specifiedFirstDirectPaymentModelDao.getAccountId(),accountCallContext).size(),4);
+}

@@ -1,0 +1,19 @@
+{
+  super.beforeClass();
+  account=testHelper.createTestAccount("lolo@gmail.com",false);
+  Mockito.when(accountInternalApi.getAccountById(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(account);
+  final UUID uuid=UUID.randomUUID();
+  retryPluginRegistry.registerService(new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getRegistrationName(){
+      return MockPaymentControlProviderPlugin.PLUGIN_NAME;
+    }
+  }
+,mockRetryProviderPlugin);
+  runner=new MockRetryableDirectPaymentAutomatonRunner(stateMachineConfig,retryStateMachineConfig,paymentDao,locker,pluginRegistry,retryPluginRegistry,clock,tagApi,directPaymentProcessor,retryServiceScheduler,paymentConfig,executor);
+  directPaymentStateContext=new RetryableDirectPaymentStateContext(MockPaymentControlProviderPlugin.PLUGIN_NAME,true,null,directPaymentExternalKey,directPaymentTransactionExternalKey,TransactionType.AUTHORIZE,account,paymentMethodId,amount,currency,emptyProperties,internalCallContext,callContext);
+  mockRetryAuthorizeOperationCallback=new MockRetryAuthorizeOperationCallback(locker,runner.getPaymentPluginDispatcher(),directPaymentStateContext,null,runner.getRetryPluginRegistry(),paymentDao,clock);
+  processor=new PluginControlledPaymentProcessor(pluginRegistry,accountInternalApi,null,tagApi,paymentDao,nonEntityDao,eventBus,locker,executor,runner,clock);
+}

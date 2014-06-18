@@ -1,7 +1,7 @@
 {
   final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
   final TenantContext tenantContext=context.createContext(request);
-  final Pagination<Refund> refunds;
+  final Pagination<DirectPayment> refunds;
   if (Strings.isNullOrEmpty(pluginName)) {
     refunds=paymentApi.getRefunds(offset,limit,pluginProperties,tenantContext);
   }
@@ -11,16 +11,16 @@
   final URI nextPageUri=uriBuilder.nextPage(RefundResource.class,"getRefunds",refunds.getNextOffset(),limit,ImmutableMap.<String,String>of(QUERY_PAYMENT_METHOD_PLUGIN_NAME,Strings.nullToEmpty(pluginName),QUERY_AUDIT,auditMode.getLevel().toString()));
   final AtomicReference<Map<UUID,AccountAuditLogs>> accountsAuditLogs=new AtomicReference<Map<UUID,AccountAuditLogs>>(new HashMap<UUID,AccountAuditLogs>());
   final Map<UUID,UUID> paymentIdAccountIdMappings=new HashMap<UUID,UUID>();
-  return buildStreamingPaginationResponse(refunds,new Function<Refund,RefundJson>(){
-    @Override public RefundJson apply(    final Refund refund){
+  return buildStreamingPaginationResponse(refunds,new Function<DirectPayment,RefundJson>(){
+    @Override public RefundJson apply(    final DirectPayment refund){
       UUID kbAccountId=null;
-      if (!AuditLevel.NONE.equals(auditMode.getLevel()) && paymentIdAccountIdMappings.get(refund.getPaymentId()) == null) {
+      if (!AuditLevel.NONE.equals(auditMode.getLevel()) && paymentIdAccountIdMappings.get(refund.getId()) == null) {
         try {
-          kbAccountId=paymentApi.getPayment(refund.getPaymentId(),false,pluginProperties,tenantContext).getAccountId();
-          paymentIdAccountIdMappings.put(refund.getPaymentId(),kbAccountId);
+          kbAccountId=paymentApi.getPayment(refund.getId(),false,pluginProperties,tenantContext).getAccountId();
+          paymentIdAccountIdMappings.put(refund.getId(),kbAccountId);
         }
  catch (        final PaymentApiException e) {
-          log.warn("Unable to retrieve payment for id " + refund.getPaymentId());
+          log.warn("Unable to retrieve payment for id " + refund.getId());
         }
       }
       if (accountsAuditLogs.get().get(kbAccountId) == null) {

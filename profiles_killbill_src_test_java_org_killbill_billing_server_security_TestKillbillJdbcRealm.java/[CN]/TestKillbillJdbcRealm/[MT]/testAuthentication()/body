@@ -1,0 +1,27 @@
+{
+  final DelegatingSubject subject=new DelegatingSubject(securityManager);
+  final AuthenticationToken goodToken=new UsernamePasswordToken(tenant.getApiKey(),tenant.getApiSecret());
+  try {
+    securityManager.login(subject,goodToken);
+    Assert.assertTrue(true);
+  }
+ catch (  final AuthenticationException e) {
+    Assert.fail();
+  }
+  final AuthenticationToken badPasswordToken=new UsernamePasswordToken(tenant.getApiKey(),tenant.getApiSecret() + "T");
+  try {
+    securityManager.login(subject,badPasswordToken);
+    Assert.fail();
+  }
+ catch (  final AuthenticationException e) {
+    Assert.assertTrue(true);
+  }
+  final AuthenticationToken badLoginToken=new UsernamePasswordToken(tenant.getApiKey() + "U",tenant.getApiSecret());
+  try {
+    securityManager.login(subject,badLoginToken);
+    Assert.fail();
+  }
+ catch (  final AuthenticationException e) {
+    Assert.assertTrue(true);
+  }
+}

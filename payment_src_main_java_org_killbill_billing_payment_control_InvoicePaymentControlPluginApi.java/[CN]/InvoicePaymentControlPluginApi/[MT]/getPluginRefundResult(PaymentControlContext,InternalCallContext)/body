@@ -1,0 +1,18 @@
+{
+  final Map<UUID,BigDecimal> idWithAmount=extractIdsWithAmountFromProperties(paymentControlPluginContext.getPluginProperties());
+  if ((paymentControlPluginContext.getAmount() == null || paymentControlPluginContext.getAmount().compareTo(BigDecimal.ZERO) == 0) && idWithAmount.size() == 0) {
+    throw new PaymentControlApiException("Refund for payment, key = " + paymentControlPluginContext.getPaymentExternalKey() + " aborted: requested refund amount is = "+ paymentControlPluginContext.getAmount());
+  }
+  final DirectPaymentModelDao directPayment=paymentDao.getDirectPayment(paymentControlPluginContext.getPaymentId(),internalContext);
+  if (directPayment == null) {
+    throw new UnknownEntryException();
+  }
+  final BigDecimal amountToBeRefunded=computeRefundAmount(directPayment.getId(),paymentControlPluginContext.getAmount(),idWithAmount,internalContext);
+  final boolean isAborted=amountToBeRefunded.compareTo(BigDecimal.ZERO) == 0;
+  if (paymentControlPluginContext.isApiPayment() && isAborted) {
+    throw new PaymentControlApiException("Refund for payment " + directPayment.getId() + " aborted : invoice item sum amount is "+ amountToBeRefunded+ ", requested refund amount is = "+ paymentControlPluginContext.getAmount());
+  }
+ else {
+    return new DefaultPriorPaymentControlResult(isAborted,amountToBeRefunded);
+  }
+}

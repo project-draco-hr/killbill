@@ -1,0 +1,10 @@
+{
+  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(paymentControlContext.getAccount().getId(),paymentControlContext);
+switch (paymentControlContext.getTransactionType()) {
+case PURCHASE:
+    final DateTime nextRetryDate=computeNextRetryDate(paymentControlContext.getPaymentExternalKey(),paymentControlContext.isApiPayment(),internalContext);
+  return new DefaultFailureCallResult(nextRetryDate);
+default :
+return new DefaultFailureCallResult(null);
+}
+}

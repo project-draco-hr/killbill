@@ -1,0 +1,8 @@
+{
+  final InternalCallContext callContext=internalCallContextFactory.createInternalCallContext(account.getId(),context);
+  final List<PaymentMethod> paymentMethods=new LinkedList<PaymentMethod>();
+  for (  final String pluginName : paymentMethodProcessor.getAvailablePlugins()) {
+    paymentMethods.addAll(paymentMethodProcessor.refreshPaymentMethods(pluginName,account,properties,context,callContext));
+  }
+  return paymentMethods;
+}

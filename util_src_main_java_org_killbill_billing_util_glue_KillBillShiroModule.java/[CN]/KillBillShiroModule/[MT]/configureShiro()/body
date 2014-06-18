@@ -1,5 +1,10 @@
 {
-  final RbacConfig config=new ConfigurationObjectFactory(configSource).build(RbacConfig.class);
+  final RbacConfig config=new ConfigurationObjectFactory(new ConfigSource(){
+    @Override public String getString(    final String propertyName){
+      return configSource.getString(propertyName);
+    }
+  }
+).build(RbacConfig.class);
   bind(RbacConfig.class).toInstance(config);
   bindRealm().toProvider(IniRealmProvider.class).asEagerSingleton();
   if (isLDAPEnabled()) {

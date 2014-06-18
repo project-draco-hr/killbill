@@ -1,0 +1,24 @@
+{
+  final DefaultPaymentControlProviderPluginRegistry pluginRegistry=new DefaultPaymentControlProviderPluginRegistry(paymentConfig);
+  final OSGIServiceDescriptor desc=new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getRegistrationName(){
+      return DefaultPaymentControlProviderPlugin.PLUGIN_NAME;
+    }
+  }
+;
+  pluginRegistry.registerService(desc,externalPaymentControlProviderPlugin);
+  final OSGIServiceDescriptor desc2=new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getRegistrationName(){
+      return InvoicePaymentControlPluginApi.PLUGIN_NAME;
+    }
+  }
+;
+  pluginRegistry.registerService(desc2,invoicePaymentControlPlugin);
+  return pluginRegistry;
+}

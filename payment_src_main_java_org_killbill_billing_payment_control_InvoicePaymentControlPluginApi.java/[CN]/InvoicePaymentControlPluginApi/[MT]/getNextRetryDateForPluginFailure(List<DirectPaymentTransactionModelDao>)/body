@@ -1,0 +1,14 @@
+{
+  DateTime result=null;
+  final int attemptsInState=getNumberAttemptsInState(purchasedTransactions,PaymentStatus.PLUGIN_FAILURE_ABORTED);
+  final int retryAttempt=(attemptsInState - 1) >= 0 ? (attemptsInState - 1) : 0;
+  if (retryAttempt < paymentConfig.getPluginFailureRetryMaxAttempts()) {
+    int nbSec=paymentConfig.getPluginFailureRetryStart();
+    int remainingAttempts=retryAttempt;
+    while (--remainingAttempts > 0) {
+      nbSec=nbSec * paymentConfig.getPluginFailureRetryMultiplier();
+    }
+    result=clock.getUTCNow().plusSeconds(nbSec);
+  }
+  return result;
+}

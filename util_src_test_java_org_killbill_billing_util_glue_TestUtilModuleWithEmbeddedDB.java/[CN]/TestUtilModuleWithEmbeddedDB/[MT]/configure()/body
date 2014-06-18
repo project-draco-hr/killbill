@@ -1,13 +1,10 @@
 {
   super.configure();
-  install(new GuicyKillbillTestWithEmbeddedDBModule());
-  install(new AuditModule());
-  install(new TagStoreModule());
-  install(new CustomFieldModule());
-  install(new MetricsModule());
-  install(new BusModule(configSource));
-  install(new NotificationQueueModule(configSource));
-  install(new NonEntityDaoModule());
-  install(new GlobalLockerModule(DBTestingHelper.get().getDBEngine()));
+  install(new GuicyKillbillTestWithEmbeddedDBModule(configSource));
+  install(new AuditModule(configSource));
+  install(new TagStoreModule(configSource));
+  install(new CustomFieldModule(configSource));
+  install(new NonEntityDaoModule(configSource));
+  install(new GlobalLockerModule(DBTestingHelper.get().getInstance().getDBEngine(),configSource));
   bind(TestApiListener.class).asEagerSingleton();
 }

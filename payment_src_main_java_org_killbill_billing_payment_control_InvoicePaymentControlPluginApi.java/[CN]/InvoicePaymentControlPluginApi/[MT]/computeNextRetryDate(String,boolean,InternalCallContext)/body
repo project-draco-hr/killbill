@@ -1,0 +1,19 @@
+{
+  if (isApiAPayment) {
+    return null;
+  }
+  final List<DirectPaymentTransactionModelDao> purchasedTransactions=getPurchasedTransactions(paymentExternalKey,internalContext);
+  if (purchasedTransactions.size() == 0) {
+    return null;
+  }
+  final DirectPaymentTransactionModelDao lastTransaction=purchasedTransactions.get(purchasedTransactions.size() - 1);
+switch (lastTransaction.getPaymentStatus()) {
+case PAYMENT_FAILURE_ABORTED:
+    return getNextRetryDateForPaymentFailure(purchasedTransactions);
+case UNKNOWN:
+case PLUGIN_FAILURE_ABORTED:
+  return getNextRetryDateForPluginFailure(purchasedTransactions);
+default :
+return null;
+}
+}

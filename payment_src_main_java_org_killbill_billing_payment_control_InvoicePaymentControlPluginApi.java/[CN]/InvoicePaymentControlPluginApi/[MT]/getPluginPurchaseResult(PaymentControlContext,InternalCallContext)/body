@@ -1,0 +1,17 @@
+{
+  final UUID invoiceId=UUID.fromString(paymentControlPluginContext.getPaymentExternalKey());
+  try {
+    final Invoice invoice=rebalanceAndGetInvoice(invoiceId,internalContext);
+    final BigDecimal requestedAmount=validateAndComputePaymentAmount(invoice,paymentControlPluginContext.getAmount(),paymentControlPluginContext.isApiPayment());
+    final boolean isAborted=requestedAmount.compareTo(BigDecimal.ZERO) == 0;
+    if (paymentControlPluginContext.isApiPayment() && isAborted) {
+      throw new PaymentControlApiException("Payment for invoice " + invoice.getId() + " aborted : invoice balance is = "+ invoice.getBalance()+ ", requested payment amount is = "+ paymentControlPluginContext.getAmount());
+    }
+ else {
+      return new DefaultPriorPaymentControlResult(isAborted,requestedAmount);
+    }
+  }
+ catch (  InvoiceApiException e) {
+    throw new UnknownEntryException();
+  }
+}

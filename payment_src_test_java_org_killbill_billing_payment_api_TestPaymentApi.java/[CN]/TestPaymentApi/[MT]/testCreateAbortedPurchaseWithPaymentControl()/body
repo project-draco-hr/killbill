@@ -1,0 +1,17 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  final UUID subscriptionId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final LocalDate now=clock.getUTCToday();
+  final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
+  final String paymentExternalKey=invoice.getId().toString();
+  final String transactionExternalKey="brrrrrr";
+  invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),BigDecimal.ONE,new BigDecimal("1.0"),Currency.USD));
+  try {
+    paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),INVOICE_PAYMENT,callContext);
+    Assert.fail("Unexpected success");
+  }
+ catch (  PaymentApiException e) {
+    assertTrue(e.getCause() instanceof PaymentControlApiException);
+  }
+}

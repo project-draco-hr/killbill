@@ -1,0 +1,13 @@
+{
+  final Account account=Mockito.mock(Account.class);
+  Mockito.when(account.getId()).thenReturn(UUID.randomUUID());
+  directPaymentStateContext=new DirectPaymentStateContext(directPaymentId,UUID.randomUUID().toString(),UUID.randomUUID().toString(),TransactionType.CAPTURE,account,UUID.randomUUID(),new BigDecimal("192.3920111"),Currency.BRL,false,ImmutableList.<PluginProperty>of(),internalCallContext,callContext);
+  if (directPaymentId != null) {
+    final DirectPaymentModelDao newPaymentModelDao=new DirectPaymentModelDao(directPaymentId,clock.getUTCNow(),clock.getUTCNow(),directPaymentStateContext.getAccount().getId(),directPaymentStateContext.getPaymentMethodId(),1,directPaymentStateContext.getDirectPaymentExternalKey(),null,null);
+    final DirectPaymentTransactionModelDao newPaymentTransactionModelDao=new DirectPaymentTransactionModelDao(clock.getUTCNow(),clock.getUTCNow(),directPaymentStateContext.getDirectPaymentTransactionExternalKey(),directPaymentId,directPaymentStateContext.getTransactionType(),clock.getUTCNow(),PaymentStatus.UNKNOWN,directPaymentStateContext.getAmount(),directPaymentStateContext.getCurrency(),null,null);
+    paymentDao.insertDirectPaymentWithFirstTransaction(newPaymentModelDao,newPaymentTransactionModelDao,internalCallContext);
+  }
+  final DirectPaymentAutomatonDAOHelper daoHelper=new DirectPaymentAutomatonDAOHelper(directPaymentStateContext,clock.getUTCNow(),paymentDao,registry,internalCallContext);
+  callback=new DirectPaymentLeavingStateTestCallback(daoHelper);
+  Mockito.when(state.getName()).thenReturn("NEW_STATE");
+}

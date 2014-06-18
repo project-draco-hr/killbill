@@ -1,0 +1,16 @@
+{
+  if (allTransactions == null || allTransactions.size() == 0) {
+    return 0;
+  }
+  return Collections2.filter(allTransactions,new Predicate<DirectPaymentTransactionModelDao>(){
+    @Override public boolean apply(    final DirectPaymentTransactionModelDao input){
+      for (      final PaymentStatus cur : statuses) {
+        if (input.getPaymentStatus() == cur) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+).size();
+}

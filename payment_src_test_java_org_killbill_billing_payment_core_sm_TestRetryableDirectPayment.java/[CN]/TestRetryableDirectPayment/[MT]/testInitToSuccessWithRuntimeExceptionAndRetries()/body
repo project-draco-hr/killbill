@@ -1,0 +1,15 @@
+{
+  mockRetryProviderPlugin.setAborted(false).setNextRetryDate(new DateTime(clock.getUTCNow().plusDays(1)));
+  mockRetryAuthorizeOperationCallback.setResult(null).setException(new RuntimeException());
+  runner.setOperationCallback(mockRetryAuthorizeOperationCallback).setContext(directPaymentStateContext);
+  try {
+    runner.run(true,TransactionType.AUTHORIZE,account,paymentMethodId,null,directPaymentExternalKey,directPaymentTransactionExternalKey,amount,currency,emptyProperties,null,callContext,internalCallContext);
+    Assert.fail("Expected Exception...");
+  }
+ catch (  PaymentApiException e) {
+    final PaymentAttemptModelDao pa=((MockPaymentDao)paymentDao).getPaymentAttemptByExternalKey(directPaymentTransactionExternalKey,internalCallContext);
+    assertEquals(pa.getTransactionExternalKey(),directPaymentTransactionExternalKey);
+    assertEquals(pa.getStateName(),"ABORTED");
+    assertEquals(pa.getOperationName(),"AUTHORIZE");
+  }
+}

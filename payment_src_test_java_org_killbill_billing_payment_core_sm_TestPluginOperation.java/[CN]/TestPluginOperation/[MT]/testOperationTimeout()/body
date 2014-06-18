@@ -1,0 +1,12 @@
+{
+  final CallbackTest callback=new CallbackTest(Integer.MAX_VALUE);
+  final PluginOperation pluginOperation=getPluginOperation(false,1);
+  try {
+    pluginOperation.dispatchWithTimeout(callback);
+    Assert.fail();
+  }
+ catch (  final OperationException e) {
+    Assert.assertEquals(e.getOperationResult(),OperationResult.EXCEPTION);
+    Assert.assertTrue(e.getCause() instanceof TimeoutException);
+  }
+}

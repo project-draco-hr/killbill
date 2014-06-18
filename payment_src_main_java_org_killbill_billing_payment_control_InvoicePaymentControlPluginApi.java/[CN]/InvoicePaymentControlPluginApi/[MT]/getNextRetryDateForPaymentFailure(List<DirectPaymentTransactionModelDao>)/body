@@ -1,0 +1,18 @@
+{
+  DateTime result=null;
+  final List<Integer> retryDays=paymentConfig.getPaymentRetryDays();
+  final int attemptsInState=getNumberAttemptsInState(purchasedTransactions,PaymentStatus.PAYMENT_FAILURE_ABORTED);
+  final int retryCount=(attemptsInState - 1) >= 0 ? (attemptsInState - 1) : 0;
+  if (retryCount < retryDays.size()) {
+    int retryInDays;
+    final DateTime nextRetryDate=clock.getUTCNow();
+    try {
+      retryInDays=retryDays.get(retryCount);
+      result=nextRetryDate.plusDays(retryInDays);
+    }
+ catch (    NumberFormatException ex) {
+      logger.error("Could not get retry day for retry count {}",retryCount);
+    }
+  }
+  return result;
+}

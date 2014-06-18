@@ -1,0 +1,24 @@
+{
+  final RetryableDirectPaymentStateContext directPaymentStateContext=createContext(isApiPayment,transactionType,account,paymentMethodId,directPaymentId,directPaymentExternalKey,directPaymentTransactionExternalKey,amount,currency,properties,pluginName,callContext,internalCallContext);
+  try {
+    final OperationCallback callback=createOperationCallback(transactionType,directPaymentStateContext);
+    final LeavingStateCallback leavingStateCallback=new RetryLeavingStateCallback(this,directPaymentStateContext,paymentDao,initialState,retriedState,transactionType);
+    final EnteringStateCallback enteringStateCallback=new RetryEnteringStateCallback(this,directPaymentStateContext,retryServiceScheduler);
+    state.runOperation(retryOperation,callback,enteringStateCallback,leavingStateCallback);
+  }
+ catch (  MissingEntryException e) {
+    throw new PaymentApiException(e.getCause(),ErrorCode.PAYMENT_INTERNAL_ERROR,e.getMessage());
+  }
+catch (  OperationException e) {
+    if (e.getCause() == null) {
+      throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,e.getMessage());
+    }
+ else     if (e.getCause() instanceof PaymentApiException) {
+      throw (PaymentApiException)e.getCause();
+    }
+ else {
+      throw new PaymentApiException(e.getCause(),ErrorCode.PAYMENT_INTERNAL_ERROR,e.getMessage());
+    }
+  }
+  return directPaymentStateContext.getResult();
+}

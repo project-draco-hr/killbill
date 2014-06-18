@@ -1,0 +1,35 @@
+{
+  if (shouldSkipFilter(request)) {
+    chain.doFilter(request,response);
+    return;
+  }
+  String apiKey=null;
+  String apiSecret=null;
+  if (request instanceof HttpServletRequest) {
+    final HttpServletRequest httpServletRequest=(HttpServletRequest)request;
+    apiKey=httpServletRequest.getHeader(JaxrsResource.HDR_API_KEY);
+    apiSecret=httpServletRequest.getHeader(JaxrsResource.HDR_API_SECRET);
+  }
+  if (apiKey == null || apiSecret == null) {
+    final String errorMessage=String.format("Make sure to set the %s and %s headers",JaxrsResource.HDR_API_KEY,JaxrsResource.HDR_API_SECRET);
+    sendAuthError(response,errorMessage);
+    return;
+  }
+  final AuthenticationToken token=new UsernamePasswordToken(apiKey,apiSecret);
+  try {
+    modularRealmAuthenticator.authenticate(token);
+  }
+ catch (  final AuthenticationException e) {
+    final String errorMessage=e.getLocalizedMessage();
+    sendAuthError(response,errorMessage);
+    return;
+  }
+  try {
+    final Tenant tenant=tenantUserApi.getTenantByApiKey(apiKey);
+    request.setAttribute(TENANT,tenant);
+    chain.doFilter(request,response);
+  }
+ catch (  final TenantApiException e) {
+    log.warn("Couldn't find the tenant?",e);
+  }
+}

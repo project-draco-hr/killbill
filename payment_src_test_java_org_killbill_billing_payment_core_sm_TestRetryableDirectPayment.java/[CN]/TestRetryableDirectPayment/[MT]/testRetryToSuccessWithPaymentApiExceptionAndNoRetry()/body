@@ -1,0 +1,18 @@
+{
+  mockRetryProviderPlugin.setAborted(false).setNextRetryDate(null);
+  mockRetryAuthorizeOperationCallback.setResult(null).setException(new PaymentApiException(ErrorCode.__UNKNOWN_ERROR_CODE,"bla"));
+  runner.setOperationCallback(mockRetryAuthorizeOperationCallback).setContext(directPaymentStateContext);
+  final State state=runner.fetchState("RETRIED");
+  final UUID directTransactionId=UUID.randomUUID();
+  paymentDao.insertPaymentAttemptWithProperties(new PaymentAttemptModelDao(utcNow,utcNow,directPaymentExternalKey,directTransactionId,directPaymentTransactionExternalKey,state.getName(),TransactionType.AUTHORIZE.name(),null),ImmutableList.<PluginPropertyModelDao>of(),internalCallContext);
+  try {
+    runner.run(state,false,TransactionType.AUTHORIZE,account,paymentMethodId,null,directPaymentExternalKey,directPaymentTransactionExternalKey,amount,currency,emptyProperties,null,callContext,internalCallContext);
+    Assert.fail("Expecting paymentApiException...");
+  }
+ catch (  PaymentApiException e) {
+    final PaymentAttemptModelDao pa=((MockPaymentDao)paymentDao).getPaymentAttemptByExternalKey(directPaymentTransactionExternalKey,internalCallContext);
+    assertEquals(pa.getTransactionExternalKey(),directPaymentTransactionExternalKey);
+    assertEquals(pa.getStateName(),"ABORTED");
+    assertEquals(pa.getOperationName(),"AUTHORIZE");
+  }
+}

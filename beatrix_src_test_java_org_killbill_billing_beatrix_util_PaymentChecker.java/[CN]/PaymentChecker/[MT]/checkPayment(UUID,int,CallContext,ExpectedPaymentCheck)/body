@@ -1,12 +1,6 @@
 {
-  final List<Payment> payments=paymentApi.getAccountPayments(accountId,context);
+  final List<DirectPayment> payments=paymentApi.getAccountPayments(accountId,context);
   Assert.assertEquals(payments.size(),paymentOrderingNumber);
-  final Payment payment=payments.get(paymentOrderingNumber - 1);
-  if (payment.getPaymentStatus() == PaymentStatus.UNKNOWN) {
-    checkPaymentNoAuditForRuntimeException(accountId,payment,context,expected);
-  }
- else {
-    checkPayment(accountId,payment,context,expected);
-  }
+  final DirectPayment payment=payments.get(paymentOrderingNumber - 1);
   return payment;
 }

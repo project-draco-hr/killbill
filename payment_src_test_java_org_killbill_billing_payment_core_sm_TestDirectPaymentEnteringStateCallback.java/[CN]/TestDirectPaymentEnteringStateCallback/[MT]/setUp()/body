@@ -1,0 +1,9 @@
+{
+  final Account account=Mockito.mock(Account.class);
+  Mockito.when(account.getId()).thenReturn(UUID.randomUUID());
+  directPaymentStateContext=new DirectPaymentStateContext(null,UUID.randomUUID().toString(),TransactionType.CAPTURE,account,UUID.randomUUID(),new BigDecimal("192.3920111"),Currency.BRL,false,ImmutableList.<PluginProperty>of(),internalCallContext,callContext);
+  daoHelper=new DirectPaymentAutomatonDAOHelper(directPaymentStateContext,clock.getUTCNow(),paymentDao,registry,internalCallContext);
+  callback=new DirectPaymentEnteringStateTestCallback(daoHelper,directPaymentStateContext);
+  Mockito.when(state.getName()).thenReturn("NEW_STATE");
+  operationResult=OperationResult.SUCCESS;
+}

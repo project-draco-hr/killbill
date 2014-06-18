@@ -1,0 +1,26 @@
+{
+  final OperationCallback callback;
+switch (transactionType) {
+case AUTHORIZE:
+    callback=new RetryAuthorizeOperationCallback(locker,paymentPluginDispatcher,directPaymentStateContext,directPaymentProcessor,paymentControlPluginRegistry);
+  break;
+case CAPTURE:
+callback=new RetryCaptureOperationCallback(locker,paymentPluginDispatcher,directPaymentStateContext,directPaymentProcessor,paymentControlPluginRegistry);
+break;
+case PURCHASE:
+callback=new RetryPurchaseOperationCallback(locker,paymentPluginDispatcher,directPaymentStateContext,directPaymentProcessor,paymentControlPluginRegistry);
+break;
+case VOID:
+callback=new RetryVoidOperationCallback(locker,paymentPluginDispatcher,directPaymentStateContext,directPaymentProcessor,paymentControlPluginRegistry);
+break;
+case CREDIT:
+callback=new RetryCreditOperationCallback(locker,paymentPluginDispatcher,directPaymentStateContext,directPaymentProcessor,paymentControlPluginRegistry);
+break;
+case REFUND:
+callback=new RetryRefundOperationCallback(locker,paymentPluginDispatcher,directPaymentStateContext,directPaymentProcessor,paymentControlPluginRegistry);
+break;
+default :
+throw new IllegalStateException("Unsupported transaction type " + transactionType);
+}
+return callback;
+}

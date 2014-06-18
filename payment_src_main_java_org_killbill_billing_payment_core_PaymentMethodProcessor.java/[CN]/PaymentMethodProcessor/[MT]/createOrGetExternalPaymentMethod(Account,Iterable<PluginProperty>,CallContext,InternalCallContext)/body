@@ -1,0 +1,8 @@
+{
+  PaymentMethod externalPaymentMethod=getExternalPaymentMethod(account,properties,callContext,context);
+  if (externalPaymentMethod != null) {
+    return externalPaymentMethod.getId();
+  }
+  final DefaultNoOpPaymentMethodPlugin props=new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),false,properties);
+  return addPaymentMethod(ExternalPaymentProviderPlugin.PLUGIN_NAME,account,false,props,properties,callContext,context);
+}

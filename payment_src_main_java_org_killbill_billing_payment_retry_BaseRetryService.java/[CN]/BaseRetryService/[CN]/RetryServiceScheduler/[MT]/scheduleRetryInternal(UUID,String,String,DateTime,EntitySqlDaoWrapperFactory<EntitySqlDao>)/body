@@ -1,0 +1,24 @@
+{
+  final InternalCallContext context=createCallContextFromPaymentId(paymentId);
+  try {
+    final NotificationQueue retryQueue=notificationQueueService.getNotificationQueue(DefaultPaymentService.SERVICE_NAME,getQueueName());
+    final NotificationEvent key=new PaymentRetryNotificationKey(transactionExternalKey,pluginName);
+    if (retryQueue != null) {
+      if (transactionalDao == null) {
+        retryQueue.recordFutureNotification(timeOfRetry,key,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+      }
+ else {
+        retryQueue.recordFutureNotificationFromTransaction(transactionalDao.getSqlDao(),timeOfRetry,key,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+      }
+    }
+  }
+ catch (  NoSuchNotificationQueue e) {
+    log.error(String.format("Failed to retrieve notification queue %s:%s",DefaultPaymentService.SERVICE_NAME,getQueueName()));
+    return false;
+  }
+catch (  IOException e) {
+    log.error(String.format("Failed to serialize notificationQueue event for paymentId %s",paymentId));
+    return false;
+  }
+  return true;
+}

@@ -1,0 +1,16 @@
+{
+  final DirectPaymentModelDao payment=paymentDao.getDirectPaymentByExternalKey(paymentExternalKey,internalContext);
+  if (payment == null) {
+    return Collections.emptyList();
+  }
+  final List<DirectPaymentTransactionModelDao> transactions=paymentDao.getDirectTransactionsForDirectPayment(payment.getId(),internalContext);
+  if (transactions == null || transactions.size() == 0) {
+    return Collections.emptyList();
+  }
+  return ImmutableList.copyOf(Iterables.filter(transactions,new Predicate<DirectPaymentTransactionModelDao>(){
+    @Override public boolean apply(    final DirectPaymentTransactionModelDao input){
+      return input.getTransactionType() == TransactionType.PURCHASE;
+    }
+  }
+));
+}

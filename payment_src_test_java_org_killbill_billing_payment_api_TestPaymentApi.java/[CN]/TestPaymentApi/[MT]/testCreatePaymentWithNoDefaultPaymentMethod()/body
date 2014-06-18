@@ -1,18 +1,15 @@
 {
   final LocalDate now=clock.getUTCToday();
-  final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD,callContext);
+  final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
   final UUID subscriptionId=UUID.randomUUID();
   final UUID bundleId=UUID.randomUUID();
   final BigDecimal requestedAmount=BigDecimal.TEN;
   invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),requestedAmount,new BigDecimal("1.0"),Currency.USD));
   try {
-    paymentApi.createPayment(account,invoice.getId(),requestedAmount,ImmutableList.<PluginProperty>of(),callContext);
+    final Account accountNoPaymentMethod=testHelper.createTestAccount("bobo@gmail.com",false);
+    paymentApi.createPurchase(accountNoPaymentMethod,accountNoPaymentMethod.getPaymentMethodId(),null,requestedAmount,Currency.AED,invoice.getId().toString(),"yo",ImmutableList.<PluginProperty>of(),callContext);
   }
  catch (  final PaymentApiException e) {
-    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD.getCode());
+    assertEquals(e.getCode(),ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD.getCode());
   }
-  final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),callContext);
-  Assert.assertEquals(payments.size(),1);
-  final Payment payment=payments.get(0);
-  Assert.assertEquals(payment.getPaymentStatus(),PaymentStatus.PAYMENT_FAILURE_ABORTED);
 }

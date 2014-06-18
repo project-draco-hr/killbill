@@ -1,7 +1,6 @@
 {
-  final List<Payment> payments=paymentProcessor.getInvoicePayments(invoiceId,internalCallContext);
-  assertEquals(payments.size(),1);
-  final Payment payment=payments.get(0);
-  assertEquals(payment.getInvoiceId(),invoiceId);
+  final String paymentExternalKey=invoiceId.toString();
+  final DirectPayment payment=paymentProcessor.getPaymentByExternalKey(paymentExternalKey,false,ImmutableList.<PluginProperty>of(),callContext,internalCallContext);
+  assertEquals(payment.getExternalKey(),paymentExternalKey);
   return payment;
 }

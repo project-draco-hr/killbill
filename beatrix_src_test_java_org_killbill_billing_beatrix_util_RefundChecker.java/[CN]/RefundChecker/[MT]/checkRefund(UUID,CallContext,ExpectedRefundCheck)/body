@@ -1,13 +1,12 @@
 {
-  final List<Refund> refunds=paymentApi.getPaymentRefunds(paymentId,context);
+  final List<DirectPayment> refunds=paymentApi.getPaymentRefunds(paymentId,context);
   Assert.assertEquals(refunds.size(),1);
   final InvoicePayment refundInvoicePayment=getInvoicePaymentEntry(paymentId,InvoicePaymentType.REFUND,context);
   final InvoicePayment invoicePayment=getInvoicePaymentEntry(paymentId,InvoicePaymentType.ATTEMPT,context);
-  final Refund refund=refunds.get(0);
-  Assert.assertEquals(refund.getPaymentId(),expected.getPaymentId());
+  final DirectPayment refund=refunds.get(0);
+  Assert.assertEquals(refund.getId(),expected.getPaymentId());
   Assert.assertEquals(refund.getCurrency(),expected.getCurrency());
-  Assert.assertEquals(refund.isAdjusted(),expected.isAdjusted);
-  Assert.assertEquals(refund.getRefundAmount().compareTo(expected.getRefundAmount()),0);
+  Assert.assertEquals(refund.getRefundedAmount().compareTo(expected.getRefundAmount()),0);
   Assert.assertEquals(refundInvoicePayment.getPaymentId(),paymentId);
   Assert.assertEquals(refundInvoicePayment.getLinkedInvoicePaymentId(),invoicePayment.getId());
   Assert.assertEquals(refundInvoicePayment.getPaymentCookieId(),refund.getId());

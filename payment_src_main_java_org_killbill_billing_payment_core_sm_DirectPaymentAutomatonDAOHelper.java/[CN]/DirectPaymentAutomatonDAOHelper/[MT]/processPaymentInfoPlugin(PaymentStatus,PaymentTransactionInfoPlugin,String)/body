@@ -1,0 +1,8 @@
+{
+  final BigDecimal processedAmount=paymentInfoPlugin == null ? null : paymentInfoPlugin.getAmount();
+  final Currency processedCurrency=paymentInfoPlugin == null ? null : paymentInfoPlugin.getCurrency();
+  final String gatewayErrorCode=paymentInfoPlugin == null ? null : paymentInfoPlugin.getGatewayErrorCode();
+  final String gatewayErrorMsg=paymentInfoPlugin == null ? null : paymentInfoPlugin.getGatewayError();
+  paymentDao.updateDirectPaymentAndTransactionOnCompletion(directPaymentStateContext.getDirectPaymentId(),currentPaymentStateName,directPaymentStateContext.getDirectPaymentTransactionModelDao().getId(),paymentStatus,processedAmount,processedCurrency,gatewayErrorCode,gatewayErrorMsg,internalCallContext);
+  directPaymentStateContext.setDirectPaymentTransactionModelDao(paymentDao.getDirectPaymentTransaction(directPaymentStateContext.getDirectPaymentTransactionModelDao().getId(),internalCallContext));
+}

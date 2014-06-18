@@ -1,0 +1,21 @@
+{
+  Assert.assertEquals(directPayment.getAccountId(),account.getAccountId());
+  Assert.assertEquals(directPayment.getPaymentMethodId(),Objects.firstNonNull(paymentMethodId,account.getPaymentMethodId()));
+  Assert.assertNotNull(directPayment.getDirectPaymentId());
+  Assert.assertNotNull(directPayment.getPaymentNumber());
+  Assert.assertEquals(directPayment.getDirectPaymentExternalKey(),directPaymentExternalKey);
+  Assert.assertEquals(directPayment.getAuthAmount().compareTo(authAmount),0);
+  Assert.assertEquals(directPayment.getCapturedAmount().compareTo(capturedAmount),0);
+  Assert.assertEquals(directPayment.getRefundedAmount().compareTo(refundedAmount),0);
+  Assert.assertEquals(directPayment.getCurrency(),account.getCurrency());
+  Assert.assertEquals(directPayment.getTransactions().size(),nbTransactions);
+  verifyDirectPaymentTransaction(directPayment.getDirectPaymentId(),directPayment.getTransactions().get(0),directPaymentExternalKey,authDirectTransactionExternalKey,account,authAmount,"AUTHORIZE");
+  final DirectPayments directPayments=killBillClient.getDirectPayments();
+  Assert.assertEquals(directPayments.size(),directPaymentNb);
+  Assert.assertEquals(directPayments.get(directPaymentNb - 1),directPayment);
+  final DirectPayment retrievedDirectPayment=killBillClient.getDirectPayment(directPayment.getDirectPaymentId());
+  Assert.assertEquals(retrievedDirectPayment,directPayment);
+  final DirectPayments directPaymentsForAccount=killBillClient.getDirectPaymentsForAccount(account.getAccountId());
+  Assert.assertEquals(directPaymentsForAccount.size(),directPaymentNb);
+  Assert.assertEquals(directPaymentsForAccount.get(directPaymentNb - 1),directPayment);
+}
