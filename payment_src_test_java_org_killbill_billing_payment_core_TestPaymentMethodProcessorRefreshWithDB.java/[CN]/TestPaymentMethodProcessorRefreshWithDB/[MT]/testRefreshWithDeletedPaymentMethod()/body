@@ -2,12 +2,12 @@
   final Account account=testHelper.createTestAccount("super@bar.com",true);
   Assert.assertEquals(getPluginApi().getPaymentMethods(account.getId(),true,PLUGIN_PROPERTIES,callContext).size(),1);
   final UUID firstPmId=account.getPaymentMethodId();
-  final UUID secondPmId=paymentApi.addPaymentMethod(MockPaymentProviderPlugin.PLUGIN_NAME,account,true,new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),false,null),PLUGIN_PROPERTIES,callContext);
+  final UUID secondPmId=paymentApi.addPaymentMethod(account,MockPaymentProviderPlugin.PLUGIN_NAME,true,new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),false,null),PLUGIN_PROPERTIES,callContext);
   Assert.assertEquals(getPluginApi().getPaymentMethods(account.getId(),true,PLUGIN_PROPERTIES,callContext).size(),2);
-  Assert.assertEquals(paymentApi.getPaymentMethods(account,false,PLUGIN_PROPERTIES,callContext).size(),2);
+  Assert.assertEquals(paymentApi.getAccountPaymentMethods(account.getId(),false,PLUGIN_PROPERTIES,callContext).size(),2);
   getPluginApi().deletePaymentMethod(account.getId(),secondPmId,PLUGIN_PROPERTIES,callContext);
   Assert.assertEquals(getPluginApi().getPaymentMethods(account.getId(),true,PLUGIN_PROPERTIES,callContext).size(),1);
-  Assert.assertEquals(paymentApi.getPaymentMethods(account,false,PLUGIN_PROPERTIES,callContext).size(),2);
+  Assert.assertEquals(paymentApi.getAccountPaymentMethods(account.getId(),false,PLUGIN_PROPERTIES,callContext).size(),2);
   final List<PaymentMethod> methods=paymentMethodProcessor.refreshPaymentMethods(MockPaymentProviderPlugin.PLUGIN_NAME,account,PLUGIN_PROPERTIES,callContext,internalCallContext);
   Assert.assertEquals(methods.size(),1);
   checkPaymentMethodExistsWithStatus(methods,firstPmId,true);

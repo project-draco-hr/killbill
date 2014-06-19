@@ -1,0 +1,24 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID paymentUuid=UUID.fromString(paymentId);
+  final DirectPayment payment=paymentApi.getPayment(paymentUuid,false,pluginProperties,callContext);
+  final Account account=accountUserApi.getAccountById(payment.getAccountId(),callContext);
+  final DirectPayment result;
+  if (json.isAdjusted()) {
+    if (json.getAdjustments() != null && json.getAdjustments().size() > 0) {
+      final Map<UUID,BigDecimal> adjustments=new HashMap<UUID,BigDecimal>();
+      for (      final InvoiceItemJson item : json.getAdjustments()) {
+        adjustments.put(UUID.fromString(item.getInvoiceItemId()),item.getAmount());
+      }
+      result=null;
+    }
+ else {
+      result=null;
+    }
+  }
+ else {
+    result=null;
+  }
+  return null;
+}

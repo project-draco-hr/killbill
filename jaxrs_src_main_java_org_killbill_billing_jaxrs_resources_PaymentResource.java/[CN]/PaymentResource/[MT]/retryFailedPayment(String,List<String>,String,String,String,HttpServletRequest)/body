@@ -1,9 +1,0 @@
-{
-  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
-  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  final UUID paymentId=UUID.fromString(paymentIdString);
-  final DirectPayment payment=paymentApi.getPayment(paymentId,false,pluginProperties,callContext);
-  final Account account=accountUserApi.getAccountById(payment.getAccountId(),callContext);
-  final DirectPayment newPayment=paymentApi.retryPayment(account,paymentId,pluginProperties,callContext);
-  return Response.status(Status.OK).entity(new PaymentJson(newPayment,null)).build();
-}

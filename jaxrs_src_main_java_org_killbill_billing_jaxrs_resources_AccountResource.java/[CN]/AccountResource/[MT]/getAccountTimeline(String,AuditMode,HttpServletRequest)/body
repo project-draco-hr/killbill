@@ -3,8 +3,8 @@
   final UUID accountId=UUID.fromString(accountIdString);
   final Account account=accountUserApi.getAccountById(accountId,tenantContext);
   final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId(),tenantContext);
-  final List<DirectPayment> payments=paymentApi.getAccountPayments(accountId,tenantContext);
-  final List<DirectPayment> refunds=paymentApi.getAccountRefunds(account,tenantContext);
+  final List<DirectPayment> payments=paymentApi.getAccountPayments(accountId,false,ImmutableList.<PluginProperty>of(),tenantContext);
+  final List<DirectPayment> refunds=null;
   final Multimap<UUID,DirectPayment> refundsByPayment=ArrayListMultimap.<UUID,DirectPayment>create();
   for (  final DirectPayment refund : refunds) {
     refundsByPayment.put(refund.getId(),refund);

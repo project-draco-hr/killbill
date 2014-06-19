@@ -8,10 +8,9 @@
   if (payAllUnpaidInvoices && unpaidInvoices.size() > 0 && !hasDefaultPaymentMethod) {
     return Response.status(Status.BAD_REQUEST).build();
   }
-  final UUID paymentMethodId=paymentApi.addPaymentMethod(data.getPluginName(),account,isDefault,data.getPluginDetail(),pluginProperties,callContext);
+  final UUID paymentMethodId=paymentApi.addPaymentMethod(account,data.getPluginName(),isDefault,data.getPluginDetail(),pluginProperties,callContext);
   if (payAllUnpaidInvoices && unpaidInvoices.size() > 0) {
     for (    final Invoice invoice : unpaidInvoices) {
-      paymentApi.createPayment(account,invoice.getId(),invoice.getBalance(),pluginProperties,callContext);
     }
   }
   return uriBuilder.buildResponse(PaymentMethodResource.class,"getPaymentMethod",paymentMethodId,uriInfo.getBaseUri().toString());

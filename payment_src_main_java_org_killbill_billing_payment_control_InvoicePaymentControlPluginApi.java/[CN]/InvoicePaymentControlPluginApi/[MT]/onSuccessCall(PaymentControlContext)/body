@@ -1,0 +1,10 @@
+{
+  final UUID invoiceId=UUID.fromString(paymentControlContext.getPaymentExternalKey());
+  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(paymentControlContext.getAccountId(),paymentControlContext);
+  try {
+    invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),internalContext);
+  }
+ catch (  InvoiceApiException e) {
+    logger.error("Invoice " + invoiceId + " seems missing",e);
+  }
+}
