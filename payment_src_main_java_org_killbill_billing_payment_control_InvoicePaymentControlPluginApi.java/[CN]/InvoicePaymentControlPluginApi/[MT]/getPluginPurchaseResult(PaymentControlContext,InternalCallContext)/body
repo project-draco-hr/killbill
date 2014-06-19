@@ -1,6 +1,6 @@
 {
-  final UUID invoiceId=UUID.fromString(paymentControlPluginContext.getPaymentExternalKey());
   try {
+    final UUID invoiceId=UUID.fromString(paymentControlPluginContext.getPaymentExternalKey());
     final Invoice invoice=rebalanceAndGetInvoice(invoiceId,internalContext);
     final BigDecimal requestedAmount=validateAndComputePaymentAmount(invoice,paymentControlPluginContext.getAmount(),paymentControlPluginContext.isApiPayment());
     final boolean isAborted=requestedAmount.compareTo(BigDecimal.ZERO) == 0;
@@ -12,6 +12,9 @@
     }
   }
  catch (  InvoiceApiException e) {
-    throw new UnknownEntryException();
+    throw new PaymentControlApiException(e);
+  }
+catch (  IllegalArgumentException e) {
+    throw new PaymentControlApiException(e);
   }
 }

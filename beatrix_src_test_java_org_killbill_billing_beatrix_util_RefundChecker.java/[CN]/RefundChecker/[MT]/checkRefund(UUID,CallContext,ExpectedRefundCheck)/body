@@ -4,9 +4,10 @@
   final InvoicePayment refundInvoicePayment=getInvoicePaymentEntry(paymentId,InvoicePaymentType.REFUND,context);
   final InvoicePayment invoicePayment=getInvoicePaymentEntry(paymentId,InvoicePaymentType.ATTEMPT,context);
   final DirectPayment refund=refunds.get(0);
-  Assert.assertEquals(refund.getId(),expected.getPaymentId());
+  final DirectPaymentTransaction refundTransaction=getRefundTransaction(refund);
+  Assert.assertEquals(refundTransaction.getDirectPaymentId(),expected.getPaymentId());
   Assert.assertEquals(refund.getCurrency(),expected.getCurrency());
-  Assert.assertEquals(refund.getRefundedAmount().compareTo(expected.getRefundAmount()),0);
+  Assert.assertEquals(refundTransaction.getAmount().compareTo(expected.getRefundAmount()),0);
   Assert.assertEquals(refundInvoicePayment.getPaymentId(),paymentId);
   Assert.assertEquals(refundInvoicePayment.getLinkedInvoicePaymentId(),invoicePayment.getId());
   Assert.assertEquals(refundInvoicePayment.getPaymentCookieId(),refund.getId());

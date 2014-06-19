@@ -5,7 +5,7 @@
   }
   final DirectPaymentModelDao directPayment=paymentDao.getDirectPayment(paymentControlPluginContext.getPaymentId(),internalContext);
   if (directPayment == null) {
-    throw new UnknownEntryException();
+    throw new PaymentControlApiException();
   }
   final BigDecimal amountToBeRefunded=computeRefundAmount(directPayment.getId(),paymentControlPluginContext.getAmount(),idWithAmount,internalContext);
   final boolean isAborted=amountToBeRefunded.compareTo(BigDecimal.ZERO) == 0;

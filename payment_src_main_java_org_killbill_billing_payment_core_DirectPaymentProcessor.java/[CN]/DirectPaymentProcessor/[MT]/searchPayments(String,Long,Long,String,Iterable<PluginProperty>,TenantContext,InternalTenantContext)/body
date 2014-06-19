@@ -1,17 +1,32 @@
 {
   final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
-  return getEntityPagination(limit,new SourcePaginationBuilder<List<PaymentTransactionInfoPlugin>,PaymentApiException>(){
-    @Override public Pagination<List<PaymentTransactionInfoPlugin>> build() throws PaymentApiException {
-      return null;
+  return getEntityPagination(limit,new SourcePaginationBuilder<PaymentTransactionInfoPlugin,PaymentApiException>(){
+    @Override public Pagination<PaymentTransactionInfoPlugin> build() throws PaymentApiException {
+      try {
+        return pluginApi.searchPayments(searchKey,offset,limit,properties,tenantContext);
+      }
+ catch (      final PaymentPluginApiException e) {
+        throw new PaymentApiException(e,ErrorCode.PAYMENT_PLUGIN_SEARCH_PAYMENTS,pluginName,searchKey);
+      }
     }
   }
-,new Function<List<PaymentTransactionInfoPlugin>,DirectPayment>(){
-    @Override public DirectPayment apply(    final List<PaymentTransactionInfoPlugin> pluginTransactions){
-      if (pluginTransactions.size() == 0) {
+,new Function<PaymentTransactionInfoPlugin,DirectPayment>(){
+    final List<PaymentTransactionInfoPlugin> cachedPaymentTransactions=new LinkedList<PaymentTransactionInfoPlugin>();
+    @Override public DirectPayment apply(    final PaymentTransactionInfoPlugin pluginTransaction){
+      if (pluginTransaction.getKbPaymentId() == null) {
         log.debug("Plugin {} returned a payment without a kbPaymentId for searchKey {}",pluginName,searchKey);
         return null;
       }
-      return toDirectPayment(pluginTransactions.get(0).getKbPaymentId(),pluginTransactions,internalTenantContext);
+      if (cachedPaymentTransactions.isEmpty() || (cachedPaymentTransactions.get(0).getKbPaymentId().equals(pluginTransaction.getKbPaymentId()))) {
+        cachedPaymentTransactions.add(pluginTransaction);
+        return null;
+      }
+ else {
+        final DirectPayment result=toDirectPayment(pluginTransaction.getKbPaymentId(),ImmutableList.<PaymentTransactionInfoPlugin>copyOf(cachedPaymentTransactions),internalTenantContext);
+        cachedPaymentTransactions.clear();
+        cachedPaymentTransactions.add(pluginTransaction);
+        return result;
+      }
     }
   }
 );
