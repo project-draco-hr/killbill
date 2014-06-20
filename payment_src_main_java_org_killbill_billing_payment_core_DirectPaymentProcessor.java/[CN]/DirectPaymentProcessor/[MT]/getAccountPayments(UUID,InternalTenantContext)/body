@@ -1,9 +1,9 @@
 {
-  final List<DirectPaymentModelDao> paymentsModelDao=paymentDao.getDirectPaymentsForAccount(accountId,tenantContext);
-  final List<DirectPaymentTransactionModelDao> transactionsModelDao=paymentDao.getDirectTransactionsForAccount(accountId,tenantContext);
-  return Lists.<DirectPaymentModelDao,DirectPayment>transform(paymentsModelDao,new Function<DirectPaymentModelDao,DirectPayment>(){
-    @Override public DirectPayment apply(    final DirectPaymentModelDao curDirectPaymentModelDao){
-      return toDirectPayment(curDirectPaymentModelDao,transactionsModelDao,null);
+  final List<PaymentModelDao> paymentsModelDao=paymentDao.getDirectPaymentsForAccount(accountId,tenantContext);
+  final List<PaymentTransactionModelDao> transactionsModelDao=paymentDao.getDirectTransactionsForAccount(accountId,tenantContext);
+  return Lists.<PaymentModelDao,DirectPayment>transform(paymentsModelDao,new Function<PaymentModelDao,DirectPayment>(){
+    @Override public DirectPayment apply(    final PaymentModelDao curPaymentModelDao){
+      return toDirectPayment(curPaymentModelDao,transactionsModelDao,null);
     }
   }
 );

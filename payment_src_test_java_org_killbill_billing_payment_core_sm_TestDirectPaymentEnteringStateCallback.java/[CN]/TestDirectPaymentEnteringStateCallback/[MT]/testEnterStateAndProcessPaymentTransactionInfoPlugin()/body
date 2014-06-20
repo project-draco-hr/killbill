@@ -9,7 +9,7 @@
   Mockito.when(paymentInfoPlugin.getGatewayError()).thenReturn(UUID.randomUUID().toString());
   directPaymentStateContext.setPaymentInfoPlugin(paymentInfoPlugin);
   callback.enteringState(state,operationCallback,operationResult,leavingStateCallback);
-  final DirectPaymentTransactionModelDao directPaymentTransaction=paymentDao.getDirectPaymentTransaction(directPaymentStateContext.getDirectPaymentTransactionModelDao().getId(),internalCallContext);
+  final PaymentTransactionModelDao directPaymentTransaction=paymentDao.getDirectPaymentTransaction(directPaymentStateContext.getDirectPaymentTransactionModelDao().getId(),internalCallContext);
   Assert.assertEquals(directPaymentTransaction.getAmount().compareTo(directPaymentStateContext.getAmount()),0);
   Assert.assertEquals(directPaymentTransaction.getCurrency(),directPaymentStateContext.getCurrency());
   Assert.assertEquals(directPaymentTransaction.getProcessedAmount().compareTo(paymentInfoPlugin.getAmount()),0);

@@ -1,0 +1,21 @@
+{
+  final InternalTenantContext tenantContextWithAccountRecordId;
+  if (tenantContext.getAccountRecordId() == null) {
+    tenantContextWithAccountRecordId=internalCallContextFactory.createInternalTenantContext(paymentModelDao.getAccountId(),tenantContext);
+  }
+ else {
+    tenantContextWithAccountRecordId=tenantContext;
+  }
+  final List<PaymentTransactionModelDao> transactionsForDirectPayment=paymentDao.getDirectTransactionsForDirectPayment(paymentModelDao.getId(),tenantContextWithAccountRecordId);
+  final PaymentPluginApi plugin=withPluginInfo ? getPaymentProviderPlugin(paymentModelDao.getPaymentMethodId(),tenantContext) : null;
+  List<PaymentTransactionInfoPlugin> pluginInfo=null;
+  if (plugin != null) {
+    try {
+      pluginInfo=plugin.getPaymentInfo(paymentModelDao.getAccountId(),paymentModelDao.getId(),properties,context);
+    }
+ catch (    final PaymentPluginApiException e) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_GET_PAYMENT_INFO,paymentModelDao.getId(),e.toString());
+    }
+  }
+  return toDirectPayment(paymentModelDao,transactionsForDirectPayment,pluginInfo);
+}

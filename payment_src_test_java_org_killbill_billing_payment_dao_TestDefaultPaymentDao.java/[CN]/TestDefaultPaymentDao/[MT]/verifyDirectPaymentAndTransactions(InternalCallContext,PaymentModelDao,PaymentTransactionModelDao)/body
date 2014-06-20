@@ -1,0 +1,21 @@
+{
+  for (  final PaymentTransactionModelDao specifiedFirstDirectPaymentTransactionModelDao : specifiedFirstDirectPaymentTransactionModelDaos) {
+    final PaymentTransactionModelDao firstDirectTransactionModelDao=paymentDao.getDirectPaymentTransaction(specifiedFirstDirectPaymentTransactionModelDao.getId(),accountCallContext);
+    verifyDirectPaymentTransaction(firstDirectTransactionModelDao,specifiedFirstDirectPaymentTransactionModelDao);
+  }
+  final PaymentModelDao secondPaymentModelDao=paymentDao.getDirectPayment(specifiedFirstPaymentModelDao.getId(),accountCallContext);
+  verifyDirectPayment(secondPaymentModelDao,specifiedFirstPaymentModelDao);
+  final List<PaymentModelDao> paymentsForAccount=paymentDao.getDirectPaymentsForAccount(specifiedFirstPaymentModelDao.getAccountId(),accountCallContext);
+  Assert.assertEquals(paymentsForAccount.size(),1);
+  verifyDirectPayment(paymentsForAccount.get(0),specifiedFirstPaymentModelDao);
+  final List<PaymentTransactionModelDao> transactionsForAccount=paymentDao.getDirectTransactionsForAccount(specifiedFirstPaymentModelDao.getAccountId(),accountCallContext);
+  Assert.assertEquals(transactionsForAccount.size(),specifiedFirstDirectPaymentTransactionModelDaos.length);
+  for (int i=0; i < specifiedFirstDirectPaymentTransactionModelDaos.length; i++) {
+    verifyDirectPaymentTransaction(transactionsForAccount.get(i),specifiedFirstDirectPaymentTransactionModelDaos[i]);
+  }
+  final List<PaymentTransactionModelDao> transactionsForPayment=paymentDao.getDirectTransactionsForDirectPayment(specifiedFirstPaymentModelDao.getId(),accountCallContext);
+  Assert.assertEquals(transactionsForPayment.size(),specifiedFirstDirectPaymentTransactionModelDaos.length);
+  for (int i=0; i < specifiedFirstDirectPaymentTransactionModelDaos.length; i++) {
+    verifyDirectPaymentTransaction(transactionsForPayment.get(i),specifiedFirstDirectPaymentTransactionModelDaos[i]);
+  }
+}
