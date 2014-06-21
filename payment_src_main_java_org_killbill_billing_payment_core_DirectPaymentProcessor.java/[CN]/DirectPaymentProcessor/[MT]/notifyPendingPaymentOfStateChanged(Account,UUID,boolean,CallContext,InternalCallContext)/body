@@ -1,11 +1,11 @@
 {
   final PaymentTransactionModelDao transactionModelDao=paymentDao.getDirectPaymentTransaction(transactionId,internalCallContext);
-  if (transactionModelDao.getPaymentStatus() != PaymentStatus.PENDING) {
+  if (transactionModelDao.getTransactionStatus() != TransactionStatus.PENDING) {
     throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_SUCCESS_PAYMENT,transactionModelDao.getPaymentId());
   }
   final PaymentModelDao paymentModelDao=paymentDao.getDirectPayment(transactionModelDao.getPaymentId(),internalCallContext);
   Preconditions.checkState(paymentModelDao != null);
-  final PaymentStatus newStatus=isSuccess ? PaymentStatus.SUCCESS : PaymentStatus.PAYMENT_FAILURE_ABORTED;
+  final TransactionStatus newStatus=isSuccess ? TransactionStatus.SUCCESS : TransactionStatus.PAYMENT_FAILURE;
   final State currentPaymentState=directPaymentAutomatonRunner.fetchNextState(paymentModelDao.getStateName(),isSuccess);
   paymentDao.updateDirectPaymentAndTransactionOnCompletion(transactionModelDao.getPaymentId(),currentPaymentState.getName(),transactionModelDao.getId(),newStatus,transactionModelDao.getProcessedAmount(),transactionModelDao.getProcessedCurrency(),transactionModelDao.getGatewayErrorCode(),transactionModelDao.getGatewayErrorMsg(),internalCallContext);
 }

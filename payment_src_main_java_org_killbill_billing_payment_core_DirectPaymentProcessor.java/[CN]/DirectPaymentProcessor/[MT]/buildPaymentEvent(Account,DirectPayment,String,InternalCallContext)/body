@@ -5,13 +5,13 @@
     }
   }
 ).get();
-switch (directPaymentTransaction.getPaymentStatus()) {
+switch (directPaymentTransaction.getTransactionStatus()) {
 case SUCCESS:
 case PENDING:
-    return new DefaultPaymentInfoEvent(account.getId(),null,directPayment.getId(),directPaymentTransaction.getAmount(),directPayment.getPaymentNumber(),directPaymentTransaction.getPaymentStatus(),directPaymentTransaction.getEffectiveDate(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
-case PAYMENT_FAILURE_ABORTED:
+    return new DefaultPaymentInfoEvent(account.getId(),null,directPayment.getId(),directPaymentTransaction.getAmount(),directPayment.getPaymentNumber(),directPaymentTransaction.getTransactionStatus(),directPaymentTransaction.getEffectiveDate(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+case PAYMENT_FAILURE:
   return new DefaultPaymentErrorEvent(account.getId(),null,directPayment.getId(),directPaymentTransaction.getPaymentInfoPlugin() == null ? null : directPaymentTransaction.getPaymentInfoPlugin().getGatewayError(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
-case PLUGIN_FAILURE_ABORTED:
+case PLUGIN_FAILURE:
 default :
 return new DefaultPaymentPluginErrorEvent(account.getId(),null,directPayment.getId(),directPaymentTransaction.getPaymentInfoPlugin() == null ? null : directPaymentTransaction.getPaymentInfoPlugin().getGatewayError(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
 }

@@ -2,8 +2,8 @@
   final PaymentTransactionModelDao transactionModelDao=paymentDao.getDirectPaymentTransaction(transactionId,internalCallContext);
   Preconditions.checkState(transactionModelDao != null);
   final DateTime utcNow=clock.getUTCNow();
-  final PaymentTransactionModelDao chargebackTransaction=new PaymentTransactionModelDao(utcNow,utcNow,chargebackTransactionExternalKey,transactionModelDao.getId(),TransactionType.CHARGEBACK,utcNow,PaymentStatus.SUCCESS,amount,currency,null,null);
+  final PaymentTransactionModelDao chargebackTransaction=new PaymentTransactionModelDao(utcNow,utcNow,chargebackTransactionExternalKey,transactionModelDao.getId(),TransactionType.CHARGEBACK,utcNow,TransactionStatus.SUCCESS,amount,currency,null,null);
   final State currentPaymentState=directPaymentAutomatonRunner.fetchNextState("CHARGEBACK_INIT",true);
   paymentDao.updateDirectPaymentWithNewTransaction(transactionModelDao.getId(),chargebackTransaction,internalCallContext);
-  paymentDao.updateDirectPaymentAndTransactionOnCompletion(transactionModelDao.getId(),currentPaymentState.getName(),chargebackTransaction.getId(),PaymentStatus.SUCCESS,chargebackTransaction.getAmount(),chargebackTransaction.getCurrency(),chargebackTransaction.getGatewayErrorCode(),chargebackTransaction.getGatewayErrorMsg(),internalCallContext);
+  paymentDao.updateDirectPaymentAndTransactionOnCompletion(transactionModelDao.getId(),currentPaymentState.getName(),chargebackTransaction.getId(),TransactionStatus.SUCCESS,chargebackTransaction.getAmount(),chargebackTransaction.getCurrency(),chargebackTransaction.getGatewayErrorCode(),chargebackTransaction.getGatewayErrorMsg(),internalCallContext);
 }
