@@ -12,14 +12,19 @@
  catch (  final TimeoutException e) {
     Assert.fail("Failed : should have had RuntimeException exception");
   }
-catch (  final PaymentApiException e) {
-    Assert.fail("Failed : should have had RuntimeException exception");
-  }
 catch (  final RuntimeException e) {
-    gotIt=true;
+    Assert.fail("Failed : should have had RuntimeException (wrapped in an ExecutionException)");
   }
-catch (  OperationException e) {
-    Assert.fail("Failed : should have had OperationException exception");
+catch (  InterruptedException e) {
+    e.printStackTrace();
+  }
+catch (  ExecutionException e) {
+    if (e.getCause() instanceof RuntimeException) {
+      gotIt=true;
+    }
+ else {
+      Assert.fail("Failed : should have had RuntimeException exception");
+    }
   }
   Assert.assertTrue(gotIt);
 }

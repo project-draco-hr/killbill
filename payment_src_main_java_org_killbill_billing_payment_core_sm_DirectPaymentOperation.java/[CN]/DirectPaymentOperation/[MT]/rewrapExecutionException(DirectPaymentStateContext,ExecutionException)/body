@@ -1,0 +1,11 @@
+{
+  if (e.getCause() instanceof PaymentPluginApiException) {
+    final Throwable realException=Objects.firstNonNull(e.getCause(),e);
+    logger.warn("Unsuccessful plugin call for account {}",directPaymentStateContext.getAccount().getExternalKey(),realException);
+    return new OperationException(realException,OperationResult.FAILURE);
+  }
+ else {
+    logger.warn("Plugin call threw an exception for account {}",directPaymentStateContext.getAccount().getExternalKey(),e);
+    return new OperationException(e,OperationResult.EXCEPTION);
+  }
+}

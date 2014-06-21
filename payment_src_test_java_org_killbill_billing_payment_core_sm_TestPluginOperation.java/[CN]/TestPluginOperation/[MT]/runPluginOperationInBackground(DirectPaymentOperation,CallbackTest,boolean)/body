@@ -1,0 +1,29 @@
+{
+  final AtomicBoolean threadStarted=new AtomicBoolean(false);
+  final Thread t1=new Thread(new Runnable(){
+    @Override public void run(){
+      threadStarted.set(true);
+      if (shouldFailBecauseOfLockFailure) {
+        try {
+          pluginOperation.dispatchWithAccountLockAndTimeout(callback);
+          Assert.fail();
+        }
+ catch (        final OperationException e) {
+          Assert.assertTrue(e.getCause() instanceof PaymentApiException);
+          Assert.assertEquals(((PaymentApiException)e.getCause()).getCode(),ErrorCode.PAYMENT_INTERNAL_ERROR.getCode());
+        }
+      }
+ else {
+        try {
+          pluginOperation.dispatchWithAccountLockAndTimeout(callback);
+        }
+ catch (        final OperationException e) {
+          Assert.fail(e.getMessage());
+        }
+      }
+    }
+  }
+);
+  t1.start();
+  Awaitility.await().untilTrue(threadStarted);
+}

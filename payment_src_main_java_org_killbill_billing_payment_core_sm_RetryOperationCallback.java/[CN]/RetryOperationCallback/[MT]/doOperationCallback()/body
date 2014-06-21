@@ -1,5 +1,5 @@
 {
-  return dispatchWithTimeout(new WithAccountLockCallback<OperationResult>(){
+  return dispatchWithAccountLockAndTimeout(new WithAccountLockCallback<OperationResult,OperationException>(){
     @Override public OperationResult doOperation() throws OperationException {
       final RetryableDirectPaymentStateContext retryableDirectPaymentStateContext=(RetryableDirectPaymentStateContext)directPaymentStateContext;
       final PaymentControlContext paymentControlContext=new DefaultPaymentControlContext(directPaymentStateContext.account,directPaymentStateContext.paymentMethodId,directPaymentStateContext.directPaymentId,directPaymentStateContext.directPaymentExternalKey,directPaymentStateContext.directPaymentTransactionExternalKey,directPaymentStateContext.transactionType,directPaymentStateContext.amount,directPaymentStateContext.currency,directPaymentStateContext.properties,retryableDirectPaymentStateContext.isApiPayment(),directPaymentStateContext.callContext);
@@ -13,42 +13,30 @@
  catch (      PaymentControlApiException e) {
         throw new OperationException(e,OperationResult.EXCEPTION);
       }
-      boolean success=false;
+      boolean success;
       try {
         if (directPaymentStateContext.getAmount() == null || (pluginResult.getAdjustedAmount() != null && pluginResult.getAdjustedAmount().compareTo(directPaymentStateContext.getAmount()) != 0)) {
           ((RetryableDirectPaymentStateContext)directPaymentStateContext).setAmount(pluginResult.getAdjustedAmount());
         }
-        final DirectPayment result=doPluginOperation();
+        final DirectPayment result=doCallSpecificOperationCallback();
         ((RetryableDirectPaymentStateContext)directPaymentStateContext).setResult(result);
         final DirectPaymentTransaction transaction=((RetryableDirectPaymentStateContext)directPaymentStateContext).getCurrentTransaction();
         success=transaction.getTransactionStatus() == TransactionStatus.SUCCESS || transaction.getTransactionStatus() == TransactionStatus.PENDING;
         if (success) {
           final PaymentControlContext updatedPaymentControlContext=new DefaultPaymentControlContext(directPaymentStateContext.account,directPaymentStateContext.paymentMethodId,result.getId(),result.getExternalKey(),directPaymentStateContext.directPaymentTransactionExternalKey,directPaymentStateContext.transactionType,transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),directPaymentStateContext.properties,retryableDirectPaymentStateContext.isApiPayment(),directPaymentStateContext.callContext);
           onCompletion(retryableDirectPaymentStateContext.getPluginName(),updatedPaymentControlContext);
+          return OperationResult.SUCCESS;
         }
  else {
-          throwAndupdateRetryDateOnFailureOrException(retryableDirectPaymentStateContext,paymentControlContext,new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,"Plugin ERROR"));
+          return getOperationResultAndSetContext(retryableDirectPaymentStateContext,paymentControlContext);
         }
       }
  catch (      PaymentApiException e) {
-        throwAndupdateRetryDateOnFailureOrException(retryableDirectPaymentStateContext,paymentControlContext,e);
+        throw new OperationException(e,getOperationResultAndSetContext(retryableDirectPaymentStateContext,paymentControlContext));
       }
-catch (      OperationException e) {
+catch (      RuntimeException e) {
+        getOperationResultAndSetContext(retryableDirectPaymentStateContext,paymentControlContext);
         throw e;
-      }
-catch (      Exception e) {
-        throw new OperationException(e,OperationResult.EXCEPTION);
-      }
-      return OperationResult.SUCCESS;
-    }
-    private void throwAndupdateRetryDateOnFailureOrException(    final RetryableDirectPaymentStateContext retryableDirectPaymentStateContext,    final PaymentControlContext paymentControlContext,    @Nullable final PaymentApiException e) throws OperationException {
-      final DateTime retryDate=getNextRetryDate(retryableDirectPaymentStateContext.getPluginName(),paymentControlContext);
-      if (retryDate == null) {
-        throw new OperationException(e,OperationResult.EXCEPTION);
-      }
- else {
-        ((RetryableDirectPaymentStateContext)directPaymentStateContext).setRetryDate(retryDate);
-        throw new OperationException(e,OperationResult.FAILURE);
       }
     }
   }

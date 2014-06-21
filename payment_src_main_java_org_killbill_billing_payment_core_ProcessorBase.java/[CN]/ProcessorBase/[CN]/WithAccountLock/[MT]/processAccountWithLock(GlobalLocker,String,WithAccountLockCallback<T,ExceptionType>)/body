@@ -1,0 +1,12 @@
+{
+  GlobalLock lock=null;
+  try {
+    lock=locker.lockWithNumberOfTries(LockerType.ACCOUNT_FOR_INVOICE_PAYMENTS.toString(),accountExternalKey,NB_LOCK_TRY);
+    return callback.doOperation();
+  }
+  finally {
+    if (lock != null) {
+      lock.release();
+    }
+  }
+}

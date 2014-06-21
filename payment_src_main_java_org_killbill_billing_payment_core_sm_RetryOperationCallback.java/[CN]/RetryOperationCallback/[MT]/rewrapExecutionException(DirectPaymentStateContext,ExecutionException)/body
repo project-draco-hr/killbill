@@ -1,0 +1,9 @@
+{
+  if (e.getCause() instanceof OperationException) {
+    return (OperationException)e.getCause();
+  }
+ else {
+    logger.warn("RetryOperationCallback failed for account {}",directPaymentStateContext.getAccount().getExternalKey(),e);
+    return new OperationException(e,getOperationResultOnException(directPaymentStateContext));
+  }
+}

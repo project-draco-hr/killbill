@@ -1,20 +1,14 @@
 {
-  try {
-    return paymentPluginNotificationDispatcher.dispatchWithTimeout(new Callable<GatewayNotification>(){
-      @Override public GatewayNotification call() throws Exception {
-        final PaymentPluginApi plugin=getPaymentPluginApi(pluginName);
+  return dispatchWithExceptionHandling(null,new Callable<GatewayNotification>(){
+    @Override public GatewayNotification call() throws PaymentApiException {
+      final PaymentPluginApi plugin=getPaymentPluginApi(pluginName);
+      try {
         return plugin.processNotification(notification,properties,callContext);
       }
+ catch (      PaymentPluginApiException e) {
+        throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,e.getErrorMessage());
+      }
     }
-);
   }
- catch (  final TimeoutException e) {
-    throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,null,null);
-  }
-catch (  final RuntimeException e) {
-    throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,e.getMessage());
-  }
-catch (  OperationException e) {
-    throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,e.getMessage());
-  }
+,paymentPluginNotificationDispatcher);
 }
