@@ -1,10 +1,10 @@
 {
   try {
-    final PaymentTransactionInfoPlugin paymentInfoPlugin=doPluginOperation();
+    final PaymentTransactionInfoPlugin paymentInfoPlugin=doCallSpecificOperationCallback();
     directPaymentStateContext.setPaymentInfoPlugin(paymentInfoPlugin);
     return processPaymentInfoPlugin();
   }
  catch (  final PaymentPluginApiException e) {
-    throw new PaymentApiException(e,ErrorCode.__UNKNOWN_ERROR_CODE,"");
+    throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,e.getErrorMessage());
   }
 }

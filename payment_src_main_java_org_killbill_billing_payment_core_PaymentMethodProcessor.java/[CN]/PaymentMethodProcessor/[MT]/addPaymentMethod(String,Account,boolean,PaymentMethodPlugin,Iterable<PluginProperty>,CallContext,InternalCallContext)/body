@@ -1,6 +1,6 @@
 {
   try {
-    return new WithAccountLock<UUID>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<UUID>(){
+    return new WithAccountLock<UUID,PaymentApiException>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<UUID,PaymentApiException>(){
       @Override public UUID doOperation() throws PaymentApiException {
         PaymentMethod pm=null;
         PaymentPluginApi pluginApi;
@@ -27,6 +27,6 @@ catch (        final AccountApiException e) {
 );
   }
  catch (  Exception e) {
-    throw new PaymentApiException(ErrorCode.__UNKNOWN_ERROR_CODE,"");
+    throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR);
   }
 }

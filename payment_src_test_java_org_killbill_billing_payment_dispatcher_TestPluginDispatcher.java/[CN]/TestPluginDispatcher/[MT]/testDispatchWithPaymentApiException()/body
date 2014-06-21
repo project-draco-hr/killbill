@@ -12,11 +12,16 @@
  catch (  final TimeoutException e) {
     Assert.fail("Failed : should have had PaymentApiException exception");
   }
-catch (  final PaymentApiException e) {
-    gotIt=true;
+catch (  InterruptedException e) {
+    Assert.fail("Failed : should have had PaymentApiException exception");
   }
-catch (  OperationException e) {
-    Assert.fail("Failed : should have had OperationException exception");
+catch (  ExecutionException e) {
+    if (e.getCause() instanceof PaymentApiException) {
+      gotIt=true;
+    }
+ else {
+      Assert.fail("Failed : should have had PaymentApiException exception");
+    }
   }
   Assert.assertTrue(gotIt);
 }
