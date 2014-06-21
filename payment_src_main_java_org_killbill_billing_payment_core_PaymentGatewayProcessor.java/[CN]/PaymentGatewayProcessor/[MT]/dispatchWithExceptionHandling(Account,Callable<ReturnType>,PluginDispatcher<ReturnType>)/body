@@ -9,7 +9,7 @@
   }
 catch (  final InterruptedException e) {
     Thread.currentThread().interrupt();
-    throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,e.getMessage());
+    throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
   }
 catch (  final ExecutionException e) {
     if (e.getCause() instanceof PaymentApiException) {
@@ -21,7 +21,7 @@ catch (  final ExecutionException e) {
       throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,format);
     }
  else {
-      throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR);
+      throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
     }
   }
 }
