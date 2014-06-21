@@ -1,6 +1,6 @@
 {
   daoHelper.createNewDirectPaymentTransaction();
-  Assert.assertEquals(paymentDao.getDirectPaymentTransaction(directPaymentStateContext.getDirectPaymentTransactionModelDao().getId(),internalCallContext).getPaymentStatus(),PaymentStatus.UNKNOWN);
+  Assert.assertEquals(paymentDao.getDirectPaymentTransaction(directPaymentStateContext.getDirectPaymentTransactionModelDao().getId(),internalCallContext).getTransactionStatus(),TransactionStatus.UNKNOWN);
   final PaymentTransactionInfoPlugin paymentInfoPlugin=Mockito.mock(PaymentTransactionInfoPlugin.class);
   Mockito.when(paymentInfoPlugin.getAmount()).thenReturn(new BigDecimal("82010.222"));
   Mockito.when(paymentInfoPlugin.getCurrency()).thenReturn(Currency.CAD);
@@ -14,7 +14,7 @@
   Assert.assertEquals(directPaymentTransaction.getCurrency(),directPaymentStateContext.getCurrency());
   Assert.assertEquals(directPaymentTransaction.getProcessedAmount().compareTo(paymentInfoPlugin.getAmount()),0);
   Assert.assertEquals(directPaymentTransaction.getProcessedCurrency(),paymentInfoPlugin.getCurrency());
-  Assert.assertEquals(directPaymentTransaction.getPaymentStatus(),PaymentStatus.PENDING);
+  Assert.assertEquals(directPaymentTransaction.getTransactionStatus(),TransactionStatus.PENDING);
   Assert.assertEquals(directPaymentTransaction.getGatewayErrorCode(),paymentInfoPlugin.getGatewayErrorCode());
   Assert.assertEquals(directPaymentTransaction.getGatewayErrorMsg(),paymentInfoPlugin.getGatewayError());
 }

@@ -13,9 +13,9 @@
   final Currency processedCurrency=Currency.USD;
   final String gatewayErrorCode=UUID.randomUUID().toString().substring(0,5);
   final String gatewayErrorMsg=UUID.randomUUID().toString();
-  paymentDao.updateDirectPaymentAndTransactionOnCompletion(specifiedSecondDirectPaymentTransactionModelDao.getPaymentId(),"SOME_ERRORED_STATE",specifiedSecondDirectPaymentTransactionModelDao.getId(),PaymentStatus.PAYMENT_FAILURE_ABORTED,processedAmount,processedCurrency,gatewayErrorCode,gatewayErrorMsg,accountCallContext);
+  paymentDao.updateDirectPaymentAndTransactionOnCompletion(specifiedSecondDirectPaymentTransactionModelDao.getPaymentId(),"SOME_ERRORED_STATE",specifiedSecondDirectPaymentTransactionModelDao.getId(),TransactionStatus.PAYMENT_FAILURE,processedAmount,processedCurrency,gatewayErrorCode,gatewayErrorMsg,accountCallContext);
   final PaymentTransactionModelDao updatedSecondDirectPaymentTransactionModelDao=paymentDao.getDirectPaymentTransaction(specifiedSecondDirectPaymentTransactionModelDao.getId(),accountCallContext);
-  Assert.assertEquals(updatedSecondDirectPaymentTransactionModelDao.getPaymentStatus(),PaymentStatus.PAYMENT_FAILURE_ABORTED);
+  Assert.assertEquals(updatedSecondDirectPaymentTransactionModelDao.getTransactionStatus(),TransactionStatus.PAYMENT_FAILURE);
   Assert.assertEquals(updatedSecondDirectPaymentTransactionModelDao.getGatewayErrorMsg(),gatewayErrorMsg);
   Assert.assertEquals(updatedSecondDirectPaymentTransactionModelDao.getGatewayErrorMsg(),gatewayErrorMsg);
   for (int i=0; i < 3; i++) {

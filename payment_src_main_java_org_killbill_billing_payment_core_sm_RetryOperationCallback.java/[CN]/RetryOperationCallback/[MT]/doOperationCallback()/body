@@ -21,7 +21,7 @@
         final DirectPayment result=doPluginOperation();
         ((RetryableDirectPaymentStateContext)directPaymentStateContext).setResult(result);
         final DirectPaymentTransaction transaction=((RetryableDirectPaymentStateContext)directPaymentStateContext).getCurrentTransaction();
-        success=transaction.getPaymentStatus() == PaymentStatus.SUCCESS || transaction.getPaymentStatus() == PaymentStatus.PENDING;
+        success=transaction.getTransactionStatus() == TransactionStatus.SUCCESS || transaction.getTransactionStatus() == TransactionStatus.PENDING;
         if (success) {
           final PaymentControlContext updatedPaymentControlContext=new DefaultPaymentControlContext(directPaymentStateContext.account,directPaymentStateContext.paymentMethodId,result.getId(),result.getExternalKey(),directPaymentStateContext.directPaymentTransactionExternalKey,directPaymentStateContext.transactionType,transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),directPaymentStateContext.properties,retryableDirectPaymentStateContext.isApiPayment(),directPaymentStateContext.callContext);
           onCompletion(retryableDirectPaymentStateContext.getPluginName(),updatedPaymentControlContext);
