@@ -10,11 +10,11 @@
       }
       final Map<UUID,BigDecimal> invoiceItemIdsWithAmounts=invoiceDaoHelper.computeItemAdjustments(payment.getInvoiceId().toString(),entitySqlDaoWrapperFactory,invoiceItemIdsWithNullAmounts,context);
       final BigDecimal requestedPositiveAmount=invoiceDaoHelper.computePositiveRefundAmount(payment,requestedRefundAmount,invoiceItemIdsWithAmounts);
-      final InvoicePaymentModelDao existingRefund=transactional.getPaymentsForCookieId(paymentCookieId.toString(),context);
+      final InvoicePaymentModelDao existingRefund=transactional.getPaymentsForCookieId(transactionExternalKey,context);
       if (existingRefund != null) {
         return existingRefund;
       }
-      final InvoicePaymentModelDao refund=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.REFUND,payment.getInvoiceId(),paymentId,context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),payment.getProcessedCurrency(),paymentCookieId,payment.getId());
+      final InvoicePaymentModelDao refund=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.REFUND,payment.getInvoiceId(),paymentId,context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),payment.getProcessedCurrency(),transactionExternalKey,payment.getId());
       transactional.create(refund,context);
       final InvoiceModelDao invoice=transInvoiceDao.getById(payment.getInvoiceId().toString(),context);
       if (invoice != null) {
