@@ -19,7 +19,7 @@
   invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment),context);
   final Map<UUID,BigDecimal> invoiceItemMap=new HashMap<UUID,BigDecimal>();
   invoiceItemMap.put(invoiceItem.getId(),new BigDecimal("239.00"));
-  invoiceDao.createRefund(paymentId,paymentAmount,true,invoiceItemMap,UUID.randomUUID(),context);
+  invoiceDao.createRefund(paymentId,paymentAmount,true,invoiceItemMap,UUID.randomUUID().toString(),context);
   final InvoiceModelDao savedInvoice=invoiceDao.getById(invoiceId,context);
   assertNotNull(savedInvoice);
   assertEquals(savedInvoice.getInvoiceItems().size(),2);

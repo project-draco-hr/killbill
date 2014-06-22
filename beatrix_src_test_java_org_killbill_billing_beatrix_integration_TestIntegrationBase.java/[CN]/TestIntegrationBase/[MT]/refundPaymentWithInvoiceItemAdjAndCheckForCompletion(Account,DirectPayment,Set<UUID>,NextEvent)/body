@@ -1,6 +1,19 @@
 {
   doCallAndCheckForCompletion(new Function<Void,Void>(){
     @Override public Void apply(    @Nullable final Void input){
+      final Map<UUID,BigDecimal> invoiceItemsWithAmount=new HashMap<UUID,BigDecimal>();
+      for (      UUID cur : invoiceItems) {
+        invoiceItemsWithAmount.put(cur,null);
+      }
+      final List<PluginProperty> properties=new ArrayList<PluginProperty>();
+      final PluginProperty prop=new PluginProperty(InvoicePaymentControlPluginApi.IPCD_REFUND_IDS_WITH_AMOUNT_KEY,invoiceItemsWithAmount,false);
+      properties.add(prop);
+      try {
+        paymentApi.createRefundWithPaymentControl(account,payment.getId(),payment.getPurchasedAmount(),payment.getCurrency(),UUID.randomUUID().toString(),properties,PAYMENT_OPTIONS,callContext);
+      }
+ catch (      final PaymentApiException e) {
+        fail(e.toString());
+      }
       return null;
     }
   }

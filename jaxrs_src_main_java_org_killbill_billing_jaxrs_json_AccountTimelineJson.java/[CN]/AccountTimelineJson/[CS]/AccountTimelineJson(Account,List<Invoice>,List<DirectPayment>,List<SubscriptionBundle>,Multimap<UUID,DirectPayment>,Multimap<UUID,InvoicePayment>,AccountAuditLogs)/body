@@ -24,12 +24,9 @@
   for (  final DirectPayment payment : payments) {
     final List<RefundJson> refunds=new ArrayList<RefundJson>();
     for (    final DirectPayment refund : refundsByPayment.get(payment.getId())) {
-      final List<AuditLog> auditLogs=accountAuditLogs.getAuditLogsForRefund(refund.getId());
     }
     final List<ChargebackJson> chargebacks=new ArrayList<ChargebackJson>();
     for (    final InvoicePayment chargeback : chargebacksByPayment.get(payment.getId())) {
-      final List<AuditLog> auditLogs=accountAuditLogs.getAuditLogsForChargeback(chargeback.getId());
-      chargebacks.add(new ChargebackJson(payment.getAccountId(),chargeback,auditLogs));
     }
     final List<AuditLog> auditLogs=accountAuditLogs.getAuditLogsForPayment(payment.getId());
     this.payments.add(new PaymentJson(payment,null,refunds,chargebacks,auditLogs));
