@@ -30,7 +30,6 @@
   final DirectPayment payment1=payments.get(0);
   final Map<UUID,BigDecimal> iias=new HashMap<UUID,BigDecimal>();
   iias.put(invoice1.getInvoiceItems().get(0).getId(),new BigDecimal("197.26"));
-  busHandler.pushExpectedEvents(NextEvent.INVOICE_ADJUSTMENT);
-  assertListenerStatus();
+  refundPaymentWithInvoiceItemAdjAndCheckForCompletion(account,payment1,iias,NextEvent.PAYMENT,NextEvent.INVOICE_ADJUSTMENT);
   checkNoMoreInvoiceToGenerate(account);
 }
