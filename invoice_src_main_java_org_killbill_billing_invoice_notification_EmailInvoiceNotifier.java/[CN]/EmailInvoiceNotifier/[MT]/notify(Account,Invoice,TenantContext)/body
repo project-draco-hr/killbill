@@ -15,17 +15,20 @@
       break;
     }
   }
-  final String htmlBody;
+  final HtmlInvoice htmlInvoice;
   try {
-    htmlBody=generator.generateInvoice(account,invoice,manualPay);
+    htmlInvoice=generator.generateInvoice(account,invoice,manualPay);
   }
  catch (  IOException e) {
     throw new InvoiceApiException(e,ErrorCode.EMAIL_SENDING_FAILED);
   }
-  final String subject=config.getInvoiceEmailSubject();
+  String subject=htmlInvoice.getSubject();
+  if (subject == null) {
+    subject=config.getInvoiceEmailSubject();
+  }
   final EmailSender sender=new DefaultEmailSender(config);
   try {
-    sender.sendHTMLEmail(to,cc,subject,htmlBody);
+    sender.sendHTMLEmail(to,cc,subject,htmlInvoice.getBody());
   }
  catch (  EmailApiException e) {
     throw new InvoiceApiException(e,ErrorCode.EMAIL_SENDING_FAILED);
