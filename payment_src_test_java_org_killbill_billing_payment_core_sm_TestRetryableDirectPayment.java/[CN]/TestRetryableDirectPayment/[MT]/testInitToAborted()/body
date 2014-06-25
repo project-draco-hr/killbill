@@ -3,8 +3,8 @@
   mockRetryAuthorizeOperationCallback.setResult(OperationResult.SUCCESS).setException(null);
   runner.setOperationCallback(mockRetryAuthorizeOperationCallback).setContext(directPaymentStateContext);
   runner.run(true,TransactionType.AUTHORIZE,account,paymentMethodId,null,directPaymentExternalKey,directPaymentTransactionExternalKey,amount,currency,emptyProperties,null,callContext,internalCallContext);
-  final PaymentAttemptModelDao pa=((MockPaymentDao)paymentDao).getPaymentAttemptByExternalKey(directPaymentTransactionExternalKey,internalCallContext);
+  final PaymentAttemptModelDao pa=paymentDao.getPaymentAttemptByExternalKey(directPaymentTransactionExternalKey,internalCallContext);
   assertEquals(pa.getTransactionExternalKey(),directPaymentTransactionExternalKey);
   assertEquals(pa.getStateName(),"ABORTED");
-  assertEquals(pa.getOperationName(),"AUTHORIZE");
+  assertEquals(pa.getTransactionType(),TransactionType.AUTHORIZE);
 }

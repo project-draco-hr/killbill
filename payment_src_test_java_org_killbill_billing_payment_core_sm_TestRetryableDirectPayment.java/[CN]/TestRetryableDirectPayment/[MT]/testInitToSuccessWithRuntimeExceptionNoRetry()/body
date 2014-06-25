@@ -6,10 +6,10 @@
     runner.run(true,TransactionType.AUTHORIZE,account,paymentMethodId,null,directPaymentExternalKey,directPaymentTransactionExternalKey,amount,currency,emptyProperties,null,callContext,internalCallContext);
     Assert.fail("Expected Exception...");
   }
- catch (  PaymentApiException e) {
-    final PaymentAttemptModelDao pa=((MockPaymentDao)paymentDao).getPaymentAttemptByExternalKey(directPaymentTransactionExternalKey,internalCallContext);
+ catch (  final PaymentApiException e) {
+    final PaymentAttemptModelDao pa=paymentDao.getPaymentAttemptByExternalKey(directPaymentTransactionExternalKey,internalCallContext);
     assertEquals(pa.getTransactionExternalKey(),directPaymentTransactionExternalKey);
     assertEquals(pa.getStateName(),"ABORTED");
-    assertEquals(pa.getOperationName(),"AUTHORIZE");
+    assertEquals(pa.getTransactionType(),TransactionType.AUTHORIZE);
   }
 }

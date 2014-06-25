@@ -4,15 +4,15 @@
   runner.setOperationCallback(mockRetryAuthorizeOperationCallback).setContext(directPaymentStateContext);
   final State state=runner.fetchState("RETRIED");
   final UUID directTransactionId=UUID.randomUUID();
-  paymentDao.insertPaymentAttemptWithProperties(new PaymentAttemptModelDao(utcNow,utcNow,directPaymentExternalKey,directTransactionId,directPaymentTransactionExternalKey,state.getName(),TransactionType.AUTHORIZE.name(),null),ImmutableList.<PluginPropertyModelDao>of(),internalCallContext);
+  paymentDao.insertPaymentAttemptWithProperties(new PaymentAttemptModelDao(account.getId(),paymentMethodId,utcNow,utcNow,directPaymentExternalKey,directTransactionId,directPaymentTransactionExternalKey,TransactionType.AUTHORIZE,state.getName(),amount,currency,null),ImmutableList.<PluginPropertyModelDao>of(),internalCallContext);
   try {
     runner.run(state,false,TransactionType.AUTHORIZE,account,paymentMethodId,null,directPaymentExternalKey,directPaymentTransactionExternalKey,amount,currency,emptyProperties,null,callContext,internalCallContext);
     Assert.fail("Expecting paymentApiException...");
   }
- catch (  PaymentApiException e) {
-    final PaymentAttemptModelDao pa=((MockPaymentDao)paymentDao).getPaymentAttemptByExternalKey(directPaymentTransactionExternalKey,internalCallContext);
+ catch (  final PaymentApiException e) {
+    final PaymentAttemptModelDao pa=paymentDao.getPaymentAttemptByExternalKey(directPaymentTransactionExternalKey,internalCallContext);
     assertEquals(pa.getTransactionExternalKey(),directPaymentTransactionExternalKey);
     assertEquals(pa.getStateName(),"ABORTED");
-    assertEquals(pa.getOperationName(),"AUTHORIZE");
+    assertEquals(pa.getTransactionType(),TransactionType.AUTHORIZE);
   }
 }
