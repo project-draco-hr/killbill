@@ -1,9 +1,6 @@
 {
   final TransactionType transactionType=paymentControlContext.getTransactionType();
   Preconditions.checkArgument(transactionType == TransactionType.PURCHASE || transactionType == TransactionType.REFUND);
-  if (insert_AUTO_PAY_OFF_ifRequired(paymentControlContext)) {
-    return new DefaultPriorPaymentControlResult(true);
-  }
   final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(paymentControlContext.getAccountId(),paymentControlContext);
   if (transactionType == TransactionType.PURCHASE) {
     return getPluginPurchaseResult(paymentControlContext,internalContext);

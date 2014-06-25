@@ -18,9 +18,7 @@
     assertEquals(cur.getBalance(),cur.getChargedAmount());
   }
   paymentPlugin.makeNextPaymentFailWithError();
-  busHandler.pushExpectedEvents(NextEvent.PAYMENT_ERROR);
-  remove_AUTO_PAY_OFF_Tag(account.getId(),ObjectType.ACCOUNT);
-  assertListenerStatus();
+  remove_AUTO_PAY_OFF_Tag(account.getId(),ObjectType.ACCOUNT,NextEvent.PAYMENT_ERROR);
   addDelayBceauseOfLackOfCorrectSynchro();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),2);
@@ -45,12 +43,8 @@
   }
   addDelayBceauseOfLackOfCorrectSynchro();
   paymentPlugin.clear();
-  remove_AUTO_PAY_OFF_Tag(account.getId(),ObjectType.ACCOUNT);
-  assertListenerStatus();
+  remove_AUTO_PAY_OFF_Tag(account.getId(),ObjectType.ACCOUNT,NextEvent.PAYMENT);
   addDelayBceauseOfLackOfCorrectSynchro();
-  busHandler.pushExpectedEvents(NextEvent.PAYMENT);
-  clock.addDays(nbDaysBeforeRetry + 1);
-  assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   for (  Invoice cur : invoices) {
     if (cur.getChargedAmount().compareTo(BigDecimal.ZERO) == 0) {
