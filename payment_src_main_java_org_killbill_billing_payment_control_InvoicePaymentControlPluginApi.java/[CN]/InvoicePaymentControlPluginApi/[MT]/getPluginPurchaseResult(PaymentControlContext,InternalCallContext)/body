@@ -1,6 +1,6 @@
 {
   try {
-    final UUID invoiceId=UUID.fromString(paymentControlPluginContext.getPaymentExternalKey());
+    final UUID invoiceId=getInvoiceId(paymentControlPluginContext);
     final Invoice invoice=rebalanceAndGetInvoice(invoiceId,internalContext);
     final BigDecimal requestedAmount=validateAndComputePaymentAmount(invoice,paymentControlPluginContext.getAmount(),paymentControlPluginContext.isApiPayment());
     final boolean isAborted=requestedAmount.compareTo(BigDecimal.ZERO) == 0;
