@@ -1,24 +1,25 @@
 {
-  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final UUID paymentUuid=UUID.fromString(paymentId);
-  final DirectPayment payment=paymentApi.getPayment(paymentUuid,false,pluginProperties,callContext);
+  final DirectPayment payment=paymentApi.getPayment(paymentUuid,false,ImmutableList.<PluginProperty>of(),callContext);
   final Account account=accountUserApi.getAccountById(payment.getAccountId(),callContext);
-  final DirectPayment result;
+  final Iterable<PluginProperty> pluginProperties;
+  final String transactionExternalKey=UUID.randomUUID().toString();
   if (json.isAdjusted()) {
     if (json.getAdjustments() != null && json.getAdjustments().size() > 0) {
       final Map<UUID,BigDecimal> adjustments=new HashMap<UUID,BigDecimal>();
       for (      final InvoiceItemJson item : json.getAdjustments()) {
         adjustments.put(UUID.fromString(item.getInvoiceItemId()),item.getAmount());
       }
-      result=null;
+      pluginProperties=extractPluginProperties(pluginPropertiesString,new PluginProperty("IPCD_REF_IDS_AMOUNTS",true,false),new PluginProperty("IPCD_REFUND_WITH_ADJUSTMENTS",adjustments,false));
     }
  else {
-      result=null;
+      pluginProperties=extractPluginProperties(pluginPropertiesString,new PluginProperty("IPCD_REF_IDS_AMOUNTS",true,false));
     }
   }
  else {
-    result=null;
+    pluginProperties=extractPluginProperties(pluginPropertiesString);
   }
-  return null;
+  final DirectPayment result=paymentApi.createRefundWithPaymentControl(account,payment.getId(),null,account.getCurrency(),transactionExternalKey,pluginProperties,createInvoicePaymentControlPluginApiPaymentOptions(false),callContext);
+  return uriBuilder.buildResponse(DirectPaymentResource.class,"getDirectPayment",result.getId(),uriInfo.getBaseUri().toString());
 }

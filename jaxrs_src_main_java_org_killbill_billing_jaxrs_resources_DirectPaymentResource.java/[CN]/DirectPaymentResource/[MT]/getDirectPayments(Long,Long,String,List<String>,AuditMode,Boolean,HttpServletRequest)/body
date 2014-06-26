@@ -3,10 +3,10 @@
   final TenantContext tenantContext=context.createContext(request);
   final Pagination<DirectPayment> directPayments;
   if (Strings.isNullOrEmpty(pluginName)) {
-    directPayments=directPaymentApi.getPayments(offset,limit,withPluginInfo,pluginProperties,tenantContext);
+    directPayments=paymentApi.getPayments(offset,limit,withPluginInfo,pluginProperties,tenantContext);
   }
  else {
-    directPayments=directPaymentApi.getPayments(offset,limit,pluginName,withPluginInfo,pluginProperties,tenantContext);
+    directPayments=paymentApi.getPayments(offset,limit,pluginName,withPluginInfo,pluginProperties,tenantContext);
   }
   final URI nextPageUri=uriBuilder.nextPage(DirectPaymentResource.class,"getDirectPayments",directPayments.getNextOffset(),limit,ImmutableMap.<String,String>of(QUERY_PAYMENT_METHOD_PLUGIN_NAME,Strings.nullToEmpty(pluginName),QUERY_AUDIT,auditMode.getLevel().toString()));
   final AtomicReference<Map<UUID,AccountAuditLogs>> accountsAuditLogs=new AtomicReference<Map<UUID,AccountAuditLogs>>(new HashMap<UUID,AccountAuditLogs>());

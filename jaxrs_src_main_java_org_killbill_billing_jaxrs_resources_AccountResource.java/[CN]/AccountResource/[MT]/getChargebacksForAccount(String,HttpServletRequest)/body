@@ -1,8 +1,10 @@
 {
   final UUID accountId=UUID.fromString(accountIdStr);
-  final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByAccountId(accountId,context.createContext(request));
+  final TenantContext tenantContext=context.createContext(request);
+  final List<DirectPayment> payments=paymentApi.getAccountPayments(accountId,false,ImmutableList.<PluginProperty>of(),tenantContext);
+  final Iterable<DirectPaymentTransaction> transactions=getDirectPaymentTransactions(payments,TransactionType.CHARGEBACK);
   final List<ChargebackJson> chargebacksJson=new ArrayList<ChargebackJson>();
-  for (  final InvoicePayment chargeback : chargebacks) {
+  for (  final DirectPaymentTransaction chargeback : transactions) {
     chargebacksJson.add(new ChargebackJson(accountId,chargeback));
   }
   return Response.status(Response.Status.OK).entity(chargebacksJson).build();

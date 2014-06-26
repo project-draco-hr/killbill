@@ -13,10 +13,7 @@
   for (  final Invoice invoice : unpaidInvoices) {
     final BigDecimal amountToPay=(remainingRequestPayment.compareTo(invoice.getBalance()) >= 0) ? invoice.getBalance() : remainingRequestPayment;
     if (amountToPay.compareTo(BigDecimal.ZERO) > 0) {
-      if (externalPayment) {
-      }
- else {
-      }
+      createPurchaseForInvoice(account,invoice.getId(),amountToPay,externalPayment,callContext);
     }
     remainingRequestPayment=remainingRequestPayment.subtract(amountToPay);
     if (remainingRequestPayment.compareTo(BigDecimal.ZERO) == 0) {

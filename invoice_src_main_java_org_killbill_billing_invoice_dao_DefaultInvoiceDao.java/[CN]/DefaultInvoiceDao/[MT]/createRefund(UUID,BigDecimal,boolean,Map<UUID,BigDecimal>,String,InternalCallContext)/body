@@ -4,7 +4,13 @@
     @Override public InvoicePaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final InvoicePaymentSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
       final InvoiceSqlDao transInvoiceDao=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
-      final InvoicePaymentModelDao payment=transactional.getByPaymentId(paymentId.toString(),context);
+      final List<InvoicePaymentModelDao> paymentsForId=transactional.getByPaymentId(paymentId.toString(),context);
+      final InvoicePaymentModelDao payment=Iterables.tryFind(paymentsForId,new Predicate<InvoicePaymentModelDao>(){
+        @Override public boolean apply(        final InvoicePaymentModelDao input){
+          return input.getType() == InvoicePaymentType.ATTEMPT;
+        }
+      }
+).orNull();
       if (payment == null) {
         throw new InvoiceApiException(ErrorCode.INVOICE_PAYMENT_BY_ATTEMPT_NOT_FOUND,paymentId);
       }

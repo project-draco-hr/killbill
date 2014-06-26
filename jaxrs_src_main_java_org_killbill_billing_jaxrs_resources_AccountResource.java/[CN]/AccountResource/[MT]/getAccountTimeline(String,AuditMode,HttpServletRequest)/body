@@ -4,18 +4,23 @@
   final Account account=accountUserApi.getAccountById(accountId,tenantContext);
   final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId(),tenantContext);
   final List<DirectPayment> payments=paymentApi.getAccountPayments(accountId,false,ImmutableList.<PluginProperty>of(),tenantContext);
-  final List<DirectPayment> refunds=null;
-  final Multimap<UUID,DirectPayment> refundsByPayment=ArrayListMultimap.<UUID,DirectPayment>create();
-  for (  final DirectPayment refund : refunds) {
-    refundsByPayment.put(refund.getId(),refund);
+  final Iterable<DirectPaymentTransaction> refunds=getDirectPaymentTransactions(payments,TransactionType.REFUND);
+  final Multimap<UUID,DirectPaymentTransaction> refundsByPayment=ArrayListMultimap.<UUID,DirectPaymentTransaction>create();
+  for (  final DirectPaymentTransaction refund : refunds) {
+    refundsByPayment.put(refund.getDirectPaymentId(),refund);
   }
-  final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByAccountId(accountId,tenantContext);
-  final Multimap<UUID,InvoicePayment> chargebacksByPayment=ArrayListMultimap.<UUID,InvoicePayment>create();
-  for (  final InvoicePayment chargeback : chargebacks) {
-    chargebacksByPayment.put(chargeback.getPaymentId(),chargeback);
+  final Iterable<DirectPaymentTransaction> chargebacks=getDirectPaymentTransactions(payments,TransactionType.CHARGEBACK);
+  final Multimap<UUID,DirectPaymentTransaction> chargebacksByPayment=ArrayListMultimap.<UUID,DirectPaymentTransaction>create();
+  for (  final DirectPaymentTransaction chargeback : chargebacks) {
+    chargebacksByPayment.put(chargeback.getDirectPaymentId(),chargeback);
   }
   final List<SubscriptionBundle> bundles=subscriptionApi.getSubscriptionBundlesForAccountId(account.getId(),tenantContext);
   final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
-  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundles,refundsByPayment,chargebacksByPayment,accountAuditLogs);
+  final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePaymentsByAccount(accountId,tenantContext);
+  final Map<UUID,UUID> invoicesIdByPayment=new HashMap<UUID,UUID>();
+  for (  InvoicePayment cur : invoicePayments) {
+    invoicesIdByPayment.put(cur.getPaymentId(),cur.getInvoiceId());
+  }
+  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,invoicesIdByPayment,bundles,refundsByPayment,chargebacksByPayment,accountAuditLogs);
   return Response.status(Status.OK).entity(json).build();
 }

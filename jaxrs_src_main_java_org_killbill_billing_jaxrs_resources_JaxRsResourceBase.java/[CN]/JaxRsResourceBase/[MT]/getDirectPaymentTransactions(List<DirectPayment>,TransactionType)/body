@@ -1,0 +1,13 @@
+{
+  return Iterables.concat(Iterables.transform(payments,new Function<DirectPayment,Iterable<DirectPaymentTransaction>>(){
+    @Override public Iterable<DirectPaymentTransaction> apply(    final DirectPayment input){
+      return Iterables.filter(input.getTransactions(),new Predicate<DirectPaymentTransaction>(){
+        @Override public boolean apply(        final DirectPaymentTransaction input){
+          return input.getTransactionType() == transactionType;
+        }
+      }
+);
+    }
+  }
+));
+}

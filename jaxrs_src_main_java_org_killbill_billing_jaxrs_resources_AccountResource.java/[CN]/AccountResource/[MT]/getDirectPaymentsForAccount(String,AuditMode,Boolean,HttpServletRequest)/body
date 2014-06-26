@@ -1,7 +1,7 @@
 {
   final UUID accountId=UUID.fromString(accountIdStr);
   final TenantContext tenantContext=context.createContext(request);
-  final List<DirectPayment> payments=directPaymentApi.getAccountPayments(accountId,withPluginInfo,ImmutableList.<PluginProperty>of(),tenantContext);
+  final List<DirectPayment> payments=paymentApi.getAccountPayments(accountId,withPluginInfo,ImmutableList.<PluginProperty>of(),tenantContext);
   final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
   final List<DirectPaymentJson> result=ImmutableList.copyOf(Iterables.transform(payments,new Function<DirectPayment,DirectPaymentJson>(){
     @Override public DirectPaymentJson apply(    final DirectPayment directPayment){
