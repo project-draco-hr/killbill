@@ -7,7 +7,7 @@
     Assert.fail("Expected Exception...");
   }
  catch (  final PaymentApiException e) {
-    final PaymentAttemptModelDao pa=paymentDao.getPaymentAttemptByExternalKey(directPaymentTransactionExternalKey,internalCallContext);
+    final PaymentAttemptModelDao pa=paymentDao.getPaymentAttemptByTransactionExternalKey(directPaymentTransactionExternalKey,internalCallContext).get(0);
     assertEquals(pa.getTransactionExternalKey(),directPaymentTransactionExternalKey);
     assertEquals(pa.getStateName(),"RETRIED");
     assertEquals(pa.getTransactionType(),TransactionType.AUTHORIZE);

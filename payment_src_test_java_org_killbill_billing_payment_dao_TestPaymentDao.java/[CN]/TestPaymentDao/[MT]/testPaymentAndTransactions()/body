@@ -32,7 +32,9 @@
   assertEquals(savedTransaction.getTransactionStatus(),TransactionStatus.SUCCESS);
   assertEquals(savedTransaction.getAmount().compareTo(BigDecimal.TEN),0);
   assertEquals(savedTransaction.getCurrency(),Currency.AED);
-  final PaymentTransactionModelDao savedTransaction2=paymentDao.getDirectPaymentTransactionByExternalKey(transactionExternalKey,internalCallContext);
+  final List<PaymentTransactionModelDao> savedTransactions=paymentDao.getDirectPaymentTransactionsByExternalKey(transactionExternalKey,internalCallContext);
+  assertEquals(savedTransactions.size(),1);
+  final PaymentTransactionModelDao savedTransaction2=savedTransactions.get(0);
   assertEquals(savedTransaction2.getTransactionExternalKey(),transactionExternalKey);
   assertEquals(savedTransaction2.getPaymentId(),paymentModelDao.getId());
   assertEquals(savedTransaction2.getTransactionType(),TransactionType.AUTHORIZE);

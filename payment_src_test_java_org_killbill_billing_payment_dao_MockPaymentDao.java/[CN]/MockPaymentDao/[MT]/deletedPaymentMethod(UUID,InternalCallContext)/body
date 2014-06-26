@@ -1,10 +1,12 @@
 {
-  final Iterator<PaymentMethodModelDao> it=paymentMethods.iterator();
-  while (it.hasNext()) {
-    final PaymentMethodModelDao cur=it.next();
-    if (cur.getId().equals(paymentMethodId)) {
-      it.remove();
-      break;
+synchronized (this) {
+    final Iterator<PaymentMethodModelDao> it=paymentMethods.iterator();
+    while (it.hasNext()) {
+      final PaymentMethodModelDao cur=it.next();
+      if (cur.getId().equals(paymentMethodId)) {
+        it.remove();
+        break;
+      }
     }
   }
 }

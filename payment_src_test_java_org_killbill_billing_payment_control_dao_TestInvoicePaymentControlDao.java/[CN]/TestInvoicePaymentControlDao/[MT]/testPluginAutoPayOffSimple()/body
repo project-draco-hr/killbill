@@ -1,10 +1,11 @@
 {
   UUID accountId=UUID.randomUUID();
+  UUID attemptId=UUID.randomUUID();
   UUID paymentId=UUID.randomUUID();
   UUID methodId=UUID.randomUUID();
   BigDecimal amount=new BigDecimal("13.33");
   DateTime utcNow=clock.getUTCNow();
-  final PluginAutoPayOffModelDao entry1=new PluginAutoPayOffModelDao("key1","tkey1",accountId,"XXX",paymentId,methodId,amount,Currency.USD,"lulu",utcNow);
+  final PluginAutoPayOffModelDao entry1=new PluginAutoPayOffModelDao(attemptId,"key1","tkey1",accountId,"XXX",paymentId,methodId,amount,Currency.USD,"lulu",utcNow);
   dao.insertAutoPayOff(entry1);
   final List<PluginAutoPayOffModelDao> entries=dao.getAutoPayOffEntry(accountId);
   assertEquals(entries.size(),1);

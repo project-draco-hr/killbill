@@ -1,6 +1,12 @@
 {
-  checkNotNullArgumentList(account,paymentMethodId,amount,currency,directPaymentExternalKey,directPaymentTransactionExternalKey,properties,callContext);
-  Preconditions.checkArgument(amount.compareTo(BigDecimal.ZERO) > 0,"Amount should be positive");
+  checkNullParameter(account,"account");
+  checkNullParameter(paymentMethodId,"paymentMethodId");
+  checkNullParameter(amount,"amount");
+  checkNullParameter(currency,"currency");
+  checkNullParameter(directPaymentExternalKey,"paymentExternalKey");
+  checkNullParameter(directPaymentTransactionExternalKey,"paymentTransactionExternalKey");
+  checkNullParameter(properties,"plugin properties");
+  checkPositiveAmount(amount);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   return directPaymentProcessor.createPurchase(account,paymentMethodId,directPaymentId,amount,currency,directPaymentExternalKey,directPaymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
 }

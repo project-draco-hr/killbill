@@ -1,0 +1,12 @@
+{
+  final List<PaymentTransactionModelDao> transactions=paymentDao.getDirectPaymentTransactionsByExternalKey(transactionExternalKey,tenantContext);
+  final PaymentTransactionModelDao transactionAlreadyExists=Iterables.tryFind(transactions,new Predicate<PaymentTransactionModelDao>(){
+    @Override public boolean apply(    final PaymentTransactionModelDao input){
+      return input.getTransactionStatus() == TransactionStatus.SUCCESS;
+    }
+  }
+).orNull();
+  if (transactionAlreadyExists != null) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS,transactionExternalKey);
+  }
+}

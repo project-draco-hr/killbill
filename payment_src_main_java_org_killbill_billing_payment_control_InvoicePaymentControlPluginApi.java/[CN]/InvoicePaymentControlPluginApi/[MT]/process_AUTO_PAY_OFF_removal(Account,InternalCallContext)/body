@@ -1,7 +1,7 @@
 {
   final List<PluginAutoPayOffModelDao> entries=controlDao.getAutoPayOffEntry(account.getId());
   for (  PluginAutoPayOffModelDao cur : entries) {
-    retryServiceScheduler.scheduleRetry(ObjectType.ACCOUNT,account.getId(),cur.getTransactionExternalKey(),PLUGIN_NAME,clock.getUTCNow());
+    retryServiceScheduler.scheduleRetry(ObjectType.ACCOUNT,account.getId(),cur.getAttemptId(),PLUGIN_NAME,clock.getUTCNow());
   }
   controlDao.removeAutoPayOffEntry(account.getId());
 }

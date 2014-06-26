@@ -1,9 +1,11 @@
 {
-  final List<PaymentAttemptModelDao> result=new ArrayList<PaymentAttemptModelDao>();
-  for (  PaymentAttemptModelDao cur : attempts.values()) {
-    if (cur.getPaymentExternalKey().equals(paymentExternalKey)) {
-      result.add(cur);
+synchronized (this) {
+    final List<PaymentAttemptModelDao> result=new ArrayList<PaymentAttemptModelDao>();
+    for (    PaymentAttemptModelDao cur : attempts.values()) {
+      if (cur.getPaymentExternalKey().equals(paymentExternalKey)) {
+        result.add(cur);
+      }
     }
+    return result;
   }
-  return result;
 }

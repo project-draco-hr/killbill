@@ -9,7 +9,7 @@
   final String transactionExternalKey2="chouette";
   final InvoiceItem invoiceItem=new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),requestedAmount,new BigDecimal("1.0"),Currency.USD);
   invoice.addInvoiceItem(invoiceItem);
-  final DirectPayment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),INVOICE_PAYMENT,callContext);
+  final DirectPayment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),INVOICE_PAYMENT,callContext);
   final List<PluginProperty> refundProperties=new ArrayList<PluginProperty>();
   final HashMap<UUID,BigDecimal> uuidBigDecimalHashMap=new HashMap<UUID,BigDecimal>();
   uuidBigDecimalHashMap.put(invoiceItem.getId(),null);

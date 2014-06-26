@@ -1,7 +1,14 @@
 {
-  checkNotNullArgumentList(account,amount,currency,directPaymentExternalKey,directPaymentTransactionExternalKey,properties,callContext);
-  Preconditions.checkArgument(amount.compareTo(BigDecimal.ZERO) > 0,"Amount should be positive");
-  Preconditions.checkArgument(paymentMethodId != null || paymentOptions.isExternalPayment(),"Payment methodId should be specified for non regular payments");
+  checkNullParameter(account,"account");
+  checkNullParameter(amount,"amount");
+  checkNullParameter(currency,"currency");
+  checkNullParameter(directPaymentExternalKey,"paymentExternalKey");
+  checkNullParameter(directPaymentTransactionExternalKey,"paymentTransactionExternalKey");
+  checkNullParameter(properties,"plugin properties");
+  checkPositiveAmount(amount);
+  if (paymentMethodId == null && paymentOptions.isExternalPayment()) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_PARAMETER,"paymentMethodId","should not be null");
+  }
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   final UUID nonNulPaymentMethodId=(paymentMethodId != null) ? paymentMethodId : paymentMethodProcessor.createOrGetExternalPaymentMethod(UUID.randomUUID().toString(),account,properties,callContext,internalCallContext);
   return pluginControlledPaymentProcessor.createPurchase(true,account,nonNulPaymentMethodId,directPaymentId,amount,currency,directPaymentExternalKey,directPaymentTransactionExternalKey,properties,paymentOptions.getPaymentControlPluginName(),callContext,internalCallContext);
