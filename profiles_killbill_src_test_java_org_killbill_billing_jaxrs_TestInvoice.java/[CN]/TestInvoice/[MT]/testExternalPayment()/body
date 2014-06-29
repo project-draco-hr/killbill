@@ -1,18 +1,17 @@
 {
   final Account accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
-  final List<Payment> noPaymentsFromJson=killBillClient.getPaymentsForAccount(accountJson.getAccountId());
+  final List<InvoicePayment> noPaymentsFromJson=killBillClient.getPaymentsForAccount(accountJson.getAccountId());
   assertEquals(noPaymentsFromJson.size(),1);
   final UUID initialPaymentId=noPaymentsFromJson.get(0).getPaymentId();
   final List<Invoice> invoices=killBillClient.getInvoicesForAccount(accountJson.getAccountId());
   assertEquals(invoices.size(),2);
   final UUID invoiceId=invoices.get(1).getInvoiceId();
-  final BigDecimal paidAmount=BigDecimal.TEN;
-  final Payment payment=new Payment();
-  payment.setAmount(BigDecimal.TEN);
-  payment.setAccountId(accountJson.getAccountId());
-  payment.setInvoiceId(invoiceId);
-  killBillClient.createPayment(payment,true,createdBy,reason,comment);
-  final List<Payment> paymentsFromJson=killBillClient.getPaymentsForAccount(accountJson.getAccountId());
+  final InvoicePayment invoicePayment=new InvoicePayment();
+  invoicePayment.setPurchasedAmount(BigDecimal.TEN);
+  invoicePayment.setAccountId(accountJson.getAccountId());
+  invoicePayment.setTargetInvoiceId(invoiceId);
+  killBillClient.createInvoicePayment(invoicePayment,true,createdBy,reason,comment);
+  final List<InvoicePayment> paymentsFromJson=killBillClient.getPaymentsForAccount(accountJson.getAccountId());
   assertEquals(paymentsFromJson.size(),2);
   Payment secondPayment=null;
   for (  final Payment cur : paymentsFromJson) {
@@ -22,7 +21,6 @@
     }
   }
   assertNotNull(secondPayment);
-  assertEquals(secondPayment.getPaidAmount().compareTo(paidAmount),0);
   final UUID paymentMethodId=secondPayment.getPaymentMethodId();
   final PaymentMethod paymentMethodJson=killBillClient.getPaymentMethod(paymentMethodId);
   assertEquals(paymentMethodJson.getPaymentMethodId(),paymentMethodId);

@@ -1,0 +1,12 @@
+{
+  final InvoicePayment paymentJson=setupScenarioWithPayment();
+  final BigDecimal refundAmount=getFractionOfAmount(paymentJson.getPurchasedAmount());
+  final BigDecimal expectedInvoiceBalance=BigDecimal.ZERO;
+  final Refund refund=new Refund();
+  refund.setPaymentId(paymentJson.getPaymentId());
+  refund.setAmount(refundAmount);
+  refund.setAdjusted(true);
+  final Payment paymentAfterRefundJson=killBillClient.createInvoicePaymentRefund(refund,createdBy,reason,comment);
+  verifyRefund(paymentJson,paymentAfterRefundJson,refundAmount);
+  verifyInvoice(paymentJson,expectedInvoiceBalance);
+}

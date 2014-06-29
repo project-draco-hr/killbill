@@ -1,0 +1,18 @@
+{
+  final List<Transaction> transactions=getDirectPaymentTransactions(ImmutableList.of(paymentAfterRefund),TransactionType.REFUND.toString());
+  Assert.assertEquals(transactions.size(),1);
+  final Transaction refund=transactions.get(0);
+  Assert.assertEquals(refund.getPaymentId(),paymentJson.getPaymentId());
+  Assert.assertEquals(refund.getAmount().setScale(2,RoundingMode.HALF_UP),refundAmount.setScale(2,RoundingMode.HALF_UP));
+  Assert.assertEquals(refund.getCurrency(),DEFAULT_CURRENCY);
+  Assert.assertEquals(refund.getStatus(),"SUCCESS");
+  Assert.assertEquals(refund.getEffectiveDate().getYear(),clock.getUTCNow().getYear());
+  Assert.assertEquals(refund.getEffectiveDate().getMonthOfYear(),clock.getUTCNow().getMonthOfYear());
+  Assert.assertEquals(refund.getEffectiveDate().getDayOfMonth(),clock.getUTCNow().getDayOfMonth());
+  final Payment retrievedPaymentJson=killBillClient.getPayment(paymentJson.getPaymentId(),true);
+  Assert.assertEquals(retrievedPaymentJson.getPaymentId(),paymentJson.getPaymentId());
+  Assert.assertEquals(retrievedPaymentJson.getPurchasedAmount().setScale(2,RoundingMode.HALF_UP),paymentJson.getPurchasedAmount().setScale(2,RoundingMode.HALF_UP));
+  Assert.assertEquals(retrievedPaymentJson.getAccountId(),paymentJson.getAccountId());
+  Assert.assertEquals(retrievedPaymentJson.getCurrency(),paymentJson.getCurrency());
+  Assert.assertEquals(retrievedPaymentJson.getPaymentMethodId(),paymentJson.getPaymentMethodId());
+}

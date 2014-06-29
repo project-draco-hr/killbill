@@ -2,18 +2,23 @@
   for (  final AuditLevel auditLevel : AuditLevel.values()) {
     final AccountTimeline timeline=killBillClient.getAccountTimeline(accountId,auditLevel);
     Assert.assertEquals(timeline.getPayments().size(),1);
-    final Payment paymentJson=timeline.getPayments().get(0);
-    Assert.assertEquals(paymentJson.getRefunds().size(),1);
-    final Refund refundJson=paymentJson.getRefunds().get(0);
-    Assert.assertEquals(refundJson.getPaymentId(),paymentJson.getPaymentId());
-    Assert.assertEquals(refundJson.getAmount().compareTo(refundAmount),0);
-    Assert.assertEquals(paymentJson.getChargebacks().size(),1);
-    final Chargeback chargebackJson=paymentJson.getChargebacks().get(0);
-    Assert.assertEquals(chargebackJson.getPaymentId(),paymentJson.getPaymentId());
-    Assert.assertEquals(chargebackJson.getAmount().compareTo(chargebackAmount),0);
-    final List<AuditLog> paymentAuditLogs=paymentJson.getAuditLogs();
-    final List<AuditLog> refundAuditLogs=refundJson.getAuditLogs();
-    final List<AuditLog> chargebackAuditLogs=chargebackJson.getAuditLogs();
+    final InvoicePayment payment=timeline.getPayments().get(0);
+    final List<Transaction> purchaseTransactions=getDirectPaymentTransactions(timeline.getPayments(),TransactionType.PURCHASE.toString());
+    Assert.assertEquals(purchaseTransactions.size(),1);
+    final Transaction purchaseTransaction=purchaseTransactions.get(0);
+    final List<Transaction> refundTransactions=getDirectPaymentTransactions(timeline.getPayments(),TransactionType.REFUND.toString());
+    Assert.assertEquals(refundTransactions.size(),1);
+    final Transaction refundTransaction=refundTransactions.get(0);
+    Assert.assertEquals(refundTransaction.getPaymentId(),payment.getPaymentId());
+    Assert.assertEquals(refundTransaction.getAmount().compareTo(refundAmount),0);
+    final List<Transaction> chargebackTransactions=getDirectPaymentTransactions(timeline.getPayments(),TransactionType.CHARGEBACK.toString());
+    Assert.assertEquals(chargebackTransactions.size(),1);
+    final Transaction chargebackTransaction=chargebackTransactions.get(0);
+    Assert.assertEquals(chargebackTransaction.getPaymentId(),payment.getPaymentId());
+    Assert.assertEquals(chargebackTransaction.getAmount().compareTo(chargebackAmount),0);
+    final List<AuditLog> paymentAuditLogs=purchaseTransaction.getAuditLogs();
+    final List<AuditLog> refundAuditLogs=refundTransaction.getAuditLogs();
+    final List<AuditLog> chargebackAuditLogs=chargebackTransaction.getAuditLogs();
     if (AuditLevel.NONE.equals(auditLevel)) {
       Assert.assertEquals(paymentAuditLogs.size(),0);
       Assert.assertEquals(refundAuditLogs.size(),0);

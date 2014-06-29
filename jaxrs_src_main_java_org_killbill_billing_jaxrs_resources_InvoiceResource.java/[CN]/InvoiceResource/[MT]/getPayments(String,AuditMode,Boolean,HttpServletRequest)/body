@@ -6,13 +6,12 @@
     final DirectPayment payment=paymentApi.getPayment(cur.getId(),withPluginInfo,ImmutableList.<PluginProperty>of(),tenantContext);
     payments.add(payment);
   }
-  final List<PaymentJson> result=new ArrayList<PaymentJson>(payments.size());
+  final List<InvoicePaymentJson> result=new ArrayList<InvoicePaymentJson>(payments.size());
   if (payments.isEmpty()) {
     return Response.status(Status.OK).entity(result).build();
   }
-  final AccountAuditLogsForObjectType auditLogsForPayments=auditUserApi.getAccountAuditLogs(payments.get(0).getAccountId(),ObjectType.PAYMENT,auditMode.getLevel(),tenantContext);
   for (  final DirectPayment cur : payments) {
-    result.add(new PaymentJson(cur,auditLogsForPayments.getAuditLogs(cur.getId())));
+    result.add(new InvoicePaymentJson(cur,invoice.getId(),null));
   }
   return Response.status(Status.OK).entity(result).build();
 }

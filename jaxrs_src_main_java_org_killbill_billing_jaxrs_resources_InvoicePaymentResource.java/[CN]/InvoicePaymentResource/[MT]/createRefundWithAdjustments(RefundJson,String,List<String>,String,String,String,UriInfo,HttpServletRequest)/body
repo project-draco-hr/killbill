@@ -11,15 +11,15 @@
       for (      final InvoiceItemJson item : json.getAdjustments()) {
         adjustments.put(UUID.fromString(item.getInvoiceItemId()),item.getAmount());
       }
-      pluginProperties=extractPluginProperties(pluginPropertiesString,new PluginProperty("IPCD_REF_IDS_AMOUNTS",true,false),new PluginProperty("IPCD_REFUND_WITH_ADJUSTMENTS",adjustments,false));
+      pluginProperties=extractPluginProperties(pluginPropertiesString,new PluginProperty("IPCD_REFUND_WITH_ADJUSTMENTS","true",false),new PluginProperty("IPCD_REFUND_IDS_AMOUNTS",adjustments,false));
     }
  else {
-      pluginProperties=extractPluginProperties(pluginPropertiesString,new PluginProperty("IPCD_REF_IDS_AMOUNTS",true,false));
+      pluginProperties=extractPluginProperties(pluginPropertiesString,new PluginProperty("IPCD_REFUND_WITH_ADJUSTMENTS","true",false));
     }
   }
  else {
     pluginProperties=extractPluginProperties(pluginPropertiesString);
   }
-  final DirectPayment result=paymentApi.createRefundWithPaymentControl(account,payment.getId(),null,account.getCurrency(),transactionExternalKey,pluginProperties,createInvoicePaymentControlPluginApiPaymentOptions(false),callContext);
+  final DirectPayment result=paymentApi.createRefundWithPaymentControl(account,payment.getId(),json.getAmount(),account.getCurrency(),transactionExternalKey,pluginProperties,createInvoicePaymentControlPluginApiPaymentOptions(false),callContext);
   return uriBuilder.buildResponse(DirectPaymentResource.class,"getDirectPayment",result.getId(),uriInfo.getBaseUri().toString());
 }

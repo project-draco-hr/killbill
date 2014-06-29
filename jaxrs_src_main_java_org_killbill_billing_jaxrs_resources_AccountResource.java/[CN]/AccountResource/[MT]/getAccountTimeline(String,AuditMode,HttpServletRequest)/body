@@ -17,10 +17,6 @@
   final List<SubscriptionBundle> bundles=subscriptionApi.getSubscriptionBundlesForAccountId(account.getId(),tenantContext);
   final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
   final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePaymentsByAccount(accountId,tenantContext);
-  final Map<UUID,UUID> invoicesIdByPayment=new HashMap<UUID,UUID>();
-  for (  InvoicePayment cur : invoicePayments) {
-    invoicesIdByPayment.put(cur.getPaymentId(),cur.getInvoiceId());
-  }
-  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,invoicesIdByPayment,bundles,refundsByPayment,chargebacksByPayment,accountAuditLogs);
+  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,invoicePayments,bundles,accountAuditLogs);
   return Response.status(Status.OK).entity(json).build();
 }

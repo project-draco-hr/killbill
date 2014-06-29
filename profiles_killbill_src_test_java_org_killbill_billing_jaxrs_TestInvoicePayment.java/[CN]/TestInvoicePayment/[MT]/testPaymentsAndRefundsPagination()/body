@@ -1,0 +1,27 @@
+{
+  InvoicePayment lastPayment=setupScenarioWithPayment();
+  for (int i=0; i < 5; i++) {
+    final Refund refund=new Refund();
+    refund.setPaymentId(lastPayment.getPaymentId());
+    refund.setAmount(lastPayment.getPurchasedAmount());
+    killBillClient.createInvoicePaymentRefund(refund,createdBy,reason,comment);
+    final InvoicePayment invoicePayment=new InvoicePayment();
+    invoicePayment.setPurchasedAmount(lastPayment.getPurchasedAmount());
+    invoicePayment.setAccountId(lastPayment.getAccountId());
+    invoicePayment.setTargetInvoiceId(lastPayment.getTargetInvoiceId());
+    final InvoicePayment payment=killBillClient.createInvoicePayment(invoicePayment,true,createdBy,reason,comment);
+    lastPayment=payment;
+  }
+  final InvoicePayments allPayments=killBillClient.getInvoicePaymentsForAccount(lastPayment.getAccountId());
+  Assert.assertEquals(allPayments.size(),6);
+  final List<Transaction> objRefundFromJson=getDirectPaymentTransactions(allPayments,TransactionType.REFUND.toString());
+  Assert.assertEquals(objRefundFromJson.size(),5);
+  Payments paymentsPage=killBillClient.getPayments(0L,1L);
+  for (int i=0; i < 6; i++) {
+    Assert.assertNotNull(paymentsPage);
+    Assert.assertEquals(paymentsPage.size(),1);
+    Assert.assertEquals(paymentsPage.get(0),allPayments.get(i));
+    paymentsPage=paymentsPage.getNext();
+  }
+  Assert.assertNull(paymentsPage);
+}

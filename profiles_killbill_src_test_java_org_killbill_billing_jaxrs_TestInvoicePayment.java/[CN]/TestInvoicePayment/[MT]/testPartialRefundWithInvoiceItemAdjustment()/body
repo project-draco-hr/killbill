@@ -1,0 +1,17 @@
+{
+  final InvoicePayment paymentJson=setupScenarioWithPayment();
+  final Invoice invoice=killBillClient.getInvoice(paymentJson.getTargetInvoiceId(),true);
+  final InvoiceItem itemToAdjust=invoice.getItems().get(0);
+  final BigDecimal refundAmount=getFractionOfAmount(itemToAdjust.getAmount());
+  final BigDecimal expectedInvoiceBalance=BigDecimal.ZERO;
+  final Refund refund=new Refund();
+  refund.setPaymentId(paymentJson.getPaymentId());
+  refund.setAdjusted(true);
+  final InvoiceItem adjustment=new InvoiceItem();
+  adjustment.setInvoiceItemId(itemToAdjust.getInvoiceItemId());
+  adjustment.setAmount(refundAmount);
+  refund.setAdjustments(ImmutableList.<InvoiceItem>of(adjustment));
+  final Payment paymentAfterRefundJson=killBillClient.createInvoicePaymentRefund(refund,createdBy,reason,comment);
+  verifyRefund(paymentJson,paymentAfterRefundJson,refundAmount);
+  verifyInvoice(paymentJson,expectedInvoiceBalance);
+}

@@ -7,12 +7,12 @@
     if (cur.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
       continue;
     }
-    final Payment payment=new Payment();
-    payment.setAccountId(accountJson.getAccountId());
-    payment.setInvoiceId(cur.getInvoiceId());
-    payment.setAmount(cur.getBalance());
-    final List<Payment> objFromJson=killBillClient.createPayment(payment,false,createdBy,reason,comment);
+    final InvoicePayment invoicePayment=new InvoicePayment();
+    invoicePayment.setPurchasedAmount(cur.getBalance());
+    invoicePayment.setAccountId(accountJson.getAccountId());
+    invoicePayment.setTargetInvoiceId(cur.getInvoiceId());
+    final InvoicePayments objFromJson=null;
     assertEquals(objFromJson.size(),1);
-    assertEquals(cur.getBalance().compareTo(objFromJson.get(0).getAmount()),0);
+    assertEquals(cur.getBalance().compareTo(objFromJson.get(0).getPurchasedAmount()),0);
   }
 }

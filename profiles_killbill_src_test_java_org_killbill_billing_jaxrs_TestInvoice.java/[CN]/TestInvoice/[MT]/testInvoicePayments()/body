@@ -4,13 +4,13 @@
   final List<Invoice> invoices=killBillClient.getInvoicesForAccount(accountJson.getAccountId());
   assertEquals(invoices.size(),2);
   for (  final Invoice cur : invoices) {
-    final List<Payment> objFromJson=killBillClient.getPaymentsForInvoice(cur.getInvoiceId());
+    final InvoicePayments objFromJson=killBillClient.getInvoicePayment(cur.getInvoiceId());
     if (cur.getAmount().compareTo(BigDecimal.ZERO) == 0) {
       assertEquals(objFromJson.size(),0);
     }
  else {
       assertEquals(objFromJson.size(),1);
-      assertEquals(cur.getAmount().compareTo(objFromJson.get(0).getAmount()),0);
+      assertEquals(cur.getAmount().compareTo(objFromJson.get(0).getPurchasedAmount()),0);
     }
   }
 }

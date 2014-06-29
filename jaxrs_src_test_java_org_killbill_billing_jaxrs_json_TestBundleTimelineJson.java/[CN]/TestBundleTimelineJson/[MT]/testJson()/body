@@ -3,8 +3,8 @@
   final String reason=UUID.randomUUID().toString();
   final BundleJson bundleJson=createBundleWithSubscriptions();
   final InvoiceJson invoiceJson=createInvoice();
-  final PaymentJson paymentJson=createPayment(UUID.fromString(invoiceJson.getAccountId()),UUID.fromString(invoiceJson.getInvoiceId()));
-  final BundleTimelineJson bundleTimelineJson=new BundleTimelineJson(viewId,bundleJson,ImmutableList.<PaymentJson>of(paymentJson),ImmutableList.<InvoiceJson>of(invoiceJson),reason);
+  final InvoicePaymentJson paymentJson=createPayment(UUID.fromString(invoiceJson.getAccountId()),UUID.fromString(invoiceJson.getInvoiceId()));
+  final BundleTimelineJson bundleTimelineJson=new BundleTimelineJson(viewId,bundleJson,ImmutableList.<InvoicePaymentJson>of(paymentJson),ImmutableList.<InvoiceJson>of(invoiceJson),reason);
   final String asJson=mapper.writeValueAsString(bundleTimelineJson);
   final BundleTimelineJson fromJson=mapper.readValue(asJson,BundleTimelineJson.class);
   Assert.assertEquals(fromJson,bundleTimelineJson);
