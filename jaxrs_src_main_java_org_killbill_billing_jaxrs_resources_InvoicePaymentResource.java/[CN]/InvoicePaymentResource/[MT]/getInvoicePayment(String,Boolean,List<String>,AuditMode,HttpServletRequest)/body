@@ -4,6 +4,14 @@
   final TenantContext tenantContext=context.createContext(request);
   final DirectPayment directPayment=paymentApi.getPayment(directPaymentIdId,withPluginInfo,pluginProperties,tenantContext);
   final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(directPayment.getAccountId(),auditMode.getLevel(),tenantContext);
-  final DirectPaymentJson paymentJson=new DirectPaymentJson(directPayment,accountAuditLogs);
-  return Response.status(Response.Status.OK).entity(paymentJson).build();
+  final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePayments(directPaymentIdId,tenantContext);
+  final InvoicePayment invoicePayment=Iterables.tryFind(invoicePayments,new Predicate<InvoicePayment>(){
+    @Override public boolean apply(    final InvoicePayment input){
+      return input.getType() == InvoicePaymentType.ATTEMPT;
+    }
+  }
+).orNull();
+  final UUID invoiceId=invoicePayment != null ? invoicePayment.getInvoiceId() : null;
+  final InvoicePaymentJson result=new InvoicePaymentJson(directPayment,invoiceId,accountAuditLogs);
+  return Response.status(Response.Status.OK).entity(result).build();
 }

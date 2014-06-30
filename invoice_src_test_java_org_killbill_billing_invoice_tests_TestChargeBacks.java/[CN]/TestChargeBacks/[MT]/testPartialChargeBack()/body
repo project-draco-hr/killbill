@@ -1,7 +1,0 @@
-{
-  final Invoice invoice=createAndPersistInvoice(invoiceDao,clock,THIRTY,CURRENCY,internalCallContext);
-  final InvoicePayment payment=createAndPersistPayment(invoiceInternalApi,clock,invoice.getId(),THIRTY,CURRENCY,internalCallContext);
-  invoicePaymentApi.createChargeback(payment.getId(),FIFTEEN,callContext);
-  final BigDecimal amount=invoicePaymentApi.getRemainingAmountPaid(payment.getId(),callContext);
-  assertTrue(amount.compareTo(FIFTEEN) == 0);
-}

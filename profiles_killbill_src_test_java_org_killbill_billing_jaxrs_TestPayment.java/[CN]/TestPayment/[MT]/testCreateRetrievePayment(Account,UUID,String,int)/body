@@ -1,6 +1,6 @@
 {
   final String authTransactionExternalKey=UUID.randomUUID().toString();
-  final Transaction authTransaction=new Transaction();
+  final PaymentTransaction authTransaction=new PaymentTransaction();
   authTransaction.setAmount(BigDecimal.TEN);
   authTransaction.setCurrency(account.getCurrency());
   authTransaction.setPaymentExternalKey(PaymentExternalKey);
@@ -9,7 +9,7 @@
   final Payment authPayment=killBillClient.createPayment(account.getAccountId(),paymentMethodId,authTransaction,createdBy,reason,comment);
   verifyPayment(account,paymentMethodId,authPayment,PaymentExternalKey,authTransactionExternalKey,BigDecimal.TEN,BigDecimal.ZERO,BigDecimal.ZERO,1,PaymentNb);
   final String capture1TransactionExternalKey=UUID.randomUUID().toString();
-  final Transaction captureTransaction=new Transaction();
+  final PaymentTransaction captureTransaction=new PaymentTransaction();
   captureTransaction.setPaymentId(authPayment.getPaymentId());
   captureTransaction.setAmount(BigDecimal.ONE);
   captureTransaction.setCurrency(account.getCurrency());
@@ -24,7 +24,7 @@
   verifyPayment(account,paymentMethodId,capturedPayment2,PaymentExternalKey,authTransactionExternalKey,BigDecimal.TEN,new BigDecimal("2"),BigDecimal.ZERO,3,PaymentNb);
   verifyPaymentTransaction(authPayment.getPaymentId(),capturedPayment2.getTransactions().get(2),PaymentExternalKey,capture2TransactionExternalKey,account,captureTransaction.getAmount(),"CAPTURE");
   final String refundTransactionExternalKey=UUID.randomUUID().toString();
-  final Transaction refundTransaction=new Transaction();
+  final PaymentTransaction refundTransaction=new PaymentTransaction();
   refundTransaction.setPaymentId(authPayment.getPaymentId());
   refundTransaction.setAmount(new BigDecimal("2"));
   refundTransaction.setCurrency(account.getCurrency());

@@ -6,7 +6,7 @@
   checkNullParameter(directPaymentTransactionExternalKey,"paymentTransactionExternalKey");
   checkNullParameter(properties,"plugin properties");
   checkPositiveAmount(amount);
-  if (paymentMethodId == null && paymentOptions.isExternalPayment()) {
+  if (paymentMethodId == null && !paymentOptions.isExternalPayment()) {
     throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_PARAMETER,"paymentMethodId","should not be null");
   }
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
