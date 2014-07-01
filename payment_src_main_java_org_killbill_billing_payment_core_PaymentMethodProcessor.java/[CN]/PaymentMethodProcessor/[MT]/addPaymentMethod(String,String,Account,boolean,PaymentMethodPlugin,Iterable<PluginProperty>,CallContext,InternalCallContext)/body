@@ -8,7 +8,7 @@
           pluginApi=getPaymentPluginApi(paymentPluginServiceName);
           pm=new DefaultPaymentMethod(paymentMethodExternalKey,account.getId(),paymentPluginServiceName,paymentMethodProps);
           pluginApi.addPaymentMethod(account.getId(),pm.getId(),paymentMethodProps,setDefault,properties,callContext);
-          final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getCreatedDate(),pm.getUpdatedDate(),pm.getAccountId(),pm.getPluginName(),pm.isActive());
+          final PaymentMethodModelDao pmModel=new PaymentMethodModelDao(pm.getId(),pm.getExternalKey(),pm.getCreatedDate(),pm.getUpdatedDate(),pm.getAccountId(),pm.getPluginName(),pm.isActive());
           paymentDao.insertPaymentMethod(pmModel,context);
           if (setDefault) {
             accountInternalApi.updatePaymentMethod(account.getId(),pm.getId(),context);
