@@ -1,0 +1,9 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final TenantContext tenantContext=context.createContext(request);
+  final PaymentMethod paymentMethod=paymentApi.getPaymentMethodByExternalKey(externalKey,false,withPluginInfo,pluginProperties,tenantContext);
+  final Account account=accountUserApi.getAccountById(paymentMethod.getAccountId(),tenantContext);
+  final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(paymentMethod.getAccountId(),auditMode.getLevel(),tenantContext);
+  final PaymentMethodJson json=PaymentMethodJson.toPaymentMethodJson(account,paymentMethod,accountAuditLogs);
+  return Response.status(Status.OK).entity(json).build();
+}

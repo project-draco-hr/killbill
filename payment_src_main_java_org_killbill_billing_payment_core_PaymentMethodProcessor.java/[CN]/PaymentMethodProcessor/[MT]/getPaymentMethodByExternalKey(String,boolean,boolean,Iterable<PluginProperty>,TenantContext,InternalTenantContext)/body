@@ -1,0 +1,7 @@
+{
+  final PaymentMethodModelDao paymentMethodModel=includedDeleted ? paymentDao.getPaymentMethodByExternalKeyIncludedDeleted(paymentMethodExternalKey,context) : paymentDao.getPaymentMethodByExternalKey(paymentMethodExternalKey,context);
+  if (paymentMethodModel == null) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,paymentMethodExternalKey);
+  }
+  return buildDefaultPaymentMethod(paymentMethodModel,withPluginInfo,properties,tenantContext,context);
+}
