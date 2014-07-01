@@ -2,20 +2,20 @@
   final DateTime utcNow=clock.getUTCNow();
   final DirectPaymentStateContext directPaymentStateContext=new DirectPaymentStateContext(directPaymentId,directPaymentExternalKey,directPaymentTransactionExternalKey,transactionType,account,paymentMethodId,amount,currency,shouldLockAccount,properties,internalCallContext,callContext);
   final DirectPaymentAutomatonDAOHelper daoHelper=new DirectPaymentAutomatonDAOHelper(directPaymentStateContext,utcNow,paymentDao,pluginRegistry,internalCallContext);
-  final UUID nonNullPaymentMethodId;
+  final UUID effectivePaymentMethodId;
   final String currentStateMachineName;
   final String currentStateName;
   if (directPaymentId != null) {
     final PaymentModelDao paymentModelDao=daoHelper.getDirectPayment();
-    nonNullPaymentMethodId=paymentModelDao.getPaymentMethodId();
+    effectivePaymentMethodId=paymentModelDao.getPaymentMethodId();
     currentStateName=paymentModelDao.getStateName();
     currentStateMachineName=getStateMachineName(currentStateName);
     Preconditions.checkState(currentStateMachineName != null,"State machine name cannot be null for direct payment " + directPaymentId);
     Preconditions.checkState(currentStateName != null,"State name cannot be null for direct payment " + directPaymentId);
-    Preconditions.checkState(paymentMethodId == null || nonNullPaymentMethodId.equals(paymentMethodId),"Specified payment method id " + paymentMethodId + " doesn't match the one on the payment "+ nonNullPaymentMethodId);
+    Preconditions.checkState(paymentMethodId == null || effectivePaymentMethodId.equals(paymentMethodId),"Specified payment method id " + paymentMethodId + " doesn't match the one on the payment "+ effectivePaymentMethodId);
   }
  else {
-    nonNullPaymentMethodId=paymentMethodId != null ? paymentMethodId : daoHelper.getDefaultPaymentMethodId();
+    effectivePaymentMethodId=paymentMethodId != null ? paymentMethodId : daoHelper.getDefaultPaymentMethodId();
 switch (transactionType) {
 case AUTHORIZE:
       currentStateMachineName="AUTHORIZE";
@@ -33,7 +33,7 @@ default :
 throw new IllegalStateException("Unsupported transaction type " + transactionType + " for null direct payment id");
 }
 }
-directPaymentStateContext.setPaymentMethodId(nonNullPaymentMethodId);
+directPaymentStateContext.setPaymentMethodId(effectivePaymentMethodId);
 final String operationStateMachineName;
 final String operationName;
 final OperationCallback operationCallback;

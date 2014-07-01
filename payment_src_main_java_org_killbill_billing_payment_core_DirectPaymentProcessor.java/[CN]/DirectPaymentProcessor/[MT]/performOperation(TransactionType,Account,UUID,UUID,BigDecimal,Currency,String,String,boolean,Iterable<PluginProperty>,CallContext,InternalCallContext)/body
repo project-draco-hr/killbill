@@ -1,0 +1,12 @@
+{
+  DirectPayment directPayment=null;
+  try {
+    validateUniqueTransactionExternalKey(directPaymentTransactionExternalKey,internalCallContext);
+    final UUID nonNullDirectPaymentId=directPaymentAutomatonRunner.run(transactionType,account,paymentMethodId,directPaymentId,directPaymentExternalKey,directPaymentTransactionExternalKey,amount,currency,shouldLockAccountAndDispatch,properties,callContext,internalCallContext);
+    directPayment=getPayment(nonNullDirectPaymentId,true,properties,callContext,internalCallContext);
+    return directPayment;
+  }
+  finally {
+    postPaymentEvent(account,transactionType,directPayment,directPaymentTransactionExternalKey,internalCallContext);
+  }
+}

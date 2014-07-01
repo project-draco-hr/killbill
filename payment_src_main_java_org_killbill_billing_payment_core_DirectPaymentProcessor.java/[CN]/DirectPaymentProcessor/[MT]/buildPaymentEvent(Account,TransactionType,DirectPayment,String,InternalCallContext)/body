@@ -1,0 +1,19 @@
+{
+  if (directPayment == null) {
+    return new DefaultPaymentErrorEvent(account.getId(),null,null,transactionType,"No payment method",context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+  }
+  final DirectPaymentTransaction directPaymentTransaction=directPayment.getTransactions().get(directPayment.getTransactions().size() - 1);
+  Preconditions.checkState(directPaymentTransaction.getExternalKey().equals(transactionExternalKey));
+  Preconditions.checkState(directPaymentTransaction.getTransactionType().equals(transactionType));
+  final TransactionStatus transactionStatus=directPaymentTransaction.getTransactionStatus();
+switch (directPaymentTransaction.getTransactionStatus()) {
+case SUCCESS:
+case PENDING:
+    return new DefaultPaymentInfoEvent(account.getId(),null,directPayment.getId(),directPaymentTransaction.getAmount(),directPayment.getPaymentNumber(),transactionStatus,transactionType,directPaymentTransaction.getEffectiveDate(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+case PAYMENT_FAILURE:
+  return new DefaultPaymentErrorEvent(account.getId(),null,directPayment.getId(),transactionType,directPaymentTransaction.getPaymentInfoPlugin() == null ? null : directPaymentTransaction.getPaymentInfoPlugin().getGatewayError(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+case PLUGIN_FAILURE:
+default :
+return new DefaultPaymentPluginErrorEvent(account.getId(),null,directPayment.getId(),transactionType,directPaymentTransaction.getPaymentInfoPlugin() == null ? null : directPaymentTransaction.getPaymentInfoPlugin().getGatewayError(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+}
+}
