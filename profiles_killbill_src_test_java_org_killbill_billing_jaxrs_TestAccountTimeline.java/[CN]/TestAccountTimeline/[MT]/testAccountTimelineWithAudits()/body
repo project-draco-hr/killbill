@@ -15,11 +15,7 @@
   refund.setPaymentId(postedPayment.getPaymentId());
   refund.setAmount(refundAmount);
   killBillClient.createInvoicePaymentRefund(refund,createdBy,reason,comment);
-  final BigDecimal chargebackAmount=BigDecimal.ONE;
-  final Chargeback chargeback=new Chargeback();
-  chargeback.setPaymentId(postedPayment.getPaymentId());
-  chargeback.setAmount(chargebackAmount);
-  killBillClient.createChargeBack(chargeback,createdBy,reason,comment);
+  final BigDecimal chargebackAmount=BigDecimal.ZERO;
   verifyPayments(accountJson.getAccountId(),startTime,endTime,refundAmount,chargebackAmount);
   verifyInvoices(accountJson.getAccountId(),startTime,endTime);
   verifyCredits(accountJson.getAccountId(),startTime,endTime,creditAmount);

@@ -11,37 +11,25 @@
     final PaymentTransaction refundTransaction=refundTransactions.get(0);
     Assert.assertEquals(refundTransaction.getPaymentId(),payment.getPaymentId());
     Assert.assertEquals(refundTransaction.getAmount().compareTo(refundAmount),0);
-    final List<PaymentTransaction> chargebackTransactions=getDirectPaymentTransactions(timeline.getPayments(),TransactionType.CHARGEBACK.toString());
-    Assert.assertEquals(chargebackTransactions.size(),1);
-    final PaymentTransaction chargebackTransaction=chargebackTransactions.get(0);
-    Assert.assertEquals(chargebackTransaction.getPaymentId(),payment.getPaymentId());
-    Assert.assertEquals(chargebackTransaction.getAmount().compareTo(chargebackAmount),0);
     final List<AuditLog> paymentAuditLogs=purchaseTransaction.getAuditLogs();
     final List<AuditLog> refundAuditLogs=refundTransaction.getAuditLogs();
-    final List<AuditLog> chargebackAuditLogs=chargebackTransaction.getAuditLogs();
     if (AuditLevel.NONE.equals(auditLevel)) {
       Assert.assertEquals(paymentAuditLogs.size(),0);
       Assert.assertEquals(refundAuditLogs.size(),0);
-      Assert.assertEquals(chargebackAuditLogs.size(),0);
     }
  else     if (AuditLevel.MINIMAL.equals(auditLevel)) {
       Assert.assertEquals(paymentAuditLogs.size(),1);
       verifyAuditLog(paymentAuditLogs.get(0),ChangeType.INSERT,null,null,PAYMENT_REQUEST_PROCESSOR,startTime,endTime);
       Assert.assertEquals(refundAuditLogs.size(),1);
       verifyAuditLog(refundAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
-      Assert.assertEquals(chargebackAuditLogs.size(),1);
-      verifyAuditLog(chargebackAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
     }
  else {
       Assert.assertEquals(paymentAuditLogs.size(),2);
       verifyAuditLog(paymentAuditLogs.get(0),ChangeType.INSERT,null,null,PAYMENT_REQUEST_PROCESSOR,startTime,endTime);
       verifyAuditLog(paymentAuditLogs.get(1),ChangeType.UPDATE,null,null,PAYMENT_REQUEST_PROCESSOR,startTime,endTime);
-      Assert.assertEquals(refundAuditLogs.size(),3);
+      Assert.assertEquals(refundAuditLogs.size(),2);
       verifyAuditLog(refundAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
       verifyAuditLog(refundAuditLogs.get(1),ChangeType.UPDATE,reason,comment,createdBy,startTime,endTime);
-      verifyAuditLog(refundAuditLogs.get(2),ChangeType.UPDATE,reason,comment,createdBy,startTime,endTime);
-      Assert.assertEquals(chargebackAuditLogs.size(),1);
-      verifyAuditLog(chargebackAuditLogs.get(0),ChangeType.INSERT,reason,comment,createdBy,startTime,endTime);
     }
   }
 }

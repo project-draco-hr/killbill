@@ -2,7 +2,8 @@
   final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
   return getEntityPagination(limit,new SourcePaginationBuilder<PaymentModelDao,PaymentApiException>(){
     @Override public Pagination<PaymentModelDao> build(){
-      return paymentDao.getDirectPayments(pluginName,offset,limit,internalTenantContext);
+      final Pagination<PaymentModelDao> result=paymentDao.getDirectPayments(pluginName,offset,limit,internalTenantContext);
+      return result;
     }
   }
 ,new Function<PaymentModelDao,DirectPayment>(){

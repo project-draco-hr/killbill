@@ -3,14 +3,14 @@
   final Account accountJson=createAccountWithPMBundleAndSubscriptionAndWaitForFirstInvoice();
   final List<Invoice> invoices=killBillClient.getInvoicesForAccount(accountJson.getAccountId());
   assertEquals(invoices.size(),2);
-  for (  final Invoice cur : invoices) {
-    final InvoicePayments objFromJson=killBillClient.getInvoicePayment(cur.getInvoiceId());
-    if (cur.getAmount().compareTo(BigDecimal.ZERO) == 0) {
-      assertEquals(objFromJson.size(),0);
-    }
- else {
-      assertEquals(objFromJson.size(),1);
-      assertEquals(cur.getAmount().compareTo(objFromJson.get(0).getPurchasedAmount()),0);
+  final Invoice invoiceWithPositiveAmount=Iterables.tryFind(invoices,new Predicate<Invoice>(){
+    @Override public boolean apply(    final Invoice input){
+      return input.getAmount().compareTo(BigDecimal.ZERO) > 0;
     }
   }
+).orNull();
+  Assert.assertNotNull(invoiceWithPositiveAmount);
+  final InvoicePayments objFromJson=killBillClient.getInvoicePayment(invoiceWithPositiveAmount.getInvoiceId());
+  assertEquals(objFromJson.size(),1);
+  assertEquals(invoiceWithPositiveAmount.getAmount().compareTo(objFromJson.get(0).getPurchasedAmount()),0);
 }
