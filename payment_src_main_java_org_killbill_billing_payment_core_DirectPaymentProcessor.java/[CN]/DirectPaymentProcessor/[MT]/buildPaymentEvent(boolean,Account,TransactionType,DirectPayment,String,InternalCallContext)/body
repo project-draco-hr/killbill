@@ -1,6 +1,6 @@
 {
-  if (directPayment == null) {
-    return new DefaultPaymentErrorEvent(account.getId(),null,null,transactionType,"No payment method",context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+  if (!isApiPayment && directPayment == null) {
+    return new DefaultPaymentErrorEvent(account.getId(),null,null,transactionType,"Early abortion of payment transaction",context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
   }
   final DirectPaymentTransaction directPaymentTransaction=directPayment.getTransactions().get(directPayment.getTransactions().size() - 1);
   Preconditions.checkState(directPaymentTransaction.getExternalKey().equals(transactionExternalKey));

@@ -1,13 +1,13 @@
 {
   final String directPaymentExternalKey=UUID.randomUUID().toString();
   final String authorizationKey=UUID.randomUUID().toString();
-  final DirectPayment authorization=directPaymentProcessor.createAuthorization(account,null,null,TEN,CURRENCY,directPaymentExternalKey,authorizationKey,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  final DirectPayment authorization=directPaymentProcessor.createAuthorization(true,account,null,null,TEN,CURRENCY,directPaymentExternalKey,authorizationKey,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
   verifyDirectPayment(authorization,directPaymentExternalKey,TEN,ZERO,ZERO,1);
   final UUID directPaymentId=authorization.getId();
   verifyDirectPaymentTransaction(authorization.getTransactions().get(0),authorizationKey,TransactionType.AUTHORIZE,TEN,directPaymentId);
   paymentBusListener.verify(1,account.getId(),directPaymentId,TEN);
   final String voidKey=UUID.randomUUID().toString();
-  final DirectPayment voidTransaction=directPaymentProcessor.createVoid(account,directPaymentId,voidKey,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  final DirectPayment voidTransaction=directPaymentProcessor.createVoid(true,account,directPaymentId,voidKey,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
   verifyDirectPayment(voidTransaction,directPaymentExternalKey,TEN,ZERO,ZERO,2);
   verifyDirectPaymentTransaction(voidTransaction.getTransactions().get(1),voidKey,TransactionType.VOID,null,directPaymentId);
   paymentBusListener.verify(2,account.getId(),directPaymentId,null);
