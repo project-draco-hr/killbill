@@ -1,4 +1,9 @@
 {
   logger.debug("Leaving state {}",oldState.getName());
-  daoHelper.createNewDirectPaymentTransaction();
+  try {
+    daoHelper.createNewDirectPaymentTransaction();
+  }
+ catch (  PaymentApiException e) {
+    throw new OperationException(e);
+  }
 }
