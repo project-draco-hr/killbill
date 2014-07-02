@@ -1,10 +1,10 @@
 {
-  checkNullParameter(account,"account");
-  checkNullParameter(amount,"amount");
-  checkNullParameter(currency,"currency");
-  checkNullParameter(directPaymentTransactionId,"paymentTransactionId");
-  checkNullParameter(chargebackTransactionExternalKey,"transactionExternalKey");
+  checkNotNullParameter(account,"account");
+  checkNotNullParameter(amount,"amount");
+  checkNotNullParameter(currency,"currency");
+  checkNotNullParameter(directPaymentTransactionId,"paymentTransactionId");
+  checkNotNullParameter(chargebackTransactionExternalKey,"transactionExternalKey");
   checkPositiveAmount(amount);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
-  return directPaymentProcessor.notifyPaymentPaymentOfChargeback(account,directPaymentTransactionId,chargebackTransactionExternalKey,amount,currency,callContext,internalCallContext);
+  return directPaymentProcessor.notifyChargeback(account,null,directPaymentTransactionId,chargebackTransactionExternalKey,amount,currency,true,callContext,internalCallContext);
 }
