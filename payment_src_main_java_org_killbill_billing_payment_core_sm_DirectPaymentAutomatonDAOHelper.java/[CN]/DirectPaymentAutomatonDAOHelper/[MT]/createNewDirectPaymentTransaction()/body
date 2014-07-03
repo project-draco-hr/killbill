@@ -1,13 +1,15 @@
 {
   final PaymentTransactionModelDao paymentTransactionModelDao;
+  final List<PaymentTransactionModelDao> existingTransactions;
   if (directPaymentStateContext.getDirectPaymentId() == null) {
     final PaymentModelDao newPaymentModelDao=buildNewDirectPaymentModelDao();
     final PaymentTransactionModelDao newPaymentTransactionModelDao=buildNewDirectPaymentTransactionModelDao(newPaymentModelDao.getId());
+    existingTransactions=ImmutableList.of();
     final PaymentModelDao paymentModelDao=paymentDao.insertDirectPaymentWithFirstTransaction(newPaymentModelDao,newPaymentTransactionModelDao,internalCallContext);
     paymentTransactionModelDao=paymentDao.getDirectTransactionsForDirectPayment(paymentModelDao.getId(),internalCallContext).get(0);
   }
  else {
-    final List<PaymentTransactionModelDao> existingTransactions=paymentDao.getDirectTransactionsForDirectPayment(directPaymentStateContext.getDirectPaymentId(),internalCallContext);
+    existingTransactions=paymentDao.getDirectTransactionsForDirectPayment(directPaymentStateContext.getDirectPaymentId(),internalCallContext);
     if (existingTransactions.isEmpty()) {
       throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_SUCCESS_PAYMENT,directPaymentStateContext.getDirectPaymentId());
     }
@@ -18,4 +20,5 @@
     paymentTransactionModelDao=paymentDao.updateDirectPaymentWithNewTransaction(directPaymentStateContext.getDirectPaymentId(),newPaymentTransactionModelDao,internalCallContext);
   }
   directPaymentStateContext.setDirectPaymentTransactionModelDao(paymentTransactionModelDao);
+  directPaymentStateContext.setOnLeavingStateExistingTransactions(existingTransactions);
 }

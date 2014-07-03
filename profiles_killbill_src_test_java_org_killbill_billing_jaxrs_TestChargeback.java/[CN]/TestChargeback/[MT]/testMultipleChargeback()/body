@@ -1,24 +1,32 @@
 {
   final Payment payment=createAccountWithInvoiceAndPayment();
-  final Chargeback input=new Chargeback();
-  input.setAmount(new BigDecimal("50.00"));
+  final InvoicePaymentTransaction input=new InvoicePaymentTransaction();
   input.setPaymentId(payment.getPaymentId());
+  input.setAmount(new BigDecimal("50.00"));
   int count=4;
   while (count-- > 0) {
-    assertNotNull(killBillClient.createChargeBack(input,createdBy,reason,comment));
+    assertNotNull(killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment));
   }
   try {
-    killBillClient.createChargeBack(input,createdBy,reason,comment);
+    killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment);
     fail();
   }
  catch (  final KillBillClientException e) {
   }
-  List<Chargeback> chargebacks=killBillClient.getChargebacksForAccount(payment.getAccountId());
-  assertEquals(chargebacks.size(),4);
-  for (  final Chargeback chargeBack : chargebacks) {
-    assertTrue(chargeBack.getAmount().compareTo(input.getAmount()) == 0);
-    assertEquals(chargeBack.getPaymentId(),input.getPaymentId());
+  final List<InvoicePayment> payments=killBillClient.getInvoicePaymentsForAccount(payment.getAccountId());
+  final List<PaymentTransaction> transactions=getDirectPaymentTransactions(payments,TransactionType.CHARGEBACK.toString());
+  Assert.assertEquals(transactions.size(),5);
+  int found=0;
+  for (  final PaymentTransaction transaction : transactions) {
+    if (transaction.getStatus().equals("SUCCESS")) {
+      assertTrue(transaction.getAmount().compareTo(input.getAmount()) == 0);
+      assertEquals(transaction.getPaymentId(),input.getPaymentId());
+      found++;
+    }
+ else {
+      assertEquals(transaction.getStatus(),"PAYMENT_FAILURE");
+      found++;
+    }
   }
-  chargebacks=killBillClient.getChargebacksForPayment(payment.getPaymentId());
-  assertEquals(chargebacks.size(),4);
+  assertEquals(found,5);
 }

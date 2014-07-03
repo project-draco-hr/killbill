@@ -1,11 +1,11 @@
 {
   final Account account=createAccountWithPMBundleAndSubscriptionAndWaitForFirstInvoice();
   final List<InvoicePayment> payments=killBillClient.getInvoicePaymentsForAccount(account.getAccountId());
-  final Chargeback input=new Chargeback();
-  input.setAmount(BigDecimal.TEN.negate());
+  final InvoicePaymentTransaction input=new InvoicePaymentTransaction();
   input.setPaymentId(payments.get(0).getPaymentId());
+  input.setAmount(BigDecimal.TEN.negate());
   try {
-    killBillClient.createChargeBack(input,createdBy,reason,comment);
+    killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment);
     fail();
   }
  catch (  final KillBillClientException e) {

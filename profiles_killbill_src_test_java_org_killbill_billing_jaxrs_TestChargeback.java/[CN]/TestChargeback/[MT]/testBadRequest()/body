@@ -1,10 +1,10 @@
 {
   final Payment payment=createAccountWithInvoiceAndPayment();
-  final Chargeback input=new Chargeback();
-  input.setAmount(BigDecimal.TEN.negate());
+  final InvoicePaymentTransaction input=new InvoicePaymentTransaction();
   input.setPaymentId(payment.getPaymentId());
+  input.setAmount(BigDecimal.TEN.negate());
   try {
-    killBillClient.createChargeBack(input,createdBy,reason,comment);
+    killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment);
     fail();
   }
  catch (  final KillBillClientException e) {
