@@ -1,7 +1,8 @@
 {
-  final TenantContext tenantContext=context.createContext(request);
   final UUID accountId=UUID.fromString(accountIdStr);
-  final List<DirectPayment> payments=paymentApi.getAccountPayments(accountId,withPluginInfo,ImmutableList.<PluginProperty>of(),tenantContext);
+  final TenantContext tenantContext=context.createContext(request);
+  final Account account=accountUserApi.getAccountById(accountId,tenantContext);
+  final List<DirectPayment> payments=paymentApi.getAccountPayments(account.getId(),withPluginInfo,ImmutableList.<PluginProperty>of(),tenantContext);
   final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePaymentsByAccount(accountId,tenantContext);
   final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
   final List<InvoicePaymentJson> result=new ArrayList<InvoicePaymentJson>(payments.size());

@@ -1,6 +1,14 @@
 {
-  final Chargeback input=new Chargeback();
+  final InvoicePaymentTransaction input=new InvoicePaymentTransaction();
+  input.setPaymentId(input.getPaymentId());
   input.setAmount(BigDecimal.TEN);
-  input.setPaymentId(UUID.randomUUID());
-  assertNull(killBillClient.createChargeBack(input,createdBy,reason,comment));
+  try {
+    killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment);
+    fail();
+  }
+ catch (  NullPointerException e) {
+  }
+catch (  KillBillClientException e) {
+    fail();
+  }
 }

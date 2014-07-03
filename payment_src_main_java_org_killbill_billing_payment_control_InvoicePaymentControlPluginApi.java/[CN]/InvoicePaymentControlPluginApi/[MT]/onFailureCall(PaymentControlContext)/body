@@ -1,10 +1,14 @@
 {
   final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(paymentControlContext.getAccountId(),paymentControlContext);
-switch (paymentControlContext.getTransactionType()) {
+  final TransactionType transactionType=paymentControlContext.getTransactionType();
+switch (transactionType) {
 case PURCHASE:
     final DateTime nextRetryDate=computeNextRetryDate(paymentControlContext.getPaymentExternalKey(),paymentControlContext.isApiPayment(),internalContext);
   return new DefaultFailureCallResult(nextRetryDate);
-default :
+case REFUND:
+case CHARGEBACK:
 return new DefaultFailureCallResult(null);
+default :
+throw new IllegalStateException("Unexpected transactionType " + transactionType);
 }
 }

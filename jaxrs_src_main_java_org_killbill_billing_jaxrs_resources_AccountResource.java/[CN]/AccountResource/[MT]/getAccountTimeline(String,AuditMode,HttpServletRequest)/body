@@ -4,16 +4,6 @@
   final Account account=accountUserApi.getAccountById(accountId,tenantContext);
   final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId(),tenantContext);
   final List<DirectPayment> payments=paymentApi.getAccountPayments(accountId,false,ImmutableList.<PluginProperty>of(),tenantContext);
-  final Iterable<DirectPaymentTransaction> refunds=getDirectPaymentTransactions(payments,TransactionType.REFUND);
-  final Multimap<UUID,DirectPaymentTransaction> refundsByPayment=ArrayListMultimap.<UUID,DirectPaymentTransaction>create();
-  for (  final DirectPaymentTransaction refund : refunds) {
-    refundsByPayment.put(refund.getDirectPaymentId(),refund);
-  }
-  final Iterable<DirectPaymentTransaction> chargebacks=getDirectPaymentTransactions(payments,TransactionType.CHARGEBACK);
-  final Multimap<UUID,DirectPaymentTransaction> chargebacksByPayment=ArrayListMultimap.<UUID,DirectPaymentTransaction>create();
-  for (  final DirectPaymentTransaction chargeback : chargebacks) {
-    chargebacksByPayment.put(chargeback.getDirectPaymentId(),chargeback);
-  }
   final List<SubscriptionBundle> bundles=subscriptionApi.getSubscriptionBundlesForAccountId(account.getId(),tenantContext);
   final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
   final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePaymentsByAccount(accountId,tenantContext);

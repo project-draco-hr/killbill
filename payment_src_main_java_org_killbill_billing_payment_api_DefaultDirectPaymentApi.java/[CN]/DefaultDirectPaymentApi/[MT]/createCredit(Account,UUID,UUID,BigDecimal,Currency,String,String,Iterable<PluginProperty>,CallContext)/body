@@ -1,13 +1,11 @@
 {
-  checkNullParameter(account,"account");
-  checkNullParameter(paymentMethodId,"paymentMethodId");
-  checkNullParameter(amount,"amount");
-  checkNullParameter(currency,"currency");
-  checkNullParameter(directPaymentId,"paymentId");
-  checkNullParameter(directPaymentExternalKey,"paymentExternalKey");
-  checkNullParameter(directPaymentTransactionExternalKey,"paymentTransactionExternalKey");
-  checkNullParameter(properties,"plugin properties");
+  checkNotNullParameter(account,"account");
+  checkNotNullParameter(paymentMethodId,"paymentMethodId");
+  checkNotNullParameter(amount,"amount");
+  checkNotNullParameter(currency,"currency");
+  checkNotNullParameter(directPaymentId,"paymentId");
+  checkNotNullParameter(properties,"plugin properties");
   checkPositiveAmount(amount);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
-  return directPaymentProcessor.createCredit(account,paymentMethodId,directPaymentId,amount,currency,directPaymentExternalKey,directPaymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
+  return directPaymentProcessor.createCredit(IS_API_PAYMENT,account,paymentMethodId,directPaymentId,amount,currency,directPaymentExternalKey,directPaymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
 }
