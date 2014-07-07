@@ -1,0 +1,11 @@
+{
+  final NextEvent[] allEvents=new NextEvent[events.length + 1];
+  allEvents[0]=NextEvent.TAG;
+  int i=1;
+  for (  NextEvent cur : events) {
+    allEvents[i++]=cur;
+  }
+  busHandler.pushExpectedEvents(allEvents);
+  tagUserApi.removeTag(id,ObjectType.ACCOUNT,ControlTagType.AUTO_INVOICING_OFF.getId(),callContext);
+  assertListenerStatus();
+}
