@@ -8,7 +8,7 @@
   if (directPaymentId != null) {
     final PaymentModelDao paymentModelDao=daoHelper.getDirectPayment();
     effectivePaymentMethodId=paymentModelDao.getPaymentMethodId();
-    currentStateName=paymentModelDao.getStateName();
+    currentStateName=paymentModelDao.getLastSuccessStateName() != null ? paymentModelDao.getLastSuccessStateName() : getInitState(transactionType);
     currentStateMachineName=getStateMachineName(currentStateName);
     Preconditions.checkState(currentStateMachineName != null,"State machine name cannot be null for direct payment " + directPaymentId);
     Preconditions.checkState(currentStateName != null,"State name cannot be null for direct payment " + directPaymentId);
@@ -16,33 +16,19 @@
   }
  else {
     effectivePaymentMethodId=paymentMethodId != null ? paymentMethodId : daoHelper.getDefaultPaymentMethodId();
-switch (transactionType) {
-case AUTHORIZE:
-      currentStateMachineName="AUTHORIZE";
-    currentStateName="AUTH_INIT";
-  break;
-case CREDIT:
-currentStateMachineName="CREDIT";
-currentStateName="CREDIT_INIT";
-break;
-case PURCHASE:
-currentStateMachineName="PURCHASE";
-currentStateName="PURCHASE_INIT";
-break;
-default :
-throw new IllegalStateException("Unsupported transaction type " + transactionType + " for null direct payment id");
-}
-}
-directPaymentStateContext.setPaymentMethodId(effectivePaymentMethodId);
-final String operationStateMachineName;
-final String operationName;
-final OperationCallback operationCallback;
-final LeavingStateCallback leavingStateCallback;
-final EnteringStateCallback enteringStateCallback;
+    currentStateName=getInitState(transactionType);
+    currentStateMachineName=getStateMachineName(currentStateName);
+  }
+  directPaymentStateContext.setPaymentMethodId(effectivePaymentMethodId);
+  final String operationStateMachineName;
+  final String operationName;
+  final OperationCallback operationCallback;
+  final LeavingStateCallback leavingStateCallback;
+  final EnteringStateCallback enteringStateCallback;
 switch (transactionType) {
 case PURCHASE:
-operationStateMachineName="PURCHASE";
-operationName="OP_PURCHASE";
+    operationStateMachineName="PURCHASE";
+  operationName="OP_PURCHASE";
 operationCallback=new PurchaseOperation(daoHelper,locker,paymentPluginDispatcher,directPaymentStateContext);
 leavingStateCallback=new PurchaseInitiated(daoHelper,directPaymentStateContext);
 enteringStateCallback=new PurchaseCompleted(daoHelper,directPaymentStateContext);
