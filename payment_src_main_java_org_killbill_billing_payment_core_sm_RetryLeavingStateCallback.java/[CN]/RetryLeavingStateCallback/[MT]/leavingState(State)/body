@@ -7,15 +7,14 @@
     stateContext.setDirectPaymentExternalKey(payment.getExternalKey());
   }
   if (state.getName().equals(initialState.getName()) || state.getName().equals(retriedState.getName())) {
-    final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(stateContext.getAccount().getId(),stateContext.getPaymentMethodId(),utcNow,utcNow,stateContext.getDirectPaymentExternalKey(),null,stateContext.directPaymentTransactionExternalKey,transactionType,initialState.getName(),stateContext.getAmount(),stateContext.getCurrency(),stateContext.getPluginName());
-    final List<PluginPropertyModelDao> properties=ImmutableList.copyOf(Iterables.transform(stateContext.getProperties(),new Function<PluginProperty,PluginPropertyModelDao>(){
-      @Override public PluginPropertyModelDao apply(      final PluginProperty input){
-        final String value=(input.getValue() instanceof String) ? (String)input.getValue() : "TODO: could not serialize";
-        return new PluginPropertyModelDao(attempt.getId(),stateContext.getDirectPaymentExternalKey(),stateContext.directPaymentTransactionExternalKey,stateContext.getAccount().getId(),stateContext.getPluginName(),input.getKey(),value,stateContext.getCallContext().getUserName(),stateContext.getCallContext().getCreatedDate());
-      }
+    try {
+      final byte[] serializedProperties=PluginPropertySerializer.serialize(stateContext.getProperties());
+      final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(stateContext.getAccount().getId(),stateContext.getPaymentMethodId(),utcNow,utcNow,stateContext.getDirectPaymentExternalKey(),null,stateContext.directPaymentTransactionExternalKey,transactionType,initialState.getName(),stateContext.getAmount(),stateContext.getCurrency(),stateContext.getPluginName(),serializedProperties);
+      retryableDirectPaymentAutomatonRunner.paymentDao.insertPaymentAttemptWithProperties(attempt,stateContext.internalCallContext);
+      stateContext.setAttemptId(attempt.getId());
     }
-));
-    retryableDirectPaymentAutomatonRunner.paymentDao.insertPaymentAttemptWithProperties(attempt,properties,stateContext.internalCallContext);
-    stateContext.setAttemptId(attempt.getId());
+ catch (    PluginPropertySerializerException e) {
+      throw new OperationException(e);
+    }
   }
 }

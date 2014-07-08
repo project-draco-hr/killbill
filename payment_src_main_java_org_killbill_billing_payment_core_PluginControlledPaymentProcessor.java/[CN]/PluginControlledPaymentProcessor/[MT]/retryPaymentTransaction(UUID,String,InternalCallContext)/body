@@ -3,13 +3,7 @@
     final PaymentAttemptModelDao attempt=paymentDao.getPaymentAttempt(attemptId,internalCallContext);
     final PaymentModelDao payment=paymentDao.getDirectPaymentByExternalKey(attempt.getPaymentExternalKey(),internalCallContext);
     final UUID paymentId=payment != null ? payment.getId() : null;
-    final List<PluginPropertyModelDao> properties=paymentDao.getProperties(attempt.getId(),internalCallContext);
-    final List<PluginProperty> pluginProperties=properties == null ? ImmutableList.<PluginProperty>of() : ImmutableList.<PluginProperty>copyOf(Iterables.transform(properties,new Function<PluginPropertyModelDao,PluginProperty>(){
-      @Nullable @Override public PluginProperty apply(      final PluginPropertyModelDao input){
-        return new PluginProperty(input.getPropKey(),input.getPropValue(),false);
-      }
-    }
-));
+    final Iterable<PluginProperty> pluginProperties=PluginPropertySerializer.deserialize(attempt.getPluginProperties());
     final Account account=accountInternalApi.getAccountById(attempt.getAccountId(),internalCallContext);
     final UUID tenantId=nonEntityDao.retrieveIdFromObject(internalCallContext.getTenantRecordId(),ObjectType.TENANT);
     final CallContext callContext=internalCallContext.toCallContext(tenantId);
@@ -17,9 +11,12 @@
     pluginControlledDirectPaymentAutomatonRunner.run(state,false,attempt.getTransactionType(),account,attempt.getPaymentMethodId(),paymentId,attempt.getPaymentExternalKey(),attempt.getTransactionExternalKey(),attempt.getAmount(),attempt.getCurrency(),pluginProperties,pluginName,callContext,internalCallContext);
   }
  catch (  AccountApiException e) {
-    e.printStackTrace();
+    log.warn("Failed to retry attempt " + attemptId + " for plugin "+ pluginName,e);
   }
 catch (  PaymentApiException e) {
-    e.printStackTrace();
+    log.warn("Failed to retry attempt " + attemptId + " for plugin "+ pluginName,e);
+  }
+catch (  PluginPropertySerializerException e) {
+    log.warn("Failed to retry attempt " + attemptId + " for plugin "+ pluginName,e);
   }
 }
