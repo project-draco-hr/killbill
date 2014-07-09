@@ -1,0 +1,19 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final TransactionSqlDao transactional=entitySqlDaoWrapperFactory.become(TransactionSqlDao.class);
+      final List<PaymentTransactionModelDao> oldPendingTransactions=transactional.getByTransactionStatusPriorDate(TransactionStatus.PENDING.toString(),createdBeforeDate.toDate(),context);
+      if (oldPendingTransactions.size() > 0) {
+        final Collection<String> oldPendingTransactionIds=Collections2.transform(oldPendingTransactions,new Function<PaymentTransactionModelDao,String>(){
+          @Override public String apply(          final PaymentTransactionModelDao input){
+            return input.getId().toString();
+          }
+        }
+);
+        transactional.failOldPendingTransactions(oldPendingTransactionIds,TransactionStatus.PAYMENT_FAILURE.toString(),context);
+      }
+      return null;
+    }
+  }
+);
+}

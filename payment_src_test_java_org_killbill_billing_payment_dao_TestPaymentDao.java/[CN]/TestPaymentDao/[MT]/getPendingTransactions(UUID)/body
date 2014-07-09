@@ -1,0 +1,9 @@
+{
+  final List<PaymentTransactionModelDao> total=paymentDao.getDirectTransactionsForDirectPayment(paymentId,internalCallContext);
+  return ImmutableList.copyOf(Iterables.filter(total,new Predicate<PaymentTransactionModelDao>(){
+    @Override public boolean apply(    final PaymentTransactionModelDao input){
+      return input.getTransactionStatus() == TransactionStatus.PENDING;
+    }
+  }
+));
+}

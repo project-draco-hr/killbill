@@ -12,12 +12,12 @@
         return entityIds.build();
       }
     }
-    if (!(arg instanceof String)) {
-      continue;
-    }
     for (    final Annotation annotation : parameterAnnotations[i]) {
-      if (Bind.class.equals(annotation.annotationType()) && ("id").equals(((Bind)annotation).value())) {
+      if (arg instanceof String && Bind.class.equals(annotation.annotationType()) && ("id").equals(((Bind)annotation).value())) {
         return ImmutableList.<String>of((String)arg);
+      }
+ else       if (arg instanceof Collection && UUIDCollectionBinder.class.equals(annotation.annotationType())) {
+        return ImmutableList.<String>copyOf((Collection)arg);
       }
     }
   }
