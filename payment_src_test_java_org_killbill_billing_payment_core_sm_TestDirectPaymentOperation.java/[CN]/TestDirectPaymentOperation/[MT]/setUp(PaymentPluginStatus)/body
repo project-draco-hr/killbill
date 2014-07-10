@@ -5,6 +5,6 @@
   final PaymentMethodModelDao paymentMethodModelDao=new PaymentMethodModelDao(directPaymentStateContext.getPaymentMethodId(),UUID.randomUUID().toString(),clock.getUTCNow(),clock.getUTCNow(),directPaymentStateContext.getAccount().getId(),MockPaymentProviderPlugin.PLUGIN_NAME,true);
   final PaymentDao paymentDao=Mockito.mock(PaymentDao.class);
   Mockito.when(paymentDao.getPaymentMethodIncludedDeleted(directPaymentStateContext.getPaymentMethodId(),internalCallContext)).thenReturn(paymentMethodModelDao);
-  final DirectPaymentAutomatonDAOHelper daoHelper=new DirectPaymentAutomatonDAOHelper(directPaymentStateContext,clock.getUTCNow(),paymentDao,registry,internalCallContext);
+  final DirectPaymentAutomatonDAOHelper daoHelper=new DirectPaymentAutomatonDAOHelper(directPaymentStateContext,clock.getUTCNow(),paymentDao,registry,internalCallContext,paymentSMHelper);
   directPaymentOperation=new DirectPaymentOperationTest(paymentPluginStatus,daoHelper,locker,paymentPluginDispatcher,directPaymentStateContext);
 }

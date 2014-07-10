@@ -6,7 +6,8 @@
   final PaymentModelDao paymentModelDao=paymentDao.getDirectPayment(transactionModelDao.getPaymentId(),internalCallContext);
   Preconditions.checkState(paymentModelDao != null);
   final TransactionStatus newStatus=isSuccess ? TransactionStatus.SUCCESS : TransactionStatus.PAYMENT_FAILURE;
-  final State currentPaymentState=directPaymentAutomatonRunner.fetchNextState(paymentModelDao.getStateName(),isSuccess);
-  final String lastSuccessPaymentStateStrOrNull=currentPaymentState.getName().endsWith("SUCCESS") ? currentPaymentState.getName() : null;
-  paymentDao.updateDirectPaymentAndTransactionOnCompletion(transactionModelDao.getPaymentId(),currentPaymentState.getName(),lastSuccessPaymentStateStrOrNull,transactionModelDao.getId(),newStatus,transactionModelDao.getProcessedAmount(),transactionModelDao.getProcessedCurrency(),transactionModelDao.getGatewayErrorCode(),transactionModelDao.getGatewayErrorMsg(),internalCallContext);
+  final State currentPaymentState;
+  final String stateName=paymentModelDao.getStateName();
+  final String lastSuccessPaymentStateStrOrNull=paymentSMHelper.isSuccessState(stateName) ? stateName : null;
+  paymentDao.updateDirectPaymentAndTransactionOnCompletion(transactionModelDao.getPaymentId(),stateName,lastSuccessPaymentStateStrOrNull,transactionModelDao.getId(),newStatus,transactionModelDao.getProcessedAmount(),transactionModelDao.getProcessedCurrency(),transactionModelDao.getGatewayErrorCode(),transactionModelDao.getGatewayErrorMsg(),internalCallContext);
 }

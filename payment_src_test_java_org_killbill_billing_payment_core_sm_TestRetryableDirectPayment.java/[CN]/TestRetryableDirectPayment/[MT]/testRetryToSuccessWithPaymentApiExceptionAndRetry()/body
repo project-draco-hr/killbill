@@ -2,7 +2,7 @@
   mockRetryProviderPlugin.setAborted(false).setNextRetryDate(new DateTime().plusDays(1));
   mockRetryAuthorizeOperationCallback.setResult(null).setException(new PaymentApiException(ErrorCode.__UNKNOWN_ERROR_CODE,"bla"));
   runner.setOperationCallback(mockRetryAuthorizeOperationCallback).setContext(directPaymentStateContext);
-  final State state=runner.fetchState("RETRIED");
+  final State state=retrySMHelper.getRetriedState();
   final UUID directTransactionId=UUID.randomUUID();
   paymentDao.insertPaymentAttemptWithProperties(new PaymentAttemptModelDao(account.getId(),paymentMethodId,utcNow,utcNow,directPaymentExternalKey,directTransactionId,directPaymentTransactionExternalKey,TransactionType.AUTHORIZE,state.getName(),amount,currency,null,EMPTY_PROPERTIES),internalCallContext);
   try {

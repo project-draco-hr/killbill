@@ -7,7 +7,7 @@
     final PaymentTransactionModelDao newPaymentTransactionModelDao=new PaymentTransactionModelDao(clock.getUTCNow(),clock.getUTCNow(),null,directPaymentStateContext.getDirectPaymentTransactionExternalKey(),directPaymentId,directPaymentStateContext.getTransactionType(),clock.getUTCNow(),TransactionStatus.UNKNOWN,directPaymentStateContext.getAmount(),directPaymentStateContext.getCurrency(),null,null);
     paymentDao.insertDirectPaymentWithFirstTransaction(newPaymentModelDao,newPaymentTransactionModelDao,internalCallContext);
   }
-  final DirectPaymentAutomatonDAOHelper daoHelper=new DirectPaymentAutomatonDAOHelper(directPaymentStateContext,clock.getUTCNow(),paymentDao,registry,internalCallContext);
+  final DirectPaymentAutomatonDAOHelper daoHelper=new DirectPaymentAutomatonDAOHelper(directPaymentStateContext,clock.getUTCNow(),paymentDao,registry,internalCallContext,paymentSMHelper);
   callback=new DirectPaymentLeavingStateTestCallback(daoHelper);
   Mockito.when(state.getName()).thenReturn("NEW_STATE");
 }
