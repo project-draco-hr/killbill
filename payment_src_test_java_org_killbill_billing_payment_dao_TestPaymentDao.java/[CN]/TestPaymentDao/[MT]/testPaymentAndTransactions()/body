@@ -6,7 +6,7 @@
   final String transactionExternalKey2="hahahaha";
   final DateTime utcNow=clock.getUTCNow();
   final PaymentModelDao paymentModelDao=new PaymentModelDao(utcNow,utcNow,accountId,paymentMethodId,externalKey);
-  final PaymentTransactionModelDao transactionModelDao=new PaymentTransactionModelDao(utcNow,utcNow,transactionExternalKey,paymentModelDao.getId(),TransactionType.AUTHORIZE,utcNow,TransactionStatus.SUCCESS,BigDecimal.TEN,Currency.AED,"success","");
+  final PaymentTransactionModelDao transactionModelDao=new PaymentTransactionModelDao(utcNow,utcNow,null,transactionExternalKey,paymentModelDao.getId(),TransactionType.AUTHORIZE,utcNow,TransactionStatus.SUCCESS,BigDecimal.TEN,Currency.AED,"success","");
   final PaymentModelDao savedPayment=paymentDao.insertDirectPaymentWithFirstTransaction(paymentModelDao,transactionModelDao,internalCallContext);
   assertEquals(savedPayment.getId(),paymentModelDao.getId());
   assertEquals(savedPayment.getAccountId(),paymentModelDao.getAccountId());
@@ -41,7 +41,7 @@
   assertEquals(savedTransaction2.getTransactionStatus(),TransactionStatus.SUCCESS);
   assertEquals(savedTransaction2.getAmount().compareTo(BigDecimal.TEN),0);
   assertEquals(savedTransaction2.getCurrency(),Currency.AED);
-  final PaymentTransactionModelDao transactionModelDao2=new PaymentTransactionModelDao(utcNow,utcNow,transactionExternalKey2,paymentModelDao.getId(),TransactionType.AUTHORIZE,utcNow,TransactionStatus.UNKNOWN,BigDecimal.TEN,Currency.AED,"success","");
+  final PaymentTransactionModelDao transactionModelDao2=new PaymentTransactionModelDao(utcNow,utcNow,null,transactionExternalKey2,paymentModelDao.getId(),TransactionType.AUTHORIZE,utcNow,TransactionStatus.UNKNOWN,BigDecimal.TEN,Currency.AED,"success","");
   final PaymentTransactionModelDao savedTransactionModelDao2=paymentDao.updateDirectPaymentWithNewTransaction(savedPayment.getId(),transactionModelDao2,internalCallContext);
   assertEquals(savedTransactionModelDao2.getTransactionExternalKey(),transactionExternalKey2);
   assertEquals(savedTransactionModelDao2.getPaymentId(),paymentModelDao.getId());

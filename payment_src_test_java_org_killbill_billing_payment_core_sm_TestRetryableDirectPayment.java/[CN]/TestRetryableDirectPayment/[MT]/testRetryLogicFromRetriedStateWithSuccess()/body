@@ -7,7 +7,7 @@
   final UUID directPaymentId=UUID.randomUUID();
   final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),paymentMethodId,utcNow,utcNow,directPaymentExternalKey,directTransactionId,directPaymentTransactionExternalKey,TransactionType.AUTHORIZE,state.getName(),amount,currency,null,EMPTY_PROPERTIES);
   paymentDao.insertPaymentAttemptWithProperties(attempt,internalCallContext);
-  paymentDao.insertDirectPaymentWithFirstTransaction(new PaymentModelDao(directPaymentId,utcNow,utcNow,account.getId(),paymentMethodId,-1,directPaymentExternalKey),new PaymentTransactionModelDao(directTransactionId,directPaymentTransactionExternalKey,utcNow,utcNow,directPaymentId,TransactionType.AUTHORIZE,utcNow,TransactionStatus.PAYMENT_FAILURE,amount,currency,"bla","foo"),internalCallContext);
+  paymentDao.insertDirectPaymentWithFirstTransaction(new PaymentModelDao(directPaymentId,utcNow,utcNow,account.getId(),paymentMethodId,-1,directPaymentExternalKey),new PaymentTransactionModelDao(directTransactionId,attempt.getId(),directPaymentTransactionExternalKey,utcNow,utcNow,directPaymentId,TransactionType.AUTHORIZE,utcNow,TransactionStatus.PAYMENT_FAILURE,amount,currency,"bla","foo"),internalCallContext);
   processor.retryPaymentTransaction(attempt.getId(),MockPaymentControlProviderPlugin.PLUGIN_NAME,internalCallContext);
   final List<PaymentAttemptModelDao> pas=paymentDao.getPaymentAttemptByTransactionExternalKey(directPaymentTransactionExternalKey,internalCallContext);
   assertEquals(pas.size(),2);

@@ -1,6 +1,11 @@
 {
-  if (result == null || result.getTransactions() == null || result.getTransactions().size() == 0) {
+  if (result == null || result.getTransactions() == null) {
     return null;
   }
-  return result.getTransactions().get(result.getTransactions().size() - 1);
+  return Iterables.tryFind(result.getTransactions(),new Predicate<DirectPaymentTransaction>(){
+    @Override public boolean apply(    final DirectPaymentTransaction input){
+      return ((DefaultDirectPaymentTransaction)input).getAttemptId().equals(attemptId);
+    }
+  }
+).orNull();
 }

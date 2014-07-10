@@ -1,5 +1,9 @@
 {
-  final TimeUnit rateUnit=paymentConfig.getJanitorRunningRate().getUnit();
-  final long period=paymentConfig.getJanitorRunningRate().getPeriod();
-  janitorExecutor.scheduleAtFixedRate(new PendingTransactionTask(),period,period,rateUnit);
+  isStopped=false;
+  final TimeUnit pendingRateUnit=paymentConfig.getJanitorRunningRate().getUnit();
+  final long pendingPeriod=paymentConfig.getJanitorRunningRate().getPeriod();
+  janitorExecutor.scheduleAtFixedRate(new PendingTransactionTask(),pendingPeriod,pendingPeriod,pendingRateUnit);
+  final TimeUnit attemptCompletionRateUnit=paymentConfig.getJanitorRunningRate().getUnit();
+  final long attemptCompletionPeriod=paymentConfig.getJanitorRunningRate().getPeriod();
+  janitorExecutor.scheduleAtFixedRate(new AttemptCompletionTask(),attemptCompletionPeriod,attemptCompletionPeriod,attemptCompletionRateUnit);
 }

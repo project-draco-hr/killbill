@@ -1,0 +1,17 @@
+{
+  final Collection<InvoicePayment> invoicePayments=Collections2.transform(dao.getInvoicePayments(paymentId,context),new Function<InvoicePaymentModelDao,InvoicePayment>(){
+    @Override public InvoicePayment apply(    final InvoicePaymentModelDao input){
+      return new DefaultInvoicePayment(input);
+    }
+  }
+);
+  if (invoicePayments.size() == 0) {
+    return null;
+  }
+  return Iterables.tryFind(invoicePayments,new Predicate<InvoicePayment>(){
+    @Override public boolean apply(    final InvoicePayment input){
+      return input.getType() == type;
+    }
+  }
+).orNull();
+}

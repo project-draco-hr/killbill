@@ -1,3 +1,10 @@
 {
-  paymentDao.failOldPendingTransactions(TransactionStatus.PLUGIN_FAILURE,getCreatedDateBefore(),fakeCallContext);
+  if (isStopped) {
+    return;
+  }
+  log.info("PendingTransactionTask start run ");
+  int result=paymentDao.failOldPendingTransactions(TransactionStatus.PLUGIN_FAILURE,getCreatedDateBefore(),fakeCallContext);
+  if (result > 0) {
+    log.info("PendingTransactionTask moved " + result + " PENDING payments ->  PLUGIN_FAILURE");
+  }
 }

@@ -1,0 +1,11 @@
+{
+  return dispatchWithAccountLockAndTimeout(new WithAccountLockCallback<OperationResult,OperationException>(){
+    @Override public OperationResult doOperation() throws OperationException {
+      final PaymentTransactionModelDao transaction=directPaymentStateContext.getDirectPaymentTransactionModelDao();
+      final PaymentControlContext updatedPaymentControlContext=new DefaultPaymentControlContext(directPaymentStateContext.getAccount(),directPaymentStateContext.getPaymentMethodId(),retryableDirectPaymentStateContext.getAttemptId(),transaction.getPaymentId(),directPaymentStateContext.getDirectPaymentExternalKey(),transaction.getId(),directPaymentStateContext.getDirectPaymentTransactionExternalKey(),directPaymentStateContext.getTransactionType(),transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),directPaymentStateContext.getProperties(),retryableDirectPaymentStateContext.isApiPayment(),directPaymentStateContext.callContext);
+      onCompletion(retryableDirectPaymentStateContext.getPluginName(),updatedPaymentControlContext);
+      return OperationResult.SUCCESS;
+    }
+  }
+);
+}
