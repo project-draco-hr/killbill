@@ -1,10 +1,15 @@
 {
   if (isStopped) {
+    shutdownLatch.countDown();
     return;
   }
   final List<PaymentAttemptModelDao> incompleteAttempts=paymentDao.getPaymentAttemptsByState("INIT",getCreatedDateBefore(),fakeCallContext);
   log.info("AttemptCompletionTask start run : found " + incompleteAttempts.size() + " incomplete attempts");
   for (  PaymentAttemptModelDao cur : incompleteAttempts) {
+    if (isStopped) {
+      shutdownLatch.countDown();
+      return;
+    }
     complete(cur);
   }
 }

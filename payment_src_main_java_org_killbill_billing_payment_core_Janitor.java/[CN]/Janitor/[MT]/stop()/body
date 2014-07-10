@@ -1,3 +1,13 @@
 {
   isStopped=true;
+  try {
+    boolean res=shutdownLatch.await(5,TimeUnit.SECONDS);
+    if (!res) {
+      log.warn("Janitor stop sequence timed out : did not complete in 5 sec");
+    }
+  }
+ catch (  InterruptedException e) {
+    Thread.currentThread().interrupt();
+    log.warn("Janitor stop sequence got interrupted");
+  }
 }
