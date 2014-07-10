@@ -1,0 +1,13 @@
+{
+  return Iterables.concat(Iterables.transform(payments,new Function<Payment,Iterable<PaymentTransaction>>(){
+    @Override public Iterable<PaymentTransaction> apply(    final Payment input){
+      return Iterables.filter(input.getTransactions(),new Predicate<PaymentTransaction>(){
+        @Override public boolean apply(        final PaymentTransaction input){
+          return input.getTransactionType() == transactionType;
+        }
+      }
+);
+    }
+  }
+));
+}

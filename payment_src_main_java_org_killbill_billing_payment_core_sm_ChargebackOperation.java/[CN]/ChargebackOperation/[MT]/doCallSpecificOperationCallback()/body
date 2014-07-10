@@ -1,7 +1,7 @@
 {
-  logger.debug("Starting CHARGEBACK for payment {} ({} {})",directPaymentStateContext.getDirectPaymentId(),directPaymentStateContext.getAmount(),directPaymentStateContext.getCurrency());
+  logger.debug("Starting CHARGEBACK for payment {} ({} {})",paymentStateContext.getPaymentId(),paymentStateContext.getAmount(),paymentStateContext.getCurrency());
   final PaymentPluginStatus status;
-  if (!directPaymentStateContext.getOnLeavingStateExistingTransactions().isEmpty()) {
+  if (!paymentStateContext.getOnLeavingStateExistingTransactions().isEmpty()) {
     final Iterable<PaymentTransactionModelDao> purchaseTransactions=getOnLeavingStateExistingTransactionsForType(TransactionType.PURCHASE);
     final Iterable<PaymentTransactionModelDao> captureTransactions=getOnLeavingStateExistingTransactionsForType(TransactionType.CAPTURE);
     final Iterable<PaymentTransactionModelDao> refundTransactions=getOnLeavingStateExistingTransactionsForType(TransactionType.REFUND);
@@ -11,7 +11,7 @@
     final BigDecimal refundedAmount=getSumAmount(refundTransactions);
     final BigDecimal chargebackAmount=getSumAmount(chargebackTransactions);
     final BigDecimal chargebackAvailableAmount=purchasedAmount.add(capturedAmount).subtract(refundedAmount.add(chargebackAmount));
-    if (directPaymentStateContext.getAmount().compareTo(chargebackAvailableAmount) > 0) {
+    if (paymentStateContext.getAmount().compareTo(chargebackAvailableAmount) > 0) {
       status=PaymentPluginStatus.ERROR;
     }
  else {
@@ -21,5 +21,5 @@
  else {
     status=PaymentPluginStatus.PROCESSED;
   }
-  return new DefaultNoOpPaymentInfoPlugin(directPaymentStateContext.getDirectPaymentId(),directPaymentStateContext.getTransactionPaymentId(),TransactionType.CHARGEBACK,directPaymentStateContext.getAmount(),directPaymentStateContext.getCurrency(),null,null,status,null);
+  return new DefaultNoOpPaymentInfoPlugin(paymentStateContext.getPaymentId(),paymentStateContext.getTransactionPaymentId(),TransactionType.CHARGEBACK,paymentStateContext.getAmount(),paymentStateContext.getCurrency(),null,null,status,null);
 }

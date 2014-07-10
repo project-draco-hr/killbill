@@ -1,0 +1,28 @@
+{
+  final Ordering<PaymentTransaction> perPaymentTransactionOrdering=Ordering.<PaymentTransaction>from(new Comparator<PaymentTransaction>(){
+    @Override public int compare(    final PaymentTransaction o1,    final PaymentTransaction o2){
+      return o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
+    }
+  }
+);
+  final Iterable<PaymentTransactionModelDao> filteredTransactions=Iterables.filter(transactionsModelDao,new Predicate<PaymentTransactionModelDao>(){
+    @Override public boolean apply(    final PaymentTransactionModelDao curPaymentTransactionModelDao){
+      return curPaymentTransactionModelDao.getPaymentId().equals(curPaymentModelDao.getId());
+    }
+  }
+);
+  final Iterable<PaymentTransaction> transactions=Iterables.transform(filteredTransactions,new Function<PaymentTransactionModelDao,PaymentTransaction>(){
+    @Override public PaymentTransaction apply(    final PaymentTransactionModelDao input){
+      final PaymentTransactionInfoPlugin info=pluginTransactions != null ? Iterables.tryFind(pluginTransactions,new Predicate<PaymentTransactionInfoPlugin>(){
+        @Override public boolean apply(        final PaymentTransactionInfoPlugin input){
+          return input.getKbTransactionPaymentId().equals(input.getKbTransactionPaymentId());
+        }
+      }
+).orNull() : null;
+      return new DefaultPaymentTransaction(input.getId(),input.getAttemptId(),input.getTransactionExternalKey(),input.getCreatedDate(),input.getUpdatedDate(),input.getPaymentId(),input.getTransactionType(),input.getEffectiveDate(),input.getTransactionStatus(),input.getAmount(),input.getCurrency(),input.getProcessedAmount(),input.getProcessedCurrency(),input.getGatewayErrorCode(),input.getGatewayErrorMsg(),info);
+    }
+  }
+);
+  final List<PaymentTransaction> sortedTransactions=perPaymentTransactionOrdering.immutableSortedCopy(transactions);
+  return new DefaultPayment(curPaymentModelDao.getId(),curPaymentModelDao.getCreatedDate(),curPaymentModelDao.getUpdatedDate(),curPaymentModelDao.getAccountId(),curPaymentModelDao.getPaymentMethodId(),curPaymentModelDao.getPaymentNumber(),curPaymentModelDao.getExternalKey(),sortedTransactions);
+}

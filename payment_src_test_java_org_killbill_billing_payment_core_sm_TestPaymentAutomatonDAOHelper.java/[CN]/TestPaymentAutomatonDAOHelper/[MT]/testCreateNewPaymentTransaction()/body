@@ -1,0 +1,29 @@
+{
+  final PaymentAutomatonDAOHelper daoHelper=createDAOHelper(null,paymentExternalKey,paymentTransactionExternalKey,amount,currency);
+  daoHelper.createNewPaymentTransaction();
+  final PaymentModelDao payment1=daoHelper.getPayment();
+  Assert.assertEquals(payment1.getExternalKey(),paymentExternalKey);
+  Assert.assertNull(payment1.getStateName());
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getTransactionExternalKey(),paymentTransactionExternalKey);
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getAmount().compareTo(amount),0);
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getCurrency(),currency);
+  final PaymentTransactionInfoPlugin paymentInfoPlugin=Mockito.mock(PaymentTransactionInfoPlugin.class);
+  Mockito.when(paymentInfoPlugin.getAmount()).thenReturn(new BigDecimal("82010.222"));
+  Mockito.when(paymentInfoPlugin.getCurrency()).thenReturn(Currency.CAD);
+  Mockito.when(paymentInfoPlugin.getStatus()).thenReturn(PaymentPluginStatus.PROCESSED);
+  Mockito.when(paymentInfoPlugin.getGatewayErrorCode()).thenReturn(UUID.randomUUID().toString().substring(0,5));
+  Mockito.when(paymentInfoPlugin.getGatewayError()).thenReturn(UUID.randomUUID().toString());
+  daoHelper.processPaymentInfoPlugin(TransactionStatus.SUCCESS,paymentInfoPlugin,"SOME_STATE");
+  final PaymentModelDao payment2=daoHelper.getPayment();
+  Assert.assertEquals(payment2.getExternalKey(),paymentExternalKey);
+  Assert.assertEquals(payment2.getStateName(),"SOME_STATE");
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getPaymentId(),payment2.getId());
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getTransactionExternalKey(),paymentTransactionExternalKey);
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getTransactionStatus(),TransactionStatus.SUCCESS);
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getAmount().compareTo(amount),0);
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getCurrency(),currency);
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getProcessedAmount().compareTo(paymentInfoPlugin.getAmount()),0);
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getProcessedCurrency(),paymentInfoPlugin.getCurrency());
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getGatewayErrorCode(),paymentInfoPlugin.getGatewayErrorCode());
+  Assert.assertEquals(paymentStateContext.getPaymentTransactionModelDao().getGatewayErrorMsg(),paymentInfoPlugin.getGatewayError());
+}

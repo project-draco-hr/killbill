@@ -1,8 +1,8 @@
 {
-  final List<DirectPayment> payments=paymentApi.getAccountPayments(accountId,false,ImmutableList.<PluginProperty>of(),context);
+  final List<Payment> payments=paymentApi.getAccountPayments(accountId,false,ImmutableList.<PluginProperty>of(),context);
   Assert.assertEquals(payments.size(),paymentOrderingNumber);
-  final DirectPayment payment=payments.get(paymentOrderingNumber - 1);
-  final DirectPaymentTransaction transaction=getPurchaseTransaction(payment);
+  final Payment payment=payments.get(paymentOrderingNumber - 1);
+  final PaymentTransaction transaction=getPurchaseTransaction(payment);
   if (transaction.getTransactionStatus() == TransactionStatus.UNKNOWN) {
     checkPaymentNoAuditForRuntimeException(accountId,payment,expected);
   }

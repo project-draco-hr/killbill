@@ -9,13 +9,13 @@
   final String transactionExternalKey2="chouette";
   final InvoiceItem invoiceItem=new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),requestedAmount,new BigDecimal("1.0"),Currency.USD);
   invoice.addInvoiceItem(invoiceItem);
-  final DirectPayment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),INVOICE_PAYMENT,callContext);
+  final Payment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),INVOICE_PAYMENT,callContext);
   final List<PluginProperty> refundProperties=new ArrayList<PluginProperty>();
   final HashMap<UUID,BigDecimal> uuidBigDecimalHashMap=new HashMap<UUID,BigDecimal>();
   uuidBigDecimalHashMap.put(invoiceItem.getId(),null);
   final PluginProperty refundIdsProp=new PluginProperty(InvoicePaymentControlPluginApi.PROP_IPCD_REFUND_IDS_WITH_AMOUNT_KEY,uuidBigDecimalHashMap,false);
   refundProperties.add(refundIdsProp);
-  final DirectPayment payment2=paymentApi.createRefundWithPaymentControl(account,payment.getId(),null,Currency.USD,transactionExternalKey2,refundProperties,INVOICE_PAYMENT,callContext);
+  final Payment payment2=paymentApi.createRefundWithPaymentControl(account,payment.getId(),null,Currency.USD,transactionExternalKey2,refundProperties,INVOICE_PAYMENT,callContext);
   assertEquals(payment2.getTransactions().size(),2);
   assertEquals(payment2.getExternalKey(),paymentExternalKey);
   assertEquals(payment2.getPaymentMethodId(),account.getPaymentMethodId());

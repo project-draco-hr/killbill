@@ -7,7 +7,7 @@
   final String paymentExternalKey=invoice.getId().toString();
   final String transactionExternalKey="wouf wouf";
   invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),requestedAmount,new BigDecimal("1.0"),Currency.USD));
-  final DirectPayment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),INVOICE_PAYMENT,callContext);
+  final Payment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),INVOICE_PAYMENT,callContext);
   assertEquals(payment.getTransactions().size(),1);
   assertEquals(payment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
   assertEquals(payment.getTransactions().get(0).getTransactionType(),TransactionType.PURCHASE);

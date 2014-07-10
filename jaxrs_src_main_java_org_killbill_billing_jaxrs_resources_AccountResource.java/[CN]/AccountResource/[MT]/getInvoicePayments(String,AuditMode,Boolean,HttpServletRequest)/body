@@ -2,11 +2,11 @@
   final UUID accountId=UUID.fromString(accountIdStr);
   final TenantContext tenantContext=context.createContext(request);
   final Account account=accountUserApi.getAccountById(accountId,tenantContext);
-  final List<DirectPayment> payments=paymentApi.getAccountPayments(account.getId(),withPluginInfo,ImmutableList.<PluginProperty>of(),tenantContext);
+  final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),withPluginInfo,ImmutableList.<PluginProperty>of(),tenantContext);
   final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePaymentsByAccount(accountId,tenantContext);
   final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
   final List<InvoicePaymentJson> result=new ArrayList<InvoicePaymentJson>(payments.size());
-  for (  final DirectPayment payment : payments) {
+  for (  final Payment payment : payments) {
     final UUID invoiceId=getInvoiceId(invoicePayments,payment);
     result.add(new InvoicePaymentJson(payment,invoiceId,accountAuditLogs));
   }

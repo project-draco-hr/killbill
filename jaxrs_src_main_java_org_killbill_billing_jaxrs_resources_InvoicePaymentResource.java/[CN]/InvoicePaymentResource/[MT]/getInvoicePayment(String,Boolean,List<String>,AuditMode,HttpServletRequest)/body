@@ -1,10 +1,10 @@
 {
   final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
-  final UUID directPaymentIdId=UUID.fromString(directPaymentIdStr);
+  final UUID paymentIdId=UUID.fromString(paymentIdStr);
   final TenantContext tenantContext=context.createContext(request);
-  final DirectPayment directPayment=paymentApi.getPayment(directPaymentIdId,withPluginInfo,pluginProperties,tenantContext);
-  final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(directPayment.getAccountId(),auditMode.getLevel(),tenantContext);
-  final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePayments(directPaymentIdId,tenantContext);
+  final Payment payment=paymentApi.getPayment(paymentIdId,withPluginInfo,pluginProperties,tenantContext);
+  final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(payment.getAccountId(),auditMode.getLevel(),tenantContext);
+  final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePayments(paymentIdId,tenantContext);
   final InvoicePayment invoicePayment=Iterables.tryFind(invoicePayments,new Predicate<InvoicePayment>(){
     @Override public boolean apply(    final InvoicePayment input){
       return input.getType() == InvoicePaymentType.ATTEMPT;
@@ -12,6 +12,6 @@
   }
 ).orNull();
   final UUID invoiceId=invoicePayment != null ? invoicePayment.getInvoiceId() : null;
-  final InvoicePaymentJson result=new InvoicePaymentJson(directPayment,invoiceId,accountAuditLogs);
+  final InvoicePaymentJson result=new InvoicePaymentJson(payment,invoiceId,accountAuditLogs);
   return Response.status(Response.Status.OK).entity(result).build();
 }

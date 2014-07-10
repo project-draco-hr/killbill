@@ -1,0 +1,16 @@
+{
+synchronized (this) {
+    final PaymentModelDao payment=payments.get(paymentId);
+    if (payment != null) {
+      payment.setStateName(currentPaymentStateName);
+    }
+    final PaymentTransactionModelDao transaction=transactions.get(transactionId);
+    if (transaction != null) {
+      transaction.setTransactionStatus(paymentStatus);
+      transaction.setProcessedAmount(processedAmount);
+      transaction.setProcessedCurrency(processedCurrency);
+      transaction.setGatewayErrorCode(gatewayErrorCode);
+      transaction.setGatewayErrorMsg(gatewayErrorMsg);
+    }
+  }
+}

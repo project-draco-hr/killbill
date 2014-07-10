@@ -6,9 +6,9 @@
   final String transactionExternalKey2="sioux2";
   final String transactionExternalKey3="sioux3";
   final String transactionExternalKey4="sioux4";
-  final DirectPayment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,authAmount,Currency.USD,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,authAmount,Currency.USD,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
   paymentApi.createCapture(account,payment.getId(),captureAmount,Currency.USD,transactionExternalKey2,ImmutableList.<PluginProperty>of(),callContext);
-  final DirectPayment payment3=paymentApi.createCapture(account,payment.getId(),captureAmount,Currency.USD,transactionExternalKey3,ImmutableList.<PluginProperty>of(),callContext);
+  final Payment payment3=paymentApi.createCapture(account,payment.getId(),captureAmount,Currency.USD,transactionExternalKey3,ImmutableList.<PluginProperty>of(),callContext);
   assertEquals(payment3.getExternalKey(),paymentExternalKey);
   assertEquals(payment3.getPaymentMethodId(),account.getPaymentMethodId());
   assertEquals(payment3.getAccountId(),account.getId());
@@ -18,14 +18,14 @@
   assertEquals(payment3.getRefundedAmount().compareTo(BigDecimal.ZERO),0);
   assertEquals(payment3.getCurrency(),Currency.USD);
   assertEquals(payment3.getTransactions().size(),3);
-  final DirectPayment payment4=paymentApi.createRefund(account,payment3.getId(),payment3.getCapturedAmount(),Currency.USD,transactionExternalKey4,ImmutableList.<PluginProperty>of(),callContext);
+  final Payment payment4=paymentApi.createRefund(account,payment3.getId(),payment3.getCapturedAmount(),Currency.USD,transactionExternalKey4,ImmutableList.<PluginProperty>of(),callContext);
   assertEquals(payment4.getAuthAmount().compareTo(authAmount),0);
   assertEquals(payment4.getCapturedAmount().compareTo(captureAmount.add(captureAmount)),0);
   assertEquals(payment4.getPurchasedAmount().compareTo(BigDecimal.ZERO),0);
   assertEquals(payment4.getRefundedAmount().compareTo(payment3.getCapturedAmount()),0);
   assertEquals(payment4.getTransactions().size(),4);
   assertEquals(payment4.getTransactions().get(3).getExternalKey(),transactionExternalKey4);
-  assertEquals(payment4.getTransactions().get(3).getDirectPaymentId(),payment.getId());
+  assertEquals(payment4.getTransactions().get(3).getPaymentId(),payment.getId());
   assertEquals(payment4.getTransactions().get(3).getAmount().compareTo(payment3.getCapturedAmount()),0);
   assertEquals(payment4.getTransactions().get(3).getCurrency(),Currency.USD);
   assertEquals(payment4.getTransactions().get(3).getProcessedAmount().compareTo(payment3.getCapturedAmount()),0);

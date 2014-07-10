@@ -3,7 +3,7 @@
   final UUID tenantId=nonEntityDao.retrieveIdFromObject(tenantContext.getTenantRecordId(),ObjectType.TENANT);
   final CallContext callContext=new DefaultCallContext(tenantId,"AttemptCompletionJanitorTask",CallOrigin.INTERNAL,UserType.SYSTEM,UUID.randomUUID(),clock);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(attempt.getAccountId(),callContext);
-  final List<PaymentTransactionModelDao> transactions=paymentDao.getDirectPaymentTransactionsByExternalKey(attempt.getTransactionExternalKey(),tenantContext);
+  final List<PaymentTransactionModelDao> transactions=paymentDao.getPaymentTransactionsByExternalKey(attempt.getTransactionExternalKey(),tenantContext);
   final PaymentTransactionModelDao transaction=Iterables.tryFind(transactions,new Predicate<PaymentTransactionModelDao>(){
     @Override public boolean apply(    final PaymentTransactionModelDao input){
       return input.getAttemptId().equals(attempt.getId()) && input.getTransactionStatus() == TransactionStatus.SUCCESS;
@@ -19,10 +19,10 @@
     log.info("AttemptCompletionTask completing attempt " + attempt.getId() + " -> SUCCESS");
     final Account account=accountInternalApi.getAccountById(attempt.getAccountId(),tenantContext);
     final boolean isApiPayment=true;
-    final RetryableDirectPaymentStateContext paymentStateContext=new RetryableDirectPaymentStateContext(attempt.getPluginName(),isApiPayment,transaction.getPaymentId(),attempt.getPaymentExternalKey(),transaction.getTransactionExternalKey(),transaction.getTransactionType(),account,attempt.getPaymentMethodId(),transaction.getAmount(),transaction.getCurrency(),PluginPropertySerializer.deserialize(attempt.getPluginProperties()),internalCallContext,callContext);
+    final RetryablePaymentStateContext paymentStateContext=new RetryablePaymentStateContext(attempt.getPluginName(),isApiPayment,transaction.getPaymentId(),attempt.getPaymentExternalKey(),transaction.getTransactionExternalKey(),transaction.getTransactionType(),account,attempt.getPaymentMethodId(),transaction.getAmount(),transaction.getCurrency(),PluginPropertySerializer.deserialize(attempt.getPluginProperties()),internalCallContext,callContext);
     paymentStateContext.setAttemptId(attempt.getId());
-    paymentStateContext.setDirectPaymentTransactionModelDao(transaction);
-    pluginControlledDirectPaymentAutomatonRunner.completeRun(paymentStateContext);
+    paymentStateContext.setPaymentTransactionModelDao(transaction);
+    pluginControlledPaymentAutomatonRunner.completeRun(paymentStateContext);
   }
  catch (  AccountApiException e) {
     log.warn("Failed to complete payment attempt " + attempt.getId(),e);

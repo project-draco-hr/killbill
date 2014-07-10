@@ -1,0 +1,9 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID paymentId=UUID.fromString(paymentIdStr);
+  final Payment initialPayment=paymentApi.getPayment(paymentId,false,ImmutableList.<PluginProperty>of(),callContext);
+  final Account account=accountUserApi.getAccountById(initialPayment.getAccountId(),callContext);
+  final Currency currency=json.getCurrency() == null ? account.getCurrency() : Currency.valueOf(json.getCurrency());
+  final Payment payment=paymentApi.createChargeback(account,paymentId,json.getAmount(),currency,json.getTransactionExternalKey(),callContext);
+  return uriBuilder.buildResponse(uriInfo,PaymentResource.class,"getPayment",payment.getId());
+}

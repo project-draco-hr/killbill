@@ -1,8 +1,8 @@
 {
-  final PaymentAttemptModelDao attempt=retryableDirectPaymentAutomatonRunner.paymentDao.getPaymentAttempt(directPaymentStateContext.getAttemptId(),directPaymentStateContext.internalCallContext);
-  final UUID transactionId=directPaymentStateContext.getCurrentTransaction() != null ? directPaymentStateContext.getCurrentTransaction().getId() : null;
-  retryableDirectPaymentAutomatonRunner.paymentDao.updatePaymentAttempt(attempt.getId(),transactionId,state.getName(),directPaymentStateContext.internalCallContext);
+  final PaymentAttemptModelDao attempt=retryablePaymentAutomatonRunner.paymentDao.getPaymentAttempt(paymentStateContext.getAttemptId(),paymentStateContext.internalCallContext);
+  final UUID transactionId=paymentStateContext.getCurrentTransaction() != null ? paymentStateContext.getCurrentTransaction().getId() : null;
+  retryablePaymentAutomatonRunner.paymentDao.updatePaymentAttempt(attempt.getId(),transactionId,state.getName(),paymentStateContext.internalCallContext);
   if ("RETRIED".equals(state.getName())) {
-    retryServiceScheduler.scheduleRetry(ObjectType.PAYMENT_ATTEMPT,attempt.getId(),attempt.getId(),directPaymentStateContext.getPluginName(),directPaymentStateContext.getRetryDate());
+    retryServiceScheduler.scheduleRetry(ObjectType.PAYMENT_ATTEMPT,attempt.getId(),attempt.getId(),paymentStateContext.getPluginName(),paymentStateContext.getRetryDate());
   }
 }

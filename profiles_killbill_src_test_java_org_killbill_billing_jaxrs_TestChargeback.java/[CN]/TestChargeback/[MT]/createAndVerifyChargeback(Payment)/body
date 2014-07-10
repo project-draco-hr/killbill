@@ -3,12 +3,12 @@
   chargeback.setPaymentId(payment.getPaymentId());
   chargeback.setAmount(BigDecimal.TEN);
   final InvoicePayment chargebackJson=killBillClient.createInvoicePaymentChargeback(chargeback,createdBy,reason,comment);
-  final List<PaymentTransaction> chargebackTransactions=getDirectPaymentTransactions(ImmutableList.of(chargebackJson),TransactionType.CHARGEBACK.toString());
+  final List<PaymentTransaction> chargebackTransactions=getPaymentTransactions(ImmutableList.of(chargebackJson),TransactionType.CHARGEBACK.toString());
   assertEquals(chargebackTransactions.size(),1);
   assertEquals(chargebackTransactions.get(0).getAmount().compareTo(chargeback.getAmount()),0);
   assertEquals(chargebackTransactions.get(0).getPaymentId(),chargeback.getPaymentId());
   final List<InvoicePayment> payments=killBillClient.getInvoicePaymentsForAccount(payment.getAccountId());
-  final List<PaymentTransaction> transactions=getDirectPaymentTransactions(payments,TransactionType.CHARGEBACK.toString());
+  final List<PaymentTransaction> transactions=getPaymentTransactions(payments,TransactionType.CHARGEBACK.toString());
   Assert.assertEquals(transactions.size(),1);
   assertEquals(transactions.get(0).getAmount().compareTo(chargeback.getAmount()),0);
   assertEquals(transactions.get(0).getPaymentId(),chargeback.getPaymentId());

@@ -1,10 +1,10 @@
 {
   return dispatchWithAccountLockAndTimeout(new WithAccountLockCallback<OperationResult,OperationException>(){
     @Override public OperationResult doOperation() throws OperationException {
-      final PaymentControlContext paymentControlContext=new DefaultPaymentControlContext(directPaymentStateContext.getAccount(),directPaymentStateContext.getPaymentMethodId(),retryableDirectPaymentStateContext.getAttemptId(),directPaymentStateContext.getDirectPaymentId(),directPaymentStateContext.getDirectPaymentExternalKey(),directPaymentStateContext.getDirectPaymentTransactionExternalKey(),directPaymentStateContext.getTransactionType(),directPaymentStateContext.getAmount(),directPaymentStateContext.getCurrency(),directPaymentStateContext.getProperties(),retryableDirectPaymentStateContext.isApiPayment(),directPaymentStateContext.callContext);
+      final PaymentControlContext paymentControlContext=new DefaultPaymentControlContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),retryablePaymentStateContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateContext.getProperties(),retryablePaymentStateContext.isApiPayment(),paymentStateContext.callContext);
       final PriorPaymentControlResult pluginResult;
       try {
-        pluginResult=getPluginResult(retryableDirectPaymentStateContext.getPluginName(),paymentControlContext);
+        pluginResult=getPluginResult(retryablePaymentStateContext.getPluginName(),paymentControlContext);
         if (pluginResult.isAborted()) {
           return OperationResult.EXCEPTION;
         }
@@ -14,27 +14,27 @@
       }
       boolean success;
       try {
-        if (directPaymentStateContext.getAmount() == null || (pluginResult.getAdjustedAmount() != null && pluginResult.getAdjustedAmount().compareTo(directPaymentStateContext.getAmount()) != 0)) {
-          ((RetryableDirectPaymentStateContext)directPaymentStateContext).setAmount(pluginResult.getAdjustedAmount());
+        if (paymentStateContext.getAmount() == null || (pluginResult.getAdjustedAmount() != null && pluginResult.getAdjustedAmount().compareTo(paymentStateContext.getAmount()) != 0)) {
+          ((RetryablePaymentStateContext)paymentStateContext).setAmount(pluginResult.getAdjustedAmount());
         }
-        final DirectPayment result=doCallSpecificOperationCallback();
-        ((RetryableDirectPaymentStateContext)directPaymentStateContext).setResult(result);
-        final DirectPaymentTransaction transaction=((RetryableDirectPaymentStateContext)directPaymentStateContext).getCurrentTransaction();
+        final Payment result=doCallSpecificOperationCallback();
+        ((RetryablePaymentStateContext)paymentStateContext).setResult(result);
+        final PaymentTransaction transaction=((RetryablePaymentStateContext)paymentStateContext).getCurrentTransaction();
         success=transaction.getTransactionStatus() == TransactionStatus.SUCCESS || transaction.getTransactionStatus() == TransactionStatus.PENDING;
         if (success) {
-          final PaymentControlContext updatedPaymentControlContext=new DefaultPaymentControlContext(directPaymentStateContext.account,directPaymentStateContext.paymentMethodId,retryableDirectPaymentStateContext.getAttemptId(),result.getId(),result.getExternalKey(),transaction.getId(),directPaymentStateContext.getDirectPaymentTransactionExternalKey(),directPaymentStateContext.getTransactionType(),transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),directPaymentStateContext.properties,retryableDirectPaymentStateContext.isApiPayment(),directPaymentStateContext.callContext);
-          onCompletion(retryableDirectPaymentStateContext.getPluginName(),updatedPaymentControlContext);
+          final PaymentControlContext updatedPaymentControlContext=new DefaultPaymentControlContext(paymentStateContext.account,paymentStateContext.paymentMethodId,retryablePaymentStateContext.getAttemptId(),result.getId(),result.getExternalKey(),transaction.getId(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),paymentStateContext.properties,retryablePaymentStateContext.isApiPayment(),paymentStateContext.callContext);
+          onCompletion(retryablePaymentStateContext.getPluginName(),updatedPaymentControlContext);
           return OperationResult.SUCCESS;
         }
  else {
-          throw new OperationException(null,getOperationResultAndSetContext(retryableDirectPaymentStateContext,paymentControlContext));
+          throw new OperationException(null,getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext));
         }
       }
  catch (      PaymentApiException e) {
-        throw new OperationException(e,getOperationResultAndSetContext(retryableDirectPaymentStateContext,paymentControlContext));
+        throw new OperationException(e,getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext));
       }
 catch (      RuntimeException e) {
-        getOperationResultAndSetContext(retryableDirectPaymentStateContext,paymentControlContext);
+        getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext);
         throw e;
       }
     }

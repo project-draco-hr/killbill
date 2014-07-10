@@ -1,0 +1,24 @@
+{
+  if (payment == null) {
+    if (isApiPayment) {
+      return null;
+    }
+ else {
+      return new DefaultPaymentErrorEvent(account.getId(),null,null,transactionType,"Early abortion of payment transaction",context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+    }
+  }
+  final PaymentTransaction paymentTransaction=payment.getTransactions().get(payment.getTransactions().size() - 1);
+  Preconditions.checkState(paymentTransaction.getExternalKey().equals(transactionExternalKey));
+  Preconditions.checkState(paymentTransaction.getTransactionType().equals(transactionType));
+  final TransactionStatus transactionStatus=paymentTransaction.getTransactionStatus();
+switch (paymentTransaction.getTransactionStatus()) {
+case SUCCESS:
+case PENDING:
+    return new DefaultPaymentInfoEvent(account.getId(),null,payment.getId(),paymentTransaction.getAmount(),payment.getPaymentNumber(),transactionStatus,transactionType,paymentTransaction.getEffectiveDate(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+case PAYMENT_FAILURE:
+  return new DefaultPaymentErrorEvent(account.getId(),null,payment.getId(),transactionType,paymentTransaction.getPaymentInfoPlugin() == null ? null : paymentTransaction.getPaymentInfoPlugin().getGatewayError(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+case PLUGIN_FAILURE:
+default :
+return new DefaultPaymentPluginErrorEvent(account.getId(),null,payment.getId(),transactionType,paymentTransaction.getPaymentInfoPlugin() == null ? null : paymentTransaction.getPaymentInfoPlugin().getGatewayError(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+}
+}

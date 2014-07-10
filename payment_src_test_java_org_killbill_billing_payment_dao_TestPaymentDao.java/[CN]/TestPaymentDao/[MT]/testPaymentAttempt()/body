@@ -1,5 +1,5 @@
 {
-  final UUID directTransactionId=UUID.randomUUID();
+  final UUID transactionId=UUID.randomUUID();
   final String paymentExternalKey="vraiment?";
   final String transactionExternalKey="tduteuqweq";
   final String stateName="INIT";
@@ -10,7 +10,7 @@
   properties.add(new PluginProperty("key1","value1",false));
   properties.add(new PluginProperty("key2","value2",false));
   final byte[] serialized=PluginPropertySerializer.serialize(properties);
-  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(UUID.randomUUID(),UUID.randomUUID(),clock.getUTCNow(),clock.getUTCNow(),paymentExternalKey,directTransactionId,transactionExternalKey,transactionType,stateName,BigDecimal.ZERO,Currency.ALL,pluginName,serialized);
+  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(UUID.randomUUID(),UUID.randomUUID(),clock.getUTCNow(),clock.getUTCNow(),paymentExternalKey,transactionId,transactionExternalKey,transactionType,stateName,BigDecimal.ZERO,Currency.ALL,pluginName,serialized);
   PaymentAttemptModelDao savedAttempt=paymentDao.insertPaymentAttemptWithProperties(attempt,internalCallContext);
   assertEquals(savedAttempt.getTransactionExternalKey(),transactionExternalKey);
   assertEquals(savedAttempt.getTransactionType(),transactionType);

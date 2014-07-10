@@ -1,5 +1,5 @@
 {
-  final Account account=directPaymentStateContext.getAccount();
+  final Account account=paymentStateContext.getAccount();
   logger.debug("Dispatching plugin call for account {}",account.getExternalKey());
   try {
     final Callable<OperationResult> task=new CallableWithAccountLock<OperationResult,ExceptionType>(locker,account.getExternalKey(),callback);
@@ -8,13 +8,13 @@
     return operationResult;
   }
  catch (  final ExecutionException e) {
-    throw rewrapExecutionException(directPaymentStateContext,e);
+    throw rewrapExecutionException(paymentStateContext,e);
   }
 catch (  final TimeoutException e) {
-    throw wrapTimeoutException(directPaymentStateContext,e);
+    throw wrapTimeoutException(paymentStateContext,e);
   }
 catch (  final InterruptedException e) {
     Thread.currentThread().interrupt();
-    throw wrapInterruptedException(directPaymentStateContext,e);
+    throw wrapInterruptedException(paymentStateContext,e);
   }
 }

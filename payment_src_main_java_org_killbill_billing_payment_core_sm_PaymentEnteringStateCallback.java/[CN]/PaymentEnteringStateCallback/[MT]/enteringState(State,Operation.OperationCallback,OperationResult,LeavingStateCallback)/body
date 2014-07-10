@@ -1,0 +1,8 @@
+{
+  logger.debug("Entering state {} with result {}",newState.getName(),operationResult);
+  if (paymentStateContext.getPaymentTransactionModelDao() != null && paymentStateContext.getPaymentTransactionModelDao().getId() != null) {
+    final PaymentTransactionInfoPlugin paymentInfoPlugin=paymentStateContext.getPaymentInfoPlugin();
+    final TransactionStatus paymentStatus=paymentPluginStatusToPaymentStatus(paymentInfoPlugin,operationResult);
+    daoHelper.processPaymentInfoPlugin(paymentStatus,paymentInfoPlugin,newState.getName());
+  }
+}

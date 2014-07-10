@@ -1,9 +1,0 @@
-{
-  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
-  final UUID directPaymentIdId=UUID.fromString(directPaymentIdStr);
-  final TenantContext tenantContext=context.createContext(request);
-  final DirectPayment directPayment=paymentApi.getPayment(directPaymentIdId,withPluginInfo,pluginProperties,tenantContext);
-  final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(directPayment.getAccountId(),auditMode.getLevel(),tenantContext);
-  final DirectPaymentJson result=new DirectPaymentJson(directPayment,accountAuditLogs);
-  return Response.status(Response.Status.OK).entity(result).build();
-}

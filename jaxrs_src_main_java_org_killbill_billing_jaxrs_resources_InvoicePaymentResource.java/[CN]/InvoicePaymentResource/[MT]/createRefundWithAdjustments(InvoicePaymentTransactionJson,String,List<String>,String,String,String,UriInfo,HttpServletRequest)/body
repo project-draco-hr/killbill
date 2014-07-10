@@ -1,7 +1,7 @@
 {
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final UUID paymentUuid=UUID.fromString(paymentId);
-  final DirectPayment payment=paymentApi.getPayment(paymentUuid,false,ImmutableList.<PluginProperty>of(),callContext);
+  final Payment payment=paymentApi.getPayment(paymentUuid,false,ImmutableList.<PluginProperty>of(),callContext);
   final Account account=accountUserApi.getAccountById(payment.getAccountId(),callContext);
   final Iterable<PluginProperty> pluginProperties;
   final String transactionExternalKey=json.getTransactionExternalKey() != null ? json.getTransactionExternalKey() : UUID.randomUUID().toString();
@@ -20,6 +20,6 @@
  else {
     pluginProperties=extractPluginProperties(pluginPropertiesString);
   }
-  final DirectPayment result=paymentApi.createRefundWithPaymentControl(account,payment.getId(),json.getAmount(),account.getCurrency(),transactionExternalKey,pluginProperties,createInvoicePaymentControlPluginApiPaymentOptions(false),callContext);
+  final Payment result=paymentApi.createRefundWithPaymentControl(account,payment.getId(),json.getAmount(),account.getCurrency(),transactionExternalKey,pluginProperties,createInvoicePaymentControlPluginApiPaymentOptions(false),callContext);
   return uriBuilder.buildResponse(InvoicePaymentResource.class,"getInvoicePayment",result.getId(),uriInfo.getBaseUri().toString());
 }

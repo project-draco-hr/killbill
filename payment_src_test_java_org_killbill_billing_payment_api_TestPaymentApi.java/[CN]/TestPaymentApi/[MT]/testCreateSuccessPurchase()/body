@@ -2,7 +2,7 @@
   final BigDecimal requestedAmount=BigDecimal.TEN;
   final String paymentExternalKey="bwwrr";
   final String transactionExternalKey="krapaut";
-  final DirectPayment payment=paymentApi.createPurchase(account,account.getPaymentMethodId(),null,requestedAmount,Currency.AED,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  final Payment payment=paymentApi.createPurchase(account,account.getPaymentMethodId(),null,requestedAmount,Currency.AED,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
   assertEquals(payment.getExternalKey(),paymentExternalKey);
   assertEquals(payment.getPaymentMethodId(),account.getPaymentMethodId());
   assertEquals(payment.getAccountId(),account.getId());
@@ -13,7 +13,7 @@
   assertEquals(payment.getCurrency(),Currency.AED);
   assertEquals(payment.getTransactions().size(),1);
   assertEquals(payment.getTransactions().get(0).getExternalKey(),transactionExternalKey);
-  assertEquals(payment.getTransactions().get(0).getDirectPaymentId(),payment.getId());
+  assertEquals(payment.getTransactions().get(0).getPaymentId(),payment.getId());
   assertEquals(payment.getTransactions().get(0).getAmount().compareTo(requestedAmount),0);
   assertEquals(payment.getTransactions().get(0).getCurrency(),Currency.AED);
   assertEquals(payment.getTransactions().get(0).getProcessedAmount().compareTo(requestedAmount),0);

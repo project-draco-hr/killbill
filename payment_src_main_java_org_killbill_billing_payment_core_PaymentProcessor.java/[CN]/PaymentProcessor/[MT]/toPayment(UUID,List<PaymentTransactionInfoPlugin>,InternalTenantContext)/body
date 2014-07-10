@@ -1,0 +1,10 @@
+{
+  final PaymentModelDao paymentModelDao=paymentDao.getPayment(paymentId,tenantContext);
+  if (paymentModelDao == null) {
+    log.warn("Unable to find payment id " + paymentId);
+    return null;
+  }
+  final InternalTenantContext tenantContextWithAccountRecordId=internalCallContextFactory.createInternalTenantContext(paymentModelDao.getAccountId(),tenantContext);
+  final List<PaymentTransactionModelDao> transactionsForAccount=paymentDao.getTransactionsForAccount(paymentModelDao.getAccountId(),tenantContextWithAccountRecordId);
+  return toPayment(paymentModelDao,transactionsForAccount,pluginTransactions);
+}
