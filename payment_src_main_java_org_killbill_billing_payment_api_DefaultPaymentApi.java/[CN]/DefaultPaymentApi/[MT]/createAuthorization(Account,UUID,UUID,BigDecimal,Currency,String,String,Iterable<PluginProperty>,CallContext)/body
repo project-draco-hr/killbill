@@ -5,6 +5,7 @@
   checkNotNullParameter(currency,"currency");
   checkNotNullParameter(properties,"plugin properties");
   checkPositiveAmount(amount);
+  logAPICall(TransactionType.AUTHORIZE.toString(),account,paymentMethodId,paymentId,amount,currency,paymentExternalKey,paymentTransactionExternalKey);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   return paymentProcessor.createAuthorization(IS_API_PAYMENT,null,account,paymentMethodId,paymentId,amount,currency,paymentExternalKey,paymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
 }
