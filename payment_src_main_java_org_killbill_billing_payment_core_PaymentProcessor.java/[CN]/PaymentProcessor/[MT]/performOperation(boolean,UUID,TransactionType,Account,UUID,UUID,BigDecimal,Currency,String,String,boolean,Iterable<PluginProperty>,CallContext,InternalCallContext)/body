@@ -1,12 +1,7 @@
 {
   Payment payment=null;
-  try {
-    validateUniqueTransactionExternalKey(paymentTransactionExternalKey,internalCallContext);
-    final UUID nonNullPaymentId=paymentAutomatonRunner.run(transactionType,account,attemptId,paymentMethodId,paymentId,paymentExternalKey,paymentTransactionExternalKey,amount,currency,shouldLockAccountAndDispatch,properties,callContext,internalCallContext);
-    payment=getPayment(nonNullPaymentId,true,properties,callContext,internalCallContext);
-    return payment;
-  }
-  finally {
-    postPaymentEvent(isApiPayment,account,transactionType,payment,paymentTransactionExternalKey,internalCallContext);
-  }
+  validateUniqueTransactionExternalKey(paymentTransactionExternalKey,internalCallContext);
+  final UUID nonNullPaymentId=paymentAutomatonRunner.run(isApiPayment,transactionType,account,attemptId,paymentMethodId,paymentId,paymentExternalKey,paymentTransactionExternalKey,amount,currency,shouldLockAccountAndDispatch,properties,callContext,internalCallContext);
+  payment=getPayment(nonNullPaymentId,true,properties,callContext,internalCallContext);
+  return payment;
 }
