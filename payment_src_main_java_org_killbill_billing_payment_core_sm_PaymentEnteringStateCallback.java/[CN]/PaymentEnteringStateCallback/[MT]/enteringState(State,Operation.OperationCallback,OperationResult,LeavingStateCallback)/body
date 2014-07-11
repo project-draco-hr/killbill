@@ -5,7 +5,7 @@
     final TransactionStatus paymentStatus=paymentPluginStatusToPaymentStatus(paymentInfoPlugin,operationResult);
     daoHelper.processPaymentInfoPlugin(paymentStatus,paymentInfoPlugin,newState.getName());
   }
- else   if (paymentStateContext.isApiPayment()) {
+ else   if (!paymentStateContext.isApiPayment()) {
     final BusInternalEvent event=new DefaultPaymentErrorEvent(paymentStateContext.getAccount().getId(),null,paymentStateContext.getTransactionType(),"Early abortion of payment transaction",paymentStateContext.getInternalCallContext().getAccountRecordId(),paymentStateContext.getInternalCallContext().getTenantRecordId(),paymentStateContext.getInternalCallContext().getUserToken());
     try {
       daoHelper.getEventBus().post(event);

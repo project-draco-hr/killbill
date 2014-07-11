@@ -1,6 +1,9 @@
 {
   logger.debug("Leaving state {}",oldState.getName());
   try {
+    if (paymentStateContext.getPaymentMethodId() == null) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD,paymentStateContext.getAccount().getId());
+    }
     daoHelper.createNewPaymentTransaction();
   }
  catch (  PaymentApiException e) {
