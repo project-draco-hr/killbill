@@ -1,7 +1,7 @@
 {
   final Account account=Mockito.mock(Account.class);
   Mockito.when(account.getId()).thenReturn(UUID.randomUUID());
-  paymentStateContext=new PaymentStateContext(true,paymentId,null,UUID.randomUUID().toString(),UUID.randomUUID().toString(),TransactionType.CAPTURE,account,UUID.randomUUID(),new BigDecimal("192.3920111"),Currency.BRL,false,ImmutableList.<PluginProperty>of(),internalCallContext,callContext);
+  paymentStateContext=new PaymentStateContext(true,paymentId,null,null,UUID.randomUUID().toString(),UUID.randomUUID().toString(),TransactionType.CAPTURE,account,UUID.randomUUID(),new BigDecimal("192.3920111"),Currency.BRL,false,null,ImmutableList.<PluginProperty>of(),internalCallContext,callContext);
   if (paymentId != null) {
     final PaymentModelDao newPaymentModelDao=new PaymentModelDao(paymentId,clock.getUTCNow(),clock.getUTCNow(),paymentStateContext.getAccount().getId(),paymentStateContext.getPaymentMethodId(),1,paymentStateContext.getPaymentExternalKey());
     final PaymentTransactionModelDao newPaymentTransactionModelDao=new PaymentTransactionModelDao(clock.getUTCNow(),clock.getUTCNow(),null,paymentStateContext.getPaymentTransactionExternalKey(),paymentId,paymentStateContext.getTransactionType(),clock.getUTCNow(),TransactionStatus.UNKNOWN,paymentStateContext.getAmount(),paymentStateContext.getCurrency(),null,null);

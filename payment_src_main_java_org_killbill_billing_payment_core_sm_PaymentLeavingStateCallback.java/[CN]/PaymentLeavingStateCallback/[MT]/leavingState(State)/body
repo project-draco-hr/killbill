@@ -4,7 +4,13 @@
     if (paymentStateContext.getPaymentMethodId() == null) {
       throw new PaymentApiException(ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD,paymentStateContext.getAccount().getId());
     }
-    daoHelper.createNewPaymentTransaction();
+    if (paymentStateContext.getTransactionId() == null) {
+      daoHelper.createNewPaymentTransaction();
+    }
+ else {
+      final PaymentTransactionModelDao transactionModelDao=daoHelper.paymentDao.getPaymentTransaction(paymentStateContext.getTransactionId(),paymentStateContext.getInternalCallContext());
+      paymentStateContext.setPaymentTransactionModelDao(transactionModelDao);
+    }
   }
  catch (  PaymentApiException e) {
     throw new OperationException(e);
