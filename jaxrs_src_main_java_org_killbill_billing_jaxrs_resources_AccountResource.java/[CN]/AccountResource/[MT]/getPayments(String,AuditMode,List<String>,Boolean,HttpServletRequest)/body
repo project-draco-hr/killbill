@@ -1,7 +1,8 @@
 {
   final UUID accountId=UUID.fromString(accountIdStr);
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
   final TenantContext tenantContext=context.createContext(request);
-  final List<Payment> payments=paymentApi.getAccountPayments(accountId,withPluginInfo,ImmutableList.<PluginProperty>of(),tenantContext);
+  final List<Payment> payments=paymentApi.getAccountPayments(accountId,withPluginInfo,pluginProperties,tenantContext);
   final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
   final List<PaymentJson> result=ImmutableList.copyOf(Iterables.transform(payments,new Function<Payment,PaymentJson>(){
     @Override public PaymentJson apply(    final Payment payment){
