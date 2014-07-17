@@ -2,9 +2,7 @@
   try {
     if (paymentStateContext.getOverridePluginOperationResult() == null) {
       final PaymentTransactionInfoPlugin paymentInfoPlugin=doCallSpecificOperationCallback();
-      if (paymentInfoPlugin == null) {
-        throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,"Payment plugin returned a null result");
-      }
+      sanityOnPaymentInfoPlugin(paymentInfoPlugin);
       paymentStateContext.setPaymentInfoPlugin(paymentInfoPlugin);
       return processPaymentInfoPlugin();
     }
