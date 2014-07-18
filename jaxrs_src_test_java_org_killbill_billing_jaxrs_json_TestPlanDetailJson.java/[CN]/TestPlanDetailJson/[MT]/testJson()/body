@@ -4,13 +4,13 @@
   final BillingPeriod billingPeriod=BillingPeriod.ANNUAL;
   final String priceListName=UUID.randomUUID().toString();
   final PlanDetailJson planDetailJason=new PlanDetailJson(productName,planName,billingPeriod,priceListName,null);
-  Assert.assertEquals(planDetailJason.getProductName(),productName);
-  Assert.assertEquals(planDetailJason.getPlanName(),planName);
-  Assert.assertEquals(planDetailJason.getBillingPeriod(),billingPeriod);
-  Assert.assertEquals(planDetailJason.getPriceListName(),priceListName);
-  Assert.assertEquals(planDetailJason.getFinalPhasePrice(),null);
+  Assert.assertEquals(planDetailJason.getProduct(),productName);
+  Assert.assertEquals(planDetailJason.getPlan(),planName);
+  Assert.assertEquals(planDetailJason.getFinalPhaseBillingPeriod(),billingPeriod);
+  Assert.assertEquals(planDetailJason.getPriceList(),priceListName);
+  Assert.assertEquals(planDetailJason.getFinalPhaseRecurringPrice(),null);
   final String asJson=mapper.writeValueAsString(planDetailJason);
-  Assert.assertEquals(asJson,"{\"productName\":\"" + planDetailJason.getProductName() + "\","+ "\"planName\":\""+ planDetailJason.getPlanName()+ "\","+ "\"billingPeriod\":\""+ planDetailJason.getBillingPeriod().toString()+ "\","+ "\"priceListName\":\""+ planDetailJason.getPriceListName()+ "\","+ "\"finalPhasePrice\":null}");
+  Assert.assertEquals(asJson,"{\"product\":\"" + planDetailJason.getProduct() + "\","+ "\"plan\":\""+ planDetailJason.getPlan()+ "\","+ "\"priceList\":\""+ planDetailJason.getPriceList()+ "\","+ "\"finalPhaseBillingPeriod\":\""+ planDetailJason.getFinalPhaseBillingPeriod().toString()+ "\","+ "\"finalPhaseRecurringPrice\":null}");
   final PlanDetailJson fromJson=mapper.readValue(asJson,PlanDetailJson.class);
   Assert.assertEquals(fromJson,planDetailJason);
 }
