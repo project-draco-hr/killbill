@@ -1,20 +1,20 @@
 {
   final Plan plan=listing.getPlan();
   if (plan == null) {
-    this.productName=null;
-    this.planName=null;
-    this.billingPeriod=null;
-    this.finalPhasePrice=ImmutableList.<PriceJson>of();
+    this.product=null;
+    this.plan=null;
+    this.finalPhaseBillingPeriod=null;
+    this.finalPhaseRecurringPrice=ImmutableList.<PriceJson>of();
   }
  else {
-    this.productName=plan.getProduct() == null ? null : plan.getProduct().getName();
-    this.planName=plan.getName();
-    this.billingPeriod=plan.getRecurringBillingPeriod();
+    this.product=plan.getProduct() == null ? null : plan.getProduct().getName();
+    this.plan=plan.getName();
+    this.finalPhaseBillingPeriod=plan.getRecurringBillingPeriod();
     if (plan.getFinalPhase() == null || plan.getFinalPhase().getRecurring() == null || plan.getFinalPhase().getRecurring().getRecurringPrice() == null || plan.getFinalPhase().getRecurring().getRecurringPrice().getPrices() == null) {
-      this.finalPhasePrice=ImmutableList.<PriceJson>of();
+      this.finalPhaseRecurringPrice=ImmutableList.<PriceJson>of();
     }
  else {
-      this.finalPhasePrice=Lists.transform(ImmutableList.<Price>copyOf(plan.getFinalPhase().getRecurring().getRecurringPrice().getPrices()),new Function<Price,PriceJson>(){
+      this.finalPhaseRecurringPrice=Lists.transform(ImmutableList.<Price>copyOf(plan.getFinalPhase().getRecurring().getRecurringPrice().getPrices()),new Function<Price,PriceJson>(){
         @Override public PriceJson apply(        final Price price){
           try {
             return new PriceJson(price);
@@ -27,5 +27,5 @@
 );
     }
   }
-  this.priceListName=listing.getPriceList() == null ? null : listing.getPriceList().getName();
+  this.priceList=listing.getPriceList() == null ? null : listing.getPriceList().getName();
 }
