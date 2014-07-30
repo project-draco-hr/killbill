@@ -1,12 +1,12 @@
 {
-  return dispatchWithAccountLockAndTimeout(new WithAccountLockCallback<OperationResult,OperationException>(){
-    @Override public OperationResult doOperation() throws OperationException {
+  return dispatchWithAccountLockAndTimeout(new WithAccountLockCallback<PluginDispatcherReturnType<OperationResult>,OperationException>(){
+    @Override public PluginDispatcherReturnType<OperationResult> doOperation() throws OperationException {
       final PaymentControlContext paymentControlContext=new DefaultPaymentControlContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),retryablePaymentStateContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateContext.getProperties(),retryablePaymentStateContext.isApiPayment(),paymentStateContext.callContext);
       final PriorPaymentControlResult pluginResult;
       try {
         pluginResult=getPluginResult(retryablePaymentStateContext.getPluginName(),paymentControlContext);
         if (pluginResult.isAborted()) {
-          return OperationResult.EXCEPTION;
+          return PluginDispatcher.createPluginDispatcherReturnType(OperationResult.EXCEPTION);
         }
       }
  catch (      PaymentControlApiException e) {
@@ -24,7 +24,7 @@
         if (success) {
           final PaymentControlContext updatedPaymentControlContext=new DefaultPaymentControlContext(paymentStateContext.account,paymentStateContext.paymentMethodId,retryablePaymentStateContext.getAttemptId(),result.getId(),result.getExternalKey(),transaction.getId(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),paymentStateContext.properties,retryablePaymentStateContext.isApiPayment(),paymentStateContext.callContext);
           onCompletion(retryablePaymentStateContext.getPluginName(),updatedPaymentControlContext);
-          return OperationResult.SUCCESS;
+          return PluginDispatcher.createPluginDispatcherReturnType(OperationResult.SUCCESS);
         }
  else {
           throw new OperationException(null,getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext));

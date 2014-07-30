@@ -1,0 +1,19 @@
+{
+  final HttpServletRequest httpServletRequest=(HttpServletRequest)servletRequest;
+  final String profilingHeaderRequest=httpServletRequest.getHeader(PROFILING_HEADER_REQ);
+  if (profilingHeaderRequest != null) {
+    try {
+      final ProfilingDataOutput profilingOutput=ProfilingDataOutput.valueOf(profilingHeaderRequest);
+      Profiling.setPerThreadProfilingData(profilingOutput);
+    }
+ catch (    IllegalArgumentException e) {
+      logger.info("Profiling data output " + profilingHeaderRequest + " is not supported, profiling NOT enabled");
+    }
+  }
+  try {
+    filterChain.doFilter(servletRequest,servletResponse);
+  }
+  finally {
+    Profiling.resetPerThreadProfilingData();
+  }
+}

@@ -1,5 +1,5 @@
 {
-  final ExecutorService pluginExecutorService=Executors.newFixedThreadPool(paymentConfig.getPaymentPluginThreadNb(),new ThreadFactory(){
+  final ExecutorService pluginExecutorService=new WithProfilingThreadPoolExecutor(paymentConfig.getPaymentPluginThreadNb(),paymentConfig.getPaymentPluginThreadNb(),0L,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>(),new ThreadFactory(){
     @Override public Thread newThread(    final Runnable r){
       final Thread th=new Thread(r);
       th.setName(PLUGIN_THREAD_PREFIX + th.getId());

@@ -1,9 +1,10 @@
 {
-  return dispatchWithExceptionHandling(null,new Callable<GatewayNotification>(){
-    @Override public GatewayNotification call() throws PaymentApiException {
+  return dispatchWithExceptionHandling(null,new Callable<PluginDispatcherReturnType<GatewayNotification>>(){
+    @Override public PluginDispatcherReturnType<GatewayNotification> call() throws PaymentApiException {
       final PaymentPluginApi plugin=getPaymentPluginApi(pluginName);
       try {
-        return plugin.processNotification(notification,properties,callContext);
+        final GatewayNotification result=plugin.processNotification(notification,properties,callContext);
+        return PluginDispatcher.createPluginDispatcherReturnType(result);
       }
  catch (      PaymentPluginApiException e) {
         throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,e.getErrorMessage());

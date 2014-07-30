@@ -1,7 +1,8 @@
 {
-  return dispatchWithAccountLockAndTimeout(new WithAccountLockCallback<OperationResult,OperationException>(){
-    @Override public OperationResult doOperation() throws OperationException {
-      return doSimpleOperationCallback();
+  return dispatchWithAccountLockAndTimeout(new WithAccountLockCallback<PluginDispatcherReturnType<OperationResult>,OperationException>(){
+    @Override public PluginDispatcherReturnType<OperationResult> doOperation() throws OperationException {
+      final OperationResult result=doSimpleOperationCallback();
+      return PluginDispatcher.createPluginDispatcherReturnType(result);
     }
   }
 );

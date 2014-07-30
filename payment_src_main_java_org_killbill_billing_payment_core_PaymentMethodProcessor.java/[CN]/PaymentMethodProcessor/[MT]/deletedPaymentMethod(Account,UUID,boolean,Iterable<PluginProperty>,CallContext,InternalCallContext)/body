@@ -1,7 +1,7 @@
 {
   try {
-    new WithAccountLock<Void,PaymentApiException>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<Void,PaymentApiException>(){
-      @Override public Void doOperation() throws PaymentApiException {
+    new WithAccountLock<Void,PaymentApiException>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<PluginDispatcherReturnType<Void>,PaymentApiException>(){
+      @Override public PluginDispatcherReturnType<Void> doOperation() throws PaymentApiException {
         final PaymentMethodModelDao paymentMethodModel=paymentDao.getPaymentMethod(paymentMethodId,context);
         if (paymentMethodModel == null) {
           throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,paymentMethodId);
@@ -23,7 +23,7 @@
           final PaymentPluginApi pluginApi=getPluginApi(paymentMethodId,context);
           pluginApi.deletePaymentMethod(account.getId(),paymentMethodId,properties,callContext);
           paymentDao.deletedPaymentMethod(paymentMethodId,context);
-          return null;
+          return PluginDispatcher.createPluginDispatcherReturnType(null);
         }
  catch (        final PaymentPluginApiException e) {
           log.warn("Error deleting payment method " + paymentMethodId,e);
