@@ -1,8 +1,8 @@
 {
   final BaseServerModuleBuilder builder=new BaseServerModuleBuilder().setJaxrsUriPattern("(" + JaxRsResourceBase.PREFIX + "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*").addJaxrsResource("org.killbill.billing.jaxrs.mappers").addJaxrsResource("org.killbill.billing.jaxrs.resources");
+  builder.addFilter("/*",ProfilingFilter.class);
   if (config.isMultiTenancyEnabled()) {
     builder.addFilter("/*",TenantFilter.class);
   }
-  builder.addFilter("/*",ProfilingFilter.class);
   return builder.build();
 }

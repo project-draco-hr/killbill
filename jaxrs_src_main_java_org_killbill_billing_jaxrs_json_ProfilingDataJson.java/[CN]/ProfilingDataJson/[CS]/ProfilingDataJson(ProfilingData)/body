@@ -1,0 +1,29 @@
+{
+  final List<ProfilingDataItem> items=input.getRawData();
+  if (items.isEmpty()) {
+    this.rawData=Collections.emptyList();
+    return;
+  }
+  final List<ProfilingDataJsonItem> root=new ArrayList<ProfilingDataJsonItem>();
+  final Stack<ProfilingDataJsonItem> stack=new Stack<ProfilingDataJsonItem>();
+  while (items.size() > 0) {
+    final ProfilingDataItem cur=items.remove(0);
+    if (cur.getLineType() == LogLineType.START) {
+      final ProfilingDataJsonItem jsonItem=new ProfilingDataJsonItem(cur.getKey(),nanoToMicro(cur.getTimestampNsec()),Long.MIN_VALUE,new ArrayList<ProfilingDataJsonItem>());
+      if (stack.isEmpty()) {
+        root.add(jsonItem);
+      }
+ else {
+        final ProfilingDataJsonItem parent=stack.peek();
+        parent.addChild(jsonItem);
+      }
+      stack.push(jsonItem);
+    }
+ else {
+      final ProfilingDataJsonItem jsonItem=stack.pop();
+      jsonItem.setDurationUsec(nanoToMicro(cur.getTimestampNsec()) - jsonItem.getStartUsec());
+    }
+  }
+  Preconditions.checkState(stack.isEmpty());
+  this.rawData=root;
+}
