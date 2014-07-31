@@ -1,0 +1,20 @@
+{
+  try {
+    final ProfilingData rawData=Profiling.getPerThreadProfilingData();
+    if (rawData != null) {
+      final ProfilingDataJson profilingData=new ProfilingDataJson(rawData);
+      final String value;
+      try {
+        value=mapper.writeValueAsString(profilingData);
+        response.getHttpHeaders().add(PROFILING_HEADER_RESP,value);
+      }
+ catch (      JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  finally {
+    Profiling.resetPerThreadProfilingData();
+  }
+  return response;
+}
