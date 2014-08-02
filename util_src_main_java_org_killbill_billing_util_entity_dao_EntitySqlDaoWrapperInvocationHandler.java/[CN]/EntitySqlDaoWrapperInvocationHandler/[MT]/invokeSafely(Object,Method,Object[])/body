@@ -8,6 +8,11 @@
     return invokeWithCaching(cachableAnnotation,method,args);
   }
  else {
-    return method.invoke(sqlDao,args);
+    return prof.executeWithProfiling(ProfilingFeatureType.DAO_DETAILS,sqlDaoClass.getSimpleName() + " (raw):" + method.getName(),new WithProfilingCallback(){
+      @Override public Object execute() throws Throwable {
+        return method.invoke(sqlDao,args);
+      }
+    }
+);
   }
 }

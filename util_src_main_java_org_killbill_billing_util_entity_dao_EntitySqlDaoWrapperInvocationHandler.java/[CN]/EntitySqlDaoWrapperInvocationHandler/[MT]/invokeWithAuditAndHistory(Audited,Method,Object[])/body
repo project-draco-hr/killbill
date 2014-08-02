@@ -11,7 +11,12 @@
       entityRecordIds.put(entityId,sqlDao.getRecordId(entityId,context));
     }
   }
-  final Object obj=method.invoke(sqlDao,args);
+  final Object obj=prof.executeWithProfiling(ProfilingFeatureType.DAO_DETAILS,sqlDaoClass.getSimpleName() + " (raw) :",new WithProfilingCallback(){
+    @Override public Object execute() throws Throwable {
+      return method.invoke(sqlDao,args);
+    }
+  }
+);
   final ChangeType changeType=auditedAnnotation.value();
   for (  final String entityId : entityIds) {
     updateHistoryAndAudit(entityId,entities,entityRecordIds,changeType,context);

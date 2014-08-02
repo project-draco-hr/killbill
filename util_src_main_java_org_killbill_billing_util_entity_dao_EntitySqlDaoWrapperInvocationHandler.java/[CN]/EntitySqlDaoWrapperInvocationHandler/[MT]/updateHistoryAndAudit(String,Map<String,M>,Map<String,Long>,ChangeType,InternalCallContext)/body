@@ -1,15 +1,21 @@
 {
-  final M reHydratedEntity=sqlDao.getById(entityId,context);
-  final Long reHydratedEntityRecordId=sqlDao.getRecordId(entityId,context);
-  final M entity=Objects.firstNonNull(reHydratedEntity,entities.get(entityId));
-  final Long entityRecordId=Objects.firstNonNull(reHydratedEntityRecordId,entityRecordIds.get(entityId));
-  final TableName tableName=entity.getTableName();
-  final Long historyRecordId;
-  if (tableName.getHistoryTableName() != null) {
-    historyRecordId=insertHistory(entityRecordId,entity,changeType,context);
-  }
+  prof.executeWithProfiling(ProfilingFeatureType.DAO_DETAILS,sqlDaoClass.getSimpleName() + " (history/audit) :",new WithProfilingCallback(){
+    @Override public Object execute(){
+      final M reHydratedEntity=sqlDao.getById(entityId,context);
+      final Long reHydratedEntityRecordId=sqlDao.getRecordId(entityId,context);
+      final M entity=Objects.firstNonNull(reHydratedEntity,entities.get(entityId));
+      final Long entityRecordId=Objects.firstNonNull(reHydratedEntityRecordId,entityRecordIds.get(entityId));
+      final TableName tableName=entity.getTableName();
+      final Long historyRecordId;
+      if (tableName.getHistoryTableName() != null) {
+        historyRecordId=insertHistory(entityRecordId,entity,changeType,context);
+      }
  else {
-    historyRecordId=entityRecordId;
+        historyRecordId=entityRecordId;
+      }
+      insertAudits(tableName,entityRecordId,historyRecordId,changeType,context);
+      return null;
+    }
   }
-  insertAudits(tableName,entityRecordId,historyRecordId,changeType,context);
+);
 }
