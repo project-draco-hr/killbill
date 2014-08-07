@@ -4,6 +4,10 @@
   if (profilingHeaderRequest != null) {
     try {
       Profiling.setPerThreadProfilingData(profilingHeaderRequest);
+      final ProfilingData profilingData=Profiling.getPerThreadProfilingData();
+      if (profilingData.getProfileFeature().isProfilingJAXRS()) {
+        profilingData.addStart(ProfilingFeatureType.JAXRS,request.getPath());
+      }
     }
  catch (    IllegalArgumentException e) {
       logger.info("Profiling data output " + profilingHeaderRequest + " is not supported, profiling NOT enabled");
