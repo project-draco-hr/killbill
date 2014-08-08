@@ -3,7 +3,7 @@
   try {
     bean=type.newInstance();
   }
- catch (  Exception e) {
+ catch (  final Exception e) {
     throw new IllegalArgumentException(String.format("A bean, %s, was mapped " + "which was not instantiable",type.getName()),e);
   }
   final Class beanClass=bean.getClass();
@@ -67,6 +67,10 @@
  else {
         value=rs.getObject(i);
       }
+      if (value instanceof Blob) {
+        final Blob blob=(Blob)value;
+        value=blob.getBytes(0,(int)blob.length());
+      }
       if (rs.wasNull() && !type.isPrimitive()) {
         value=null;
       }
@@ -82,16 +86,16 @@
           field.set(bean,value);
         }
       }
- catch (      NoSuchFieldException e) {
+ catch (      final NoSuchFieldException e) {
         throw new IllegalArgumentException(String.format("Unable to find field for " + "property, %s",name),e);
       }
-catch (      IllegalAccessException e) {
+catch (      final IllegalAccessException e) {
         throw new IllegalArgumentException(String.format("Unable to access setter for " + "property, %s",name),e);
       }
-catch (      InvocationTargetException e) {
+catch (      final InvocationTargetException e) {
         throw new IllegalArgumentException(String.format("Invocation target exception trying to " + "invoker setter for the %s property",name),e);
       }
-catch (      NullPointerException e) {
+catch (      final NullPointerException e) {
         throw new IllegalArgumentException(String.format("No appropriate method to " + "write value %s ",value.toString()),e);
       }
     }
