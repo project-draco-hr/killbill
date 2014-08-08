@@ -5,5 +5,17 @@
   if (cache != null) {
     return (Long)cache.get(objectId.toString(),new CacheLoaderArgument(objectType));
   }
-  return op.doRetrieve(objectId,objectType);
+  final Long result;
+  try {
+    result=prof.executeWithProfiling(ProfilingFeatureType.DAO_DETAILS,"NonEntityDao (type = " + objectType + ") cache miss",new WithProfilingCallback(){
+      @Override public Long execute() throws Throwable {
+        return op.doRetrieve(objectId,objectType);
+      }
+    }
+);
+    return result;
+  }
+ catch (  Throwable throwable) {
+    throw new RuntimeException(throwable);
+  }
 }
