@@ -11,12 +11,12 @@
   }
 ).orNull();
   if (transaction == null) {
-    log.info("AttemptCompletionTask moving attempt " + attempt.getId() + " -> ABORTED");
+    log.info("Janitor AttemptCompletionTask moving attempt " + attempt.getId() + " -> ABORTED");
     paymentDao.updatePaymentAttempt(attempt.getId(),attempt.getTransactionId(),"ABORTED",internalCallContext);
     return;
   }
   try {
-    log.info("AttemptCompletionTask completing attempt " + attempt.getId() + " -> SUCCESS");
+    log.info("Janitor AttemptCompletionTask completing attempt " + attempt.getId() + " -> SUCCESS");
     final Account account=accountInternalApi.getAccountById(attempt.getAccountId(),tenantContext);
     final boolean isApiPayment=true;
     final RetryablePaymentStateContext paymentStateContext=new RetryablePaymentStateContext(attempt.getPluginName(),isApiPayment,transaction.getPaymentId(),attempt.getPaymentExternalKey(),transaction.getTransactionExternalKey(),transaction.getTransactionType(),account,attempt.getPaymentMethodId(),transaction.getAmount(),transaction.getCurrency(),PluginPropertySerializer.deserialize(attempt.getPluginProperties()),internalCallContext,callContext);
@@ -25,12 +25,12 @@
     pluginControlledPaymentAutomatonRunner.completeRun(paymentStateContext);
   }
  catch (  AccountApiException e) {
-    log.warn("Failed to complete payment attempt " + attempt.getId(),e);
+    log.warn("Janitor AttemptCompletionTask failed to complete payment attempt " + attempt.getId(),e);
   }
 catch (  PluginPropertySerializerException e) {
-    log.warn("Failed to complete payment attempt " + attempt.getId(),e);
+    log.warn("Janitor AttemptCompletionTask failed to complete payment attempt " + attempt.getId(),e);
   }
 catch (  PaymentApiException e) {
-    log.warn("Failed to complete payment attempt " + attempt.getId(),e);
+    log.warn("Janitor AttemptCompletionTask failed to complete payment attempt " + attempt.getId(),e);
   }
 }

@@ -1,9 +1,10 @@
 {
   isStopped=true;
   try {
-    boolean res=shutdownLatch.await(5,TimeUnit.SECONDS);
-    if (!res) {
-      log.warn("Janitor stop sequence timed out : did not complete in 5 sec");
+    janitorExecutor.shutdown();
+    boolean success=janitorExecutor.awaitTermination(TERMINATION_TIMEOUT_SEC,TimeUnit.SECONDS);
+    if (!success) {
+      log.warn("Janitor failed to complete termination within " + TERMINATION_TIMEOUT_SEC + "sec");
     }
   }
  catch (  InterruptedException e) {
