@@ -9,10 +9,10 @@
           return PluginDispatcher.createPluginDispatcherReturnType(OperationResult.EXCEPTION);
         }
       }
- catch (      PaymentControlApiException e) {
+ catch (      final PaymentControlApiException e) {
         throw new OperationException(e,OperationResult.EXCEPTION);
       }
-      boolean success;
+      final boolean success;
       try {
         if (paymentStateContext.getAmount() == null || (pluginResult.getAdjustedAmount() != null && pluginResult.getAdjustedAmount().compareTo(paymentStateContext.getAmount()) != 0)) {
           ((RetryablePaymentStateContext)paymentStateContext).setAmount(pluginResult.getAdjustedAmount());
@@ -30,10 +30,10 @@
           throw new OperationException(null,getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext));
         }
       }
- catch (      PaymentApiException e) {
+ catch (      final PaymentApiException e) {
         throw new OperationException(e,getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext));
       }
-catch (      RuntimeException e) {
+catch (      final RuntimeException e) {
         getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext);
         throw e;
       }
