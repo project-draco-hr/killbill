@@ -12,14 +12,14 @@
   }
 );
   final Iterable<PaymentTransaction> transactions=Iterables.transform(filteredTransactions,new Function<PaymentTransactionModelDao,PaymentTransaction>(){
-    @Override public PaymentTransaction apply(    final PaymentTransactionModelDao input){
-      final PaymentTransactionInfoPlugin info=pluginTransactions != null ? Iterables.tryFind(pluginTransactions,new Predicate<PaymentTransactionInfoPlugin>(){
-        @Override public boolean apply(        final PaymentTransactionInfoPlugin input){
-          return input.getKbTransactionPaymentId().equals(input.getKbTransactionPaymentId());
+    @Override public PaymentTransaction apply(    final PaymentTransactionModelDao paymentTransactionModelDao){
+      final PaymentTransactionInfoPlugin paymentTransactionInfoPlugin=pluginTransactions != null ? Iterables.tryFind(pluginTransactions,new Predicate<PaymentTransactionInfoPlugin>(){
+        @Override public boolean apply(        final PaymentTransactionInfoPlugin paymentTransactionInfoPlugin){
+          return paymentTransactionModelDao.getId().equals(paymentTransactionInfoPlugin.getKbTransactionPaymentId());
         }
       }
 ).orNull() : null;
-      return new DefaultPaymentTransaction(input.getId(),input.getAttemptId(),input.getTransactionExternalKey(),input.getCreatedDate(),input.getUpdatedDate(),input.getPaymentId(),input.getTransactionType(),input.getEffectiveDate(),input.getTransactionStatus(),input.getAmount(),input.getCurrency(),input.getProcessedAmount(),input.getProcessedCurrency(),input.getGatewayErrorCode(),input.getGatewayErrorMsg(),info);
+      return new DefaultPaymentTransaction(paymentTransactionModelDao.getId(),paymentTransactionModelDao.getAttemptId(),paymentTransactionModelDao.getTransactionExternalKey(),paymentTransactionModelDao.getCreatedDate(),paymentTransactionModelDao.getUpdatedDate(),paymentTransactionModelDao.getPaymentId(),paymentTransactionModelDao.getTransactionType(),paymentTransactionModelDao.getEffectiveDate(),paymentTransactionModelDao.getTransactionStatus(),paymentTransactionModelDao.getAmount(),paymentTransactionModelDao.getCurrency(),paymentTransactionModelDao.getProcessedAmount(),paymentTransactionModelDao.getProcessedCurrency(),paymentTransactionModelDao.getGatewayErrorCode(),paymentTransactionModelDao.getGatewayErrorMsg(),paymentTransactionInfoPlugin);
     }
   }
 );

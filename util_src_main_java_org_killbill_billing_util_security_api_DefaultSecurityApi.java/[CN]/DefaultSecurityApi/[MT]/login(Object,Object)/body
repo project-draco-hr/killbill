@@ -1,5 +1,8 @@
 {
   final Subject currentUser=SecurityUtils.getSubject();
+  if (principal.equals(currentUser.getPrincipal()) && currentUser.isAuthenticated()) {
+    return;
+  }
   if (principal instanceof String && credentials instanceof String) {
     currentUser.login(new UsernamePasswordToken((String)principal,(String)credentials));
   }
