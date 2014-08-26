@@ -1,14 +1,14 @@
 {
   this.transactionalSqlDao=new EntitySqlDaoTransactionalJdbiWrapper(dbi,clock,controlCacheDispatcher,nonEntityDao);
   final TagModelDao tag=new TagModelDao(clock.getUTCNow(),UUID.randomUUID(),UUID.randomUUID(),ObjectType.TAG);
-  Assert.assertEquals(getCacheSize(),0);
+  Assert.assertEquals(getCacheSize(CacheType.RECORD_ID),0);
   insertTag(tag);
-  Assert.assertEquals(getCacheSize(),0);
+  Assert.assertEquals(getCacheSize(CacheType.RECORD_ID),0);
   final Long tagRecordId=getTagRecordId(tag.getId());
-  Assert.assertEquals(getCacheSize(),1);
+  Assert.assertEquals(getCacheSize(CacheType.RECORD_ID),1);
   final Long recordIdFromCache=retrieveRecordIdFromCache(tag.getId());
   Assert.assertNotNull(recordIdFromCache);
   Assert.assertEquals(recordIdFromCache,new Long(1));
   Assert.assertEquals(tagRecordId,new Long(1));
-  Assert.assertEquals(getCacheSize(),1);
+  Assert.assertEquals(getCacheSize(CacheType.RECORD_ID),1);
 }
