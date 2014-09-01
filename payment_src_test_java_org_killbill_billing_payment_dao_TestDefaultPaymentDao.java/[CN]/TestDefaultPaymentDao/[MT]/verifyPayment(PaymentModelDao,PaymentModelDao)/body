@@ -3,4 +3,6 @@
   Assert.assertTrue(loadedPaymentModelDao.getPaymentNumber() > 0);
   Assert.assertEquals(loadedPaymentModelDao.getPaymentMethodId(),specifiedPaymentModelDao.getPaymentMethodId());
   Assert.assertEquals(loadedPaymentModelDao.getExternalKey(),specifiedPaymentModelDao.getExternalKey());
+  Assert.assertEquals(ImmutableList.<PaymentModelDao>copyOf(paymentDao.searchPayments(specifiedPaymentModelDao.getPaymentMethodId().toString(),0L,Long.MAX_VALUE,internalCallContext).iterator()).size(),1);
+  Assert.assertEquals(ImmutableList.<PaymentModelDao>copyOf(paymentDao.searchPayments(specifiedPaymentModelDao.getExternalKey(),0L,Long.MAX_VALUE,internalCallContext).iterator()).size(),1);
 }

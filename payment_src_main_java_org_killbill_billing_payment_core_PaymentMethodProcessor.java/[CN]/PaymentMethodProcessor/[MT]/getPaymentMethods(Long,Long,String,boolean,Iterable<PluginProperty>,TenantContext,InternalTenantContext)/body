@@ -1,0 +1,23 @@
+{
+  final PaymentPluginApi pluginApi=withPluginInfo ? getPaymentPluginApi(pluginName) : null;
+  return getEntityPagination(limit,new SourcePaginationBuilder<PaymentMethodModelDao,PaymentApiException>(){
+    @Override public Pagination<PaymentMethodModelDao> build(){
+      return paymentDao.getPaymentMethods(pluginName,offset,limit,internalTenantContext);
+    }
+  }
+,new Function<PaymentMethodModelDao,PaymentMethod>(){
+    @Override public PaymentMethod apply(    final PaymentMethodModelDao paymentMethodModelDao){
+      PaymentMethodPlugin paymentMethodPlugin=null;
+      if (pluginApi != null) {
+        try {
+          paymentMethodPlugin=pluginApi.getPaymentMethodDetail(paymentMethodModelDao.getAccountId(),paymentMethodModelDao.getId(),properties,tenantContext);
+        }
+ catch (        final PaymentPluginApiException e) {
+          log.warn("Unable to find payment method id " + paymentMethodModelDao.getId() + " in plugin "+ pluginName);
+        }
+      }
+      return new DefaultPaymentMethod(paymentMethodModelDao,paymentMethodPlugin);
+    }
+  }
+);
+}

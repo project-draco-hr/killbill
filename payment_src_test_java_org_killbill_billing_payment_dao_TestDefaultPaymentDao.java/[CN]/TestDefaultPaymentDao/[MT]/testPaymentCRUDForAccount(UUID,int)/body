@@ -23,6 +23,9 @@
     final PaymentTransactionModelDao paymentTransactionModelDao=generatePaymentTransactionModelDao(paymentModelDao.getId());
     final PaymentModelDao insertedPaymentModelDao=paymentDao.insertPaymentWithFirstTransaction(paymentModelDao,paymentTransactionModelDao,accountCallContext);
     verifyPayment(insertedPaymentModelDao,paymentModelDao);
+    Assert.assertEquals(ImmutableList.<PaymentModelDao>copyOf(paymentDao.searchPayments(paymentModelDao.getPaymentMethodId().toString(),0L,Long.MAX_VALUE,internalCallContext).iterator()).size(),1);
+    Assert.assertEquals(ImmutableList.<PaymentModelDao>copyOf(paymentDao.searchPayments(paymentModelDao.getExternalKey(),0L,Long.MAX_VALUE,internalCallContext).iterator()).size(),1);
   }
   Assert.assertEquals(paymentDao.getPaymentsForAccount(specifiedFirstPaymentModelDao.getAccountId(),accountCallContext).size(),4);
+  Assert.assertEquals(ImmutableList.<PaymentModelDao>copyOf(paymentDao.searchPayments(accountId.toString(),0L,Long.MAX_VALUE,internalCallContext).iterator()).size(),4);
 }

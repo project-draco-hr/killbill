@@ -1,0 +1,11 @@
+{
+  return paginationHelper.getPagination(PaymentSqlDao.class,new PaginationIteratorBuilder<PaymentModelDao,Payment,PaymentSqlDao>(){
+    @Override public Long getCount(    final PaymentSqlDao paymentSqlDao,    final InternalTenantContext context){
+      return paymentSqlDao.getSearchCount(searchKey,String.format("%%%s%%",searchKey),context);
+    }
+    @Override public Iterator<PaymentModelDao> build(    final PaymentSqlDao paymentSqlDao,    final Long limit,    final InternalTenantContext context){
+      return paymentSqlDao.search(searchKey,String.format("%%%s%%",searchKey),offset,limit,context);
+    }
+  }
+,offset,limit,context);
+}

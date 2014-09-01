@@ -1,0 +1,15 @@
+{
+  final PaymentPluginApi pluginApi=withPluginInfo ? getPaymentPluginApi(pluginName) : null;
+  return getEntityPagination(limit,new SourcePaginationBuilder<PaymentModelDao,PaymentApiException>(){
+    @Override public Pagination<PaymentModelDao> build(){
+      return paymentDao.getPayments(pluginName,offset,limit,internalTenantContext);
+    }
+  }
+,new Function<PaymentModelDao,Payment>(){
+    @Override public Payment apply(    final PaymentModelDao paymentModelDao){
+      final List<PaymentTransactionInfoPlugin> pluginInfo=getPaymentTransactionInfoPluginsIfNeeded(pluginApi,paymentModelDao,tenantContext);
+      return toPayment(paymentModelDao.getId(),pluginInfo,internalTenantContext);
+    }
+  }
+);
+}
