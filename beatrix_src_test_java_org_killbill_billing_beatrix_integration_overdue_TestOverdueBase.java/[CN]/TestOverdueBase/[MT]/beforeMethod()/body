@@ -4,6 +4,8 @@
   final InputStream is=new ByteArrayInputStream(configXml.getBytes());
   final OverdueConfig config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
   overdueWrapperFactory.setOverdueConfig(config);
+  overdueListener.setOverdueConfig(config);
+  ((DefaultOverdueUserApi)overdueUserApi).setOverdueConfig(config);
   account=createAccountWithNonOsgiPaymentMethod(getAccountData(0));
   assertNotNull(account);
   paymentApi.addPaymentMethod(account,UUID.randomUUID().toString(),BeatrixIntegrationModule.NON_OSGI_PLUGIN_NAME,true,paymentMethodPlugin,PLUGIN_PROPERTIES,callContext);
