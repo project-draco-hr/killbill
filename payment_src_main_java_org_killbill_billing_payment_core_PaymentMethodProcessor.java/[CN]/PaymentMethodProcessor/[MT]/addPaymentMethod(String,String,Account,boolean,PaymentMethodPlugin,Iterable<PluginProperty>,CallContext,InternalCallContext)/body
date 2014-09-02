@@ -3,7 +3,7 @@
     final PluginDispatcherReturnType<UUID> result=new WithAccountLock<UUID,PaymentApiException>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<PluginDispatcherReturnType<UUID>,PaymentApiException>(){
       @Override public PluginDispatcherReturnType<UUID> doOperation() throws PaymentApiException {
         PaymentMethod pm=null;
-        PaymentPluginApi pluginApi;
+        final PaymentPluginApi pluginApi;
         try {
           pluginApi=getPaymentPluginApi(paymentPluginServiceName);
           pm=new DefaultPaymentMethod(paymentMethodExternalKey,account.getId(),paymentPluginServiceName,paymentMethodProps);
@@ -27,7 +27,7 @@ catch (        final AccountApiException e) {
 );
     return result.getReturnType();
   }
- catch (  Exception e) {
+ catch (  final Exception e) {
     throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
   }
 }
