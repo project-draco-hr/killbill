@@ -16,7 +16,7 @@ throw new IllegalStateException("Unexpected OverdueCancellationPolicy " + nextOv
 }
 final List<Entitlement> toBeCancelled=new LinkedList<Entitlement>();
 computeEntitlementsToCancel(account,toBeCancelled,context);
-final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT);
+final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
 for (final Entitlement cur : toBeCancelled) {
 try {
 cur.cancelEntitlementWithDateOverrideBillingPolicy(new LocalDate(clock.getUTCNow(),account.getTimeZone()),actionPolicy,context.toCallContext(tenantId));

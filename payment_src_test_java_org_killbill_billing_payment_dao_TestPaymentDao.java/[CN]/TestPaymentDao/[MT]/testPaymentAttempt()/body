@@ -1,0 +1,35 @@
+{
+  final UUID transactionId=UUID.randomUUID();
+  final String paymentExternalKey="vraiment?";
+  final String transactionExternalKey="tduteuqweq";
+  final String stateName="INIT";
+  final TransactionType transactionType=TransactionType.AUTHORIZE;
+  final String pluginName="superPlugin";
+  final UUID accountId=UUID.randomUUID();
+  final List<PluginProperty> properties=new ArrayList<PluginProperty>();
+  properties.add(new PluginProperty("key1","value1",false));
+  properties.add(new PluginProperty("key2","value2",false));
+  final byte[] serialized=PluginPropertySerializer.serialize(properties);
+  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(UUID.randomUUID(),UUID.randomUUID(),clock.getUTCNow(),clock.getUTCNow(),paymentExternalKey,transactionId,transactionExternalKey,transactionType,stateName,BigDecimal.ZERO,Currency.ALL,pluginName,serialized);
+  PaymentAttemptModelDao savedAttempt=paymentDao.insertPaymentAttemptWithProperties(attempt,internalCallContext);
+  assertEquals(savedAttempt.getTransactionExternalKey(),transactionExternalKey);
+  assertEquals(savedAttempt.getTransactionType(),transactionType);
+  assertEquals(savedAttempt.getStateName(),stateName);
+  assertEquals(savedAttempt.getPluginName(),pluginName);
+  final Iterable<PluginProperty> deserialized=PluginPropertySerializer.deserialize(savedAttempt.getPluginProperties());
+  int i=0;
+  for (  PluginProperty cur : deserialized) {
+    Assert.assertEquals(cur,properties.get(i++));
+  }
+  final PaymentAttemptModelDao retrievedAttempt1=paymentDao.getPaymentAttempt(attempt.getId(),internalCallContext);
+  assertEquals(retrievedAttempt1.getTransactionExternalKey(),transactionExternalKey);
+  assertEquals(retrievedAttempt1.getTransactionType(),transactionType);
+  assertEquals(retrievedAttempt1.getStateName(),stateName);
+  assertEquals(retrievedAttempt1.getPluginName(),pluginName);
+  final List<PaymentAttemptModelDao> retrievedAttempts=paymentDao.getPaymentAttemptByTransactionExternalKey(transactionExternalKey,internalCallContext);
+  assertEquals(retrievedAttempts.size(),1);
+  assertEquals(retrievedAttempts.get(0).getTransactionExternalKey(),transactionExternalKey);
+  assertEquals(retrievedAttempts.get(0).getTransactionType(),transactionType);
+  assertEquals(retrievedAttempts.get(0).getStateName(),stateName);
+  assertEquals(retrievedAttempts.get(0).getPluginName(),pluginName);
+}

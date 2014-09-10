@@ -1,0 +1,9 @@
+{
+  return ImmutableList.copyOf(Iterables.transform(transactions,new Function<PaymentTransaction,PaymentTransactionJson>(){
+    @Override public PaymentTransactionJson apply(    final PaymentTransaction paymentTransaction){
+      final List<AuditLog> auditLogsForPaymentTransaction=accountAuditLogs == null ? null : accountAuditLogs.getAuditLogsForPaymentTransaction(paymentTransaction.getId());
+      return new PaymentTransactionJson(paymentTransaction,paymentExternalKey,auditLogsForPaymentTransaction);
+    }
+  }
+));
+}

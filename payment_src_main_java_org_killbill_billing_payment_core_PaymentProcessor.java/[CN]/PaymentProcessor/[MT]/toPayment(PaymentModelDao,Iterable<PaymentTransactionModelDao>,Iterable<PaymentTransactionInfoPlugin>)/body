@@ -1,0 +1,28 @@
+{
+  final Ordering<PaymentTransaction> perPaymentTransactionOrdering=Ordering.<PaymentTransaction>from(new Comparator<PaymentTransaction>(){
+    @Override public int compare(    final PaymentTransaction o1,    final PaymentTransaction o2){
+      return o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
+    }
+  }
+);
+  final Iterable<PaymentTransactionModelDao> filteredTransactions=Iterables.filter(transactionsModelDao,new Predicate<PaymentTransactionModelDao>(){
+    @Override public boolean apply(    final PaymentTransactionModelDao curPaymentTransactionModelDao){
+      return curPaymentTransactionModelDao.getPaymentId().equals(curPaymentModelDao.getId());
+    }
+  }
+);
+  final Iterable<PaymentTransaction> transactions=Iterables.transform(filteredTransactions,new Function<PaymentTransactionModelDao,PaymentTransaction>(){
+    @Override public PaymentTransaction apply(    final PaymentTransactionModelDao paymentTransactionModelDao){
+      final PaymentTransactionInfoPlugin paymentTransactionInfoPlugin=pluginTransactions != null ? Iterables.tryFind(pluginTransactions,new Predicate<PaymentTransactionInfoPlugin>(){
+        @Override public boolean apply(        final PaymentTransactionInfoPlugin paymentTransactionInfoPlugin){
+          return paymentTransactionModelDao.getId().equals(paymentTransactionInfoPlugin.getKbTransactionPaymentId());
+        }
+      }
+).orNull() : null;
+      return new DefaultPaymentTransaction(paymentTransactionModelDao.getId(),paymentTransactionModelDao.getAttemptId(),paymentTransactionModelDao.getTransactionExternalKey(),paymentTransactionModelDao.getCreatedDate(),paymentTransactionModelDao.getUpdatedDate(),paymentTransactionModelDao.getPaymentId(),paymentTransactionModelDao.getTransactionType(),paymentTransactionModelDao.getEffectiveDate(),paymentTransactionModelDao.getTransactionStatus(),paymentTransactionModelDao.getAmount(),paymentTransactionModelDao.getCurrency(),paymentTransactionModelDao.getProcessedAmount(),paymentTransactionModelDao.getProcessedCurrency(),paymentTransactionModelDao.getGatewayErrorCode(),paymentTransactionModelDao.getGatewayErrorMsg(),paymentTransactionInfoPlugin);
+    }
+  }
+);
+  final List<PaymentTransaction> sortedTransactions=perPaymentTransactionOrdering.immutableSortedCopy(transactions);
+  return new DefaultPayment(curPaymentModelDao.getId(),curPaymentModelDao.getCreatedDate(),curPaymentModelDao.getUpdatedDate(),curPaymentModelDao.getAccountId(),curPaymentModelDao.getPaymentMethodId(),curPaymentModelDao.getPaymentNumber(),curPaymentModelDao.getExternalKey(),sortedTransactions);
+}

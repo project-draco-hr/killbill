@@ -1,0 +1,15 @@
+{
+  super.beforeClass();
+  account=testHelper.createTestAccount("lolo@gmail.com",false);
+  Mockito.when(accountInternalApi.getAccountById(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(account);
+  retryPluginRegistry.registerService(new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getRegistrationName(){
+      return MockPaymentControlProviderPlugin.PLUGIN_NAME;
+    }
+  }
+,mockRetryProviderPlugin);
+  EMPTY_PROPERTIES=PluginPropertySerializer.serialize(ImmutableList.<PluginProperty>of());
+}

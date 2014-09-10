@@ -1,6 +1,7 @@
 {
   final BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId,callContext);
   final BigDecimal externalChargeAmount=BigDecimal.TEN;
-  final InvoiceItem externalChargeInvoiceItem=invoiceUserApi.insertExternalCharge(accountId,externalChargeAmount,UUID.randomUUID().toString(),clock.getUTCToday(),accountCurrency,callContext);
+  final InvoiceItem externalCharge=new ExternalChargeInvoiceItem(null,accountId,null,UUID.randomUUID().toString(),clock.getUTCToday(),externalChargeAmount,accountCurrency);
+  final InvoiceItem externalChargeInvoiceItem=invoiceUserApi.insertExternalCharges(accountId,clock.getUTCToday(),ImmutableList.<InvoiceItem>of(externalCharge),callContext).get(0);
   verifyExternalChargeOnNewInvoice(accountBalance,null,externalChargeAmount,externalChargeInvoiceItem);
 }

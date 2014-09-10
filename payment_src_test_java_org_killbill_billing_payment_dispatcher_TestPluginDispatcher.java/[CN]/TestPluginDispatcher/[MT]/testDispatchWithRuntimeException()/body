@@ -1,0 +1,30 @@
+{
+  boolean gotIt=false;
+  try {
+    voidPluginDispatcher.dispatchWithTimeout(new Callable<PluginDispatcherReturnType<Void>>(){
+      @Override public PluginDispatcherReturnType<Void> call() throws Exception {
+        throw new RuntimeException("whatever");
+      }
+    }
+,100,TimeUnit.MILLISECONDS);
+    Assert.fail("Failed : should have had Timeout exception");
+  }
+ catch (  final TimeoutException e) {
+    Assert.fail("Failed : should have had RuntimeException exception");
+  }
+catch (  final RuntimeException e) {
+    Assert.fail("Failed : should have had RuntimeException (wrapped in an ExecutionException)");
+  }
+catch (  InterruptedException e) {
+    e.printStackTrace();
+  }
+catch (  ExecutionException e) {
+    if (e.getCause() instanceof RuntimeException) {
+      gotIt=true;
+    }
+ else {
+      Assert.fail("Failed : should have had RuntimeException exception");
+    }
+  }
+  Assert.assertTrue(gotIt);
+}

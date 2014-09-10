@@ -24,7 +24,9 @@
   }
   final Collection<SubscriptionBase> futureBlockedAddons=Collections2.<SubscriptionBase>filter(allSubscriptionsForBundle,new Predicate<SubscriptionBase>(){
     @Override public boolean apply(    final SubscriptionBase subscription){
-      return ProductCategory.ADD_ON.equals(subscription.getCategory()) && getEntitlementCancellationEvent(subscription.getId()) == null && (baseTransitionTriggerNextProduct == null || (includedAddonsForProduct.contains(subscription.getLastActivePlan().getProduct().getName()) || !availableAddonsForProduct.contains(subscription.getLastActivePlan().getProduct().getName())));
+      final Plan lastActivePlan=subscription.getLastActivePlan();
+      final boolean result=ProductCategory.ADD_ON.equals(subscription.getCategory()) && lastActivePlan != null && getEntitlementCancellationEvent(subscription.getId()) == null && (baseTransitionTriggerNextProduct == null || (includedAddonsForProduct.contains(lastActivePlan.getProduct().getName()) || !availableAddonsForProduct.contains(subscription.getLastActivePlan().getProduct().getName())));
+      return result;
     }
   }
 );

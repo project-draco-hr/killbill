@@ -1,7 +1,7 @@
 {
-  return containedCall.withCaching(new OperationRetrieval<Long>(){
+  final TableName tableName=TableName.fromObjectType(objectType);
+  return withCachingObjectId.withCaching(new OperationRetrieval<UUID,Long>(){
     @Override public Long doRetrieve(    final UUID objectId,    final ObjectType objectType){
-      final TableName tableName=TableName.fromObjectType(objectType);
 switch (tableName) {
 case TENANT:
 case TAG_DEFINITIONS:
@@ -14,5 +14,5 @@ default :
 }
 }
 }
-,objectId,objectType,cache);
+,objectId,objectType,tableName,cache);
 }

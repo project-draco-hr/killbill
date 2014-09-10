@@ -1,9 +1,11 @@
 {
-  final List<PaymentMethodModelDao> result=new ArrayList<PaymentMethodModelDao>();
-  for (  final PaymentMethodModelDao cur : paymentMethods) {
-    if (cur.getAccountId().equals(accountId)) {
-      result.add(cur);
+synchronized (this) {
+    final List<PaymentMethodModelDao> result=new ArrayList<PaymentMethodModelDao>();
+    for (    final PaymentMethodModelDao cur : paymentMethods) {
+      if (cur.getAccountId().equals(accountId)) {
+        result.add(cur);
+      }
     }
+    return result;
   }
-  return result;
 }

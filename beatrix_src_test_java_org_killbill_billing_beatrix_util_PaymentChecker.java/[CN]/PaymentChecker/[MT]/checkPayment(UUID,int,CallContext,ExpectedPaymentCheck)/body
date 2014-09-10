@@ -1,9 +1,10 @@
 {
-  final List<Payment> payments=paymentApi.getAccountPayments(accountId,context);
+  final List<Payment> payments=paymentApi.getAccountPayments(accountId,false,ImmutableList.<PluginProperty>of(),context);
   Assert.assertEquals(payments.size(),paymentOrderingNumber);
   final Payment payment=payments.get(paymentOrderingNumber - 1);
-  if (payment.getPaymentStatus() == PaymentStatus.UNKNOWN) {
-    checkPaymentNoAuditForRuntimeException(accountId,payment,context,expected);
+  final PaymentTransaction transaction=getPurchaseTransaction(payment);
+  if (transaction.getTransactionStatus() == TransactionStatus.UNKNOWN) {
+    checkPaymentNoAuditForRuntimeException(accountId,payment,expected);
   }
  else {
     checkPayment(accountId,payment,context,expected);

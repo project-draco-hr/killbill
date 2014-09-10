@@ -1,0 +1,12 @@
+{
+  final CallbackTest callback=new CallbackTest(new NullPointerException("Expected for the test"));
+  final PaymentOperation pluginOperation=getPluginOperation();
+  try {
+    pluginOperation.dispatchWithAccountLockAndTimeout(callback);
+    Assert.fail();
+  }
+ catch (  final OperationException e) {
+    Assert.assertEquals(e.getOperationResult(),OperationResult.EXCEPTION);
+    Assert.assertTrue(e.getCause() instanceof NullPointerException);
+  }
+}

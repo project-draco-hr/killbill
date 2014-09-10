@@ -1,0 +1,14 @@
+{
+  super.beforeSuite();
+  if (config == null) {
+    config=new ConfigurationObjectFactory(System.getProperties()).build(HttpServerConfig.class);
+  }
+  if (daoConfig == null) {
+    daoConfig=new ConfigurationObjectFactory(skifeConfigSource).build(DaoConfig.class);
+  }
+  serverConfig=new ConfigurationObjectFactory(skifeConfigSource).build(KillbillServerConfig.class);
+  listener=new TestKillbillGuiceListener(serverConfig,configSource);
+  server=new HttpServer();
+  server.configure(config,getListeners(),getFilters());
+  server.start();
+}

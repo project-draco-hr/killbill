@@ -3,19 +3,10 @@
   final UUID accountId=UUID.fromString(accountIdString);
   final Account account=accountUserApi.getAccountById(accountId,tenantContext);
   final List<Invoice> invoices=invoiceApi.getInvoicesByAccount(account.getId(),tenantContext);
-  final List<Payment> payments=paymentApi.getAccountPayments(accountId,tenantContext);
-  final List<Refund> refunds=paymentApi.getAccountRefunds(account,tenantContext);
-  final Multimap<UUID,Refund> refundsByPayment=ArrayListMultimap.<UUID,Refund>create();
-  for (  final Refund refund : refunds) {
-    refundsByPayment.put(refund.getPaymentId(),refund);
-  }
-  final List<InvoicePayment> chargebacks=invoicePaymentApi.getChargebacksByAccountId(accountId,tenantContext);
-  final Multimap<UUID,InvoicePayment> chargebacksByPayment=ArrayListMultimap.<UUID,InvoicePayment>create();
-  for (  final InvoicePayment chargeback : chargebacks) {
-    chargebacksByPayment.put(chargeback.getPaymentId(),chargeback);
-  }
+  final List<Payment> payments=paymentApi.getAccountPayments(accountId,false,ImmutableList.<PluginProperty>of(),tenantContext);
   final List<SubscriptionBundle> bundles=subscriptionApi.getSubscriptionBundlesForAccountId(account.getId(),tenantContext);
   final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
-  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,bundles,refundsByPayment,chargebacksByPayment,accountAuditLogs);
+  final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePaymentsByAccount(accountId,tenantContext);
+  final AccountTimelineJson json=new AccountTimelineJson(account,invoices,payments,invoicePayments,bundles,accountAuditLogs);
   return Response.status(Status.OK).entity(json).build();
 }

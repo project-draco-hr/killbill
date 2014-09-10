@@ -1,0 +1,39 @@
+{
+  final List<PluginProperty> result=new ArrayList<PluginProperty>();
+  try {
+    final byte[] uncompressed=LZFDecoder.decode(input);
+    final InputStream in=new ByteArrayInputStream(uncompressed);
+    final JsonParser jsonParser=jsonFactory.createParser(in);
+    PluginProperty prop=null;
+    String key=null;
+    JsonToken nextToken=jsonParser.nextToken();
+    while (nextToken != null && nextToken != JsonToken.END_ARRAY) {
+      if (nextToken != JsonToken.START_ARRAY) {
+        if (nextToken == JsonToken.FIELD_NAME && key == null) {
+          key=jsonParser.getText();
+        }
+ else         if (key != null) {
+          final Object value=mapper.readValue(jsonParser,Object.class);
+          prop=new PluginProperty(key,value,false);
+          key=null;
+        }
+ else         if (nextToken == JsonToken.END_OBJECT) {
+          result.add(prop);
+          prop=null;
+        }
+      }
+      nextToken=jsonParser.nextToken();
+    }
+    jsonParser.close();
+    return result;
+  }
+ catch (  final UnsupportedEncodingException e) {
+    throw new PluginPropertySerializerException(e);
+  }
+catch (  final JsonParseException e) {
+    throw new PluginPropertySerializerException(e);
+  }
+catch (  final IOException e) {
+    throw new PluginPropertySerializerException(e);
+  }
+}

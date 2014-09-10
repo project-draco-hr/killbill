@@ -23,10 +23,15 @@
     }
 ,null);
     final CacheLoaderArgument cacheLoaderArgument=new CacheLoaderArgument(objectType,args,internalTenantContext);
-    result=cache.get(cacheKey,cacheLoaderArgument);
+    return cache.get(cacheKey,cacheLoaderArgument);
   }
   if (result == null) {
-    result=method.invoke(sqlDao,args);
+    result=prof.executeWithProfiling(ProfilingFeatureType.DAO_DETAILS,sqlDaoClass.getSimpleName() + "(raw) :" + method.getName(),new WithProfilingCallback(){
+      @Override public Object execute() throws Throwable {
+        return method.invoke(sqlDao,args);
+      }
+    }
+);
   }
   return result;
 }

@@ -1,0 +1,14 @@
+{
+  try {
+    this.plugin=daoHelper.getPaymentProviderPlugin();
+    if (paymentStateContext.shouldLockAccountAndDispatch()) {
+      return doOperationCallbackWithDispatchAndAccountLock();
+    }
+ else {
+      return doSimpleOperationCallback();
+    }
+  }
+ catch (  final PaymentApiException e) {
+    throw new OperationException(e,OperationResult.EXCEPTION);
+  }
+}

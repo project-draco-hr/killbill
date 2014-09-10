@@ -1,0 +1,23 @@
+{
+  final Subject currentUser=SecurityUtils.getSubject();
+  if (principal.equals(currentUser.getPrincipal()) && currentUser.isAuthenticated()) {
+    return;
+  }
+  if (principal instanceof String && credentials instanceof String) {
+    currentUser.login(new UsernamePasswordToken((String)principal,(String)credentials));
+  }
+ else   if (principal instanceof String && credentials instanceof char[]) {
+    currentUser.login(new UsernamePasswordToken((String)principal,(char[])credentials));
+  }
+ else {
+    currentUser.login(new AuthenticationToken(){
+      @Override public Object getPrincipal(){
+        return principal;
+      }
+      @Override public Object getCredentials(){
+        return credentials;
+      }
+    }
+);
+  }
+}

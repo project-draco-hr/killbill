@@ -1,0 +1,27 @@
+{
+  final DateTime startTime=clock.getUTCNow();
+  final Account accountJson=createAccountWithPMBundleAndSubscriptionAndWaitForFirstInvoice();
+  final DateTime endTime=clock.getUTCNow();
+  final Invoice invoice=killBillClient.getInvoicesForAccount(accountJson.getAccountId()).get(1);
+  final BigDecimal creditAmount=BigDecimal.ONE;
+  final Credit credit=new Credit();
+  credit.setAccountId(accountJson.getAccountId());
+  credit.setInvoiceId(invoice.getInvoiceId());
+  credit.setCreditAmount(creditAmount);
+  killBillClient.createCredit(credit,createdBy,reason,comment);
+  final Payment postedPayment=killBillClient.getPaymentsForAccount(accountJson.getAccountId()).get(0);
+  final BigDecimal refundAmount=BigDecimal.ONE;
+  final InvoicePaymentTransaction refund=new InvoicePaymentTransaction();
+  refund.setPaymentId(postedPayment.getPaymentId());
+  refund.setAmount(refundAmount);
+  killBillClient.createInvoicePaymentRefund(refund,createdBy,reason,comment);
+  final BigDecimal chargebackAmount=BigDecimal.ONE;
+  final InvoicePaymentTransaction chargeback=new InvoicePaymentTransaction();
+  chargeback.setPaymentId(postedPayment.getPaymentId());
+  chargeback.setAmount(chargebackAmount);
+  killBillClient.createInvoicePaymentChargeback(chargeback,createdBy,reason,comment);
+  verifyPayments(accountJson.getAccountId(),startTime,endTime,refundAmount,chargebackAmount);
+  verifyInvoices(accountJson.getAccountId(),startTime,endTime);
+  verifyCredits(accountJson.getAccountId(),startTime,endTime,creditAmount);
+  verifyBundles(accountJson.getAccountId(),startTime,endTime);
+}

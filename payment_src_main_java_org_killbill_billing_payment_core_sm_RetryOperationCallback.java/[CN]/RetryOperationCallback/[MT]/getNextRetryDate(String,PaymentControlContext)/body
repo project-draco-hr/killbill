@@ -1,0 +1,11 @@
+{
+  try {
+    final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
+    final FailureCallResult result=plugin.onFailureCall(paymentControlContext);
+    return result.getNextRetryDate();
+  }
+ catch (  final PaymentControlApiException e) {
+    logger.warn("Plugin " + pluginName + " failed to return next retryDate for payment "+ paymentControlContext.getPaymentExternalKey(),e);
+    return null;
+  }
+}

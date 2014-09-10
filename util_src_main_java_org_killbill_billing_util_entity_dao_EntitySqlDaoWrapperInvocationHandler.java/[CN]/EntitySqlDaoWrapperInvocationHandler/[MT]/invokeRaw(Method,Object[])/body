@@ -1,0 +1,12 @@
+{
+  return prof.executeWithProfiling(ProfilingFeatureType.DAO_DETAILS,sqlDaoClass.getSimpleName() + " (raw):" + method.getName(),new WithProfilingCallback(){
+    @Override public Object execute() throws Throwable {
+      Object result=method.invoke(sqlDao,args);
+      if (result != null && method.getName().equals("getById")) {
+        populateCacheOnGetByIdInvocation((M)result);
+      }
+      return result;
+    }
+  }
+);
+}

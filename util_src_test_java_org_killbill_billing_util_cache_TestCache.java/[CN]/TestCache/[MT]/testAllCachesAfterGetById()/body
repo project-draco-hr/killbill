@@ -1,0 +1,22 @@
+{
+  this.transactionalSqlDao=new EntitySqlDaoTransactionalJdbiWrapper(dbi,clock,controlCacheDispatcher,nonEntityDao);
+  final TagModelDao tag=new TagModelDao(clock.getUTCNow(),UUID.randomUUID(),UUID.randomUUID(),ObjectType.TAG);
+  insertTag(tag);
+  Assert.assertEquals(getCacheSize(CacheType.RECORD_ID),0);
+  Assert.assertEquals(getCacheSize(CacheType.ACCOUNT_RECORD_ID),0);
+  Assert.assertEquals(getCacheSize(CacheType.TENANT_RECORD_ID),0);
+  Assert.assertEquals(getCacheSize(CacheType.OBJECT_ID),0);
+  final TagModelDao result=getById(tag.getId());
+  Assert.assertEquals(getCacheSize(CacheType.RECORD_ID),1);
+  Assert.assertEquals(getCacheSize(CacheType.ACCOUNT_RECORD_ID),1);
+  Assert.assertEquals(getCacheSize(CacheType.TENANT_RECORD_ID),1);
+  Assert.assertEquals(getCacheSize(CacheType.OBJECT_ID),1);
+  final Long recordId=(Long)controlCacheDispatcher.getCacheController(CacheType.RECORD_ID).get(tag.getId().toString(),new CacheLoaderArgument(ObjectType.TAG));
+  Assert.assertEquals(recordId,result.getRecordId());
+  final Long tenantRecordId=(Long)controlCacheDispatcher.getCacheController(CacheType.TENANT_RECORD_ID).get(tag.getId().toString(),new CacheLoaderArgument(ObjectType.TAG));
+  Assert.assertEquals(tenantRecordId,result.getTenantRecordId());
+  final UUID objectId=(UUID)controlCacheDispatcher.getCacheController(CacheType.OBJECT_ID).get(TableName.TAG + CacheControllerDispatcher.CACHE_KEY_SEPARATOR + recordId,new CacheLoaderArgument(ObjectType.TAG));
+  Assert.assertEquals(objectId,result.getId());
+  final Long accountRecordId=(Long)controlCacheDispatcher.getCacheController(CacheType.ACCOUNT_RECORD_ID).get(tag.getId().toString(),new CacheLoaderArgument(ObjectType.TAG));
+  Assert.assertEquals(accountRecordId,result.getAccountRecordId());
+}

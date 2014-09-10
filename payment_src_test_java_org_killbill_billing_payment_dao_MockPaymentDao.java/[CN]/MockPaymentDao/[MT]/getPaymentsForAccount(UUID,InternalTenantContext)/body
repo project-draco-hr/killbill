@@ -1,11 +1,10 @@
 {
-  final List<PaymentModelDao> result=new ArrayList<PaymentModelDao>();
 synchronized (this) {
-    for (    final PaymentModelDao cur : payments.values()) {
-      if (cur.getAccountId().equals(accountId)) {
-        result.add(cur);
+    return ImmutableList.copyOf(Iterables.filter(payments.values(),new Predicate<PaymentModelDao>(){
+      @Override public boolean apply(      final PaymentModelDao input){
+        return input.getAccountId().equals(accountId);
       }
     }
+));
   }
-  return result;
 }

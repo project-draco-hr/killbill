@@ -1,0 +1,17 @@
+{
+  final Account accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
+  assertEquals(killBillClient.getInvoicesForAccount(accountJson.getAccountId()).size(),2);
+  final BigDecimal chargeAmount=BigDecimal.TEN;
+  final UUID bundleId=UUID.randomUUID();
+  final InvoiceItem externalCharge=new InvoiceItem();
+  externalCharge.setAccountId(accountJson.getAccountId());
+  externalCharge.setAmount(chargeAmount);
+  externalCharge.setCurrency(Currency.valueOf(accountJson.getCurrency()));
+  externalCharge.setBundleId(bundleId);
+  final InvoiceItem createdExternalCharge=killBillClient.createExternalCharge(externalCharge,clock.getUTCNow(),false,createdBy,reason,comment);
+  final Invoice invoiceWithItems=killBillClient.getInvoice(createdExternalCharge.getInvoiceId(),true);
+  assertEquals(invoiceWithItems.getBalance().compareTo(chargeAmount),0);
+  assertEquals(invoiceWithItems.getItems().size(),1);
+  assertEquals(invoiceWithItems.getItems().get(0).getBundleId(),bundleId);
+  assertEquals(killBillClient.getInvoicesForAccount(accountJson.getAccountId()).size(),3);
+}

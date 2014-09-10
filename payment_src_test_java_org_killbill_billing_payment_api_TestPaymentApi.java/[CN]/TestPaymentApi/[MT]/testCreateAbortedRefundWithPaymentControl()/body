@@ -1,0 +1,20 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.ONE;
+  final UUID subscriptionId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final LocalDate now=clock.getUTCToday();
+  final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
+  final String paymentExternalKey=invoice.getId().toString();
+  final String transactionExternalKey="payment";
+  final String transactionExternalKey2="refund";
+  final InvoiceItem invoiceItem=new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),requestedAmount,new BigDecimal("1.0"),Currency.USD);
+  invoice.addInvoiceItem(invoiceItem);
+  final Payment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),INVOICE_PAYMENT,callContext);
+  final List<PluginProperty> refundProperties=ImmutableList.<PluginProperty>of();
+  try {
+    paymentApi.createRefundWithPaymentControl(account,payment.getId(),BigDecimal.TEN,Currency.USD,transactionExternalKey2,refundProperties,INVOICE_PAYMENT,callContext);
+  }
+ catch (  PaymentApiException e) {
+    assertTrue(e.getCause() instanceof PaymentControlApiException);
+  }
+}

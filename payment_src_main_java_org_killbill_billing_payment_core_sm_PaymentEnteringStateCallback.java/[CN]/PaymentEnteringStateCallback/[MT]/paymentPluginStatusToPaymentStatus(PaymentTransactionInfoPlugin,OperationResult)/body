@@ -1,0 +1,25 @@
+{
+  if (paymentInfoPlugin == null) {
+    if (OperationResult.EXCEPTION.equals(operationResult)) {
+      return TransactionStatus.PLUGIN_FAILURE;
+    }
+ else {
+      return TransactionStatus.PLUGIN_FAILURE;
+    }
+  }
+  if (paymentInfoPlugin.getStatus() == null) {
+    return TransactionStatus.UNKNOWN;
+  }
+switch (paymentInfoPlugin.getStatus()) {
+case UNDEFINED:
+    return TransactionStatus.UNKNOWN;
+case PROCESSED:
+  return TransactionStatus.SUCCESS;
+case PENDING:
+return TransactionStatus.PENDING;
+case ERROR:
+return TransactionStatus.PAYMENT_FAILURE;
+default :
+return TransactionStatus.UNKNOWN;
+}
+}

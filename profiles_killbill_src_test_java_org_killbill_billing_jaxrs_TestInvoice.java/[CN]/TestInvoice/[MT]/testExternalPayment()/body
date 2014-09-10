@@ -1,0 +1,23 @@
+{
+  final Account accountJson=createAccountNoPMBundleAndSubscriptionAndWaitForFirstInvoice();
+  final List<InvoicePayment> noPaymentsFromJson=killBillClient.getInvoicePaymentsForAccount(accountJson.getAccountId());
+  assertEquals(noPaymentsFromJson.size(),0);
+  final List<Invoice> invoices=killBillClient.getInvoicesForAccount(accountJson.getAccountId());
+  assertEquals(invoices.size(),2);
+  final UUID invoiceId=invoices.get(1).getInvoiceId();
+  final InvoicePayment invoicePayment=new InvoicePayment();
+  invoicePayment.setPurchasedAmount(BigDecimal.TEN);
+  invoicePayment.setAccountId(accountJson.getAccountId());
+  invoicePayment.setTargetInvoiceId(invoiceId);
+  killBillClient.createInvoicePayment(invoicePayment,true,createdBy,reason,comment);
+  final List<InvoicePayment> paymentsFromJson=killBillClient.getInvoicePaymentsForAccount(accountJson.getAccountId());
+  assertEquals(paymentsFromJson.size(),1);
+  assertEquals(paymentsFromJson.get(0).getPurchasedAmount().compareTo(BigDecimal.TEN),0);
+  assertEquals(paymentsFromJson.get(0).getTargetInvoiceId(),invoiceId);
+  final UUID paymentMethodId=paymentsFromJson.get(0).getPaymentMethodId();
+  final PaymentMethod paymentMethodJson=killBillClient.getPaymentMethod(paymentMethodId);
+  assertEquals(paymentMethodJson.getPaymentMethodId(),paymentMethodId);
+  assertEquals(paymentMethodJson.getAccountId(),accountJson.getAccountId());
+  assertEquals(paymentMethodJson.getPluginName(),ExternalPaymentProviderPlugin.PLUGIN_NAME);
+  assertNull(paymentMethodJson.getPluginInfo());
+}

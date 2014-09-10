@@ -6,7 +6,8 @@
   ((ClockMock)clock).addDays(1);
   CallContext newCallContextLater=new DefaultCallContext(callContext.getTenantId(),callContext.getUserName(),callContext.getCallOrigin(),callContext.getUserType(),callContext.getUserToken(),clock);
   final BigDecimal externalChargeAmount=BigDecimal.TEN;
-  final InvoiceItem externalChargeInvoiceItem=invoiceUserApi.insertExternalChargeForInvoice(accountId,invoiceId,externalChargeAmount,UUID.randomUUID().toString(),clock.getUTCToday(),accountCurrency,newCallContextLater);
+  final InvoiceItem externalCharge=new ExternalChargeInvoiceItem(invoiceId,accountId,null,UUID.randomUUID().toString(),clock.getUTCToday(),externalChargeAmount,accountCurrency);
+  final InvoiceItem externalChargeInvoiceItem=invoiceUserApi.insertExternalCharges(accountId,clock.getUTCToday(),ImmutableList.<InvoiceItem>of(externalCharge),newCallContextLater).get(0);
   final Invoice newInvoice=invoiceUserApi.getInvoice(invoiceId,callContext);
   final BigDecimal newOriginalAmountCharged=newInvoice.getOriginalChargedAmount();
   final BigDecimal newAmountCharged=newInvoice.getChargedAmount();

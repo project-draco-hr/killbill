@@ -1,0 +1,11 @@
+{
+  final Future<PluginDispatcherReturnType<ReturnType>> future=executor.submit(task);
+  final PluginDispatcherReturnType<ReturnType> pluginDispatcherResult=future.get(timeout,unit);
+  if (pluginDispatcherResult instanceof WithProfilingPluginDispatcherReturnType) {
+    final ProfilingData currentThreadProfilingData=Profiling.getPerThreadProfilingData();
+    if (currentThreadProfilingData != null) {
+      currentThreadProfilingData.merge(((WithProfilingPluginDispatcherReturnType)pluginDispatcherResult).getProfilingData());
+    }
+  }
+  return pluginDispatcherResult.getReturnType();
+}

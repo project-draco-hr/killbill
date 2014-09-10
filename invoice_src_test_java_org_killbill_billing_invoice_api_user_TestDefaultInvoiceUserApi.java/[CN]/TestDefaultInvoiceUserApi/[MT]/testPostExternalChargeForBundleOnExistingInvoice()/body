@@ -5,6 +5,7 @@
   Assert.assertEquals(accountBalance,invoiceBalance);
   final BigDecimal externalChargeAmount=BigDecimal.TEN;
   final UUID bundleId=UUID.randomUUID();
-  final InvoiceItem externalChargeInvoiceItem=invoiceUserApi.insertExternalChargeForInvoiceAndBundle(accountId,invoiceId,bundleId,externalChargeAmount,UUID.randomUUID().toString(),clock.getUTCToday(),accountCurrency,callContext);
+  final InvoiceItem externalCharge=new ExternalChargeInvoiceItem(invoiceId,accountId,bundleId,UUID.randomUUID().toString(),clock.getUTCToday(),externalChargeAmount,accountCurrency);
+  final InvoiceItem externalChargeInvoiceItem=invoiceUserApi.insertExternalCharges(accountId,clock.getUTCToday(),ImmutableList.<InvoiceItem>of(externalCharge),callContext).get(0);
   verifyExternalChargeOnExistingInvoice(invoiceBalance,bundleId,externalChargeAmount,externalChargeInvoiceItem);
 }

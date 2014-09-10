@@ -1,0 +1,16 @@
+{
+  final Account account=createAccountWithPMBundleAndSubscriptionAndWaitForFirstInvoice();
+  final List<InvoicePayment> payments=killBillClient.getInvoicePaymentsForAccount(account.getAccountId());
+  final InvoicePaymentTransaction input=new InvoicePaymentTransaction();
+  input.setPaymentId(payments.get(0).getPaymentId());
+  input.setAmount(BigDecimal.TEN.negate());
+  try {
+    killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment);
+    fail();
+  }
+ catch (  final KillBillClientException e) {
+    Assert.assertEquals(e.getBillingException().getClassName(),InvoiceApiException.class.getName());
+    Assert.assertEquals(e.getBillingException().getCode(),(Integer)ErrorCode.CHARGE_BACK_AMOUNT_IS_NEGATIVE.getCode());
+    Assert.assertFalse(e.getBillingException().getStackTrace().isEmpty());
+  }
+}

@@ -1,0 +1,23 @@
+{
+  final Profiling<TypeOut> prof=new Profiling<TypeOut>();
+  if (objectOrRecordId == null) {
+    return null;
+  }
+  if (cache != null) {
+    final String key=(cache.getCacheType().isKeyPrefixedWithTableName()) ? tableName + CacheControllerDispatcher.CACHE_KEY_SEPARATOR + objectOrRecordId.toString() : objectOrRecordId.toString();
+    return (TypeOut)cache.get(key,new CacheLoaderArgument(objectType));
+  }
+  final TypeOut result;
+  try {
+    result=prof.executeWithProfiling(ProfilingFeatureType.DAO_DETAILS,"NonEntityDao (type = " + objectType + ") cache miss",new WithProfilingCallback<TypeOut>(){
+      @Override public <ExceptionType extends Throwable>TypeOut execute() throws ExceptionType {
+        return op.doRetrieve(objectOrRecordId,objectType);
+      }
+    }
+);
+    return result;
+  }
+ catch (  Throwable throwable) {
+    throw new RuntimeException(throwable);
+  }
+}

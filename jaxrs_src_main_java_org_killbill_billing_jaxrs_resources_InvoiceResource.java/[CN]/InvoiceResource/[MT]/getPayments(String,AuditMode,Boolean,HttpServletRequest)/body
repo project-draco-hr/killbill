@@ -1,0 +1,17 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Invoice invoice=invoiceApi.getInvoice(UUID.fromString(invoiceId),tenantContext);
+  final List<Payment> payments=new ArrayList<Payment>();
+  for (  InvoicePayment cur : invoice.getPayments()) {
+    final Payment payment=paymentApi.getPayment(cur.getPaymentId(),withPluginInfo,ImmutableList.<PluginProperty>of(),tenantContext);
+    payments.add(payment);
+  }
+  final List<InvoicePaymentJson> result=new ArrayList<InvoicePaymentJson>(payments.size());
+  if (payments.isEmpty()) {
+    return Response.status(Status.OK).entity(result).build();
+  }
+  for (  final Payment cur : payments) {
+    result.add(new InvoicePaymentJson(cur,invoice.getId(),null));
+  }
+  return Response.status(Status.OK).entity(result).build();
+}

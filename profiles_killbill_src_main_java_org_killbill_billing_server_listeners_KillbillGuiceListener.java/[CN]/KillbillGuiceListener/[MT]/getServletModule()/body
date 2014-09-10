@@ -1,0 +1,9 @@
+{
+  final BaseServerModuleBuilder builder=new BaseServerModuleBuilder().setJaxrsUriPattern("(" + JaxRsResourceBase.PREFIX + "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*").addJaxrsResource("org.killbill.billing.jaxrs.mappers").addJaxrsResource("org.killbill.billing.jaxrs.resources");
+  builder.addJerseyFilter("com.sun.jersey.api.container.filter.LoggingFilter");
+  builder.addJerseyFilter(ProfilingContainerResponseFilter.class.getName());
+  if (config.isMultiTenancyEnabled()) {
+    builder.addFilter("/*",TenantFilter.class);
+  }
+  return builder.build();
+}

@@ -15,13 +15,13 @@
   final BillingEvent event2=createMockBillingEvent(endDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),Collections.<Usage>emptyList());
   final ContiguousIntervalConsumableInArrear intervalConsumableInArrear=createContiguousIntervalConsumableInArrear(usage,targetDate,true,event1,event2);
   final List<InvoiceItem> invoiceItems=new ArrayList<InvoiceItem>();
-  InvoiceItem ii1=new UsageInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,usage.getName(),startDate,firstBCDDate,BigDecimal.ONE,currency);
+  final InvoiceItem ii1=new UsageInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,usage.getName(),startDate,firstBCDDate,BigDecimal.ONE,currency);
   invoiceItems.add(ii1);
-  InvoiceItem ii2=new UsageInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,usage.getName(),firstBCDDate,endDate,BigDecimal.ONE,currency);
+  final InvoiceItem ii2=new UsageInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,usage.getName(),firstBCDDate,endDate,BigDecimal.ONE,currency);
   invoiceItems.add(ii2);
   final List<InvoiceItem> result=intervalConsumableInArrear.computeMissingItems(invoiceItems);
   assertEquals(result.size(),2);
-  assertTrue(result.get(0).getAmount().compareTo(new BigDecimal("4.0")) == 0);
+  assertEquals(result.get(0).getAmount().compareTo(new BigDecimal("4.0")),0,String.format("%s != 4.0",result.get(0).getAmount()));
   assertEquals(result.get(0).getCurrency(),Currency.BTC);
   assertEquals(result.get(0).getAccountId(),accountId);
   assertEquals(result.get(0).getBundleId(),bundleId);
@@ -31,7 +31,7 @@
   assertEquals(result.get(0).getUsageName(),usage.getName());
   assertTrue(result.get(0).getStartDate().compareTo(startDate) == 0);
   assertTrue(result.get(0).getEndDate().compareTo(firstBCDDate) == 0);
-  assertTrue(result.get(1).getAmount().compareTo(new BigDecimal("1.0")) == 0);
+  assertEquals(result.get(1).getAmount().compareTo(new BigDecimal("1.0")),0,String.format("%s != 1.0",result.get(0).getAmount()));
   assertEquals(result.get(1).getCurrency(),Currency.BTC);
   assertEquals(result.get(1).getAccountId(),accountId);
   assertEquals(result.get(1).getBundleId(),bundleId);

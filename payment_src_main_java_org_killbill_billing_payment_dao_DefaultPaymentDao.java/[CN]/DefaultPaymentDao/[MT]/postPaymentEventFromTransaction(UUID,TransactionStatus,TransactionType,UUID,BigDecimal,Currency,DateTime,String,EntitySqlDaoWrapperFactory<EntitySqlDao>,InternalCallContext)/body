@@ -1,0 +1,22 @@
+{
+  final BusInternalEvent event;
+switch (transactionStatus) {
+case SUCCESS:
+case PENDING:
+    event=new DefaultPaymentInfoEvent(accountId,paymentId,processedAmount,processedCurrency,transactionStatus,transactionType,effectiveDate,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+  break;
+case PAYMENT_FAILURE:
+event=new DefaultPaymentErrorEvent(accountId,paymentId,transactionType,gatewayErrorCode,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+break;
+case PLUGIN_FAILURE:
+default :
+event=new DefaultPaymentPluginErrorEvent(accountId,paymentId,transactionType,gatewayErrorCode,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+break;
+}
+try {
+eventBus.postFromTransaction(event,entitySqlDaoWrapperFactory.getSqlDao());
+}
+ catch (EventBusException e) {
+log.error("Failed to post Payment event event for account {} ",accountId,e);
+}
+}

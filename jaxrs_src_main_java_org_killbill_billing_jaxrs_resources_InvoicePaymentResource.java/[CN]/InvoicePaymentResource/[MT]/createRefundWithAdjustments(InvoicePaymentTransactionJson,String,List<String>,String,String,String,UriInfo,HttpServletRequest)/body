@@ -1,0 +1,25 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID paymentUuid=UUID.fromString(paymentId);
+  final Payment payment=paymentApi.getPayment(paymentUuid,false,ImmutableList.<PluginProperty>of(),callContext);
+  final Account account=accountUserApi.getAccountById(payment.getAccountId(),callContext);
+  final Iterable<PluginProperty> pluginProperties;
+  final String transactionExternalKey=json.getTransactionExternalKey() != null ? json.getTransactionExternalKey() : UUID.randomUUID().toString();
+  if (json.isAdjusted() != null && json.isAdjusted()) {
+    if (json.getAdjustments() != null && json.getAdjustments().size() > 0) {
+      final Map<UUID,BigDecimal> adjustments=new HashMap<UUID,BigDecimal>();
+      for (      final InvoiceItemJson item : json.getAdjustments()) {
+        adjustments.put(UUID.fromString(item.getInvoiceItemId()),item.getAmount());
+      }
+      pluginProperties=extractPluginProperties(pluginPropertiesString,new PluginProperty("IPCD_REFUND_WITH_ADJUSTMENTS","true",false),new PluginProperty("IPCD_REFUND_IDS_AMOUNTS",adjustments,false));
+    }
+ else {
+      pluginProperties=extractPluginProperties(pluginPropertiesString,new PluginProperty("IPCD_REFUND_WITH_ADJUSTMENTS","true",false));
+    }
+  }
+ else {
+    pluginProperties=extractPluginProperties(pluginPropertiesString);
+  }
+  final Payment result=paymentApi.createRefundWithPaymentControl(account,payment.getId(),json.getAmount(),account.getCurrency(),transactionExternalKey,pluginProperties,createInvoicePaymentControlPluginApiPaymentOptions(false),callContext);
+  return uriBuilder.buildResponse(InvoicePaymentResource.class,"getInvoicePayment",result.getId(),uriInfo.getBaseUri().toString());
+}

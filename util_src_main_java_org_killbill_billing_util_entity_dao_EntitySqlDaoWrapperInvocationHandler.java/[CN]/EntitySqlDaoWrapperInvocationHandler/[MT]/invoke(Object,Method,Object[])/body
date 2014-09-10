@@ -1,6 +1,11 @@
 {
   try {
-    return invokeSafely(proxy,method,args);
+    return prof.executeWithProfiling(ProfilingFeatureType.DAO,sqlDaoClass.getSimpleName() + ":" + method.getName(),new WithProfilingCallback(){
+      @Override public Object execute() throws Throwable {
+        return invokeSafely(proxy,method,args);
+      }
+    }
+);
   }
  catch (  Throwable t) {
     if (t.getCause() != null && t.getCause().getCause() != null && DBIException.class.isAssignableFrom(t.getCause().getClass())) {

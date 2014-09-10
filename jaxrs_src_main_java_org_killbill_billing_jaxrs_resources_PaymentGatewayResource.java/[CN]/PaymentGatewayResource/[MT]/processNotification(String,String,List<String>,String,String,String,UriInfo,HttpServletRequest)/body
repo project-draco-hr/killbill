@@ -1,0 +1,14 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final String notificationPayload;
+  if (Strings.emptyToNull(body) == null && uriInfo.getRequestUri() != null) {
+    notificationPayload=uriInfo.getRequestUri().getRawQuery();
+  }
+ else {
+    notificationPayload=body;
+  }
+  final GatewayNotification notification=paymentGatewayApi.processNotification(notificationPayload,pluginName,pluginProperties,callContext);
+  final GatewayNotificationJson result=new GatewayNotificationJson(notification);
+  return result.toResponse();
+}

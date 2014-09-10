@@ -1,0 +1,27 @@
+{
+  final HashMap<String,BigDecimal> something=new HashMap<String,BigDecimal>();
+  something.put("yoyo",new BigDecimal("0.0"));
+  something.put("what",new BigDecimal("10.0"));
+  final List<PluginProperty> input=new ArrayList<PluginProperty>();
+  input.add(new PluginProperty("prev","simple",false));
+  input.add(new PluginProperty("foo",something,false));
+  input.add(new PluginProperty("next","easy",false));
+  final byte[] serialized=PluginPropertySerializer.serialize(input);
+  final Iterable<PluginProperty> deserialized=PluginPropertySerializer.deserialize(serialized);
+  int i=0;
+  for (  PluginProperty cur : deserialized) {
+    if (i == 0 || i == 2) {
+      Assert.assertEquals(cur,input.get(i));
+    }
+ else {
+      Assert.assertEquals(cur.getKey(),"foo");
+      Assert.assertTrue(cur.getValue() instanceof Map);
+      final Map<String,BigDecimal> mappedValue=(Map<String,BigDecimal>)cur.getValue();
+      Assert.assertTrue(mappedValue.containsKey("yoyo"));
+      Assert.assertTrue(mappedValue.containsKey("what"));
+      Assert.assertTrue(mappedValue.get("yoyo").compareTo(BigDecimal.ZERO) == 0);
+      Assert.assertTrue(mappedValue.get("what").compareTo(BigDecimal.TEN) == 0);
+    }
+    i++;
+  }
+}

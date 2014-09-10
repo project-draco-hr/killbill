@@ -1,6 +1,9 @@
 {
   boolean updatedAccountBCD=false;
   for (  final SubscriptionBase subscription : subscriptions) {
+    if (subscription.getState() == null) {
+      continue;
+    }
     for (    final EffectiveSubscriptionInternalEvent transition : subscriptionApi.getBillingTransitions(subscription,context)) {
       try {
         final int bcdLocal=bcdCalculator.calculateBcd(bundle,subscription,transition,account,context);

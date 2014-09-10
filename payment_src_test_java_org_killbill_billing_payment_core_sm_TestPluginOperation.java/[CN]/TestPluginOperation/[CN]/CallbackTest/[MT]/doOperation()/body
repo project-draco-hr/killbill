@@ -1,0 +1,29 @@
+{
+  try {
+    if (available != null) {
+      available.acquire();
+    }
+    if (sleepTimeMillis != null) {
+      Thread.sleep(sleepTimeMillis);
+    }
+    if (paymentApiException != null) {
+      throw paymentApiException;
+    }
+ else     if (runtimeException != null) {
+      throw runtimeException;
+    }
+ else {
+      runCount.incrementAndGet();
+    }
+  }
+ catch (  final InterruptedException e) {
+    Thread.currentThread().interrupt();
+    Assert.fail(e.getMessage());
+  }
+ finally {
+    if (available != null) {
+      available.release();
+    }
+  }
+  return PluginDispatcher.createPluginDispatcherReturnType(null);
+}

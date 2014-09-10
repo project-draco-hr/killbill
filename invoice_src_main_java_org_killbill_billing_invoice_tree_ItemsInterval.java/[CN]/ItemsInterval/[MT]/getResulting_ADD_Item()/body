@@ -1,20 +1,5 @@
 {
-  final Set<UUID> repairedIds=new HashSet<UUID>();
-  final ListIterator<Item> it=items.listIterator(items.size());
-  while (it.hasPrevious()) {
-    final Item cur=it.previous();
-switch (cur.getAction()) {
-case ADD:
-      if (!repairedIds.contains(cur.getId())) {
-        return cur;
-      }
-    break;
-case CANCEL:
-  if (cur.getLinkedId() != null) {
-    repairedIds.add(cur.getLinkedId());
-  }
-break;
-}
-}
-return null;
+  Preconditions.checkState(items.size() <= 2);
+  final Item item=items.size() > 0 && items.get(0).getAction() == ItemAction.ADD ? items.get(0) : null;
+  return item;
 }

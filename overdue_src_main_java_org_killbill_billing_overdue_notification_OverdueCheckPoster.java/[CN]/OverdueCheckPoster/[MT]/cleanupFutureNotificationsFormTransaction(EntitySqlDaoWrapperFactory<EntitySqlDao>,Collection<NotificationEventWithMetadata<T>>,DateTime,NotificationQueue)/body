@@ -1,6 +1,6 @@
 {
   boolean shouldInsertNewNotification=true;
-  if (futureNotifications.size() > 0) {
+  if (!futureNotifications.isEmpty()) {
     final DateTime earliestExistingNotificationDate=futureNotifications.iterator().next().getEffectiveDate();
     final int minIndexToDeleteFrom;
     if (earliestExistingNotificationDate.isBefore(futureNotificationTime)) {
@@ -11,9 +11,7 @@
       minIndexToDeleteFrom=0;
     }
     int index=0;
-    final Iterator<NotificationEventWithMetadata<T>> it=futureNotifications.iterator();
-    while (it.hasNext()) {
-      final NotificationEventWithMetadata<T> cur=it.next();
+    for (    final NotificationEventWithMetadata<T> cur : futureNotifications) {
       if (minIndexToDeleteFrom <= index) {
         overdueQueue.removeNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),cur.getRecordId());
       }

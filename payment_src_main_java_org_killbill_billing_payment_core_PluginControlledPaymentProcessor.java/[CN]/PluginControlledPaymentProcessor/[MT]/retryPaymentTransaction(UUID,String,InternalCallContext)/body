@@ -1,0 +1,25 @@
+{
+  try {
+    final PaymentAttemptModelDao attempt=paymentDao.getPaymentAttempt(attemptId,internalCallContext);
+    final PaymentModelDao payment=paymentDao.getPaymentByExternalKey(attempt.getPaymentExternalKey(),internalCallContext);
+    final UUID paymentId=payment != null ? payment.getId() : null;
+    final Iterable<PluginProperty> pluginProperties=PluginPropertySerializer.deserialize(attempt.getPluginProperties());
+    final Account account=accountInternalApi.getAccountById(attempt.getAccountId(),internalCallContext);
+    final UUID tenantId=nonEntityDao.retrieveIdFromObject(internalCallContext.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+    final CallContext callContext=internalCallContext.toCallContext(tenantId);
+    final State state=retrySMHelper.getState(attempt.getStateName());
+    pluginControlledPaymentAutomatonRunner.run(state,false,attempt.getTransactionType(),account,attempt.getPaymentMethodId(),paymentId,attempt.getPaymentExternalKey(),attempt.getTransactionExternalKey(),attempt.getAmount(),attempt.getCurrency(),pluginProperties,pluginName,callContext,internalCallContext);
+  }
+ catch (  AccountApiException e) {
+    log.warn("Failed to retry attempt " + attemptId + " for plugin "+ pluginName,e);
+  }
+catch (  PaymentApiException e) {
+    log.warn("Failed to retry attempt " + attemptId + " for plugin "+ pluginName,e);
+  }
+catch (  PluginPropertySerializerException e) {
+    log.warn("Failed to retry attempt " + attemptId + " for plugin "+ pluginName,e);
+  }
+catch (  MissingEntryException e) {
+    log.warn("Failed to retry attempt " + attemptId + " for plugin "+ pluginName,e);
+  }
+}

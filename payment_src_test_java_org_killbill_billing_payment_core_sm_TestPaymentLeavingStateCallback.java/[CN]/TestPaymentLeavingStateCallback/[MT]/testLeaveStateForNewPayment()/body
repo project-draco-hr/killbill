@@ -1,0 +1,9 @@
+{
+  setUp(null);
+  callback.leavingState(state);
+  verifyPaymentTransaction();
+  final PaymentModelDao payment=paymentDao.getPayment(paymentStateContext.getPaymentTransactionModelDao().getPaymentId(),internalCallContext);
+  Assert.assertEquals(payment.getExternalKey(),paymentStateContext.getPaymentExternalKey());
+  Assert.assertNull(payment.getStateName());
+  Assert.assertEquals(paymentDao.getTransactionsForPayment(payment.getId(),internalCallContext).size(),1);
+}

@@ -1,0 +1,16 @@
+{
+synchronized (this) {
+    return ImmutableList.copyOf(Iterables.filter(transactions.values(),new Predicate<PaymentTransactionModelDao>(){
+      @Override public boolean apply(      final PaymentTransactionModelDao input){
+        final PaymentModelDao payment=payments.get(input.getPaymentId());
+        if (payment != null) {
+          return payment.getAccountId().equals(accountId);
+        }
+ else {
+          return false;
+        }
+      }
+    }
+));
+  }
+}

@@ -1,0 +1,18 @@
+{
+  final Enumeration<Driver> drivers=DriverManager.getDrivers();
+  while (drivers.hasMoreElements()) {
+    try {
+      final Driver driver=drivers.nextElement();
+      DriverManager.deregisterDriver(driver);
+    }
+ catch (    final SQLException e) {
+      logger.warn("Unable to de-register driver",e);
+    }
+  }
+  try {
+    AbandonedConnectionCleanupThread.shutdown();
+  }
+ catch (  final InterruptedException e) {
+    logger.warn("Unable to shutdown MySQL threads",e);
+  }
+}

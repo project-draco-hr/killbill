@@ -1,0 +1,16 @@
+{
+  final ImmutableList<PaymentMethodPlugin> results=ImmutableList.<PaymentMethodPlugin>copyOf(Iterables.<PaymentMethodPlugin>filter(paymentMethods.values(),new Predicate<PaymentMethodPlugin>(){
+    @Override public boolean apply(    final PaymentMethodPlugin input){
+      if (input.getProperties() != null) {
+        for (        PluginProperty cur : input.getProperties()) {
+          if (cur.getValue().equals(searchKey)) {
+            return true;
+          }
+        }
+      }
+      return (input.getKbPaymentMethodId().toString().equals(searchKey));
+    }
+  }
+));
+  return DefaultPagination.<PaymentMethodPlugin>build(offset,limit,results);
+}

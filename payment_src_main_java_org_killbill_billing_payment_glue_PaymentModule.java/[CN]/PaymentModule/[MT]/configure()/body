@@ -1,17 +1,23 @@
 {
-  final ConfigurationObjectFactory factory=new ConfigurationObjectFactory(configSource);
+  final ConfigurationObjectFactory factory=new ConfigurationObjectFactory(skifeConfigSource);
   final PaymentConfig paymentConfig=factory.build(PaymentConfig.class);
   bind(PaymentConfig.class).toInstance(paymentConfig);
   bind(new TypeLiteral<OSGIServiceRegistration<PaymentPluginApi>>(){
   }
 ).toProvider(DefaultPaymentProviderPluginRegistryProvider.class).asEagerSingleton();
-  bind(PaymentInternalApi.class).to(DefaultPaymentInternalApi.class).asEagerSingleton();
+  bind(new TypeLiteral<OSGIServiceRegistration<PaymentControlPluginApi>>(){
+  }
+).toProvider(DefaultPaymentControlProviderPluginRegistryProvider.class).asEagerSingleton();
   bind(PaymentApi.class).to(DefaultPaymentApi.class).asEagerSingleton();
+  bind(PaymentGatewayApi.class).to(DefaultPaymentGatewayApi.class).asEagerSingleton();
   bind(InvoiceHandler.class).asEagerSingleton();
   bind(PaymentTagHandler.class).asEagerSingleton();
   bind(PaymentService.class).to(DefaultPaymentService.class).asEagerSingleton();
   installPaymentProviderPlugins(paymentConfig);
   installPaymentDao();
   installProcessors(paymentConfig);
+  installStateMachines();
+  installAutomatonRunner();
   installRetryEngines();
+  installJanitor();
 }

@@ -1,13 +1,14 @@
 {
+  final List<PluginProperty> properties=ImmutableList.<PluginProperty>of();
   final UUID accountId=UUID.randomUUID();
   final UUID paymentId=UUID.randomUUID();
+  final UUID kbTransactionId=UUID.randomUUID();
   final UUID paymentMethodId=UUID.randomUUID();
   final BigDecimal amount=BigDecimal.TEN;
-  final PaymentInfoPlugin paymentInfoPlugin=plugin.processPayment(accountId,paymentId,paymentMethodId,amount,Currency.BRL,callContext);
+  final PaymentTransactionInfoPlugin paymentInfoPlugin=plugin.purchasePayment(accountId,paymentId,kbTransactionId,paymentMethodId,amount,Currency.BRL,properties,callContext);
   Assert.assertEquals(paymentInfoPlugin.getAmount(),amount);
   Assert.assertNull(paymentInfoPlugin.getGatewayError());
   Assert.assertNull(paymentInfoPlugin.getGatewayErrorCode());
   Assert.assertEquals(paymentInfoPlugin.getStatus(),PaymentPluginStatus.PROCESSED);
-  final PaymentInfoPlugin retrievedPaymentInfoPlugin=plugin.getPaymentInfo(accountId,paymentId,callContext);
-  Assert.assertEquals(retrievedPaymentInfoPlugin.getStatus(),PaymentPluginStatus.PROCESSED);
+  final List<PaymentTransactionInfoPlugin> retrievedPaymentTransactionInfoPlugin=plugin.getPaymentInfo(accountId,paymentId,properties,callContext);
 }

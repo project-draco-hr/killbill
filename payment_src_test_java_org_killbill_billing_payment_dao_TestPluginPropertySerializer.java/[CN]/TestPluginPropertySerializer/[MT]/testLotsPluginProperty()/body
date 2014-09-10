@@ -1,0 +1,12 @@
+{
+  final List<PluginProperty> input=new ArrayList<PluginProperty>();
+  for (int i=0; i < 100; i++) {
+    input.add(new PluginProperty("foo-" + i,"bar-" + i,false));
+  }
+  final byte[] serialized=PluginPropertySerializer.serialize(input);
+  final Iterable<PluginProperty> deserialized=PluginPropertySerializer.deserialize(serialized);
+  int i=0;
+  for (  PluginProperty cur : deserialized) {
+    Assert.assertEquals(cur,input.get(i++));
+  }
+}

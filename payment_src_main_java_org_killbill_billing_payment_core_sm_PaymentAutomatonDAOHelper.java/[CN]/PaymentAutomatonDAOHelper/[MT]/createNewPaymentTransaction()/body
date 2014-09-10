@@ -1,0 +1,24 @@
+{
+  final PaymentTransactionModelDao paymentTransactionModelDao;
+  final List<PaymentTransactionModelDao> existingTransactions;
+  if (paymentStateContext.getPaymentId() == null) {
+    final PaymentModelDao newPaymentModelDao=buildNewPaymentModelDao();
+    final PaymentTransactionModelDao newPaymentTransactionModelDao=buildNewPaymentTransactionModelDao(newPaymentModelDao.getId());
+    existingTransactions=ImmutableList.of();
+    final PaymentModelDao paymentModelDao=paymentDao.insertPaymentWithFirstTransaction(newPaymentModelDao,newPaymentTransactionModelDao,internalCallContext);
+    paymentTransactionModelDao=paymentDao.getTransactionsForPayment(paymentModelDao.getId(),internalCallContext).get(0);
+  }
+ else {
+    existingTransactions=paymentDao.getTransactionsForPayment(paymentStateContext.getPaymentId(),internalCallContext);
+    if (existingTransactions.isEmpty()) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_SUCCESS_PAYMENT,paymentStateContext.getPaymentId());
+    }
+    if (paymentStateContext.getCurrency() != null && existingTransactions.get(0).getCurrency() != paymentStateContext.getCurrency()) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_PARAMETER,"currency"," should be " + existingTransactions.get(0).getCurrency() + " to match other existing transactions");
+    }
+    final PaymentTransactionModelDao newPaymentTransactionModelDao=buildNewPaymentTransactionModelDao(paymentStateContext.getPaymentId());
+    paymentTransactionModelDao=paymentDao.updatePaymentWithNewTransaction(paymentStateContext.getPaymentId(),newPaymentTransactionModelDao,internalCallContext);
+  }
+  paymentStateContext.setPaymentTransactionModelDao(paymentTransactionModelDao);
+  paymentStateContext.setOnLeavingStateExistingTransactions(existingTransactions);
+}

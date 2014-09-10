@@ -1,0 +1,32 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  final UUID subscriptionId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final LocalDate now=clock.getUTCToday();
+  final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
+  final String paymentExternalKey=invoice.getId().toString();
+  final String transactionExternalKey="brrrrrr";
+  invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),requestedAmount,new BigDecimal("1.0"),Currency.USD));
+  final Payment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),INVOICE_PAYMENT,callContext);
+  assertEquals(payment.getExternalKey(),paymentExternalKey);
+  assertEquals(payment.getPaymentMethodId(),account.getPaymentMethodId());
+  assertEquals(payment.getAccountId(),account.getId());
+  assertEquals(payment.getAuthAmount().compareTo(BigDecimal.ZERO),0);
+  assertEquals(payment.getCapturedAmount().compareTo(BigDecimal.ZERO),0);
+  assertEquals(payment.getPurchasedAmount().compareTo(requestedAmount),0);
+  assertEquals(payment.getRefundedAmount().compareTo(BigDecimal.ZERO),0);
+  assertEquals(payment.getCurrency(),Currency.USD);
+  assertEquals(payment.getTransactions().size(),1);
+  assertEquals(payment.getTransactions().get(0).getExternalKey(),transactionExternalKey);
+  assertEquals(payment.getTransactions().get(0).getPaymentId(),payment.getId());
+  assertEquals(payment.getTransactions().get(0).getAmount().compareTo(requestedAmount),0);
+  assertEquals(payment.getTransactions().get(0).getCurrency(),Currency.USD);
+  assertEquals(payment.getTransactions().get(0).getProcessedAmount().compareTo(requestedAmount),0);
+  assertEquals(payment.getTransactions().get(0).getProcessedCurrency(),Currency.USD);
+  assertEquals(payment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
+  assertEquals(payment.getTransactions().get(0).getTransactionType(),TransactionType.PURCHASE);
+  assertNull(payment.getTransactions().get(0).getGatewayErrorMsg());
+  assertNull(payment.getTransactions().get(0).getGatewayErrorCode());
+  final List<PaymentAttemptModelDao> attempts=paymentDao.getPaymentAttempts(payment.getExternalKey(),internalCallContext);
+  assertEquals(attempts.size(),1);
+}

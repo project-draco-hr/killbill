@@ -1,0 +1,16 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      entitySqlDaoWrapperFactory.become(TransactionSqlDao.class).updateTransactionStatus(transactionId.toString(),processedAmount,processedCurrency == null ? null : processedCurrency.toString(),transactionStatus == null ? null : transactionStatus.toString(),gatewayErrorCode,gatewayErrorMsg,context);
+      if (lastPaymentSuccessStateName != null) {
+        entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).updateLastSuccessPaymentStateName(paymentId.toString(),currentPaymentStateName,lastPaymentSuccessStateName,context);
+      }
+ else {
+        entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).updatePaymentStateName(paymentId.toString(),currentPaymentStateName,context);
+      }
+      postPaymentEventFromTransaction(accountId,transactionStatus,transactionType,paymentId,processedAmount,processedCurrency,clock.getUTCNow(),gatewayErrorCode,entitySqlDaoWrapperFactory,context);
+      return null;
+    }
+  }
+);
+}

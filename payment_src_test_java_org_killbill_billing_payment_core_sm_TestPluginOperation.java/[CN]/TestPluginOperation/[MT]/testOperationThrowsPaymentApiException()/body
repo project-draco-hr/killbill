@@ -1,0 +1,12 @@
+{
+  final CallbackTest callback=new CallbackTest(new PaymentApiException(ErrorCode.__UNKNOWN_ERROR_CODE));
+  final PaymentOperation pluginOperation=getPluginOperation();
+  try {
+    pluginOperation.dispatchWithAccountLockAndTimeout(callback);
+    Assert.fail();
+  }
+ catch (  final OperationException e) {
+    Assert.assertEquals(e.getOperationResult(),OperationResult.FAILURE);
+    Assert.assertTrue(e.getCause() instanceof PaymentApiException);
+  }
+}

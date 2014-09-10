@@ -1,0 +1,9 @@
+{
+  Preconditions.checkArgument(context.getAccountRecordId() != null);
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<PaymentTransactionModelDao>>(){
+    @Override public List<PaymentTransactionModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      return entitySqlDaoWrapperFactory.become(TransactionSqlDao.class).getByAccountRecordId(context);
+    }
+  }
+);
+}

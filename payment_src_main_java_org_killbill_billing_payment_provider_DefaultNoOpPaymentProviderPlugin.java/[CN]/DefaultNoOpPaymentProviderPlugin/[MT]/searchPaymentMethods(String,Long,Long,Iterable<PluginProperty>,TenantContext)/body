@@ -1,0 +1,19 @@
+{
+  final ImmutableList<PaymentMethodPlugin> allResults=ImmutableList.<PaymentMethodPlugin>copyOf(Iterables.<PaymentMethodPlugin>filter(Iterables.<PaymentMethodPlugin>concat(paymentMethods.values()),new Predicate<PaymentMethodPlugin>(){
+    @Override public boolean apply(    final PaymentMethodPlugin input){
+      return input.getKbPaymentMethodId().toString().equals(searchKey);
+    }
+  }
+));
+  final List<PaymentMethodPlugin> results;
+  if (offset >= allResults.size()) {
+    results=ImmutableList.<PaymentMethodPlugin>of();
+  }
+ else   if (offset + limit > allResults.size()) {
+    results=allResults.subList(offset.intValue(),allResults.size());
+  }
+ else {
+    results=allResults.subList(offset.intValue(),offset.intValue() + limit.intValue());
+  }
+  return new DefaultPagination<PaymentMethodPlugin>(offset,limit,(long)results.size(),(long)paymentMethods.values().size(),results.iterator());
+}

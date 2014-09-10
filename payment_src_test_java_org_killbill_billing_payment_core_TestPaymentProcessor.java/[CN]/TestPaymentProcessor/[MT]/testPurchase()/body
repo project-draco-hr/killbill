@@ -1,0 +1,9 @@
+{
+  final String paymentExternalKey=UUID.randomUUID().toString();
+  final String purchaseKey=UUID.randomUUID().toString();
+  final Payment purchase=paymentProcessor.createPurchase(true,null,account,null,null,TEN,CURRENCY,paymentExternalKey,purchaseKey,SHOULD_LOCK_ACCOUNT,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  verifyPayment(purchase,paymentExternalKey,ZERO,ZERO,ZERO,1);
+  final UUID paymentId=purchase.getId();
+  verifyPaymentTransaction(purchase.getTransactions().get(0),purchaseKey,TransactionType.PURCHASE,TEN,paymentId);
+  paymentBusListener.verify(1,account.getId(),paymentId,TEN);
+}

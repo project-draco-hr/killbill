@@ -3,8 +3,9 @@
   installOverdueService();
   installOverdueWrapperFactory();
   installOverdueEmail();
-  final OverdueProperties config=new ConfigurationObjectFactory(configSource).build(OverdueProperties.class);
+  final OverdueProperties config=new ConfigurationObjectFactory(skifeConfigSource).build(OverdueProperties.class);
   bind(OverdueProperties.class).toInstance(config);
+  bind(OverdueListener.class).asEagerSingleton();
   bind(OverdueNotifier.class).annotatedWith(Names.named(OVERDUE_NOTIFIER_CHECK_NAMED)).to(OverdueCheckNotifier.class).asEagerSingleton();
   bind(OverdueNotifier.class).annotatedWith(Names.named(OVERDUE_NOTIFIER_ASYNC_BUS_NAMED)).to(OverdueAsyncBusNotifier.class).asEagerSingleton();
   bind(OverduePoster.class).annotatedWith(Names.named(OVERDUE_NOTIFIER_CHECK_NAMED)).to(OverdueCheckPoster.class).asEagerSingleton();

@@ -25,6 +25,21 @@
     }
  else {
       if (!dryRun) {
+        final List<InvoicePluginApi> invoicePlugins=this.getInvoicePlugins();
+        final CallContext callContext=buildCallContext(context);
+        for (        final InvoicePluginApi invoicePlugin : invoicePlugins) {
+          final List<InvoiceItem> items=invoicePlugin.getAdditionalInvoiceItems(invoice,ImmutableList.<PluginProperty>of(),callContext);
+          if (items != null) {
+            for (            final InvoiceItem item : items) {
+              if (InvoiceItemType.EXTERNAL_CHARGE.equals(item.getInvoiceItemType()) || InvoiceItemType.TAX.equals(item.getInvoiceItemType())) {
+                invoice.addInvoiceItem(item);
+              }
+ else {
+                log.warn("Ignoring invoice item of type {} from InvoicePluginApi {}: {}",item.getInvoiceItemType(),invoicePlugin,item);
+              }
+            }
+          }
+        }
         final Set<UUID> adjustedUniqueOtherInvoiceId=new TreeSet<UUID>();
         adjustedUniqueOtherInvoiceId.addAll(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,UUID>(){
           @Nullable @Override public UUID apply(          @Nullable final InvoiceItem input){
@@ -48,14 +63,8 @@
           }
         }
 ));
-        final List<InvoicePaymentModelDao> invoicePaymentModelDaos=ImmutableList.<InvoicePaymentModelDao>copyOf(Collections2.transform(invoice.getPayments(),new Function<InvoicePayment,InvoicePaymentModelDao>(){
-          @Override public InvoicePaymentModelDao apply(          final InvoicePayment input){
-            return new InvoicePaymentModelDao(input);
-          }
-        }
-));
-        final Map<UUID,List<DateTime>> callbackDateTimePerSubscriptions=createNextFutureNotificationDate(invoiceItemModelDaos,UsageUtils.getKnownUsages(billingEvents,null),dateAndTimeZoneContext);
-        invoiceDao.createInvoice(invoiceModelDao,invoiceItemModelDaos,invoicePaymentModelDaos,isRealInvoiceWithItems,callbackDateTimePerSubscriptions,context);
+        final Map<UUID,List<DateTime>> callbackDateTimePerSubscriptions=createNextFutureNotificationDate(invoiceItemModelDaos,billingEvents.getUsages(),dateAndTimeZoneContext);
+        invoiceDao.createInvoice(invoiceModelDao,invoiceItemModelDaos,isRealInvoiceWithItems,callbackDateTimePerSubscriptions,context);
         final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
         final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
         setChargedThroughDates(dateAndTimeZoneContext,fixedPriceInvoiceItems,recurringInvoiceItems,context);
@@ -63,11 +72,11 @@
         if (isRealInvoiceWithItems) {
           events.add(new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken()));
         }
-        for (        UUID cur : adjustedUniqueOtherInvoiceId) {
+        for (        final UUID cur : adjustedUniqueOtherInvoiceId) {
           final InvoiceAdjustmentInternalEvent event=new DefaultInvoiceAdjustmentEvent(cur,invoice.getAccountId(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
           events.add(event);
         }
-        for (        InvoiceInternalEvent event : events) {
+        for (        final InvoiceInternalEvent event : events) {
           postEvent(event,accountId,context);
         }
       }
@@ -77,7 +86,7 @@
     }
     return invoice;
   }
- catch (  AccountApiException e) {
+ catch (  final AccountApiException e) {
     log.error("Failed handling SubscriptionBase change.",e);
     return null;
   }

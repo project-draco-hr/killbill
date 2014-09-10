@@ -1,0 +1,10 @@
+{
+  final PaymentAutomatonDAOHelper daoHelper=createDAOHelper(UUID.randomUUID(),paymentExternalKey,paymentTransactionExternalKey,amount,currency);
+  try {
+    daoHelper.getPayment();
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_NO_SUCH_PAYMENT.getCode());
+  }
+}

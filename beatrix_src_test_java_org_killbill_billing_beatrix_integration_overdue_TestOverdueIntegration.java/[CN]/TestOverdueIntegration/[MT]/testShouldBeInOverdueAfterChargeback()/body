@@ -14,8 +14,9 @@
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
-  final InvoicePayment payment=invoicePaymentApi.getInvoicePayments(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).get(1).getPayments().get(0).getPaymentId(),callContext).get(0);
-  createChargeBackAndCheckForCompletion(payment,NextEvent.BLOCK,NextEvent.INVOICE_ADJUSTMENT);
+  final InvoicePayment invoicePayment=invoicePaymentApi.getInvoicePayments(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).get(1).getPayments().get(0).getPaymentId(),callContext).get(0);
+  final Payment payment=paymentApi.getPayment(invoicePayment.getPaymentId(),false,ImmutableList.<PluginProperty>of(),callContext);
+  createChargeBackAndCheckForCompletion(account,payment,NextEvent.BLOCK,NextEvent.INVOICE_ADJUSTMENT);
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseEntitlement,true,true);
 }

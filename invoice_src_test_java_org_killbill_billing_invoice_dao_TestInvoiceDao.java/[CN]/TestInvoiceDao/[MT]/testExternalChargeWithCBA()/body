@@ -2,15 +2,20 @@
   final UUID accountId=account.getId();
   final UUID bundleId=UUID.randomUUID();
   invoiceDao.insertCredit(accountId,null,new BigDecimal("20.0"),new LocalDate(),Currency.USD,context);
-  final InvoiceItemModelDao charge=invoiceDao.insertExternalCharge(accountId,null,bundleId,"bla",new BigDecimal("15.0"),clock.getUTCNow().toLocalDate(),Currency.USD,context);
+  final String description=UUID.randomUUID().toString();
+  final InvoiceItemModelDao externalCharge=new InvoiceItemModelDao(new ExternalChargeInvoiceItem(null,accountId,bundleId,description,clock.getUTCToday(),new BigDecimal("15.0"),Currency.USD));
+  final InvoiceItemModelDao charge=invoiceDao.insertExternalCharges(accountId,clock.getUTCToday(),ImmutableList.<InvoiceItemModelDao>of(externalCharge),context).get(0);
   final InvoiceModelDao newInvoice=invoiceDao.getById(charge.getInvoiceId(),context);
   final List<InvoiceItemModelDao> items=newInvoice.getInvoiceItems();
   assertEquals(items.size(),2);
   for (  final InvoiceItemModelDao cur : items) {
-    if (!cur.getId().equals(charge.getId())) {
+    if (cur.getId().equals(charge.getId())) {
+      assertEquals(cur.getType(),InvoiceItemType.EXTERNAL_CHARGE);
+      assertEquals(cur.getDescription(),description);
+    }
+ else {
       assertEquals(cur.getType(),InvoiceItemType.CBA_ADJ);
       assertTrue(cur.getAmount().compareTo(new BigDecimal("-15.00")) == 0);
-      break;
     }
   }
 }

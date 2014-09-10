@@ -1,0 +1,8 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final PaymentMethod paymentMethod=paymentApi.getPaymentMethodById(UUID.fromString(paymentMethodId),false,false,pluginProperties,callContext);
+  final Account account=accountUserApi.getAccountById(paymentMethod.getAccountId(),callContext);
+  paymentApi.deletePaymentMethod(account,UUID.fromString(paymentMethodId),deleteDefaultPaymentMethodWithAutoPayOff,pluginProperties,callContext);
+  return Response.status(Status.OK).build();
+}

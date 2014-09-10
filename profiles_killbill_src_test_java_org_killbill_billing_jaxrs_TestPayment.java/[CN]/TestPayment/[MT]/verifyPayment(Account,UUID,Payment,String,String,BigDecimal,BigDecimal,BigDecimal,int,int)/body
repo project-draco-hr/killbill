@@ -1,0 +1,21 @@
+{
+  Assert.assertEquals(Payment.getAccountId(),account.getAccountId());
+  Assert.assertEquals(Payment.getPaymentMethodId(),Objects.firstNonNull(paymentMethodId,account.getPaymentMethodId()));
+  Assert.assertNotNull(Payment.getPaymentId());
+  Assert.assertNotNull(Payment.getPaymentNumber());
+  Assert.assertEquals(Payment.getPaymentExternalKey(),PaymentExternalKey);
+  Assert.assertEquals(Payment.getAuthAmount().compareTo(authAmount),0);
+  Assert.assertEquals(Payment.getCapturedAmount().compareTo(capturedAmount),0);
+  Assert.assertEquals(Payment.getRefundedAmount().compareTo(refundedAmount),0);
+  Assert.assertEquals(Payment.getCurrency(),account.getCurrency());
+  Assert.assertEquals(Payment.getTransactions().size(),nbTransactions);
+  verifyPaymentTransaction(Payment.getPaymentId(),Payment.getTransactions().get(0),PaymentExternalKey,authTransactionExternalKey,account,authAmount,"AUTHORIZE");
+  final Payments Payments=killBillClient.getPayments();
+  Assert.assertEquals(Payments.size(),PaymentNb);
+  Assert.assertEquals(Payments.get(PaymentNb - 1),Payment);
+  final Payment retrievedPayment=killBillClient.getPayment(Payment.getPaymentId());
+  Assert.assertEquals(retrievedPayment,Payment);
+  final Payments paymentsForAccount=killBillClient.getPaymentsForAccount(account.getAccountId());
+  Assert.assertEquals(paymentsForAccount.size(),PaymentNb);
+  Assert.assertEquals(paymentsForAccount.get(PaymentNb - 1),Payment);
+}

@@ -1,10 +1,9 @@
 {
-  try {
-    this.configSource=getConfigSource();
+  this.configSource=getConfigSource();
+  this.skifeConfigSource=new ConfigSource(){
+    @Override public String getString(    final String propertyName){
+      return configSource.getString(propertyName);
+    }
   }
- catch (  final Exception e) {
-    final AssertionError assertionError=new AssertionError("Initialization error");
-    assertionError.initCause(e);
-    throw assertionError;
-  }
+;
 }

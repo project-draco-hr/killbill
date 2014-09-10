@@ -1,0 +1,13 @@
+{
+  checkNotNullParameter(account,"account");
+  checkNotNullParameter(currency,"currency");
+  checkNotNullParameter(paymentId,"paymentId");
+  checkNotNullParameter(paymentTransactionExternalKey,"paymentTransactionExternalKey");
+  checkNotNullParameter(properties,"plugin properties");
+  if (amount != null) {
+    checkPositiveAmount(amount);
+  }
+  logAPICall(TransactionType.REFUND.name(),account,null,paymentId,null,amount,currency,null,paymentTransactionExternalKey);
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
+  return pluginControlledPaymentProcessor.createRefund(IS_API_PAYMENT,account,paymentId,amount,currency,paymentTransactionExternalKey,properties,paymentOptions.getPaymentControlPluginName(),callContext,internalCallContext);
+}

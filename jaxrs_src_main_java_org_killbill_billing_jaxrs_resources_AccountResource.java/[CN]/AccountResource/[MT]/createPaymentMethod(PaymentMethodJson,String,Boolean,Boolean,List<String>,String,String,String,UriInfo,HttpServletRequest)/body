@@ -1,0 +1,18 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final PaymentMethod data=json.toPaymentMethod(accountId);
+  final Account account=accountUserApi.getAccountById(data.getAccountId(),callContext);
+  final boolean hasDefaultPaymentMethod=account.getPaymentMethodId() != null || isDefault;
+  final Collection<Invoice> unpaidInvoices=payAllUnpaidInvoices ? invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext) : Collections.<Invoice>emptyList();
+  if (payAllUnpaidInvoices && unpaidInvoices.size() > 0 && !hasDefaultPaymentMethod) {
+    return Response.status(Status.BAD_REQUEST).build();
+  }
+  final UUID paymentMethodId=paymentApi.addPaymentMethod(account,data.getExternalKey(),data.getPluginName(),isDefault,data.getPluginDetail(),pluginProperties,callContext);
+  if (payAllUnpaidInvoices && unpaidInvoices.size() > 0) {
+    for (    final Invoice invoice : unpaidInvoices) {
+      createPurchaseForInvoice(account,invoice.getId(),invoice.getBalance(),false,callContext);
+    }
+  }
+  return uriBuilder.buildResponse(PaymentMethodResource.class,"getPaymentMethod",paymentMethodId,uriInfo.getBaseUri().toString());
+}

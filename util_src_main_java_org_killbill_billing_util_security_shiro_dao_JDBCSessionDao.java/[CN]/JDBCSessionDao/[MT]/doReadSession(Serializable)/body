@@ -1,12 +1,22 @@
 {
-  final SessionModelDao sessionModelDao=jdbcSessionSqlDao.read(sessionId);
+  if (sessionId == null) {
+    return null;
+  }
+  final Long recordId;
+  try {
+    recordId=Long.parseLong(sessionId.toString().trim());
+  }
+ catch (  final NumberFormatException e) {
+    return null;
+  }
+  final SessionModelDao sessionModelDao=jdbcSessionSqlDao.read(recordId);
   if (sessionModelDao == null) {
     return null;
   }
   try {
     return sessionModelDao.toSimpleSession();
   }
- catch (  IOException e) {
+ catch (  final IOException e) {
     log.warn("Corrupted cookie",e);
     return null;
   }

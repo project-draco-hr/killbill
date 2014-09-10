@@ -1,0 +1,63 @@
+{
+  final DateTime utcNow=clock.getUTCNow();
+  final PaymentStateContext paymentStateContext=new PaymentStateContext(isApiPayment,paymentId,transactionId,attemptId,paymentExternalKey,paymentTransactionExternalKey,transactionType,account,paymentMethodId,amount,currency,shouldLockAccount,overridePluginOperationResult,properties,internalCallContext,callContext);
+  final PaymentAutomatonDAOHelper daoHelper=new PaymentAutomatonDAOHelper(paymentStateContext,utcNow,paymentDao,pluginRegistry,internalCallContext,eventBus,paymentSMHelper);
+  final UUID effectivePaymentMethodId;
+  final String currentStateName;
+  if (paymentId != null) {
+    final PaymentModelDao paymentModelDao=daoHelper.getPayment();
+    effectivePaymentMethodId=paymentModelDao.getPaymentMethodId();
+    currentStateName=paymentModelDao.getLastSuccessStateName() != null ? paymentModelDao.getLastSuccessStateName() : paymentSMHelper.getInitStateNameForTransaction();
+    Preconditions.checkState(currentStateName != null,"State name cannot be null for payment " + paymentId);
+    Preconditions.checkState(paymentMethodId == null || effectivePaymentMethodId.equals(paymentMethodId),"Specified payment method id " + paymentMethodId + " doesn't match the one on the payment "+ effectivePaymentMethodId);
+  }
+ else {
+    effectivePaymentMethodId=paymentMethodId != null ? paymentMethodId : account.getPaymentMethodId();
+    currentStateName=paymentSMHelper.getInitStateNameForTransaction();
+  }
+  paymentStateContext.setPaymentMethodId(effectivePaymentMethodId);
+  final OperationCallback operationCallback;
+  final LeavingStateCallback leavingStateCallback;
+  final EnteringStateCallback enteringStateCallback;
+switch (transactionType) {
+case PURCHASE:
+    operationCallback=new PurchaseOperation(daoHelper,locker,paymentPluginDispatcher,paymentStateContext);
+  leavingStateCallback=new PurchaseInitiated(daoHelper,paymentStateContext);
+enteringStateCallback=new PurchaseCompleted(daoHelper,paymentStateContext);
+break;
+case AUTHORIZE:
+operationCallback=new AuthorizeOperation(daoHelper,locker,paymentPluginDispatcher,paymentStateContext);
+leavingStateCallback=new AuthorizeInitiated(daoHelper,paymentStateContext);
+enteringStateCallback=new AuthorizeCompleted(daoHelper,paymentStateContext);
+break;
+case CAPTURE:
+operationCallback=new CaptureOperation(daoHelper,locker,paymentPluginDispatcher,paymentStateContext);
+leavingStateCallback=new CaptureInitiated(daoHelper,paymentStateContext);
+enteringStateCallback=new CaptureCompleted(daoHelper,paymentStateContext);
+break;
+case VOID:
+operationCallback=new VoidOperation(daoHelper,locker,paymentPluginDispatcher,paymentStateContext);
+leavingStateCallback=new VoidInitiated(daoHelper,paymentStateContext);
+enteringStateCallback=new VoidCompleted(daoHelper,paymentStateContext);
+break;
+case REFUND:
+operationCallback=new RefundOperation(daoHelper,locker,paymentPluginDispatcher,paymentStateContext);
+leavingStateCallback=new RefundInitiated(daoHelper,paymentStateContext);
+enteringStateCallback=new RefundCompleted(daoHelper,paymentStateContext);
+break;
+case CREDIT:
+operationCallback=new CreditOperation(daoHelper,locker,paymentPluginDispatcher,paymentStateContext);
+leavingStateCallback=new CreditInitiated(daoHelper,paymentStateContext);
+enteringStateCallback=new CreditCompleted(daoHelper,paymentStateContext);
+break;
+case CHARGEBACK:
+operationCallback=new ChargebackOperation(daoHelper,locker,paymentPluginDispatcher,paymentStateContext);
+leavingStateCallback=new ChargebackInitiated(daoHelper,paymentStateContext);
+enteringStateCallback=new ChargebackCompleted(daoHelper,paymentStateContext);
+break;
+default :
+throw new IllegalStateException("Unsupported transaction type " + transactionType);
+}
+runStateMachineOperation(currentStateName,transactionType,leavingStateCallback,operationCallback,enteringStateCallback);
+return paymentStateContext.getPaymentId();
+}

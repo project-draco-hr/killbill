@@ -1,0 +1,14 @@
+{
+  if (e.getCause() instanceof OperationException) {
+    return (OperationException)e.getCause();
+  }
+ else   if (e.getCause() instanceof LockFailedException) {
+    final String format=String.format("Failed to lock account %s",paymentStateContext.getAccount().getExternalKey());
+    logger.error(String.format(format),e);
+    return new OperationException(e,getOperationResultOnException(paymentStateContext));
+  }
+ else {
+    logger.warn("RetryOperationCallback failed for account {}",paymentStateContext.getAccount().getExternalKey(),e);
+    return new OperationException(e,getOperationResultOnException(paymentStateContext));
+  }
+}

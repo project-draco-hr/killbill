@@ -5,7 +5,7 @@
   final String productName="Shotgun";
   final BillingPeriod term=BillingPeriod.ANNUAL;
   final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
-  DefaultEntitlement bpEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
+  final DefaultEntitlement bpEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   assertNotNull(bpEntitlement);
   assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).size(),1);
   assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getRecurringBillingPeriod(),BillingPeriod.ANNUAL);
@@ -25,19 +25,11 @@
   toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2013,8,18),new LocalDate(2014,8,18),InvoiceItemType.RECURRING,new BigDecimal("2399.95")),new ExpectedInvoiceItemCheck(new LocalDate(2013,9,17),new LocalDate(2014,8,18),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-2202.69")),new ExpectedInvoiceItemCheck(new LocalDate(2013,9,17),new LocalDate(2013,9,17),InvoiceItemType.CBA_ADJ,new BigDecimal("2202.69")));
   invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,toBeChecked);
   final Invoice invoice1=invoices.get(1);
-  final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),callContext);
-  final ExpectedPaymentCheck expectedPaymentCheck=new ExpectedPaymentCheck(clock.getUTCNow().toLocalDate(),new BigDecimal("2399.95"),PaymentStatus.SUCCESS,invoice1.getId(),Currency.USD);
+  final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
+  final ExpectedPaymentCheck expectedPaymentCheck=new ExpectedPaymentCheck(clock.getUTCNow().toLocalDate(),new BigDecimal("2399.95"),TransactionStatus.SUCCESS,invoice1.getId(),Currency.USD);
   final Payment payment1=payments.get(0);
   final Map<UUID,BigDecimal> iias=new HashMap<UUID,BigDecimal>();
   iias.put(invoice1.getInvoiceItems().get(0).getId(),new BigDecimal("197.26"));
-  busHandler.pushExpectedEvents(NextEvent.INVOICE_ADJUSTMENT);
-  paymentApi.createRefundWithItemsAdjustments(account,payment1.getId(),iias,callContext);
-  assertListenerStatus();
-  try {
-    invoiceUserApi.triggerInvoiceGeneration(account.getId(),new LocalDate(clock.getUTCToday()),false,callContext);
-    Assert.fail("Should not gnenerated an new invoice");
-  }
- catch (  InvoiceApiException e) {
-    Assert.assertEquals(e.getCode(),ErrorCode.INVOICE_NOTHING_TO_DO.getCode());
-  }
+  refundPaymentWithInvoiceItemAdjAndCheckForCompletion(account,payment1,iias,NextEvent.PAYMENT,NextEvent.INVOICE_ADJUSTMENT);
+  checkNoMoreInvoiceToGenerate(account);
 }

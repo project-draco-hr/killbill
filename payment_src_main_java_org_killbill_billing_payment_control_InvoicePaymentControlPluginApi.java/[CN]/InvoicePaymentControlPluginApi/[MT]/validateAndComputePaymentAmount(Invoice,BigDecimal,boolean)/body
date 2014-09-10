@@ -1,0 +1,16 @@
+{
+  if (invoice.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+    logger.info("Invoice " + invoice.getId() + " has already been paid");
+    return BigDecimal.ZERO;
+  }
+  if (isApiPayment && inputAmount != null && invoice.getBalance().compareTo(inputAmount) < 0) {
+    logger.info("Invoice " + invoice.getId() + " has a balance of "+ invoice.getBalance().floatValue()+ " less than retry payment amount of "+ inputAmount.floatValue());
+    return BigDecimal.ZERO;
+  }
+  if (inputAmount == null) {
+    return invoice.getBalance();
+  }
+ else {
+    return invoice.getBalance().compareTo(inputAmount) < 0 ? invoice.getBalance() : inputAmount;
+  }
+}

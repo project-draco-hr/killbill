@@ -1,0 +1,20 @@
+{
+  final DateTime utcNow=retryablePaymentAutomatonRunner.clock.getUTCNow();
+  Preconditions.checkState(stateContext.getPaymentExternalKey() != null || stateContext.getPaymentId() != null);
+  if (stateContext.getPaymentExternalKey() == null) {
+    final PaymentModelDao payment=paymentDao.getPayment(stateContext.getPaymentId(),stateContext.internalCallContext);
+    Preconditions.checkState(payment != null);
+    stateContext.setPaymentExternalKey(payment.getExternalKey());
+  }
+  if (state.getName().equals(initialState.getName()) || state.getName().equals(retriedState.getName())) {
+    try {
+      final byte[] serializedProperties=PluginPropertySerializer.serialize(stateContext.getProperties());
+      final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(stateContext.getAccount().getId(),stateContext.getPaymentMethodId(),utcNow,utcNow,stateContext.getPaymentExternalKey(),null,stateContext.paymentTransactionExternalKey,transactionType,initialState.getName(),stateContext.getAmount(),stateContext.getCurrency(),stateContext.getPluginName(),serializedProperties);
+      retryablePaymentAutomatonRunner.paymentDao.insertPaymentAttemptWithProperties(attempt,stateContext.internalCallContext);
+      stateContext.setAttemptId(attempt.getId());
+    }
+ catch (    PluginPropertySerializerException e) {
+      throw new OperationException(e);
+    }
+  }
+}

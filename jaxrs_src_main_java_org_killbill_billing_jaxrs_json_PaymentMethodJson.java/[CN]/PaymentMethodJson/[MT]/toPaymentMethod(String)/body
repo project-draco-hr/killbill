@@ -9,6 +9,9 @@
     @Override public UUID getId(){
       return paymentMethodId != null ? UUID.fromString(paymentMethodId) : null;
     }
+    @Override public String getExternalKey(){
+      return externalKey;
+    }
     @Override public DateTime getCreatedDate(){
       return null;
     }
@@ -26,50 +29,14 @@
         @Override public boolean isDefaultPaymentMethod(){
           return false;
         }
-        @Override public String getType(){
-          return null;
-        }
-        @Override public String getCCName(){
-          return null;
-        }
-        @Override public String getCCType(){
-          return null;
-        }
-        @Override public String getCCExpirationMonth(){
-          return null;
-        }
-        @Override public String getCCExpirationYear(){
-          return null;
-        }
-        @Override public String getCCLast4(){
-          return null;
-        }
-        @Override public String getAddress1(){
-          return null;
-        }
-        @Override public String getAddress2(){
-          return null;
-        }
-        @Override public String getCity(){
-          return null;
-        }
-        @Override public String getState(){
-          return null;
-        }
-        @Override public String getZip(){
-          return null;
-        }
-        @Override public String getCountry(){
-          return null;
-        }
         @Override public String getExternalPaymentMethodId(){
           return pluginInfo.getExternalPaymentId();
         }
-        @Override public List<PaymentMethodKVInfo> getProperties(){
+        @Override public List<PluginProperty> getProperties(){
           if (pluginInfo.getProperties() != null) {
-            final List<PaymentMethodKVInfo> result=new LinkedList<PaymentMethodKVInfo>();
-            for (            final PaymentMethodProperties cur : pluginInfo.getProperties()) {
-              result.add(new PaymentMethodKVInfo(cur.getKey(),cur.getValue(),cur.isUpdatable));
+            final List<PluginProperty> result=new LinkedList<PluginProperty>();
+            for (            final PluginPropertyJson cur : pluginInfo.getProperties()) {
+              result.add(new PluginProperty(cur.getKey(),cur.getValue(),cur.getIsUpdatable()));
             }
             return result;
           }

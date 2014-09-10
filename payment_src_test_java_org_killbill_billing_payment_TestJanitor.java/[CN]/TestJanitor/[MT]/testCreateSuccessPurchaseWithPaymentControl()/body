@@ -1,0 +1,30 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  final UUID subscriptionId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final LocalDate now=clock.getUTCToday();
+  final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
+  final String paymentExternalKey=invoice.getId().toString();
+  final String transactionExternalKey="wouf wouf";
+  invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),requestedAmount,new BigDecimal("1.0"),Currency.USD));
+  final Payment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),INVOICE_PAYMENT,callContext);
+  assertEquals(payment.getTransactions().size(),1);
+  assertEquals(payment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
+  assertEquals(payment.getTransactions().get(0).getTransactionType(),TransactionType.PURCHASE);
+  final List<PaymentAttemptModelDao> attempts=paymentDao.getPaymentAttempts(paymentExternalKey,internalCallContext);
+  assertEquals(attempts.size(),1);
+  final PaymentAttemptModelDao attempt=attempts.get(0);
+  assertEquals(attempt.getStateName(),"SUCCESS");
+  paymentDao.updatePaymentAttempt(attempt.getId(),attempt.getTransactionId(),"INIT",internalCallContext);
+  final PaymentAttemptModelDao attempt2=paymentDao.getPaymentAttempt(attempt.getId(),internalCallContext);
+  assertEquals(attempt2.getStateName(),"INIT");
+  clock.addDays(1);
+  try {
+    Thread.sleep(1500);
+  }
+ catch (  InterruptedException e) {
+  }
+  ;
+  final PaymentAttemptModelDao attempt3=paymentDao.getPaymentAttempt(attempt.getId(),internalCallContext);
+  assertEquals(attempt3.getStateName(),"SUCCESS");
+}

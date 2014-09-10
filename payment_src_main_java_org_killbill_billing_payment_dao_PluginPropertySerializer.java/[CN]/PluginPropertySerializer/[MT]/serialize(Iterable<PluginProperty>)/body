@@ -1,0 +1,22 @@
+{
+  final ByteArrayOutputStream out=new ByteArrayOutputStream(MAX_SIZE_PROPERTIES_BYTES);
+  try {
+    final JsonGenerator jsonGenerator=jsonFactory.createGenerator(out,JsonEncoding.UTF8);
+    jsonGenerator.writeStartArray();
+    for (    final PluginProperty cur : input) {
+      final String key=cur.getKey();
+      final Object value=cur.getValue();
+      jsonGenerator.writeStartObject();
+      jsonGenerator.writeFieldName(key);
+      mapper.writeValue(jsonGenerator,value);
+      jsonGenerator.writeEndObject();
+    }
+    jsonGenerator.writeEndArray();
+    jsonGenerator.close();
+    final byte[] data=out.toByteArray();
+    return LZFEncoder.encode(data);
+  }
+ catch (  final IOException e) {
+    throw new PluginPropertySerializerException(e);
+  }
+}

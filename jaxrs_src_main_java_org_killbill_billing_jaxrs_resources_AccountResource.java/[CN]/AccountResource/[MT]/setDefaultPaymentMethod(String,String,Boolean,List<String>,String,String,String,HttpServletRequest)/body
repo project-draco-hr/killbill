@@ -1,0 +1,13 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),callContext);
+  paymentApi.setDefaultPaymentMethod(account,UUID.fromString(paymentMethodId),pluginProperties,callContext);
+  if (payAllUnpaidInvoices) {
+    final Collection<Invoice> unpaidInvoices=invoiceApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext);
+    for (    final Invoice invoice : unpaidInvoices) {
+      createPurchaseForInvoice(account,invoice.getId(),invoice.getBalance(),false,callContext);
+    }
+  }
+  return Response.status(Status.OK).build();
+}

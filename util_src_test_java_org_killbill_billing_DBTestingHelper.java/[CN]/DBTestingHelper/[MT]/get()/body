@@ -1,22 +1,6 @@
 {
-  if (instance == null) {
-    if ("true".equals(System.getProperty("org.killbill.billing.dbi.test.h2"))) {
-      log.info("Using h2 as the embedded database");
-      instance=new H2EmbeddedDB();
-    }
- else {
-      if (isUsingLocalInstance()) {
-        log.info("Using MySQL local database");
-        final String databaseName=System.getProperty("org.killbill.billing.dbi.test.localDb.database","killbill");
-        final String username=System.getProperty("org.killbill.billing.dbi.test.localDb.password","root");
-        final String password=System.getProperty("org.killbill.billing.dbi.test.localDb.username","root");
-        instance=new MySQLStandaloneDB(databaseName,username,password);
-      }
- else {
-        log.info("Using MySQL as the embedded database");
-        instance=new MySQLEmbeddedDB();
-      }
-    }
+  if (dbTestingHelper == null) {
+    dbTestingHelper=new DBTestingHelper();
   }
-  return instance;
+  return dbTestingHelper;
 }

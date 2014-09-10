@@ -1,0 +1,32 @@
+{
+  final Payment payment=createAccountWithInvoiceAndPayment();
+  final InvoicePaymentTransaction input=new InvoicePaymentTransaction();
+  input.setPaymentId(payment.getPaymentId());
+  input.setAmount(new BigDecimal("50.00"));
+  int count=4;
+  while (count-- > 0) {
+    assertNotNull(killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment));
+  }
+  try {
+    killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment);
+    fail();
+  }
+ catch (  final KillBillClientException e) {
+  }
+  final List<InvoicePayment> payments=killBillClient.getInvoicePaymentsForAccount(payment.getAccountId());
+  final List<PaymentTransaction> transactions=getPaymentTransactions(payments,TransactionType.CHARGEBACK.toString());
+  Assert.assertEquals(transactions.size(),5);
+  int found=0;
+  for (  final PaymentTransaction transaction : transactions) {
+    if (transaction.getStatus().equals("SUCCESS")) {
+      assertTrue(transaction.getAmount().compareTo(input.getAmount()) == 0);
+      assertEquals(transaction.getPaymentId(),input.getPaymentId());
+      found++;
+    }
+ else {
+      assertEquals(transaction.getStatus(),"PAYMENT_FAILURE");
+      found++;
+    }
+  }
+  assertEquals(found,5);
+}

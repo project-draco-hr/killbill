@@ -1,0 +1,13 @@
+{
+  final BigDecimal requestedAmount=new BigDecimal("80.0091");
+  final Payment initialPayment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,account.getCurrency(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),ImmutableList.<PluginProperty>of(),callContext);
+  try {
+    paymentApi.createCapture(account,initialPayment.getId(),requestedAmount,Currency.AMD,UUID.randomUUID().toString(),ImmutableList.<PluginProperty>of(),callContext);
+    Assert.fail("Expected capture to fail...");
+  }
+ catch (  PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_PARAMETER.getCode());
+    final Payment latestPayment=paymentApi.getPayment(initialPayment.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
+    assertEquals(latestPayment,initialPayment);
+  }
+}
