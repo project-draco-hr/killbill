@@ -1,5 +1,8 @@
 {
-  isStopped=true;
+  if (isStopped) {
+    log.warn("Janitor is already in a stopped state");
+    return;
+  }
   try {
     janitorExecutor.shutdown();
     boolean success=janitorExecutor.awaitTermination(TERMINATION_TIMEOUT_SEC,TimeUnit.SECONDS);
@@ -10,5 +13,8 @@
  catch (  InterruptedException e) {
     Thread.currentThread().interrupt();
     log.warn("Janitor stop sequence got interrupted");
+  }
+ finally {
+    isStopped=true;
   }
 }
