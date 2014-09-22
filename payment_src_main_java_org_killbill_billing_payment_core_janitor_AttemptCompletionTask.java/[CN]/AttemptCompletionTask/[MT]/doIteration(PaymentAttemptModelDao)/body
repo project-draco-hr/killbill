@@ -1,7 +1,6 @@
 {
   final InternalTenantContext tenantContext=internalCallContextFactory.createInternalTenantContext(attempt.getAccountId(),attempt.getId(),ObjectType.PAYMENT_ATTEMPT);
-  final UUID tenantId=nonEntityDao.retrieveIdFromObject(tenantContext.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
-  final CallContext callContext=new DefaultCallContext(tenantId,"AttemptCompletionJanitorTask",CallOrigin.INTERNAL,UserType.SYSTEM,UUID.randomUUID(),clock);
+  final CallContext callContext=createCallContext("AttemptCompletionJanitorTask",tenantContext);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(attempt.getAccountId(),callContext);
   final List<PaymentTransactionModelDao> transactions=paymentDao.getPaymentTransactionsByExternalKey(attempt.getTransactionExternalKey(),tenantContext);
   final PaymentTransactionModelDao transaction=Iterables.tryFind(transactions,new Predicate<PaymentTransactionModelDao>(){
