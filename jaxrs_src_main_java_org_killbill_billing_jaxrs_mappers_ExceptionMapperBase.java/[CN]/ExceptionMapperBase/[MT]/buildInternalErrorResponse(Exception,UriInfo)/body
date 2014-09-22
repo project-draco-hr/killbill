@@ -1,4 +1,6 @@
 {
   log.warn("Internal error",e);
-  return buildInternalErrorResponse(exceptionToString(e),uriInfo);
+  final Response.ResponseBuilder responseBuilder=Response.status(Status.INTERNAL_SERVER_ERROR);
+  serializeException(e,responseBuilder);
+  return responseBuilder.build();
 }
