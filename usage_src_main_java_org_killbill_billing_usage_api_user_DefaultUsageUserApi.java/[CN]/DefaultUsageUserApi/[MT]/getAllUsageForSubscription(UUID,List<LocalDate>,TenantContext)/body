@@ -1,0 +1,14 @@
+{
+  final InternalTenantContext internalCallContext=internalCallContextFactory.createInternalTenantContext(subscriptionId,ObjectType.SUBSCRIPTION,tenantContext);
+  List<RolledUpUsage> result=new ArrayList<RolledUpUsage>();
+  LocalDate prevDate=null;
+  for (  LocalDate curDate : transitionTimes) {
+    if (prevDate != null) {
+      final List<RolledUpUsageModelDao> usageForSubscription=rolledUpUsageDao.getAllUsageForSubscription(subscriptionId,prevDate,curDate,internalCallContext);
+      final List<RolledUpUnit> rolledUpAmount=getRolledUpUnits(usageForSubscription);
+      result.add(new DefaultRolledUpUsage(subscriptionId,prevDate,curDate,rolledUpAmount));
+    }
+    prevDate=curDate;
+  }
+  return result;
+}

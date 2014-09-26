@@ -1,0 +1,9 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final LocalDate usageStartDate=LOCAL_DATE_FORMATTER.parseLocalDate(startDate);
+  final LocalDate usageEndDate=LOCAL_DATE_FORMATTER.parseLocalDate(endDate);
+  final List<LocalDate> startEndDate=ImmutableList.<LocalDate>builder().add(usageStartDate).add(usageEndDate).build();
+  final List<RolledUpUsage> usage=usageUserApi.getAllUsageForSubscription(UUID.fromString(subscriptionId),startEndDate,tenantContext);
+  final RolledUpUsageJson result=new RolledUpUsageJson(usage.get(0));
+  return Response.status(Status.OK).entity(result).build();
+}

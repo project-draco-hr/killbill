@@ -1,0 +1,13 @@
+{
+  final Map<String,Long> tmp=new HashMap<String,Long>();
+  for (  RolledUpUsageModelDao cur : usageForSubscription) {
+    Long currentAmount=tmp.get(cur.getUnitType());
+    Long updatedAmount=(currentAmount != null) ? currentAmount + cur.getAmount() : cur.getAmount();
+    tmp.put(cur.getUnitType(),updatedAmount);
+  }
+  final List<RolledUpUnit> result=new ArrayList<RolledUpUnit>(tmp.size());
+  for (  final String unitType : tmp.keySet()) {
+    result.add(new DefaultRolledUpUnit(unitType,tmp.get(unitType)));
+  }
+  return result;
+}

@@ -1,18 +1,20 @@
 {
   final UUID subscriptionId=UUID.randomUUID();
   final String unitType="foo";
-  final DateTime startDate=new DateTime(2013,1,1,0,0,DateTimeZone.UTC);
-  final DateTime endDate=new DateTime(2013,2,1,0,0,DateTimeZone.UTC);
-  final BigDecimal amount1=BigDecimal.TEN;
-  final BigDecimal amount2=BigDecimal.TEN;
-  rolledUpUsageDao.record(subscriptionId,unitType,startDate,endDate,amount1,internalCallContext);
-  rolledUpUsageDao.record(subscriptionId,unitType,startDate,endDate,amount2,internalCallContext);
-  final RolledUpUsageModelDao result=rolledUpUsageDao.getUsageForSubscription(subscriptionId,startDate,endDate,unitType,internalCallContext);
-  assertEquals(result.getSubscriptionId(),subscriptionId);
-  assertEquals(result.getStartTime().compareTo(startDate),0);
-  assertEquals(result.getEndTime().compareTo(endDate),0);
-  assertEquals(result.getUnitType(),unitType);
-  assertEquals(result.getSubscriptionId(),subscriptionId);
-  assertEquals(result.getSubscriptionId(),subscriptionId);
-  assertEquals(result.getAmount().compareTo(amount1.add(amount2)),0);
+  final LocalDate startDate=new LocalDate(2013,1,1);
+  final LocalDate endDate=new LocalDate(2013,2,1);
+  final Long amount1=10L;
+  final Long amount2=5L;
+  rolledUpUsageDao.record(subscriptionId,unitType,startDate,amount1,internalCallContext);
+  rolledUpUsageDao.record(subscriptionId,unitType,endDate.minusDays(1),amount2,internalCallContext);
+  final List<RolledUpUsageModelDao> result=rolledUpUsageDao.getUsageForSubscription(subscriptionId,startDate,endDate,unitType,internalCallContext);
+  assertEquals(result.size(),2);
+  assertEquals(result.get(0).getSubscriptionId(),subscriptionId);
+  assertEquals(result.get(0).getRecordDate().compareTo(startDate),0);
+  assertEquals(result.get(0).getUnitType(),unitType);
+  assertEquals(result.get(0).getAmount().compareTo(amount1),0);
+  assertEquals(result.get(1).getSubscriptionId(),subscriptionId);
+  assertEquals(result.get(1).getRecordDate().compareTo(endDate.minusDays(1)),0);
+  assertEquals(result.get(1).getUnitType(),unitType);
+  assertEquals(result.get(1).getAmount().compareTo(amount2),0);
 }
