@@ -1,0 +1,8 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<PaymentModelDao>>(){
+    @Override public List<PaymentModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      return entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).getPaymentsByStates(ImmutableList.copyOf(states),createdBeforeDate.toDate(),createdAfterDate.toDate(),context,limit);
+    }
+  }
+);
+}

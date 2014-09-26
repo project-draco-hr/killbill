@@ -1,4 +1,6 @@
 {
   log.warn("Authorization error",e);
-  return buildAuthorizationErrorResponse(exceptionToString(e),uriInfo);
+  final Response.ResponseBuilder responseBuilder=Response.status(Status.UNAUTHORIZED);
+  serializeException(e,responseBuilder);
+  return responseBuilder.build();
 }

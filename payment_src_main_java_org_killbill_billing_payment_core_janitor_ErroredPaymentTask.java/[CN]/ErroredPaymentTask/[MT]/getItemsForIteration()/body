@@ -1,0 +1,7 @@
+{
+  int delayBeforeNow=(int)paymentConfig.getPaymentPluginTimeout().getMillis() + SAFETY_DELAY_MS;
+  final DateTime createdBeforeDate=clock.getUTCNow().minusMillis(delayBeforeNow);
+  final DateTime createdAfterDate=clock.getUTCNow().minusDays(OLDER_PAYMENTS_IN_DAYS);
+  final List<PaymentModelDao> result=paymentDao.getPaymentsByStates(paymentStateMachineHelper.getErroredStateNames(),createdBeforeDate,createdAfterDate,MAX_ITEMS_PER_LOOP,completionTaskCallContext);
+  return result;
+}

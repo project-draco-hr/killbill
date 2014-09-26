@@ -1,0 +1,52 @@
+{
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(item.getAccountId(),item.getId(),ObjectType.PAYMENT);
+  final CallContext callContext=createCallContext("ErroredPaymentTask",internalTenantContext);
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(item.getAccountId(),callContext);
+  final List<PaymentTransactionModelDao> transactions=paymentDao.getTransactionsForPayment(item.getId(),internalTenantContext);
+  Preconditions.checkState(!transactions.isEmpty(),"Janitor ErroredPaymentTask found item " + item.getId() + " with no transactions, skipping");
+  final PaymentTransactionModelDao unknownTransaction=transactions.get(transactions.size() - 1);
+  if (unknownTransaction.getTransactionStatus() != TransactionStatus.UNKNOWN) {
+    return;
+  }
+  final PaymentMethodModelDao paymentMethod=paymentDao.getPaymentMethod(item.getPaymentMethodId(),internalCallContext);
+  final PaymentPluginApi paymentPluginApi=getPaymentPluginApi(item,paymentMethod.getPluginName());
+  PaymentTransactionInfoPlugin pluginErroredTransaction=null;
+  try {
+    final List<PaymentTransactionInfoPlugin> result=paymentPluginApi.getPaymentInfo(item.getAccountId(),item.getId(),ImmutableList.<PluginProperty>of(),callContext);
+    pluginErroredTransaction=Iterables.tryFind(result,new Predicate<PaymentTransactionInfoPlugin>(){
+      @Override public boolean apply(      @Nullable final PaymentTransactionInfoPlugin input){
+        return input.getKbTransactionPaymentId().equals(unknownTransaction.getId());
+      }
+    }
+).orNull();
+  }
+ catch (  PaymentPluginApiException ignored) {
+  }
+  final TransactionStatus transactionStatus=PaymentEnteringStateCallback.paymentPluginStatusToTransactionStatus(pluginErroredTransaction);
+  if (transactionStatus == unknownTransaction.getTransactionStatus()) {
+    return;
+  }
+  final String newPaymentState;
+switch (transactionStatus) {
+case PENDING:
+    newPaymentState=paymentStateMachineHelper.getPendingStateForTransaction(unknownTransaction.getTransactionType());
+  break;
+case SUCCESS:
+newPaymentState=paymentStateMachineHelper.getSuccessfulStateForTransaction(unknownTransaction.getTransactionType());
+break;
+case PAYMENT_FAILURE:
+newPaymentState=paymentStateMachineHelper.getFailureStateForTransaction(unknownTransaction.getTransactionType());
+break;
+case PLUGIN_FAILURE:
+case UNKNOWN:
+default :
+newPaymentState=paymentStateMachineHelper.getErroredStateForTransaction(unknownTransaction.getTransactionType());
+break;
+}
+final String lastSuccessPaymentState=paymentStateMachineHelper.isSuccessState(newPaymentState) ? newPaymentState : null;
+final BigDecimal processedAmount=pluginErroredTransaction != null ? pluginErroredTransaction.getAmount() : null;
+final Currency processedCurrency=pluginErroredTransaction != null ? pluginErroredTransaction.getCurrency() : null;
+final String gatewayErrorCode=pluginErroredTransaction != null ? pluginErroredTransaction.getGatewayErrorCode() : null;
+final String gatewayError=pluginErroredTransaction != null ? pluginErroredTransaction.getGatewayError() : null;
+paymentDao.updatePaymentAndTransactionOnCompletion(item.getAccountId(),item.getId(),unknownTransaction.getTransactionType(),newPaymentState,lastSuccessPaymentState,unknownTransaction.getId(),transactionStatus,processedAmount,processedCurrency,gatewayErrorCode,gatewayError,internalCallContext);
+}

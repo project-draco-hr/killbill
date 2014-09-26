@@ -1,4 +1,6 @@
 {
   log.warn("Bad request",e);
-  return buildBadRequestResponse(exceptionToString(e),uriInfo);
+  final Response.ResponseBuilder responseBuilder=Response.status(Status.BAD_REQUEST);
+  serializeException(e,responseBuilder);
+  return responseBuilder.build();
 }

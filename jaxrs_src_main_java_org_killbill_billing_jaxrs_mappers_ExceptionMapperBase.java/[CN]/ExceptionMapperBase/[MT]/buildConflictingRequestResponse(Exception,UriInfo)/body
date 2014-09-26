@@ -1,4 +1,6 @@
 {
   log.warn("Conflicting request",e);
-  return buildConflictingRequestResponse(exceptionToString(e),uriInfo);
+  final Response.ResponseBuilder responseBuilder=Response.status(Status.CONFLICT);
+  serializeException(e,responseBuilder);
+  return responseBuilder.build();
 }

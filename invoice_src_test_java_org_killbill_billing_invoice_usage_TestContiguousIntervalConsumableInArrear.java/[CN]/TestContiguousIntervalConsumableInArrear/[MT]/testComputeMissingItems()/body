@@ -2,10 +2,14 @@
   final LocalDate startDate=new LocalDate(2014,03,20);
   final LocalDate firstBCDDate=new LocalDate(2014,04,15);
   final LocalDate endDate=new LocalDate(2014,05,15);
-  final RolledUpUsage usage1=new DefaultRolledUpUsage(subscriptionId,"unit",startDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),firstBCDDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),new BigDecimal("130"));
-  final RolledUpUsage usage2=new DefaultRolledUpUsage(subscriptionId,"unit",startDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),firstBCDDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),new BigDecimal("271"));
-  final RolledUpUsage usage3=new DefaultRolledUpUsage(subscriptionId,"unit",firstBCDDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),endDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),new BigDecimal("199"));
-  final List<RolledUpUsage> usages=ImmutableList.<RolledUpUsage>builder().add(usage1).add(usage2).add(usage3).build();
+  final List<RolledUpUnit> units1=new ArrayList<RolledUpUnit>();
+  units1.add(createRolledUpUnit("unit",130L));
+  units1.add(createRolledUpUnit("unit",271L));
+  final RolledUpUsage usage1=new DefaultRolledUpUsage(subscriptionId,startDate,firstBCDDate,units1);
+  final List<RolledUpUnit> units2=new ArrayList<RolledUpUnit>();
+  units2.add(createRolledUpUnit("unit",199L));
+  final RolledUpUsage usage3=new DefaultRolledUpUsage(subscriptionId,firstBCDDate,endDate,units2);
+  final List<RolledUpUsage> usages=ImmutableList.<RolledUpUsage>builder().add(usage1).add(usage3).build();
   this.mockUsageUserApi=createMockUsageUserApi(usages);
   final DefaultTieredBlock block=createDefaultTieredBlock("unit",100,10,BigDecimal.ONE);
   final DefaultTier tier=createDefaultTier(block);

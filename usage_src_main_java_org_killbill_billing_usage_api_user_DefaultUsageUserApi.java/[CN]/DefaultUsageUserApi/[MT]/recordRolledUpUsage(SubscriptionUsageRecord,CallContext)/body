@@ -1,0 +1,8 @@
+{
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(record.getSubscriptionId(),ObjectType.SUBSCRIPTION,callContext);
+  for (  UnitUsageRecord unitUsageRecord : record.getPerUnitUsage()) {
+    for (    UsageRecord usageRecord : unitUsageRecord.getDailyAmount()) {
+      rolledUpUsageDao.record(record.getSubscriptionId(),unitUsageRecord.getUnitType(),usageRecord.getDate(),usageRecord.getAmount(),internalCallContext);
+    }
+  }
+}

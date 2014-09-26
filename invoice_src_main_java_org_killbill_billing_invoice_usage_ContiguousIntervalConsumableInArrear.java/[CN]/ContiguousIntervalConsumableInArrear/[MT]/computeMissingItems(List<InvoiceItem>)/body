@@ -1,19 +1,25 @@
 {
   Preconditions.checkState(isBuilt.get());
   final List<InvoiceItem> result=Lists.newLinkedList();
-  final RolledUpUsageForUnitTypesFactory factory=new RolledUpUsageForUnitTypesFactory(getRolledUpUsage(),unitTypes,getAccountTimeZone());
-  for (  RolledUpUsageForUnitTypes ru : factory.getOrderedRolledUpUsageForUnitTypes()) {
+  final List<RolledUpUsage> allUsage=getRolledUpUsage();
+  for (  final RolledUpUsage ru : allUsage) {
     BigDecimal toBeBilledUsage=BigDecimal.ZERO;
-    for (    final String unitType : unitTypes) {
-      final BigDecimal usageAmountForUnitType=ru.getUsageAmountForUnitType(unitType);
-      final BigDecimal toBeBilledForUnit=computeToBeBilledUsage(usageAmountForUnitType,unitType);
+    for (    final RolledUpUnit cur : ru.getRolledUpUnit()) {
+      if (!unitTypes.contains(cur.getUnitType())) {
+        log.warn("ContiguousIntervalConsumableInArrear is skipping unitType " + cur.getUnitType());
+        continue;
+      }
+      final BigDecimal toBeBilledForUnit=computeToBeBilledUsage(cur.getAmount(),cur.getUnitType());
       toBeBilledUsage=toBeBilledUsage.add(toBeBilledForUnit);
     }
-    final Iterable<InvoiceItem> billedItems=getBilledItems(ru.getStartDate(),ru.getEndDate(),existingUsage);
+    final Iterable<InvoiceItem> billedItems=getBilledItems(ru.getStart(),ru.getEnd(),existingUsage);
     final BigDecimal billedUsage=computeBilledUsage(billedItems);
     if (!billedItems.iterator().hasNext() || billedUsage.compareTo(toBeBilledUsage) < 0) {
-      InvoiceItem item=new UsageInvoiceItem(invoiceId,getAccountId(),getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),usage.getName(),ru.getStartDate(),ru.getEndDate(),toBeBilledUsage.subtract(billedUsage),getCurrency());
-      result.add(item);
+      final BigDecimal amountToBill=toBeBilledUsage.subtract(billedUsage);
+      if (amountToBill.compareTo(BigDecimal.ZERO) > 0 || insertZeroAmountItems) {
+        InvoiceItem item=new UsageInvoiceItem(invoiceId,getAccountId(),getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),usage.getName(),ru.getStart(),ru.getEnd(),amountToBill,getCurrency());
+        result.add(item);
+      }
     }
   }
   return result;

@@ -1,0 +1,10 @@
+{
+  Preconditions.checkNotNull(json.getSubscriptionId());
+  Preconditions.checkNotNull(json.getUnitUsageRecords());
+  Preconditions.checkArgument(!json.getUnitUsageRecords().isEmpty());
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  entitlementApi.getEntitlementForId(UUID.fromString(json.getSubscriptionId()),callContext);
+  final SubscriptionUsageRecord record=json.toSubscriptionUsageRecord();
+  usageUserApi.recordRolledUpUsage(record,callContext);
+  return Response.status(Status.CREATED).build();
+}

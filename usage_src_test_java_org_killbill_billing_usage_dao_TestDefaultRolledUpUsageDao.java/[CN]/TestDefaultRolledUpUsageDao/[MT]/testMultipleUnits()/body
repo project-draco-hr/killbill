@@ -1,0 +1,27 @@
+{
+  final UUID subscriptionId=UUID.randomUUID();
+  final String unitType1="foo";
+  final String unitType2="bar";
+  final LocalDate startDate=new LocalDate(2013,1,1);
+  final LocalDate endDate=new LocalDate(2013,2,1);
+  final Long amount1=10L;
+  final Long amount2=5L;
+  final Long amount3=13L;
+  rolledUpUsageDao.record(subscriptionId,unitType1,startDate,amount1,internalCallContext);
+  rolledUpUsageDao.record(subscriptionId,unitType1,startDate.plusDays(1),amount2,internalCallContext);
+  rolledUpUsageDao.record(subscriptionId,unitType2,endDate.minusDays(1),amount3,internalCallContext);
+  final List<RolledUpUsageModelDao> result=rolledUpUsageDao.getAllUsageForSubscription(subscriptionId,startDate,endDate,internalCallContext);
+  assertEquals(result.size(),3);
+  assertEquals(result.get(0).getSubscriptionId(),subscriptionId);
+  assertEquals(result.get(0).getRecordDate().compareTo(startDate),0);
+  assertEquals(result.get(0).getUnitType(),unitType1);
+  assertEquals(result.get(0).getAmount().compareTo(amount1),0);
+  assertEquals(result.get(1).getSubscriptionId(),subscriptionId);
+  assertEquals(result.get(1).getRecordDate().compareTo(startDate.plusDays(1)),0);
+  assertEquals(result.get(1).getUnitType(),unitType1);
+  assertEquals(result.get(1).getAmount().compareTo(amount2),0);
+  assertEquals(result.get(2).getSubscriptionId(),subscriptionId);
+  assertEquals(result.get(2).getRecordDate().compareTo(endDate.minusDays(1)),0);
+  assertEquals(result.get(2).getUnitType(),unitType2);
+  assertEquals(result.get(2).getAmount().compareTo(amount3),0);
+}
