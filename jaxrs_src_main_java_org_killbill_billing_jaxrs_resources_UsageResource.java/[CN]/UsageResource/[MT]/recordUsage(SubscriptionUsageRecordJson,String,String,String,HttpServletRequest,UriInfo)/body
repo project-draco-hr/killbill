@@ -3,7 +3,10 @@
   Preconditions.checkNotNull(json.getUnitUsageRecords());
   Preconditions.checkArgument(!json.getUnitUsageRecords().isEmpty());
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  entitlementApi.getEntitlementForId(UUID.fromString(json.getSubscriptionId()),callContext);
+  final Entitlement entitlement=entitlementApi.getEntitlementForId(UUID.fromString(json.getSubscriptionId()),callContext);
+  if (entitlement.getState() != EntitlementState.ACTIVE) {
+    return Response.status(Status.BAD_REQUEST).build();
+  }
   final SubscriptionUsageRecord record=json.toSubscriptionUsageRecord();
   usageUserApi.recordRolledUpUsage(record,callContext);
   return Response.status(Status.CREATED).build();
