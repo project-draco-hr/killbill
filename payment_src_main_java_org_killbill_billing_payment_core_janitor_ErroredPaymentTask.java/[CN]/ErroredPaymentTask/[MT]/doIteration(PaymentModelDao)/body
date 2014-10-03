@@ -48,5 +48,6 @@ final BigDecimal processedAmount=pluginErroredTransaction != null ? pluginErrore
 final Currency processedCurrency=pluginErroredTransaction != null ? pluginErroredTransaction.getCurrency() : null;
 final String gatewayErrorCode=pluginErroredTransaction != null ? pluginErroredTransaction.getGatewayErrorCode() : null;
 final String gatewayError=pluginErroredTransaction != null ? pluginErroredTransaction.getGatewayError() : null;
+log.info("Janitor ErroredPaymentTask repairing payment {}, transaction {}",item.getId(),unknownTransaction.getId());
 paymentDao.updatePaymentAndTransactionOnCompletion(item.getAccountId(),item.getId(),unknownTransaction.getTransactionType(),newPaymentState,lastSuccessPaymentState,unknownTransaction.getId(),transactionStatus,processedAmount,processedCurrency,gatewayErrorCode,gatewayError,internalCallContext);
 }
