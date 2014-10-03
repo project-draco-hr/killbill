@@ -1,0 +1,17 @@
+{
+  final PreparedStatement stmt=connection.prepareStatement("select * from full_of_dates");
+  try {
+    final ResultSet rs=stmt.executeQuery();
+    rs.next();
+    final String dateString=rs.getString(2);
+    final LocalDate d1=new LocalDate(dateString,DateTimeZone.UTC);
+    final Timestamp t2=rs.getTimestamp(3);
+    final DateTime d2=new DateTime(t2.getTime(),DateTimeZone.UTC);
+    return new FullOfDates(d1,d2,null);
+  }
+  finally {
+    if (stmt != null) {
+      stmt.close();
+    }
+  }
+}

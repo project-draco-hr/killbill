@@ -1,0 +1,18 @@
+{
+  final PreparedStatement stmt=connection.prepareStatement("insert into full_of_dates (date1, datetime1, timestamp1) VALUES (?, ?, ?)");
+  try {
+    if (date1 != null) {
+      stmt.setString(1,date1.toString());
+    }
+    if (date2 != null) {
+      stmt.setTimestamp(2,new Timestamp(date2.toDate().getTime()));
+    }
+    stmt.setTimestamp(3,new Timestamp(new DateTime().toDate().getTime()));
+    stmt.execute();
+  }
+  finally {
+    if (stmt != null) {
+      stmt.close();
+    }
+  }
+}
