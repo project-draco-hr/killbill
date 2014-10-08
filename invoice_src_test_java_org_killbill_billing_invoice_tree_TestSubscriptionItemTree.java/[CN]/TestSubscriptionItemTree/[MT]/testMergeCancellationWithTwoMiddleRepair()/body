@@ -7,7 +7,7 @@
   final LocalDate endDate=new LocalDate(2014,2,1);
   final BigDecimal monthlyRate=new BigDecimal("12.00");
   final BigDecimal monthlyAmount=monthlyRate;
-  final SubscriptionItemTree tree=new SubscriptionItemTree(subscriptionId);
+  final SubscriptionItemTree tree=new SubscriptionItemTree(subscriptionId,invoiceId);
   final InvoiceItem monthly=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,monthlyAmount,monthlyRate,currency);
   tree.addItem(monthly);
   tree.flatten(true);
@@ -24,7 +24,7 @@
   expectedResult.add(repair1);
   expectedResult.add(repair2);
   verifyResult(tree.getView(),expectedResult);
-  final SubscriptionItemTree treeAgain=new SubscriptionItemTree(subscriptionId);
+  final SubscriptionItemTree treeAgain=new SubscriptionItemTree(subscriptionId,invoiceId);
   final InvoiceItem monthlyAgain=new RecurringInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,startDate,endDate,monthlyAmount,monthlyRate,currency);
   treeAgain.addItem(monthlyAgain);
   treeAgain.flatten(true);

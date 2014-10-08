@@ -17,13 +17,15 @@
   ImmutableList<ExpectedInvoiceItemCheck> toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2013,8,18),new LocalDate(2014,8,18),InvoiceItemType.RECURRING,new BigDecimal("2399.95")));
   invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,toBeChecked);
   clock.addDays(30);
-  busHandler.pushExpectedEvents(NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.INVOICE_ADJUSTMENT);
+  busHandler.pushExpectedEvents(NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.INVOICE);
   bpEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.IMMEDIATE,BillingActionPolicy.IMMEDIATE,callContext);
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
-  assertEquals(invoices.size(),2);
-  toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2013,8,18),new LocalDate(2014,8,18),InvoiceItemType.RECURRING,new BigDecimal("2399.95")),new ExpectedInvoiceItemCheck(new LocalDate(2013,9,17),new LocalDate(2014,8,18),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-2202.69")),new ExpectedInvoiceItemCheck(new LocalDate(2013,9,17),new LocalDate(2013,9,17),InvoiceItemType.CBA_ADJ,new BigDecimal("2202.69")));
+  assertEquals(invoices.size(),3);
+  toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2013,8,18),new LocalDate(2014,8,18),InvoiceItemType.RECURRING,new BigDecimal("2399.95")));
   invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,toBeChecked);
+  toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2013,9,17),new LocalDate(2014,8,18),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-2202.69")),new ExpectedInvoiceItemCheck(new LocalDate(2013,9,17),new LocalDate(2013,9,17),InvoiceItemType.CBA_ADJ,new BigDecimal("2202.69")));
+  invoiceChecker.checkInvoice(invoices.get(2).getId(),callContext,toBeChecked);
   final Invoice invoice1=invoices.get(1);
   final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
   final ExpectedPaymentCheck expectedPaymentCheck=new ExpectedPaymentCheck(clock.getUTCNow().toLocalDate(),new BigDecimal("2399.95"),TransactionStatus.SUCCESS,invoice1.getId(),Currency.USD);
