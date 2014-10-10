@@ -1,0 +1,9 @@
+{
+  return transactionalSqlDao.execute(InvoiceApiException.class,new EntitySqlDaoTransactionWrapper<InvoiceItemModelDao>(){
+    @Override public InvoiceItemModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceItemModelDao cbaNewItem=cbaDao.computeCBAComplexity(invoice,entitySqlDaoWrapperFactory,context);
+      return cbaNewItem;
+    }
+  }
+);
+}

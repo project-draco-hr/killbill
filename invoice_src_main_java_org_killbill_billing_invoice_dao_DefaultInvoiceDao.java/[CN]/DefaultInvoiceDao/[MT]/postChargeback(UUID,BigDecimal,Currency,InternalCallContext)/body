@@ -29,7 +29,7 @@
       final InvoicePaymentModelDao chargeBack=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.CHARGED_BACK,payment.getInvoiceId(),payment.getPaymentId(),context.getCreatedDate(),requestedChargedBackAmount.negate(),payment.getCurrency(),payment.getProcessedCurrency(),null,payment.getId());
       transactional.create(chargeBack,context);
       final UUID accountId=transactional.getAccountIdFromInvoicePaymentId(chargeBack.getId().toString(),context);
-      cbaDao.doCBAComplexity(accountId,entitySqlDaoWrapperFactory,context);
+      cbaDao.addCBAComplexityFromTransaction(payment.getInvoiceId(),entitySqlDaoWrapperFactory,context);
       notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,payment.getInvoiceId(),accountId,context.getUserToken(),context);
       return chargeBack;
     }
