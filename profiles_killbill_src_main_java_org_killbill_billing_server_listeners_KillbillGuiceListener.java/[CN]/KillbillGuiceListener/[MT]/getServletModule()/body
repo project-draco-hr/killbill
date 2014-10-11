@@ -1,7 +1,8 @@
 {
-  final BaseServerModuleBuilder builder=new BaseServerModuleBuilder().setJaxrsUriPattern("(" + JaxRsResourceBase.PREFIX + "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*").addJaxrsResource("org.killbill.billing.jaxrs.mappers").addJaxrsResource("org.killbill.billing.jaxrs.resources");
+  final BaseServerModuleBuilder builder=new BaseServerModuleBuilder().setJaxrsUriPattern("/" + SWAGGER_PATH + "|((/"+ SWAGGER_PATH+ "|"+ JaxRsResourceBase.PREFIX+ "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*)").addJaxrsResource("org.killbill.billing.jaxrs.mappers").addJaxrsResource("org.killbill.billing.jaxrs.resources").addJaxrsResource("com.wordnik.swagger.jersey.listing");
   builder.addJerseyFilter("com.sun.jersey.api.container.filter.LoggingFilter");
   builder.addJerseyFilter(ProfilingContainerResponseFilter.class.getName());
+  builder.addFilter("/" + SWAGGER_PATH + "*",ResponseCorsFilter.class);
   if (config.isMultiTenancyEnabled()) {
     builder.addFilter("/*",TenantFilter.class);
   }
