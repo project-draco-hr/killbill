@@ -3,6 +3,6 @@
   final UUID transactionId=paymentStateContext.getCurrentTransaction() != null ? paymentStateContext.getCurrentTransaction().getId() : null;
   retryablePaymentAutomatonRunner.paymentDao.updatePaymentAttempt(attempt.getId(),transactionId,state.getName(),paymentStateContext.internalCallContext);
   if ("RETRIED".equals(state.getName())) {
-    retryServiceScheduler.scheduleRetry(ObjectType.PAYMENT_ATTEMPT,attempt.getId(),attempt.getId(),paymentStateContext.getPluginName(),paymentStateContext.getRetryDate());
+    retryServiceScheduler.scheduleRetry(ObjectType.PAYMENT_ATTEMPT,attempt.getId(),attempt.getId(),paymentStateContext.getPaymentControlPluginNames(),paymentStateContext.getRetryDate());
   }
 }
