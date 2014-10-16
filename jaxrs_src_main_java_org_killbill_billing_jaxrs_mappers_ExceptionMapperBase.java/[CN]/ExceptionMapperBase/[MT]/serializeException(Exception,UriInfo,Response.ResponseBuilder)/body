@@ -1,10 +1,11 @@
 {
-  final BillingExceptionJson billingExceptionJson=new BillingExceptionJson(e);
+  final boolean withStackTrace=uriInfo.getQueryParameters() != null && "true".equals(uriInfo.getQueryParameters().getFirst(QUERY_WITH_STACK_TRACE));
+  final BillingExceptionJson billingExceptionJson=new BillingExceptionJson(e,withStackTrace);
   try {
     final String billingExceptionJsonAsString=mapper.writeValueAsString(billingExceptionJson);
     responseBuilder.entity(billingExceptionJsonAsString).type(MediaType.APPLICATION_JSON);
   }
- catch (  JsonProcessingException jsonException) {
+ catch (  final JsonProcessingException jsonException) {
     log.warn("Unable to serialize exception",jsonException);
     responseBuilder.entity(e.toString()).type(MediaType.TEXT_PLAIN_TYPE);
   }
