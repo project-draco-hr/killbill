@@ -1,6 +1,6 @@
 {
-  Preconditions.checkNotNull(json.getSubscriptionId());
-  Preconditions.checkNotNull(json.getUnitUsageRecords());
+  verifyNonNullOrEmpty(json,"SubscriptionUsageRecordJson body should be specified");
+  verifyNonNullOrEmpty(json.getSubscriptionId(),"SubscriptionUsageRecordJson subscriptionId needs to be set",json.getUnitUsageRecords(),"SubscriptionUsageRecordJson unitUsageRecords needs to be set");
   Preconditions.checkArgument(!json.getUnitUsageRecords().isEmpty());
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final Entitlement entitlement=entitlementApi.getEntitlementForId(UUID.fromString(json.getSubscriptionId()),callContext);

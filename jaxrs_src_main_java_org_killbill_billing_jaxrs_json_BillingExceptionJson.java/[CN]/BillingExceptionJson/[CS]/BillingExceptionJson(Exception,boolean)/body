@@ -1,0 +1,8 @@
+{
+  this(exception.getClass().getName(),exception instanceof BillingExceptionBase ? ((BillingExceptionBase)exception).getCode() : null,exception.getLocalizedMessage(),exception.getCause() == null ? null : exception.getCause().getClass().getName(),exception.getCause() == null ? null : exception.getCause().getLocalizedMessage(),!withStackTrace ? ImmutableList.<StackTraceElementJson>of() : Lists.<StackTraceElement,StackTraceElementJson>transform(ImmutableList.<StackTraceElement>copyOf(exception.getStackTrace()),new Function<StackTraceElement,StackTraceElementJson>(){
+    @Override public StackTraceElementJson apply(    final StackTraceElement input){
+      return new StackTraceElementJson(input.getClassName(),input.getFileName(),input.getLineNumber(),input.getMethodName(),input.isNativeMethod());
+    }
+  }
+));
+}

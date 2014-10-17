@@ -1,6 +1,6 @@
 {
-  Preconditions.checkNotNull(json.getName(),String.format("TagDefinition name needs to be set"));
-  Preconditions.checkNotNull(json.getDescription(),String.format("TagDefinition description needs to be set"));
+  verifyNonNullOrEmpty(json,"TagDefinitionJson body should be specified");
+  verifyNonNullOrEmpty(json.getName(),"TagDefinition name needs to be set",json.getDescription(),"TagDefinition description needs to be set");
   final TagDefinition createdTagDef=tagUserApi.createTagDefinition(json.getName(),json.getDescription(),context.createContext(createdBy,reason,comment,request));
   return uriBuilder.buildResponse(uriInfo,TagDefinitionResource.class,"getTagDefinition",createdTagDef.getId());
 }
