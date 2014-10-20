@@ -1,4 +1,6 @@
 {
+  verifyNonNullOrEmpty(json,"TenantJson body should be specified");
+  verifyNonNullOrEmpty(json.getApiKey(),"TenantJson apiKey needs to be set",json.getApiSecret(),"TenantJson apiSecret needs to be set");
   final TenantData data=json.toTenantData();
   final Tenant tenant=tenantApi.createTenant(data,context.createContext(createdBy,reason,comment,request));
   return uriBuilder.buildResponse(uriInfo,TenantResource.class,"getTenant",tenant.getId());

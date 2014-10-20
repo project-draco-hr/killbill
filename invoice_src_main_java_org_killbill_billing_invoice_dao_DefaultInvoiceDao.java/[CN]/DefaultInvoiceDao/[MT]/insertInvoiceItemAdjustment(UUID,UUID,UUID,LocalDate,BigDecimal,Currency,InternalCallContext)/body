@@ -3,7 +3,7 @@
     @Override public InvoiceItemModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
       final InvoiceItemModelDao invoiceItemAdjustment=invoiceDaoHelper.createAdjustmentItem(entitySqlDaoWrapperFactory,invoiceId,invoiceItemId,positiveAdjAmount,currency,effectiveDate,context);
       invoiceDaoHelper.insertItem(entitySqlDaoWrapperFactory,invoiceItemAdjustment,context);
-      cbaDao.doCBAComplexity(accountId,entitySqlDaoWrapperFactory,context);
+      cbaDao.addCBAComplexityFromTransaction(invoiceId,entitySqlDaoWrapperFactory,context);
       notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,invoiceId,accountId,context.getUserToken(),context);
       return invoiceItemAdjustment;
     }

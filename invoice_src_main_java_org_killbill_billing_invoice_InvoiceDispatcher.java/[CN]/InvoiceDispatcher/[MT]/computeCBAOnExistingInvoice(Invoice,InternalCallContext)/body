@@ -1,0 +1,12 @@
+{
+  final InvoiceModelDao invoiceModelDao=new InvoiceModelDao(invoice);
+  final List<InvoiceItemModelDao> invoiceItemModelDaos=ImmutableList.copyOf(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,InvoiceItemModelDao>(){
+    @Override public InvoiceItemModelDao apply(    final InvoiceItem input){
+      return new InvoiceItemModelDao(input);
+    }
+  }
+));
+  invoiceModelDao.addInvoiceItems(invoiceItemModelDaos);
+  final InvoiceItemModelDao cbaItem=invoiceDao.doCBAComplexity(invoiceModelDao,context);
+  return cbaItem != null ? InvoiceItemFactory.fromModelDao(cbaItem) : null;
+}

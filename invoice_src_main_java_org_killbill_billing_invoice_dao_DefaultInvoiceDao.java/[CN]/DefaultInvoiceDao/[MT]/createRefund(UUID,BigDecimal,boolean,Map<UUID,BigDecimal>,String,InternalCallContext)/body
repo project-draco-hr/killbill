@@ -23,12 +23,8 @@
       final InvoicePaymentModelDao refund=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.REFUND,payment.getInvoiceId(),paymentId,context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),payment.getProcessedCurrency(),transactionExternalKey,payment.getId());
       transactional.create(refund,context);
       final InvoiceModelDao invoice=transInvoiceDao.getById(payment.getInvoiceId().toString(),context);
-      if (invoice != null) {
-        invoiceDaoHelper.populateChildren(invoice,entitySqlDaoWrapperFactory,context);
-      }
- else {
-        throw new IllegalStateException("Invoice shouldn't be null for payment " + payment.getId());
-      }
+      Preconditions.checkState(invoice != null,"Invoice shouldn't be null for payment " + payment.getId());
+      invoiceDaoHelper.populateChildren(invoice,entitySqlDaoWrapperFactory,context);
       final BigDecimal invoiceBalanceAfterRefund=InvoiceModelDaoHelper.getBalance(invoice);
       final InvoiceItemSqlDao transInvoiceItemDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
       if (isInvoiceAdjusted && !isInvoiceItemAdjusted) {
@@ -37,6 +33,7 @@
         if (requestedPositiveAmountToAdjust.compareTo(BigDecimal.ZERO) > 0) {
           final InvoiceItemModelDao adjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.REFUND_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,null,null,context.getCreatedDate().toLocalDate(),null,requestedPositiveAmountToAdjust.negate(),null,invoice.getCurrency(),null);
           transInvoiceItemDao.create(adjItem,context);
+          invoice.addInvoiceItem(adjItem);
         }
       }
  else       if (isInvoiceAdjusted) {
@@ -44,9 +41,10 @@
           final BigDecimal adjAmount=invoiceItemIdsWithAmounts.get(invoiceItemId);
           final InvoiceItemModelDao item=invoiceDaoHelper.createAdjustmentItem(entitySqlDaoWrapperFactory,invoice.getId(),invoiceItemId,adjAmount,invoice.getCurrency(),context.getCreatedDate().toLocalDate(),context);
           transInvoiceItemDao.create(item,context);
+          invoice.addInvoiceItem(item);
         }
       }
-      cbaDao.doCBAComplexity(invoice.getAccountId(),entitySqlDaoWrapperFactory,context);
+      cbaDao.addCBAComplexityFromTransaction(invoice,entitySqlDaoWrapperFactory,context);
       notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,invoice.getId(),invoice.getAccountId(),context.getUserToken(),context);
       return refund;
     }

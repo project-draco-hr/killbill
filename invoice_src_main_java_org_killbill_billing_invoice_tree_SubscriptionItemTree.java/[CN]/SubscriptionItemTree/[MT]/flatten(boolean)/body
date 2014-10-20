@@ -2,10 +2,10 @@
   if (!isBuilt) {
     build();
   }
-  root=new ItemsNodeInterval();
+  root=new ItemsNodeInterval(targetInvoiceId);
   for (  Item item : items) {
     Preconditions.checkState(item.getAction() == ItemAction.ADD);
-    root.addExistingItem(new ItemsNodeInterval(root,new Item(item,reverse ? ItemAction.CANCEL : ItemAction.ADD)));
+    root.addExistingItem(new ItemsNodeInterval(root,targetInvoiceId,new Item(item,reverse ? ItemAction.CANCEL : ItemAction.ADD)));
   }
   items.clear();
   isBuilt=false;

@@ -1,0 +1,18 @@
+{
+  final BigDecimal balance=InvoiceModelDaoHelper.getBalance(invoice);
+  if (balance.compareTo(BigDecimal.ZERO) < 0) {
+    return new InvoiceItemModelDao(new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),balance.negate(),invoice.getCurrency()));
+  }
+ else   if (balance.compareTo(BigDecimal.ZERO) > 0) {
+    final List<InvoiceModelDao> allInvoices=invoiceDaoHelper.getAllInvoicesByAccountFromTransaction(entitySqlDaoWrapperFactory,context);
+    final BigDecimal accountCBA=getAccountCBAFromTransaction(allInvoices);
+    if (accountCBA.compareTo(BigDecimal.ZERO) <= 0) {
+      return null;
+    }
+    final BigDecimal positiveCreditAmount=accountCBA.compareTo(balance) > 0 ? balance : accountCBA;
+    return new InvoiceItemModelDao(new CreditBalanceAdjInvoiceItem(invoice.getId(),invoice.getAccountId(),context.getCreatedDate().toLocalDate(),positiveCreditAmount.negate(),invoice.getCurrency()));
+  }
+ else {
+    return null;
+  }
+}

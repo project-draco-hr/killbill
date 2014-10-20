@@ -55,7 +55,7 @@
   expectedAmount=TWENTY;
   testInvoiceGeneration(accountId,events,invoices,invoiceUtil.buildDate(2011,4,10),1,expectedAmount);
   events.add(createBillingEvent(subscriptionId1,bundleId,plan1CancelDate,plan1,plan1Phase3,5));
-  expectedAmount=ZERO;
+  expectedAmount=new BigDecimal("-2.40");
   testInvoiceGeneration(accountId,events,invoices,plan1CancelDate,1,expectedAmount);
   expectedAmount=TWENTY;
   testInvoiceGeneration(accountId,events,invoices,invoiceUtil.buildDate(2011,5,10),1,expectedAmount);
@@ -80,7 +80,7 @@
   expectedAmount=TEN;
   testInvoiceGeneration(accountId,events,invoices,invoiceUtil.buildDate(2011,7,20),1,expectedAmount);
   events.add(createBillingEvent(subscriptionId3,bundleId,plan3UpgradeToAnnualDate,plan3,plan3Phase2,31));
-  testInvoiceGeneration(accountId,events,invoices,plan3UpgradeToAnnualDate,2,ONE_HUNDRED);
+  testInvoiceGeneration(accountId,events,invoices,plan3UpgradeToAnnualDate,2,new BigDecimal("93.55"));
   events.add(createBillingEvent(subscriptionId4,bundleId,plan4ChangeOfPlanDate,plan4b,plan4bPhase1,7));
   expectedAmount=TWENTY_FOUR;
   testInvoiceGeneration(accountId,events,invoices,plan4ChangeOfPlanDate,1,expectedAmount);
@@ -92,7 +92,7 @@
   expectedAmount=FORTY.add(TWENTY);
   testInvoiceGeneration(accountId,events,invoices,plan2PhaseChangeToEvergreenDate,2,expectedAmount);
   events.add(createBillingEvent(subscriptionId5,bundleId,plan5CancelDate,plan5,plan5Phase2,10));
-  testInvoiceGeneration(accountId,events,invoices,plan5CancelDate,2,TWENTY_FOUR);
+  testInvoiceGeneration(accountId,events,invoices,plan5CancelDate,2,new BigDecimal("22.00"));
   expectedAmount=FORTY;
   testInvoiceGeneration(accountId,events,invoices,invoiceUtil.buildDate(2011,10,10),1,expectedAmount);
 }

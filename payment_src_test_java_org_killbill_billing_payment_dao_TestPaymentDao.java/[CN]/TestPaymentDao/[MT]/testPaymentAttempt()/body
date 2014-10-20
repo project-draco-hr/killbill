@@ -10,7 +10,7 @@
   properties.add(new PluginProperty("key1","value1",false));
   properties.add(new PluginProperty("key2","value2",false));
   final byte[] serialized=PluginPropertySerializer.serialize(properties);
-  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(UUID.randomUUID(),UUID.randomUUID(),clock.getUTCNow(),clock.getUTCNow(),paymentExternalKey,transactionId,transactionExternalKey,transactionType,stateName,BigDecimal.ZERO,Currency.ALL,pluginName,serialized);
+  final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(UUID.randomUUID(),UUID.randomUUID(),clock.getUTCNow(),clock.getUTCNow(),paymentExternalKey,transactionId,transactionExternalKey,transactionType,stateName,BigDecimal.ZERO,Currency.ALL,ImmutableList.<String>of(pluginName),serialized);
   PaymentAttemptModelDao savedAttempt=paymentDao.insertPaymentAttemptWithProperties(attempt,internalCallContext);
   assertEquals(savedAttempt.getTransactionExternalKey(),transactionExternalKey);
   assertEquals(savedAttempt.getTransactionType(),transactionType);
