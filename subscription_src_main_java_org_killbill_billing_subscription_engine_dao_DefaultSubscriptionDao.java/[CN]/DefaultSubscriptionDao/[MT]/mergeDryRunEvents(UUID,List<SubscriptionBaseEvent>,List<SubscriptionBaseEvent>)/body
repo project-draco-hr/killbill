@@ -1,0 +1,17 @@
+{
+  if (dryRunEvents == null || dryRunEvents.isEmpty()) {
+    return;
+  }
+  for (  SubscriptionBaseEvent curDryRun : dryRunEvents) {
+    if (curDryRun.getSubscriptionId() != null && curDryRun.getSubscriptionId().equals(subscriptionId)) {
+      final Iterator<SubscriptionBaseEvent> it=events.iterator();
+      while (it.hasNext()) {
+        final SubscriptionBaseEvent event=it.next();
+        if (event.getEffectiveDate().isAfter(curDryRun.getEffectiveDate())) {
+          it.remove();
+        }
+      }
+      events.add(curDryRun);
+    }
+  }
+}

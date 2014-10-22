@@ -15,7 +15,8 @@
     onPhaseEvent(subscription,context);
   }
  else   if (event.getType() == EventType.API_USER && subscription.getCategory() == ProductCategory.BASE) {
-    theRealSeqId=onBasePlanEvent(subscription,(ApiEvent)event,context);
+    final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+    theRealSeqId=onBasePlanEvent(subscription,(ApiEvent)event,context.toCallContext(tenantId));
   }
   try {
     final SubscriptionBaseTransitionData transition=(subscription.getTransitionFromEvent(event,theRealSeqId));

@@ -1,0 +1,34 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final LocalDate inputDate=toLocalDate(UUID.fromString(accountId),targetDateTime,callContext);
+  if (dryRunSubscriptionSpec != null && dryRunSubscriptionSpec.getDryRunAction() != null) {
+    if (SubscriptionEventType.START_BILLING.toString().equals(dryRunSubscriptionSpec.getDryRunAction())) {
+      verifyNonNullOrEmpty(dryRunSubscriptionSpec.getProductName(),"DryRun subscription product category should be specified");
+      verifyNonNullOrEmpty(dryRunSubscriptionSpec.getBillingPeriod(),"DryRun subscription billingPeriod should be specified");
+      verifyNonNullOrEmpty(dryRunSubscriptionSpec.getProductCategory(),"DryRun subscription product category should be specified");
+      if (dryRunSubscriptionSpec.getProductCategory().equals(ProductCategory.ADD_ON)) {
+        verifyNonNullOrEmpty(dryRunSubscriptionSpec.getBundleId(),"DryRun bundle ID should be specified");
+      }
+    }
+ else     if (SubscriptionEventType.CHANGE.toString().equals(dryRunSubscriptionSpec.getDryRunAction())) {
+      verifyNonNullOrEmpty(dryRunSubscriptionSpec.getProductName(),"DryRun subscription product category should be specified");
+      verifyNonNullOrEmpty(dryRunSubscriptionSpec.getBillingPeriod(),"DryRun subscription billingPeriod should be specified");
+      verifyNonNullOrEmpty(dryRunSubscriptionSpec.getSubscriptionId(),"DryRun subscriptionID should be specified");
+    }
+ else     if (SubscriptionEventType.STOP_BILLING.toString().equals(dryRunSubscriptionSpec.getDryRunAction())) {
+      verifyNonNullOrEmpty(dryRunSubscriptionSpec.getSubscriptionId(),"DryRun subscriptionID should be specified");
+    }
+  }
+  final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),callContext);
+  final DryRunArguments dryRunArguments=new DefaultDryRunArguments(dryRunSubscriptionSpec,account.getTimeZone(),clock);
+  try {
+    final Invoice generatedInvoice=invoiceApi.triggerInvoiceGeneration(UUID.fromString(accountId),inputDate,dryRunArguments,callContext);
+    return Response.status(Status.OK).entity(new InvoiceJson(generatedInvoice,true,null)).build();
+  }
+ catch (  InvoiceApiException e) {
+    if (e.getCode() == ErrorCode.INVOICE_NOTHING_TO_DO.getCode()) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    throw e;
+  }
+}

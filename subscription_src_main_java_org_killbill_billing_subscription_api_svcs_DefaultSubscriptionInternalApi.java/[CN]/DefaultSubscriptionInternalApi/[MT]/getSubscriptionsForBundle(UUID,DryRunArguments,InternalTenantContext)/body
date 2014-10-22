@@ -1,0 +1,10 @@
+{
+  final List<SubscriptionBaseEvent> outputDryRunEvents=new ArrayList<SubscriptionBaseEvent>();
+  final List<SubscriptionBase> outputSubscriptions=new ArrayList<SubscriptionBase>();
+  populateDryRunEvents(bundleId,dryRunArguments,outputDryRunEvents,outputSubscriptions,context);
+  final List<SubscriptionBase> result=dao.getSubscriptions(bundleId,outputDryRunEvents,context);
+  if (result != null && !result.isEmpty()) {
+    outputSubscriptions.addAll(result);
+  }
+  return createSubscriptionsForApiUse(outputSubscriptions);
+}

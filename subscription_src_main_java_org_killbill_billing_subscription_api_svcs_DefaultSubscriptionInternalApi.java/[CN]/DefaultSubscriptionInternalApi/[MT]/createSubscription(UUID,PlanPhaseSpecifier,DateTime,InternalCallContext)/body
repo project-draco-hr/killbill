@@ -17,40 +17,12 @@
     if (bundle == null) {
       throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_NO_BUNDLE,bundleId);
     }
-    DateTime bundleStartDate=null;
     final DefaultSubscriptionBase baseSubscription=(DefaultSubscriptionBase)dao.getBaseSubscription(bundleId,context);
-switch (plan.getProduct().getCategory()) {
-case BASE:
-      if (baseSubscription != null) {
-        if (baseSubscription.getState() == EntitlementState.ACTIVE) {
-          throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_BP_EXISTS,bundleId);
-        }
-      }
-    bundleStartDate=requestedDate;
-  break;
-case ADD_ON:
-if (baseSubscription == null) {
-  throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_NO_BP,bundleId);
-}
-if (effectiveDate.isBefore(baseSubscription.getStartDate())) {
-throw new SubscriptionBaseApiException(ErrorCode.SUB_INVALID_REQUESTED_DATE,effectiveDate.toString(),baseSubscription.getStartDate().toString());
-}
-addonUtils.checkAddonCreationRights(baseSubscription,plan);
-bundleStartDate=baseSubscription.getStartDate();
-break;
-case STANDALONE:
-if (baseSubscription != null) {
-throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_BP_EXISTS,bundleId);
-}
-bundleStartDate=requestedDate;
-break;
-default :
-throw new SubscriptionBaseError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
-}
-final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
-return apiService.createPlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(effectiveDate),plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,now,context.toCallContext(tenantId));
-}
- catch (CatalogApiException e) {
-throw new SubscriptionBaseApiException(e);
-}
+    final DateTime bundleStartDate=getBundleStartDateWithSanity(bundleId,baseSubscription,plan,requestedDate,effectiveDate);
+    final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+    return apiService.createPlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(effectiveDate),plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,now,context.toCallContext(tenantId));
+  }
+ catch (  CatalogApiException e) {
+    throw new SubscriptionBaseApiException(e);
+  }
 }

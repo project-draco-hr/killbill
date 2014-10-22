@@ -1,0 +1,64 @@
+{
+  if (dryRunArguments == null || dryRunArguments.getAction() == null) {
+    return;
+  }
+  final DateTime utcNow=clock.getUTCNow();
+  List<SubscriptionBaseEvent> dryRunEvents=null;
+  try {
+    final PlanPhaseSpecifier inputSpec=dryRunArguments.getPlanPhaseSpecifier();
+    final String realPriceList=(inputSpec != null && inputSpec.getPriceListName() != null) ? inputSpec.getPriceListName() : PriceListSet.DEFAULT_PRICELIST_NAME;
+    final Catalog catalog=catalogService.getFullCatalog();
+    final Plan plan=(inputSpec != null && inputSpec.getProductName() != null && inputSpec.getBillingPeriod() != null) ? catalog.findPlan(inputSpec.getProductName(),inputSpec.getBillingPeriod(),realPriceList,utcNow) : null;
+    final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+    if (dryRunArguments != null) {
+switch (dryRunArguments.getAction()) {
+case START_BILLING:
+        final DefaultSubscriptionBase baseSubscription=(DefaultSubscriptionBase)dao.getBaseSubscription(bundleId,context);
+      final DateTime startEffectiveDate=dryRunArguments.getEffectiveDate() != null ? dryRunArguments.getEffectiveDate() : utcNow;
+    final DateTime bundleStartDate=getBundleStartDateWithSanity(bundleId,baseSubscription,plan,startEffectiveDate,startEffectiveDate);
+  final UUID subscriptionId=UUID.randomUUID();
+dryRunEvents=apiService.getEventsOnCreation(subscriptionId,startEffectiveDate,bundleStartDate,1L,plan,inputSpec.getPhaseType(),realPriceList,utcNow,startEffectiveDate,utcNow,false,context.toTenantContext(tenantId));
+final SubscriptionBuilder builder=new SubscriptionBuilder().setId(subscriptionId).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(startEffectiveDate);
+final DefaultSubscriptionBase newSubscription=new DefaultSubscriptionBase(builder,apiService,clock);
+newSubscription.rebuildTransitions(dryRunEvents,catalog);
+outputSubscriptions.add(newSubscription);
+break;
+case CHANGE:
+final DefaultSubscriptionBase subscriptionForChange=(DefaultSubscriptionBase)dao.getSubscriptionFromId(dryRunArguments.getSubscriptionId(),context);
+DateTime changeEffectiveDate=dryRunArguments.getEffectiveDate();
+if (changeEffectiveDate == null) {
+BillingActionPolicy policy=dryRunArguments.getBillingActionPolicy();
+if (policy == null) {
+final PlanChangeResult planChangeResult=apiService.getPlanChangeResult(subscriptionForChange,dryRunArguments.getPlanPhaseSpecifier().getProductName(),dryRunArguments.getPlanPhaseSpecifier().getBillingPeriod(),dryRunArguments.getPlanPhaseSpecifier().getPriceListName(),utcNow);
+policy=planChangeResult.getPolicy();
+}
+changeEffectiveDate=subscriptionForChange.getPlanChangeEffectiveDate(policy);
+}
+dryRunEvents=apiService.getEventsOnChangePlan(subscriptionForChange,plan,realPriceList,utcNow,changeEffectiveDate,utcNow,true,context.toTenantContext(tenantId));
+break;
+case STOP_BILLING:
+final DefaultSubscriptionBase subscriptionForCancellation=(DefaultSubscriptionBase)dao.getSubscriptionFromId(dryRunArguments.getSubscriptionId(),context);
+DateTime cancelEffectiveDate=dryRunArguments.getEffectiveDate();
+if (dryRunArguments.getEffectiveDate() == null) {
+BillingActionPolicy policy=dryRunArguments.getBillingActionPolicy();
+if (policy == null) {
+final Plan currentPlan=subscriptionForCancellation.getCurrentPlan();
+final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),subscriptionForCancellation.getCurrentPlan().getRecurringBillingPeriod(),subscriptionForCancellation.getCurrentPriceList().getName(),subscriptionForCancellation.getCurrentPhase().getPhaseType());
+policy=catalogService.getFullCatalog().planCancelPolicy(spec,utcNow);
+}
+cancelEffectiveDate=subscriptionForCancellation.getPlanChangeEffectiveDate(policy);
+}
+dryRunEvents=apiService.getEventsOnCancelPlan(subscriptionForCancellation,utcNow,cancelEffectiveDate,utcNow,true,context.toTenantContext(tenantId));
+break;
+default :
+throw new IllegalArgumentException("Unexpected dryRunArguments action " + dryRunArguments.getAction());
+}
+}
+}
+ catch (CatalogApiException e) {
+throw new SubscriptionBaseApiException(e);
+}
+if (dryRunEvents != null && !dryRunEvents.isEmpty()) {
+outputDryRunEvents.addAll(dryRunEvents);
+}
+}

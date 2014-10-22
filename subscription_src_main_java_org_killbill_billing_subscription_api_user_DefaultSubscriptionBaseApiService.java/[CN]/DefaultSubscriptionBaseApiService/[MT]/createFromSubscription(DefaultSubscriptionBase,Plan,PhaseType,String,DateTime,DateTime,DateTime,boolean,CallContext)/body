@@ -1,16 +1,7 @@
 {
   final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
   try {
-    final TimedPhase[] curAndNextPhases=planAligner.getCurrentAndNextTimedPhaseOnCreate(subscription,plan,initialPhase,realPriceList,requestedDate,effectiveDate);
-    final ApiEventBuilder createBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(plan.getName()).setEventPlanPhase(curAndNextPhases[0].getPhase().getName()).setEventPriceList(realPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(processedDate).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true);
-    final ApiEvent creationEvent=(reCreate) ? new ApiEventReCreate(createBuilder) : new ApiEventCreate(createBuilder);
-    final TimedPhase nextTimedPhase=curAndNextPhases[1];
-    final PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(nextTimedPhase.getPhase().getName(),subscription,processedDate,nextTimedPhase.getStartPhase()) : null;
-    final List<SubscriptionBaseEvent> events=new ArrayList<SubscriptionBaseEvent>();
-    events.add(creationEvent);
-    if (nextPhaseEvent != null) {
-      events.add(nextPhaseEvent);
-    }
+    final List<SubscriptionBaseEvent> events=getEventsOnCreation(subscription.getId(),subscription.getAlignStartDate(),subscription.getBundleStartDate(),subscription.getActiveVersion(),plan,initialPhase,realPriceList,requestedDate,effectiveDate,processedDate,reCreate,context);
     if (reCreate) {
       dao.recreateSubscription(subscription,events,internalCallContext);
     }
