@@ -1,0 +1,15 @@
+{
+  final TransactionType transactionType=paymentRoutingContext.getTransactionType();
+  Preconditions.checkArgument(transactionType == TransactionType.PURCHASE || transactionType == TransactionType.REFUND || transactionType == TransactionType.CHARGEBACK);
+  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(paymentRoutingContext.getAccountId(),paymentRoutingContext);
+switch (transactionType) {
+case PURCHASE:
+    return getPluginPurchaseResult(paymentRoutingContext,internalContext);
+case REFUND:
+  return getPluginRefundResult(paymentRoutingContext,internalContext);
+case CHARGEBACK:
+return new DefaultPriorPaymentRoutingResult(false,paymentRoutingContext.getAmount(),null,null);
+default :
+throw new IllegalStateException("Unexpected transactionType " + transactionType);
+}
+}

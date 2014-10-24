@@ -1,0 +1,14 @@
+{
+  final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(paymentRoutingContext.getAccountId(),paymentRoutingContext);
+  final TransactionType transactionType=paymentRoutingContext.getTransactionType();
+switch (transactionType) {
+case PURCHASE:
+    final DateTime nextRetryDate=computeNextRetryDate(paymentRoutingContext.getPaymentExternalKey(),paymentRoutingContext.isApiPayment(),internalContext);
+  return new DefaultFailureCallResult(nextRetryDate);
+case REFUND:
+case CHARGEBACK:
+return new DefaultFailureCallResult(null);
+default :
+throw new IllegalStateException("Unexpected transactionType " + transactionType);
+}
+}

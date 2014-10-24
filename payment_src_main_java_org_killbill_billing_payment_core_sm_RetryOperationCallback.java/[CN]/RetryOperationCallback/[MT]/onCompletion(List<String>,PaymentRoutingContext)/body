@@ -1,0 +1,13 @@
+{
+  for (  String pluginName : paymentControlPluginNames) {
+    final PaymentRoutingPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
+    if (plugin != null) {
+      try {
+        plugin.onSuccessCall(paymentControlContext,paymentStateContext.getProperties());
+      }
+ catch (      final PaymentRoutingApiException e) {
+        logger.warn("Plugin " + pluginName + " failed to complete onCompletion call for "+ paymentControlContext.getPaymentExternalKey(),e);
+      }
+    }
+  }
+}

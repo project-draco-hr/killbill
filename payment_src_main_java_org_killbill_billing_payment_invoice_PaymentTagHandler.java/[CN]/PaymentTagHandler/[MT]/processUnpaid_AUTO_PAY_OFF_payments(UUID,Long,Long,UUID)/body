@@ -1,0 +1,10 @@
+{
+  try {
+    final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(tenantRecordId,accountRecordId,"PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,userToken);
+    final Account account=accountApi.getAccountById(accountId,internalCallContext);
+    ((InvoicePaymentRoutingPluginApi)invoicePaymentControlPlugin).process_AUTO_PAY_OFF_removal(account,internalCallContext);
+  }
+ catch (  AccountApiException e) {
+    log.warn(String.format("Failed to process process  removal AUTO_PAY_OFF for account %s",accountId),e);
+  }
+}
