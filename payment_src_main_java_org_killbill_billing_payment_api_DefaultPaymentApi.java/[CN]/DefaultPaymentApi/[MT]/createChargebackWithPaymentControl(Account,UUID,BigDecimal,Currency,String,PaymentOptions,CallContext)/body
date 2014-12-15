@@ -1,9 +1,13 @@
 {
+  final List<String> paymentControlPluginNames=toPaymentControlPluginNames(paymentOptions);
+  if (paymentControlPluginNames.isEmpty()) {
+    return createChargeback(account,paymentId,amount,currency,paymentTransactionExternalKey,callContext);
+  }
   checkNotNullParameter(account,"account");
   checkNotNullParameter(amount,"amount");
   checkNotNullParameter(currency,"currency");
   checkNotNullParameter(paymentId,"paymentId");
   checkPositiveAmount(amount);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
-  return pluginRoutingPaymentProcessor.createChargeback(account,paymentId,paymentTransactionExternalKey,amount,currency,toPaymentControlPluginNames(paymentOptions),callContext,internalCallContext);
+  return pluginRoutingPaymentProcessor.createChargeback(account,paymentId,paymentTransactionExternalKey,amount,currency,paymentControlPluginNames,callContext,internalCallContext);
 }
