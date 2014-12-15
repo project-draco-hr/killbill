@@ -4,13 +4,13 @@
   final String transactionExternalKey="grenouye";
   final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,Currency.EUR,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
   paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,"AUTH_ERRORED",null,payment.getTransactions().get(0).getId(),TransactionStatus.PLUGIN_FAILURE,null,null,null,null,internalCallContext);
-  PaymentSqlDao paymentSqlDao=dbi.onDemand(PaymentSqlDao.class);
+  final PaymentSqlDao paymentSqlDao=dbi.onDemand(PaymentSqlDao.class);
   paymentSqlDao.updateLastSuccessPaymentStateName(payment.getId().toString(),"AUTH_ERRORED",null,internalCallContext);
   try {
     paymentApi.createCapture(account,payment.getId(),requestedAmount,Currency.EUR,"tetard",ImmutableList.<PluginProperty>of(),callContext);
     Assert.fail("Unexpected success");
   }
- catch (  PaymentApiException e) {
+ catch (  final PaymentApiException e) {
     Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
   }
 }
