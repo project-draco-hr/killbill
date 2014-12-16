@@ -1,10 +1,10 @@
 {
   PriorPaymentRoutingResult prevResult=null;
   PaymentRoutingContext inputPaymentRoutingContext=paymentControlContextArg;
-  for (  String pluginName : paymentControlPluginNames) {
+  for (  final String pluginName : paymentControlPluginNames) {
     final PaymentRoutingPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
     if (plugin == null) {
-      logger.warn("Skipping payment plugin invoice {} when fetching results",pluginName);
+      logger.warn("Skipping unknown payment control plugin {} when fetching results",pluginName);
       continue;
     }
     prevResult=plugin.priorCall(inputPaymentRoutingContext,paymentStateContext.getProperties());

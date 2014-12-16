@@ -5,10 +5,10 @@
     final EnteringStateCallback enteringStateCallback=new RetryEnteringStateCallback(this,paymentStateContext,retryServiceScheduler);
     retrySMHelper.getInitialState().runOperation(retrySMHelper.getRetryOperation(),callback,enteringStateCallback,leavingStateCallback);
   }
- catch (  MissingEntryException e) {
+ catch (  final MissingEntryException e) {
     throw new PaymentApiException(e.getCause(),ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
   }
-catch (  OperationException e) {
+catch (  final OperationException e) {
     if (e.getCause() == null) {
       throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
     }

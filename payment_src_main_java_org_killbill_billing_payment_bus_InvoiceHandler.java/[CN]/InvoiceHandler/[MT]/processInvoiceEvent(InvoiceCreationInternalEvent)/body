@@ -9,7 +9,8 @@
     properties.add(prop1);
     final CallContext callContext=internalContext.toCallContext(nonEntityDao.retrieveIdFromObject(internalContext.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID)));
     final BigDecimal amountToBePaid=null;
-    final List<String> paymentControlPluginNames=paymentConfig.getPaymentControlPluginNames() != null ? paymentConfig.getPaymentControlPluginNames() : ImmutableList.of(InvoicePaymentRoutingPluginApi.PLUGIN_NAME);
+    final List<String> paymentControlPluginNames=paymentConfig.getPaymentControlPluginNames() != null ? new LinkedList<String>(paymentConfig.getPaymentControlPluginNames()) : new LinkedList<String>();
+    paymentControlPluginNames.add(InvoicePaymentRoutingPluginApi.PLUGIN_NAME);
     pluginRoutingPaymentProcessor.createPurchase(false,account,account.getPaymentMethodId(),null,amountToBePaid,account.getCurrency(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),properties,paymentControlPluginNames,callContext,internalContext);
   }
  catch (  final AccountApiException e) {
