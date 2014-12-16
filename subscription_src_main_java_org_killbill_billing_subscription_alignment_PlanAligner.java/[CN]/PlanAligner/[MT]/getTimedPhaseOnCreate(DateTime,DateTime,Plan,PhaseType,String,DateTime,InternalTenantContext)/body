@@ -1,0 +1,17 @@
+{
+  final Catalog catalog=catalogService.getFullCatalog(context);
+  final PlanSpecifier planSpecifier=new PlanSpecifier(plan.getProduct().getName(),plan.getProduct().getCategory(),plan.getRecurringBillingPeriod(),priceList);
+  final DateTime planStartDate;
+  final PlanAlignmentCreate alignment=catalog.planCreateAlignment(planSpecifier,requestedDate);
+switch (alignment) {
+case START_OF_SUBSCRIPTION:
+    planStartDate=subscriptionStartDate;
+  break;
+case START_OF_BUNDLE:
+planStartDate=bundleStartDate;
+break;
+default :
+throw new SubscriptionBaseError(String.format("Unknown PlanAlignmentCreate %s",alignment));
+}
+return getPhaseAlignments(plan,initialPhase,planStartDate);
+}

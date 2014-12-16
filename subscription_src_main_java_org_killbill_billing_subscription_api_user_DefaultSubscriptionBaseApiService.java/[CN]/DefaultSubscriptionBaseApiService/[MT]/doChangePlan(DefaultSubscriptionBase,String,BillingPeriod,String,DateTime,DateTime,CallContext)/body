@@ -1,9 +1,9 @@
 {
-  final Plan newPlan=catalogService.getFullCatalog().findPlan(newProductName,newBillingPeriod,newPriceList,effectiveDate,subscription.getStartDate());
-  final List<SubscriptionBaseEvent> changeEvents=getEventsOnChangePlan(subscription,newPlan,newPriceList,now,effectiveDate,now,false,context);
   final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
+  final Plan newPlan=catalogService.getFullCatalog(internalCallContext).findPlan(newProductName,newBillingPeriod,newPriceList,effectiveDate,subscription.getStartDate());
+  final List<SubscriptionBaseEvent> changeEvents=getEventsOnChangePlan(subscription,newPlan,newPriceList,now,effectiveDate,now,false,context);
   dao.changePlan(subscription,changeEvents,internalCallContext);
-  subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),catalogService.getFullCatalog());
+  subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),catalogService.getFullCatalog(internalCallContext));
   if (subscription.getCategory() == ProductCategory.BASE) {
     final Product baseProduct=(subscription.getState() == EntitlementState.CANCELLED) ? null : subscription.getCurrentPlan().getProduct();
     cancelAddOnsIfRequired(baseProduct,subscription.getBundleId(),effectiveDate,context);

@@ -1,0 +1,7 @@
+{
+  final InputStream stream=new ByteArrayInputStream(catalogXML.getBytes());
+  XMLLoader.getObjectFromStream(new URI(JaxrsResource.CATALOG_PATH),stream,StandaloneCatalog.class);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  tenantApi.addTenantKeyValue(TenantKey.CATALOG.toString(),catalogXML,callContext);
+  return uriBuilder.buildResponse(uriInfo,CatalogResource.class,null,null);
+}

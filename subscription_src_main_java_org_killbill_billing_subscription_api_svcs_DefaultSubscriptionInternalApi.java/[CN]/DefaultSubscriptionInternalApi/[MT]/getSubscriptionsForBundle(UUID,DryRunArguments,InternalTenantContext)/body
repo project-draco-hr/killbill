@@ -1,10 +1,16 @@
 {
-  final List<SubscriptionBaseEvent> outputDryRunEvents=new ArrayList<SubscriptionBaseEvent>();
-  final List<SubscriptionBase> outputSubscriptions=new ArrayList<SubscriptionBase>();
-  populateDryRunEvents(bundleId,dryRunArguments,outputDryRunEvents,outputSubscriptions,context);
-  final List<SubscriptionBase> result=dao.getSubscriptions(bundleId,outputDryRunEvents,context);
-  if (result != null && !result.isEmpty()) {
-    outputSubscriptions.addAll(result);
+  try {
+    final List<SubscriptionBaseEvent> outputDryRunEvents=new ArrayList<SubscriptionBaseEvent>();
+    final List<SubscriptionBase> outputSubscriptions=new ArrayList<SubscriptionBase>();
+    populateDryRunEvents(bundleId,dryRunArguments,outputDryRunEvents,outputSubscriptions,context);
+    final List<SubscriptionBase> result;
+    result=dao.getSubscriptions(bundleId,outputDryRunEvents,context);
+    if (result != null && !result.isEmpty()) {
+      outputSubscriptions.addAll(result);
+    }
+    return createSubscriptionsForApiUse(outputSubscriptions);
   }
-  return createSubscriptionsForApiUse(outputSubscriptions);
+ catch (  CatalogApiException e) {
+    throw new SubscriptionBaseApiException(e);
+  }
 }

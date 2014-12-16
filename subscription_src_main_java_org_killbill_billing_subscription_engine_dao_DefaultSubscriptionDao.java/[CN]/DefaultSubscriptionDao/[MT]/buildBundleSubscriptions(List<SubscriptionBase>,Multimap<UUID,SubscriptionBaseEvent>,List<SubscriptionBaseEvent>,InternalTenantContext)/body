@@ -21,7 +21,7 @@
   for (  final SubscriptionBase cur : input) {
     final List<SubscriptionBaseEvent> events=eventsForSubscription != null ? (List<SubscriptionBaseEvent>)eventsForSubscription.get(cur.getId()) : getEventsForSubscription(cur.getId(),context);
     mergeDryRunEvents(cur.getId(),events,dryRunEvents);
-    SubscriptionBase reloaded=createSubscriptionForInternalUse(cur,events);
+    SubscriptionBase reloaded=createSubscriptionForInternalUse(cur,events,context);
 switch (cur.getCategory()) {
 case BASE:
       final Collection<SubscriptionBaseEvent> futureApiEvents=Collections2.filter(events,new Predicate<SubscriptionBaseEvent>(){
@@ -35,12 +35,12 @@ case BASE:
 case ADD_ON:
 final Plan targetAddOnPlan=reloaded.getCurrentPlan();
 final String baseProductName=(futureBaseEvent instanceof ApiEventChange) ? ((ApiEventChange)futureBaseEvent).getEventPlan() : null;
-final boolean createCancelEvent=(futureBaseEvent != null && targetAddOnPlan != null) && ((futureBaseEvent instanceof ApiEventCancel) || ((!addonUtils.isAddonAvailableFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan)) || (addonUtils.isAddonIncludedFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan))));
+final boolean createCancelEvent=(futureBaseEvent != null && targetAddOnPlan != null) && ((futureBaseEvent instanceof ApiEventCancel) || ((!addonUtils.isAddonAvailableFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan,context)) || (addonUtils.isAddonIncludedFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan,context))));
 if (createCancelEvent && reloaded.getFutureEndDate() == null) {
 final DateTime now=clock.getUTCNow();
 final SubscriptionBaseEvent addOnCancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(reloaded.getId()).setActiveVersion(((DefaultSubscriptionBase)reloaded).getActiveVersion()).setProcessedDate(now).setEffectiveDate(futureBaseEvent.getEffectiveDate()).setRequestedDate(now).setCreatedDate(futureBaseEvent.getCreatedDate()).setFromDisk(false));
 events.add(addOnCancelEvent);
-reloaded=createSubscriptionForInternalUse(cur,events);
+reloaded=createSubscriptionForInternalUse(cur,events,context);
 }
 break;
 default :

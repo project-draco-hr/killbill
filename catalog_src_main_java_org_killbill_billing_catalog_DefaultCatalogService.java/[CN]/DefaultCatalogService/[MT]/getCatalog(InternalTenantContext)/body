@@ -1,0 +1,18 @@
+{
+  if (context.getTenantRecordId() == InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID) {
+    return catalog;
+  }
+  try {
+    final List<String> catalogXMLs=tenantApi.getTenantCatalogs(context);
+    if (catalogXMLs.isEmpty()) {
+      return catalog;
+    }
+    return loader.load(catalogXMLs);
+  }
+ catch (  TenantApiException e) {
+    throw new CatalogApiException(e);
+  }
+catch (  ServiceException e) {
+    throw new CatalogApiException(ErrorCode.CAT_INVALID_FOR_TENANT,"Failed to load catalog for tenant " + context.getTenantRecordId());
+  }
+}

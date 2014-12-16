@@ -1,0 +1,16 @@
+{
+  final VersionedCatalog result=new VersionedCatalog(clock);
+  final URI uri;
+  try {
+    uri=new URI("/tenantCatalog");
+    for (    final String cur : catalogXMLs) {
+      final InputStream curCatalogStream=new ByteArrayInputStream(cur.getBytes());
+      final StandaloneCatalog catalog=XMLLoader.getObjectFromStream(uri,curCatalogStream,StandaloneCatalog.class);
+      result.add(catalog);
+    }
+    return result;
+  }
+ catch (  Exception e) {
+    throw new ServiceException("Problem encountered loading catalog",e);
+  }
+}

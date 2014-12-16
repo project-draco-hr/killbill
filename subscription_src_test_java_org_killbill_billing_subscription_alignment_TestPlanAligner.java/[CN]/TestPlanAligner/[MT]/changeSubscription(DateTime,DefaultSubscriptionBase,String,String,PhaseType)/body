@@ -1,7 +1,7 @@
 {
   final SubscriptionBaseEvent previousEvent=createSubscriptionEvent(defaultSubscriptionBase.getStartDate(),previousProductName,commonPhaseType,ApiEventType.CREATE,defaultSubscriptionBase.getActiveVersion());
   final SubscriptionBaseEvent event=createSubscriptionEvent(effectiveChangeDate,newProductName,commonPhaseType,ApiEventType.CHANGE,defaultSubscriptionBase.getActiveVersion());
-  defaultSubscriptionBase.rebuildTransitions(ImmutableList.<SubscriptionBaseEvent>of(previousEvent,event),catalogService.getFullCatalog());
+  defaultSubscriptionBase.rebuildTransitions(ImmutableList.<SubscriptionBaseEvent>of(previousEvent,event),catalogService.getFullCatalog(internalCallContext));
   final List<SubscriptionBaseTransition> newTransitions=defaultSubscriptionBase.getAllTransitions();
   Assert.assertEquals(newTransitions.size(),2);
   Assert.assertNull(newTransitions.get(0).getPreviousPhase());

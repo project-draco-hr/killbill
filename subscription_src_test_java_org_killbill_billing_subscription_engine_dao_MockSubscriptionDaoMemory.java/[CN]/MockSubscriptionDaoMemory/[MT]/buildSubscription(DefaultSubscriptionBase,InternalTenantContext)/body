@@ -1,7 +1,12 @@
 {
   final DefaultSubscriptionBase subscription=new DefaultSubscriptionBase(new SubscriptionBuilder(in),null,clock);
   if (events.size() > 0) {
-    subscription.rebuildTransitions(getEventsForSubscription(in.getId(),context),catalogService.getFullCatalog());
+    try {
+      subscription.rebuildTransitions(getEventsForSubscription(in.getId(),context),catalogService.getFullCatalog(context));
+    }
+ catch (    CatalogApiException e) {
+      e.printStackTrace();
+    }
   }
   return subscription;
 }

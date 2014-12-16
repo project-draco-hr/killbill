@@ -3,12 +3,13 @@
     if (bundle == null) {
       throw new SubscriptionBaseRepairException(ErrorCode.SUB_REPAIR_UNKNOWN_BUNDLE,descBundle);
     }
-    final List<SubscriptionDataRepair> subscriptions=convertToSubscriptionsDataRepair(dao.getSubscriptions(bundle.getId(),ImmutableList.<SubscriptionBaseEvent>of(),internalCallContextFactory.createInternalTenantContext(context)));
+    final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(bundle.getAccountId(),context);
+    final List<SubscriptionDataRepair> subscriptions=convertToSubscriptionsDataRepair(dao.getSubscriptions(bundle.getId(),ImmutableList.<SubscriptionBaseEvent>of(),internalTenantContext));
     if (subscriptions.size() == 0) {
       throw new SubscriptionBaseRepairException(ErrorCode.SUB_REPAIR_NO_ACTIVE_SUBSCRIPTIONS,bundle.getId());
     }
     final String viewId=getViewId(((DefaultSubscriptionBaseBundle)bundle).getLastSysUpdateDate(),subscriptions);
-    final List<SubscriptionBaseTimeline> repairs=createGetSubscriptionRepairList(subscriptions,Collections.<SubscriptionBaseTimeline>emptyList());
+    final List<SubscriptionBaseTimeline> repairs=createGetSubscriptionRepairList(subscriptions,Collections.<SubscriptionBaseTimeline>emptyList(),internalTenantContext);
     return createGetBundleRepair(bundle.getId(),bundle.getExternalKey(),viewId,repairs);
   }
  catch (  CatalogApiException e) {

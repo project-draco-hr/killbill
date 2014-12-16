@@ -1,0 +1,14 @@
+{
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(accountId,context);
+  final TimedMigration[] events=migrationAligner.getEventsMigration(input,now,internalCallContext);
+  final DateTime migrationStartDate=events[0].getEventTime();
+  final List<SubscriptionBaseEvent> emptyEvents=Collections.emptyList();
+  final DefaultSubscriptionBase defaultSubscriptionBase;
+  try {
+    defaultSubscriptionBase=createSubscriptionForApiUse(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(productCategory).setBundleStartDate(bundleStartDate).setAlignStartDate(migrationStartDate),emptyEvents,internalCallContext);
+    return new SubscriptionMigrationData(defaultSubscriptionBase,toEvents(defaultSubscriptionBase,now,ctd,events,context),ctd);
+  }
+ catch (  CatalogApiException e) {
+    throw new SubscriptionBaseMigrationApiException(e);
+  }
+}

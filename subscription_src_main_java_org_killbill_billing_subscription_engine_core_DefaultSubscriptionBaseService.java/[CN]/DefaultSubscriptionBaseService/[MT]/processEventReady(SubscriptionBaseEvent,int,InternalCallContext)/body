@@ -2,28 +2,31 @@
   if (!event.isActive()) {
     return;
   }
-  final DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)dao.getSubscriptionFromId(event.getSubscriptionId(),context);
-  if (subscription == null) {
-    log.warn("Failed to retrieve subscription for id %s",event.getSubscriptionId());
-    return;
-  }
-  if (subscription.getActiveVersion() > event.getActiveVersion()) {
-    return;
-  }
-  int theRealSeqId=seqId;
-  if (event.getType() == EventType.PHASE) {
-    onPhaseEvent(subscription,context);
-  }
- else   if (event.getType() == EventType.API_USER && subscription.getCategory() == ProductCategory.BASE) {
-    final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
-    theRealSeqId=onBasePlanEvent(subscription,(ApiEvent)event,context.toCallContext(tenantId));
-  }
   try {
+    final DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)dao.getSubscriptionFromId(event.getSubscriptionId(),context);
+    if (subscription == null) {
+      log.warn("Failed to retrieve subscription for id %s",event.getSubscriptionId());
+      return;
+    }
+    if (subscription.getActiveVersion() > event.getActiveVersion()) {
+      return;
+    }
+    int theRealSeqId=seqId;
+    if (event.getType() == EventType.PHASE) {
+      onPhaseEvent(subscription,context);
+    }
+ else     if (event.getType() == EventType.API_USER && subscription.getCategory() == ProductCategory.BASE) {
+      final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+      theRealSeqId=onBasePlanEvent(subscription,(ApiEvent)event,context.toCallContext(tenantId));
+    }
     final SubscriptionBaseTransitionData transition=(subscription.getTransitionFromEvent(event,theRealSeqId));
     final EffectiveSubscriptionInternalEvent busEvent=new DefaultEffectiveSubscriptionEvent(transition,subscription.getAlignStartDate(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
     eventBus.post(busEvent);
   }
  catch (  EventBusException e) {
+    log.warn("Failed to post subscription event " + event,e);
+  }
+catch (  CatalogApiException e) {
     log.warn("Failed to post subscription event " + event,e);
   }
 }

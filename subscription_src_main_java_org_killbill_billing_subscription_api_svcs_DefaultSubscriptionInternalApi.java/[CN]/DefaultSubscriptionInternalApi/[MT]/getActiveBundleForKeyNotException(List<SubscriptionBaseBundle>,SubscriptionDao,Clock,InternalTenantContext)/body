@@ -1,13 +1,20 @@
 {
   for (  SubscriptionBaseBundle cur : existingBundles) {
-    final List<SubscriptionBase> subscriptions=dao.getSubscriptions(cur.getId(),ImmutableList.<SubscriptionBaseEvent>of(),context);
-    for (    SubscriptionBase s : subscriptions) {
-      if (s.getCategory() == ProductCategory.ADD_ON) {
-        continue;
+    final List<SubscriptionBase> subscriptions;
+    try {
+      subscriptions=dao.getSubscriptions(cur.getId(),ImmutableList.<SubscriptionBaseEvent>of(),context);
+      for (      SubscriptionBase s : subscriptions) {
+        if (s.getCategory() == ProductCategory.ADD_ON) {
+          continue;
+        }
+        if (s.getEndDate() == null || s.getEndDate().compareTo(clock.getUTCNow()) > 0) {
+          return cur;
+        }
       }
-      if (s.getEndDate() == null || s.getEndDate().compareTo(clock.getUTCNow()) > 0) {
-        return cur;
-      }
+    }
+ catch (    CatalogApiException e) {
+      log.warn("Failed to get subscriptions, ",e);
+      return null;
     }
   }
   return null;

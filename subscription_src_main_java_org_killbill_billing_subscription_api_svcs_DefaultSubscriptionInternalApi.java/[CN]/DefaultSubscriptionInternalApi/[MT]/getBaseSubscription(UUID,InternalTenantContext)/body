@@ -1,7 +1,12 @@
 {
-  final SubscriptionBase result=dao.getBaseSubscription(bundleId,context);
-  if (result == null) {
-    throw new SubscriptionBaseApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,bundleId);
+  try {
+    final SubscriptionBase result=dao.getBaseSubscription(bundleId,context);
+    if (result == null) {
+      throw new SubscriptionBaseApiException(ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION,bundleId);
+    }
+    return createSubscriptionForApiUse(result);
   }
-  return createSubscriptionForApiUse(result);
+ catch (  CatalogApiException e) {
+    throw new SubscriptionBaseApiException(e);
+  }
 }

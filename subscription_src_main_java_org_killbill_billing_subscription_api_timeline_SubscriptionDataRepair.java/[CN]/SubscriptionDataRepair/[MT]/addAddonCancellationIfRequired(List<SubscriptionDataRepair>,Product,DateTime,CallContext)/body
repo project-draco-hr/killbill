@@ -9,8 +9,10 @@
     final Plan addonCurrentPlan=cur.getCurrentPlan();
     if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
       final SubscriptionBaseEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(now).setEffectiveDate(effectiveDate).setRequestedDate(now).setFromDisk(true));
-      repairDao.cancelSubscription(cur,cancelEvent,internalCallContextFactory.createInternalCallContext(cur.getId(),ObjectType.SUBSCRIPTION,context),0);
-      cur.rebuildTransitions(repairDao.getEventsForSubscription(cur.getId(),internalCallContextFactory.createInternalTenantContext(context)),catalogService.getFullCatalog());
+      final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(cur.getId(),ObjectType.SUBSCRIPTION,context);
+      repairDao.cancelSubscription(cur,cancelEvent,internalCallContext,0);
+      final Catalog fullCatalog=catalogService.getFullCatalog(internalCallContext);
+      cur.rebuildTransitions(repairDao.getEventsForSubscription(cur.getId(),internalCallContextFactory.createInternalTenantContext(context)),fullCatalog);
     }
   }
 }

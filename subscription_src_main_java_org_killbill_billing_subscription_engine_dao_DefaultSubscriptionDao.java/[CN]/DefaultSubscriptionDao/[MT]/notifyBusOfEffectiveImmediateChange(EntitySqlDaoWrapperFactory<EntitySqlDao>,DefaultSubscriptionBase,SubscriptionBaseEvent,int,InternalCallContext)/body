@@ -1,11 +1,14 @@
 {
   try {
-    final DefaultSubscriptionBase upToDateSubscription=createSubscriptionWithNewEvent(subscription,immediateEvent);
+    final DefaultSubscriptionBase upToDateSubscription=createSubscriptionWithNewEvent(subscription,immediateEvent,context);
     final SubscriptionBaseTransitionData transition=upToDateSubscription.getTransitionFromEvent(immediateEvent,seqId);
     final EffectiveSubscriptionInternalEvent busEvent=new DefaultEffectiveSubscriptionEvent(transition,upToDateSubscription.getAlignStartDate(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
     eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory.getSqlDao());
   }
  catch (  EventBusException e) {
+    log.warn("Failed to post effective event for subscription " + subscription.getId(),e);
+  }
+catch (  CatalogApiException e) {
     log.warn("Failed to post effective event for subscription " + subscription.getId(),e);
   }
 }

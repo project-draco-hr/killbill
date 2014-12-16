@@ -1,4 +1,10 @@
 {
-  final Map<UUID,List<SubscriptionBase>> subscriptions=subscriptionInternalApi.getSubscriptionsForAccount(internalTenantContext);
-  return buildForAccount(subscriptions,internalTenantContext);
+  final Map<UUID,List<SubscriptionBase>> subscriptions;
+  try {
+    subscriptions=subscriptionInternalApi.getSubscriptionsForAccount(internalTenantContext);
+    return buildForAccount(subscriptions,internalTenantContext);
+  }
+ catch (  SubscriptionBaseApiException e) {
+    throw new EntitlementApiException(e);
+  }
 }

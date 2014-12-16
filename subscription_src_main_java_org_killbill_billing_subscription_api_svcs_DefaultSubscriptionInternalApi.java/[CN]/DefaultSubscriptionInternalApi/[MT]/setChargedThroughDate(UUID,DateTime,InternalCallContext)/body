@@ -1,5 +1,10 @@
 {
-  final DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)dao.getSubscriptionFromId(subscriptionId,context);
-  final SubscriptionBuilder builder=new SubscriptionBuilder(subscription).setChargedThroughDate(chargedThruDate);
-  dao.updateChargedThroughDate(new DefaultSubscriptionBase(builder),context);
+  try {
+    final DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)dao.getSubscriptionFromId(subscriptionId,context);
+    final SubscriptionBuilder builder=new SubscriptionBuilder(subscription).setChargedThroughDate(chargedThruDate);
+    dao.updateChargedThroughDate(new DefaultSubscriptionBase(builder),context);
+  }
+ catch (  CatalogApiException e) {
+    throw new SubscriptionBaseApiException(e);
+  }
 }

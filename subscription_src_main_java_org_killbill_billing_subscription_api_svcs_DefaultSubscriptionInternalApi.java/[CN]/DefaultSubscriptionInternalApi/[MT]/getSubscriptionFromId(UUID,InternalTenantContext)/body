@@ -1,7 +1,12 @@
 {
-  final SubscriptionBase result=dao.getSubscriptionFromId(id,context);
-  if (result == null) {
-    throw new SubscriptionBaseApiException(ErrorCode.SUB_INVALID_SUBSCRIPTION_ID,id);
+  try {
+    final SubscriptionBase result=dao.getSubscriptionFromId(id,context);
+    if (result == null) {
+      throw new SubscriptionBaseApiException(ErrorCode.SUB_INVALID_SUBSCRIPTION_ID,id);
+    }
+    return createSubscriptionForApiUse(result);
   }
-  return createSubscriptionForApiUse(result);
+ catch (  CatalogApiException e) {
+    throw new SubscriptionBaseApiException(e);
+  }
 }

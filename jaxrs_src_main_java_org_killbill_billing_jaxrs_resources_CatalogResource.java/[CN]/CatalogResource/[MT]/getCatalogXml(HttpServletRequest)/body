@@ -1,3 +1,4 @@
 {
-  return Response.status(Status.OK).entity(XMLWriter.writeXML(catalogService.getCurrentCatalog(),StaticCatalog.class)).build();
+  final TenantContext tenantContext=context.createContext(request);
+  return Response.status(Status.OK).entity(XMLWriter.writeXML((VersionedCatalog)catalogUserApi.getCatalog(catalogName,tenantContext),VersionedCatalog.class)).build();
 }

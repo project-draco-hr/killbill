@@ -36,8 +36,8 @@
       if (bundleStartdate == null) {
         bundleStartdate=oldSubscription.getStartDate();
       }
-      final DefaultSubscriptionBase defaultSubscriptionBase=createSubscriptionForApiUse(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(subscriptionBundleData.getId()).setCategory(productCategory).setBundleStartDate(effectiveTransferDate).setAlignStartDate(subscriptionAlignStartDate),ImmutableList.<SubscriptionBaseEvent>of());
-      final List<SubscriptionBaseEvent> events=toEvents(existingEvents,defaultSubscriptionBase,effectiveTransferDate,context);
+      final DefaultSubscriptionBase defaultSubscriptionBase=createSubscriptionForApiUse(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(subscriptionBundleData.getId()).setCategory(productCategory).setBundleStartDate(effectiveTransferDate).setAlignStartDate(subscriptionAlignStartDate),ImmutableList.<SubscriptionBaseEvent>of(),fromInternalCallContext);
+      final List<SubscriptionBaseEvent> events=toEvents(existingEvents,defaultSubscriptionBase,effectiveTransferDate,fromInternalCallContext);
       final SubscriptionMigrationData curData=new SubscriptionMigrationData(defaultSubscriptionBase,events,null);
       subscriptionMigrationDataList.add(curData);
     }
@@ -46,6 +46,9 @@
     return bundleMigrationData.getData();
   }
  catch (  SubscriptionBaseRepairException e) {
+    throw new SubscriptionBaseTransferApiException(e);
+  }
+catch (  CatalogApiException e) {
     throw new SubscriptionBaseTransferApiException(e);
   }
 }
