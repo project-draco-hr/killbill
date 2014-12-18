@@ -1,0 +1,10 @@
+{
+  catalogCache.loadDefaultCatalog(Resources.getResource("SpyCarBasic.xml").toExternalForm());
+  final InternalTenantContext tenantContext=Mockito.mock(InternalTenantContext.class);
+  Mockito.when(tenantContext.getTenantRecordId()).thenReturn(99L);
+  Mockito.when(tenantInternalApi.getTenantCatalogs((Mockito.<InternalTenantContext>any()))).thenReturn(ImmutableList.<String>of());
+  VersionedCatalog result=catalogCache.getCatalog(tenantContext);
+  Assert.assertNotNull(result);
+  final DefaultProduct[] products=result.getProducts(clock.getUTCNow());
+  Assert.assertEquals(products.length,3);
+}
