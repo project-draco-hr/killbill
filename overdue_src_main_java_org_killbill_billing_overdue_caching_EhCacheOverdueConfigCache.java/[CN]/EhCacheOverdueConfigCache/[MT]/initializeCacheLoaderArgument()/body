@@ -1,0 +1,22 @@
+{
+  final LoaderCallback loaderCallback=new LoaderCallback(){
+    @Override public Object loadCatalog(    final String catalogXMLs) throws OverdueApiException {
+      final InputStream overdueConfigStream=new ByteArrayInputStream(catalogXMLs.getBytes());
+      final URI uri;
+      try {
+        uri=new URI("/overdueConfig");
+        final DefaultOverdueConfig overdueConfig=XMLLoader.getObjectFromStream(uri,overdueConfigStream,DefaultOverdueConfig.class);
+        return overdueConfig;
+      }
+ catch (      Exception e) {
+        throw new OverdueApiException(ErrorCode.OVERDUE_INVALID_FOR_TENANT,"Problem encountered loading overdue config ",e);
+      }
+    }
+  }
+;
+  final Object[] args=new Object[1];
+  args[0]=loaderCallback;
+  final ObjectType irrelevant=null;
+  final InternalTenantContext notUsed=null;
+  return new CacheLoaderArgument(irrelevant,args,notUsed);
+}

@@ -1,0 +1,21 @@
+{
+  boolean missingOrCorruptedDefaultConfig;
+  try {
+    if (configURI == null || configURI.isEmpty()) {
+      missingOrCorruptedDefaultConfig=true;
+    }
+ else {
+      final URI u=new URI(configURI);
+      defaultOverdueConfig=XMLLoader.getObjectFromUri(u,DefaultOverdueConfig.class);
+      missingOrCorruptedDefaultConfig=(defaultOverdueConfig == null);
+    }
+  }
+ catch (  Exception e) {
+    missingOrCorruptedDefaultConfig=true;
+    log.warn("Exception loading default overdue config from " + configURI,e);
+  }
+  if (missingOrCorruptedDefaultConfig) {
+    defaultOverdueConfig=new DefaultOverdueConfig();
+    log.warn("Overdue system disabled: unable to load the overdue config from " + configURI);
+  }
+}

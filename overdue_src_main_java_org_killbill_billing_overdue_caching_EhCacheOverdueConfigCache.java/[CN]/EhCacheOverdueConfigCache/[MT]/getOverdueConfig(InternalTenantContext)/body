@@ -1,0 +1,12 @@
+{
+  if (tenantContext.getTenantRecordId() == InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID) {
+    return defaultOverdueConfig;
+  }
+  try {
+    final OverdueConfig overdueConfig=(OverdueConfig)cacheController.get(tenantContext,cacheLoaderArgument);
+    return (overdueConfig != null) ? overdueConfig : defaultOverdueConfig;
+  }
+ catch (  IllegalStateException e) {
+    throw new OverdueApiException(ErrorCode.OVERDUE_INVALID_FOR_TENANT,tenantContext.getTenantRecordId());
+  }
+}

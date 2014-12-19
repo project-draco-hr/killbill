@@ -1,7 +1,9 @@
 {
   try {
+    final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(context);
     final String stateName=accessApi.getBlockingStateForService(overdueable.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,internalCallContextFactory.createInternalTenantContext(context)).getStateName();
-    final OverdueStateSet states=overdueConfig.getOverdueStatesAccount();
+    final OverdueConfig overdueConfig=overdueConfigCache.getOverdueConfig(internalTenantContext);
+    final OverdueStateSet states=((DefaultOverdueConfig)overdueConfig).getOverdueStatesAccount();
     return states.findState(stateName);
   }
  catch (  OverdueApiException e) {

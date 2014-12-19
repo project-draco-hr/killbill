@@ -1,0 +1,23 @@
+{
+  final OverdueConfig overdueConfig;
+  try {
+    overdueConfig=overdueConfigCache.getOverdueConfig(context);
+    if (overdueConfig == null || overdueConfig.getOverdueStatesAccount() == null) {
+      return new DefaultOverdueStateSet(){
+        @SuppressWarnings("unchecked") @Override public DefaultOverdueState[] getStates(){
+          return new DefaultOverdueState[0];
+        }
+        @Override public Period getInitialReevaluationInterval(){
+          return null;
+        }
+      }
+;
+    }
+ else {
+      return ((DefaultOverdueConfig)overdueConfig).getOverdueStatesAccount();
+    }
+  }
+ catch (  OverdueApiException e) {
+    throw new OverdueException(e);
+  }
+}

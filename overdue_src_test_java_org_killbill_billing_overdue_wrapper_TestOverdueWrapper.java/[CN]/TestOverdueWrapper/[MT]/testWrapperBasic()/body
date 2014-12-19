@@ -1,23 +1,23 @@
 {
   final InputStream is=new ByteArrayInputStream(testOverdueHelper.getConfigXml().getBytes());
   final DefaultOverdueConfig config=XMLLoader.getObjectFromStreamNoValidation(is,DefaultOverdueConfig.class);
-  overdueWrapperFactory.setOverdueConfig(config);
+  ((MockOverdueConfigCache)overdueConfigCache).loadOverwriteDefaultOverdueConfig(config);
   Account account;
   OverdueWrapper wrapper;
   OverdueState state;
   state=config.getOverdueStatesAccount().findState("OD1");
   account=testOverdueHelper.createAccount(clock.getUTCToday().minusDays(31));
-  wrapper=overdueWrapperFactory.createOverdueWrapperFor(account);
+  wrapper=overdueWrapperFactory.createOverdueWrapperFor(account,internalCallContext);
   wrapper.refresh(internalCallContext);
   testOverdueHelper.checkStateApplied(state);
   state=config.getOverdueStatesAccount().findState("OD2");
   account=testOverdueHelper.createAccount(clock.getUTCToday().minusDays(41));
-  wrapper=overdueWrapperFactory.createOverdueWrapperFor(account);
+  wrapper=overdueWrapperFactory.createOverdueWrapperFor(account,internalCallContext);
   wrapper.refresh(internalCallContext);
   testOverdueHelper.checkStateApplied(state);
   state=config.getOverdueStatesAccount().findState("OD3");
   account=testOverdueHelper.createAccount(clock.getUTCToday().minusDays(51));
-  wrapper=overdueWrapperFactory.createOverdueWrapperFor(account);
+  wrapper=overdueWrapperFactory.createOverdueWrapperFor(account,internalCallContext);
   wrapper.refresh(internalCallContext);
   testOverdueHelper.checkStateApplied(state);
 }
