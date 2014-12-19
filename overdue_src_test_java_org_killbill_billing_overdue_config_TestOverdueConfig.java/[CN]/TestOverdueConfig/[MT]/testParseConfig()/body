@@ -1,12 +1,12 @@
 {
   final String xml="<overdueConfig>" + "   <accountOverdueStates>" + "       <initialReevaluationInterval>"+ "           <unit>DAYS</unit><number>1</number>"+ "       </initialReevaluationInterval>"+ "       <state name=\"OD1\">"+ "           <condition>"+ "               <timeSinceEarliestUnpaidInvoiceEqualsOrExceeds>"+ "                   <unit>MONTHS</unit><number>1</number>"+ "               </timeSinceEarliestUnpaidInvoiceEqualsOrExceeds>"+ "           </condition>"+ "           <externalMessage>Reached OD1</externalMessage>"+ "           <blockChanges>true</blockChanges>"+ "           <disableEntitlementAndChangesBlocked>false</disableEntitlementAndChangesBlocked>"+ "           <autoReevaluationInterval>"+ "               <unit>DAYS</unit><number>15</number>"+ "           </autoReevaluationInterval>"+ "       </state>"+ "       <state name=\"OD2\">"+ "           <condition>"+ "               <timeSinceEarliestUnpaidInvoiceEqualsOrExceeds>"+ "                   <unit>MONTHS</unit><number>2</number>"+ "               </timeSinceEarliestUnpaidInvoiceEqualsOrExceeds>"+ "           </condition>"+ "           <externalMessage>Reached OD1</externalMessage>"+ "           <blockChanges>true</blockChanges>"+ "           <disableEntitlementAndChangesBlocked>true</disableEntitlementAndChangesBlocked>"+ "           <autoReevaluationInterval>"+ "               <unit>DAYS</unit><number>15</number>"+ "           </autoReevaluationInterval>"+ "           <enterStateEmailNotification>"+ "               <subject>ToTo</subject><templateName>Titi</templateName>"+ "           </enterStateEmailNotification>"+ "       </state>"+ "   </accountOverdueStates>"+ "</overdueConfig>";
   final InputStream is=new ByteArrayInputStream(xml.getBytes());
-  final OverdueConfig c=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
-  Assert.assertEquals(c.getStateSet().size(),2);
-  Assert.assertNull(c.getStateSet().getStates()[0].getEnterStateEmailNotification());
-  Assert.assertNotNull(c.getStateSet().getInitialReevaluationInterval());
-  Assert.assertEquals(c.getStateSet().getInitialReevaluationInterval().getDays(),1);
-  final EmailNotification secondNotification=c.getStateSet().getStates()[1].getEnterStateEmailNotification();
+  final DefaultOverdueConfig c=XMLLoader.getObjectFromStreamNoValidation(is,DefaultOverdueConfig.class);
+  Assert.assertEquals(c.getOverdueStatesAccount().size(),2);
+  Assert.assertNull(c.getOverdueStatesAccount().getStates()[0].getEmailNotification());
+  Assert.assertNotNull(c.getOverdueStatesAccount().getInitialReevaluationInterval());
+  Assert.assertEquals(c.getOverdueStatesAccount().getInitialReevaluationInterval().getDays(),1);
+  final EmailNotification secondNotification=c.getOverdueStatesAccount().getStates()[1].getEmailNotification();
   Assert.assertEquals(secondNotification.getSubject(),"ToTo");
   Assert.assertEquals(secondNotification.getTemplateName(),"Titi");
   Assert.assertFalse(secondNotification.isHTML());

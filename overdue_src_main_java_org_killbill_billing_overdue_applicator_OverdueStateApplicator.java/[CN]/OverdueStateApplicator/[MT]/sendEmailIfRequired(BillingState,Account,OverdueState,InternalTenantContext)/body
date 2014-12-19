@@ -1,13 +1,13 @@
 {
-  if (nextOverdueState.getEnterStateEmailNotification() == null) {
+  if (nextOverdueState.getEmailNotification() == null) {
     return;
   }
   final List<String> to=ImmutableList.<String>of(account.getEmail());
   final List<String> cc=ImmutableList.<String>of();
-  final String subject=nextOverdueState.getEnterStateEmailNotification().getSubject();
+  final String subject=nextOverdueState.getEmailNotification().getSubject();
   try {
     final String emailBody=overdueEmailGenerator.generateEmail(account,billingState,account,nextOverdueState);
-    if (nextOverdueState.getEnterStateEmailNotification().isHTML()) {
+    if (nextOverdueState.getEmailNotification().isHTML()) {
       emailSender.sendHTMLEmail(to,cc,subject,emailBody);
     }
  else {

@@ -1,10 +1,10 @@
 {
-  if (nextOverdueState.getSubscriptionCancellationPolicy() == OverdueCancellationPolicy.NONE) {
+  if (nextOverdueState.getOverdueCancellationPolicy() == OverdueCancellationPolicy.NONE) {
     return;
   }
   try {
     final BillingActionPolicy actionPolicy;
-switch (nextOverdueState.getSubscriptionCancellationPolicy()) {
+switch (nextOverdueState.getOverdueCancellationPolicy()) {
 case END_OF_TERM:
       actionPolicy=BillingActionPolicy.END_OF_TERM;
     break;
@@ -12,7 +12,7 @@ case IMMEDIATE:
   actionPolicy=BillingActionPolicy.IMMEDIATE;
 break;
 default :
-throw new IllegalStateException("Unexpected OverdueCancellationPolicy " + nextOverdueState.getSubscriptionCancellationPolicy());
+throw new IllegalStateException("Unexpected OverdueCancellationPolicy " + nextOverdueState.getOverdueCancellationPolicy());
 }
 final List<Entitlement> toBeCancelled=new LinkedList<Entitlement>();
 computeEntitlementsToCancel(account,toBeCancelled,context);

@@ -2,10 +2,10 @@
   super.beforeMethod();
   final String configXml=getOverdueConfig();
   final InputStream is=new ByteArrayInputStream(configXml.getBytes());
-  final OverdueConfig config=XMLLoader.getObjectFromStreamNoValidation(is,OverdueConfig.class);
+  final DefaultOverdueConfig config=XMLLoader.getObjectFromStreamNoValidation(is,DefaultOverdueConfig.class);
   overdueWrapperFactory.setOverdueConfig(config);
   overdueListener.setOverdueConfig(config);
-  ((DefaultOverdueUserApi)overdueUserApi).setOverdueConfig(config);
+  ((DefaultOverdueInternalApi)overdueUserApi).setOverdueConfig(config);
   account=createAccountWithNonOsgiPaymentMethod(getAccountData(0));
   assertNotNull(account);
   paymentApi.addPaymentMethod(account,UUID.randomUUID().toString(),BeatrixIntegrationModule.NON_OSGI_PLUGIN_NAME,true,paymentMethodPlugin,PLUGIN_PROPERTIES,callContext);

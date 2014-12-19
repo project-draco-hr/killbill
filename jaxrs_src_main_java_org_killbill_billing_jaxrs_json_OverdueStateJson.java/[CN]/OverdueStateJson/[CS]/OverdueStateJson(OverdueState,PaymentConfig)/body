@@ -1,0 +1,20 @@
+{
+  this.name=overdueState.getName();
+  this.externalMessage=overdueState.getExternalMessage();
+  this.daysBetweenPaymentRetries=paymentConfig.getPaymentRetryDays();
+  this.disableEntitlementAndChangesBlocked=overdueState.isDisableEntitlementAndChangesBlocked();
+  this.blockChanges=overdueState.isBlockChanges();
+  this.isClearState=overdueState.isClearState();
+  Period reevaluationIntervalPeriod=null;
+  try {
+    reevaluationIntervalPeriod=overdueState.getAutoReevaluationInterval();
+  }
+ catch (  final OverdueApiException ignored) {
+  }
+  if (reevaluationIntervalPeriod != null) {
+    this.reevaluationIntervalDays=reevaluationIntervalPeriod.getDays();
+  }
+ else {
+    this.reevaluationIntervalDays=null;
+  }
+}

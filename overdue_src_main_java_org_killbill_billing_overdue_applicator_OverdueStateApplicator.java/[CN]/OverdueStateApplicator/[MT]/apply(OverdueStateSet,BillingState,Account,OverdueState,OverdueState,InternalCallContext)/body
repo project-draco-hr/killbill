@@ -8,7 +8,7 @@
     final OverdueState firstOverdueState=overdueStateSet.getFirstState();
     final boolean conditionForNextNotfication=!nextOverdueState.isClearState() || (firstOverdueState != null && billingState != null && billingState.getDateOfEarliestUnpaidInvoice() != null);
     if (conditionForNextNotfication) {
-      final Period reevaluationInterval=nextOverdueState.isClearState() ? overdueStateSet.getInitialReevaluationInterval() : nextOverdueState.getReevaluationInterval();
+      final Period reevaluationInterval=nextOverdueState.isClearState() ? overdueStateSet.getInitialReevaluationInterval() : nextOverdueState.getAutoReevaluationInterval();
       if (reevaluationInterval == null) {
         log.debug("OverdueStateApplicator <notificationQ> : Missing InitialReevaluationInterval from config, NOT inserting notification for account " + account.getId());
       }

@@ -2,20 +2,20 @@
   if (!isConfigLoaded) {
     try {
       final URI u=new URI(properties.getConfigURI());
-      overdueConfig=XMLLoader.getObjectFromUri(u,OverdueConfig.class);
+      overdueConfig=XMLLoader.getObjectFromUri(u,DefaultOverdueConfig.class);
       if (overdueConfig == null) {
         log.warn("Overdue system disabled: unable to load the overdue config from " + properties.getConfigURI());
-        overdueConfig=new OverdueConfig();
+        overdueConfig=new DefaultOverdueConfig();
       }
       isConfigLoaded=true;
     }
  catch (    final URISyntaxException e) {
       log.warn("Overdue system disabled: unable to load the overdue config from " + properties.getConfigURI(),e);
-      overdueConfig=new OverdueConfig();
+      overdueConfig=new DefaultOverdueConfig();
     }
 catch (    final IllegalArgumentException e) {
       log.warn("Overdue system disabled: unable to load the overdue config from " + properties.getConfigURI(),e);
-      overdueConfig=new OverdueConfig();
+      overdueConfig=new DefaultOverdueConfig();
     }
 catch (    final Exception e) {
       log.warn("Unable to load the overdue config from " + properties.getConfigURI(),e);
@@ -23,6 +23,6 @@ catch (    final Exception e) {
     }
     factory.setOverdueConfig(overdueConfig);
     listener.setOverdueConfig(overdueConfig);
-    ((DefaultOverdueUserApi)userApi).setOverdueConfig(overdueConfig);
+    ((DefaultOverdueInternalApi)userApi).setOverdueConfig(overdueConfig);
   }
 }
