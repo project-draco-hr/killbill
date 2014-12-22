@@ -4,5 +4,6 @@
   data.put("billingState",overdueEmailFormatterFactory.createBillingStateFormatter(billingState));
   data.put("overdueable",overdueable);
   data.put("nextOverdueState",nextOverdueState);
-  return templateEngine.executeTemplate(nextOverdueState.getEmailNotification().getTemplateName(),data);
+  final InputStream input=new FileInputStream(nextOverdueState.getEmailNotification().getTemplateName());
+  return templateEngine.executeTemplateText(IOUtils.toString(input),data);
 }

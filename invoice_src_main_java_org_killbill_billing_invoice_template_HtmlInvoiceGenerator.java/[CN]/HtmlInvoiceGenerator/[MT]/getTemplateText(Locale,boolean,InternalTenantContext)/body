@@ -1,0 +1,7 @@
+{
+  if (context.getTenantRecordId() == InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID) {
+    return getDefaultTemplate(manualPay ? config.getManualPayTemplateName() : config.getTemplateName());
+  }
+  final String template=manualPay ? tenantApi.getManualPayInvoiceTemplate(locale,context) : tenantApi.getInvoiceTemplate(locale,context);
+  return template == null ? getDefaultTemplate(manualPay ? config.getManualPayTemplateName() : config.getTemplateName()) : template;
+}

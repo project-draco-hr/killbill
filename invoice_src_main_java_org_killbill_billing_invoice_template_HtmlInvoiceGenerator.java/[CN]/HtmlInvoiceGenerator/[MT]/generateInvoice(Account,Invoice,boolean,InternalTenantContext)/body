@@ -1,0 +1,20 @@
+{
+  if (invoice == null) {
+    return null;
+  }
+  final String accountLocale=Strings.emptyToNull(account.getLocale());
+  final Locale locale=accountLocale == null ? Locale.getDefault() : LocaleUtils.toLocale(accountLocale);
+  final HtmlInvoice invoiceData=new HtmlInvoice();
+  final Map<String,Object> data=new HashMap<String,Object>();
+  final ResourceBundle invoiceBundle=accountLocale != null ? bundleFactory.createBundle(LocaleUtils.toLocale(accountLocale),config.getInvoiceTemplateBundlePath(),ResourceBundleType.INVOICE_TRANSLATION,context) : null;
+  final ResourceBundle defaultInvoiceBundle=bundleFactory.createBundle(Locale.getDefault(),config.getInvoiceTemplateBundlePath(),ResourceBundleType.INVOICE_TRANSLATION,context);
+  final DefaultInvoiceTranslator invoiceTranslator=new DefaultInvoiceTranslator(invoiceBundle,defaultInvoiceBundle);
+  data.put("text",invoiceTranslator);
+  data.put("account",account);
+  final InvoiceFormatter formattedInvoice=factory.createInvoiceFormatter(config,invoice,locale,currencyConversionApi,bundleFactory,context);
+  data.put("invoice",formattedInvoice);
+  invoiceData.setSubject(invoiceTranslator.getInvoiceEmailSubject());
+  final String templateText=getTemplateText(locale,manualPay,context);
+  invoiceData.setBody(templateEngine.executeTemplateText(templateText,data));
+  return invoiceData;
+}

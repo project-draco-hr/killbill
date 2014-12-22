@@ -1,0 +1,15 @@
+{
+  if (tenantContext.getTenantRecordId() == InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID) {
+    return getGlobalBundle(locale,bundlePath);
+  }
+  final String bundle=getTenantBundleForType(locale,type,tenantContext);
+  if (bundle != null) {
+    try {
+      return new PropertyResourceBundle(new ByteArrayInputStream(bundle.getBytes(Charsets.UTF_8)));
+    }
+ catch (    IOException e) {
+      logger.warn("Failed to de-serialize the property bundle for tenant {} and locale {}",tenantContext.getTenantRecordId(),locale);
+    }
+  }
+  return getGlobalBundle(locale,bundlePath);
+}
