@@ -1,0 +1,23 @@
+{
+  final String tenantKeyStr;
+  if (localeStr != null) {
+    final InputStream stream=new ByteArrayInputStream(templateResource.getBytes());
+    new PropertyResourceBundle(stream);
+    final Locale locale=localeStr != null ? LocaleUtils.toLocale(localeStr) : defaultLocale;
+    tenantKeyStr=LocaleUtils.localeString(locale,tenantKey.toString());
+  }
+ else {
+    tenantKeyStr=tenantKey.toString();
+  }
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  if (!tenantApi.getTenantValueForKey(tenantKeyStr,callContext).isEmpty()) {
+    if (deleteIfExists) {
+      tenantApi.deleteTenantKey(tenantKeyStr,callContext);
+    }
+ else {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+  }
+  tenantApi.addTenantKeyValue(tenantKeyStr,templateResource,callContext);
+  return uriBuilder.buildResponse(uriInfo,InvoiceResource.class,getMethodStr,localeStr);
+}
