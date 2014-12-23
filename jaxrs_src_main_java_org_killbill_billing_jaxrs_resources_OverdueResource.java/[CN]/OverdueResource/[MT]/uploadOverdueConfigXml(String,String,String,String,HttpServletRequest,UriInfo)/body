@@ -2,6 +2,6 @@
   final InputStream stream=new ByteArrayInputStream(overdueXML.getBytes());
   XMLLoader.getObjectFromStream(new URI(JaxrsResource.OVERDUE_PATH),stream,DefaultOverdueConfig.class);
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  tenantApi.addTenantKeyValue(TenantKey.OVERDUE_CONFIG.toString(),overdueXML,callContext);
+  overdueApi.uploadOverdueConfig(overdueXML,callContext);
   return uriBuilder.buildResponse(uriInfo,OverdueResource.class,null,null);
 }

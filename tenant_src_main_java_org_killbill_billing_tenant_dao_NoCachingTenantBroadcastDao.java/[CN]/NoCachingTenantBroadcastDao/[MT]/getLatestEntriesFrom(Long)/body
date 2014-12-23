@@ -1,0 +1,8 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<TenantBroadcastModelDao>>(){
+    @Override public List<TenantBroadcastModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      return entitySqlDaoWrapperFactory.become(TenantBroadcastSqlDao.class).getLatestEntries(recordId);
+    }
+  }
+);
+}

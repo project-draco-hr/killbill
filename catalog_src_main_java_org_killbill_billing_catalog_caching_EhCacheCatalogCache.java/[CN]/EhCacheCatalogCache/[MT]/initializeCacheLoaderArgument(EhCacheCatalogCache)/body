@@ -1,0 +1,16 @@
+{
+  final LoaderCallback loaderCallback=new LoaderCallback(){
+    @Override public Object loadCatalog(    final List<String> catalogXMLs) throws CatalogApiException {
+      return loader.load(catalogXMLs);
+    }
+    @Override public void invalidateCache(    final InternalTenantContext tenantContext){
+      parentCache.clearCatalog(tenantContext);
+    }
+  }
+;
+  final Object[] args=new Object[1];
+  args[0]=loaderCallback;
+  final ObjectType irrelevant=null;
+  final InternalTenantContext notUsed=null;
+  return new CacheLoaderArgument(irrelevant,args,notUsed);
+}

@@ -1,0 +1,18 @@
+{
+  if (parent.isStopped) {
+    return;
+  }
+  final List<TenantBroadcastModelDao> entries=broadcastDao.getLatestEntriesFrom(parent.getLatestRecordIdProcessed().get());
+  for (  TenantBroadcastModelDao cur : entries) {
+    if (parent.isStopped()) {
+      return;
+    }
+    final CacheInvalidationKey key=new CacheInvalidationKey(cur.getTenantRecordId(),TenantKey.valueOf(cur.getType()));
+    final CacheInvalidationCallback callback=parent.getCacheInvalidation(key);
+    if (callback != null) {
+      final InternalTenantContext tenantContext=new InternalTenantContext(cur.getTenantRecordId(),null);
+      callback.invalidateCache(tenantContext);
+    }
+    parent.setLatestRecordIdProcessed(cur.getRecordId());
+  }
+}

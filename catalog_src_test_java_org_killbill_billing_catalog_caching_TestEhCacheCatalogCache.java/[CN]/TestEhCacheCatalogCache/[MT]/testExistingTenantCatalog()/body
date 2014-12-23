@@ -4,12 +4,12 @@
   final String catalogXML=CharStreams.toString(new InputStreamReader(inputCatalog,"UTF-8"));
   final InternalTenantContext tenantContext=Mockito.mock(InternalTenantContext.class);
   Mockito.when(tenantContext.getTenantRecordId()).thenReturn(156L);
-  Mockito.when(tenantInternalApi.getTenantCatalogs((Mockito.<InternalTenantContext>any()))).thenReturn(ImmutableList.<String>of(catalogXML));
+  Mockito.when(tenantInternalApi.getTenantCatalogs(Mockito.any(InternalTenantContext.class),Mockito.any(CacheInvalidationCallback.class))).thenReturn(ImmutableList.<String>of(catalogXML));
   VersionedCatalog result=catalogCache.getCatalog(tenantContext);
   Assert.assertNotNull(result);
   final DefaultProduct[] products=result.getProducts(clock.getUTCNow());
   Assert.assertEquals(products.length,6);
-  Mockito.when(tenantInternalApi.getTenantCatalogs(tenantContext)).thenThrow(RuntimeException.class);
+  Mockito.when(tenantInternalApi.getTenantCatalogs(tenantContext,cacheInvalidationCallback)).thenThrow(RuntimeException.class);
   VersionedCatalog result2=catalogCache.getCatalog(tenantContext);
   Assert.assertNotNull(result2);
   final DefaultProduct[] products2=result.getProducts(clock.getUTCNow());

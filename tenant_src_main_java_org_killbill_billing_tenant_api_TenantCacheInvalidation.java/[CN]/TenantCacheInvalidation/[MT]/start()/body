@@ -1,0 +1,9 @@
+{
+  if (isStopped) {
+    logger.warn("TenantExecutor is in a stopped state, abort start sequence");
+    return;
+  }
+  final TimeUnit pendingRateUnit=tenantConfig.getTenantBroadcastServiceRunningRate().getUnit();
+  final long pendingPeriod=tenantConfig.getTenantBroadcastServiceRunningRate().getPeriod();
+  tenantExecutor.scheduleAtFixedRate(new TenantCacheInvalidationRunnable(this,broadcastDao),pendingPeriod,pendingPeriod,pendingRateUnit);
+}

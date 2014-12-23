@@ -1,0 +1,20 @@
+{
+  final InternalCallContext context79=createContext(81L);
+  TenantBroadcastModelDao latestInsert=null;
+  for (int i=0; i < 100; i++) {
+    final TenantBroadcastModelDao model=new TenantBroadcastModelDao("foo-" + i);
+    tenantBroadcastDao.create(model,context79);
+    latestInsert=model;
+  }
+  final TenantBroadcastModelDao latestInsertRefreshed=tenantBroadcastDao.getById(latestInsert.getId(),context79);
+  final TenantBroadcastModelDao lastEntry=noCachingTenantBroadcastDao.getLatestEntry();
+  Assert.assertEquals(lastEntry.getRecordId(),latestInsertRefreshed.getRecordId());
+  final int expectedEntries=25;
+  final Long fromRecordId=lastEntry.getRecordId() - expectedEntries;
+  final List<TenantBroadcastModelDao> result=noCachingTenantBroadcastDao.getLatestEntriesFrom(fromRecordId);
+  Assert.assertEquals(result.size(),expectedEntries);
+  long i=0;
+  for (  TenantBroadcastModelDao cur : result) {
+    Assert.assertEquals(cur.getRecordId().longValue(),(fromRecordId + i++ + 1L));
+  }
+}

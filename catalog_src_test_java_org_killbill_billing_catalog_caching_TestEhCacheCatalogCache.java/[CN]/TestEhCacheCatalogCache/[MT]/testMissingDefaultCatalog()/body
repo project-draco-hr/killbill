@@ -1,4 +1,7 @@
 {
-  Mockito.when(tenantInternalApi.getTenantCatalogs((Mockito.<InternalTenantContext>any()))).thenReturn(ImmutableList.<String>of());
+  final InternalTenantContext tenantContext=Mockito.mock(InternalTenantContext.class);
+  Mockito.when(tenantContext.getTenantRecordId()).thenReturn(0L);
+  catalogCache.loadDefaultCatalog(null);
+  Mockito.when(tenantInternalApi.getTenantCatalogs(tenantContext,cacheInvalidationCallback)).thenReturn(ImmutableList.<String>of());
   catalogCache.getCatalog(internalCallContext);
 }
