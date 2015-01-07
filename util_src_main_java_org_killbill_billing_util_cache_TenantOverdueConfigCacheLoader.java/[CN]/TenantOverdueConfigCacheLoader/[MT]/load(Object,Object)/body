@@ -12,11 +12,12 @@
     throw new IllegalArgumentException("Missing LoaderCallback from the arguments ");
   }
   final LoaderCallback callback=(LoaderCallback)cacheLoaderArgument.getArgs()[0];
-  final String overdueXML=tenantApi.getTenantOverdueConfig(internalTenantContext,(CacheInvalidationCallback)callback);
+  final String overdueXML=tenantApi.getTenantOverdueConfig(internalTenantContext);
   if (overdueXML == null) {
     return null;
   }
   try {
+    logger.info("Loading overdue cache for tenant " + internalTenantContext.getTenantRecordId());
     return callback.loadCatalog(overdueXML);
   }
  catch (  OverdueApiException e) {

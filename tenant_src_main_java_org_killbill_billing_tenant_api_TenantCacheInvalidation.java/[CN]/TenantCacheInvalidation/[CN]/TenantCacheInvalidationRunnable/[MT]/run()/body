@@ -7,11 +7,13 @@
     if (parent.isStopped()) {
       return;
     }
-    final CacheInvalidationKey key=new CacheInvalidationKey(cur.getTenantRecordId(),TenantKey.valueOf(cur.getType()));
-    final CacheInvalidationCallback callback=parent.getCacheInvalidation(key);
+    final CacheInvalidationCallback callback=parent.getCacheInvalidation(TenantKey.valueOf(cur.getType()));
     if (callback != null) {
       final InternalTenantContext tenantContext=new InternalTenantContext(cur.getTenantRecordId(),null);
       callback.invalidateCache(tenantContext);
+    }
+ else {
+      logger.warn("Failed to find CacheInvalidationCallback for " + cur.getType());
     }
     parent.setLatestRecordIdProcessed(cur.getRecordId());
   }
