@@ -3,7 +3,8 @@
   if (request instanceof HttpServletRequest) {
     final HttpServletRequest httpServletRequest=(HttpServletRequest)request;
     final String path=httpServletRequest.getRequestURI();
-    if (("/1.0/kb/tenants".equals(path) && "POST".equals(httpServletRequest.getMethod())) || (("/1.0/kb/security/subject".equals(path) || "/1.0/kb/security/permissions".equals(path)) && "GET".equals(httpServletRequest.getMethod())) || (KillbillGuiceListener.METRICS_SERVLETS_PATHS.contains(path) && "GET".equals(httpServletRequest.getMethod()))|| "OPTIONS".equals(httpServletRequest.getMethod())|| (!path.startsWith("/1.0") && "GET".equals(httpServletRequest.getMethod()))) {
+    final String httpMethod=httpServletRequest.getMethod();
+    if (isTenantCreationRequest(path,httpMethod) || isPermissionRequest(path,httpMethod) || isMetricsRequest(path,httpMethod)|| isOptionsRequest(httpMethod)|| isStaticResourceRequest(path,httpMethod)) {
       shouldSkip=true;
     }
   }

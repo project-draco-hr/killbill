@@ -1,6 +1,6 @@
 {
-  return dispatchWithExceptionHandling(account,new CallableWithAccountLock<HostedPaymentPageFormDescriptor,PaymentApiException>(locker,account.getExternalKey(),new WithAccountLockCallback<PluginDispatcherReturnType<HostedPaymentPageFormDescriptor>,PaymentApiException>(){
-    @Override public PluginDispatcherReturnType<HostedPaymentPageFormDescriptor> doOperation() throws PaymentApiException {
+  return dispatchWithExceptionHandling(account,new Callable<PluginDispatcherReturnType<HostedPaymentPageFormDescriptor>>(){
+    @Override public PluginDispatcherReturnType<HostedPaymentPageFormDescriptor> call() throws PaymentApiException {
       final PaymentPluginApi plugin=getPaymentProviderPlugin(account,internalCallContext);
       try {
         final HostedPaymentPageFormDescriptor result=plugin.buildFormDescriptor(account.getId(),customFields,properties,callContext);
@@ -14,5 +14,5 @@ catch (      final PaymentPluginApiException e) {
       }
     }
   }
-),paymentPluginFormDispatcher);
+,paymentPluginFormDispatcher);
 }
