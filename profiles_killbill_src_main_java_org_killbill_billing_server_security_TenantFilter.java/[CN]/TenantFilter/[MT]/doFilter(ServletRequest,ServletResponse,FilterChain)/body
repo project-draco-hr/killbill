@@ -7,13 +7,8 @@
     apiSecret=httpServletRequest.getHeader(JaxrsResource.HDR_API_SECRET);
   }
   if (apiKey == null || apiSecret == null) {
-    if (shouldContinueIfTenantInformationIsMissing(request)) {
-      chain.doFilter(request,response);
-    }
- else {
-      final String errorMessage=String.format("Make sure to set the %s and %s headers",JaxrsResource.HDR_API_KEY,JaxrsResource.HDR_API_SECRET);
-      sendAuthError(response,errorMessage);
-    }
+    final String errorMessage=String.format("Make sure to set the %s and %s headers",JaxrsResource.HDR_API_KEY,JaxrsResource.HDR_API_SECRET);
+    handleAuthenticationError(errorMessage,chain,request,response);
     return;
   }
   final AuthenticationToken token=new UsernamePasswordToken(apiKey,apiSecret);
@@ -22,7 +17,7 @@
   }
  catch (  final AuthenticationException e) {
     final String errorMessage=e.getLocalizedMessage();
-    sendAuthError(response,errorMessage);
+    handleAuthenticationError(errorMessage,chain,request,response);
     return;
   }
   try {
