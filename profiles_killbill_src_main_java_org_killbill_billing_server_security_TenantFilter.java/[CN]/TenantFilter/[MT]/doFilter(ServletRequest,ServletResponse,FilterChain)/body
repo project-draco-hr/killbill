@@ -1,8 +1,4 @@
 {
-  if (shouldSkipFilter(request)) {
-    chain.doFilter(request,response);
-    return;
-  }
   String apiKey=null;
   String apiSecret=null;
   if (request instanceof HttpServletRequest) {
@@ -11,8 +7,13 @@
     apiSecret=httpServletRequest.getHeader(JaxrsResource.HDR_API_SECRET);
   }
   if (apiKey == null || apiSecret == null) {
-    final String errorMessage=String.format("Make sure to set the %s and %s headers",JaxrsResource.HDR_API_KEY,JaxrsResource.HDR_API_SECRET);
-    sendAuthError(response,errorMessage);
+    if (shouldContinueIfTenantInformationIsMissing(request)) {
+      chain.doFilter(request,response);
+    }
+ else {
+      final String errorMessage=String.format("Make sure to set the %s and %s headers",JaxrsResource.HDR_API_KEY,JaxrsResource.HDR_API_SECRET);
+      sendAuthError(response,errorMessage);
+    }
     return;
   }
   final AuthenticationToken token=new UsernamePasswordToken(apiKey,apiSecret);

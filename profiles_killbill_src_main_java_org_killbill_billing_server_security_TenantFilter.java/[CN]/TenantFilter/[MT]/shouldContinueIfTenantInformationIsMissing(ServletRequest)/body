@@ -1,0 +1,12 @@
+{
+  boolean shouldContinue=false;
+  if (request instanceof HttpServletRequest) {
+    final HttpServletRequest httpServletRequest=(HttpServletRequest)request;
+    final String path=httpServletRequest.getRequestURI();
+    final String httpMethod=httpServletRequest.getMethod();
+    if (isTenantCreationRequest(path,httpMethod) || isPermissionRequest(path,httpMethod) || isMetricsRequest(path,httpMethod)|| isOptionsRequest(httpMethod)|| isPluginRequest(path)|| isNotKbNorPluginResourceRequest(path,httpMethod)) {
+      shouldContinue=true;
+    }
+  }
+  return shouldContinue;
+}
