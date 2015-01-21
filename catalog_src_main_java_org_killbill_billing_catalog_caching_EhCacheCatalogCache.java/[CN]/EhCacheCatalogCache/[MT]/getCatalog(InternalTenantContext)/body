@@ -1,15 +1,15 @@
 {
   if (tenantContext.getTenantRecordId() == InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID) {
     if (defaultCatalog == null) {
-      throw new CatalogApiException(ErrorCode.CAT_INVALID_DEFAULT,": the system property org.killbill.catalog.uri must be specified and point to valid catalog xml");
+      throw new CatalogApiException(ErrorCode.CAT_INVALID_DEFAULT,"the system property org.killbill.catalog.uri must be specified and point to valid catalog xml");
     }
     return defaultCatalog;
   }
   try {
-    final VersionedCatalog tenantCatalog=(VersionedCatalog)cacheController.get(tenantContext,cacheLoaderArgument);
+    final VersionedCatalog tenantCatalog=(VersionedCatalog)cacheController.get(tenantContext.getTenantRecordId(),cacheLoaderArgument);
     return (tenantCatalog != null) ? tenantCatalog : defaultCatalog;
   }
- catch (  IllegalStateException e) {
+ catch (  final IllegalStateException e) {
     throw new CatalogApiException(ErrorCode.CAT_INVALID_FOR_TENANT,tenantContext.getTenantRecordId());
   }
 }

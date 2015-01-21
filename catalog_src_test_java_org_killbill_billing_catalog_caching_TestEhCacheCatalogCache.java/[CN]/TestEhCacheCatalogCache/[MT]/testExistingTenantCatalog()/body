@@ -1,17 +1,40 @@
 {
+  final AtomicBoolean shouldThrow=new AtomicBoolean(false);
+  final Long multiTenantRecordId=multiTenantContext.getTenantRecordId();
   catalogCache.loadDefaultCatalog(Resources.getResource("SpyCarBasic.xml").toExternalForm());
-  final InputStream inputCatalog=UriAccessor.accessUri(new URI(Resources.getResource("SpyCarAdvanced.xml").toExternalForm()));
-  final String catalogXML=CharStreams.toString(new InputStreamReader(inputCatalog,"UTF-8"));
-  final InternalTenantContext tenantContext=Mockito.mock(InternalTenantContext.class);
-  Mockito.when(tenantContext.getTenantRecordId()).thenReturn(156L);
-  Mockito.when(tenantInternalApi.getTenantCatalogs(Mockito.any(InternalTenantContext.class))).thenReturn(ImmutableList.<String>of(catalogXML));
-  VersionedCatalog result=catalogCache.getCatalog(tenantContext);
+  final InputStream tenantInputCatalog=UriAccessor.accessUri(new URI(Resources.getResource("SpyCarAdvanced.xml").toExternalForm()));
+  final String tenantCatalogXML=CharStreams.toString(new InputStreamReader(tenantInputCatalog,"UTF-8"));
+  final InputStream otherTenantInputCatalog=UriAccessor.accessUri(new URI(Resources.getResource("SpyCarBasic.xml").toExternalForm()));
+  final String otherTenantCatalogXML=CharStreams.toString(new InputStreamReader(otherTenantInputCatalog,"UTF-8"));
+  Mockito.when(tenantInternalApi.getTenantCatalogs(Mockito.any(InternalTenantContext.class))).thenAnswer(new Answer<List<String>>(){
+    @Override public List<String> answer(    final InvocationOnMock invocation) throws Throwable {
+      if (shouldThrow.get()) {
+        throw new RuntimeException();
+      }
+      final InternalTenantContext internalContext=(InternalTenantContext)invocation.getArguments()[0];
+      if (multiTenantRecordId.equals(internalContext.getTenantRecordId())) {
+        return ImmutableList.<String>of(tenantCatalogXML);
+      }
+ else {
+        return ImmutableList.<String>of(otherTenantCatalogXML);
+      }
+    }
+  }
+);
+  final VersionedCatalog result=catalogCache.getCatalog(multiTenantContext);
   Assert.assertNotNull(result);
   final DefaultProduct[] products=result.getProducts(clock.getUTCNow());
   Assert.assertEquals(products.length,6);
-  Mockito.when(tenantInternalApi.getTenantCatalogs(tenantContext)).thenThrow(RuntimeException.class);
-  VersionedCatalog result2=catalogCache.getCatalog(tenantContext);
-  Assert.assertNotNull(result2);
-  final DefaultProduct[] products2=result.getProducts(clock.getUTCNow());
-  Assert.assertEquals(products2.length,6);
+  final VersionedCatalog otherResult=catalogCache.getCatalog(otherMultiTenantContext);
+  Assert.assertNotNull(otherResult);
+  final DefaultProduct[] otherProducts=otherResult.getProducts(clock.getUTCNow());
+  Assert.assertEquals(otherProducts.length,3);
+  shouldThrow.set(true);
+  final VersionedCatalog result2=catalogCache.getCatalog(multiTenantContext);
+  Assert.assertEquals(result2,result);
+  final InternalCallContext sameMultiTenantContext=Mockito.mock(InternalCallContext.class);
+  Mockito.when(sameMultiTenantContext.getAccountRecordId()).thenReturn(9102L);
+  Mockito.when(sameMultiTenantContext.getTenantRecordId()).thenReturn(multiTenantRecordId);
+  Assert.assertEquals(catalogCache.getCatalog(sameMultiTenantContext),result);
+  Assert.assertEquals(catalogCache.getCatalog(otherMultiTenantContext),otherResult);
 }

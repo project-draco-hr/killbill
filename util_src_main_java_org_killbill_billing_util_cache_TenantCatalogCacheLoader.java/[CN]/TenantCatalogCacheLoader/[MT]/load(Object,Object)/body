@@ -1,12 +1,13 @@
 {
   checkCacheLoaderStatus();
-  if (!(key instanceof InternalTenantContext)) {
+  if (!(key instanceof Long)) {
     throw new IllegalArgumentException("Unexpected key type of " + key.getClass().getName());
   }
   if (!(argument instanceof CacheLoaderArgument)) {
     throw new IllegalArgumentException("Unexpected argument type of " + argument.getClass().getName());
   }
-  final InternalTenantContext internalTenantContext=(InternalTenantContext)key;
+  final Long tenantRecordId=(Long)key;
+  final InternalTenantContext internalTenantContext=new InternalTenantContext(tenantRecordId);
   final CacheLoaderArgument cacheLoaderArgument=(CacheLoaderArgument)argument;
   if (cacheLoaderArgument.getArgs() == null || !(cacheLoaderArgument.getArgs()[0] instanceof LoaderCallback)) {
     throw new IllegalArgumentException("Missing LoaderCallback from the arguments ");
@@ -20,7 +21,7 @@
     logger.info("Loading catalog cache for tenant " + internalTenantContext.getTenantRecordId());
     return callback.loadCatalog(catalogXMLs);
   }
- catch (  CatalogApiException e) {
+ catch (  final CatalogApiException e) {
     throw new IllegalStateException(String.format("Failed to de-serialize catalog for tenant %s : %s",internalTenantContext.getTenantRecordId(),e.getMessage()),e);
   }
 }
