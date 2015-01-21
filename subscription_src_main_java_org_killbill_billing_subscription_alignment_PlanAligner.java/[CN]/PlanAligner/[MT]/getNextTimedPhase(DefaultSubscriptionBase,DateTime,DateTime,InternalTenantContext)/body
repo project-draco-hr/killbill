@@ -1,6 +1,6 @@
 {
   try {
-    final SubscriptionBaseTransitionData lastPlanTransition=subscription.getInitialTransitionForCurrentPlan();
+    final SubscriptionBaseTransitionData lastPlanTransition=subscription.getLastTransitionForCurrentPlan();
     if (effectiveDate.isBefore(lastPlanTransition.getEffectiveTransitionTime())) {
       throw new SubscriptionBaseError(String.format("Cannot specify an effectiveDate prior to last Plan Change, subscription = %s, effectiveDate = %s",subscription.getId(),effectiveDate));
     }
@@ -12,7 +12,7 @@ case TRANSFER:
       final List<TimedPhase> timedPhases=getTimedPhaseOnCreate(subscription.getAlignStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPhase().getPhaseType(),lastPlanTransition.getNextPriceList().getName(),requestedDate,context);
     return getTimedPhase(timedPhases,effectiveDate,WhichPhase.NEXT);
 case CHANGE:
-  return getTimedPhaseOnChange(subscription.getAlignStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getPreviousPhase(),lastPlanTransition.getPreviousPlan(),lastPlanTransition.getPreviousPriceList().getName(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPriceList().getName(),requestedDate,effectiveDate,WhichPhase.NEXT,context);
+  return getTimedPhaseOnChange(subscription.getAlignStartDate(),subscription.getBundleStartDate(),lastPlanTransition.getPreviousPhase(),lastPlanTransition.getPreviousPlan(),lastPlanTransition.getPreviousPriceList().getName(),lastPlanTransition.getNextPlan(),lastPlanTransition.getNextPriceList().getName(),requestedDate,effectiveDate,lastPlanTransition.getEffectiveTransitionTime(),WhichPhase.NEXT,context);
 default :
 throw new SubscriptionBaseError(String.format("Unexpected initial transition %s for current plan %s on subscription %s",lastPlanTransition.getTransitionType(),subscription.getCurrentPlan(),subscription.getId()));
 }
