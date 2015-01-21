@@ -72,14 +72,9 @@ throw new SubscriptionBaseError(String.format("Unexpected Event type = %s",cur.g
 Plan nextPlan=null;
 PlanPhase nextPhase=null;
 PriceList nextPriceList=null;
-try {
 nextPlan=(nextPlanName != null) ? catalog.findPlan(nextPlanName,cur.getRequestedDate(),getAlignStartDate()) : null;
 nextPhase=(nextPhaseName != null) ? catalog.findPhase(nextPhaseName,cur.getRequestedDate(),getAlignStartDate()) : null;
 nextPriceList=(nextPriceListName != null) ? catalog.findPriceList(nextPriceListName,cur.getRequestedDate()) : null;
-}
- catch (CatalogApiException e) {
-log.error(String.format("Failed to build transition for subscription %s",id),e);
-}
 final SubscriptionBaseTransitionData transition=new SubscriptionBaseTransitionData(cur.getId(),id,bundleId,cur.getType(),apiEventType,cur.getRequestedDate(),cur.getEffectiveDate(),prevEventId,prevCreatedDate,previousState,previousPlan,previousPhase,previousPriceList,nextEventId,nextCreatedDate,nextState,nextPlan,nextPhase,nextPriceList,cur.getTotalOrdering(),cur.getCreatedDate(),nextUserToken,isFromDisk);
 transitions.add(transition);
 previousState=nextState;
