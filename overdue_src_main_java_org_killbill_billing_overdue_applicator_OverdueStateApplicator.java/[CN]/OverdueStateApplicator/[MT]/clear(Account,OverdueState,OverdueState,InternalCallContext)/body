@@ -5,13 +5,13 @@
   try {
     avoid_extra_credit_by_toggling_AUTO_INVOICE_OFF(account,previousOverdueState,clearState,context);
   }
- catch (  OverdueApiException e) {
+ catch (  final OverdueApiException e) {
     throw new OverdueException(e);
   }
   try {
     bus.post(createOverdueEvent(account,previousOverdueState.getName(),clearState.getName(),isBlockBillingTransition(previousOverdueState,clearState),isUnblockBillingTransition(previousOverdueState,clearState),context));
   }
- catch (  Exception e) {
+ catch (  final Exception e) {
     log.error("Error posting overdue change event to bus",e);
   }
 }

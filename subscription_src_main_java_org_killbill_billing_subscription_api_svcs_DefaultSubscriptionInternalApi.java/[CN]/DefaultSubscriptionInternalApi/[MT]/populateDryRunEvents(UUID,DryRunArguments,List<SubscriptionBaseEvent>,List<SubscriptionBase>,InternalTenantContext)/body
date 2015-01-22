@@ -9,7 +9,7 @@
     final String realPriceList=(inputSpec != null && inputSpec.getPriceListName() != null) ? inputSpec.getPriceListName() : PriceListSet.DEFAULT_PRICELIST_NAME;
     final Catalog catalog=catalogService.getFullCatalog(context);
     final Plan plan=(inputSpec != null && inputSpec.getProductName() != null && inputSpec.getBillingPeriod() != null) ? catalog.findPlan(inputSpec.getProductName(),inputSpec.getBillingPeriod(),realPriceList,utcNow) : null;
-    final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+    final TenantContext tenantContext=internalCallContextFactory.createTenantContext(context);
     if (dryRunArguments != null) {
 switch (dryRunArguments.getAction()) {
 case START_BILLING:
@@ -17,7 +17,7 @@ case START_BILLING:
       final DateTime startEffectiveDate=dryRunArguments.getEffectiveDate() != null ? dryRunArguments.getEffectiveDate() : utcNow;
     final DateTime bundleStartDate=getBundleStartDateWithSanity(bundleId,baseSubscription,plan,startEffectiveDate,startEffectiveDate);
   final UUID subscriptionId=UUID.randomUUID();
-dryRunEvents=apiService.getEventsOnCreation(bundleId,subscriptionId,startEffectiveDate,bundleStartDate,1L,plan,inputSpec.getPhaseType(),realPriceList,utcNow,startEffectiveDate,utcNow,false,context.toTenantContext(tenantId));
+dryRunEvents=apiService.getEventsOnCreation(bundleId,subscriptionId,startEffectiveDate,bundleStartDate,1L,plan,inputSpec.getPhaseType(),realPriceList,utcNow,startEffectiveDate,utcNow,false,tenantContext);
 final SubscriptionBuilder builder=new SubscriptionBuilder().setId(subscriptionId).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(startEffectiveDate);
 final DefaultSubscriptionBase newSubscription=new DefaultSubscriptionBase(builder,apiService,clock);
 newSubscription.rebuildTransitions(dryRunEvents,catalog);
@@ -29,12 +29,12 @@ DateTime changeEffectiveDate=dryRunArguments.getEffectiveDate();
 if (changeEffectiveDate == null) {
 BillingActionPolicy policy=dryRunArguments.getBillingActionPolicy();
 if (policy == null) {
-final PlanChangeResult planChangeResult=apiService.getPlanChangeResult(subscriptionForChange,dryRunArguments.getPlanPhaseSpecifier().getProductName(),dryRunArguments.getPlanPhaseSpecifier().getBillingPeriod(),dryRunArguments.getPlanPhaseSpecifier().getPriceListName(),utcNow,context.toTenantContext(tenantId));
+final PlanChangeResult planChangeResult=apiService.getPlanChangeResult(subscriptionForChange,dryRunArguments.getPlanPhaseSpecifier().getProductName(),dryRunArguments.getPlanPhaseSpecifier().getBillingPeriod(),dryRunArguments.getPlanPhaseSpecifier().getPriceListName(),utcNow,tenantContext);
 policy=planChangeResult.getPolicy();
 }
 changeEffectiveDate=subscriptionForChange.getPlanChangeEffectiveDate(policy);
 }
-dryRunEvents=apiService.getEventsOnChangePlan(subscriptionForChange,plan,realPriceList,utcNow,changeEffectiveDate,utcNow,true,context.toTenantContext(tenantId));
+dryRunEvents=apiService.getEventsOnChangePlan(subscriptionForChange,plan,realPriceList,utcNow,changeEffectiveDate,utcNow,true,tenantContext);
 break;
 case STOP_BILLING:
 final DefaultSubscriptionBase subscriptionForCancellation=(DefaultSubscriptionBase)dao.getSubscriptionFromId(dryRunArguments.getSubscriptionId(),context);
@@ -48,14 +48,14 @@ policy=catalogService.getFullCatalog(context).planCancelPolicy(spec,utcNow);
 }
 cancelEffectiveDate=subscriptionForCancellation.getPlanChangeEffectiveDate(policy);
 }
-dryRunEvents=apiService.getEventsOnCancelPlan(subscriptionForCancellation,utcNow,cancelEffectiveDate,utcNow,true,context.toTenantContext(tenantId));
+dryRunEvents=apiService.getEventsOnCancelPlan(subscriptionForCancellation,utcNow,cancelEffectiveDate,utcNow,true,tenantContext);
 break;
 default :
 throw new IllegalArgumentException("Unexpected dryRunArguments action " + dryRunArguments.getAction());
 }
 }
 }
- catch (CatalogApiException e) {
+ catch (final CatalogApiException e) {
 throw new SubscriptionBaseApiException(e);
 }
 if (dryRunEvents != null && !dryRunEvents.isEmpty()) {

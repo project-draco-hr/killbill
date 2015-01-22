@@ -120,7 +120,7 @@ eventBusType=ExtBusEventType.CUSTOM_FIELD_DELETION;
 break;
 default :
 }
-final UUID accountId=getAccountIdFromRecordId(event.getBusEventType(),objectId,context.getAccountRecordId());
-final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,cacheControllerDispatcher.getCacheController(CacheType.OBJECT_ID));
-return eventBusType != null ? new DefaultBusExternalEvent(objectId,objectType,eventBusType,accountId,tenantId,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken()) : null;
+final TenantContext tenantContext=internalCallContextFactory.createTenantContext(context);
+final UUID accountId=getAccountId(event.getBusEventType(),objectId,objectType,tenantContext);
+return eventBusType != null ? new DefaultBusExternalEvent(objectId,objectType,eventBusType,accountId,tenantContext.getTenantId(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken()) : null;
 }

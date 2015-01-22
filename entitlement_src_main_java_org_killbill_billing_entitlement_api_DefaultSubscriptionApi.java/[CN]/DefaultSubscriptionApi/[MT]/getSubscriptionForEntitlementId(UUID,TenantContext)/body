@@ -1,11 +1,10 @@
 {
-  final Long accountRecordId=nonEntityDao.retrieveAccountRecordIdFromObject(entitlementId,ObjectType.SUBSCRIPTION,cacheControllerDispatcher.getCacheController(CacheType.ACCOUNT_RECORD_ID));
-  final UUID accountId=nonEntityDao.retrieveIdFromObject(accountRecordId,ObjectType.ACCOUNT,cacheControllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+  final UUID accountId=internalCallContextFactory.getAccountId(entitlementId,ObjectType.SUBSCRIPTION,context);
   final AccountEntitlements accountEntitlements;
   try {
     accountEntitlements=entitlementInternalApi.getAllEntitlementsForAccountId(accountId,context);
   }
- catch (  EntitlementApiException e) {
+ catch (  final EntitlementApiException e) {
     throw new SubscriptionApiException(e);
   }
   final Iterable<Subscription> accountSubscriptions=Iterables.<Subscription>concat(buildSubscriptionsFromEntitlements(accountEntitlements).values());

@@ -1,7 +1,7 @@
 {
   final List<PluginAutoPayOffModelDao> entries=controlDao.getAutoPayOffEntry(account.getId());
-  for (  PluginAutoPayOffModelDao cur : entries) {
-    retryServiceScheduler.scheduleRetry(ObjectType.ACCOUNT,account.getId(),cur.getAttemptId(),ImmutableList.<String>of(PLUGIN_NAME),clock.getUTCNow());
+  for (  final PluginAutoPayOffModelDao cur : entries) {
+    retryServiceScheduler.scheduleRetry(ObjectType.ACCOUNT,account.getId(),cur.getAttemptId(),internalCallContext.getTenantRecordId(),ImmutableList.<String>of(PLUGIN_NAME),clock.getUTCNow());
   }
   controlDao.removeAutoPayOffEntry(account.getId());
 }

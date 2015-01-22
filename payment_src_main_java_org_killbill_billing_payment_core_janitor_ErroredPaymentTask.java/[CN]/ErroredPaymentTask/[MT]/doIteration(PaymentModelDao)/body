@@ -1,5 +1,5 @@
 {
-  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(item.getAccountId(),item.getId(),ObjectType.PAYMENT);
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(item.getTenantRecordId(),item.getAccountRecordId());
   final CallContext callContext=createCallContext("ErroredPaymentTask",internalTenantContext);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(item.getAccountId(),callContext);
   final List<PaymentTransactionModelDao> transactions=paymentDao.getTransactionsForPayment(item.getId(),internalTenantContext);
@@ -20,7 +20,7 @@
     }
 ).orNull();
   }
- catch (  PaymentPluginApiException ignored) {
+ catch (  final PaymentPluginApiException ignored) {
   }
   final TransactionStatus transactionStatus=PaymentEnteringStateCallback.paymentPluginStatusToTransactionStatus(pluginErroredTransaction);
   if (transactionStatus == unknownTransaction.getTransactionStatus()) {

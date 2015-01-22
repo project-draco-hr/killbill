@@ -16,17 +16,17 @@
       onPhaseEvent(subscription,context);
     }
  else     if (event.getType() == EventType.API_USER && subscription.getCategory() == ProductCategory.BASE) {
-      final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
-      theRealSeqId=onBasePlanEvent(subscription,(ApiEvent)event,context.toCallContext(tenantId));
+      final CallContext callContext=internalCallContextFactory.createCallContext(context);
+      theRealSeqId=onBasePlanEvent(subscription,(ApiEvent)event,callContext);
     }
     final SubscriptionBaseTransitionData transition=(subscription.getTransitionFromEvent(event,theRealSeqId));
     final EffectiveSubscriptionInternalEvent busEvent=new DefaultEffectiveSubscriptionEvent(transition,subscription.getAlignStartDate(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
     eventBus.post(busEvent);
   }
- catch (  EventBusException e) {
+ catch (  final EventBusException e) {
     log.warn("Failed to post subscription event " + event,e);
   }
-catch (  CatalogApiException e) {
+catch (  final CatalogApiException e) {
     log.warn("Failed to post subscription event " + event,e);
   }
 }

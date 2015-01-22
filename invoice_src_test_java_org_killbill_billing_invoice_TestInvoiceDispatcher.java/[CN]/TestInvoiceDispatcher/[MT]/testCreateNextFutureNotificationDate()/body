@@ -5,7 +5,7 @@
   final DateAndTimeZoneContext dateAndTimeZoneContext=new DateAndTimeZoneContext(clock.getUTCNow(),DateTimeZone.forID("Pacific/Pitcairn"),clock);
   final InvoiceItemModelDao item=new InvoiceItemModelDao(UUID.randomUUID(),clock.getUTCNow(),InvoiceItemType.RECURRING,UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),null,"planName","phaseName",null,startDate,endDate,new BigDecimal("23.9"),new BigDecimal("23.9"),Currency.EUR,null);
   final InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
-  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(pluginRegistry,generator,accountApi,billingApi,subscriptionApi,invoiceDao,nonEntityDao,invoiceNotifier,locker,busService.getBus(),clock,controllerDispatcher);
+  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(pluginRegistry,generator,accountApi,billingApi,subscriptionApi,invoiceDao,internalCallContextFactory,invoiceNotifier,locker,busService.getBus(),clock);
   final Map<UUID,List<DateTime>> result=dispatcher.createNextFutureNotificationDate(Collections.singletonList(item),null,dateAndTimeZoneContext);
   Assert.assertEquals(result.size(),1);
   final List<DateTime> receivedDates=result.get(item.getSubscriptionId());

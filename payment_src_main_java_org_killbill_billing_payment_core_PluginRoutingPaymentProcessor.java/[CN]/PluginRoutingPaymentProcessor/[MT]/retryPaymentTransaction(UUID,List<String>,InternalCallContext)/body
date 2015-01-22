@@ -5,8 +5,7 @@
     final UUID paymentId=payment != null ? payment.getId() : null;
     final Iterable<PluginProperty> pluginProperties=PluginPropertySerializer.deserialize(attempt.getPluginProperties());
     final Account account=accountInternalApi.getAccountById(attempt.getAccountId(),internalCallContext);
-    final UUID tenantId=nonEntityDao.retrieveIdFromObject(internalCallContext.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
-    final CallContext callContext=internalCallContext.toCallContext(tenantId);
+    final CallContext callContext=buildCallContext(internalCallContext);
     final State state=retrySMHelper.getState(attempt.getStateName());
     pluginControlledPaymentAutomatonRunner.run(state,false,attempt.getTransactionType(),account,attempt.getPaymentMethodId(),paymentId,attempt.getPaymentExternalKey(),attempt.getTransactionExternalKey(),attempt.getAmount(),attempt.getCurrency(),pluginProperties,paymentControlPluginNames,callContext,internalCallContext);
   }

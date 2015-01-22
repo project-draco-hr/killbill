@@ -2,6 +2,7 @@
   if (nextOverdueState.getOverdueCancellationPolicy() == OverdueCancellationPolicy.NONE) {
     return;
   }
+  final CallContext callContext=internalCallContextFactory.createCallContext(context);
   try {
     final BillingActionPolicy actionPolicy;
 switch (nextOverdueState.getOverdueCancellationPolicy()) {
@@ -15,20 +16,19 @@ default :
 throw new IllegalStateException("Unexpected OverdueCancellationPolicy " + nextOverdueState.getOverdueCancellationPolicy());
 }
 final List<Entitlement> toBeCancelled=new LinkedList<Entitlement>();
-computeEntitlementsToCancel(account,toBeCancelled,context);
-final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+computeEntitlementsToCancel(account,toBeCancelled,callContext);
 for (final Entitlement cur : toBeCancelled) {
 try {
-cur.cancelEntitlementWithDateOverrideBillingPolicy(new LocalDate(clock.getUTCNow(),account.getTimeZone()),actionPolicy,context.toCallContext(tenantId));
+cur.cancelEntitlementWithDateOverrideBillingPolicy(new LocalDate(clock.getUTCNow(),account.getTimeZone()),actionPolicy,callContext);
 }
- catch (EntitlementApiException e) {
+ catch (final EntitlementApiException e) {
 if (e.getCode() != ErrorCode.SUB_CANCEL_BAD_STATE.getCode()) {
 throw new OverdueException(e);
 }
 }
 }
 }
- catch (EntitlementApiException e) {
+ catch (final EntitlementApiException e) {
 throw new OverdueException(e);
 }
 }

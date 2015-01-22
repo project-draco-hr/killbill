@@ -1,0 +1,14 @@
+{
+  final NotificationQueue nextBillingQueue;
+  try {
+    nextBillingQueue=notificationQueueService.getNotificationQueue(DefaultInvoiceService.INVOICE_SERVICE_NAME,DefaultNextBillingDateNotifier.NEXT_BILLING_DATE_NOTIFIER_QUEUE);
+    log.info("Queuing next billing date notification at {} for subscriptionId {}",futureNotificationTime.toString(),subscriptionId.toString());
+    nextBillingQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),futureNotificationTime,new NextBillingDateNotificationKey(subscriptionId),internalCallContext.getUserToken(),internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId());
+  }
+ catch (  final NoSuchNotificationQueue e) {
+    log.error("Attempting to put items on a non-existent queue (NextBillingDateNotifier).",e);
+  }
+catch (  final IOException e) {
+    log.error("Failed to serialize notificationKey for subscriptionId {}",subscriptionId);
+  }
+}

@@ -4,8 +4,8 @@
       @Override public void handleReadyNotification(      final NotificationEvent inputKey,      final DateTime eventDateTime,      final UUID fromNotificationQueueUserToken,      final Long accountRecordId,      final Long tenantRecordId){
         final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(tenantRecordId,accountRecordId,"EntitlementQueue",CallOrigin.INTERNAL,UserType.SYSTEM,fromNotificationQueueUserToken);
         if (inputKey instanceof EntitlementNotificationKey) {
-          final UUID tenantId=nonEntityDao.retrieveIdFromObject(tenantRecordId,ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
-          processEntitlementNotification((EntitlementNotificationKey)inputKey,tenantId,internalCallContext);
+          final CallContext callContext=internalCallContextFactory.createCallContext(internalCallContext);
+          processEntitlementNotification((EntitlementNotificationKey)inputKey,internalCallContext,callContext);
         }
  else         if (inputKey instanceof BlockingTransitionNotificationKey) {
           processBlockingNotification((BlockingTransitionNotificationKey)inputKey,internalCallContext);

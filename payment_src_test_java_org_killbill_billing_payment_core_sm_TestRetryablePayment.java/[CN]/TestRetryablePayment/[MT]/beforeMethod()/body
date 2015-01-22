@@ -5,5 +5,5 @@
   runner=new MockRetryablePaymentAutomatonRunner(stateMachineConfig,retryStateMachineConfig,paymentDao,locker,pluginRegistry,retryPluginRegistry,clock,tagApi,paymentProcessor,retryServiceScheduler,paymentConfig,executor,paymentSMHelper,retrySMHelper,eventBus);
   paymentStateContext=new RetryablePaymentStateContext(ImmutableList.<String>of(MockPaymentRoutingProviderPlugin.PLUGIN_NAME),true,null,paymentExternalKey,paymentTransactionExternalKey,TransactionType.AUTHORIZE,account,paymentMethodId,amount,currency,emptyProperties,internalCallContext,callContext);
   mockRetryAuthorizeOperationCallback=new MockRetryAuthorizeOperationCallback(locker,runner.getPaymentPluginDispatcher(),paymentStateContext,null,runner.getRetryPluginRegistry(),paymentDao,clock);
-  processor=new PluginRoutingPaymentProcessor(pluginRegistry,accountInternalApi,null,tagApi,paymentDao,nonEntityDao,locker,executor,runner,retrySMHelper,clock,cacheControllerDispatcher);
+  processor=new PluginRoutingPaymentProcessor(pluginRegistry,accountInternalApi,null,tagApi,paymentDao,locker,executor,internalCallContextFactory,runner,retrySMHelper,clock);
 }

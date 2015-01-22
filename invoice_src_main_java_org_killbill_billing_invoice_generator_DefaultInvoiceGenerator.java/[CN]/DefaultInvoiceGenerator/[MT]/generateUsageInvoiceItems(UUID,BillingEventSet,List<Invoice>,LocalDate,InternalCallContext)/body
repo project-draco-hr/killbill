@@ -1,5 +1,5 @@
 {
-  final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+  final TenantContext tenantContext=internalCallContextFactory.createTenantContext(context);
   try {
     final List<InvoiceItem> items=Lists.newArrayList();
     final Iterator<BillingEvent> events=eventSet.iterator();
@@ -13,7 +13,7 @@
       }
       final UUID subscriptionId=event.getSubscription().getId();
       if (curSubscriptionId != null && !curSubscriptionId.equals(subscriptionId)) {
-        final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,usageApi,config.isInsertZeroUsageItems(),targetDate,context.toTenantContext(tenantId));
+        final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,usageApi,config.isInsertZeroUsageItems(),targetDate,tenantContext);
         items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(extractUsageItemsForSubscription(curSubscriptionId,existingInvoices)));
         curEvents=Lists.newArrayList();
       }
@@ -21,7 +21,7 @@
       curEvents.add(event);
     }
     if (curSubscriptionId != null) {
-      final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,usageApi,config.isInsertZeroUsageItems(),targetDate,context.toTenantContext(tenantId));
+      final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,usageApi,config.isInsertZeroUsageItems(),targetDate,tenantContext);
       items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(extractUsageItemsForSubscription(curSubscriptionId,existingInvoices)));
     }
     return items;

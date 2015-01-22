@@ -1,5 +1,5 @@
 {
-  final InternalTenantContext tenantContext=internalCallContextFactory.createInternalTenantContext(attempt.getAccountId(),attempt.getId(),ObjectType.PAYMENT_ATTEMPT);
+  final InternalTenantContext tenantContext=internalCallContextFactory.createInternalTenantContext(attempt.getTenantRecordId(),attempt.getAccountRecordId());
   final CallContext callContext=createCallContext("AttemptCompletionJanitorTask",tenantContext);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(attempt.getAccountId(),callContext);
   final List<PaymentTransactionModelDao> transactions=paymentDao.getPaymentTransactionsByExternalKey(attempt.getTransactionExternalKey(),tenantContext);
@@ -23,13 +23,13 @@
     paymentStateContext.setPaymentTransactionModelDao(transaction);
     pluginControlledPaymentAutomatonRunner.completeRun(paymentStateContext);
   }
- catch (  AccountApiException e) {
+ catch (  final AccountApiException e) {
     log.warn("Janitor AttemptCompletionTask failed to complete payment attempt " + attempt.getId(),e);
   }
-catch (  PluginPropertySerializerException e) {
+catch (  final PluginPropertySerializerException e) {
     log.warn("Janitor AttemptCompletionTask failed to complete payment attempt " + attempt.getId(),e);
   }
-catch (  PaymentApiException e) {
+catch (  final PaymentApiException e) {
     log.warn("Janitor AttemptCompletionTask failed to complete payment attempt " + attempt.getId(),e);
   }
 }

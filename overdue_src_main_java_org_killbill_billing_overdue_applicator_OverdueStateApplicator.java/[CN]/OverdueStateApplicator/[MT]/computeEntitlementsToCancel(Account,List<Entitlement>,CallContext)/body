@@ -1,0 +1,10 @@
+{
+  final List<Entitlement> allEntitlementsForAccountId=entitlementApi.getAllEntitlementsForAccountId(account.getId(),context);
+  final Collection<Entitlement> allEntitlementsButAddonsForAccountId=Collections2.<Entitlement>filter(allEntitlementsForAccountId,new Predicate<Entitlement>(){
+    @Override public boolean apply(    final Entitlement entitlement){
+      return !ProductCategory.ADD_ON.equals(entitlement.getLastActiveProductCategory());
+    }
+  }
+);
+  result.addAll(allEntitlementsButAddonsForAccountId);
+}

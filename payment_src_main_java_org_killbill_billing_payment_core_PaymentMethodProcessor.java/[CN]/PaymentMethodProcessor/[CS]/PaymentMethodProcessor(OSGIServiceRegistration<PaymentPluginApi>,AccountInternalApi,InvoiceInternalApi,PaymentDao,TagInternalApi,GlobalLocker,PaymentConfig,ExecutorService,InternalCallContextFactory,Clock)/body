@@ -1,0 +1,5 @@
+{
+  super(pluginRegistry,accountInternalApi,paymentDao,tagUserApi,locker,executor,internalCallContextFactory,invoiceApi,clock);
+  final long paymentPluginTimeoutSec=TimeUnit.SECONDS.convert(paymentConfig.getPaymentPluginTimeout().getPeriod(),paymentConfig.getPaymentPluginTimeout().getUnit());
+  this.uuidPluginNotificationDispatcher=new PluginDispatcher<UUID>(paymentPluginTimeoutSec,executor);
+}

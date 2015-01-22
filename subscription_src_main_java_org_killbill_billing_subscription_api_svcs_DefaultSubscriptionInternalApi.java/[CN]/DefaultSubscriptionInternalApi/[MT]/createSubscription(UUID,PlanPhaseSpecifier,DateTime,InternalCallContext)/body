@@ -19,10 +19,10 @@
     }
     final DefaultSubscriptionBase baseSubscription=(DefaultSubscriptionBase)dao.getBaseSubscription(bundleId,context);
     final DateTime bundleStartDate=getBundleStartDateWithSanity(bundleId,baseSubscription,plan,requestedDate,effectiveDate);
-    final UUID tenantId=nonEntityDao.retrieveIdFromObject(context.getTenantRecordId(),ObjectType.TENANT,controllerDispatcher.getCacheController(CacheType.OBJECT_ID));
-    return apiService.createPlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(effectiveDate),plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,now,context.toCallContext(tenantId));
+    final CallContext callContext=internalCallContextFactory.createCallContext(context);
+    return apiService.createPlan(new SubscriptionBuilder().setId(UUID.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(effectiveDate),plan,spec.getPhaseType(),realPriceList,requestedDate,effectiveDate,now,callContext);
   }
- catch (  CatalogApiException e) {
+ catch (  final CatalogApiException e) {
     throw new SubscriptionBaseApiException(e);
   }
 }
