@@ -1,7 +1,7 @@
 {
   final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
   try {
-    final List<SubscriptionBaseEvent> events=getEventsOnCreation(subscription.getBundleId(),subscription.getId(),subscription.getAlignStartDate(),subscription.getBundleStartDate(),subscription.getActiveVersion(),plan,initialPhase,realPriceList,requestedDate,effectiveDate,processedDate,reCreate,context);
+    final List<SubscriptionBaseEvent> events=getEventsOnCreation(subscription.getBundleId(),subscription.getId(),subscription.getAlignStartDate(),subscription.getBundleStartDate(),subscription.getActiveVersion(),plan,initialPhase,realPriceList,requestedDate,effectiveDate,processedDate,reCreate,internalCallContext);
     if (reCreate) {
       dao.recreateSubscription(subscription,events,internalCallContext);
     }
@@ -10,7 +10,7 @@
     }
     subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),catalogService.getFullCatalog(internalCallContext));
   }
- catch (  CatalogApiException e) {
+ catch (  final CatalogApiException e) {
     throw new SubscriptionBaseApiException(e);
   }
 }

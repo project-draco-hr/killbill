@@ -1,5 +1,4 @@
 {
-  final InternalTenantContext internalTenantContext=createTenantContextFromBundleId(subscription.getBundleId(),context);
   final TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(subscription,newPlan,newPriceList,requestedDate,effectiveDate,internalTenantContext);
   final SubscriptionBaseEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(processedDate).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true));
   final TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(subscription,newPlan,newPriceList,processedDate,effectiveDate,internalTenantContext);
@@ -11,7 +10,7 @@
   }
   if (subscription.getCategory() == ProductCategory.BASE && addCancellationAddOnForEventsIfRequired) {
     final Product currentBaseProduct=changeEvent.getEffectiveDate().compareTo(clock.getUTCNow()) <= 0 ? newPlan.getProduct() : subscription.getCurrentPlan().getProduct();
-    addCancellationAddOnForEventsIfRequired(changeEvents,currentBaseProduct,subscription.getBundleId(),requestedDate,effectiveDate,processedDate,context);
+    addCancellationAddOnForEventsIfRequired(changeEvents,currentBaseProduct,subscription.getBundleId(),requestedDate,effectiveDate,processedDate,internalTenantContext);
   }
   return changeEvents;
 }

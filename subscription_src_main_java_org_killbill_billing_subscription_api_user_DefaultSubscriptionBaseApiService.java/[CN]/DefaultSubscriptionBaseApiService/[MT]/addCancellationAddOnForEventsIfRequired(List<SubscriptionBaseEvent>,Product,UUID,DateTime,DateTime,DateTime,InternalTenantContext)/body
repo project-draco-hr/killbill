@@ -1,7 +1,6 @@
 {
   final List<DefaultSubscriptionBase> subscriptionsToBeCancelled=new ArrayList<DefaultSubscriptionBase>();
-  final InternalTenantContext internalCallContext=createTenantContextFromBundleId(bundleId,context);
-  final List<SubscriptionBase> subscriptions=dao.getSubscriptions(bundleId,ImmutableList.<SubscriptionBaseEvent>of(),internalCallContext);
+  final List<SubscriptionBase> subscriptions=dao.getSubscriptions(bundleId,ImmutableList.<SubscriptionBaseEvent>of(),internalTenantContext);
   for (  final SubscriptionBase subscription : subscriptions) {
     final DefaultSubscriptionBase cur=(DefaultSubscriptionBase)subscription;
     if (cur.getState() == EntitlementState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
