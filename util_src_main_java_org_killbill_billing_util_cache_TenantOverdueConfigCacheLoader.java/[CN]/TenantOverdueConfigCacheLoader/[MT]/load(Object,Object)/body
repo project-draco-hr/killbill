@@ -1,15 +1,16 @@
 {
   checkCacheLoaderStatus();
-  if (!(key instanceof InternalTenantContext)) {
+  if (!(key instanceof Long)) {
     throw new IllegalArgumentException("Unexpected key type of " + key.getClass().getName());
   }
   if (!(argument instanceof CacheLoaderArgument)) {
     throw new IllegalArgumentException("Unexpected argument type of " + argument.getClass().getName());
   }
-  final InternalTenantContext internalTenantContext=(InternalTenantContext)key;
+  final Long tenantRecordId=(Long)key;
+  final InternalTenantContext internalTenantContext=new InternalTenantContext(tenantRecordId);
   final CacheLoaderArgument cacheLoaderArgument=(CacheLoaderArgument)argument;
   if (cacheLoaderArgument.getArgs() == null || !(cacheLoaderArgument.getArgs()[0] instanceof LoaderCallback)) {
-    throw new IllegalArgumentException("Missing LoaderCallback from the arguments ");
+    throw new IllegalArgumentException("Missing LoaderCallback from the arguments");
   }
   final LoaderCallback callback=(LoaderCallback)cacheLoaderArgument.getArgs()[0];
   final String overdueXML=tenantApi.getTenantOverdueConfig(internalTenantContext);
@@ -18,9 +19,9 @@
   }
   try {
     logger.info("Loading overdue cache for tenant " + internalTenantContext.getTenantRecordId());
-    return callback.loadCatalog(overdueXML);
+    return callback.loadOverdueConfig(overdueXML);
   }
- catch (  OverdueApiException e) {
+ catch (  final OverdueApiException e) {
     throw new IllegalStateException(String.format("Failed to de-serialize overdue config for tenant %s : %s",internalTenantContext.getTenantRecordId(),e.getMessage()),e);
   }
 }

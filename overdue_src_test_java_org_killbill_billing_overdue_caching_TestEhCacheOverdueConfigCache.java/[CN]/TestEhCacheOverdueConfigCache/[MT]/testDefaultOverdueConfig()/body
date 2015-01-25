@@ -1,0 +1,11 @@
+{
+  overdueConfigCache.loadDefaultOverdueConfig(Resources.getResource("OverdueConfig.xml").toExternalForm());
+  final OverdueConfig result=overdueConfigCache.getOverdueConfig(internalCallContext);
+  Assert.assertNotNull(result);
+  Assert.assertEquals(result.getOverdueStatesAccount().getStates().length,1);
+  Assert.assertTrue(result.getOverdueStatesAccount().getStates()[0].isClearState());
+  Assert.assertEquals(overdueConfigCache.getOverdueConfig(multiTenantContext),result);
+  Assert.assertEquals(overdueConfigCache.getOverdueConfig(otherMultiTenantContext),result);
+  Assert.assertEquals(overdueConfigCache.getOverdueConfig(Mockito.mock(InternalTenantContext.class)),result);
+  Assert.assertEquals(overdueConfigCache.getOverdueConfig(Mockito.mock(InternalCallContext.class)),result);
+}

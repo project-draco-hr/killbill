@@ -1,0 +1,40 @@
+{
+  final AtomicBoolean shouldThrow=new AtomicBoolean(false);
+  final Long multiTenantRecordId=multiTenantContext.getTenantRecordId();
+  overdueConfigCache.loadDefaultOverdueConfig(Resources.getResource("OverdueConfig.xml").toExternalForm());
+  final InputStream tenantInputOverdueConfig=UriAccessor.accessUri(new URI(Resources.getResource("OverdueConfig2.xml").toExternalForm()));
+  final String tenantOverdueConfigXML=CharStreams.toString(new InputStreamReader(tenantInputOverdueConfig,"UTF-8"));
+  final InputStream otherTenantInputOverdueConfig=UriAccessor.accessUri(new URI(Resources.getResource("OverdueConfig.xml").toExternalForm()));
+  final String otherTenantOverdueConfigXML=CharStreams.toString(new InputStreamReader(otherTenantInputOverdueConfig,"UTF-8"));
+  Mockito.when(tenantInternalApi.getTenantOverdueConfig(Mockito.any(InternalTenantContext.class))).thenAnswer(new Answer<String>(){
+    @Override public String answer(    final InvocationOnMock invocation) throws Throwable {
+      if (shouldThrow.get()) {
+        throw new RuntimeException();
+      }
+      final InternalTenantContext internalContext=(InternalTenantContext)invocation.getArguments()[0];
+      if (multiTenantRecordId.equals(internalContext.getTenantRecordId())) {
+        return tenantOverdueConfigXML;
+      }
+ else {
+        return otherTenantOverdueConfigXML;
+      }
+    }
+  }
+);
+  final OverdueConfig result=overdueConfigCache.getOverdueConfig(multiTenantContext);
+  Assert.assertNotNull(result);
+  Assert.assertEquals(result.getOverdueStatesAccount().getStates().length,1);
+  Assert.assertFalse(result.getOverdueStatesAccount().getStates()[0].isClearState());
+  final OverdueConfig otherResult=overdueConfigCache.getOverdueConfig(otherMultiTenantContext);
+  Assert.assertNotNull(otherResult);
+  Assert.assertEquals(otherResult.getOverdueStatesAccount().getStates().length,1);
+  Assert.assertTrue(otherResult.getOverdueStatesAccount().getStates()[0].isClearState());
+  shouldThrow.set(true);
+  final OverdueConfig result2=overdueConfigCache.getOverdueConfig(multiTenantContext);
+  Assert.assertEquals(result2,result);
+  final InternalCallContext sameMultiTenantContext=Mockito.mock(InternalCallContext.class);
+  Mockito.when(sameMultiTenantContext.getAccountRecordId()).thenReturn(9102L);
+  Mockito.when(sameMultiTenantContext.getTenantRecordId()).thenReturn(multiTenantRecordId);
+  Assert.assertEquals(overdueConfigCache.getOverdueConfig(sameMultiTenantContext),result);
+  Assert.assertEquals(overdueConfigCache.getOverdueConfig(otherMultiTenantContext),otherResult);
+}
