@@ -1,4 +1,10 @@
 {
   final UUID paymentMethodId=paymentApi.addPaymentMethod(account,paymentMethodInfo.getExternalPaymentMethodId(),MockPaymentProviderPlugin.PLUGIN_NAME,true,paymentMethodInfo,ImmutableList.<PluginProperty>of(),context);
-  Mockito.when(account.getPaymentMethodId()).thenReturn(paymentMethodId);
+  if (isFastTest()) {
+    Mockito.when(account.getPaymentMethodId()).thenReturn(paymentMethodId);
+    return account;
+  }
+ else {
+    return accountApi.getAccountById(account.getId(),context);
+  }
 }

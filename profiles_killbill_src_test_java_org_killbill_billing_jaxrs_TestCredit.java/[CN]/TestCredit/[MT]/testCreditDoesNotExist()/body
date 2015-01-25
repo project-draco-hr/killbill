@@ -1,3 +1,9 @@
 {
-  assertNull(killBillClient.getCredit(UUID.randomUUID()));
+  try {
+    killBillClient.getCredit(UUID.randomUUID());
+    Assert.fail();
+  }
+ catch (  final KillBillClientException e) {
+    Assert.assertEquals(e.getBillingException().getClassName(),"java.lang.IllegalStateException");
+  }
 }

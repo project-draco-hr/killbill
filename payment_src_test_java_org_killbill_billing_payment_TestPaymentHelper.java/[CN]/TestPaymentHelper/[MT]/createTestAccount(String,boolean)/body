@@ -1,22 +1,30 @@
 {
   final String name="First" + UUID.randomUUID().toString() + " "+ "Last"+ UUID.randomUUID().toString();
   final String externalKey=UUID.randomUUID().toString();
-  final Account account=Mockito.mock(Account.class);
-  Mockito.when(account.getId()).thenReturn(UUID.randomUUID());
-  Mockito.when(account.getExternalKey()).thenReturn(externalKey);
-  Mockito.when(account.getName()).thenReturn(name);
-  Mockito.when(account.getFirstNameLength()).thenReturn(10);
-  Mockito.when(account.getPhone()).thenReturn("123-456-7890");
-  Mockito.when(account.getEmail()).thenReturn(email);
-  Mockito.when(account.getCurrency()).thenReturn(Currency.USD);
-  Mockito.when(account.getBillCycleDayLocal()).thenReturn(1);
-  Mockito.when(account.isMigrated()).thenReturn(false);
-  Mockito.when(account.isNotifiedForInvoices()).thenReturn(false);
-  Mockito.when(AccountApi.getAccountById(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(account);
-  Mockito.when(AccountApi.getAccountByKey(Mockito.anyString(),Mockito.<InternalTenantContext>any())).thenReturn(account);
+  final Account accountData=Mockito.mock(Account.class);
+  Mockito.when(accountData.getId()).thenReturn(UUID.randomUUID());
+  Mockito.when(accountData.getExternalKey()).thenReturn(externalKey);
+  Mockito.when(accountData.getName()).thenReturn(name);
+  Mockito.when(accountData.getFirstNameLength()).thenReturn(10);
+  Mockito.when(accountData.getPhone()).thenReturn("123-456-7890");
+  Mockito.when(accountData.getEmail()).thenReturn(email);
+  Mockito.when(accountData.getCurrency()).thenReturn(Currency.USD);
+  Mockito.when(accountData.getBillCycleDayLocal()).thenReturn(1);
+  Mockito.when(accountData.isMigrated()).thenReturn(false);
+  Mockito.when(accountData.isNotifiedForInvoices()).thenReturn(false);
+  Account account;
+  if (isFastTest()) {
+    account=accountData;
+    Mockito.when(accountInternalApi.getAccountById(Mockito.<UUID>any(),Mockito.<InternalTenantContext>any())).thenReturn(account);
+    Mockito.when(accountInternalApi.getAccountByKey(Mockito.anyString(),Mockito.<InternalTenantContext>any())).thenReturn(account);
+    mockNonEntityDao.addTenantRecordIdMapping(account.getId(),internalCallContext);
+  }
+ else {
+    account=accountApi.createAccount(accountData,context);
+  }
   if (addPaymentMethod) {
     final PaymentMethodPlugin pm=new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),true,null);
-    addTestPaymentMethod(account,pm);
+    account=addTestPaymentMethod(account,pm);
   }
   return account;
 }

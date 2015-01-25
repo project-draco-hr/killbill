@@ -1,7 +1,9 @@
 {
   ((MockSubscriptionDaoMemory)dao).reset();
-  subscriptionTestInitializer.startTestFamework(testListener,clock,busService,subscriptionBaseService);
+  subscriptionTestInitializer.startTestFramework(testListener,clock,busService,subscriptionBaseService);
   this.catalog=subscriptionTestInitializer.initCatalog(catalogService,internalCallContext);
   this.accountData=subscriptionTestInitializer.initAccountData();
-  this.bundle=subscriptionTestInitializer.initBundle(subscriptionInternalApi,internalCallContext);
+  final UUID accountId=UUID.randomUUID();
+  mockNonEntityDao.addTenantRecordIdMapping(accountId,internalCallContext);
+  this.bundle=subscriptionTestInitializer.initBundle(accountId,subscriptionInternalApi,internalCallContext);
 }

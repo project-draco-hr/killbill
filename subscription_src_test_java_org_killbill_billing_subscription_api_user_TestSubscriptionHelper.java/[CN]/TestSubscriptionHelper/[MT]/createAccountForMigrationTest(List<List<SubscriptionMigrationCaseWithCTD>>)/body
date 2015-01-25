@@ -1,6 +1,13 @@
 {
+  final Account account;
+  try {
+    final Account accountData=new MockAccountBuilder().name(UUID.randomUUID().toString().substring(1,8)).email(UUID.randomUUID().toString().substring(1,8)).build();
+    account=accountApi.createAccount(accountData,callContext);
+  }
+ catch (  final AccountApiException e) {
+    throw new AssertionError(e.getLocalizedMessage());
+  }
   return new AccountMigration(){
-    private final UUID accountId=UUID.randomUUID();
     @Override public BundleMigration[] getBundles(){
       final List<BundleMigration> bundles=new ArrayList<BundleMigration>();
       final BundleMigration bundle0=new BundleMigration(){
@@ -38,7 +45,7 @@
       return bundles.toArray(new BundleMigration[bundles.size()]);
     }
     @Override public UUID getAccountKey(){
-      return accountId;
+      return account.getId();
     }
   }
 ;

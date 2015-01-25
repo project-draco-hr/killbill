@@ -1,6 +1,12 @@
 {
   final Account accountJson=createAccount();
-  Assert.assertNull(killBillClient.getBundle(UUID.randomUUID()));
+  try {
+    killBillClient.getBundle(UUID.randomUUID());
+    Assert.fail();
+  }
+ catch (  final KillBillClientException e) {
+    Assert.assertEquals(e.getBillingException().getClassName(),"java.lang.IllegalStateException");
+  }
   Assert.assertTrue(killBillClient.getAccountBundles(accountJson.getAccountId(),"98374982743892").isEmpty());
   Assert.assertTrue(killBillClient.getAccountBundles(accountJson.getAccountId()).isEmpty());
 }

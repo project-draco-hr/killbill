@@ -6,11 +6,14 @@ synchronized (events) {
         final DefaultSubscriptionBase subData=curSubscription.getData();
         for (        final SubscriptionBaseEvent curEvent : curSubscription.getInitialEvents()) {
           events.add(curEvent);
+          mockNonEntityDao.addTenantRecordIdMapping(curEvent.getId(),context);
           recordFutureNotificationFromTransaction(null,curEvent.getEffectiveDate(),new SubscriptionNotificationKey(curEvent.getId()),context);
         }
         subscriptions.add(subData);
+        mockNonEntityDao.addTenantRecordIdMapping(subData.getId(),context);
       }
       bundles.add(bundleData);
+      mockNonEntityDao.addTenantRecordIdMapping(bundleData.getId(),context);
     }
   }
 }
