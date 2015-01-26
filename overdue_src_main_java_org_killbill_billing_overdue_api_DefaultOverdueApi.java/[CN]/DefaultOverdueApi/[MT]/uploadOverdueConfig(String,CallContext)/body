@@ -1,10 +1,14 @@
 {
   try {
     final InternalTenantContext internalTenantContext=createInternalTenantContext(callContext);
+    final String tenantKey=TenantKey.OVERDUE_CONFIG.toString();
+    if (!tenantApi.getTenantValueForKey(tenantKey,callContext).isEmpty()) {
+      tenantApi.deleteTenantKey(tenantKey,callContext);
+    }
+    tenantApi.addTenantKeyValue(tenantKey,overdueXML,callContext);
     overdueConfigCache.clearOverdueConfig(internalTenantContext);
-    tenantApi.addTenantKeyValue(TenantKey.OVERDUE_CONFIG.toString(),overdueXML,callContext);
   }
- catch (  TenantApiException e) {
+ catch (  final TenantApiException e) {
     throw new OverdueApiException(e);
   }
 }
