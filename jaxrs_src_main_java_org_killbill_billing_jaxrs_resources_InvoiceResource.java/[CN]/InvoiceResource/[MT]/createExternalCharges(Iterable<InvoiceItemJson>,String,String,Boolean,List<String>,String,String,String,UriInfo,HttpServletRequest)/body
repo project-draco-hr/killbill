@@ -9,7 +9,7 @@
   }
 ));
   if (currencies.size() != 1 || !currencies.iterator().next().equals(account.getCurrency())) {
-    throw new InvoiceApiException(ErrorCode.EXTERNAL_CHARGE_CURRENCY_INVALID,account.getCurrency());
+    throw new InvoiceApiException(ErrorCode.CURRENCY_INVALID,currencies.iterator().next(),account.getCurrency());
   }
   final LocalDate requestedDate=toLocalDate(account,requestedDateTimeString,callContext);
   final Iterable<InvoiceItem> externalCharges=Iterables.<InvoiceItemJson,InvoiceItem>transform(externalChargesJson,new Function<InvoiceItemJson,InvoiceItem>(){
