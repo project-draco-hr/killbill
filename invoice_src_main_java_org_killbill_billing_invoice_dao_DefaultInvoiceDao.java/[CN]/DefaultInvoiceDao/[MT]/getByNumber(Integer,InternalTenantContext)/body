@@ -3,7 +3,7 @@
     throw new InvoiceApiException(ErrorCode.INVOICE_INVALID_NUMBER,"(null)");
   }
   return transactionalSqlDao.execute(InvoiceApiException.class,new EntitySqlDaoTransactionWrapper<InvoiceModelDao>(){
-    @Override public InvoiceModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public InvoiceModelDao inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final InvoiceSqlDao invoiceDao=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
       final InvoiceModelDao invoice=invoiceDao.getByRecordId(number.longValue(),context);
       if (invoice == null) {

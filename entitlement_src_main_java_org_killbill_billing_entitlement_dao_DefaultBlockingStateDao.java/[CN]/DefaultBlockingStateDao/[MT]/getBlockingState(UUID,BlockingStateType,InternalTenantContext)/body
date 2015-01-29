@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<BlockingState>>(){
-    @Override public List<BlockingState> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public List<BlockingState> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final Date upTo=clock.getUTCNow().toDate();
       final List<BlockingStateModelDao> models=entitySqlDaoWrapperFactory.become(BlockingStateSqlDao.class).getBlockingState(blockableId,upTo,context);
       final Collection<BlockingStateModelDao> modelsFiltered=filterBlockingStates(models,blockingStateType);

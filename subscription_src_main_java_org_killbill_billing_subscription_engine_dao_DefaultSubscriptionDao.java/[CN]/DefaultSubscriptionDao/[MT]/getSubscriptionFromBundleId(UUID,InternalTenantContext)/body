@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<SubscriptionBase>>(){
-    @Override public List<SubscriptionBase> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public List<SubscriptionBase> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final List<SubscriptionModelDao> models=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class).getSubscriptionsFromBundleId(bundleId.toString(),context);
       return new ArrayList<SubscriptionBase>(Collections2.transform(models,new Function<SubscriptionModelDao,SubscriptionBase>(){
         @Override public SubscriptionBase apply(        @Nullable final SubscriptionModelDao input){

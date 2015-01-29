@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<PaymentTransactionModelDao>(){
-    @Override public PaymentTransactionModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public PaymentTransactionModelDao inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final TransactionSqlDao transactional=entitySqlDaoWrapperFactory.become(TransactionSqlDao.class);
       transactional.create(paymentTransaction,context);
       final PaymentTransactionModelDao paymentTransactionModelDao=transactional.getById(paymentTransaction.getId().toString(),context);

@@ -1,7 +1,7 @@
 {
   final boolean isInvoiceItemAdjusted=isInvoiceAdjusted && invoiceItemIdsWithNullAmounts.size() > 0;
   return transactionalSqlDao.execute(InvoiceApiException.class,new EntitySqlDaoTransactionWrapper<InvoicePaymentModelDao>(){
-    @Override public InvoicePaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public InvoicePaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final InvoicePaymentSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
       final InvoiceSqlDao transInvoiceDao=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
       final List<InvoicePaymentModelDao> paymentsForId=transactional.getByPaymentId(paymentId.toString(),context);

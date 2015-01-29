@@ -1,6 +1,6 @@
 {
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
-    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final TenantKVModelDao tenantKVModelDao=new TenantKVModelDao(UUID.randomUUID(),context.getCreatedDate(),context.getUpdatedDate(),key,value);
       entitySqlDaoWrapperFactory.become(TenantKVSqlDao.class).create(tenantKVModelDao,context);
       broadcastConfigurationChangeFromTransaction(entitySqlDaoWrapperFactory,key,context);

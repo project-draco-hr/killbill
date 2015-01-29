@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<AuthenticationInfo>(){
-    @Override public AuthenticationInfo inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public AuthenticationInfo inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final TenantModelDao tenantModelDao=entitySqlDaoWrapperFactory.become(TenantSqlDao.class).getSecrets(id.toString());
       final SimpleAuthenticationInfo authenticationInfo=new SimpleAuthenticationInfo(tenantModelDao.getApiKey(),tenantModelDao.getApiSecret().toCharArray(),getClass().getSimpleName());
       authenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(Base64.decode(tenantModelDao.getApiSalt())));

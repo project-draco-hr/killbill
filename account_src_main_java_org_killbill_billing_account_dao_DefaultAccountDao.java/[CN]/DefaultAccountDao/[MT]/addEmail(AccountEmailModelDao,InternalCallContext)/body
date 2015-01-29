@@ -1,6 +1,6 @@
 {
   transactionalSqlDao.execute(AccountApiException.class,new EntitySqlDaoTransactionWrapper<Void>(){
-    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final AccountEmailSqlDao transactional=entitySqlDaoWrapperFactory.become(AccountEmailSqlDao.class);
       if (transactional.getById(email.getId().toString(),context) != null) {
         throw new AccountApiException(ErrorCode.ACCOUNT_EMAIL_ALREADY_EXISTS,email.getId());

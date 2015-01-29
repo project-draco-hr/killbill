@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(InvoiceApiException.class,new EntitySqlDaoTransactionWrapper<UUID>(){
-    @Override public UUID inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public UUID inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final UUID accountId=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class).getAccountIdFromInvoicePaymentId(invoicePaymentId.toString(),context);
       if (accountId == null) {
         throw new InvoiceApiException(ErrorCode.CHARGE_BACK_COULD_NOT_FIND_ACCOUNT_ID,invoicePaymentId);

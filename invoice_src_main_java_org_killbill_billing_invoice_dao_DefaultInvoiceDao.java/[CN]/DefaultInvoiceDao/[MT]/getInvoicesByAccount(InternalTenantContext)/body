@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<InvoiceModelDao>>(){
-    @Override public List<InvoiceModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public List<InvoiceModelDao> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final InvoiceSqlDao invoiceDao=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
       final List<InvoiceModelDao> invoices=ImmutableList.<InvoiceModelDao>copyOf(INVOICE_MODEL_DAO_ORDERING.sortedCopy(Iterables.<InvoiceModelDao>filter(invoiceDao.getByAccountRecordId(context),new Predicate<InvoiceModelDao>(){
         @Override public boolean apply(        final InvoiceModelDao invoice){

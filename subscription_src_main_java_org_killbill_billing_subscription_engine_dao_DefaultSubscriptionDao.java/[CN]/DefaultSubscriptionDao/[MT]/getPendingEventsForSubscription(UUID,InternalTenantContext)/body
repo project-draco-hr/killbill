@@ -1,7 +1,7 @@
 {
   final Date now=clock.getUTCNow().toDate();
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<SubscriptionBaseEvent>>(){
-    @Override public List<SubscriptionBaseEvent> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public List<SubscriptionBaseEvent> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final List<SubscriptionEventModelDao> eventModels=entitySqlDaoWrapperFactory.become(SubscriptionEventSqlDao.class).getFutureActiveEventForSubscription(subscriptionId.toString(),now,context);
       final List<SubscriptionBaseEvent> events=new ArrayList<SubscriptionBaseEvent>(Collections2.transform(eventModels,new Function<SubscriptionEventModelDao,SubscriptionBaseEvent>(){
         @Override public SubscriptionBaseEvent apply(        @Nullable final SubscriptionEventModelDao input){

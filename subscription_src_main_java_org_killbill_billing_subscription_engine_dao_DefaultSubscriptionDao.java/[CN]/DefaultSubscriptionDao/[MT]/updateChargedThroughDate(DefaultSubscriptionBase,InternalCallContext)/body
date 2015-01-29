@@ -1,7 +1,7 @@
 {
   final Date ctd=(subscription.getChargedThroughDate() != null) ? subscription.getChargedThroughDate().toDate() : null;
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
-    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final SubscriptionSqlDao transactionalDao=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
       transactionalDao.updateChargedThroughDate(subscription.getId().toString(),ctd,context);
       final BundleSqlDao bundleSqlDao=entitySqlDaoWrapperFactory.become(BundleSqlDao.class);

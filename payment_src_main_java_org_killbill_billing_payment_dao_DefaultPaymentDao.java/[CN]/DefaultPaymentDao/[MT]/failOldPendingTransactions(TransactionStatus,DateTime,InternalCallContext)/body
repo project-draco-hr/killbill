@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Integer>(){
-    @Override public Integer inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public Integer inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final TransactionSqlDao transactional=entitySqlDaoWrapperFactory.become(TransactionSqlDao.class);
       final List<PaymentTransactionModelDao> oldPendingTransactions=transactional.getByTransactionStatusPriorDate(TransactionStatus.PENDING.toString(),createdBeforeDate.toDate(),context);
       if (oldPendingTransactions.size() > 0) {

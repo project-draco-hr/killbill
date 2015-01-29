@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(InvoiceApiException.class,new EntitySqlDaoTransactionWrapper<InvoicePaymentModelDao>(){
-    @Override public InvoicePaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public InvoicePaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final InvoicePaymentSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
       final List<InvoicePaymentModelDao> invoicePayments=transactional.getByPaymentId(paymentId.toString(),context);
       final InvoicePaymentModelDao invoicePayment=Iterables.tryFind(invoicePayments,new Predicate<InvoicePaymentModelDao>(){

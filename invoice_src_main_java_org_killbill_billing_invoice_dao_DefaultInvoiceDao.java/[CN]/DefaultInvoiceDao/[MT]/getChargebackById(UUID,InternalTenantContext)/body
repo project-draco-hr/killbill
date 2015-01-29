@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(InvoiceApiException.class,new EntitySqlDaoTransactionWrapper<InvoicePaymentModelDao>(){
-    @Override public InvoicePaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public InvoicePaymentModelDao inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final InvoicePaymentModelDao chargeback=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class).getById(chargebackId.toString(),context);
       if (chargeback == null) {
         throw new InvoiceApiException(ErrorCode.CHARGE_BACK_DOES_NOT_EXIST,chargebackId);

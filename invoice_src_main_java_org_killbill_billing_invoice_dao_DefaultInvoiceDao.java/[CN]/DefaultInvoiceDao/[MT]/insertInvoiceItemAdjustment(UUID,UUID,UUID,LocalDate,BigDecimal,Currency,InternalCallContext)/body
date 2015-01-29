@@ -1,6 +1,6 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<InvoiceItemModelDao>(){
-    @Override public InvoiceItemModelDao inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public InvoiceItemModelDao inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final InvoiceItemModelDao invoiceItemAdjustment=invoiceDaoHelper.createAdjustmentItem(entitySqlDaoWrapperFactory,invoiceId,invoiceItemId,positiveAdjAmount,currency,effectiveDate,context);
       invoiceDaoHelper.insertItem(entitySqlDaoWrapperFactory,invoiceItemAdjustment,context);
       cbaDao.addCBAComplexityFromTransaction(invoiceId,entitySqlDaoWrapperFactory,context);

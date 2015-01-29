@@ -5,7 +5,7 @@
   }
   final Long targetRecordId=nonEntitySqlDao.getRecordIdFromObject(objectId.toString(),tableName.getTableName());
   final List<AuditLog> allAuditLogs=transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<AuditLog>>(){
-    @Override public List<AuditLog> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+    @Override public List<AuditLog> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final List<AuditLogModelDao> auditLogsViaHistoryForTargetRecordId=entitySqlDaoWrapperFactory.become(EntitySqlDao.class).getAuditLogsViaHistoryForTargetRecordId(historyTableName.name(),historyTableName.getTableName().toLowerCase(),targetRecordId,context);
       return buildAuditLogsFromModelDao(auditLogsViaHistoryForTargetRecordId,tableName.getObjectType(),objectId);
     }
