@@ -8,7 +8,7 @@
         final boolean shouldInsertNewNotification=cleanupFutureNotificationsFormTransaction(entitySqlDaoWrapperFactory,futureNotifications,futureNotificationTime,overdueQueue);
         if (shouldInsertNewNotification) {
           log.debug("Queuing overdue check notification. Account id: {}, timestamp: {}",accountId.toString(),futureNotificationTime.toString());
-          overdueQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory.getSqlDao(),futureNotificationTime,notificationKey,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+          overdueQueue.recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory.getHandle().getConnection(),futureNotificationTime,notificationKey,context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
         }
  else {
           log.debug("Skipping queuing overdue check notification. Account id: {}, timestamp: {}",accountId.toString(),futureNotificationTime.toString());

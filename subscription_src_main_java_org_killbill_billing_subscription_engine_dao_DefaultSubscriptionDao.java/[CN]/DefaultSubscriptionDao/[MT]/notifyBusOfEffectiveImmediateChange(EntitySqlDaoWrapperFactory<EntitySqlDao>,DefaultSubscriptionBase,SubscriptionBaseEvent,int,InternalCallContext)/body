@@ -3,7 +3,7 @@
     final DefaultSubscriptionBase upToDateSubscription=createSubscriptionWithNewEvent(subscription,immediateEvent,context);
     final SubscriptionBaseTransitionData transition=upToDateSubscription.getTransitionFromEvent(immediateEvent,seqId);
     final EffectiveSubscriptionInternalEvent busEvent=new DefaultEffectiveSubscriptionEvent(transition,upToDateSubscription.getAlignStartDate(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
-    eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory.getSqlDao());
+    eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory.getHandle().getConnection());
   }
  catch (  EventBusException e) {
     log.warn("Failed to post effective event for subscription " + subscription.getId(),e);

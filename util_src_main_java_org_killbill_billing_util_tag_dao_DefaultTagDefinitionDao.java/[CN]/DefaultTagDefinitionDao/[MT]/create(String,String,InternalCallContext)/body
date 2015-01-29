@@ -21,9 +21,9 @@
           tagDefinitionEvent=tagEventBuilder.newUserTagDefinitionCreationEvent(tagDefinition.getId(),tagDefinition,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
         }
         try {
-          bus.postFromTransaction(tagDefinitionEvent,entitySqlDaoWrapperFactory.getSqlDao());
+          bus.postFromTransaction(tagDefinitionEvent,entitySqlDaoWrapperFactory.getHandle().getConnection());
         }
- catch (        PersistentBus.EventBusException e) {
+ catch (        final PersistentBus.EventBusException e) {
           log.warn("Failed to post tag definition creation event for tag " + tagDefinition.getId(),e);
         }
         return tagDefinition;
@@ -31,7 +31,7 @@
     }
 );
   }
- catch (  TransactionFailedException exception) {
+ catch (  final TransactionFailedException exception) {
     if (exception.getCause() instanceof TagDefinitionApiException) {
       throw (TagDefinitionApiException)exception.getCause();
     }

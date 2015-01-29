@@ -1,6 +1,6 @@
 {
   final EntityHistoryModelDao<M,E> history=new EntityHistoryModelDao<M,E>(entityModelDao,entityRecordId,changeType,clock.getUTCNow());
   sqlDao.addHistoryFromTransaction(history,context);
-  final NonEntitySqlDao transactional=sqlDao.become(NonEntitySqlDao.class);
+  final NonEntitySqlDao transactional=SqlObjectBuilder.attach(handle,NonEntitySqlDao.class);
   return nonEntityDao.retrieveLastHistoryRecordIdFromTransaction(entityRecordId,entityModelDao.getHistoryTableName(),transactional);
 }

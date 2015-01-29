@@ -1,4 +1,10 @@
 {
-  final EntitySqlDao<EntityModelDao<Entity>,Entity> entitySqlDao=dbi.onDemand(InitialEntitySqlDao.class);
-  return entitySqlDao.inTransaction(TransactionIsolationLevel.READ_COMMITTED,new JdbiTransaction<ReturnType,EntityModelDao<Entity>,Entity>(entitySqlDaoTransactionWrapper));
+  final Handle handle=dbi.open();
+  try {
+    final EntitySqlDao<EntityModelDao<Entity>,Entity> entitySqlDao=handle.attach(InitialEntitySqlDao.class);
+    return entitySqlDao.inTransaction(TransactionIsolationLevel.READ_COMMITTED,new JdbiTransaction<ReturnType,EntityModelDao<Entity>,Entity>(handle,entitySqlDaoTransactionWrapper));
+  }
+  finally {
+    handle.close();
+  }
 }

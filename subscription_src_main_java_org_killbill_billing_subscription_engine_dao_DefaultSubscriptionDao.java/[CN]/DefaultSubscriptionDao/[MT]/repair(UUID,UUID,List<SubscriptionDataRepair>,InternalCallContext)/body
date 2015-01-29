@@ -17,7 +17,7 @@
       }
       try {
         final RepairSubscriptionInternalEvent busEvent=new DefaultRepairSubscriptionEvent(accountId,bundleId,clock.getUTCNow(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
-        eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory.getSqlDao());
+        eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory.getHandle().getConnection());
       }
  catch (      EventBusException e) {
         log.warn("Failed to post repair subscription event for bundle " + bundleId,e);
