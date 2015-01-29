@@ -6,7 +6,7 @@
  else {
     actualTableName=tableName.getTableName();
   }
-  final EntitySqlDao auditSqlDao=transactionalSqlDao.onDemand(EntitySqlDao.class);
+  final EntitySqlDao auditSqlDao=transactionalSqlDao.onDemandForStreamingResults(EntitySqlDao.class);
   final Iterator<AuditLogModelDao> auditLogsForTableNameAndAccountRecordId=auditSqlDao.getAuditLogsForTableNameAndAccountRecordId(actualTableName,context);
   final Iterator<AuditLog> allAuditLogs=buildAuditLogsFromModelDao(auditLogsForTableNameAndAccountRecordId,context);
   return new DefaultAccountAuditLogsForObjectType(auditLevel,allAuditLogs);

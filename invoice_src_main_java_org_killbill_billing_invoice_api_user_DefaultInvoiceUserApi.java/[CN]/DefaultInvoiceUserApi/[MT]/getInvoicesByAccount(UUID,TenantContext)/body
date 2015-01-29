@@ -1,8 +1,4 @@
 {
-  return ImmutableList.<Invoice>copyOf(Collections2.transform(dao.getInvoicesByAccount(internalCallContextFactory.createInternalTenantContext(accountId,context)),new Function<InvoiceModelDao,Invoice>(){
-    @Override public Invoice apply(    final InvoiceModelDao input){
-      return new DefaultInvoice(input);
-    }
-  }
-));
+  final List<InvoiceModelDao> invoicesByAccount=dao.getInvoicesByAccount(internalCallContextFactory.createInternalTenantContext(accountId,context));
+  return fromInvoiceModelDao(invoicesByAccount);
 }

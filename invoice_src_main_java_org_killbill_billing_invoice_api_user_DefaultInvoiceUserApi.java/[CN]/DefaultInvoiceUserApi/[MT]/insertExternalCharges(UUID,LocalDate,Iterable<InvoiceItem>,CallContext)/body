@@ -4,17 +4,34 @@
       throw new InvoiceApiException(ErrorCode.EXTERNAL_CHARGE_AMOUNT_INVALID,charge.getAmount());
     }
   }
-  final Iterable<InvoiceItemModelDao> chargesModelDao=Iterables.<InvoiceItem,InvoiceItemModelDao>transform(charges,new Function<InvoiceItem,InvoiceItemModelDao>(){
-    @Nullable @Override public InvoiceItemModelDao apply(    final InvoiceItem externalCharge){
-      return new InvoiceItemModelDao(externalCharge);
+  final WithAccountLock withAccountLock=new WithAccountLock(){
+    @Override public Iterable<Invoice> prepareInvoices() throws InvoiceApiException {
+      final Map<Currency,Invoice> newInvoicesForExternalCharges=new HashMap<Currency,Invoice>();
+      final Map<UUID,Invoice> existingInvoicesForExternalCharges=new HashMap<UUID,Invoice>();
+      for (      final InvoiceItem charge : charges) {
+        final Invoice invoiceForExternalCharge;
+        final UUID invoiceIdForExternalCharge=charge.getInvoiceId();
+        if (invoiceIdForExternalCharge == null) {
+          final Currency currency=charge.getCurrency();
+          if (newInvoicesForExternalCharges.get(currency) == null) {
+            final Invoice newInvoiceForExternalCharge=new DefaultInvoice(accountId,effectiveDate,effectiveDate,currency);
+            newInvoicesForExternalCharges.put(currency,newInvoiceForExternalCharge);
+          }
+          invoiceForExternalCharge=newInvoicesForExternalCharges.get(currency);
+        }
+ else {
+          if (existingInvoicesForExternalCharges.get(invoiceIdForExternalCharge) == null) {
+            final Invoice existingInvoiceForExternalCharge=getInvoice(invoiceIdForExternalCharge,context);
+            existingInvoicesForExternalCharges.put(invoiceIdForExternalCharge,existingInvoiceForExternalCharge);
+          }
+          invoiceForExternalCharge=existingInvoicesForExternalCharges.get(invoiceIdForExternalCharge);
+        }
+        final InvoiceItem externalCharge=new ExternalChargeInvoiceItem(UUID.randomUUID(),context.getCreatedDate(),invoiceForExternalCharge.getId(),accountId,charge.getBundleId(),charge.getDescription(),effectiveDate,charge.getAmount(),charge.getCurrency());
+        invoiceForExternalCharge.addInvoiceItem(externalCharge);
+      }
+      return Iterables.<Invoice>concat(newInvoicesForExternalCharges.values(),existingInvoicesForExternalCharges.values());
     }
   }
-);
-  final List<InvoiceItemModelDao> externalCharges=dao.insertExternalCharges(accountId,effectiveDate,chargesModelDao,internalCallContextFactory.createInternalCallContext(accountId,context));
-  return Lists.<InvoiceItemModelDao,InvoiceItem>transform(externalCharges,new Function<InvoiceItemModelDao,InvoiceItem>(){
-    @Nullable @Override public InvoiceItem apply(    @Nullable final InvoiceItemModelDao externalCharge){
-      return InvoiceItemFactory.fromModelDao(externalCharge);
-    }
-  }
-);
+;
+  return dispatchToInvoicePluginsAndInsertItems(accountId,withAccountLock,context);
 }

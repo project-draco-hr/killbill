@@ -1,0 +1,24 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<InvoiceItemModelDao>>(){
+    @Override public List<InvoiceItemModelDao> inTransaction(    final EntitySqlDaoWrapperFactory<EntitySqlDao> entitySqlDaoWrapperFactory) throws Exception {
+      final InvoiceSqlDao invoiceSqlDao=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
+      final InvoiceItemSqlDao transInvoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
+      final List<InvoiceItemModelDao> createdInvoiceItems=new LinkedList<InvoiceItemModelDao>();
+      for (      final InvoiceModelDao invoiceModelDao : invoices) {
+        if (invoiceSqlDao.getById(invoiceModelDao.getId().toString(),context) == null) {
+          invoiceSqlDao.create(invoiceModelDao,context);
+        }
+        for (        final InvoiceItemModelDao invoiceItemModelDao : invoiceModelDao.getInvoiceItems()) {
+          if (transInvoiceItemSqlDao.getById(invoiceItemModelDao.getId().toString(),context) == null) {
+            transInvoiceItemSqlDao.create(invoiceItemModelDao,context);
+            createdInvoiceItems.add(transInvoiceItemSqlDao.getById(invoiceItemModelDao.getId().toString(),context));
+          }
+        }
+        cbaDao.addCBAComplexityFromTransaction(invoiceModelDao.getId(),entitySqlDaoWrapperFactory,context);
+        notifyBusOfInvoiceAdjustment(entitySqlDaoWrapperFactory,invoiceModelDao.getId(),invoiceModelDao.getAccountId(),context.getUserToken(),context);
+      }
+      return createdInvoiceItems;
+    }
+  }
+);
+}

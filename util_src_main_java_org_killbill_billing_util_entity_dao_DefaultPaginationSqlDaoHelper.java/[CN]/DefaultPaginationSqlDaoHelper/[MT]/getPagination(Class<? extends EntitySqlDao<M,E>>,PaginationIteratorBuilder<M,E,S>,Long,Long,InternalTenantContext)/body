@@ -6,7 +6,7 @@
     }
   }
 );
-  final EntitySqlDao<M,E> sqlDao=transactionalSqlDao.onDemand(sqlDaoClazz);
+  final EntitySqlDao<M,E> sqlDao=transactionalSqlDao.onDemandForStreamingResults(sqlDaoClazz);
   final Long totalCount=sqlDao.getCount(context);
   final Iterator<M> results=paginationIteratorBuilder.build((S)sqlDao,limit,context);
   return new DefaultPagination<M>(offset,limit,count,totalCount,results);

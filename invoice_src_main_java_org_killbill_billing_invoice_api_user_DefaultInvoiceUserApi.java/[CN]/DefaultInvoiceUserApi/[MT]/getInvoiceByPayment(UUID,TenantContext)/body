@@ -2,8 +2,8 @@
   final InternalTenantContext tenantContext=internalCallContextFactory.createInternalTenantContext(context);
   final UUID invoiceId=dao.getInvoiceIdByPaymentId(paymentId,tenantContext);
   if (invoiceId == null) {
-    throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,invoiceId);
+    throw new InvoiceApiException(ErrorCode.INVOICE_NOT_FOUND,paymentId);
   }
-  final InvoiceModelDao invoiceModelDao=invoiceId != null ? dao.getById(invoiceId,tenantContext) : null;
+  final InvoiceModelDao invoiceModelDao=dao.getById(invoiceId,tenantContext);
   return new DefaultInvoice(invoiceModelDao);
 }

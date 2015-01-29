@@ -1,15 +1,11 @@
 {
 synchronized (monitor) {
-    invoices.put(invoice.getId(),invoice);
-    for (    final InvoiceItemModelDao invoiceItemModelDao : invoiceItems) {
-      items.put(invoiceItemModelDao.getId(),invoiceItemModelDao);
-    }
-    accountRecordIds.put(invoice.getAccountId(),context.getAccountRecordId());
+    storeInvoice(invoice,context);
   }
   try {
     eventBus.post(new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),InvoiceModelDaoHelper.getBalance(invoice),invoice.getCurrency(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken()));
   }
- catch (  PersistentBus.EventBusException ex) {
+ catch (  final PersistentBus.EventBusException ex) {
     throw new RuntimeException(ex);
   }
 }

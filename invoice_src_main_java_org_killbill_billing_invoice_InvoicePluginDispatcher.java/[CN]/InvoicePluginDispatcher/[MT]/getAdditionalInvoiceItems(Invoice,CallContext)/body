@@ -1,0 +1,19 @@
+{
+  final Invoice clonedInvoice=(Invoice)((DefaultInvoice)originalInvoice).clone();
+  final List<InvoiceItem> additionalInvoiceItems=new LinkedList<InvoiceItem>();
+  final List<InvoicePluginApi> invoicePlugins=getInvoicePlugins();
+  for (  final InvoicePluginApi invoicePlugin : invoicePlugins) {
+    final List<InvoiceItem> items=invoicePlugin.getAdditionalInvoiceItems(clonedInvoice,ImmutableList.<PluginProperty>of(),callContext);
+    if (items != null) {
+      for (      final InvoiceItem item : items) {
+        if (item.getInvoiceItemType() != InvoiceItemType.FIXED && item.getInvoiceItemType() != InvoiceItemType.RECURRING && item.getInvoiceItemType() != InvoiceItemType.REPAIR_ADJ && item.getInvoiceItemType() != InvoiceItemType.CBA_ADJ && item.getInvoiceItemType() != InvoiceItemType.CREDIT_ADJ && item.getInvoiceItemType() != InvoiceItemType.REFUND_ADJ && item.getInvoiceItemType() != InvoiceItemType.USAGE) {
+          additionalInvoiceItems.add(item);
+        }
+ else {
+          log.warn("Ignoring invoice item of type {} from InvoicePlugin {}: {}",item.getInvoiceItemType(),invoicePlugin,item);
+        }
+      }
+    }
+  }
+  return additionalInvoiceItems;
+}

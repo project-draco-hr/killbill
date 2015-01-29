@@ -2,6 +2,26 @@
   if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
     throw new InvoiceApiException(ErrorCode.CREDIT_AMOUNT_INVALID,amount);
   }
-  final InvoiceItemModelDao credit=dao.insertCredit(accountId,invoiceId,amount,effectiveDate,currency,internalCallContextFactory.createInternalCallContext(accountId,context));
-  return InvoiceItemFactory.fromModelDao(credit);
+  final WithAccountLock withAccountLock=new WithAccountLock(){
+    private InvoiceItem creditItem;
+    @Override public List<Invoice> prepareInvoices() throws InvoiceApiException {
+      final Invoice invoiceForCredit;
+      if (invoiceId == null) {
+        invoiceForCredit=new DefaultInvoice(accountId,effectiveDate,effectiveDate,currency);
+      }
+ else {
+        invoiceForCredit=getInvoice(invoiceId,context);
+        if (invoiceForCredit.getCurrency() != currency) {
+          throw new InvoiceApiException(ErrorCode.CURRENCY_INVALID,currency,invoiceForCredit.getCurrency());
+        }
+      }
+      creditItem=new CreditAdjInvoiceItem(UUID.randomUUID(),context.getCreatedDate(),invoiceForCredit.getId(),accountId,effectiveDate,amount.negate(),currency);
+      invoiceForCredit.addInvoiceItem(creditItem);
+      return ImmutableList.<Invoice>of(invoiceForCredit);
+    }
+  }
+;
+  final List<InvoiceItem> creditInvoiceItems=dispatchToInvoicePluginsAndInsertItems(accountId,withAccountLock,context);
+  Preconditions.checkState(creditInvoiceItems.size() == 1,"Should have created a single credit invoice item: " + creditInvoiceItems);
+  return creditInvoiceItems.get(0);
 }

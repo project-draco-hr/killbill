@@ -1,0 +1,12 @@
+{
+  final Collection<InvoiceItemModelDao> createdItems=new LinkedList<InvoiceItemModelDao>();
+  invoices.put(invoice.getId(),invoice);
+  for (  final InvoiceItemModelDao invoiceItemModelDao : invoice.getInvoiceItems()) {
+    final InvoiceItemModelDao oldItemOrNull=items.put(invoiceItemModelDao.getId(),invoiceItemModelDao);
+    if (oldItemOrNull == null) {
+      createdItems.add(invoiceItemModelDao);
+    }
+  }
+  accountRecordIds.put(invoice.getAccountId(),context.getAccountRecordId());
+  return createdItems;
+}

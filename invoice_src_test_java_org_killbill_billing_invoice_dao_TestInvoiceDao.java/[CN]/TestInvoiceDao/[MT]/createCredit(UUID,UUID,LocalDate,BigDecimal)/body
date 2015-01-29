@@ -1,0 +1,12 @@
+{
+  final InvoiceModelDao invoiceModelDao;
+  if (invoiceId == null) {
+    invoiceModelDao=new InvoiceModelDao(accountId,effectiveDate,effectiveDate,Currency.USD);
+  }
+ else {
+    invoiceModelDao=invoiceDao.getById(invoiceId,context);
+  }
+  final CreditAdjInvoiceItem invoiceItem=new CreditAdjInvoiceItem(UUID.randomUUID(),context.getCreatedDate(),invoiceModelDao.getId(),accountId,effectiveDate,creditAmount.negate(),invoiceModelDao.getCurrency());
+  invoiceModelDao.addInvoiceItem(new InvoiceItemModelDao(invoiceItem));
+  invoiceDao.createInvoices(ImmutableList.<InvoiceModelDao>of(invoiceModelDao),context);
+}
