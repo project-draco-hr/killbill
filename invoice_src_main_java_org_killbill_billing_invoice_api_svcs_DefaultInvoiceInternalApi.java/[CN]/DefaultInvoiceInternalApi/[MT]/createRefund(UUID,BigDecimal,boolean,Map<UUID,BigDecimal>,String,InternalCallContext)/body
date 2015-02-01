@@ -2,5 +2,16 @@
   if (amount.compareTo(BigDecimal.ZERO) <= 0) {
     throw new InvoiceApiException(ErrorCode.PAYMENT_REFUND_AMOUNT_NEGATIVE_OR_NULL,paymentId,amount);
   }
-  return new DefaultInvoicePayment(dao.createRefund(paymentId,amount,isInvoiceAdjusted,invoiceItemIdsWithAmounts,transactionExternalKey,context));
+  final InvoicePaymentModelDao refund=dao.createRefund(paymentId,amount,isInvoiceAdjusted,invoiceItemIdsWithAmounts,transactionExternalKey,context);
+  final CallContext callContext=internalCallContextFactory.createCallContext(context);
+  final Invoice invoice=getInvoiceById(refund.getInvoiceId(),context);
+  final UUID accountId=invoice.getAccountId();
+  final WithAccountLock withAccountLock=new WithAccountLock(){
+    @Override public Iterable<Invoice> prepareInvoices() throws InvoiceApiException {
+      return ImmutableList.<Invoice>of(invoice);
+    }
+  }
+;
+  final List<InvoiceItem> createdInvoiceItems=invoiceApiHelper.dispatchToInvoicePluginsAndInsertItems(accountId,withAccountLock,callContext);
+  return new DefaultInvoicePayment(refund);
 }

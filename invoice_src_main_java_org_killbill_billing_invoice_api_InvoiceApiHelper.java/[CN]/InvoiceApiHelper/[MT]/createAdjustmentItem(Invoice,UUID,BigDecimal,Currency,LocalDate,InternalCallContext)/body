@@ -1,0 +1,17 @@
+{
+  final InvoiceItem invoiceItemToBeAdjusted=Iterables.<InvoiceItem>tryFind(invoiceToBeAdjusted.getInvoiceItems(),new Predicate<InvoiceItem>(){
+    @Override public boolean apply(    final InvoiceItem input){
+      return input.getId().equals(invoiceItemId);
+    }
+  }
+).orNull();
+  if (invoiceItemToBeAdjusted == null) {
+    throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_NOT_FOUND,invoiceItemId);
+  }
+  final BigDecimal amountToAdjust=Objects.firstNonNull(positiveAdjAmount,invoiceItemToBeAdjusted.getAmount());
+  final Currency currencyForAdjustment=Objects.firstNonNull(currency,invoiceItemToBeAdjusted.getCurrency());
+  if (invoiceItemToBeAdjusted.getCurrency() != currencyForAdjustment) {
+    throw new InvoiceApiException(ErrorCode.CURRENCY_INVALID,currency,invoiceItemToBeAdjusted.getCurrency());
+  }
+  return new ItemAdjInvoiceItem(UUID.randomUUID(),context.getCreatedDate(),invoiceItemToBeAdjusted.getInvoiceId(),invoiceItemToBeAdjusted.getAccountId(),effectiveDate,null,amountToAdjust.negate(),currencyForAdjustment,invoiceItemToBeAdjusted.getId());
+}

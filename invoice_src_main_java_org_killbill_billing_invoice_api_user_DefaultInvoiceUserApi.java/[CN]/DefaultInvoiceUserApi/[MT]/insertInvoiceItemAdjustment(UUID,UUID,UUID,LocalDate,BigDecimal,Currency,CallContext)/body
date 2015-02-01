@@ -2,6 +2,16 @@
   if (amount != null && amount.compareTo(BigDecimal.ZERO) <= 0) {
     throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_ADJUSTMENT_AMOUNT_SHOULD_BE_POSITIVE,amount);
   }
-  final InvoiceItemModelDao adjustment=dao.insertInvoiceItemAdjustment(accountId,invoiceId,invoiceItemId,effectiveDate,amount,currency,internalCallContextFactory.createInternalCallContext(accountId,context));
-  return InvoiceItemFactory.fromModelDao(adjustment);
+  final WithAccountLock withAccountLock=new WithAccountLock(){
+    @Override public Iterable<Invoice> prepareInvoices() throws InvoiceApiException {
+      final Invoice invoice=getInvoiceAndCheckCurrency(invoiceId,currency,context);
+      final InvoiceItem adjustmentItem=invoiceApiHelper.createAdjustmentItem(invoice,invoiceItemId,amount,currency,effectiveDate,internalCallContextFactory.createInternalCallContext(context));
+      invoice.addInvoiceItem(adjustmentItem);
+      return ImmutableList.<Invoice>of(invoice);
+    }
+  }
+;
+  final List<InvoiceItem> adjustmentInvoiceItems=invoiceApiHelper.dispatchToInvoicePluginsAndInsertItems(accountId,withAccountLock,context);
+  Preconditions.checkState(adjustmentInvoiceItems.size() == 1,"Should have created a single adjustment item: " + adjustmentInvoiceItems);
+  return adjustmentInvoiceItems.get(0);
 }

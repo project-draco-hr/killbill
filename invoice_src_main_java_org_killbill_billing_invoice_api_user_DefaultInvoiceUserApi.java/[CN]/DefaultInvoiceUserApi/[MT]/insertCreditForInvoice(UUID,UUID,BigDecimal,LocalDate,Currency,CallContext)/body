@@ -10,10 +10,7 @@
         invoiceForCredit=new DefaultInvoice(accountId,effectiveDate,effectiveDate,currency);
       }
  else {
-        invoiceForCredit=getInvoice(invoiceId,context);
-        if (invoiceForCredit.getCurrency() != currency) {
-          throw new InvoiceApiException(ErrorCode.CURRENCY_INVALID,currency,invoiceForCredit.getCurrency());
-        }
+        invoiceForCredit=getInvoiceAndCheckCurrency(invoiceId,currency,context);
       }
       creditItem=new CreditAdjInvoiceItem(UUID.randomUUID(),context.getCreatedDate(),invoiceForCredit.getId(),accountId,effectiveDate,amount.negate(),currency);
       invoiceForCredit.addInvoiceItem(creditItem);
@@ -21,7 +18,7 @@
     }
   }
 ;
-  final List<InvoiceItem> creditInvoiceItems=dispatchToInvoicePluginsAndInsertItems(accountId,withAccountLock,context);
+  final List<InvoiceItem> creditInvoiceItems=invoiceApiHelper.dispatchToInvoicePluginsAndInsertItems(accountId,withAccountLock,context);
   Preconditions.checkState(creditInvoiceItems.size() == 1,"Should have created a single credit invoice item: " + creditInvoiceItems);
   return creditInvoiceItems.get(0);
 }
