@@ -1,5 +1,6 @@
 {
   Preconditions.checkState(!isBuilt);
+  allExistingItems.add(existingItem);
 switch (existingItem.getInvoiceItemType()) {
 case EXTERNAL_CHARGE:
 case TAX:
@@ -16,7 +17,12 @@ case ITEM_ADJ:
 default :
 Preconditions.checkState(false,"Unknown invoice item type " + existingItem.getInvoiceItemType());
 }
-allExistingItems.add(existingItem);
+if (existingItem.getInvoiceItemType() == InvoiceItemType.ITEM_ADJ) {
+final InvoiceItem linkedInvoiceItem=getLinkedInvoiceItem(existingItem,allExistingItems);
+if (linkedInvoiceItem != null && linkedInvoiceItem.getInvoiceItemType() != InvoiceItemType.RECURRING && linkedInvoiceItem.getInvoiceItemType() != InvoiceItemType.FIXED) {
+return;
+}
+}
 final UUID subscriptionId=getSubscriptionId(existingItem,allExistingItems);
 Preconditions.checkState(subscriptionId != null || !failOnMissingSubscription,"Missing subscription id");
 if (subscriptionId == null && existingItem.getInvoiceItemType() == InvoiceItemType.ITEM_ADJ) {

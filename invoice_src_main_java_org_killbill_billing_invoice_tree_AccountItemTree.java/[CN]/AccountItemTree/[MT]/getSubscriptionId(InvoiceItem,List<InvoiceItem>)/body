@@ -3,12 +3,7 @@
     return item.getSubscriptionId();
   }
  else {
-    final InvoiceItem linkedItem=Iterables.tryFind(allItems,new Predicate<InvoiceItem>(){
-      @Override public boolean apply(      final InvoiceItem input){
-        return item.getLinkedItemId().equals(input.getId());
-      }
-    }
-).orNull();
+    final InvoiceItem linkedItem=getLinkedInvoiceItem(item,allItems);
     return linkedItem != null ? linkedItem.getSubscriptionId() : null;
   }
 }
