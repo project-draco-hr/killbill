@@ -32,7 +32,7 @@
         final BigDecimal requestedPositiveAmountToAdjust=requestedPositiveAmount.compareTo(maxBalanceToAdjust) > 0 ? maxBalanceToAdjust : requestedPositiveAmount;
         if (requestedPositiveAmountToAdjust.compareTo(BigDecimal.ZERO) > 0) {
           final InvoiceItemModelDao adjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.REFUND_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,null,null,context.getCreatedDate().toLocalDate(),null,requestedPositiveAmountToAdjust.negate(),null,invoice.getCurrency(),null);
-          transInvoiceItemDao.create(adjItem,context);
+          createInvoiceItemFromTransaction(transInvoiceItemDao,adjItem,context);
           invoice.addInvoiceItem(adjItem);
         }
       }
@@ -40,7 +40,7 @@
         for (        final UUID invoiceItemId : invoiceItemIdsWithAmounts.keySet()) {
           final BigDecimal adjAmount=invoiceItemIdsWithAmounts.get(invoiceItemId);
           final InvoiceItemModelDao item=invoiceDaoHelper.createAdjustmentItem(entitySqlDaoWrapperFactory,invoice.getId(),invoiceItemId,adjAmount,invoice.getCurrency(),context.getCreatedDate().toLocalDate(),context);
-          transInvoiceItemDao.create(item,context);
+          createInvoiceItemFromTransaction(transInvoiceItemDao,item,context);
           invoice.addInvoiceItem(item);
         }
       }

@@ -12,7 +12,7 @@
         throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_NOT_FOUND,invoiceItemId);
       }
       final InvoiceItemModelDao cbaAdjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.CBA_ADJ,invoice.getId(),invoice.getAccountId(),null,null,null,null,null,null,context.getCreatedDate().toLocalDate(),null,cbaItem.getAmount().negate(),null,cbaItem.getCurrency(),cbaItem.getId());
-      invoiceItemSqlDao.create(cbaAdjItem,context);
+      createInvoiceItemFromTransaction(invoiceItemSqlDao,cbaAdjItem,context);
       invoiceDaoHelper.populateChildren(invoice,entitySqlDaoWrapperFactory,context);
       if (InvoiceModelDaoHelper.getBalance(invoice).compareTo(BigDecimal.ZERO) < 0) {
         throw new InvoiceApiException(ErrorCode.INVOICE_WOULD_BE_NEGATIVE);
@@ -50,7 +50,7 @@
             }
           }
           final InvoiceItemModelDao nextCBAAdjItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.CBA_ADJ,invoiceFollowing.getId(),invoice.getAccountId(),null,null,null,null,null,null,context.getCreatedDate().toLocalDate(),null,positiveCBAAdjItemAmount,null,cbaItem.getCurrency(),cbaItem.getId());
-          invoiceItemSqlDao.create(nextCBAAdjItem,context);
+          createInvoiceItemFromTransaction(invoiceItemSqlDao,nextCBAAdjItem,context);
           if (positiveRemainderToAdjust.compareTo(BigDecimal.ZERO) == 0) {
             break;
           }

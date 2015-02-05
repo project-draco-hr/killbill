@@ -9,7 +9,7 @@
         }
         final InvoiceItemSqlDao transInvoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
         for (        final InvoiceItemModelDao invoiceItemModelDao : invoiceItems) {
-          transInvoiceItemSqlDao.create(invoiceItemModelDao,context);
+          createInvoiceItemFromTransaction(transInvoiceItemSqlDao,invoiceItemModelDao,context);
         }
         cbaDao.addCBAComplexityFromTransaction(invoice,entitySqlDaoWrapperFactory,context);
         notifyOfFutureBillingEvents(entitySqlDaoWrapperFactory,invoice.getAccountId(),callbackDateTimePerSubscriptions,context);
