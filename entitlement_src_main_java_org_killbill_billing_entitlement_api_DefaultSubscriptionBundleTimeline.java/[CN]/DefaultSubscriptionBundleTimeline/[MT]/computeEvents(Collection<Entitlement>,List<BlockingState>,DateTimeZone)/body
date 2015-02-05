@@ -6,40 +6,6 @@
   }
 ));
   final LinkedList<SubscriptionEvent> result=computeSubscriptionBaseEvents(entitlements,accountTimeZone);
-  Collections.sort(allBlockingStates,new Comparator<BlockingState>(){
-    @Override public int compare(    final BlockingState o1,    final BlockingState o2){
-      final int effectivedComp=o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
-      if (effectivedComp != 0) {
-        return effectivedComp;
-      }
-      final int serviceNameComp=o1.getService().compareTo(o2.getService());
-      if (serviceNameComp != 0) {
-        if (o1.getService().equals(DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME)) {
-          return -1;
-        }
- else         if (o2.getService().equals(DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME)) {
-          return 1;
-        }
- else {
-          return serviceNameComp;
-        }
-      }
-      final int uuidComp=o1.getBlockedId().compareTo(o2.getBlockedId());
-      if (uuidComp != 0) {
-        return uuidComp;
-      }
-      final int serviceStateComp=o1.getStateName().compareTo(o2.getStateName());
-      if (serviceStateComp != 0) {
-        return serviceStateComp;
-      }
-      final int createdDateComp=o1.getCreatedDate().compareTo(o2.getCreatedDate());
-      if (createdDateComp != 0) {
-        return createdDateComp;
-      }
-      return 0;
-    }
-  }
-);
   for (  final BlockingState bs : allBlockingStates) {
     final List<SubscriptionEvent> newEvents=new ArrayList<SubscriptionEvent>();
     final int index=insertFromBlockingEvent(accountTimeZone,allEntitlementUUIDs,result,bs,bs.getEffectiveDate(),newEvents);
