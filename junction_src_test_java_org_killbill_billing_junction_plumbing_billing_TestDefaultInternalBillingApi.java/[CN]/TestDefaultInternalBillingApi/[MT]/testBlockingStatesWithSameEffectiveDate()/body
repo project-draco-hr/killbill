@@ -45,19 +45,11 @@
   clock.addDays(5);
   assertListenerStatus();
   final List<BillingEvent> events=ImmutableList.<BillingEvent>copyOf(billingInternalApi.getBillingEventsForAccountAndUpdateAccountBCD(account.getId(),null,internalCallContext));
-  Assert.assertEquals(events.size(),7);
+  Assert.assertEquals(events.size(),3);
   Assert.assertEquals(events.get(0).getTransitionType(),SubscriptionBaseTransitionType.CREATE);
   Assert.assertEquals(events.get(0).getEffectiveDate(),subscription.getStartDate());
   Assert.assertEquals(events.get(1).getTransitionType(),SubscriptionBaseTransitionType.START_BILLING_DISABLED);
-  Assert.assertEquals(events.get(1).getEffectiveDate(),block1Date);
+  Assert.assertEquals(events.get(1).getEffectiveDate(),block3Date);
   Assert.assertEquals(events.get(2).getTransitionType(),SubscriptionBaseTransitionType.END_BILLING_DISABLED);
-  Assert.assertEquals(events.get(2).getEffectiveDate(),block1Date);
-  Assert.assertEquals(events.get(3).getTransitionType(),SubscriptionBaseTransitionType.START_BILLING_DISABLED);
-  Assert.assertEquals(events.get(3).getEffectiveDate(),block2Date);
-  Assert.assertEquals(events.get(4).getTransitionType(),SubscriptionBaseTransitionType.END_BILLING_DISABLED);
-  Assert.assertEquals(events.get(4).getEffectiveDate(),block2Date);
-  Assert.assertEquals(events.get(5).getTransitionType(),SubscriptionBaseTransitionType.START_BILLING_DISABLED);
-  Assert.assertEquals(events.get(5).getEffectiveDate(),block3Date);
-  Assert.assertEquals(events.get(6).getTransitionType(),SubscriptionBaseTransitionType.END_BILLING_DISABLED);
-  Assert.assertEquals(events.get(6).getEffectiveDate(),block5Date);
+  Assert.assertEquals(events.get(2).getEffectiveDate(),block5Date);
 }
