@@ -16,7 +16,8 @@
     }
   }
 );
-  SubscriptionBaseEvent futureBaseEvent=null;
+  final List<ApiEventChange> baseChangeEvents=new LinkedList<ApiEventChange>();
+  ApiEventCancel baseCancellationEvent=null;
   final List<SubscriptionBase> result=new ArrayList<SubscriptionBase>(input.size());
   for (  final SubscriptionBase cur : input) {
     final List<SubscriptionBaseEvent> events=eventsForSubscription != null ? (List<SubscriptionBaseEvent>)eventsForSubscription.get(cur.getId()) : getEventsForSubscription(cur.getId(),context);
@@ -24,21 +25,41 @@
     SubscriptionBase reloaded=createSubscriptionForInternalUse(cur,events,context);
 switch (cur.getCategory()) {
 case BASE:
-      final Collection<SubscriptionBaseEvent> futureApiEvents=Collections2.filter(events,new Predicate<SubscriptionBaseEvent>(){
-        @Override public boolean apply(        final SubscriptionBaseEvent input){
-          return (input.isActive() && input.getEffectiveDate().isAfter(clock.getUTCNow()) && ((input instanceof ApiEventCancel) || (input instanceof ApiEventChange)));
+      for (      final SubscriptionBaseEvent event : events) {
+        if (!event.isActive()) {
+          continue;
+        }
+ else         if (event instanceof ApiEventCancel) {
+          baseCancellationEvent=(ApiEventCancel)event;
+          break;
+        }
+ else         if (event instanceof ApiEventChange) {
+          baseChangeEvents.add((ApiEventChange)event);
         }
       }
-);
-    futureBaseEvent=(futureApiEvents.size() == 0) ? null : futureApiEvents.iterator().next();
-  break;
+    break;
 case ADD_ON:
-final Plan targetAddOnPlan=reloaded.getCurrentPlan();
-final String baseProductName=(futureBaseEvent instanceof ApiEventChange) ? ((ApiEventChange)futureBaseEvent).getEventPlan() : null;
-final boolean createCancelEvent=(futureBaseEvent != null && targetAddOnPlan != null) && ((futureBaseEvent instanceof ApiEventCancel) || ((!addonUtils.isAddonAvailableFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan,context)) || (addonUtils.isAddonIncludedFromPlanName(baseProductName,futureBaseEvent.getEffectiveDate(),targetAddOnPlan,context))));
-if (createCancelEvent && reloaded.getFutureEndDate() == null) {
+  final Plan targetAddOnPlan=reloaded.getCurrentPlan();
+if (targetAddOnPlan == null || reloaded.getFutureEndDate() != null) {
+  break;
+}
+SubscriptionBaseEvent baseTriggerEventForAddOnCancellation=baseCancellationEvent;
+for (final ApiEventChange baseChangeEvent : baseChangeEvents) {
+final String baseProductName=baseChangeEvent.getEventPlan();
+if ((!addonUtils.isAddonAvailableFromPlanName(baseProductName,baseChangeEvent.getEffectiveDate(),targetAddOnPlan,context)) || (addonUtils.isAddonIncludedFromPlanName(baseProductName,baseChangeEvent.getEffectiveDate(),targetAddOnPlan,context))) {
+if (baseTriggerEventForAddOnCancellation != null) {
+  if (baseTriggerEventForAddOnCancellation.getEffectiveDate().isAfter(baseChangeEvent.getEffectiveDate())) {
+    baseTriggerEventForAddOnCancellation=baseChangeEvent;
+  }
+}
+ else {
+  baseTriggerEventForAddOnCancellation=baseChangeEvent;
+}
+}
+}
+if (baseTriggerEventForAddOnCancellation != null) {
 final DateTime now=clock.getUTCNow();
-final SubscriptionBaseEvent addOnCancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(reloaded.getId()).setActiveVersion(((DefaultSubscriptionBase)reloaded).getActiveVersion()).setProcessedDate(now).setEffectiveDate(futureBaseEvent.getEffectiveDate()).setRequestedDate(now).setCreatedDate(futureBaseEvent.getCreatedDate()).setFromDisk(false));
+final SubscriptionBaseEvent addOnCancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(reloaded.getId()).setActiveVersion(((DefaultSubscriptionBase)reloaded).getActiveVersion()).setProcessedDate(now).setEffectiveDate(baseTriggerEventForAddOnCancellation.getEffectiveDate()).setRequestedDate(now).setCreatedDate(baseTriggerEventForAddOnCancellation.getCreatedDate()).setFromDisk(false));
 events.add(addOnCancelEvent);
 reloaded=createSubscriptionForInternalUse(cur,events,context);
 }
