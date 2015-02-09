@@ -20,9 +20,7 @@
       final Product product=cur.getNextProduct() != null ? cur.getNextProduct() : cur.getPrevProduct();
       final PriceList priceList=cur.getNextPriceList() != null ? cur.getNextPriceList() : cur.getPrevPriceList();
       final PlanPhase phase=cur.getNextPhase() != null ? cur.getNextPhase() : cur.getPrevPhase();
-      this.events.add(new EventSubscriptionJson(cur.getId().toString(),billingPeriod != null ? billingPeriod.toString() : null,cur.getRequestedDate(),cur.getEffectiveDate(),product != null ? product.getName() : null,priceList != null ? priceList.getName() : null,cur.getSubscriptionEventType().toString(),phase != null ? phase.getName() : null,toAuditLogJson(accountAuditLogs == null ? null : accountAuditLogs.getAuditLogsForSubscriptionEvent(cur.getId()))));
+      this.events.add(new EventSubscriptionJson(cur.getId().toString(),billingPeriod != null ? billingPeriod.toString() : null,cur.getRequestedDate(),cur.getEffectiveDate(),product != null ? product.getName() : null,priceList != null ? priceList.getName() : null,cur.getSubscriptionEventType().toString(),cur.isBlockedBilling(),cur.isBlockedEntitlement(),cur.getServiceName(),cur.getServiceStateName(),phase != null ? phase.getName() : null,toAuditLogJson(accountAuditLogs == null ? null : accountAuditLogs.getAuditLogsForSubscriptionEvent(cur.getId()))));
     }
   }
-  this.newEvents=null;
-  this.deletedEvents=null;
 }
