@@ -26,9 +26,9 @@
   final BlockingState bs4=new DefaultBlockingState(UUID.randomUUID(),bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,DefaultEntitlementApi.ENT_STATE_CANCELLED,DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveDate,clock.getUTCNow(),clock.getUTCNow(),3L);
   blockingStates.add(bs4);
   final List<Entitlement> entitlements=new ArrayList<Entitlement>();
-  final Entitlement entitlement=createEntitlement(entitlementId,allTransitions);
+  final Entitlement entitlement=createEntitlement(entitlementId,allTransitions,blockingStates);
   entitlements.add(entitlement);
-  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlements,blockingStates);
+  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlements);
   final List<SubscriptionEvent> events=timeline.getSubscriptionEvents();
   assertEquals(events.size(),4);
   assertEquals(events.get(0).getEffectiveDate().compareTo(new LocalDate(tr1.getEffectiveTransitionTime(),accountTimeZone)),0);
@@ -40,7 +40,7 @@
   assertEquals(events.get(2).getSubscriptionEventType(),SubscriptionEventType.PAUSE_ENTITLEMENT);
   assertEquals(events.get(3).getSubscriptionEventType(),SubscriptionEventType.STOP_ENTITLEMENT);
   assertEquals(events.get(0).getServiceName(),DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME);
-  assertEquals(events.get(1).getServiceName(),DefaultSubscriptionBundleTimeline.BILLING_SERVICE_NAME);
+  assertEquals(events.get(1).getServiceName(),EntitlementOrderingBase.BILLING_SERVICE_NAME);
   assertEquals(events.get(2).getServiceName(),DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME);
   assertEquals(events.get(3).getServiceName(),DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME);
   assertNull(events.get(0).getPrevPhase());

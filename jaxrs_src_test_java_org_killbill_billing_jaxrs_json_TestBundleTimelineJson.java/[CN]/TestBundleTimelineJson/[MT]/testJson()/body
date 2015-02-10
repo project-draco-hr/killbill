@@ -1,10 +1,6 @@
 {
-  final String viewId=UUID.randomUUID().toString();
-  final String reason=UUID.randomUUID().toString();
-  final BundleJson bundleJson=createBundleWithSubscriptions();
-  final InvoiceJson invoiceJson=createInvoice();
-  final InvoicePaymentJson paymentJson=createPayment(UUID.fromString(invoiceJson.getAccountId()),UUID.fromString(invoiceJson.getInvoiceId()));
-  final BundleTimelineJson bundleTimelineJson=new BundleTimelineJson(viewId,bundleJson,ImmutableList.<InvoicePaymentJson>of(paymentJson),ImmutableList.<InvoiceJson>of(invoiceJson),reason);
+  final EventSubscriptionJson event=new EventSubscriptionJson(UUID.randomUUID().toString(),BillingPeriod.NO_BILLING_PERIOD.toString(),new LocalDate(),new LocalDate(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),true,false,UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),null);
+  final BundleTimelineJson bundleTimelineJson=new BundleTimelineJson(UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),ImmutableList.<EventSubscriptionJson>of(event),null);
   final String asJson=mapper.writeValueAsString(bundleTimelineJson);
   final BundleTimelineJson fromJson=mapper.readValue(asJson,BundleTimelineJson.class);
   Assert.assertEquals(fromJson,bundleTimelineJson);

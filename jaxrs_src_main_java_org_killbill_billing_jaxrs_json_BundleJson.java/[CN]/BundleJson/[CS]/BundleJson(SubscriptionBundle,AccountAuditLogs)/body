@@ -4,13 +4,8 @@
   this.bundleId=bundle.getId().toString();
   this.externalKey=bundle.getExternalKey();
   this.subscriptions=new LinkedList<SubscriptionJson>();
-  for (  final Subscription cur : bundle.getSubscriptions()) {
-    final ImmutableList<SubscriptionEvent> events=ImmutableList.<SubscriptionEvent>copyOf(Collections2.filter(bundle.getTimeline().getSubscriptionEvents(),new Predicate<SubscriptionEvent>(){
-      @Override public boolean apply(      @Nullable final SubscriptionEvent input){
-        return input.getEntitlementId().equals(cur.getId());
-      }
-    }
-));
-    this.subscriptions.add(new SubscriptionJson(cur,events,accountAuditLogs));
+  for (  final Subscription subscription : bundle.getSubscriptions()) {
+    this.subscriptions.add(new SubscriptionJson(subscription,accountAuditLogs));
   }
+  this.timeline=new BundleTimelineJson(bundle.getTimeline(),accountAuditLogs);
 }

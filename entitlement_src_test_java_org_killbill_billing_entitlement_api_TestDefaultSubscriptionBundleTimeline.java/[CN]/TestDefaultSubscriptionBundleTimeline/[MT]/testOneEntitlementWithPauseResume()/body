@@ -33,9 +33,9 @@
   final BlockingState bs4=new DefaultBlockingState(UUID.randomUUID(),entitlementId,BlockingStateType.SUBSCRIPTION,"NothingUseful4",service,false,false,false,effectiveDate,clock.getUTCNow(),clock.getUTCNow(),3L);
   blockingStates.add(bs4);
   final List<Entitlement> entitlements=new ArrayList<Entitlement>();
-  final Entitlement entitlement=createEntitlement(entitlementId,allTransitions);
+  final Entitlement entitlement=createEntitlement(entitlementId,allTransitions,blockingStates);
   entitlements.add(entitlement);
-  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlements,blockingStates);
+  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlements);
   assertEquals(timeline.getAccountId(),accountId);
   assertEquals(timeline.getBundleId(),bundleId);
   assertEquals(timeline.getExternalKey(),externalKey);
@@ -60,12 +60,12 @@
   assertEquals(events.get(7).getSubscriptionEventType(),SubscriptionEventType.PAUSE_BILLING);
   assertEquals(events.get(8).getSubscriptionEventType(),SubscriptionEventType.RESUME_BILLING);
   assertEquals(events.get(0).getServiceName(),DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME);
-  assertEquals(events.get(1).getServiceName(),DefaultSubscriptionBundleTimeline.BILLING_SERVICE_NAME);
-  assertEquals(events.get(2).getServiceName(),DefaultSubscriptionBundleTimeline.ENT_BILLING_SERVICE_NAME);
+  assertEquals(events.get(1).getServiceName(),EntitlementOrderingBase.BILLING_SERVICE_NAME);
+  assertEquals(events.get(2).getServiceName(),EntitlementOrderingBase.ENT_BILLING_SERVICE_NAME);
   assertEquals(events.get(3).getServiceName(),DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME);
-  assertEquals(events.get(4).getServiceName(),DefaultSubscriptionBundleTimeline.BILLING_SERVICE_NAME);
+  assertEquals(events.get(4).getServiceName(),EntitlementOrderingBase.BILLING_SERVICE_NAME);
   assertEquals(events.get(5).getServiceName(),DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME);
-  assertEquals(events.get(6).getServiceName(),DefaultSubscriptionBundleTimeline.BILLING_SERVICE_NAME);
+  assertEquals(events.get(6).getServiceName(),EntitlementOrderingBase.BILLING_SERVICE_NAME);
   assertEquals(events.get(7).getServiceName(),service);
   assertEquals(events.get(8).getServiceName(),service);
   assertNull(events.get(0).getPrevPhase());

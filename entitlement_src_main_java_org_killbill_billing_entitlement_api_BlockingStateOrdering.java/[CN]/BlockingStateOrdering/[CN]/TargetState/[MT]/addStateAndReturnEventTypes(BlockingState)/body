@@ -1,0 +1,38 @@
+{
+  final BlockingState fixedBlockingState=new DefaultBlockingState(bs.getBlockedId(),bs.getType(),bs.getStateName(),bs.getService(),bs.isBlockChange(),(bs.isBlockEntitlement() && isEntitlementStarted && !isEntitlementStopped),(bs.isBlockBilling() && isBillingStarted && !isBillingStopped),bs.getEffectiveDate());
+  final List<SubscriptionEventType> result=new ArrayList<SubscriptionEventType>(4);
+  if (fixedBlockingState.getStateName().equals(DefaultEntitlementApi.ENT_STATE_CANCELLED)) {
+    isEntitlementStopped=true;
+    result.add(SubscriptionEventType.STOP_ENTITLEMENT);
+    return result;
+  }
+  final BlockingAggregator stateBefore=getState();
+  if (DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME.equals(fixedBlockingState.getService())) {
+    perServiceBlockingState.put(DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME,fixedBlockingState);
+    perServiceBlockingState.put(BILLING_SERVICE_NAME,fixedBlockingState);
+  }
+ else {
+    perServiceBlockingState.put(fixedBlockingState.getService(),fixedBlockingState);
+  }
+  final BlockingAggregator stateAfter=getState();
+  final boolean shouldResumeEntitlement=isEntitlementStarted && !isEntitlementStopped && stateBefore.isBlockEntitlement()&& !stateAfter.isBlockEntitlement();
+  if (shouldResumeEntitlement) {
+    result.add(SubscriptionEventType.RESUME_ENTITLEMENT);
+  }
+  final boolean shouldResumeBilling=isBillingStarted && !isBillingStopped && stateBefore.isBlockBilling()&& !stateAfter.isBlockBilling();
+  if (shouldResumeBilling) {
+    result.add(SubscriptionEventType.RESUME_BILLING);
+  }
+  final boolean shouldBlockEntitlement=isEntitlementStarted && !isEntitlementStopped && !stateBefore.isBlockEntitlement()&& stateAfter.isBlockEntitlement();
+  if (shouldBlockEntitlement) {
+    result.add(SubscriptionEventType.PAUSE_ENTITLEMENT);
+  }
+  final boolean shouldBlockBilling=isBillingStarted && !isBillingStopped && !stateBefore.isBlockBilling()&& stateAfter.isBlockBilling();
+  if (shouldBlockBilling) {
+    result.add(SubscriptionEventType.PAUSE_BILLING);
+  }
+  if (!shouldResumeEntitlement && !shouldResumeBilling && !shouldBlockEntitlement&& !shouldBlockBilling&& !fixedBlockingState.getService().equals(DefaultEntitlementService.ENTITLEMENT_SERVICE_NAME)) {
+    result.add(SubscriptionEventType.SERVICE_STATE_CHANGE);
+  }
+  return result;
+}

@@ -1,0 +1,10 @@
+{
+  super(toAuditLogJson(accountAuditLogs == null ? null : accountAuditLogs.getAuditLogsForBundle(bundleTimeline.getBundleId())));
+  this.accountId=bundleTimeline.getAccountId().toString();
+  this.bundleId=bundleTimeline.getBundleId().toString();
+  this.externalKey=bundleTimeline.getExternalKey();
+  this.events=new LinkedList<EventSubscriptionJson>();
+  for (  final SubscriptionEvent subscriptionEvent : bundleTimeline.getSubscriptionEvents()) {
+    this.events.add(new EventSubscriptionJson(subscriptionEvent,accountAuditLogs));
+  }
+}
