@@ -1,0 +1,17 @@
+{
+  final Collection<NotificationQueue> filtered=Collections2.<NotificationQueue>filter(notificationQueueService.getNotificationQueues(),new Predicate<NotificationQueue>(){
+    @Override public boolean apply(    final NotificationQueue notificationQueue){
+      for (      final NotificationEventWithMetadata<NotificationEvent> notificationEvent : notificationQueue.getFutureNotificationForSearchKey2(tenantRecordId)) {
+        if (!notificationEvent.getEffectiveDate().isAfter(clock.getUTCNow())) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+);
+  if (!filtered.isEmpty()) {
+    log.info("TestResource: {} more notification(s) to process",filtered.size());
+  }
+  return filtered.isEmpty() && notificationQueueService.inProcessingNotificationsCount() == 0;
+}

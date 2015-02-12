@@ -1,0 +1,23 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final Long tenantRecordId=recordIdApi.getRecordId(tenantContext.getTenantId(),ObjectType.TENANT,tenantContext);
+  int nbTryLeft=timeoutSec != null ? timeoutSec.intValue() : 0;
+  boolean areAllNotificationsProcessed=false;
+  try {
+    while (!areAllNotificationsProcessed && nbTryLeft > 0) {
+      areAllNotificationsProcessed=areAllNotificationsProcessed(tenantRecordId);
+      areAllNotificationsProcessed=areAllNotificationsProcessed && areAllBusEventsProcessed(tenantRecordId);
+      areAllNotificationsProcessed=areAllNotificationsProcessed && areAllNotificationsProcessed(tenantRecordId);
+      if (!areAllNotificationsProcessed) {
+        Thread.sleep(MILLIS_IN_SEC);
+        nbTryLeft--;
+      }
+    }
+  }
+ catch (  final InterruptedException ignore) {
+  }
+  if (!areAllNotificationsProcessed) {
+    log.warn("TestResource: there are more notifications or bus events to process, consider increasing the timeout (currently {}s)",timeoutSec);
+  }
+  return areAllNotificationsProcessed;
+}
