@@ -4,10 +4,22 @@
   while (curChild != null) {
     if (curChild.isSame(toBeRemoved)) {
       if (prevChild == null) {
-        leftChild=curChild.getRightSibling();
+        if (curChild.getLeftChild() == null) {
+          leftChild=curChild.getRightSibling();
+        }
+ else {
+          leftChild=curChild.getLeftChild();
+          adjustRightMostChildSibling(curChild);
+        }
       }
  else {
-        prevChild.rightSibling=curChild.getRightSibling();
+        if (curChild.getLeftChild() == null) {
+          prevChild.rightSibling=curChild.getRightSibling();
+        }
+ else {
+          prevChild.rightSibling=curChild.getLeftChild();
+          adjustRightMostChildSibling(curChild);
+        }
       }
       break;
     }
