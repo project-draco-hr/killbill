@@ -1,0 +1,9 @@
+{
+  return Iterables.<SubscriptionBase>tryFind(subscriptions,new Predicate<SubscriptionBase>(){
+    @Override public boolean apply(    final SubscriptionBase input){
+      final List<SubscriptionBaseTransition> allTransitions=input.getAllTransitions();
+      return !allTransitions.isEmpty() && allTransitions.get(0).getNextPlan() != null && allTransitions.get(0).getNextPlan().getProduct() != null && ProductCategory.BASE.equals(allTransitions.get(0).getNextPlan().getProduct().getCategory());
+    }
+  }
+).orNull();
+}

@@ -39,12 +39,7 @@
   for (  final UUID bundleId : subscriptions.keySet()) {
     final SubscriptionBaseBundle bundle=bundlesPerId.get(bundleId);
     final List<SubscriptionBase> allSubscriptionsForBundle=subscriptions.get(bundleId);
-    final SubscriptionBase baseSubscription=Iterables.<SubscriptionBase>tryFind(allSubscriptionsForBundle,new Predicate<SubscriptionBase>(){
-      @Override public boolean apply(      final SubscriptionBase input){
-        return ProductCategory.BASE.equals(input.getLastActiveProduct().getCategory());
-      }
-    }
-).orNull();
+    final SubscriptionBase baseSubscription=findBaseSubscription(allSubscriptionsForBundle);
     final List<BlockingState> bundleBlockingStates=Objects.firstNonNull(blockingStatesPerBundle.get(bundleId),ImmutableList.<BlockingState>of());
     if (entitlementsPerBundle.get(bundleId) == null) {
       entitlementsPerBundle.put(bundleId,new LinkedList<EventsStream>());

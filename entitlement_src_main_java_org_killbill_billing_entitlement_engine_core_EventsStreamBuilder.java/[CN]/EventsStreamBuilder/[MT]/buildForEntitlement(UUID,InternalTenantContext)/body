@@ -7,12 +7,7 @@
     subscription=subscriptionInternalApi.getSubscriptionFromId(entitlementId,internalTenantContext);
     bundle=subscriptionInternalApi.getBundleFromId(subscription.getBundleId(),internalTenantContext);
     allSubscriptionsForBundle=subscriptionInternalApi.getSubscriptionsForBundle(subscription.getBundleId(),null,internalTenantContext);
-    baseSubscription=Iterables.<SubscriptionBase>tryFind(allSubscriptionsForBundle,new Predicate<SubscriptionBase>(){
-      @Override public boolean apply(      final SubscriptionBase input){
-        return ProductCategory.BASE.equals(input.getLastActiveProduct().getCategory());
-      }
-    }
-).orNull();
+    baseSubscription=findBaseSubscription(allSubscriptionsForBundle);
   }
  catch (  SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);
