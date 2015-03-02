@@ -1,0 +1,21 @@
+{
+  checkCacheLoaderStatus();
+  if (!(key instanceof String)) {
+    throw new IllegalArgumentException("Unexpected key type of " + key.getClass().getName());
+  }
+  if (!(argument instanceof CacheLoaderArgument)) {
+    throw new IllegalArgumentException("Unexpected key type of " + argument.getClass().getName());
+  }
+  final String[] parts=((String)key).split(CacheControllerDispatcher.CACHE_KEY_SEPARATOR);
+  final String rawKey=parts[0];
+  final String tenantRecordId=parts[1];
+  final InternalTenantContext internalTenantContext=new InternalTenantContext(Long.valueOf(tenantRecordId));
+  final List<String> valuesForKey=tenantApi.getTenantValueForKey(rawKey,internalTenantContext);
+  if (valuesForKey == null || valuesForKey.size() == 0) {
+    return null;
+  }
+  if (valuesForKey.size() > 1) {
+    throw new IllegalStateException("TenantKVCacheLoader expecting no more than one value for key " + key);
+  }
+  return valuesForKey.get(0);
+}

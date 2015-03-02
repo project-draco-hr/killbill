@@ -1,4 +1,6 @@
 {
   final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(context);
-  tenantDao.addTenantKeyValue(key,value,internalContext);
+  final String tenantKey=getCacheKeyName(key,internalContext);
+  tenantKVCache.remove(tenantKey);
+  tenantDao.addTenantKeyValue(key,value,isSingleValueKey(key),internalContext);
 }

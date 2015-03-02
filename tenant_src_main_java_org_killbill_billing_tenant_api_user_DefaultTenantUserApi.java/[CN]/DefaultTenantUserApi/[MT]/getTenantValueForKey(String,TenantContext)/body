@@ -1,4 +1,8 @@
 {
   final InternalTenantContext internalContext=internalCallContextFactory.createInternalTenantContext(context);
+  final String value=getCachedTenantValueForKey(key,internalContext);
+  if (value != null) {
+    return ImmutableList.<String>of(value);
+  }
   return tenantDao.getTenantValueForKey(key,internalContext);
 }

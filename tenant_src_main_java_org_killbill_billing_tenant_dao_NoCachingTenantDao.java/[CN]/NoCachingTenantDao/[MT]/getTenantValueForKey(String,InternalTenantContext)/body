@@ -2,7 +2,7 @@
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<String>>(){
     @Override public List<String> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final List<TenantKVModelDao> tenantKV=entitySqlDaoWrapperFactory.become(TenantKVSqlDao.class).getTenantValueForKey(key,context);
-      return ImmutableList.copyOf(Collections2.transform(tenantKV,new Function<TenantKVModelDao,String>(){
+      return new ArrayList(Collections2.transform(tenantKV,new Function<TenantKVModelDao,String>(){
         @Override public String apply(        final TenantKVModelDao in){
           return in.getTenantValue();
         }

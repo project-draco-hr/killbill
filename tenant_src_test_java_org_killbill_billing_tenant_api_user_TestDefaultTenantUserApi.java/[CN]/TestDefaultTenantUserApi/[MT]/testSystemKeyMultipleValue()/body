@@ -1,0 +1,13 @@
+{
+  final String tenantKey=TenantKey.CATALOG.toString();
+  tenantUserApi.addTenantKeyValue(tenantKey,"TheValue",callContext);
+  List<String> value=tenantUserApi.getTenantValueForKey(tenantKey,callContext);
+  Assert.assertEquals(value.size(),1);
+  Assert.assertEquals(value.get(0),"TheValue");
+  tenantUserApi.addTenantKeyValue(tenantKey,"TheSecondValue",callContext);
+  value=tenantUserApi.getTenantValueForKey(tenantKey,callContext);
+  Assert.assertEquals(value.size(),2);
+  tenantUserApi.deleteTenantKey(tenantKey,callContext);
+  value=tenantUserApi.getTenantValueForKey(tenantKey,callContext);
+  Assert.assertEquals(value.size(),0);
+}
