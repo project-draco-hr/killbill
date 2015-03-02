@@ -7,14 +7,21 @@
     if (parent.isStopped()) {
       return;
     }
-    final CacheInvalidationCallback callback=parent.getCacheInvalidation(TenantKey.valueOf(cur.getType()));
-    if (callback != null) {
-      final InternalTenantContext tenantContext=new InternalTenantContext(cur.getTenantRecordId(),null);
-      callback.invalidateCache(tenantContext);
-    }
+    try {
+      final TenantKeyAndCookie tenantKeyAndCookie=extractTenantKeyAndCookie(cur.getType());
+      if (tenantKeyAndCookie != null) {
+        final CacheInvalidationCallback callback=parent.getCacheInvalidation(tenantKeyAndCookie.getTenantKey());
+        if (callback != null) {
+          final InternalTenantContext tenantContext=new InternalTenantContext(cur.getTenantRecordId(),null);
+          callback.invalidateCache(tenantKeyAndCookie.getTenantKey(),tenantKeyAndCookie.getCookie(),tenantContext);
+        }
  else {
-      logger.warn("Failed to find CacheInvalidationCallback for " + cur.getType());
+          logger.warn("Failed to find CacheInvalidationCallback for " + cur.getType());
+        }
+      }
     }
-    parent.setLatestRecordIdProcessed(cur.getRecordId());
+  finally {
+      parent.setLatestRecordIdProcessed(cur.getRecordId());
+    }
   }
 }

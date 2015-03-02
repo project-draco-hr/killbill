@@ -1,0 +1,11 @@
+{
+  final StringBuilder keyBuilder=new StringBuilder(tenantKey.toString());
+  if (cookie instanceof String) {
+    keyBuilder.append((String)cookie);
+  }
+  keyBuilder.append(CacheControllerDispatcher.CACHE_KEY_SEPARATOR);
+  keyBuilder.append(tenantContext.getTenantRecordId());
+  final String key=keyBuilder.toString();
+  log.info("Invalidate cache for tenant {} and key {} ",tenantContext.getTenantRecordId(),key);
+  tenantKVCache.remove(key);
+}

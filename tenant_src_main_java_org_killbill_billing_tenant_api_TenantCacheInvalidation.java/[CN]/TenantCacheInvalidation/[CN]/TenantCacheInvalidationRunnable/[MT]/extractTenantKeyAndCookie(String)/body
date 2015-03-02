@@ -1,0 +1,13 @@
+{
+  final TenantKey tenantKey=Iterables.tryFind(ImmutableList.copyOf(TenantKey.values()),new Predicate<TenantKey>(){
+    @Override public boolean apply(    final TenantKey input){
+      return key.startsWith(input.toString());
+    }
+  }
+).orNull();
+  if (tenantKey == null) {
+    return null;
+  }
+  final String cookie=!key.equals(tenantKey.toString()) ? key.substring(tenantKey.toString().length()) : null;
+  return new TenantKeyAndCookie(tenantKey,cookie);
+}
