@@ -3,6 +3,7 @@
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final UUID accountId=UUID.fromString(accountIdString);
   final Account account=accountUserApi.getAccountById(accountId,callContext);
+  final UUID paymentMethodId=paymentMethodIdStr == null ? account.getPaymentMethodId() : UUID.fromString(paymentMethodIdStr);
   final Iterable<PluginProperty> customFields;
   if (json == null) {
     customFields=ImmutableList.<PluginProperty>of();
@@ -15,7 +16,7 @@
     }
 );
   }
-  final HostedPaymentPageFormDescriptor descriptor=paymentGatewayApi.buildFormDescriptor(account,customFields,pluginProperties,callContext);
+  final HostedPaymentPageFormDescriptor descriptor=paymentGatewayApi.buildFormDescriptor(account,paymentMethodId,customFields,pluginProperties,callContext);
   final HostedPaymentPageFormDescriptorJson result=new HostedPaymentPageFormDescriptorJson(descriptor);
   return Response.status(Response.Status.OK).entity(result).build();
 }
