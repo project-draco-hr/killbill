@@ -3,8 +3,12 @@
   if (item == null) {
     return null;
   }
-  final Item result=new Item(item.toProratedInvoiceItem(startDate,endDate),targetInvoiceId,item.getAction());
-  if (item.getAction() == ItemAction.CANCEL && result != null) {
+  final InvoiceItem proratedInvoiceItem=item.toProratedInvoiceItem(startDate,endDate);
+  if (proratedInvoiceItem == null) {
+    return null;
+  }
+  final Item result=new Item(proratedInvoiceItem,targetInvoiceId,item.getAction());
+  if (item.getAction() == ItemAction.CANCEL) {
     item.incrementCurrentRepairedAmount(result.getAmount());
   }
   return result;
