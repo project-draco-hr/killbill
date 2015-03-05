@@ -1,8 +1,9 @@
 {
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
-      broadcastConfigurationChangeFromTransaction(entitySqlDaoWrapperFactory,key,context);
-      return deleteFromTransaction(key,entitySqlDaoWrapperFactory,context);
+      deleteFromTransaction(key,entitySqlDaoWrapperFactory,context);
+      broadcastConfigurationChangeFromTransaction(key,entitySqlDaoWrapperFactory,context);
+      return null;
     }
   }
 );
