@@ -2,6 +2,7 @@
   ObjectType objectType=null;
   UUID objectId=null;
   ExtBusEventType eventBusType=null;
+  String metaData=null;
   UUID accountId=null;
 switch (event.getBusEventType()) {
 case ACCOUNT_CREATE:
@@ -109,20 +110,34 @@ objectId=realTagEventDel.getTagId();
 eventBusType=ExtBusEventType.TAG_DELETION;
 break;
 case CUSTOM_FIELD_CREATION:
-final CustomFieldCreationEvent realCustomEveventCr=(CustomFieldCreationEvent)event;
+final CustomFieldCreationEvent realCustomFieldEventCr=(CustomFieldCreationEvent)event;
 objectType=ObjectType.CUSTOM_FIELD;
-objectId=realCustomEveventCr.getCustomFieldId();
+objectId=realCustomFieldEventCr.getCustomFieldId();
 eventBusType=ExtBusEventType.CUSTOM_FIELD_CREATION;
 break;
 case CUSTOM_FIELD_DELETION:
-final CustomFieldDeletionEvent realCustomEveventDel=(CustomFieldDeletionEvent)event;
+final CustomFieldDeletionEvent realCustomFieldEventDel=(CustomFieldDeletionEvent)event;
 objectType=ObjectType.CUSTOM_FIELD;
-objectId=realCustomEveventDel.getCustomFieldId();
+objectId=realCustomFieldEventDel.getCustomFieldId();
 eventBusType=ExtBusEventType.CUSTOM_FIELD_DELETION;
+break;
+case TENANT_CONFIG_CHANGE:
+final TenantConfigChangeInternalEvent realTenantConfigEventChg=(TenantConfigChangeInternalEvent)event;
+objectType=ObjectType.TENANT_KVS;
+objectId=realTenantConfigEventChg.getId();
+eventBusType=ExtBusEventType.TENANT_CONFIG_CHANGE;
+metaData=realTenantConfigEventChg.getKey();
+break;
+case TENANT_CONFIG_DELETION:
+final TenantConfigDeletionInternalEvent realTenantConfigEventDel=(TenantConfigDeletionInternalEvent)event;
+objectType=ObjectType.TENANT_KVS;
+objectId=null;
+eventBusType=ExtBusEventType.TENANT_CONFIG_DELETION;
+metaData=realTenantConfigEventDel.getKey();
 break;
 default :
 }
 final TenantContext tenantContext=internalCallContextFactory.createTenantContext(context);
 accountId=(accountId == null) ? getAccountId(event.getBusEventType(),objectId,objectType,tenantContext) : accountId;
-return eventBusType != null ? new DefaultBusExternalEvent(objectId,objectType,eventBusType,accountId,tenantContext.getTenantId(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken()) : null;
+return eventBusType != null ? new DefaultBusExternalEvent(objectId,objectType,eventBusType,accountId,tenantContext.getTenantId(),metaData,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken()) : null;
 }

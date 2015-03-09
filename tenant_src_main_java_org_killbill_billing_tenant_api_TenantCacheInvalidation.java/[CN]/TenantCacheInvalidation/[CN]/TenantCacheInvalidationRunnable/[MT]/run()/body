@@ -14,10 +14,25 @@
         if (callback != null) {
           final InternalTenantContext tenantContext=new InternalTenantContext(cur.getTenantRecordId(),null);
           callback.invalidateCache(tenantKeyAndCookie.getTenantKey(),tenantKeyAndCookie.getCookie(),tenantContext);
-        }
+          final Long tenantKvsTargetRecordId=cur.getTargetRecordId();
+          final BusInternalEvent event;
+          if (tenantKvsTargetRecordId != null) {
+            final TenantKVModelDao tenantModelDao=tenantDao.getKeyByRecordId(tenantKvsTargetRecordId,tenantContext);
+            event=new DefaultTenantConfigChangeInternalEvent(tenantModelDao.getId(),cur.getType(),null,tenantContext.getTenantRecordId(),cur.getUserToken());
+          }
  else {
-          logger.warn("Failed to find CacheInvalidationCallback for " + cur.getType());
+            event=new DefaultTenantConfigDeletionInternalEvent(cur.getType(),null,tenantContext.getTenantRecordId(),cur.getUserToken());
+          }
+          try {
+            parent.getEventBus().post(event);
+          }
+ catch (          final EventBusException e) {
+            logger.warn("Failed post bus event " + event,e);
+          }
         }
+      }
+ else {
+        logger.warn("Failed to find CacheInvalidationCallback for " + cur.getType());
       }
     }
   finally {
