@@ -3,12 +3,12 @@
   final DefaultTenantDao tenantDao=new DefaultTenantDao(dbi,clock,cacheControllerDispatcher,new DefaultNonEntityDao(dbi));
   tenant=new DefaultTenant(UUID.randomUUID(),null,null,UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString());
   tenantDao.create(new TenantModelDao(tenant),internalCallContext);
-  final BoneCPConfig dbConfig=new BoneCPConfig();
+  final HikariConfig dbConfig=new HikariConfig();
   dbConfig.setJdbcUrl(helper.getJdbcConnectionString());
   dbConfig.setUsername(helper.getUsername());
   dbConfig.setPassword(helper.getPassword());
   final KillbillJdbcRealm jdbcRealm;
   jdbcRealm=new KillbillJdbcRealm(daoConfig);
-  jdbcRealm.setDataSource(new BoneCPDataSource(dbConfig));
+  jdbcRealm.setDataSource(new HikariDataSource(dbConfig));
   securityManager=new DefaultSecurityManager(jdbcRealm);
 }
