@@ -1,5 +1,9 @@
 {
-  final Cache cache=cacheManager.getCache(name);
+  final Ehcache cache=cacheManager.getEhcache(name);
+  if (cache == null) {
+    logger.warn("No cache configured for name {}",name);
+    return ImmutableList.<EhCacheBasedCacheController<Object,Object>>of();
+  }
   return Collections2.transform(cache.getRegisteredCacheLoaders(),new Function<CacheLoader,EhCacheBasedCacheController<Object,Object>>(){
     @Override public EhCacheBasedCacheController<Object,Object> apply(    final CacheLoader input){
       return new EhCacheBasedCacheController<Object,Object>(cache,cacheType);

@@ -4,19 +4,26 @@
     final InputStream inputStream=UriAccessor.accessUri(cacheConfig.getCacheConfigLocation());
     cacheManager=CacheManager.create(inputStream);
   }
- catch (  IOException e) {
+ catch (  final IOException e) {
     throw new RuntimeException(e);
   }
-catch (  URISyntaxException e) {
+catch (  final URISyntaxException e) {
     throw new RuntimeException(e);
   }
   for (  final BaseCacheLoader cacheLoader : cacheLoaders) {
     cacheLoader.init();
-    final Cache cache=cacheManager.getCache(cacheLoader.getCacheType().getCacheName());
+    final Ehcache cache=cacheManager.getEhcache(cacheLoader.getCacheType().getCacheName());
     for (    final CacheLoader existingCacheLoader : cache.getRegisteredCacheLoaders()) {
       cache.unregisterCacheLoader(existingCacheLoader);
     }
     cache.registerCacheLoader(cacheLoader);
+    final Ehcache decoratedCache=InstrumentedEhcache.instrument(metricRegistry,cache);
+    try {
+      cacheManager.replaceCacheWithDecoratedCache(cache,decoratedCache);
+    }
+ catch (    final CacheException e) {
+      logger.warn("Unable to instrument cache {}: {}",cache.getName(),e.getMessage());
+    }
   }
   return cacheManager;
 }
