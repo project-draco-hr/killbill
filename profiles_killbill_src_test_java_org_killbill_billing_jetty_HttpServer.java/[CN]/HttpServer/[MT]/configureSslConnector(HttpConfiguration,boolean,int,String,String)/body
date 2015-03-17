@@ -1,0 +1,14 @@
+{
+  final SslContextFactory sslContextFactory=new SslContextFactory();
+  sslContextFactory.setKeyStorePath(sslKeyStorePath);
+  sslContextFactory.setKeyStorePassword(sslKeyStorePassword);
+  final HttpConfiguration httpsConfig=new HttpConfiguration(httpConfiguration);
+  httpsConfig.addCustomizer(new SecureRequestCustomizer());
+  final ServerConnector https=new ServerConnector(server,new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),new HttpConnectionFactory(httpsConfig));
+  https.setPort(localSslPort);
+  if (isStatsOn) {
+    final ConnectorStatistics stats=new ConnectorStatistics();
+    https.addBean(stats);
+  }
+  return https;
+}

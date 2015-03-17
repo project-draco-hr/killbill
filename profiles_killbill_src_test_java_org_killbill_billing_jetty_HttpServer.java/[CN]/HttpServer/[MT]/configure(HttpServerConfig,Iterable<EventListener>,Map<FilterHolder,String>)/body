@@ -1,9 +1,16 @@
 {
   server.setStopAtShutdown(true);
   configureJMX(ManagementFactory.getPlatformMBeanServer());
-  configureMainConnector(config.isJettyStatsOn(),config.getServerHost(),config.getServerPort());
+  final HttpConfiguration httpConfiguration=new HttpConfiguration();
+  httpConfiguration.setSecurePort(config.getServerSslPort());
+  final ServerConnector http=configureMainConnector(httpConfiguration,config.isJettyStatsOn(),config.getServerHost(),config.getServerPort());
+  final ServerConnector https;
   if (config.isSSLEnabled()) {
-    configureSslConnector(config.isJettyStatsOn(),config.getServerSslPort(),config.getSSLkeystoreLocation(),config.getSSLkeystorePassword());
+    https=configureSslConnector(httpConfiguration,config.isJettyStatsOn(),config.getServerSslPort(),config.getSSLkeystoreLocation(),config.getSSLkeystorePassword());
+    server.setConnectors(new Connector[]{http,https});
+  }
+ else {
+    server.setConnectors(new Connector[]{http});
   }
   configureThreadPool(config);
   final HandlerCollection handlers=new HandlerCollection();

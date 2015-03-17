@@ -1,6 +1,8 @@
 {
-  final QueuedThreadPool threadPool=new QueuedThreadPool(config.getMaxThreads());
-  threadPool.setMinThreads(config.getMinThreads());
-  threadPool.setName("http-worker");
-  server.setThreadPool(threadPool);
+  if (server.getThreadPool() instanceof QueuedThreadPool) {
+    final QueuedThreadPool threadPool=(QueuedThreadPool)server.getThreadPool();
+    threadPool.setMaxThreads(config.getMaxThreads());
+    threadPool.setMinThreads(config.getMinThreads());
+    threadPool.setName("http-worker");
+  }
 }
