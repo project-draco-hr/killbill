@@ -1,7 +1,11 @@
 {
   super.configureDao();
-  dbi.registerMapper(new AuditLogModelDaoMapper());
-  dbi.registerMapper(new RecordIdIdMappingsMapper());
-  queueDbi.registerMapper(new AuditLogModelDaoMapper());
-  queueDbi.registerMapper(new RecordIdIdMappingsMapper());
+  final Provider<DataSource> dataSourceSpyProvider=new ReferenceableDataSourceSpyProvider(daoConfig,SHIRO_DATA_SOURCE_ID);
+  requestInjection(dataSourceSpyProvider);
+  bind(DataSource.class).annotatedWith(Names.named(SHIRO_DATA_SOURCE_ID)).toProvider(dataSourceSpyProvider).asEagerSingleton();
+  final Multibinder<ResultSetMapperFactory> resultSetMapperFactorySetBinder=Multibinder.newSetBinder(binder(),ResultSetMapperFactory.class);
+  resultSetMapperFactorySetBinder.addBinding().toInstance(new LowerToCamelBeanMapperFactory(SessionModelDao.class));
+  final Multibinder<ResultSetMapper> resultSetMapperSetBinder=Multibinder.newSetBinder(binder(),ResultSetMapper.class);
+  resultSetMapperSetBinder.addBinding().to(AuditLogModelDaoMapper.class).asEagerSingleton();
+  resultSetMapperSetBinder.addBinding().to(RecordIdIdMappingsMapper.class).asEagerSingleton();
 }
