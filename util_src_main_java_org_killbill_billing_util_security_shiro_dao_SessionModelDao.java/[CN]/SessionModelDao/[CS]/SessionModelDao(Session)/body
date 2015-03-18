@@ -1,5 +1,5 @@
 {
-  this.recordId=(Long)session.getId();
+  this.recordId=session.getId() == null ? null : Long.valueOf(session.getId().toString());
   this.startTimestamp=new DateTime(session.getStartTimestamp(),DateTimeZone.UTC);
   this.lastAccessTime=new DateTime(session.getLastAccessTime(),DateTimeZone.UTC);
   this.timeout=session.getTimeout();
@@ -7,7 +7,7 @@
   try {
     this.sessionData=serializeSessionData(session);
   }
- catch (  IOException e) {
+ catch (  final IOException e) {
     this.sessionData=new byte[]{};
   }
 }
