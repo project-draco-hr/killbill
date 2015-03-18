@@ -2,6 +2,9 @@
   final TenantContext context=contextFactory.createTenantContext(event.getTenantId());
   try {
     final List<String> callbacks=getCallbacksForTenant(context);
+    if (callbacks.isEmpty()) {
+      return;
+    }
     dispatchCallback(event.getTenantId(),event,callbacks);
   }
  catch (  final TenantApiException e) {

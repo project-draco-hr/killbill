@@ -1,0 +1,12 @@
+{
+  final String tenantKey=TenantKey.PLUGIN_CONFIG_.toString() + "MyPluginName";
+  List<String> value=tenantUserApi.getTenantValuesForKey(tenantKey,callContext);
+  Assert.assertEquals(value.size(),0);
+  tenantDao.addTenantKeyValue(tenantKey,"TheValue-hidden!",true,internalCallContext);
+  value=tenantUserApi.getTenantValuesForKey(tenantKey,callContext);
+  Assert.assertEquals(value.size(),0);
+  tenantUserApi.addTenantKeyValue(tenantKey,"TheValue",callContext);
+  value=tenantUserApi.getTenantValuesForKey(tenantKey,callContext);
+  Assert.assertEquals(value.size(),1);
+  Assert.assertEquals(value.get(0),"TheValue");
+}
