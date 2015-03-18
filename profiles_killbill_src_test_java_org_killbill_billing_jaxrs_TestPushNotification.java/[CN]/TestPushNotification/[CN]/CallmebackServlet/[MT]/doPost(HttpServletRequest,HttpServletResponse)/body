@@ -1,7 +1,6 @@
 {
   final int current=receivedCalls.incrementAndGet();
   final String body=CharStreams.toString(new InputStreamReader(request.getInputStream(),"UTF-8"));
-  response.setContentType("application/json");
   response.setStatus(HttpServletResponse.SC_OK);
   log.info("Got body {}",body);
   try {
@@ -12,6 +11,7 @@
     Assert.assertNotNull(notification.getAccountId());
     Assert.assertEquals(notification.getObjectId(),notification.getAccountId());
     test.retrieveAccountWithAsserts(notification.getObjectId());
+    Assert.assertEquals(request.getHeader(PushNotificationListener.HTTP_HEADER_CONTENT_TYPE),PushNotificationListener.CONTENT_TYPE_JSON);
   }
  catch (  final AssertionError e) {
     withError=true;
