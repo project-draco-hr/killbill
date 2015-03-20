@@ -2,7 +2,7 @@
   if (baseSubscription.getState() != EntitlementState.ACTIVE) {
     throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_AO_BP_NON_ACTIVE,targetAddOnPlan.getName());
   }
-  final Product baseProduct=baseSubscription.getCurrentPlan().getProduct();
+  final Product baseProduct=catalogService.getFullCatalog(context).findProduct(baseSubscription.getCurrentPlan().getProduct().getName(),requestedDate);
   if (isAddonIncluded(baseProduct,targetAddOnPlan)) {
     throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_AO_ALREADY_INCLUDED,targetAddOnPlan.getName(),baseSubscription.getCurrentPlan().getProduct().getName());
   }
