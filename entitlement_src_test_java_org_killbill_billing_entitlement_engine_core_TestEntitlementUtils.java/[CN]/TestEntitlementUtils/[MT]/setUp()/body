@@ -5,9 +5,9 @@
   internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   testListener.pushExpectedEvents(NextEvent.CREATE,NextEvent.CREATE);
   final PlanPhaseSpecifier baseSpec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
-  baseEntitlement=(DefaultEntitlement)entitlementApi.createBaseEntitlement(account.getId(),baseSpec,account.getExternalKey(),initialDate,callContext);
+  baseEntitlement=(DefaultEntitlement)entitlementApi.createBaseEntitlement(account.getId(),baseSpec,account.getExternalKey(),null,initialDate,callContext);
   final PlanPhaseSpecifier addOnSpec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
-  addOnEntitlement=(DefaultEntitlement)entitlementApi.addEntitlement(baseEntitlement.getBundleId(),addOnSpec,initialDate,callContext);
+  addOnEntitlement=(DefaultEntitlement)entitlementApi.addEntitlement(baseEntitlement.getBundleId(),addOnSpec,null,initialDate,callContext);
   checkFutureBlockingStatesToCancel(baseEntitlement,null,null);
   checkFutureBlockingStatesToCancel(addOnEntitlement,null,null);
   checkFutureBlockingStatesToCancel(baseEntitlement,addOnEntitlement,null);

@@ -9,13 +9,16 @@
     verifyNonNullOrEmpty(entitlement.getAccountId(),"SubscriptionJson accountId should be specified");
   }
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID accountId=entitlement.getAccountId() != null ? UUID.fromString(entitlement.getAccountId()) : null;
+  final Account account=accountUserApi.getAccountById(accountId,callContext);
   final EntitlementCallCompletionCallback<Entitlement> callback=new EntitlementCallCompletionCallback<Entitlement>(){
     @Override public Entitlement doOperation(    final CallContext ctx) throws InterruptedException, TimeoutException, EntitlementApiException {
       final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),null);
-      final UUID accountId=entitlement.getAccountId() != null ? UUID.fromString(entitlement.getAccountId()) : null;
       final LocalDate inputLocalDate=toLocalDate(accountId,requestedDate,callContext);
       final UUID bundleId=entitlement.getBundleId() != null ? UUID.fromString(entitlement.getBundleId()) : null;
-      return createAddOnEntitlement ? entitlementApi.addEntitlement(bundleId,spec,inputLocalDate,callContext) : entitlementApi.createBaseEntitlement(accountId,spec,entitlement.getExternalKey(),inputLocalDate,callContext);
+      final PlanSpecifier planSpec=new PlanSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList());
+      final List<PlanPhasePriceOverride> overrides=PhasePriceOverrideJson.toPlanPhasePriceOverrides(entitlement.getPriceOverrides(),planSpec,account.getCurrency());
+      return createAddOnEntitlement ? entitlementApi.addEntitlement(bundleId,spec,overrides,inputLocalDate,callContext) : entitlementApi.createBaseEntitlement(accountId,spec,entitlement.getExternalKey(),overrides,inputLocalDate,callContext);
     }
     @Override public boolean isImmOperation(){
       return true;

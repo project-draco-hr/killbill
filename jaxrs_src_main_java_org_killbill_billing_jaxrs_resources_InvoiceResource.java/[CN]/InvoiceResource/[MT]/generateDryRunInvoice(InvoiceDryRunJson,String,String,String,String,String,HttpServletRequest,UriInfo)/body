@@ -20,7 +20,7 @@
     }
   }
   final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),callContext);
-  final DryRunArguments dryRunArguments=new DefaultDryRunArguments(dryRunSubscriptionSpec,account.getTimeZone(),clock);
+  final DryRunArguments dryRunArguments=new DefaultDryRunArguments(dryRunSubscriptionSpec,account.getTimeZone(),account.getCurrency(),clock);
   try {
     final Invoice generatedInvoice=invoiceApi.triggerInvoiceGeneration(UUID.fromString(accountId),inputDate,dryRunArguments,callContext);
     return Response.status(Status.OK).entity(new InvoiceJson(generatedInvoice,true,null)).build();

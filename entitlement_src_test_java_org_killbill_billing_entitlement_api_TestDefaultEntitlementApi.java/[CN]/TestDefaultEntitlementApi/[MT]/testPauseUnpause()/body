@@ -4,13 +4,13 @@
   final Account account=accountApi.createAccount(getAccountData(7),callContext);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),initialDate,callContext);
+  final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,initialDate,callContext);
   assertListenerStatus();
   clock.addDays(1);
   final LocalDate effectiveDateSpec1=new LocalDate(clock.getUTCNow(),account.getTimeZone());
   final PlanPhaseSpecifier spec1=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement telescopicEntitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,effectiveDateSpec1,callContext);
+  final Entitlement telescopicEntitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,null,effectiveDateSpec1,callContext);
   assertListenerStatus();
   clock.addDays(5);
   testListener.pushExpectedEvents(NextEvent.PAUSE,NextEvent.BLOCK);
@@ -34,7 +34,7 @@
   }
   try {
     final PlanPhaseSpecifier spec3=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
-    final Entitlement telescopicEntitlement3=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,effectiveDateSpec1,callContext);
+    final Entitlement telescopicEntitlement3=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,null,effectiveDateSpec1,callContext);
   }
  catch (  EntitlementApiException e) {
     assertEquals(e.getCode(),ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION.getCode());
