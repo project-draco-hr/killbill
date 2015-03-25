@@ -1,0 +1,11 @@
+{
+  final CatalogOverridePhaseDefinitionSqlDao sqlDao=inTransactionHandle.attach(CatalogOverridePhaseDefinitionSqlDao.class);
+  CatalogOverridePhaseDefinitionModelDao result=sqlDao.getByAttributes(parentPhaseName,override.getCurrency().name(),override.getFixedPrice(),override.getRecurringPrice(),context);
+  if (result == null) {
+    final CatalogOverridePhaseDefinitionModelDao phaseDef=new CatalogOverridePhaseDefinitionModelDao(parentPhaseName,override.getCurrency().name(),override.getFixedPrice(),override.getRecurringPrice(),catalogEffectiveDate);
+    sqlDao.create(phaseDef,context);
+    final Long recordId=sqlDao.getLastInsertId();
+    result=sqlDao.getByRecordId(recordId,context);
+  }
+  return result;
+}

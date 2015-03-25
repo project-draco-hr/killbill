@@ -1,0 +1,15 @@
+{
+  final CatalogOverridePlanPhaseModelDao obj1=new CatalogOverridePlanPhaseModelDao((short)1,2L,3L);
+  performTestInTransaction(new WithCatalogOverridePlanPhaseSqlDaoTransaction<Void>(){
+    @Override public Void doTransaction(    final CatalogOverridePlanPhaseSqlDao sqlDao){
+      sqlDao.create(obj1,internalCallContext);
+      final Long lastInserted=sqlDao.getLastInsertId();
+      final CatalogOverridePlanPhaseModelDao rehydrated=sqlDao.getByRecordId(lastInserted,internalCallContext);
+      assertEquals(rehydrated.getPhaseNumber(),obj1.getPhaseNumber());
+      assertEquals(rehydrated.getPhaseDefRecordId(),obj1.getPhaseDefRecordId());
+      assertEquals(rehydrated.getTargetPlanDefRecordId(),obj1.getTargetPlanDefRecordId());
+      return null;
+    }
+  }
+);
+}

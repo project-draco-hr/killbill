@@ -1,0 +1,16 @@
+{
+  final CatalogOverridePhaseDefinitionModelDao obj1=new CatalogOverridePhaseDefinitionModelDao("p1","EUR",BigDecimal.ONE,BigDecimal.TEN,clock.getUTCNow());
+  performTestInTransaction(new WithCatalogOverridePhaseDefinitionSqlDaoTransaction<Void>(){
+    @Override public Void doTransaction(    final CatalogOverridePhaseDefinitionSqlDao sqlDao){
+      sqlDao.create(obj1,internalCallContext);
+      final Long lastInserted=sqlDao.getLastInsertId();
+      final CatalogOverridePhaseDefinitionModelDao rehydrated=sqlDao.getByRecordId(lastInserted,internalCallContext);
+      assertEquals(rehydrated.getParentPhaseName(),obj1.getParentPhaseName());
+      assertEquals(rehydrated.getFixedPrice().compareTo(obj1.getFixedPrice()),0);
+      assertEquals(rehydrated.getRecurringPrice().compareTo(obj1.getRecurringPrice()),0);
+      assertEquals(rehydrated.getCurrency(),obj1.getCurrency());
+      return null;
+    }
+  }
+);
+}
