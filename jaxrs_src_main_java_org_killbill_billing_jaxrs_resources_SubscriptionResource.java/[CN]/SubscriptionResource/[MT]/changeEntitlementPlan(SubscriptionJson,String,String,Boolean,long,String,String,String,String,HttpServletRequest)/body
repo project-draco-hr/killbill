@@ -3,7 +3,6 @@
   verifyNonNullOrEmpty(entitlement.getProductName(),"SubscriptionJson productName needs to be set",entitlement.getBillingPeriod(),"SubscriptionJson billingPeriod needs to be set",entitlement.getPriceList(),"SubscriptionJson priceList needs to be set");
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final UUID accountId=entitlement.getAccountId() != null ? UUID.fromString(entitlement.getAccountId()) : null;
-  final Account account=accountUserApi.getAccountById(accountId,callContext);
   final EntitlementCallCompletionCallback<Response> callback=new EntitlementCallCompletionCallback<Response>(){
     private boolean isImmediateOp=true;
     @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException {
@@ -11,6 +10,7 @@
       final Entitlement current=entitlementApi.getEntitlementForId(uuid,callContext);
       final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
       final Entitlement newEntitlement;
+      final Account account=accountUserApi.getAccountById(accountId,callContext);
       final PlanSpecifier planSpec=new PlanSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList());
       final List<PlanPhasePriceOverride> overrides=PhasePriceOverrideJson.toPlanPhasePriceOverrides(entitlement.getPriceOverrides(),planSpec,account.getCurrency());
       if (requestedDate == null && policyString == null) {

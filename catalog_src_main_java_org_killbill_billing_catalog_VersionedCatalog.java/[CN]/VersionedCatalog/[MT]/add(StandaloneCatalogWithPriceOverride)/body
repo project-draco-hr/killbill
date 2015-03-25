@@ -1,0 +1,25 @@
+{
+  if (catalogName == null) {
+    catalogName=e.getCatalogName();
+  }
+ else {
+    if (!catalogName.equals(e.getCatalogName())) {
+      throw new CatalogApiException(ErrorCode.CAT_CATALOG_NAME_MISMATCH,catalogName,e.getCatalogName());
+    }
+  }
+  if (recurringBillingMode == null) {
+    recurringBillingMode=e.getRecurringBillingMode();
+  }
+ else {
+    if (!recurringBillingMode.equals(e.getRecurringBillingMode())) {
+      throw new CatalogApiException(ErrorCode.CAT_CATALOG_RECURRING_MODE_MISMATCH,recurringBillingMode,e.getRecurringBillingMode());
+    }
+  }
+  versions.add(e);
+  Collections.sort(versions,new Comparator<StandaloneCatalogWithPriceOverride>(){
+    @Override public int compare(    final StandaloneCatalogWithPriceOverride c1,    final StandaloneCatalogWithPriceOverride c2){
+      return c1.getEffectiveDate().compareTo(c2.getEffectiveDate());
+    }
+  }
+);
+}
