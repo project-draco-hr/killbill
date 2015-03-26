@@ -1,0 +1,14 @@
+{
+  final PlanPhasePriceOverride[] result=new PlanPhasePriceOverride[defaultPlan.getAllPhases().length];
+  for (int i=0; i < defaultPlan.getAllPhases().length; i++) {
+    final PlanPhase curPhase=defaultPlan.getAllPhases()[i];
+    final CatalogOverridePhaseDefinitionModelDao overriddenPhase=Iterables.tryFind(phaseDefs,new Predicate<CatalogOverridePhaseDefinitionModelDao>(){
+      @Override public boolean apply(      final CatalogOverridePhaseDefinitionModelDao input){
+        return input.getParentPhaseName().equals(curPhase.getName());
+      }
+    }
+).orNull();
+    result[i]=(overriddenPhase != null) ? new DefaultPlanPhasePriceOverride(curPhase.getName(),Currency.valueOf(overriddenPhase.getCurrency()),overriddenPhase.getFixedPrice(),overriddenPhase.getRecurringPrice()) : null;
+  }
+  return result;
+}

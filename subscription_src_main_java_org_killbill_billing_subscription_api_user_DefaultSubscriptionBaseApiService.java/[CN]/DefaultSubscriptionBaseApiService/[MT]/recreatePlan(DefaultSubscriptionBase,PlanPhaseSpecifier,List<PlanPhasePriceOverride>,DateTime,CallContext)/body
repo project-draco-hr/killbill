@@ -9,7 +9,8 @@
   try {
     final String realPriceList=(spec.getPriceListName() == null) ? PriceListSet.DEFAULT_PRICELIST_NAME : spec.getPriceListName();
     final InternalTenantContext internalCallContext=createTenantContextFromBundleId(subscription.getBundleId(),context);
-    final Plan plan=catalogService.getFullCatalog(internalCallContext).findPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,overrides,effectiveDate);
+    final PlanPhasePriceOverridesWithCallContext overridesWithContext=new DefaultPlanPhasePriceOverridesWithCallContext(overrides,context);
+    final Plan plan=catalogService.getFullCatalog(internalCallContext).findPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,overridesWithContext,effectiveDate);
     final PlanPhase phase=plan.getAllPhases()[0];
     if (phase == null) {
       throw new SubscriptionBaseError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",spec.getProductName(),spec.getBillingPeriod().toString(),realPriceList));

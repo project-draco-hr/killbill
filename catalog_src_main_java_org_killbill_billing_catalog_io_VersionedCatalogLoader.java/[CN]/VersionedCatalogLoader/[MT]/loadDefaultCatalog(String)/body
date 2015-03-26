@@ -1,0 +1,33 @@
+{
+  try {
+    List<URI> xmlURIs;
+    if (uriString.endsWith(XML_EXTENSION)) {
+      xmlURIs=new ArrayList<URI>();
+      URI uri=new URI(uriString);
+      final String schemeSpecificPart=uri.getSchemeSpecificPart();
+      if (schemeSpecificPart != null) {
+        final String[] split=schemeSpecificPart.split("/");
+        final String fileName=split[split.length - 1];
+        try {
+          uri=new URI(Resources.getResource(fileName).toExternalForm());
+        }
+ catch (        IllegalArgumentException ignored) {
+        }
+      }
+      xmlURIs.add(uri);
+    }
+ else {
+      final String directoryContents=UriAccessor.accessUriAsString(uriString);
+      xmlURIs=findXmlReferences(directoryContents,new URL(uriString));
+    }
+    final VersionedCatalog result=new VersionedCatalog(clock,InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID);
+    for (    final URI u : xmlURIs) {
+      final StandaloneCatalog catalog=XMLLoader.getObjectFromUri(u,StandaloneCatalog.class);
+      result.add(new StandaloneCatalogWithPriceOverride(catalog,priceOverride,InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID,internalCallContextFactory));
+    }
+    return result;
+  }
+ catch (  Exception e) {
+    throw new CatalogApiException(ErrorCode.CAT_INVALID_DEFAULT,"Problem encountered loading catalog ",e);
+  }
+}

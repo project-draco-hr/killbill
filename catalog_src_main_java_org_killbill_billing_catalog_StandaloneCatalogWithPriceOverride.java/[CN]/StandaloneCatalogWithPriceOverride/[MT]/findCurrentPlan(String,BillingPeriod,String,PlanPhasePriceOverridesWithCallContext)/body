@@ -1,0 +1,8 @@
+{
+  final Plan defaultPlan=standaloneCatalog.findCurrentPlan(productName,period,priceListName,null);
+  if (overrides == null || overrides.getOverrides() == null || overrides.getOverrides().isEmpty()) {
+    return defaultPlan;
+  }
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(overrides.getCallContext());
+  return priceOverride.getOrCreateOverriddenPlan(defaultPlan,new DateTime(getEffectiveDate()),overrides.getOverrides(),internalCallContext);
+}
