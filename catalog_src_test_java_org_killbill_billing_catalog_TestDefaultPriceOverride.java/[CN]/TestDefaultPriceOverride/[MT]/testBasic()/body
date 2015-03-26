@@ -1,0 +1,43 @@
+{
+  final StandaloneCatalog catalog=XMLLoader.getObjectFromString(Resources.getResource("SpyCarAdvanced.xml").toExternalForm(),StandaloneCatalog.class);
+  final Plan plan=catalog.findCurrentPlan("discount-standard-monthly");
+  final List<PlanPhasePriceOverride> overrides=new ArrayList<PlanPhasePriceOverride>();
+  final PlanPhasePriceOverride phase1=new DefaultPlanPhasePriceOverride(plan.getAllPhases()[0].getName(),Currency.USD,BigDecimal.ONE,null);
+  overrides.add(phase1);
+  final PlanPhasePriceOverride phase3=new DefaultPlanPhasePriceOverride(plan.getAllPhases()[2].getName(),Currency.USD,null,new BigDecimal("142.41"));
+  overrides.add(phase3);
+  final DefaultPlan overriddenPlan=priceOverride.getOrCreateOverriddenPlan(plan,new DateTime(catalog.getEffectiveDate()),overrides,internalCallContext);
+  final Matcher m=DefaultPriceOverride.CUSTOM_PLAN_NAME_PATTERN.matcher(overriddenPlan.getName());
+  assertTrue(m.matches());
+  assertEquals(m.group(1),plan.getName());
+  assertEquals(m.group(2),"1");
+  assertEquals(overriddenPlan.getProduct().getName(),plan.getProduct().getName());
+  assertEquals(overriddenPlan.getRecurringBillingPeriod(),plan.getRecurringBillingPeriod());
+  if (plan.getEffectiveDateForExistingSubscriptons() != null) {
+    assertEquals(overriddenPlan.getEffectiveDateForExistingSubscriptons().compareTo(plan.getEffectiveDateForExistingSubscriptons()),0);
+  }
+  assertEquals(overriddenPlan.getFinalPhase().getName(),plan.getFinalPhase().getName());
+  assertEquals(overriddenPlan.getPlansAllowedInBundle(),plan.getPlansAllowedInBundle());
+  assertEquals(overriddenPlan.getAllPhases().length,overriddenPlan.getAllPhases().length);
+  for (int i=0; i < overriddenPlan.getAllPhases().length; i++) {
+    final DefaultPlanPhase initialPhase=(DefaultPlanPhase)plan.getAllPhases()[i];
+    final DefaultPlanPhase newPhase=(DefaultPlanPhase)overriddenPlan.getAllPhases()[i];
+    final PlanPhasePriceOverride override=Iterables.tryFind(overrides,new Predicate<PlanPhasePriceOverride>(){
+      @Override public boolean apply(      final PlanPhasePriceOverride input){
+        return input.getPhaseName().equals(initialPhase.getName());
+      }
+    }
+).orNull();
+    assertEquals(newPhase.getName(),initialPhase.getName());
+    assertEquals(newPhase.getDuration(),initialPhase.getDuration());
+    assertEquals(newPhase.getPhaseType(),initialPhase.getPhaseType());
+    assertEquals(newPhase.getUsages().length,initialPhase.getUsages().length);
+    if (initialPhase.getFixed() != null) {
+      assertEquals(newPhase.getFixed().getType(),initialPhase.getFixed().getType());
+      assertInternationalPrice(newPhase.getFixed().getPrice(),initialPhase.getFixed().getPrice(),override,true);
+    }
+    if (initialPhase.getRecurring() != null) {
+      assertInternationalPrice(newPhase.getRecurring().getRecurringPrice(),initialPhase.getRecurring().getRecurringPrice(),override,false);
+    }
+  }
+}
