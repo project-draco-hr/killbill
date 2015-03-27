@@ -10,7 +10,7 @@
     final CallContext callContext=internalCallContextFactory.createCallContext(context);
     final Catalog catalog=catalogService.getFullCatalog(context);
     final PlanPhasePriceOverridesWithCallContext overridesWithContext=new DefaultPlanPhasePriceOverridesWithCallContext(overrides,callContext);
-    final Plan plan=catalog.findPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,overridesWithContext,requestedDate);
+    final Plan plan=catalog.createOrFindPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,overridesWithContext,requestedDate);
     final PlanPhase phase=plan.getAllPhases()[0];
     if (phase == null) {
       throw new SubscriptionBaseError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",spec.getProductName(),spec.getBillingPeriod().toString(),realPriceList));
