@@ -1,15 +1,16 @@
 {
   try {
+    final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(baseSubscription.getId(),ObjectType.SUBSCRIPTION,context);
     final PlanPhaseSpecifier spec=input.getPlanPhaseSpecifier();
 switch (input.getSubscriptionTransitionType()) {
 case CREATE:
 case RE_CREATE:
       recreate(spec,input.getRequestedDate(),context);
-    checkAddonRights(baseSubscription);
+    checkAddonRights(baseSubscription,internalTenantContext);
   break;
 case CHANGE:
 changePlanWithDate(spec.getProductName(),spec.getBillingPeriod(),spec.getPriceListName(),input.getRequestedDate(),context);
-checkAddonRights(baseSubscription);
+checkAddonRights(baseSubscription,internalTenantContext);
 trickleDownBPEffectForAddon(addonSubscriptions,getLastUserEventEffectiveDate(),context);
 break;
 case CANCEL:

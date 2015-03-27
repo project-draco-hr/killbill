@@ -7,7 +7,7 @@
       continue;
     }
     final Plan addonCurrentPlan=cur.getCurrentPlan();
-    if (baseProduct == null || addonUtils.isAddonIncluded(baseProduct,addonCurrentPlan) || !addonUtils.isAddonAvailable(baseProduct,addonCurrentPlan)) {
+    if (baseProduct == null || addonUtils.isAddonIncludedFromProdName(baseProduct.getName(),addonCurrentPlan,requestedDate,internalTenantContext) || !addonUtils.isAddonAvailableFromProdName(baseProduct.getName(),addonCurrentPlan,requestedDate,internalTenantContext)) {
       final SubscriptionBaseEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setProcessedDate(processedDate).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true));
       subscriptionsToBeCancelled.add(cur);
       events.add(cancelEvent);
