@@ -1,11 +1,11 @@
 {
-  final List<StandaloneCatalog> catalogs=versionsBeforeDate(requestedDate.toDate());
+  final List<StandaloneCatalogWithPriceOverride> catalogs=versionsBeforeDate(requestedDate.toDate());
   if (catalogs.size() == 0) {
     throw new CatalogApiException(ErrorCode.CAT_NO_CATALOG_FOR_GIVEN_DATE,requestedDate.toDate().toString());
   }
   for (int i=catalogs.size() - 1; i >= 0; i--) {
-    final StandaloneCatalog c=catalogs.get(i);
-    Plan plan=null;
+    final StandaloneCatalogWithPriceOverride c=catalogs.get(i);
+    Plan plan;
     try {
       plan=wrapper.findPlan(c);
     }

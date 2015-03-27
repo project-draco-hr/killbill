@@ -1,0 +1,31 @@
+{
+  if (input == null) {
+    this.action=null;
+    this.subscriptionId=null;
+    this.effectiveDate=null;
+    this.specifier=null;
+    this.bundleId=null;
+    this.billingPolicy=null;
+    this.overrides=null;
+  }
+ else {
+    this.action=input.getDryRunAction() != null ? SubscriptionEventType.valueOf(input.getDryRunAction()) : null;
+    this.subscriptionId=input.getSubscriptionId() != null ? UUID.fromString(input.getSubscriptionId()) : null;
+    this.bundleId=input.getBundleId() != null ? UUID.fromString(input.getBundleId()) : null;
+    this.effectiveDate=input.getEffectiveDate() != null ? ClockUtil.computeDateTimeWithUTCReferenceTime(input.getEffectiveDate(),clock.getUTCNow().toLocalTime(),accountTimeZone,clock) : null;
+    this.billingPolicy=input.getBillingPolicy() != null ? BillingActionPolicy.valueOf(input.getBillingPolicy()) : null;
+    final PlanPhaseSpecifier planPhaseSpecifier=(input.getProductName() != null && input.getProductCategory() != null && input.getBillingPeriod() != null) ? new PlanPhaseSpecifier(input.getProductName(),ProductCategory.valueOf(input.getProductCategory()),BillingPeriod.valueOf(input.getBillingPeriod()),input.getPriceListName(),input.getPhaseType() != null ? PhaseType.valueOf(input.getPhaseType()) : null) : null;
+    this.specifier=planPhaseSpecifier;
+    this.overrides=input.getPriceOverrides() != null ? ImmutableList.copyOf(Iterables.transform(input.getPriceOverrides(),new Function<PhasePriceOverrideJson,PlanPhasePriceOverride>(){
+      @Nullable @Override public PlanPhasePriceOverride apply(      @Nullable final PhasePriceOverrideJson input){
+        if (input.getPhaseName() != null) {
+          return new DefaultPlanPhasePriceOverride(input.getPhaseName(),currency,input.getFixedPrice(),input.getRecurringPrice());
+        }
+ else {
+          return new DefaultPlanPhasePriceOverride(planPhaseSpecifier,currency,input.getFixedPrice(),input.getRecurringPrice());
+        }
+      }
+    }
+)) : ImmutableList.<PlanPhasePriceOverride>of();
+  }
+}

@@ -1,0 +1,30 @@
+{
+  return dbi.inTransaction(new TransactionCallback<CatalogOverridePlanDefinitionModelDao>(){
+    @Override public CatalogOverridePlanDefinitionModelDao inTransaction(    final Handle handle,    final TransactionStatus status) throws Exception {
+      final CatalogOverridePhaseDefinitionModelDao[] overridePhaseDefinitionModelDaos=new CatalogOverridePhaseDefinitionModelDao[resolvedOverride.length];
+      for (int i=0; i < resolvedOverride.length; i++) {
+        final PlanPhasePriceOverride curOverride=resolvedOverride[i];
+        if (curOverride != null) {
+          final CatalogOverridePhaseDefinitionModelDao createdOverridePhaseDefinitionModelDao=getOrCreateOverridePhaseDefinitionFromTransaction(curOverride.getPhaseName(),catalogEffectiveDate,curOverride,handle,context);
+          overridePhaseDefinitionModelDaos[i]=createdOverridePhaseDefinitionModelDao;
+        }
+      }
+      final CatalogOverridePlanDefinitionSqlDao sqlDao=handle.attach(CatalogOverridePlanDefinitionSqlDao.class);
+      final Long targetPlanDefinitionRecordId=getOverridePlanDefinitionFromTransaction(overridePhaseDefinitionModelDaos,handle,context);
+      if (targetPlanDefinitionRecordId != null) {
+        return sqlDao.getByRecordId(targetPlanDefinitionRecordId,context);
+      }
+      final CatalogOverridePlanDefinitionModelDao inputPlanDef=new CatalogOverridePlanDefinitionModelDao(parentPlanName,true,catalogEffectiveDate);
+      sqlDao.create(inputPlanDef,context);
+      final Long recordId=sqlDao.getLastInsertId();
+      final CatalogOverridePlanDefinitionModelDao resultPlanDef=sqlDao.getByRecordId(recordId,context);
+      for (short i=0; i < overridePhaseDefinitionModelDaos.length; i++) {
+        if (overridePhaseDefinitionModelDaos[i] != null) {
+          createCatalogOverridePlanPhaseFromTransaction(i,overridePhaseDefinitionModelDaos[i],resultPlanDef,handle,context);
+        }
+      }
+      return resultPlanDef;
+    }
+  }
+);
+}

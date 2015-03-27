@@ -1,0 +1,22 @@
+{
+  final CatalogOverridePlanPhaseModelDao obj1=new CatalogOverridePlanPhaseModelDao((short)1,2L,3L);
+  final CatalogOverridePlanPhaseModelDao obj2=new CatalogOverridePlanPhaseModelDao((short)2,5L,3L);
+  final CatalogOverridePlanPhaseModelDao obj3=new CatalogOverridePlanPhaseModelDao((short)4,7L,3L);
+  final CatalogOverridePlanPhaseModelDao nobj1=new CatalogOverridePlanPhaseModelDao((short)4,7L,4L);
+  performTestInTransaction(new WithCatalogOverridePlanPhaseSqlDaoTransaction<Void>(){
+    @Override public Void doTransaction(    final CatalogOverridePlanPhaseSqlDao sqlDao){
+      sqlDao.create(obj1,internalCallContext);
+      sqlDao.create(obj2,internalCallContext);
+      sqlDao.create(obj3,internalCallContext);
+      sqlDao.create(nobj1,internalCallContext);
+      final List<String> keys=new ArrayList<String>();
+      keys.add("1,2");
+      keys.add("2,5");
+      keys.add("4,7");
+      final Long targetPlan=sqlDao.getTargetPlanDefinition(keys,keys.size(),internalCallContext);
+      assertEquals(targetPlan,new Long(3));
+      return null;
+    }
+  }
+);
+}

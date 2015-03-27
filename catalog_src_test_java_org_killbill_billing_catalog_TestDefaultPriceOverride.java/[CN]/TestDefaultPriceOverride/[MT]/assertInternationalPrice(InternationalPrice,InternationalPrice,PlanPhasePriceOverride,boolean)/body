@@ -1,0 +1,15 @@
+{
+  assertEquals(newInternationalPrice.getPrices().length,initInternationalPrice.getPrices().length);
+  for (int i=0; i < newInternationalPrice.getPrices().length; i++) {
+    final Price initPrice=initInternationalPrice.getPrices()[i];
+    final Price newPrice=newInternationalPrice.getPrices()[i];
+    if (override != null && override.getCurrency() == initPrice.getCurrency() && ((isFixed && override.getFixedPrice() != null) || (!isFixed && override.getRecurringPrice() != null))) {
+      assertEquals(newPrice.getValue().compareTo(isFixed ? override.getFixedPrice() : override.getRecurringPrice()),0);
+    }
+ else {
+      if (initPrice != null && initPrice.getValue() != null) {
+        assertEquals(newPrice.getValue().compareTo(initPrice.getValue()),0);
+      }
+    }
+  }
+}

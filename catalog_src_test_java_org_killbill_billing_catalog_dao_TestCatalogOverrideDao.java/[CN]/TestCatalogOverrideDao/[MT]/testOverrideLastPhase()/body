@@ -1,0 +1,10 @@
+{
+  final StandaloneCatalog catalog=XMLLoader.getObjectFromString(Resources.getResource("SpyCarBasic.xml").toExternalForm(),StandaloneCatalog.class);
+  final Plan plan=catalog.findCurrentPlan("standard-monthly");
+  final PlanPhasePriceOverride[] resolvedOverrides=new PlanPhasePriceOverride[plan.getAllPhases().length];
+  resolvedOverrides[0]=null;
+  resolvedOverrides[1]=new DefaultPlanPhasePriceOverride(plan.getFinalPhase().getName(),Currency.USD,null,new BigDecimal("128.76"));
+  final CatalogOverridePlanDefinitionModelDao newPlan=catalogOverrideDao.getOrCreateOverridePlanDefinition(plan.getName(),new DateTime(catalog.getEffectiveDate()),resolvedOverrides,internalCallContext);
+  assertEquals(newPlan.getParentPlanName(),"standard-monthly");
+  assertTrue(newPlan.getIsActive());
+}

@@ -1,0 +1,13 @@
+{
+  final StandaloneCatalog catalog=XMLLoader.getObjectFromString(Resources.getResource("SpyCarAdvanced.xml").toExternalForm(),StandaloneCatalog.class);
+  final Plan plan=catalog.findCurrentPlan("discount-standard-monthly");
+  final PlanPhasePriceOverride[] resolvedOverrides=new PlanPhasePriceOverride[plan.getAllPhases().length];
+  resolvedOverrides[0]=new DefaultPlanPhasePriceOverride(plan.getAllPhases()[0].getName(),Currency.USD,BigDecimal.TEN,null);
+  resolvedOverrides[1]=null;
+  resolvedOverrides[2]=new DefaultPlanPhasePriceOverride(plan.getFinalPhase().getName(),Currency.USD,null,new BigDecimal("348.64"));
+  final CatalogOverridePlanDefinitionModelDao newPlan=catalogOverrideDao.getOrCreateOverridePlanDefinition(plan.getName(),new DateTime(catalog.getEffectiveDate()),resolvedOverrides,internalCallContext);
+  assertEquals(newPlan.getParentPlanName(),"discount-standard-monthly");
+  assertTrue(newPlan.getIsActive());
+  final List<CatalogOverridePhaseDefinitionModelDao> phases=catalogOverrideDao.getOverriddenPlanPhases(1L,internalCallContext);
+  assertEquals(phases.size(),2);
+}

@@ -1,13 +1,13 @@
 {
   final SubscriptionBase subscription=testUtil.createSubscription(bundle,"Shotgun",BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME);
   try {
-    subscription.changePlanWithPolicy("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,BillingActionPolicy.ILLEGAL,callContext);
+    subscription.changePlanWithPolicy("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null,BillingActionPolicy.ILLEGAL,callContext);
     Assert.fail();
   }
  catch (  final SubscriptionBaseError error) {
     assertTrue(true);
     assertEquals(subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext).getCurrentPlan().getRecurringBillingPeriod(),BillingPeriod.ANNUAL);
   }
-  assertEquals(DefaultClock.truncateMs(subscription.changePlanWithPolicy("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,BillingActionPolicy.IMMEDIATE,callContext)),DefaultClock.truncateMs(clock.getUTCNow()));
+  assertEquals(DefaultClock.truncateMs(subscription.changePlanWithPolicy("Shotgun",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null,BillingActionPolicy.IMMEDIATE,callContext)),DefaultClock.truncateMs(clock.getUTCNow()));
   assertEquals(subscriptionInternalApi.getSubscriptionFromId(subscription.getId(),internalCallContext).getCurrentPlan().getRecurringBillingPeriod(),BillingPeriod.MONTHLY);
 }

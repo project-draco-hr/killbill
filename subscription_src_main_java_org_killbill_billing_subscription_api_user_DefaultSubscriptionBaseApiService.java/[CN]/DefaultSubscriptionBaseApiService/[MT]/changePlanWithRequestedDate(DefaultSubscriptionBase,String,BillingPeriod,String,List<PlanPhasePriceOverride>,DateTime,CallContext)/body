@@ -1,0 +1,12 @@
+{
+  final DateTime now=clock.getUTCNow();
+  final DateTime effectiveDate=(requestedDateWithMs != null) ? DefaultClock.truncateMs(requestedDateWithMs) : now;
+  validateEffectiveDate(subscription,effectiveDate);
+  validateEntitlementState(subscription);
+  try {
+    return doChangePlan(subscription,productName,term,priceList,overrides,now,effectiveDate,context);
+  }
+ catch (  final CatalogApiException e) {
+    throw new SubscriptionBaseApiException(e);
+  }
+}

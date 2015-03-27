@@ -1,0 +1,14 @@
+{
+  final CatalogOverridePlanDefinitionModelDao obj1=new CatalogOverridePlanDefinitionModelDao("p1",true,clock.getUTCNow());
+  performTestInTransaction(new WithCatalogOverridePlanDefinitionSqlDaoTransaction<Void>(){
+    @Override public Void doTransaction(    final CatalogOverridePlanDefinitionSqlDao sqlDao){
+      sqlDao.create(obj1,internalCallContext);
+      final Long lastInserted=sqlDao.getLastInsertId();
+      final CatalogOverridePlanDefinitionModelDao rehydrated=sqlDao.getByRecordId(lastInserted,internalCallContext);
+      assertEquals(rehydrated.getParentPlanName(),obj1.getParentPlanName());
+      assertEquals(rehydrated.getIsActive(),obj1.getIsActive());
+      return null;
+    }
+  }
+);
+}

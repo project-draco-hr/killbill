@@ -1,0 +1,8 @@
+{
+  final Matcher m=DefaultPriceOverride.CUSTOM_PLAN_NAME_PATTERN.matcher(planName);
+  if (m.matches()) {
+    final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(tenantRecordId,null);
+    return priceOverride.getOverriddenPlan(planName,standaloneCatalog,internalTenantContext);
+  }
+  return standaloneCatalog.findCurrentPlan(planName);
+}

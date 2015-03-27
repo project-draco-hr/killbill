@@ -5,7 +5,7 @@
   final Account account=accountApi.createAccount(getAccountData(7),callContext);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,externalKey,initialDate,callContext);
+  final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,externalKey,null,initialDate,callContext);
   assertListenerStatus();
   assertEquals(entitlement.getAccountId(),account.getId());
   assertEquals(entitlement.getExternalKey(),externalKey);
@@ -29,7 +29,7 @@
   clock.addDays(1);
   final PlanPhaseSpecifier spec2=new PlanPhaseSpecifier("Pistol",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement entitlement2=entitlementApi.createBaseEntitlement(account.getId(),spec2,externalKey,new LocalDate(clock.getUTCNow(),account.getTimeZone()),callContext);
+  final Entitlement entitlement2=entitlementApi.createBaseEntitlement(account.getId(),spec2,externalKey,null,new LocalDate(clock.getUTCNow(),account.getTimeZone()),callContext);
   assertListenerStatus();
   assertEquals(entitlement2.getAccountId(),account.getId());
   assertEquals(entitlement2.getExternalKey(),externalKey);
