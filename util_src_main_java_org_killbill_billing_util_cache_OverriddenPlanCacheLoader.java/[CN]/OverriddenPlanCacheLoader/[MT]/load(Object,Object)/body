@@ -1,0 +1,30 @@
+{
+  checkCacheLoaderStatus();
+  if (!(key instanceof String)) {
+    throw new IllegalArgumentException("Unexpected key type of " + key.getClass().getName());
+  }
+  if (!(argument instanceof CacheLoaderArgument)) {
+    throw new IllegalArgumentException("Unexpected argument type of " + argument.getClass().getName());
+  }
+  final CacheLoaderArgument cacheLoaderArgument=(CacheLoaderArgument)argument;
+  if (cacheLoaderArgument.getArgs() == null || cacheLoaderArgument.getArgs().length != 2) {
+    throw new IllegalArgumentException("Invalid arguments for overridden plans");
+  }
+  if (!(cacheLoaderArgument.getArgs()[0] instanceof LoaderCallback)) {
+    throw new IllegalArgumentException("Invalid arguments for overridden plans: missing loaderCallback from argument");
+  }
+  if (!(cacheLoaderArgument.getArgs()[1] instanceof StaticCatalog)) {
+    throw new IllegalArgumentException("Invalid arguments for overridden plans: missing catalog from argument");
+  }
+  final String planName=(String)key;
+  final LoaderCallback callback=(LoaderCallback)cacheLoaderArgument.getArgs()[0];
+  final StaticCatalog catalog=(StaticCatalog)cacheLoaderArgument.getArgs()[1];
+  final InternalTenantContext internalTenantContext=((CacheLoaderArgument)argument).getInternalTenantContext();
+  try {
+    log.info("Loading overridden plan {} for tenant {}",planName,internalTenantContext.getTenantRecordId());
+    return callback.loadPlan(planName,catalog,internalTenantContext);
+  }
+ catch (  final CatalogApiException e) {
+    throw new IllegalStateException(String.format("Failed to load overridden plan for tenant %s : %s",planName,internalTenantContext.getTenantRecordId()),e);
+  }
+}
