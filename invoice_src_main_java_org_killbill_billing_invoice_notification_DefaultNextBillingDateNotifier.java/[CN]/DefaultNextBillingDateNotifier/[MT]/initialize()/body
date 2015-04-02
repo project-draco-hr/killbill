@@ -7,13 +7,18 @@
           return;
         }
         final NextBillingDateNotificationKey key=(NextBillingDateNotificationKey)notificationKey;
+        final DateTime targetDate=key.getTargetDate() != null ? key.getTargetDate() : eventDate;
         try {
           final SubscriptionBase subscription=subscriptionApi.getSubscriptionFromId(key.getUuidKey(),callContextFactory.createInternalTenantContext(tenantRecordId,accountRecordId));
           if (subscription == null) {
             log.warn("Next Billing Date Notification Queue handled spurious notification (key: " + key + ")");
+            return;
+          }
+          if (key.isDryRunForInvoiceNotification() != null && key.isDryRunForInvoiceNotification()) {
+            processEventForInvoiceNotification(key.getUuidKey(),targetDate,userToken,accountRecordId,tenantRecordId);
           }
  else {
-            processEvent(key.getUuidKey(),eventDate,userToken,accountRecordId,tenantRecordId);
+            processEventForInvoiceGeneration(key.getUuidKey(),targetDate,userToken,accountRecordId,tenantRecordId);
           }
         }
  catch (        SubscriptionBaseApiException e) {
