@@ -6,9 +6,8 @@
     for (    final DateTime cur : callbackDateTimeUTC) {
       if (isInvoiceNotificationEnabled) {
         final DateTime curDryRunNotificationTime=cur.minus(dryRunNotificationTime);
-        if (curDryRunNotificationTime.isAfter(clock.getUTCNow())) {
-          nextBillingDatePoster.insertNextBillingDryRunNotificationFromTransaction(entitySqlDaoWrapperFactory,accountId,subscriptionId,curDryRunNotificationTime,cur,internalCallContext);
-        }
+        final DateTime effectiveCurDryRunNotificationTime=(curDryRunNotificationTime.isAfter(clock.getUTCNow())) ? curDryRunNotificationTime : clock.getUTCNow();
+        nextBillingDatePoster.insertNextBillingDryRunNotificationFromTransaction(entitySqlDaoWrapperFactory,accountId,subscriptionId,effectiveCurDryRunNotificationTime,cur,internalCallContext);
       }
       nextBillingDatePoster.insertNextBillingNotificationFromTransaction(entitySqlDaoWrapperFactory,accountId,subscriptionId,cur,internalCallContext);
     }
