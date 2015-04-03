@@ -1,8 +1,13 @@
 {
-  if (objectBelongsToTheRightTenant(objectId,objectType,context)) {
-    return nonEntityDao.retrieveRecordIdFromObject(objectId,objectType,cacheControllerDispatcher.getCacheController(CacheType.RECORD_ID));
-  }
+  try {
+    if (objectBelongsToTheRightTenant(objectId,objectType,context)) {
+      return nonEntityDao.retrieveRecordIdFromObject(objectId,objectType,cacheControllerDispatcher.getCacheController(CacheType.RECORD_ID));
+    }
  else {
+      return null;
+    }
+  }
+ catch (  final ObjectDoesNotExist e) {
     return null;
   }
 }

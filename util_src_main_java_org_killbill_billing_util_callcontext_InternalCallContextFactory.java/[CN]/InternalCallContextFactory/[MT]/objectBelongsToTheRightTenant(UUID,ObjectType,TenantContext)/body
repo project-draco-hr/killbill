@@ -1,4 +1,7 @@
 {
   final Long realTenantRecordId=getTenantRecordIdSafe(context);
+  if (realTenantRecordId == null) {
+    throw new ObjectDoesNotExist(String.format("Tenant id=%s doesn't exist!",context.getTenantId()));
+  }
   return objectBelongsToTheRightTenant(objectId,objectType,realTenantRecordId);
 }

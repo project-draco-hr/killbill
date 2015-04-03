@@ -1,4 +1,7 @@
 {
   final Long objectTenantRecordId=getTenantRecordIdUnsafe(objectId,objectType);
-  return realTenantRecordId != null && realTenantRecordId.equals(objectTenantRecordId);
+  if (objectTenantRecordId == null) {
+    throw new ObjectDoesNotExist(String.format("Object id=%s type=%s doesn't exist!",objectId,objectType));
+  }
+  return objectTenantRecordId.equals(realTenantRecordId);
 }
