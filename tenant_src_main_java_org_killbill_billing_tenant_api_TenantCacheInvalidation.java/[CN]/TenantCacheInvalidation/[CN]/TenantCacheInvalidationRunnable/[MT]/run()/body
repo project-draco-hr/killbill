@@ -18,6 +18,9 @@
           final BusInternalEvent event;
           if (tenantKvsTargetRecordId != null) {
             final TenantKVModelDao tenantModelDao=tenantDao.getKeyByRecordId(tenantKvsTargetRecordId,tenantContext);
+            if (tenantModelDao == null) {
+              continue;
+            }
             event=new DefaultTenantConfigChangeInternalEvent(tenantModelDao.getId(),cur.getType(),null,tenantContext.getTenantRecordId(),cur.getUserToken());
           }
  else {
