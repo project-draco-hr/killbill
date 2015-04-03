@@ -1,10 +1,9 @@
 {
-  final UUID accountId=UUID.randomUUID();
   final SubscriptionBase subscription=invoiceUtil.createSubscription();
   final UUID subscriptionId=subscription.getId();
   final DateTime now=clock.getUTCNow();
   final NotificationQueue nextBillingQueue=notificationQueueService.getNotificationQueue(DefaultInvoiceService.INVOICE_SERVICE_NAME,DefaultNextBillingDateNotifier.NEXT_BILLING_DATE_NOTIFIER_QUEUE);
-  nextBillingQueue.recordFutureNotification(now,new NextBillingDateNotificationKey(subscriptionId),internalCallContext.getUserToken(),internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId());
+  nextBillingQueue.recordFutureNotification(now,new NextBillingDateNotificationKey(subscriptionId,now,Boolean.FALSE),internalCallContext.getUserToken(),internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId());
   ((ClockMock)clock).setDeltaFromReality(3000);
   await().atMost(1,MINUTES).until(new Callable<Boolean>(){
     @Override public Boolean call() throws Exception {

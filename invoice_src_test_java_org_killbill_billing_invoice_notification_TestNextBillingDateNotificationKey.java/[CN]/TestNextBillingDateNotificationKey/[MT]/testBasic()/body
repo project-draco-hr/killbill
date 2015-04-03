@@ -1,0 +1,11 @@
+{
+  final UUID uuidKey=UUID.randomUUID();
+  final DateTime targetDate=new DateTime();
+  final Boolean isDryRunForInvoiceNotification=Boolean.FALSE;
+  final NextBillingDateNotificationKey key=new NextBillingDateNotificationKey(uuidKey,targetDate,isDryRunForInvoiceNotification);
+  final String json=mapper.writeValueAsString(key);
+  final NextBillingDateNotificationKey result=mapper.readValue(json,NextBillingDateNotificationKey.class);
+  Assert.assertEquals(result.getUuidKey(),uuidKey);
+  Assert.assertEquals(result.getTargetDate().compareTo(targetDate),0);
+  Assert.assertEquals(result.isDryRunForInvoiceNotification(),isDryRunForInvoiceNotification);
+}

@@ -1,0 +1,12 @@
+{
+  final Invoice dryRunInvoice=processSubscriptionInternal(subscriptionId,targetDate,true,context);
+  if (dryRunInvoice != null && dryRunInvoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+    final InvoiceNotificationInternalEvent event=new DefaultInvoiceNotificationInternalEvent(dryRunInvoice.getAccountId(),dryRunInvoice.getBalance(),dryRunInvoice.getCurrency(),targetDate,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+    try {
+      eventBus.post(event);
+    }
+ catch (    EventBusException e) {
+      log.error("Failed to post event " + event,e);
+    }
+  }
+}

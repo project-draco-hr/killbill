@@ -1,0 +1,15 @@
+{
+  try {
+    if (subscriptionId == null) {
+      log.error("Failed handling SubscriptionBase change.",new InvoiceApiException(ErrorCode.INVOICE_INVALID_TRANSITION));
+      return null;
+    }
+    final UUID accountId=subscriptionApi.getAccountIdFromSubscriptionId(subscriptionId,context);
+    final DryRunArguments dryRunArguments=dryRunForNotification ? NULL_DRY_RUN_ARGUMENTS : null;
+    return processAccount(accountId,targetDate,dryRunArguments,context);
+  }
+ catch (  final SubscriptionBaseApiException e) {
+    log.error("Failed handling SubscriptionBase change.",new InvoiceApiException(ErrorCode.INVOICE_NO_ACCOUNT_ID_FOR_SUBSCRIPTION_ID,subscriptionId.toString()));
+    return null;
+  }
+}
