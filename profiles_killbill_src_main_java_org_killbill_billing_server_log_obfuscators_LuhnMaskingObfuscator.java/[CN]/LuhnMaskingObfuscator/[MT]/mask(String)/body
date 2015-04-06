@@ -1,0 +1,47 @@
+{
+  if (!hasEnoughDigits(formattedMessage)) {
+    return formattedMessage;
+  }
+  final int length=formattedMessage.length();
+  int unwrittenStart=0;
+  int numberStart=-1;
+  int numberEnd;
+  int digitsSeen=0;
+  final int[] last4pos={-1,-1,-1,-1};
+  int pos;
+  char current;
+  final StringBuilder masked=new StringBuilder(formattedMessage.length());
+  for (pos=0; pos < length; pos++) {
+    current=formattedMessage.charAt(pos);
+    if (isDigit(current)) {
+      digitsSeen++;
+      if (numberStart == -1) {
+        numberStart=pos;
+      }
+      last4pos[0]=last4pos[1];
+      last4pos[1]=last4pos[2];
+      last4pos[2]=last4pos[3];
+      last4pos[3]=pos;
+    }
+ else     if (digitsSeen > 0 && current != ' ' && current != '-') {
+      numberEnd=last4pos[3] + 1;
+      if ((digitsSeen >= MIN_CC_DIGITS) && luhnCheck(stripSeparators(formattedMessage.substring(numberStart,numberEnd)))) {
+        masked.append(formattedMessage,unwrittenStart,numberStart);
+        masked.append(obfuscateConfidentialData(formattedMessage.substring(numberStart,numberEnd),formattedMessage.substring(last4pos[0],numberEnd)));
+        masked.append(formattedMessage,last4pos[0],numberEnd);
+        unwrittenStart=numberEnd;
+      }
+      numberStart=-1;
+      digitsSeen=0;
+    }
+  }
+  if (numberStart != -1 && (digitsSeen >= MIN_CC_DIGITS) && luhnCheck(stripSeparators(formattedMessage.substring(numberStart,pos)))) {
+    masked.append(formattedMessage,unwrittenStart,numberStart);
+    masked.append(obfuscateConfidentialData(formattedMessage.substring(numberStart,pos),formattedMessage.substring(last4pos[0],pos)));
+    masked.append(formattedMessage,last4pos[0],pos);
+  }
+ else {
+    masked.append(formattedMessage,unwrittenStart,pos);
+  }
+  return masked.toString();
+}
