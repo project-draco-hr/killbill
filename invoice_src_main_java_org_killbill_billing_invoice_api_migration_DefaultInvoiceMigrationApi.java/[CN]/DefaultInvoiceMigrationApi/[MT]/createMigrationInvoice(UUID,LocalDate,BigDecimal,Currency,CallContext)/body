@@ -1,6 +1,7 @@
 {
+  Account account;
   try {
-    accountUserApi.getAccountById(accountId,internalCallContextFactory.createInternalTenantContext(accountId,context));
+    account=accountUserApi.getAccountById(accountId,internalCallContextFactory.createInternalTenantContext(accountId,context));
   }
  catch (  AccountApiException e) {
     log.warn("Unable to find account for id {}",accountId);
@@ -8,6 +9,8 @@
   }
   final InvoiceModelDao migrationInvoice=new InvoiceModelDao(accountId,clock.getUTCToday(),targetDate,currency,true);
   final InvoiceItemModelDao migrationInvoiceItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.FIXED,migrationInvoice.getId(),accountId,null,null,null,MigrationPlan.MIGRATION_PLAN_NAME,MigrationPlan.MIGRATION_PLAN_PHASE_NAME,null,targetDate,null,balance,null,currency,null);
-  dao.createInvoice(migrationInvoice,ImmutableList.<InvoiceItemModelDao>of(migrationInvoiceItem),true,ImmutableMap.<UUID,List<DateTime>>of(),internalCallContextFactory.createInternalCallContext(accountId,context));
+  final DateTime wrongEffectiveDateButDoesNotMatter=null;
+  final DateAndTimeZoneContext dateAndTimeZoneContext=new DateAndTimeZoneContext(wrongEffectiveDateButDoesNotMatter,account.getTimeZone(),clock);
+  dao.createInvoice(migrationInvoice,ImmutableList.<InvoiceItemModelDao>of(migrationInvoiceItem),true,new FutureAccountNotifications(dateAndTimeZoneContext,ImmutableMap.<UUID,List<DateTime>>of()),internalCallContextFactory.createInternalCallContext(accountId,context));
   return migrationInvoice.getId();
 }
