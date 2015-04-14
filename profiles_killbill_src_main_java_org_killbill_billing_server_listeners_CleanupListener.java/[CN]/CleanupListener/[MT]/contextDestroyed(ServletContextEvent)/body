@@ -10,9 +10,18 @@
     }
   }
   try {
-    AbandonedConnectionCleanupThread.shutdown();
+    Class.forName("com.mysql.jdbc.AbandonedConnectionCleanupThread");
+    com.mysql.jdbc.AbandonedConnectionCleanupThread.shutdown();
   }
  catch (  final InterruptedException e) {
     logger.warn("Unable to shutdown MySQL threads",e);
+  }
+catch (  final ClassNotFoundException ignored) {
+  }
+  try {
+    Class.forName("org.mariadb.jdbc.Driver");
+    org.mariadb.jdbc.Driver.unloadDriver();
+  }
+ catch (  final ClassNotFoundException ignored) {
   }
 }
