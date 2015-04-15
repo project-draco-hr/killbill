@@ -4,5 +4,5 @@
   entitySqlDaoWrapperFactory.become(SubscriptionEventSqlDao.class).create(new SubscriptionEventModelDao(cancelEvent),context);
   final boolean isBusEvent=cancelEvent.getEffectiveDate().compareTo(clock.getUTCNow()) <= 0;
   recordBusOrFutureNotificationFromTransaction(subscription,cancelEvent,entitySqlDaoWrapperFactory,isBusEvent,seqId,context);
-  notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,cancelEvent,context);
+  notifyBusOfRequestedChange(entitySqlDaoWrapperFactory,subscription,cancelEvent,SubscriptionBaseTransitionType.CANCEL,context);
 }
