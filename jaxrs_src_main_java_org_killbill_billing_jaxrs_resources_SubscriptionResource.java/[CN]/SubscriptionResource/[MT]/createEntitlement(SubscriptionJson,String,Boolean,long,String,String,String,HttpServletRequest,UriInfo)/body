@@ -1,24 +1,23 @@
 {
   verifyNonNullOrEmpty(entitlement,"SubscriptionJson body should be specified");
-  verifyNonNullOrEmpty(entitlement.getProductName(),"SubscriptionJson productName needs to be set",entitlement.getProductCategory(),"SubscriptionJson productCategory needs to be set",entitlement.getBillingPeriod(),"SubscriptionJson billingPeriod needs to be set",entitlement.getPriceList(),"SubscriptionJson priceList needs to be set",entitlement.getAccountId(),"SubscriptionJson accountId needs to be set");
+  verifyNonNullOrEmpty(entitlement.getProductName(),"SubscriptionJson productName needs to be set",entitlement.getProductCategory(),"SubscriptionJson productCategory needs to be set",entitlement.getBillingPeriod(),"SubscriptionJson billingPeriod needs to be set",entitlement.getPriceList(),"SubscriptionJson priceList needs to be set");
   final boolean createAddOnEntitlement=ProductCategory.ADD_ON.toString().equals(entitlement.getProductCategory());
   if (createAddOnEntitlement) {
-    verifyNonNullOrEmpty(entitlement.getBundleId(),"SubscriptionJson bundleId should be specified");
+    verifyNonNullOrEmpty(entitlement.getBundleId(),"SubscriptionJson bundleId should be specified for ADD_ON");
   }
  else {
-    verifyNonNullOrEmpty(entitlement.getAccountId(),"SubscriptionJson accountId should be specified");
+    verifyNonNullOrEmpty(entitlement.getAccountId(),"SubscriptionJson accountId should be specified for BP");
   }
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  final UUID accountId=entitlement.getAccountId() != null ? UUID.fromString(entitlement.getAccountId()) : null;
-  final Account account=accountUserApi.getAccountById(accountId,callContext);
   final EntitlementCallCompletionCallback<Entitlement> callback=new EntitlementCallCompletionCallback<Entitlement>(){
-    @Override public Entitlement doOperation(    final CallContext ctx) throws InterruptedException, TimeoutException, EntitlementApiException {
+    @Override public Entitlement doOperation(    final CallContext ctx) throws InterruptedException, TimeoutException, EntitlementApiException, SubscriptionApiException, AccountApiException {
+      final Account account=getAccountFromSubscriptionJson(entitlement,callContext);
       final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),null);
-      final LocalDate inputLocalDate=toLocalDate(accountId,requestedDate,callContext);
+      final LocalDate inputLocalDate=toLocalDate(account,requestedDate,callContext);
       final UUID bundleId=entitlement.getBundleId() != null ? UUID.fromString(entitlement.getBundleId()) : null;
       final PlanSpecifier planSpec=new PlanSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList());
       final List<PlanPhasePriceOverride> overrides=PhasePriceOverrideJson.toPlanPhasePriceOverrides(entitlement.getPriceOverrides(),planSpec,account.getCurrency());
-      return createAddOnEntitlement ? entitlementApi.addEntitlement(bundleId,spec,overrides,inputLocalDate,callContext) : entitlementApi.createBaseEntitlement(accountId,spec,entitlement.getExternalKey(),overrides,inputLocalDate,callContext);
+      return createAddOnEntitlement ? entitlementApi.addEntitlement(bundleId,spec,overrides,inputLocalDate,callContext) : entitlementApi.createBaseEntitlement(account.getId(),spec,entitlement.getExternalKey(),overrides,inputLocalDate,callContext);
     }
     @Override public boolean isImmOperation(){
       return true;

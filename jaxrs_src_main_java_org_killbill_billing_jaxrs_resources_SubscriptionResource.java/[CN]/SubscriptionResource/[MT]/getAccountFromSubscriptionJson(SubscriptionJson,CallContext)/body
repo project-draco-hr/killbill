@@ -1,0 +1,15 @@
+{
+  final UUID accountId;
+  if (entitlementJson.getAccountId() != null) {
+    accountId=UUID.fromString(entitlementJson.getAccountId());
+  }
+ else   if (entitlementJson.getSubscriptionId() != null) {
+    final Entitlement entitlement=entitlementApi.getEntitlementForId(UUID.fromString(entitlementJson.getSubscriptionId()),callContext);
+    accountId=entitlement.getAccountId();
+  }
+ else {
+    final SubscriptionBundle subscriptionBundle=subscriptionApi.getSubscriptionBundle(UUID.fromString(entitlementJson.getBundleId()),callContext);
+    accountId=subscriptionBundle.getAccountId();
+  }
+  return accountUserApi.getAccountById(accountId,callContext);
+}
