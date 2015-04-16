@@ -1,0 +1,30 @@
+{
+  final String username="i like";
+  final String password="c0ff33";
+  securityApi.addRoleDefinition("restricted",ImmutableList.of("account:*","invoice","tag:create_tag_definition"),callContext);
+  securityApi.addUserRoles(username,password,ImmutableList.of("restricted"),callContext);
+  final AuthenticationToken goodToken=new UsernamePasswordToken(username,password);
+  final Subject subject=securityManager.login(null,goodToken);
+  subject.checkPermission(Permission.ACCOUNT_CAN_CHARGE.toString());
+  subject.checkPermission(Permission.INVOICE_CAN_CREDIT.toString());
+  subject.checkPermission(Permission.TAG_CAN_CREATE_TAG_DEFINITION.toString());
+  try {
+    subject.checkPermission(Permission.TAG_CAN_DELETE_TAG_DEFINITION.toString());
+    Assert.fail("Subject should not have rights to delete tag definitions");
+  }
+ catch (  AuthorizationException e) {
+  }
+  subject.logout();
+  securityApi.addRoleDefinition("newRestricted",ImmutableList.of("account:*","invoice","tag:delete_tag_definition"),callContext);
+  securityApi.updateUserRoles(username,ImmutableList.of("newRestricted"),callContext);
+  final Subject newSubject=securityManager.login(null,goodToken);
+  newSubject.checkPermission(Permission.ACCOUNT_CAN_CHARGE.toString());
+  newSubject.checkPermission(Permission.INVOICE_CAN_CREDIT.toString());
+  newSubject.checkPermission(Permission.TAG_CAN_DELETE_TAG_DEFINITION.toString());
+  try {
+    newSubject.checkPermission(Permission.TAG_CAN_CREATE_TAG_DEFINITION.toString());
+    Assert.fail("Subject should not have rights to create tag definitions");
+  }
+ catch (  AuthorizationException e) {
+  }
+}

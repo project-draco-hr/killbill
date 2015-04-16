@@ -1,0 +1,17 @@
+{
+  final ByteSource salt=rng.nextBytes();
+  final String hashedPasswordBase64=new SimpleHash(KillbillCredentialsMatcher.HASH_ALGORITHM_NAME,password,salt.toBase64(),KillbillCredentialsMatcher.HASH_ITERATIONS).toBase64();
+  dbi.inTransaction(new TransactionCallback<Void>(){
+    @Override public Void inTransaction(    final Handle handle,    final TransactionStatus status) throws Exception {
+      final DateTime updatedDate=clock.getUTCNow();
+      final UsersSqlDao usersSqlDao=handle.attach(UsersSqlDao.class);
+      final UserModelDao userModelDao=usersSqlDao.getByUsername(username);
+      if (userModelDao == null) {
+        throw new SecurityApiException(ErrorCode.SECURITY_INVALID_USER,username);
+      }
+      usersSqlDao.updatePassword(username,hashedPasswordBase64,salt.toBase64(),updatedDate.toDate(),updatedBy);
+      return null;
+    }
+  }
+);
+}

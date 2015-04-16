@@ -2,6 +2,7 @@
   final RbacConfig config=new ConfigurationObjectFactory(configSource).build(RbacConfig.class);
   bind(RbacConfig.class).toInstance(config);
   bindRealm().toProvider(IniRealmProvider.class).asEagerSingleton();
+  bindRealm().to(KillBillJdbcRealm.class).asEagerSingleton();
   if (KillBillShiroModule.isLDAPEnabled()) {
     bindRealm().to(KillBillJndiLdapRealm.class).asEagerSingleton();
   }

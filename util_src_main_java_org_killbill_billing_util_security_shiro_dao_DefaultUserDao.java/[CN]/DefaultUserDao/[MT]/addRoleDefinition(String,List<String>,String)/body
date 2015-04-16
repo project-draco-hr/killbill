@@ -1,0 +1,17 @@
+{
+  final DateTime createdDate=clock.getUTCNow();
+  dbi.inTransaction(new TransactionCallback<Void>(){
+    @Override public Void inTransaction(    final Handle handle,    final TransactionStatus status) throws Exception {
+      final RolesPermissionsSqlDao rolesPermissionsSqlDao=handle.attach(RolesPermissionsSqlDao.class);
+      final List<RolesPermissionsModelDao> existingRole=rolesPermissionsSqlDao.getByRoleName(role);
+      if (!existingRole.isEmpty()) {
+        throw new SecurityApiException(ErrorCode.SECURITY_ROLE_ALREADY_EXISTS,role);
+      }
+      for (      String permission : permissions) {
+        rolesPermissionsSqlDao.create(new RolesPermissionsModelDao(role,permission,createdDate,createdBy));
+      }
+      return null;
+    }
+  }
+);
+}

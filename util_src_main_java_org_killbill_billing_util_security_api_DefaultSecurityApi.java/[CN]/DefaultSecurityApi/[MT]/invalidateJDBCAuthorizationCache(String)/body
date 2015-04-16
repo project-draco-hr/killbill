@@ -1,0 +1,14 @@
+{
+  final Collection<Realm> realms=((DefaultSecurityManager)SecurityUtils.getSecurityManager()).getRealms();
+  final KillBillJdbcRealm killBillJdbcRealm=(KillBillJdbcRealm)Iterables.tryFind(realms,new Predicate<Realm>(){
+    @Override public boolean apply(    @Nullable final Realm input){
+      return (input instanceof KillBillJdbcRealm);
+    }
+  }
+).orNull();
+  if (killBillJdbcRealm != null) {
+    SimplePrincipalCollection principals=new SimplePrincipalCollection();
+    principals.add(username,killBillJdbcRealm.getName());
+    killBillJdbcRealm.clearCachedAuthorizationInfo(principals);
+  }
+}

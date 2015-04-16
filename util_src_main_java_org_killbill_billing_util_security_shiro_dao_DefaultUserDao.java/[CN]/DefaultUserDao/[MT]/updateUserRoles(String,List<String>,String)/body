@@ -1,0 +1,36 @@
+{
+  dbi.inTransaction(new TransactionCallback<Void>(){
+    @Override public Void inTransaction(    final Handle handle,    final TransactionStatus status) throws Exception {
+      final DateTime updatedDate=clock.getUTCNow();
+      final UsersSqlDao usersSqlDao=handle.attach(UsersSqlDao.class);
+      final UserModelDao userModelDao=usersSqlDao.getByUsername(username);
+      if (userModelDao == null) {
+        throw new SecurityApiException(ErrorCode.SECURITY_INVALID_USER,username);
+      }
+      final UserRolesSqlDao userRolesSqlDao=handle.attach(UserRolesSqlDao.class);
+      final List<UserRolesModelDao> existingRoles=userRolesSqlDao.getByUsername(username);
+      for (      final UserRolesModelDao curRole : existingRoles) {
+        if (Iterables.tryFind(roles,new Predicate<String>(){
+          @Override public boolean apply(          final String input){
+            return input.equals(curRole.getRoleName());
+          }
+        }
+).orNull() == null) {
+          userRolesSqlDao.invalidate(username,curRole.getRoleName(),updatedDate.toDate(),updatedBy);
+        }
+      }
+      for (      final String curNewRole : roles) {
+        if (Iterables.tryFind(existingRoles,new Predicate<UserRolesModelDao>(){
+          @Override public boolean apply(          final UserRolesModelDao input){
+            return input.getRoleName().equals(curNewRole);
+          }
+        }
+).orNull() == null) {
+          userRolesSqlDao.create(new UserRolesModelDao(username,curNewRole,updatedDate,updatedBy));
+        }
+      }
+      return null;
+    }
+  }
+);
+}

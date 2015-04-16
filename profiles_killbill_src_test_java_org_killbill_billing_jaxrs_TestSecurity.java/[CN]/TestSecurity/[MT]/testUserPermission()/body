@@ -1,0 +1,37 @@
+{
+  final String roleDefinition="notEnoughToAddUserAndRoles";
+  final List<String> permissions=new ArrayList<String>();
+  for (  Permission cur : Permission.values()) {
+    if (!cur.getGroup().equals("user")) {
+      permissions.add(cur.toString());
+    }
+  }
+  Response response=killBillClient.addRoleDefinition(new RoleDefinition(roleDefinition,permissions),createdBy,reason,comment);
+  Assert.assertEquals(response.getStatusCode(),201);
+  final String username="candy";
+  final String password="lolipop";
+  response=killBillClient.addUserRoles(new UserRoles(username,password,ImmutableList.of(roleDefinition)),createdBy,reason,comment);
+  Assert.assertEquals(response.getStatusCode(),201);
+  logout();
+  login(username,password);
+  boolean success=false;
+  try {
+    killBillClient.addRoleDefinition(new RoleDefinition("dsfdsfds",ImmutableList.of("*")),createdBy,reason,comment);
+    success=true;
+  }
+ catch (  final Exception e) {
+  }
+ finally {
+    Assert.assertFalse(success);
+  }
+  success=false;
+  try {
+    killBillClient.addUserRoles(new UserRoles("sdsd","sdsdsd",ImmutableList.of(roleDefinition)),createdBy,reason,comment);
+    success=true;
+  }
+ catch (  final Exception e) {
+  }
+ finally {
+    Assert.assertFalse(success);
+  }
+}

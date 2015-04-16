@@ -1,0 +1,35 @@
+{
+  final String roleDefinition="somethingNice";
+  final String allPermissions="*";
+  final String username="GuanYu";
+  final String password="IamAGreatWarrior";
+  Response response=killBillClient.addRoleDefinition(new RoleDefinition(roleDefinition,ImmutableList.of(allPermissions)),createdBy,reason,comment);
+  Assert.assertEquals(response.getStatusCode(),201);
+  response=killBillClient.addUserRoles(new UserRoles(username,password,ImmutableList.of(roleDefinition)),createdBy,reason,comment);
+  Assert.assertEquals(response.getStatusCode(),201);
+  logout();
+  login(username,password);
+  Permissions permissions=killBillClient.getPermissions();
+  Assert.assertEquals(permissions.size(),Permission.values().length);
+  String newPassword="IamTheBestWarrior";
+  killBillClient.updateUserPassword(username,newPassword,createdBy,reason,comment);
+  logout();
+  login(username,newPassword);
+  permissions=killBillClient.getPermissions();
+  Assert.assertEquals(permissions.size(),Permission.values().length);
+  final String newRoleDefinition="somethingLessNice";
+  final String littlePermissions="user";
+  response=killBillClient.addRoleDefinition(new RoleDefinition(newRoleDefinition,ImmutableList.of(littlePermissions)),createdBy,reason,comment);
+  Assert.assertEquals(response.getStatusCode(),201);
+  killBillClient.updateUserRoles(username,ImmutableList.of(newRoleDefinition),createdBy,reason,comment);
+  permissions=killBillClient.getPermissions();
+  Assert.assertEquals(permissions.size(),2);
+  killBillClient.invalidateUser(username,createdBy,reason,comment);
+  try {
+    killBillClient.getPermissions();
+    Assert.fail();
+  }
+ catch (  final KillBillClientException e) {
+    Assert.assertEquals(e.getResponse().getStatusCode(),Status.UNAUTHORIZED.getStatusCode());
+  }
+}

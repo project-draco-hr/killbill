@@ -8,7 +8,7 @@
   }
   configureShiro();
   CacheManager.getInstance().shutdown();
-  final Injector injector=Guice.createInjector(Stage.PRODUCTION,new KillBillShiroModule(configSource),new KillBillShiroAopModule(),new SecurityModule(configSource),new AbstractModule(){
+  final Injector injector=Guice.createInjector(Stage.PRODUCTION,new ShiroModuleNoDB(configSource),new KillBillShiroAopModule(),new TestSecurityModuleNoDB(configSource),new AbstractModule(){
     @Override protected void configure(){
       bind(IDBI.class).toInstance(Mockito.mock(IDBI.class));
     }

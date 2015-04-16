@@ -1,0 +1,41 @@
+{
+  final String username="toto";
+  final String password="supperCompli43cated";
+  securityApi.addRoleDefinition("root",ImmutableList.of("*"),callContext);
+  securityApi.addUserRoles(username,password,ImmutableList.of("root"),callContext);
+  final DelegatingSubject subject=new DelegatingSubject(securityManager);
+  final AuthenticationToken goodToken=new UsernamePasswordToken(username,password);
+  securityManager.login(subject,goodToken);
+  Assert.assertTrue(true);
+  try {
+    final AuthenticationToken badToken=new UsernamePasswordToken(username,"somethingelse");
+    securityManager.login(subject,badToken);
+    Assert.assertTrue(true);
+    securityManager.logout(subject);
+    securityManager.login(subject,badToken);
+    Assert.fail("Should not succeed to login with an incorrect password");
+  }
+ catch (  final AuthenticationException e) {
+  }
+  final String newPassword="suppersimple";
+  securityApi.updateUserPassword(username,newPassword,callContext);
+  try {
+    final AuthenticationToken notGoodTokenAnyLonger=goodToken;
+    securityManager.login(subject,notGoodTokenAnyLonger);
+    Assert.fail("Should not succeed to login with an incorrect password");
+  }
+ catch (  final AuthenticationException e) {
+  }
+  final AuthenticationToken newGoodToken=new UsernamePasswordToken(username,newPassword);
+  securityManager.login(subject,newGoodToken);
+  Assert.assertTrue(true);
+  securityManager.logout(subject);
+  securityApi.invalidateUser(username,callContext);
+  try {
+    final AuthenticationToken notGoodTokenAnyLonger=goodToken;
+    securityManager.login(subject,notGoodTokenAnyLonger);
+    Assert.fail("Should not succeed to login with an incorrect password");
+  }
+ catch (  final AuthenticationException e) {
+  }
+}
