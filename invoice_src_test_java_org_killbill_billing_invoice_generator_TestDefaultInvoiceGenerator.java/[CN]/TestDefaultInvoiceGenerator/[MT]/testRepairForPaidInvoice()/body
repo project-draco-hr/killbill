@@ -1,13 +1,12 @@
 {
   final LocalDate april25=new LocalDate(2012,4,25);
-  final UUID accountId=UUID.randomUUID();
   final SubscriptionBase originalSubscription=createSubscription();
   final Plan originalPlan=new MockPlan("original plan");
   final MockInternationalPrice price10=new MockInternationalPrice(new DefaultPrice(TEN,Currency.USD));
   final PlanPhase originalPlanEvergreen=new MockPlanPhase(price10,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
   final BillingEventSet events=new MockBillingEventSet();
   events.add(createBillingEvent(originalSubscription.getId(),originalSubscription.getBundleId(),april25,originalPlan,originalPlanEvergreen,25));
-  final Invoice invoice1=generator.generateInvoice(accountId,events,null,april25,Currency.USD,internalCallContext);
+  final Invoice invoice1=generator.generateInvoice(account,events,null,april25,Currency.USD,internalCallContext);
   printDetailInvoice(invoice1);
   assertEquals(invoice1.getNumberOfItems(),1);
   final List<Invoice> invoices=new ArrayList<Invoice>();
@@ -20,7 +19,7 @@
   final MockInternationalPrice price5=new MockInternationalPrice(new DefaultPrice(FIVE,Currency.USD));
   final PlanPhase newPlanEvergreen=new MockPlanPhase(price5,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
   events.add(createBillingEvent(newSubscription.getId(),originalSubscription.getBundleId(),april25,newPlan,newPlanEvergreen,25));
-  final Invoice invoice2=generator.generateInvoice(accountId,events,invoices,april25,Currency.USD,internalCallContext);
+  final Invoice invoice2=generator.generateInvoice(account,events,invoices,april25,Currency.USD,internalCallContext);
   printDetailInvoice(invoice2);
   assertEquals(invoice2.getNumberOfItems(),2);
   invoices.add(invoice2);

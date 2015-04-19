@@ -14,21 +14,21 @@
   final Plan plan2=new MockPlan();
   final PlanPhase plan2phase1=createMockMonthlyPlanPhase(TWELVE,null,PhaseType.EVERGREEN);
   eventSet.add(createBillingEvent(subscriptionId2,bundleId,startDate,plan2,plan2phase1,1));
-  final Invoice invoice1=generator.generateInvoice(accountId,eventSet,invoices,startDate,currency,internalCallContext);
+  final Invoice invoice1=generator.generateInvoice(account,eventSet,invoices,startDate,currency,internalCallContext);
   assertNotNull(invoice1);
   assertTrue(invoice1.getBalance().compareTo(FIFTEEN.add(TWELVE)) == 0);
   invoices.add(invoice1);
   eventSet.remove(subscription1creation);
   eventSet.addSubscriptionWithAutoInvoiceOff(subscriptionId1);
   final LocalDate targetDate2=startDate.plusMonths(1);
-  final Invoice invoice2=generator.generateInvoice(accountId,eventSet,invoices,targetDate2,currency,internalCallContext);
+  final Invoice invoice2=generator.generateInvoice(account,eventSet,invoices,targetDate2,currency,internalCallContext);
   assertNotNull(invoice2);
   assertTrue(invoice2.getBalance().compareTo(TWELVE) == 0);
   invoices.add(invoice2);
   final LocalDate targetDate3=targetDate2.plusMonths(1);
   eventSet.clearSubscriptionsWithAutoInvoiceOff();
   eventSet.add(subscription1creation);
-  final Invoice invoice3=generator.generateInvoice(accountId,eventSet,invoices,targetDate3,currency,internalCallContext);
+  final Invoice invoice3=generator.generateInvoice(account,eventSet,invoices,targetDate3,currency,internalCallContext);
   assertNotNull(invoice3);
   assertTrue(invoice3.getBalance().compareTo(FIFTEEN.multiply(TWO).add(TWELVE)) == 0);
 }

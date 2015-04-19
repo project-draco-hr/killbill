@@ -16,7 +16,7 @@
   final DateTime effectiveDate2=effectiveDate1.plusDays(30);
   final BillingEvent event2=invoiceUtil.createMockBillingEvent(null,subscription,effectiveDate2,plan,phase2,null,recurringPrice.getPrice(currency),currency,BillingPeriod.MONTHLY,31,BillingMode.IN_ADVANCE,"testEvent2",2L,SubscriptionBaseTransitionType.CHANGE);
   events.add(event2);
-  final Invoice invoice=generator.generateInvoice(UUID.randomUUID(),events,null,new LocalDate(effectiveDate2),Currency.USD,context);
+  final Invoice invoice=generator.generateInvoice(account,events,null,new LocalDate(effectiveDate2),Currency.USD,context);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
   assertEquals(invoice.getBalance().compareTo(cheapAmount),0);
