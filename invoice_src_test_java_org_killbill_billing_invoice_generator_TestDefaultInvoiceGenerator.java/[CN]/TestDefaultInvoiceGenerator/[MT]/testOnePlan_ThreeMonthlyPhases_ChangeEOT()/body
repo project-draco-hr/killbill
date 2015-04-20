@@ -15,8 +15,7 @@
   final BillingEvent event3=createBillingEvent(sub.getId(),sub.getBundleId(),invoiceUtil.buildDate(2011,11,1),plan1,phase3,1);
   events.add(event3);
   final LocalDate targetDate=invoiceUtil.buildDate(2011,12,3);
-  final UUID accountId=UUID.randomUUID();
-  final Invoice invoice=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD,internalCallContext);
+  final Invoice invoice=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),4);
   assertEquals(invoice.getBalance(),KillBillMoney.of(rate1.add(rate2).add(TWO.multiply(rate3)),invoice.getCurrency()));

@@ -1,5 +1,4 @@
 {
-  final UUID accountId=UUID.randomUUID();
   final SubscriptionBase subscription=createSubscription();
   final Plan plan=new MockPlan("plan 1");
   final MockInternationalPrice zeroPrice=new MockInternationalPrice(new DefaultPrice(ZERO,Currency.USD));
@@ -12,12 +11,12 @@
   final BillingEvent event2=invoiceUtil.createMockBillingEvent(null,subscription,changeDate,plan,phase2,ZERO,null,Currency.USD,BillingPeriod.NO_BILLING_PERIOD,1,BillingMode.IN_ADVANCE,"Test Event 2",2L,SubscriptionBaseTransitionType.PHASE);
   events.add(event2);
   events.add(event1);
-  final Invoice invoice1=generator.generateInvoice(accountId,events,null,new LocalDate("2012-02-01"),Currency.USD,internalCallContext);
+  final Invoice invoice1=generator.generateInvoice(account,events,null,new LocalDate("2012-02-01"),Currency.USD,internalCallContext);
   assertNotNull(invoice1);
   assertEquals(invoice1.getNumberOfItems(),1);
   final List<Invoice> invoiceList=new ArrayList<Invoice>();
   invoiceList.add(invoice1);
-  final Invoice invoice2=generator.generateInvoice(accountId,events,invoiceList,new LocalDate("2012-04-05"),Currency.USD,internalCallContext);
+  final Invoice invoice2=generator.generateInvoice(account,events,invoiceList,new LocalDate("2012-04-05"),Currency.USD,internalCallContext);
   assertNotNull(invoice2);
   assertEquals(invoice2.getNumberOfItems(),1);
   final FixedPriceInvoiceItem item=(FixedPriceInvoiceItem)invoice2.getInvoiceItems().get(0);

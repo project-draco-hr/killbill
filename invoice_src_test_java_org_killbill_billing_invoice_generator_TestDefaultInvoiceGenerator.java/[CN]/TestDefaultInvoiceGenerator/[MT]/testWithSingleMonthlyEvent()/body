@@ -8,8 +8,7 @@
   final BillingEvent event=createBillingEvent(sub.getId(),sub.getBundleId(),startDate,plan,phase,1);
   events.add(event);
   final LocalDate targetDate=invoiceUtil.buildDate(2011,10,3);
-  final UUID accountId=UUID.randomUUID();
-  final Invoice invoice=generator.generateInvoice(accountId,events,null,targetDate,Currency.USD,internalCallContext);
+  final Invoice invoice=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
   assertEquals(invoice.getBalance(),KillBillMoney.of(TWENTY,invoice.getCurrency()));
