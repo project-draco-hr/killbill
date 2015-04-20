@@ -1,4 +1,10 @@
 {
   final Injector g=Guice.createInjector(Stage.PRODUCTION,new TestUtilModuleWithEmbeddedDB(configSource));
   g.injectMembers(this);
+  if (DBEngine.MYSQL.equals(helper.getDBEngine())) {
+    Assert.assertTrue(locker instanceof MySqlGlobalLocker);
+  }
+ else {
+    Assert.assertTrue(locker instanceof MemoryGlobalLocker);
+  }
 }
