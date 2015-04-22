@@ -1,0 +1,45 @@
+{
+  try {
+    final List<InvoiceItem> items=Lists.newArrayList();
+    final Iterator<BillingEvent> events=eventSet.iterator();
+    boolean seenAnyUsageItems=false;
+    List<RawUsage> rawUsage=ImmutableList.of();
+    List<BillingEvent> curEvents=Lists.newArrayList();
+    UUID curSubscriptionId=null;
+    while (events.hasNext()) {
+      final BillingEvent event=events.next();
+      final LocalDate eventLocalEffectiveDate=new LocalDate(event.getEffectiveDate(),event.getAccount().getTimeZone());
+      if (eventLocalEffectiveDate.isAfter(targetDate)) {
+        continue;
+      }
+      if (!seenAnyUsageItems) {
+        final boolean foundUsage=Iterables.tryFind(event.getUsages(),new Predicate<Usage>(){
+          @Override public boolean apply(          @Nullable final Usage input){
+            return (input.getUsageType() == UsageType.CONSUMABLE && input.getBillingMode() == BillingMode.IN_ARREAR);
+          }
+        }
+).orNull() != null;
+        if (foundUsage) {
+          rawUsage=usageApi.getRawUsageForAccount(account.getId(),new LocalDate(event.getEffectiveDate(),account.getTimeZone()),targetDate,internalCallContext);
+          seenAnyUsageItems=true;
+        }
+      }
+      final UUID subscriptionId=event.getSubscription().getId();
+      if (curSubscriptionId != null && !curSubscriptionId.equals(subscriptionId)) {
+        final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,rawUsage,targetDate);
+        items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(extractUsageItemsForSubscription(curSubscriptionId,existingInvoices)));
+        curEvents=Lists.newArrayList();
+      }
+      curSubscriptionId=subscriptionId;
+      curEvents.add(event);
+    }
+    if (curSubscriptionId != null) {
+      final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,rawUsage,targetDate);
+      items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(extractUsageItemsForSubscription(curSubscriptionId,existingInvoices)));
+    }
+    return items;
+  }
+ catch (  CatalogApiException e) {
+    throw new InvoiceApiException(e);
+  }
+}

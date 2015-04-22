@@ -2,6 +2,14 @@
   Preconditions.checkState(isBuilt.get());
   final List<InvoiceItem> result=Lists.newLinkedList();
   final List<RolledUpUsage> allUsage=getRolledUpUsage();
+  LocalDate prevDate=null;
+  for (  LocalDate curDate : transitionTimes) {
+    if (prevDate != null) {
+      InvoiceItem item=new UsageInvoiceItem(invoiceId,getAccountId(),getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),usage.getName(),prevDate,curDate,BigDecimal.ZERO,getCurrency());
+      result.add(item);
+    }
+    prevDate=curDate;
+  }
   for (  final RolledUpUsage ru : allUsage) {
     BigDecimal toBeBilledUsage=BigDecimal.ZERO;
     for (    final RolledUpUnit cur : ru.getRolledUpUnits()) {
@@ -16,7 +24,7 @@
     final BigDecimal billedUsage=computeBilledUsage(billedItems);
     if (!billedItems.iterator().hasNext() || billedUsage.compareTo(toBeBilledUsage) < 0) {
       final BigDecimal amountToBill=toBeBilledUsage.subtract(billedUsage);
-      if (amountToBill.compareTo(BigDecimal.ZERO) > 0 || insertZeroAmountItems) {
+      if (amountToBill.compareTo(BigDecimal.ZERO) > 0) {
         InvoiceItem item=new UsageInvoiceItem(invoiceId,getAccountId(),getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),usage.getName(),ru.getStart(),ru.getEnd(),amountToBill,getCurrency());
         result.add(item);
       }

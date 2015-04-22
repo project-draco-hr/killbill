@@ -1,6 +1,53 @@
 {
-  if (transitionTimes.size() <= 1) {
-    return Collections.emptyList();
+  final Iterator<RawUsage> rawUsageIterator=rawSubscriptionUsage.iterator();
+  if (!rawUsageIterator.hasNext()) {
+    return ImmutableList.of();
   }
-  return usageApi.getAllUsageForSubscription(getSubscriptionId(),transitionTimes,context);
+  final List<RolledUpUsage> result=new ArrayList<RolledUpUsage>();
+  RawUsage prevRawUsage=null;
+  while (rawUsageIterator.hasNext()) {
+    final RawUsage curRawUsage=rawUsageIterator.next();
+    if (curRawUsage.getDate().compareTo(transitionTimes.get(0)) >= 0) {
+      prevRawUsage=curRawUsage;
+      break;
+    }
+  }
+  if (prevRawUsage.getDate().compareTo(transitionTimes.get(transitionTimes.size() - 1)) >= 0) {
+    return ImmutableList.of();
+  }
+  LocalDate prevDate=null;
+  for (  LocalDate curDate : transitionTimes) {
+    if (prevDate != null) {
+      final Map<String,Long> perRangeUnitToAmount=new HashMap<String,Long>();
+      if (prevRawUsage != null) {
+        if (prevRawUsage.getDate().compareTo(prevDate) >= 0 && prevRawUsage.getDate().compareTo(curDate) < 0) {
+          Long currentAmount=perRangeUnitToAmount.get(prevRawUsage.getUnitType());
+          Long updatedAmount=(currentAmount != null) ? currentAmount + prevRawUsage.getAmount() : prevRawUsage.getAmount();
+          perRangeUnitToAmount.put(prevRawUsage.getUnitType(),updatedAmount);
+          prevRawUsage=null;
+        }
+      }
+      if (prevRawUsage == null) {
+        while (rawUsageIterator.hasNext()) {
+          final RawUsage curRawUsage=rawUsageIterator.next();
+          if (curRawUsage.getDate().compareTo(curDate) >= 0) {
+            prevRawUsage=curRawUsage;
+            break;
+          }
+          Long currentAmount=perRangeUnitToAmount.get(curRawUsage.getUnitType());
+          Long updatedAmount=(currentAmount != null) ? currentAmount + curRawUsage.getAmount() : curRawUsage.getAmount();
+          perRangeUnitToAmount.put(curRawUsage.getUnitType(),updatedAmount);
+        }
+      }
+      if (!perRangeUnitToAmount.isEmpty()) {
+        final List<RolledUpUnit> rolledUpUnits=new ArrayList<RolledUpUnit>(perRangeUnitToAmount.size());
+        for (        final String unitType : perRangeUnitToAmount.keySet()) {
+          rolledUpUnits.add(new DefaultRolledUpUnit(unitType,perRangeUnitToAmount.get(unitType)));
+        }
+        result.add(new DefaultRolledUpUsage(getSubscriptionId(),prevDate,curDate,rolledUpUnits));
+      }
+    }
+    prevDate=curDate;
+  }
+  return result;
 }

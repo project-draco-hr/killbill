@@ -1,4 +1,5 @@
 {
+  final boolean hasInvoiceItems=!invoiceItems.isEmpty();
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final InvoiceSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
@@ -7,11 +8,13 @@
         if (isRealInvoice) {
           transactional.create(invoice,context);
         }
-        final InvoiceItemSqlDao transInvoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
-        for (        final InvoiceItemModelDao invoiceItemModelDao : invoiceItems) {
-          createInvoiceItemFromTransaction(transInvoiceItemSqlDao,invoiceItemModelDao,context);
+        if (hasInvoiceItems) {
+          final InvoiceItemSqlDao transInvoiceItemSqlDao=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class);
+          for (          final InvoiceItemModelDao invoiceItemModelDao : invoiceItems) {
+            createInvoiceItemFromTransaction(transInvoiceItemSqlDao,invoiceItemModelDao,context);
+          }
+          cbaDao.addCBAComplexityFromTransaction(invoice,entitySqlDaoWrapperFactory,context);
         }
-        cbaDao.addCBAComplexityFromTransaction(invoice,entitySqlDaoWrapperFactory,context);
         notifyOfFutureBillingEvents(entitySqlDaoWrapperFactory,invoice.getAccountId(),callbackDateTimePerSubscriptions,context);
       }
       return null;
