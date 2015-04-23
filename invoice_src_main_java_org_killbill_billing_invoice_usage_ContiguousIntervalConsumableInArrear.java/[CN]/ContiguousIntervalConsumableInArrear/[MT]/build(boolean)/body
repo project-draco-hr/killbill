@@ -9,10 +9,14 @@
   final BillingIntervalDetail bid=new BillingIntervalDetail(startDate,endDate,targetDate,getBCD(),usage.getBillingPeriod());
   int numberOfPeriod=0;
   LocalDate nextBillCycleDate=bid.getFutureBillingDateFor(numberOfPeriod);
-  transitionTimes.add(startDate);
+  if (startDate.compareTo(rawUsageStartDate) >= 0) {
+    transitionTimes.add(startDate);
+  }
   while (!nextBillCycleDate.isAfter(endDate)) {
     if (nextBillCycleDate.isAfter(startDate)) {
-      transitionTimes.add(nextBillCycleDate);
+      if (nextBillCycleDate.compareTo(rawUsageStartDate) >= 0) {
+        transitionTimes.add(nextBillCycleDate);
+      }
     }
     numberOfPeriod++;
     nextBillCycleDate=bid.getFutureBillingDateFor(numberOfPeriod);

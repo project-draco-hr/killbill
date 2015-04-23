@@ -1,4 +1,6 @@
 {
   final LocalDate targetStartDate=config.getMaxRawUsagePreviousPeriod() > 0 ? getOptimizedRawUsageStartDate(firstEventStartDate,targetDate,existingUsageItems,knownUsage) : firstEventStartDate;
-  return usageApi.getRawUsageForAccount(targetStartDate,targetDate,internalCallContext);
+  log.info("RawUsageOptimizer [accountRecordId = {}]: rawUsageStartDate = {}, (proposed) firstEventStartDate = {}",new Object[]{internalCallContext.getAccountRecordId(),targetStartDate,firstEventStartDate});
+  final List<RawUsage> rawUsageData=usageApi.getRawUsageForAccount(targetStartDate,targetDate,internalCallContext);
+  return new RawUsageOptimizerResult(firstEventStartDate,targetStartDate,rawUsageData);
 }

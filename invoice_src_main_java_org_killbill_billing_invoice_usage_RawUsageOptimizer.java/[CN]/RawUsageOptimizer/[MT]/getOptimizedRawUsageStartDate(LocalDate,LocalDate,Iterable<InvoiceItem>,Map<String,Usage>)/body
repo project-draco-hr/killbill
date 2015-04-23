@@ -21,12 +21,7 @@
     final Usage usage=knownUsage.get(item.getUsageName());
     if (perBillingPeriodMostRecentConsumableInArrearItemEndDate[usage.getBillingPeriod().ordinal()] == null) {
       perBillingPeriodMostRecentConsumableInArrearItemEndDate[usage.getBillingPeriod().ordinal()]=item.getEndDate();
-      if (!Iterables.any(ImmutableList.copyOf(perBillingPeriodMostRecentConsumableInArrearItemEndDate),new Predicate<LocalDate>(){
-        @Override public boolean apply(        @Nullable final LocalDate input){
-          return input == null;
-        }
-      }
-)) {
+      if (!containsNullEntries(perBillingPeriodMostRecentConsumableInArrearItemEndDate)) {
         break;
       }
     }
@@ -44,6 +39,5 @@
     idx++;
   }
   final LocalDate result=targetStartDate.compareTo(firstEventStartDate) > 0 ? targetStartDate : firstEventStartDate;
-  log.info("RawUsageOptimizer rawEventStartDate = {}, firstEventStartDate = {}",result,firstEventStartDate);
   return result;
 }
