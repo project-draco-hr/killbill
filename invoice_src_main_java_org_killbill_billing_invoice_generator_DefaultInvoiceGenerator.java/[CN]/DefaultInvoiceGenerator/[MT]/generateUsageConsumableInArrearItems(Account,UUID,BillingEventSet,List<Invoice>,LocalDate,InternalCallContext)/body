@@ -1,4 +1,5 @@
 {
+  final Map<UUID,List<InvoiceItem>> perSubscriptionConsumableInArrearUsageItems=extractPerSubscriptionExistingConsumableInArrearUsageItems(eventSet.getUsages(),existingInvoices);
   try {
     final List<InvoiceItem> items=Lists.newArrayList();
     final Iterator<BillingEvent> events=eventSet.iterator();
@@ -20,14 +21,15 @@
         }
 ).orNull() != null;
         if (foundUsage) {
-          rawUsage=usageApi.getRawUsageForAccount(account.getId(),new LocalDate(event.getEffectiveDate(),account.getTimeZone()),targetDate,internalCallContext);
+          rawUsage=rawUsageOptimizer.getConsumableInArrearUsage(new LocalDate(event.getEffectiveDate(),account.getTimeZone()),targetDate,Iterables.concat(perSubscriptionConsumableInArrearUsageItems.values()),eventSet.getUsages(),internalCallContext);
           seenAnyUsageItems=true;
         }
       }
       final UUID subscriptionId=event.getSubscription().getId();
       if (curSubscriptionId != null && !curSubscriptionId.equals(subscriptionId)) {
         final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,rawUsage,targetDate);
-        items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(extractUsageItemsForSubscription(curSubscriptionId,existingInvoices)));
+        final List<InvoiceItem> consumableInUsageArrearItems=perSubscriptionConsumableInArrearUsageItems.get(curSubscriptionId);
+        items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(consumableInUsageArrearItems != null ? consumableInUsageArrearItems : ImmutableList.<InvoiceItem>of()));
         curEvents=Lists.newArrayList();
       }
       curSubscriptionId=subscriptionId;
@@ -35,7 +37,8 @@
     }
     if (curSubscriptionId != null) {
       final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,rawUsage,targetDate);
-      items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(extractUsageItemsForSubscription(curSubscriptionId,existingInvoices)));
+      final List<InvoiceItem> consumableInUsageArrearItems=perSubscriptionConsumableInArrearUsageItems.get(curSubscriptionId);
+      items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(consumableInUsageArrearItems != null ? consumableInUsageArrearItems : ImmutableList.<InvoiceItem>of()));
     }
     return items;
   }

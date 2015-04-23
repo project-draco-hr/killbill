@@ -11,8 +11,11 @@
     @Override public TimeSpan getDryRunNotificationSchedule(){
       return new TimeSpan("0s");
     }
+    @Override public int getMaxRawUsagePreviousPeriod(){
+      return -1;
+    }
   }
 ;
-  this.generator=new DefaultInvoiceGenerator(clock,null,invoiceConfig);
+  this.generator=new DefaultInvoiceGenerator(clock,invoiceConfig,null);
   this.account=new MockAccountBuilder().name(UUID.randomUUID().toString().substring(1,8)).firstNameLength(6).email(UUID.randomUUID().toString().substring(1,8)).phone(UUID.randomUUID().toString().substring(1,8)).migrated(false).isNotifiedForInvoices(true).externalKey(UUID.randomUUID().toString().substring(1,8)).billingCycleDayLocal(31).currency(Currency.USD).paymentMethodId(UUID.randomUUID()).timeZone(DateTimeZone.UTC).build();
 }

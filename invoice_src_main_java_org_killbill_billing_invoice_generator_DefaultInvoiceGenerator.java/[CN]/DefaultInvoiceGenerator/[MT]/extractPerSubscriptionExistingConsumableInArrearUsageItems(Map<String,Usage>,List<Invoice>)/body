@@ -1,0 +1,30 @@
+{
+  if (existingInvoices == null || existingInvoices.isEmpty()) {
+    return ImmutableMap.of();
+  }
+  final Map<UUID,List<InvoiceItem>> result=new HashMap<UUID,List<InvoiceItem>>();
+  final Iterable<InvoiceItem> usageConsumableInArrearItems=Iterables.concat(Iterables.transform(existingInvoices,new Function<Invoice,Iterable<InvoiceItem>>(){
+    @Override public Iterable<InvoiceItem> apply(    final Invoice input){
+      return Iterables.filter(input.getInvoiceItems(),new Predicate<InvoiceItem>(){
+        @Override public boolean apply(        final InvoiceItem input){
+          if (input.getInvoiceItemType() == InvoiceItemType.USAGE) {
+            final Usage usage=knownUsage.get(input.getUsageName());
+            return usage.getUsageType() == UsageType.CONSUMABLE && usage.getBillingMode() == BillingMode.IN_ARREAR;
+          }
+          return false;
+        }
+      }
+);
+    }
+  }
+));
+  for (  InvoiceItem cur : usageConsumableInArrearItems) {
+    List<InvoiceItem> perSubscriptionUsageItems=result.get(cur.getSubscriptionId());
+    if (perSubscriptionUsageItems == null) {
+      perSubscriptionUsageItems=new LinkedList<InvoiceItem>();
+      result.put(cur.getSubscriptionId(),perSubscriptionUsageItems);
+    }
+    perSubscriptionUsageItems.add(cur);
+  }
+  return result;
+}
