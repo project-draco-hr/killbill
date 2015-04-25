@@ -17,7 +17,9 @@
   }
   final ListIterator<InvoiceItem> iterator=sortedUsageItems.listIterator(sortedUsageItems.size());
   while (iterator.hasPrevious()) {
-    final UsageInvoiceItem item=(UsageInvoiceItem)iterator.previous();
+    final InvoiceItem previous=iterator.previous();
+    Preconditions.checkState(previous instanceof UsageInvoiceItem);
+    final UsageInvoiceItem item=(UsageInvoiceItem)previous;
     final Usage usage=knownUsage.get(item.getUsageName());
     if (perBillingPeriodMostRecentConsumableInArrearItemEndDate[usage.getBillingPeriod().ordinal()] == null) {
       perBillingPeriodMostRecentConsumableInArrearItemEndDate[usage.getBillingPeriod().ordinal()]=item.getEndDate();
