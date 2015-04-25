@@ -1,0 +1,9 @@
+{
+  final List<RolledUpUsageModelDao> usage=rolledUpUsageDao.getRawUsageForAccount(stateDate,endDate,internalTenantContext);
+  return ImmutableList.copyOf(Iterables.transform(usage,new Function<RolledUpUsageModelDao,RawUsage>(){
+    @Nullable @Override public RawUsage apply(    final RolledUpUsageModelDao input){
+      return new DefaultRawUsage(input.getSubscriptionId(),input.getRecordDate(),input.getUnitType(),input.getAmount());
+    }
+  }
+));
+}

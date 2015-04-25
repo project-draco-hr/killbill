@@ -30,7 +30,7 @@
     }
     final CallContext callContext=buildCallContext(context);
     invoice.addInvoiceItems(invoicePluginDispatcher.getAdditionalInvoiceItems(invoice,callContext));
-    boolean isRealInvoiceWithItems=false;
+    boolean isRealInvoiceWithNonEmptyItems=false;
     if (!isDryRun) {
       final Set<UUID> adjustedUniqueOtherInvoiceId=new TreeSet<UUID>();
       adjustedUniqueOtherInvoiceId.addAll(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,UUID>(){
@@ -39,7 +39,7 @@
         }
       }
 ));
-      isRealInvoiceWithItems=adjustedUniqueOtherInvoiceId.remove(invoice.getId());
+      boolean isRealInvoiceWithItems=adjustedUniqueOtherInvoiceId.remove(invoice.getId());
       if (isRealInvoiceWithItems) {
         log.info("Generated invoice {} with {} items for accountId {} and targetDate {} (targetDateTime {})",new Object[]{invoice.getId(),invoice.getNumberOfItems(),accountId,targetDate,targetDateTime});
       }
@@ -49,19 +49,32 @@
         log.info("Adjusting existing invoices {} with {} items for accountId {} and targetDate {} (targetDateTime {})",new Object[]{adjustedInvoices,invoice.getNumberOfItems(),accountId,targetDate,targetDateTime});
       }
       final InvoiceModelDao invoiceModelDao=new InvoiceModelDao(invoice);
-      final List<InvoiceItemModelDao> invoiceItemModelDaos=ImmutableList.copyOf(Collections2.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,InvoiceItemModelDao>(){
+      final Iterable<InvoiceItemModelDao> invoiceItemModelDaos=Iterables.transform(invoice.getInvoiceItems(),new Function<InvoiceItem,InvoiceItemModelDao>(){
         @Override public InvoiceItemModelDao apply(        final InvoiceItem input){
           return new InvoiceItemModelDao(input);
         }
       }
-));
-      final FutureAccountNotifications futureAccountNotifications=createNextFutureNotificationDate(invoiceItemModelDaos,billingEvents.getUsages(),dateAndTimeZoneContext);
-      invoiceDao.createInvoice(invoiceModelDao,invoiceItemModelDaos,isRealInvoiceWithItems,futureAccountNotifications,context);
+);
+      final FutureAccountNotifications futureAccountNotifications=createNextFutureNotificationDate(invoiceItemModelDaos,billingEvents,dateAndTimeZoneContext);
+      final Iterable<InvoiceItemModelDao> filteredInvoiceItemModelDaos=Iterables.filter(invoiceItemModelDaos,new Predicate<InvoiceItemModelDao>(){
+        @Override public boolean apply(        @Nullable final InvoiceItemModelDao input){
+          return (input.getType() != InvoiceItemType.USAGE || input.getAmount().compareTo(BigDecimal.ZERO) != 0);
+        }
+      }
+);
+      final boolean isThereAnyItemsLeft=filteredInvoiceItemModelDaos.iterator().hasNext();
+      isRealInvoiceWithNonEmptyItems=isThereAnyItemsLeft ? isRealInvoiceWithItems : false;
+      if (isThereAnyItemsLeft) {
+        invoiceDao.createInvoice(invoiceModelDao,ImmutableList.copyOf(filteredInvoiceItemModelDaos),isRealInvoiceWithItems,futureAccountNotifications,context);
+      }
+ else {
+        invoiceDao.setFutureAccountNotificationsForEmptyInvoice(accountId,futureAccountNotifications,context);
+      }
       final List<InvoiceItem> fixedPriceInvoiceItems=invoice.getInvoiceItems(FixedPriceInvoiceItem.class);
       final List<InvoiceItem> recurringInvoiceItems=invoice.getInvoiceItems(RecurringInvoiceItem.class);
       setChargedThroughDates(dateAndTimeZoneContext,fixedPriceInvoiceItems,recurringInvoiceItems,context);
       final List<InvoiceInternalEvent> events=new ArrayList<InvoiceInternalEvent>();
-      if (isRealInvoiceWithItems) {
+      if (isRealInvoiceWithNonEmptyItems) {
         events.add(new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken()));
       }
       for (      final UUID cur : adjustedUniqueOtherInvoiceId) {
@@ -72,7 +85,7 @@
         postEvent(event,accountId,context);
       }
     }
-    if (account.isNotifiedForInvoices() && isRealInvoiceWithItems && !isDryRun) {
+    if (account.isNotifiedForInvoices() && isRealInvoiceWithNonEmptyItems && !isDryRun) {
       invoiceNotifier.notify(account,new DefaultInvoice(invoiceDao.getById(invoice.getId(),context)),buildTenantContext(context));
     }
     return invoice;
