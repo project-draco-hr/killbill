@@ -1,0 +1,47 @@
+{
+  if (!existingUsageItems.iterator().hasNext()) {
+    return firstEventStartDate;
+  }
+  final Set<BillingPeriod> knownUsageBillingPeriod=ImmutableSet.copyOf(Iterables.transform(knownUsage.values(),new Function<Usage,BillingPeriod>(){
+    @Nullable @Override public BillingPeriod apply(    final Usage input){
+      return input.getBillingPeriod();
+    }
+  }
+));
+  final List<InvoiceItem> sortedUsageItems=USAGE_ITEM_ORDERING.sortedCopy(existingUsageItems);
+  final LocalDate[] perBillingPeriodMostRecentConsumableInArrearItemEndDate=new LocalDate[BillingPeriod.values().length - 1];
+  int idx=0;
+  for (  BillingPeriod bp : BillingPeriod.values()) {
+    if (bp != BillingPeriod.NO_BILLING_PERIOD) {
+      final LocalDate makerDateThanCannotBeChosenAsTheMinOfAllDates=targetDate.plusMonths(config.getMaxRawUsagePreviousPeriod() * bp.getNumberOfMonths());
+      perBillingPeriodMostRecentConsumableInArrearItemEndDate[idx++]=(knownUsageBillingPeriod.contains(bp)) ? null : makerDateThanCannotBeChosenAsTheMinOfAllDates;
+    }
+  }
+  final ListIterator<InvoiceItem> iterator=sortedUsageItems.listIterator(sortedUsageItems.size());
+  while (iterator.hasPrevious()) {
+    final InvoiceItem previous=iterator.previous();
+    Preconditions.checkState(previous instanceof UsageInvoiceItem);
+    final UsageInvoiceItem item=(UsageInvoiceItem)previous;
+    final Usage usage=knownUsage.get(item.getUsageName());
+    if (perBillingPeriodMostRecentConsumableInArrearItemEndDate[usage.getBillingPeriod().ordinal()] == null) {
+      perBillingPeriodMostRecentConsumableInArrearItemEndDate[usage.getBillingPeriod().ordinal()]=item.getEndDate();
+      if (!containsNullEntries(perBillingPeriodMostRecentConsumableInArrearItemEndDate)) {
+        break;
+      }
+    }
+  }
+  LocalDate targetStartDate=null;
+  idx=0;
+  for (  BillingPeriod bp : BillingPeriod.values()) {
+    if (bp != BillingPeriod.NO_BILLING_PERIOD) {
+      final LocalDate tmp=perBillingPeriodMostRecentConsumableInArrearItemEndDate[idx];
+      final LocalDate targetBillingPeriodDate=tmp != null ? tmp.minusMonths(config.getMaxRawUsagePreviousPeriod() * bp.getNumberOfMonths()) : null;
+      if (targetStartDate == null || (targetBillingPeriodDate != null && targetBillingPeriodDate.compareTo(targetStartDate) < 0)) {
+        targetStartDate=targetBillingPeriodDate;
+      }
+      idx++;
+    }
+  }
+  final LocalDate result=targetStartDate.compareTo(firstEventStartDate) > 0 ? targetStartDate : firstEventStartDate;
+  return result;
+}

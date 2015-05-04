@@ -1,9 +1,10 @@
 {
-  final InputSupplier<InputStream> inputSupplier=new InputSupplier<InputStream>(){
-    @Override public InputStream getInput() throws IOException {
-      return stream;
-    }
+  final String result;
+  try {
+    result=new String(ByteStreams.toByteArray(inputStream),Charsets.UTF_8);
   }
-;
-  return CharStreams.toString(CharStreams.newReaderSupplier(inputSupplier,Charsets.UTF_8));
+  finally {
+    inputStream.close();
+  }
+  return result;
 }

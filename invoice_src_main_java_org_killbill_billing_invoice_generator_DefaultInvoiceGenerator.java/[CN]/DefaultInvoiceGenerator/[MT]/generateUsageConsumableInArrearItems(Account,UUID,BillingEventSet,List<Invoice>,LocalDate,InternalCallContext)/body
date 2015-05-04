@@ -1,0 +1,46 @@
+{
+  final Map<UUID,List<InvoiceItem>> perSubscriptionConsumableInArrearUsageItems=extractPerSubscriptionExistingConsumableInArrearUsageItems(eventSet.getUsages(),existingInvoices);
+  try {
+    final List<InvoiceItem> items=Lists.newArrayList();
+    final Iterator<BillingEvent> events=eventSet.iterator();
+    RawUsageOptimizerResult rawUsageOptimizerResult=null;
+    List<BillingEvent> curEvents=Lists.newArrayList();
+    UUID curSubscriptionId=null;
+    while (events.hasNext()) {
+      final BillingEvent event=events.next();
+      final LocalDate eventLocalEffectiveDate=new LocalDate(event.getEffectiveDate(),event.getAccount().getTimeZone());
+      if (eventLocalEffectiveDate.isAfter(targetDate)) {
+        continue;
+      }
+      if (rawUsageOptimizerResult == null && Iterables.any(event.getUsages(),new Predicate<Usage>(){
+        @Override public boolean apply(        @Nullable final Usage input){
+          return (input.getUsageType() == UsageType.CONSUMABLE && input.getBillingMode() == BillingMode.IN_ARREAR);
+        }
+      }
+)) {
+        rawUsageOptimizerResult=rawUsageOptimizer.getConsumableInArrearUsage(new LocalDate(event.getEffectiveDate(),account.getTimeZone()),targetDate,Iterables.concat(perSubscriptionConsumableInArrearUsageItems.values()),eventSet.getUsages(),internalCallContext);
+      }
+      if (rawUsageOptimizerResult == null) {
+        continue;
+      }
+      final UUID subscriptionId=event.getSubscription().getId();
+      if (curSubscriptionId != null && !curSubscriptionId.equals(subscriptionId)) {
+        final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,rawUsageOptimizerResult.getRawUsage(),targetDate,rawUsageOptimizerResult.getRawUsageStartDate());
+        final List<InvoiceItem> consumableInUsageArrearItems=perSubscriptionConsumableInArrearUsageItems.get(curSubscriptionId);
+        items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(consumableInUsageArrearItems != null ? consumableInUsageArrearItems : ImmutableList.<InvoiceItem>of()));
+        curEvents=Lists.newArrayList();
+      }
+      curSubscriptionId=subscriptionId;
+      curEvents.add(event);
+    }
+    if (curSubscriptionId != null) {
+      final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,rawUsageOptimizerResult.getRawUsage(),targetDate,rawUsageOptimizerResult.getRawUsageStartDate());
+      final List<InvoiceItem> consumableInUsageArrearItems=perSubscriptionConsumableInArrearUsageItems.get(curSubscriptionId);
+      items.addAll(subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(consumableInUsageArrearItems != null ? consumableInUsageArrearItems : ImmutableList.<InvoiceItem>of()));
+    }
+    return items;
+  }
+ catch (  CatalogApiException e) {
+    throw new InvoiceApiException(e);
+  }
+}
