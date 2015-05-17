@@ -1,0 +1,35 @@
+{
+  final int billingDay=14;
+  final DateTime initialCreationDate=new DateTime(2015,5,15,0,0,0,0,testTimeZone);
+  log.info("Beginning test with BCD of " + billingDay);
+  final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(billingDay));
+  clock.setTime(initialCreationDate);
+  int invoiceItemCount=1;
+  DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
+  DefaultSubscriptionBase subscription=subscriptionDataFromSubscription(baseEntitlement.getSubscriptionBase());
+  invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,new ExpectedInvoiceItemCheck(initialCreationDate.toLocalDate(),null,InvoiceItemType.FIXED,new BigDecimal("0")));
+  invoiceChecker.checkChargedThroughDate(subscription.getId(),clock.getUTCToday(),callContext);
+  final List<ExpectedInvoiceItemCheck> expectedInvoices=new ArrayList<ExpectedInvoiceItemCheck>();
+  expectedInvoices.add(new ExpectedInvoiceItemCheck(new LocalDate(2015,6,14),new LocalDate(2015,7,14),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
+  DryRunArguments dryRun=new TestDryRunArguments();
+  Invoice dryRunInvoice=invoiceUserApi.triggerInvoiceGeneration(account.getId(),null,dryRun,callContext);
+  invoiceChecker.checkInvoiceNoAudits(dryRunInvoice,callContext,expectedInvoices);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  clock.addDays(30);
+  assertListenerStatus();
+  List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
+  invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,expectedInvoices);
+  expectedInvoices.clear();
+  expectedInvoices.add(new ExpectedInvoiceItemCheck(new LocalDate(2015,7,14),new LocalDate(2015,8,14),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
+  dryRunInvoice=invoiceUserApi.triggerInvoiceGeneration(account.getId(),null,dryRun,callContext);
+  invoiceChecker.checkInvoiceNoAudits(dryRunInvoice,callContext,expectedInvoices);
+  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT);
+  clock.addMonths(1);
+  assertListenerStatus();
+  invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
+  invoiceChecker.checkInvoice(invoices.get(2).getId(),callContext,expectedInvoices);
+  expectedInvoices.clear();
+  expectedInvoices.add(new ExpectedInvoiceItemCheck(new LocalDate(2015,8,14),new LocalDate(2015,9,14),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
+  dryRunInvoice=invoiceUserApi.triggerInvoiceGeneration(account.getId(),null,dryRun,callContext);
+  invoiceChecker.checkInvoiceNoAudits(dryRunInvoice,callContext,expectedInvoices);
+}

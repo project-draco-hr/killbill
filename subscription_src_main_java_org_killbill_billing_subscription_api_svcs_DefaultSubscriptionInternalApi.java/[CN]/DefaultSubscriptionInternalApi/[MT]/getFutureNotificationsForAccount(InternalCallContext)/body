@@ -1,0 +1,15 @@
+{
+  try {
+    final NotificationQueue notificationQueue=notificationQueueService.getNotificationQueue(DefaultSubscriptionBaseService.SUBSCRIPTION_SERVICE_NAME,DefaultSubscriptionBaseService.NOTIFICATION_QUEUE_NAME);
+    final List<NotificationEventWithMetadata<NotificationEvent>> futureNotifications=notificationQueue.getFutureNotificationForSearchKeys(internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId());
+    return Iterables.transform(futureNotifications,new Function<NotificationEventWithMetadata<NotificationEvent>,DateTime>(){
+      @Nullable @Override public DateTime apply(      final NotificationEventWithMetadata<NotificationEvent> input){
+        return input.getEffectiveDate();
+      }
+    }
+);
+  }
+ catch (  NoSuchNotificationQueue noSuchNotificationQueue) {
+    throw new IllegalStateException(noSuchNotificationQueue);
+  }
+}

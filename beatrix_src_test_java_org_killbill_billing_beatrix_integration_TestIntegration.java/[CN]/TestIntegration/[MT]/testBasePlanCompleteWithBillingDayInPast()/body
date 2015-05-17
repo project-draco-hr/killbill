@@ -23,8 +23,8 @@
   setDateAndCheckForCompletion(new DateTime(2012,3,1,23,59,59,0,testTimeZone));
   DateTime nextDate=clock.getUTCNow().plusDays(1);
   dryRun=new TestDryRunArguments();
-  dryRunInvoice=invoiceUserApi.triggerInvoiceGeneration(account.getId(),new LocalDate(nextDate,testTimeZone),dryRun,callContext);
   expectedInvoices.add(new ExpectedInvoiceItemCheck(new LocalDate(2012,3,2),new LocalDate(2012,3,31),InvoiceItemType.RECURRING,new BigDecimal("561.24")));
+  dryRunInvoice=invoiceUserApi.triggerInvoiceGeneration(account.getId(),new LocalDate(nextDate,testTimeZone),dryRun,callContext);
   invoiceChecker.checkInvoiceNoAudits(dryRunInvoice,callContext,expectedInvoices);
   setDateAndCheckForCompletion(nextDate,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
   invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,expectedInvoices);
