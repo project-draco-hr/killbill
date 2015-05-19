@@ -1,0 +1,28 @@
+{
+  final SecureRandom random=threadRandom.get();
+  final byte[] uuid=new byte[16];
+  random.nextBytes(uuid);
+  uuid[6]&=0x0f;
+  uuid[6]|=0x40;
+  uuid[8]&=0x3f;
+  uuid[8]|=0x80;
+  long msb=0;
+  msb=(msb << 8) | (uuid[0] & 0xff);
+  msb=(msb << 8) | (uuid[1] & 0xff);
+  msb=(msb << 8) | (uuid[2] & 0xff);
+  msb=(msb << 8) | (uuid[3] & 0xff);
+  msb=(msb << 8) | (uuid[4] & 0xff);
+  msb=(msb << 8) | (uuid[5] & 0xff);
+  msb=(msb << 8) | (uuid[6] & 0xff);
+  msb=(msb << 8) | (uuid[7] & 0xff);
+  long lsb=0;
+  lsb=(lsb << 8) | (uuid[8] & 0xff);
+  lsb=(lsb << 8) | (uuid[9] & 0xff);
+  lsb=(lsb << 8) | (uuid[10] & 0xff);
+  lsb=(lsb << 8) | (uuid[11] & 0xff);
+  lsb=(lsb << 8) | (uuid[12] & 0xff);
+  lsb=(lsb << 8) | (uuid[13] & 0xff);
+  lsb=(lsb << 8) | (uuid[14] & 0xff);
+  lsb=(lsb << 8) | (uuid[15] & 0xff);
+  return new UUID(msb,lsb);
+}

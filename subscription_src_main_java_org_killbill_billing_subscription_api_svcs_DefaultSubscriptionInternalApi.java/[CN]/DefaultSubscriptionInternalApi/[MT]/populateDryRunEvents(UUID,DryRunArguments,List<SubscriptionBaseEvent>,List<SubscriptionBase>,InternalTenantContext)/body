@@ -17,7 +17,7 @@ case START_BILLING:
         final DefaultSubscriptionBase baseSubscription=(DefaultSubscriptionBase)dao.getBaseSubscription(bundleId,context);
       final DateTime startEffectiveDate=dryRunArguments.getEffectiveDate() != null ? dryRunArguments.getEffectiveDate() : utcNow;
     final DateTime bundleStartDate=getBundleStartDateWithSanity(bundleId,baseSubscription,plan,startEffectiveDate,startEffectiveDate,context);
-  final UUID subscriptionId=UUID.randomUUID();
+  final UUID subscriptionId=UUIDs.randomUUID();
 dryRunEvents=apiService.getEventsOnCreation(bundleId,subscriptionId,startEffectiveDate,bundleStartDate,1L,plan,inputSpec.getPhaseType(),realPriceList,utcNow,startEffectiveDate,utcNow,false,context);
 final SubscriptionBuilder builder=new SubscriptionBuilder().setId(subscriptionId).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(startEffectiveDate);
 final DefaultSubscriptionBase newSubscription=new DefaultSubscriptionBase(builder,apiService,clock);

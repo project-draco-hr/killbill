@@ -20,7 +20,7 @@
       if (existingRefund != null) {
         return existingRefund;
       }
-      final InvoicePaymentModelDao refund=new InvoicePaymentModelDao(UUID.randomUUID(),context.getCreatedDate(),InvoicePaymentType.REFUND,payment.getInvoiceId(),paymentId,context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),payment.getProcessedCurrency(),transactionExternalKey,payment.getId());
+      final InvoicePaymentModelDao refund=new InvoicePaymentModelDao(UUIDs.randomUUID(),context.getCreatedDate(),InvoicePaymentType.REFUND,payment.getInvoiceId(),paymentId,context.getCreatedDate(),requestedPositiveAmount.negate(),payment.getCurrency(),payment.getProcessedCurrency(),transactionExternalKey,payment.getId());
       transactional.create(refund,context);
       final InvoiceModelDao invoice=transInvoiceDao.getById(payment.getInvoiceId().toString(),context);
       Preconditions.checkState(invoice != null,"Invoice shouldn't be null for payment " + payment.getId());
