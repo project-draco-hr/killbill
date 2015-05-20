@@ -10,7 +10,7 @@
   Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(Mockito.<UUID>any(),Mockito.<DryRunArguments>any(),Mockito.<InternalCallContext>any())).thenReturn(events);
   final DateTime target=new DateTime();
   final InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
-  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,subscriptionApi,invoiceDao,internalCallContextFactory,invoiceNotifier,invoicePluginDispatcher,locker,busService.getBus(),null,clock);
+  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,subscriptionApi,invoiceDao,internalCallContextFactory,invoiceNotifier,invoicePluginDispatcher,locker,busService.getBus(),null,invoiceConfig,clock);
   Invoice invoice=dispatcher.processAccount(accountId,target,new DryRunFutureDateArguments(),context);
   Assert.assertNotNull(invoice);
   List<InvoiceModelDao> invoices=invoiceDao.getInvoicesByAccount(context);

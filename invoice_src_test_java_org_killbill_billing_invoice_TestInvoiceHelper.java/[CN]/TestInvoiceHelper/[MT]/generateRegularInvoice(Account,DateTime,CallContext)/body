@@ -11,7 +11,7 @@
   events.add(createMockBillingEvent(account,subscription,effectiveDate,plan,planPhase,fixedPrice,BigDecimal.ONE,currency,BillingPeriod.MONTHLY,1,BillingMode.IN_ADVANCE,"",1L,SubscriptionBaseTransitionType.CREATE));
   Mockito.when(billingApi.getBillingEventsForAccountAndUpdateAccountBCD(Mockito.<UUID>any(),Mockito.<DryRunArguments>any(),Mockito.<InternalCallContext>any())).thenReturn(events);
   final InvoiceNotifier invoiceNotifier=new NullInvoiceNotifier();
-  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,subscriptionApi,invoiceDao,internalCallContextFactory,invoiceNotifier,invoicePluginDispatcher,locker,busService.getBus(),null,clock);
+  final InvoiceDispatcher dispatcher=new InvoiceDispatcher(generator,accountApi,billingApi,subscriptionApi,invoiceDao,internalCallContextFactory,invoiceNotifier,invoicePluginDispatcher,locker,busService.getBus(),null,invoiceConfig,clock);
   Invoice invoice=dispatcher.processAccount(account.getId(),targetDate,new DryRunFutureDateArguments(),internalCallContext);
   Assert.assertNotNull(invoice);
   final InternalCallContext context=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);

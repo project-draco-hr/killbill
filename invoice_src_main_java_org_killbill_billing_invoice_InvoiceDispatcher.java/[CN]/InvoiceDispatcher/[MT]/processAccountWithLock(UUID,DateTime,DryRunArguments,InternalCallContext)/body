@@ -1,6 +1,6 @@
 {
   final boolean isDryRun=dryRunArguments != null;
-  Preconditions.checkArgument(inputTargetDateTime != null || isDryRun);
+  Preconditions.checkArgument(inputTargetDateTime != null || isDryRun,"inputTargetDateTime is required in non dryRun mode");
   try {
     final BillingEventSet billingEvents=billingApi.getBillingEventsForAccountAndUpdateAccountBCD(accountId,dryRunArguments,context);
     final List<DateTime> candidateDateTimes=(inputTargetDateTime != null) ? ImmutableList.of(inputTargetDateTime) : getUpcomingInvoiceCandidateDates(context);
