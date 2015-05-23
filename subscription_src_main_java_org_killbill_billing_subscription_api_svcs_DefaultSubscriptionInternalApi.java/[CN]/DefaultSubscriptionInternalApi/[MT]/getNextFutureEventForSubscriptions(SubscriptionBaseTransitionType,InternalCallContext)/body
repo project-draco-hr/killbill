@@ -1,0 +1,17 @@
+{
+  final Iterable<SubscriptionBaseEvent> events=dao.getFutureEventsForAccount(internalCallContext);
+  final Iterable<SubscriptionBaseEvent> filteredEvents=Iterables.filter(events,new Predicate<SubscriptionBaseEvent>(){
+    @Override public boolean apply(    final SubscriptionBaseEvent input){
+      return (eventType == SubscriptionBaseTransitionType.PHASE && input.getType() == EventType.PHASE) || input.getType() != EventType.PHASE;
+    }
+  }
+);
+  final Map<UUID,DateTime> result=filteredEvents.iterator().hasNext() ? new HashMap<UUID,DateTime>() : ImmutableMap.<UUID,DateTime>of();
+  for (  SubscriptionBaseEvent cur : filteredEvents) {
+    final DateTime targetDate=result.get(cur.getSubscriptionId());
+    if (targetDate == null || targetDate.compareTo(cur.getEffectiveDate()) > 0) {
+      result.put(cur.getSubscriptionId(),cur.getEffectiveDate());
+    }
+  }
+  return result;
+}
