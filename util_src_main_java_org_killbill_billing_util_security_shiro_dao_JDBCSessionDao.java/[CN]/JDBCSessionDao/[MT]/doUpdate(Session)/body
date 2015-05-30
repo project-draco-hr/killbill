@@ -6,6 +6,9 @@
       final Long sessionId=Long.valueOf(session.getId().toString());
       jdbcSessionSqlDao.updateLastAccessTime(lastAccessTime,sessionId);
     }
+ else     if (session instanceof SimpleSession) {
+      ((SimpleSession)session).setLastAccessTime(previousSession.getLastAccessTime());
+    }
   }
  else {
     jdbcSessionSqlDao.update(new SessionModelDao(session));
