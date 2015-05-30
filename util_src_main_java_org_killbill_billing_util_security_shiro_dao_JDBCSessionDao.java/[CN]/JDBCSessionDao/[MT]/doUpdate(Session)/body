@@ -1,5 +1,13 @@
 {
-  final DateTime lastAccessTime=new DateTime(session.getLastAccessTime(),DateTimeZone.UTC);
-  final Long sessionId=Long.valueOf(session.getId().toString());
-  jdbcSessionSqlDao.updateLastAccessTime(lastAccessTime,sessionId);
+  final Session previousSession=readSession(session.getId());
+  if (SessionUtils.sameSession(previousSession,session)) {
+    if (!SessionUtils.accessedRecently(previousSession,session)) {
+      final DateTime lastAccessTime=new DateTime(session.getLastAccessTime(),DateTimeZone.UTC);
+      final Long sessionId=Long.valueOf(session.getId().toString());
+      jdbcSessionSqlDao.updateLastAccessTime(lastAccessTime,sessionId);
+    }
+  }
+ else {
+    jdbcSessionSqlDao.update(new SessionModelDao(session));
+  }
 }

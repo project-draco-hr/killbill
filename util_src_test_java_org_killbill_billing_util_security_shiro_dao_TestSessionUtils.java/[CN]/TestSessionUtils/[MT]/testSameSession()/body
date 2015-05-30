@@ -1,0 +1,30 @@
+{
+  final SimpleSession session1=new SimpleSession();
+  final SimpleSession session2=new SimpleSession();
+  Assert.assertTrue(SessionUtils.sameSession(session1,session2));
+  Assert.assertTrue(SessionUtils.sameSession(session2,session1));
+  session1.setStartTimestamp(new Date(2 * System.currentTimeMillis()));
+  Assert.assertFalse(SessionUtils.sameSession(session1,session2));
+  Assert.assertFalse(SessionUtils.sameSession(session2,session1));
+  session2.setStartTimestamp(session1.getStartTimestamp());
+  Assert.assertTrue(SessionUtils.sameSession(session1,session2));
+  Assert.assertTrue(SessionUtils.sameSession(session2,session1));
+  session1.setTimeout(12345L);
+  Assert.assertFalse(SessionUtils.sameSession(session1,session2));
+  Assert.assertFalse(SessionUtils.sameSession(session2,session1));
+  session2.setTimeout(session1.getTimeout());
+  Assert.assertTrue(SessionUtils.sameSession(session1,session2));
+  Assert.assertTrue(SessionUtils.sameSession(session2,session1));
+  session1.setHost(UUID.randomUUID().toString());
+  Assert.assertFalse(SessionUtils.sameSession(session1,session2));
+  Assert.assertFalse(SessionUtils.sameSession(session2,session1));
+  session2.setHost(session1.getHost());
+  Assert.assertTrue(SessionUtils.sameSession(session1,session2));
+  Assert.assertTrue(SessionUtils.sameSession(session2,session1));
+  session1.setAttributes(buildAttributes(UUID.randomUUID()));
+  Assert.assertFalse(SessionUtils.sameSession(session1,session2));
+  Assert.assertFalse(SessionUtils.sameSession(session2,session1));
+  session2.setAttributes(session1.getAttributes());
+  Assert.assertTrue(SessionUtils.sameSession(session1,session2));
+  Assert.assertTrue(SessionUtils.sameSession(session2,session1));
+}
