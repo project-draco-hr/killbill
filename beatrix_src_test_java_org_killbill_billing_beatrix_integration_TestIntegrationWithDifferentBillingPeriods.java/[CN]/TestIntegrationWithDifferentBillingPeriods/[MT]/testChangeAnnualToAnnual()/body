@@ -1,0 +1,24 @@
+{
+  final LocalDate startDate=new LocalDate(2014,12,2);
+  final int accountBCD=1;
+  final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(accountBCD));
+  clock.setDeltaFromReality(startDate.toDateTimeAtCurrentTime(DateTimeZone.UTC).getMillis() - clock.getUTCNow().getMillis());
+  final DefaultEntitlement bpEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey","Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,NextEvent.CREATE,NextEvent.INVOICE);
+  assertNotNull(bpEntitlement);
+  assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).size(),1);
+  assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getRecurringBillingPeriod(),BillingPeriod.ANNUAL);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  clock.addDays(30);
+  assertListenerStatus();
+  List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
+  assertEquals(invoices.size(),2);
+  ImmutableList<ExpectedInvoiceItemCheck> toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2015,1,1),new LocalDate(2016,1,1),InvoiceItemType.RECURRING,new BigDecimal("2399.95")));
+  invoiceChecker.checkInvoice(invoices.get(1).getId(),callContext,toBeChecked);
+  clock.addDays(73);
+  changeEntitlementAndCheckForCompletion(bpEntitlement,"Assault-Rifle",BillingPeriod.ANNUAL,BillingActionPolicy.IMMEDIATE,NextEvent.CHANGE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
+  assertEquals(invoices.size(),3);
+  toBeChecked=ImmutableList.<ExpectedInvoiceItemCheck>of(new ExpectedInvoiceItemCheck(new LocalDate(2015,3,15),new LocalDate(2016,3,1),InvoiceItemType.RECURRING,new BigDecimal("5770.44")),new ExpectedInvoiceItemCheck(new LocalDate(2015,3,15),new LocalDate(2016,1,1),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-1919.96")));
+  invoiceChecker.checkInvoice(invoices.get(2).getId(),callContext,toBeChecked);
+  checkNoMoreInvoiceToGenerate(account);
+}
