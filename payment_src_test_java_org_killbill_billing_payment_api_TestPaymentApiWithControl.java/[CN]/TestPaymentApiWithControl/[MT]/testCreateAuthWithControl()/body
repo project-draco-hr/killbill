@@ -1,0 +1,16 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  final String paymentExternalKey="dfdf";
+  final String transactionExternalKey="qwqwqw";
+  final PaymentOptions paymentOptions=new PaymentOptions(){
+    @Override public boolean isExternalPayment(){
+      return false;
+    }
+    @Override public List<String> getPaymentControlPluginNames(){
+      return ImmutableList.of(TestPaymentRoutingPluginApi.PLUGIN_NAME);
+    }
+  }
+;
+  final Payment payment=paymentApi.createAuthorizationWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),paymentOptions,callContext);
+  Assert.assertEquals(payment.getPaymentMethodId(),newPaymentMethodId);
+}

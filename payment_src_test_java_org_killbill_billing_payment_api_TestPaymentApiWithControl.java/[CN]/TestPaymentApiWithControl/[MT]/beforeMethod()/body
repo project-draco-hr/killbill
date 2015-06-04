@@ -1,0 +1,15 @@
+{
+  super.beforeMethod();
+  account=testHelper.createTestAccount("bobo@gmail.com",true);
+  final PaymentMethodPlugin paymentMethodInfo=new DefaultNoOpPaymentMethodPlugin(UUID.randomUUID().toString(),false,null);
+  newPaymentMethodId=paymentApi.addPaymentMethod(account,paymentMethodInfo.getExternalPaymentMethodId(),MockPaymentProviderPlugin.PLUGIN_NAME,false,paymentMethodInfo,ImmutableList.<PluginProperty>of(),callContext);
+  retryPluginRegistry.registerService(new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getRegistrationName(){
+      return TestPaymentRoutingPluginApi.PLUGIN_NAME;
+    }
+  }
+,new TestPaymentRoutingPluginApi(newPaymentMethodId));
+}
