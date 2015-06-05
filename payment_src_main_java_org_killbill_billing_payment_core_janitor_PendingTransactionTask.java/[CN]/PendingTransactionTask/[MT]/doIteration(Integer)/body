@@ -1,5 +1,6 @@
 {
-  int result=paymentDao.failOldPendingTransactions(TransactionStatus.PLUGIN_FAILURE,getCreatedDateBefore(),completionTaskCallContext);
+  final InternalCallContext contextTemplate=internalCallContextFactory.createInternalCallContext((Long)null,(Long)null,"PendingTransactionTask",CallOrigin.INTERNAL,UserType.SYSTEM,UUIDs.randomUUID());
+  int result=paymentDao.failOldPendingTransactions(TransactionStatus.PLUGIN_FAILURE,getCreatedDateBefore(),contextTemplate);
   if (result > 0) {
     log.info("Janitor PendingTransactionTask moved " + result + " PENDING payments ->  PLUGIN_FAILURE");
   }
