@@ -1,6 +1,6 @@
 {
   if (paymentStateContext.getPaymentInfoPlugin() == null || paymentStateContext.getPaymentInfoPlugin().getStatus() == null) {
-    return OperationResult.FAILURE;
+    return OperationResult.EXCEPTION;
   }
 switch (paymentStateContext.getPaymentInfoPlugin().getStatus()) {
 case PROCESSED:
@@ -8,8 +8,9 @@ case PROCESSED:
 case PENDING:
   return OperationResult.PENDING;
 case ERROR:
+return OperationResult.FAILURE;
 case UNDEFINED:
 default :
-return OperationResult.FAILURE;
+return OperationResult.EXCEPTION;
 }
 }
