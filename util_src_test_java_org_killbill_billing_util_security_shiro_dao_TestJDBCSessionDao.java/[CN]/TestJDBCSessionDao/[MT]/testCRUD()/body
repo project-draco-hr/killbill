@@ -5,12 +5,7 @@
   final Serializable sessionId=jdbcSessionDao.doCreate(session);
   final Session retrievedSession=jdbcSessionDao.doReadSession(sessionId);
   Assert.assertEquals(retrievedSession,session);
-  Date lastAccessTime=new Date(retrievedSession.getLastAccessTime().getTime() + 1000);
-  Assert.assertNotEquals(retrievedSession.getLastAccessTime(),lastAccessTime);
-  session.setLastAccessTime(lastAccessTime);
-  jdbcSessionDao.doUpdate(session);
-  Assert.assertEquals(jdbcSessionDao.doReadSession(sessionId).getLastAccessTime().compareTo(retrievedSession.getLastAccessTime()),0);
-  lastAccessTime=new Date(retrievedSession.getLastAccessTime().getTime() + 100000);
+  final Date lastAccessTime=DateTime.now().withTimeAtStartOfDay().toDate();
   Assert.assertNotEquals(retrievedSession.getLastAccessTime(),lastAccessTime);
   session.setLastAccessTime(lastAccessTime);
   jdbcSessionDao.doUpdate(session);
