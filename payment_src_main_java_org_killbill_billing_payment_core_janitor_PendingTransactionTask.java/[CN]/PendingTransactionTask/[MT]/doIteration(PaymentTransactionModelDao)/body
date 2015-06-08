@@ -1,0 +1,9 @@
+{
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(paymentTransaction.getTenantRecordId(),paymentTransaction.getAccountRecordId());
+  final CallContext callContext=createCallContext("PendingTransactionTask",internalTenantContext);
+  final PaymentModelDao payment=paymentDao.getPayment(paymentTransaction.getPaymentId(),internalTenantContext);
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(payment.getAccountId(),callContext);
+  final String newPaymentState=paymentStateMachineHelper.getFailureStateForTransaction(paymentTransaction.getTransactionType());
+  paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),payment.getId(),paymentTransaction.getTransactionType(),newPaymentState,payment.getLastSuccessStateName(),paymentTransaction.getId(),TransactionStatus.PAYMENT_FAILURE,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),paymentTransaction.getGatewayErrorCode(),paymentTransaction.getGatewayErrorMsg(),internalCallContext);
+  log.info("Janitor PendingTransactionTask repairing payment {}, transaction {}",payment.getId(),paymentTransaction.getId());
+}

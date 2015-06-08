@@ -1,0 +1,9 @@
+{
+  return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<PaymentTransactionModelDao>>(){
+    @Override public List<PaymentTransactionModelDao> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
+      final TransactionSqlDao transactional=entitySqlDaoWrapperFactory.become(TransactionSqlDao.class);
+      return transactional.getByTransactionStatusPriorDateAcrossTenants(transactionStatus.toString(),createdBeforeDate.toDate());
+    }
+  }
+);
+}
