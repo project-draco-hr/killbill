@@ -1,0 +1,12 @@
+{
+  final List<String> paymentControlPluginNames=toPaymentControlPluginNames(paymentOptions);
+  if (paymentControlPluginNames.isEmpty()) {
+    return createVoid(account,paymentId,paymentTransactionExternalKey,properties,callContext);
+  }
+  checkNotNullParameter(account,"account");
+  checkNotNullParameter(paymentId,"paymentId");
+  checkNotNullParameter(properties,"plugin properties");
+  logAPICall(TransactionType.VOID.name(),account,null,paymentId,null,null,null,null,paymentTransactionExternalKey);
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
+  return pluginRoutingPaymentProcessor.createVoid(IS_API_PAYMENT,account,paymentId,paymentTransactionExternalKey,properties,paymentControlPluginNames,callContext,internalCallContext);
+}

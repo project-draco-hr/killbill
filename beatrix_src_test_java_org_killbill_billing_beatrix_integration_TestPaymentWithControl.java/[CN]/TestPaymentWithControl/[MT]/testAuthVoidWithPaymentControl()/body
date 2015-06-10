@@ -1,0 +1,13 @@
+{
+  final AccountData accountData=getAccountData(1);
+  final Account account=createAccountWithNonOsgiPaymentMethod(accountData);
+  busHandler.pushExpectedEvents(NextEvent.PAYMENT);
+  final Payment payment=paymentApi.createAuthorizationWithPaymentControl(account,account.getPaymentMethodId(),null,BigDecimal.ONE,account.getCurrency(),null,null,properties,paymentOptions,callContext);
+  assertListenerStatus();
+  busHandler.pushExpectedEvents(NextEvent.PAYMENT);
+  paymentApi.createVoidWithPaymentControl(account,payment.getId(),null,properties,paymentOptions,callContext);
+  assertListenerStatus();
+  Assert.assertEquals(testPaymentRoutingWithControl.getCalls().size(),2);
+  Assert.assertEquals(testPaymentRoutingWithControl.getCalls().get(TransactionType.AUTHORIZE.toString()),new Integer(1));
+  Assert.assertEquals(testPaymentRoutingWithControl.getCalls().get(TransactionType.VOID.toString()),new Integer(1));
+}
