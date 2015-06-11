@@ -1,10 +1,10 @@
 {
-  final RetryablePaymentStateContext paymentStateContext=createContext(isApiPayment,transactionType,account,paymentMethodId,paymentId,paymentExternalKey,paymentTransactionExternalKey,amount,currency,properties,paymentControlPluginNames,callContext,internalCallContext);
+  final PaymentStateControlContext paymentStateContext=createContext(isApiPayment,transactionType,account,paymentMethodId,paymentId,paymentExternalKey,paymentTransactionExternalKey,amount,currency,properties,paymentControlPluginNames,callContext,internalCallContext);
   try {
     final OperationCallback callback=createOperationCallback(transactionType,paymentStateContext);
-    final LeavingStateCallback leavingStateCallback=new RetryLeavingStateCallback(this,paymentStateContext,paymentDao,retrySMHelper.getInitialState(),retrySMHelper.getRetriedState(),transactionType);
-    final EnteringStateCallback enteringStateCallback=new RetryEnteringStateCallback(this,paymentStateContext,retryServiceScheduler);
-    state.runOperation(retrySMHelper.getRetryOperation(),callback,enteringStateCallback,leavingStateCallback);
+    final LeavingStateCallback leavingStateCallback=new DefaultControlCompleted(this,paymentStateContext,paymentDao,paymentControlStateMachineHelper.getInitialState(),paymentControlStateMachineHelper.getRetriedState(),transactionType);
+    final EnteringStateCallback enteringStateCallback=new DefaultControlInitiated(this,paymentStateContext,retryServiceScheduler);
+    state.runOperation(paymentControlStateMachineHelper.getOperation(),callback,enteringStateCallback,leavingStateCallback);
   }
  catch (  final MissingEntryException e) {
     throw new PaymentApiException(e.getCause(),ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));

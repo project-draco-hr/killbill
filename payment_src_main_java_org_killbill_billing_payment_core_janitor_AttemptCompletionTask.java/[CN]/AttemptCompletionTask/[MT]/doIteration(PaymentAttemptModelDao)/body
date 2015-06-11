@@ -18,7 +18,7 @@
     log.info("Janitor AttemptCompletionTask completing attempt " + attempt.getId() + " -> SUCCESS");
     final Account account=accountInternalApi.getAccountById(attempt.getAccountId(),tenantContext);
     final boolean isApiPayment=true;
-    final RetryablePaymentStateContext paymentStateContext=new RetryablePaymentStateContext(attempt.toPaymentControlPluginNames(),isApiPayment,transaction.getPaymentId(),attempt.getPaymentExternalKey(),transaction.getTransactionExternalKey(),transaction.getTransactionType(),account,attempt.getPaymentMethodId(),transaction.getAmount(),transaction.getCurrency(),PluginPropertySerializer.deserialize(attempt.getPluginProperties()),internalCallContext,callContext);
+    final PaymentStateControlContext paymentStateContext=new PaymentStateControlContext(attempt.toPaymentControlPluginNames(),isApiPayment,transaction.getPaymentId(),attempt.getPaymentExternalKey(),transaction.getTransactionExternalKey(),transaction.getTransactionType(),account,attempt.getPaymentMethodId(),transaction.getAmount(),transaction.getCurrency(),PluginPropertySerializer.deserialize(attempt.getPluginProperties()),internalCallContext,callContext);
     paymentStateContext.setAttemptId(attempt.getId());
     paymentStateContext.setPaymentTransactionModelDao(transaction);
     pluginControlledPaymentAutomatonRunner.completeRun(paymentStateContext);

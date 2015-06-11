@@ -1,0 +1,18 @@
+{
+  logger.debug("Leaving state {}",oldState.getName());
+  try {
+    if (paymentStateContext.getPaymentMethodId() == null) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD,paymentStateContext.getAccount().getId());
+    }
+    if (paymentStateContext.getTransactionId() == null) {
+      daoHelper.createNewPaymentTransaction();
+    }
+ else {
+      final PaymentTransactionModelDao transactionModelDao=daoHelper.getPaymentDao().getPaymentTransaction(paymentStateContext.getTransactionId(),paymentStateContext.getInternalCallContext());
+      paymentStateContext.setPaymentTransactionModelDao(transactionModelDao);
+    }
+  }
+ catch (  PaymentApiException e) {
+    throw new OperationException(e);
+  }
+}
