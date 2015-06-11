@@ -1,0 +1,13 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Payment payment=paymentApi.getPayment(UUID.fromString(paymentIdStr),false,ImmutableList.<PluginProperty>of(),callContext);
+  final UUID paymentTransactionId=UUID.fromString(paymentTransactionIdStr);
+  final PaymentTransaction paymentTransaction=Iterables.tryFind(payment.getTransactions(),new Predicate<PaymentTransaction>(){
+    @Override public boolean apply(    final PaymentTransaction input){
+      return input.getId().equals(paymentTransactionId);
+    }
+  }
+).orNull();
+  adminPaymentApi.fixPaymentTransactionState(payment,paymentTransaction,TransactionStatus.valueOf(json.getTransactionStatus()),json.getLastSuccessPaymentState(),json.getCurrentPaymentStateName(),ImmutableList.<PluginProperty>of(),callContext);
+  return Response.status(Status.OK).build();
+}
