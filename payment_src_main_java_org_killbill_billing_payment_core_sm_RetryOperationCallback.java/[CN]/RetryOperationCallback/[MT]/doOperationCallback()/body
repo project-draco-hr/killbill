@@ -4,7 +4,7 @@
       final PaymentRoutingContext paymentControlContext=new DefaultPaymentRoutingContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),retryablePaymentStateContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateContext.getProperties(),retryablePaymentStateContext.isApiPayment(),paymentStateContext.callContext);
       final PriorPaymentRoutingResult pluginResult;
       try {
-        pluginResult=getPluginResult(retryablePaymentStateContext.getPaymentControlPluginNames(),paymentControlContext);
+        pluginResult=executePluginPriorCalls(retryablePaymentStateContext.getPaymentControlPluginNames(),paymentControlContext);
         if (pluginResult != null && pluginResult.isAborted()) {
           return PluginDispatcher.createPluginDispatcherReturnType(OperationResult.EXCEPTION);
         }
@@ -21,18 +21,18 @@
         success=transaction.getTransactionStatus() == TransactionStatus.SUCCESS || transaction.getTransactionStatus() == TransactionStatus.PENDING;
         if (success) {
           final PaymentRoutingContext updatedPaymentRoutingContext=new DefaultPaymentRoutingContext(paymentStateContext.account,paymentStateContext.paymentMethodId,retryablePaymentStateContext.getAttemptId(),result.getId(),result.getExternalKey(),transaction.getId(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),paymentStateContext.properties,retryablePaymentStateContext.isApiPayment(),paymentStateContext.callContext);
-          onCompletion(retryablePaymentStateContext.getPaymentControlPluginNames(),updatedPaymentRoutingContext);
+          executePluginOnSuccessCalls(retryablePaymentStateContext.getPaymentControlPluginNames(),updatedPaymentRoutingContext);
           return PluginDispatcher.createPluginDispatcherReturnType(OperationResult.SUCCESS);
         }
  else {
-          throw new OperationException(null,getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext));
+          throw new OperationException(null,executePluginOnFailureCallsAndSetRetryDate(retryablePaymentStateContext,paymentControlContext));
         }
       }
  catch (      final PaymentApiException e) {
-        throw new OperationException(e,getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext));
+        throw new OperationException(e,executePluginOnFailureCallsAndSetRetryDate(retryablePaymentStateContext,paymentControlContext));
       }
 catch (      final RuntimeException e) {
-        getOperationResultAndSetContext(retryablePaymentStateContext,paymentControlContext);
+        executePluginOnFailureCallsAndSetRetryDate(retryablePaymentStateContext,paymentControlContext);
         throw e;
       }
     }

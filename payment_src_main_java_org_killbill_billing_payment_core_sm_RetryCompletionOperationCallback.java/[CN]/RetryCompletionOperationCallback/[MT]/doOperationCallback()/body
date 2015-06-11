@@ -3,7 +3,7 @@
     @Override public PluginDispatcherReturnType<OperationResult> doOperation() throws OperationException {
       final PaymentTransactionModelDao transaction=paymentStateContext.getPaymentTransactionModelDao();
       final PaymentRoutingContext updatedPaymentControlContext=new DefaultPaymentRoutingContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),retryablePaymentStateContext.getAttemptId(),transaction.getPaymentId(),paymentStateContext.getPaymentExternalKey(),transaction.getId(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),paymentStateContext.getProperties(),retryablePaymentStateContext.isApiPayment(),paymentStateContext.callContext);
-      onCompletion(retryablePaymentStateContext.getPaymentControlPluginNames(),updatedPaymentControlContext);
+      executePluginOnSuccessCalls(retryablePaymentStateContext.getPaymentControlPluginNames(),updatedPaymentControlContext);
       return PluginDispatcher.createPluginDispatcherReturnType(OperationResult.SUCCESS);
     }
   }
