@@ -1,6 +1,4 @@
 {
   logger.error("Plugin call TIMEOUT for account {}",paymentStateContext.getAccount().getExternalKey());
-  final PaymentTransactionInfoPlugin paymentInfoPlugin=new DefaultNoOpPaymentInfoPlugin(paymentStateContext.getPaymentId(),paymentStateContext.getTransactionId(),paymentStateContext.getTransactionType(),paymentStateContext.getPaymentTransactionModelDao().getProcessedAmount(),paymentStateContext.getPaymentTransactionModelDao().getProcessedCurrency(),paymentStateContext.getPaymentTransactionModelDao().getEffectiveDate(),paymentStateContext.getPaymentTransactionModelDao().getCreatedDate(),PaymentPluginStatus.UNDEFINED,null);
-  paymentStateContext.setPaymentTransactionInfoPlugin(paymentInfoPlugin);
-  return new OperationException(e,OperationResult.EXCEPTION);
+  return convertToUnknownTransactionStatusAndErroredPaymentState(e);
 }
