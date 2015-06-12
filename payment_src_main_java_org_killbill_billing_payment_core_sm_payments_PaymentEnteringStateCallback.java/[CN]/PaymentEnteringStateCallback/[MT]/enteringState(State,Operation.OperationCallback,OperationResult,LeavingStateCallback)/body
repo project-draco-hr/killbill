@@ -1,8 +1,8 @@
 {
   logger.debug("Entering state {} with result {}",newState.getName(),operationResult);
   if (paymentStateContext.getPaymentTransactionModelDao() != null && paymentStateContext.getPaymentTransactionModelDao().getId() != null) {
-    final PaymentTransactionInfoPlugin paymentInfoPlugin=paymentStateContext.getPaymentInfoPlugin();
-    final TransactionStatus transactionStatus=paymentPluginStatusToTransactionStatus(paymentInfoPlugin);
+    final PaymentTransactionInfoPlugin paymentInfoPlugin=paymentStateContext.getPaymentTransactionInfoPlugin();
+    final TransactionStatus transactionStatus=PaymentTransactionInfoPluginConverter.toTransactionStatus(paymentInfoPlugin);
     daoHelper.processPaymentInfoPlugin(transactionStatus,paymentInfoPlugin,newState.getName());
   }
  else   if (!paymentStateContext.isApiPayment()) {
