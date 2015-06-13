@@ -1,0 +1,9 @@
+{
+  final String uri="/1.0/kb/admin/payments/" + payment.getPaymentId().toString() + "/transactions/"+ payment.getTransactions().get(0).getTransactionId().toString();
+  final AdminPaymentJson body=new AdminPaymentJson(lastSuccessPaymentState,currentPaymentStateName,transactionStatus.toString());
+  final Multimap result=HashMultimap.create();
+  result.put(KillBillHttpClient.AUDIT_OPTION_CREATED_BY,createdBy);
+  result.put(KillBillHttpClient.AUDIT_OPTION_REASON,reason);
+  result.put(KillBillHttpClient.AUDIT_OPTION_COMMENT,comment);
+  killBillHttpClient.doPut(uri,body,result);
+}
