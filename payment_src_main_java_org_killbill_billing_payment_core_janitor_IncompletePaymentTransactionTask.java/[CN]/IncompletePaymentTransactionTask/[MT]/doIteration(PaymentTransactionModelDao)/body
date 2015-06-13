@@ -32,8 +32,8 @@ break;
 case PLUGIN_FAILURE:
 case UNKNOWN:
 default :
-newPaymentState=payment.getStateName();
-break;
+log.info("Janitor IncompletePaymentTransactionTask repairing payment {}, transaction {}, bail early...",new Object[]{payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus});
+return;
 }
 final String lastSuccessPaymentState=paymentStateMachineHelper.isSuccessState(newPaymentState) ? newPaymentState : null;
 final BigDecimal processedAmount=(paymentTransactionInfoPlugin != null && isPendingOrFinalTransactionStatus(transactionStatus)) ? paymentTransactionInfoPlugin.getAmount() : paymentTransaction.getProcessedAmount();
