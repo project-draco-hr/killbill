@@ -10,5 +10,11 @@
   }
   info.addAmount(type,amount);
   final PaymentTransactionInfoPlugin result=new DefaultNoOpPaymentInfoPlugin(kbPaymentId,kbTransactionId,type,amount,currency,clock.getUTCNow(),clock.getUTCNow(),status,null);
+  List<PaymentTransactionInfoPlugin> existingTransactions=paymentTransactions.get(kbPaymentId.toString());
+  if (existingTransactions == null) {
+    existingTransactions=new ArrayList<PaymentTransactionInfoPlugin>();
+    paymentTransactions.put(kbPaymentId.toString(),existingTransactions);
+  }
+  existingTransactions.add(result);
   return result;
 }

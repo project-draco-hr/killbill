@@ -1,0 +1,17 @@
+{
+  logger.debug("Entering state {} with result {}",newState.getName(),operationResult);
+  if (paymentStateContext.getPaymentTransactionModelDao() != null && paymentStateContext.getPaymentTransactionModelDao().getId() != null) {
+    final PaymentTransactionInfoPlugin paymentInfoPlugin=paymentStateContext.getPaymentTransactionInfoPlugin();
+    final TransactionStatus transactionStatus=PaymentTransactionInfoPluginConverter.toTransactionStatus(paymentInfoPlugin);
+    daoHelper.processPaymentInfoPlugin(transactionStatus,paymentInfoPlugin,newState.getName());
+  }
+ else   if (!paymentStateContext.isApiPayment()) {
+    final BusInternalEvent event=new DefaultPaymentErrorEvent(paymentStateContext.getAccount().getId(),null,paymentStateContext.getTransactionType(),"Early abortion of payment transaction",paymentStateContext.getInternalCallContext().getAccountRecordId(),paymentStateContext.getInternalCallContext().getTenantRecordId(),paymentStateContext.getInternalCallContext().getUserToken());
+    try {
+      daoHelper.getEventBus().post(event);
+    }
+ catch (    EventBusException e) {
+      logger.error("Failed to post Payment event event for account {} ",paymentStateContext.getAccount().getId(),e);
+    }
+  }
+}

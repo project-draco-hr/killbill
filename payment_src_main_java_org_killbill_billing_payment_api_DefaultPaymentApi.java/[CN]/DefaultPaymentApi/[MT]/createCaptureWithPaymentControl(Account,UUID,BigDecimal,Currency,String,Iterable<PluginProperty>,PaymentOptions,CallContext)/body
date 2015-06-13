@@ -1,0 +1,13 @@
+{
+  final List<String> paymentControlPluginNames=toPaymentControlPluginNames(paymentOptions);
+  if (paymentControlPluginNames.isEmpty()) {
+    return createCapture(account,paymentId,amount,currency,paymentTransactionExternalKey,properties,callContext);
+  }
+  checkNotNullParameter(account,"account");
+  checkNotNullParameter(paymentId,"paymentId");
+  checkNotNullParameter(currency,"currency");
+  checkNotNullParameter(properties,"plugin properties");
+  checkPositiveAmount(amount);
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
+  return pluginRoutingPaymentProcessor.createCapture(IS_API_PAYMENT,account,paymentId,amount,currency,paymentTransactionExternalKey,properties,paymentControlPluginNames,callContext,internalCallContext);
+}

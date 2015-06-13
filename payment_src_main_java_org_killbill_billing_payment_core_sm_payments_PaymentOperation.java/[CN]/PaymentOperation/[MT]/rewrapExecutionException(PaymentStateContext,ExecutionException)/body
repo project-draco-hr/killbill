@@ -1,0 +1,16 @@
+{
+  final Throwable realException=Objects.firstNonNull(e.getCause(),e);
+  if (e.getCause() instanceof PaymentApiException) {
+    logger.warn("Unsuccessful plugin call for account {}",paymentStateContext.getAccount().getExternalKey(),realException);
+    return convertToUnknownTransactionStatusAndErroredPaymentState(realException);
+  }
+ else   if (e.getCause() instanceof LockFailedException) {
+    final String format=String.format("Failed to lock account %s",paymentStateContext.getAccount().getExternalKey());
+    logger.error(String.format(format));
+    return new OperationException(realException,OperationResult.EXCEPTION);
+  }
+ else {
+    logger.warn("Plugin call threw an exception for account {}",paymentStateContext.getAccount().getExternalKey(),e);
+    return new OperationException(realException,OperationResult.EXCEPTION);
+  }
+}

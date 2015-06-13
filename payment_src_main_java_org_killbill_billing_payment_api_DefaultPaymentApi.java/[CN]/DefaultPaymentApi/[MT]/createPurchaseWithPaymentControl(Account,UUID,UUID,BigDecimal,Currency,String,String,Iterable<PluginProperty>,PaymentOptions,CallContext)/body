@@ -15,6 +15,6 @@
     throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_PARAMETER,"paymentMethodId","should not be null");
   }
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
-  final UUID nonNulPaymentMethodId=(paymentMethodId != null) ? paymentMethodId : paymentMethodProcessor.createOrGetExternalPaymentMethod(UUID.randomUUID().toString(),account,properties,callContext,internalCallContext);
+  final UUID nonNulPaymentMethodId=(paymentMethodId != null) ? paymentMethodId : paymentMethodProcessor.createOrGetExternalPaymentMethod(UUIDs.randomUUID().toString(),account,properties,callContext,internalCallContext);
   return pluginRoutingPaymentProcessor.createPurchase(IS_API_PAYMENT,account,nonNulPaymentMethodId,paymentId,amount,currency,paymentExternalKey,paymentTransactionExternalKey,properties,paymentControlPluginNames,callContext,internalCallContext);
 }

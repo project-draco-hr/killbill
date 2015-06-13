@@ -1,0 +1,35 @@
+{
+  final InternalTenantContext tenantContext=internalCallContextFactory.createInternalTenantContext(attempt.getTenantRecordId(),attempt.getAccountRecordId());
+  final CallContext callContext=createCallContext("AttemptCompletionJanitorTask",tenantContext);
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(attempt.getAccountId(),callContext);
+  final List<PaymentTransactionModelDao> transactions=paymentDao.getPaymentTransactionsByExternalKey(attempt.getTransactionExternalKey(),tenantContext);
+  final PaymentTransactionModelDao transaction=Iterables.tryFind(transactions,new Predicate<PaymentTransactionModelDao>(){
+    @Override public boolean apply(    final PaymentTransactionModelDao input){
+      return input.getAttemptId().equals(attempt.getId()) && input.getTransactionStatus() == TransactionStatus.SUCCESS;
+    }
+  }
+).orNull();
+  if (transaction == null) {
+    log.info("Janitor AttemptCompletionTask moving attempt " + attempt.getId() + " -> ABORTED");
+    paymentDao.updatePaymentAttempt(attempt.getId(),attempt.getTransactionId(),"ABORTED",internalCallContext);
+    return;
+  }
+  try {
+    log.info("Janitor AttemptCompletionTask completing attempt " + attempt.getId() + " -> SUCCESS");
+    final Account account=accountInternalApi.getAccountById(attempt.getAccountId(),tenantContext);
+    final boolean isApiPayment=true;
+    final PaymentStateControlContext paymentStateContext=new PaymentStateControlContext(attempt.toPaymentControlPluginNames(),isApiPayment,transaction.getPaymentId(),attempt.getPaymentExternalKey(),transaction.getTransactionExternalKey(),transaction.getTransactionType(),account,attempt.getPaymentMethodId(),transaction.getAmount(),transaction.getCurrency(),PluginPropertySerializer.deserialize(attempt.getPluginProperties()),internalCallContext,callContext);
+    paymentStateContext.setAttemptId(attempt.getId());
+    paymentStateContext.setPaymentTransactionModelDao(transaction);
+    pluginControlledPaymentAutomatonRunner.completeRun(paymentStateContext);
+  }
+ catch (  final AccountApiException e) {
+    log.warn("Janitor AttemptCompletionTask failed to complete payment attempt " + attempt.getId(),e);
+  }
+catch (  final PluginPropertySerializerException e) {
+    log.warn("Janitor AttemptCompletionTask failed to complete payment attempt " + attempt.getId(),e);
+  }
+catch (  final PaymentApiException e) {
+    log.warn("Janitor AttemptCompletionTask failed to complete payment attempt " + attempt.getId(),e);
+  }
+}

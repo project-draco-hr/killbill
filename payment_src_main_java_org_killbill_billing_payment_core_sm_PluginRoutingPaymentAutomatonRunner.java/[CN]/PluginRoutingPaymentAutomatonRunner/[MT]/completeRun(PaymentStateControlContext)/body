@@ -1,0 +1,23 @@
+{
+  try {
+    final OperationCallback callback=new CompletionControlOperation(locker,paymentPluginDispatcher,paymentStateContext,paymentProcessor,paymentControlPluginRegistry);
+    final LeavingStateCallback leavingStateCallback=new NoopControlInitiated();
+    final EnteringStateCallback enteringStateCallback=new DefaultControlCompleted(this,paymentStateContext,retryServiceScheduler);
+    paymentControlStateMachineHelper.getInitialState().runOperation(paymentControlStateMachineHelper.getOperation(),callback,enteringStateCallback,leavingStateCallback);
+  }
+ catch (  final MissingEntryException e) {
+    throw new PaymentApiException(e.getCause(),ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
+  }
+catch (  final OperationException e) {
+    if (e.getCause() == null) {
+      throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
+    }
+ else     if (e.getCause() instanceof PaymentApiException) {
+      throw (PaymentApiException)e.getCause();
+    }
+ else {
+      throw new PaymentApiException(e.getCause(),ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
+    }
+  }
+  return paymentStateContext.getResult();
+}

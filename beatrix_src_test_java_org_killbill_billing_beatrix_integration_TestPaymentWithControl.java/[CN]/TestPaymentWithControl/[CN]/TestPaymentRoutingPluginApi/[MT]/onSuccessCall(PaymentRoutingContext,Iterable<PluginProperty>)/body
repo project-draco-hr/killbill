@@ -1,0 +1,15 @@
+{
+  final PluginProperty nameProperty=Iterables.tryFind(properties,new Predicate<PluginProperty>(){
+    @Override public boolean apply(    final PluginProperty input){
+      return input.getKey().equals("name");
+    }
+  }
+).orNull();
+  if (nameProperty != null && nameProperty.getValue().equals(TEST_PAYMENT_WITH_CONTROL)) {
+    final Integer result=calls.get(paymentRoutingContext.getTransactionType());
+    calls.put(paymentRoutingContext.getTransactionType().toString(),result == null ? new Integer(1) : new Integer(result.intValue() + 1));
+  }
+  return new OnSuccessPaymentRoutingResult(){
+  }
+;
+}

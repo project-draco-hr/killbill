@@ -1,0 +1,18 @@
+{
+  try {
+    if (paymentStateContext.getOverridePluginOperationResult() == null) {
+      final PaymentTransactionInfoPlugin paymentInfoPlugin=doCallSpecificOperationCallback();
+      sanityOnPaymentInfoPlugin(paymentInfoPlugin);
+      paymentStateContext.setPaymentTransactionInfoPlugin(paymentInfoPlugin);
+      return PaymentTransactionInfoPluginConverter.toOperationResult(paymentStateContext.getPaymentTransactionInfoPlugin());
+    }
+ else {
+      final PaymentTransactionInfoPlugin paymentInfoPlugin=new DefaultNoOpPaymentInfoPlugin(paymentStateContext.getPaymentId(),paymentStateContext.getTransactionId(),paymentStateContext.getTransactionType(),paymentStateContext.getPaymentTransactionModelDao().getProcessedAmount(),paymentStateContext.getPaymentTransactionModelDao().getProcessedCurrency(),paymentStateContext.getPaymentTransactionModelDao().getEffectiveDate(),paymentStateContext.getPaymentTransactionModelDao().getCreatedDate(),buildPaymentPluginStatusFromOperationResult(paymentStateContext.getOverridePluginOperationResult()),null);
+      paymentStateContext.setPaymentTransactionInfoPlugin(paymentInfoPlugin);
+      return paymentStateContext.getOverridePluginOperationResult();
+    }
+  }
+ catch (  final PaymentPluginApiException e) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,e.getErrorMessage());
+  }
+}

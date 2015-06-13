@@ -1,0 +1,24 @@
+{
+  super.beforeClass();
+  this.testPaymentRoutingWithControl=new TestPaymentRoutingPluginApi();
+  pluginRegistry.registerService(new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return TEST_PAYMENT_WITH_CONTROL;
+    }
+    @Override public String getRegistrationName(){
+      return TEST_PAYMENT_WITH_CONTROL;
+    }
+  }
+,testPaymentRoutingWithControl);
+  properties=new ArrayList<PluginProperty>();
+  paymentOptions=new PaymentOptions(){
+    @Override public boolean isExternalPayment(){
+      return false;
+    }
+    @Override public List<String> getPaymentControlPluginNames(){
+      return ImmutableList.of(TEST_PAYMENT_WITH_CONTROL);
+    }
+  }
+;
+  properties.add(new PluginProperty("name",TEST_PAYMENT_WITH_CONTROL,false));
+}
