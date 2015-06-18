@@ -1,15 +1,10 @@
 {
-  if (e.getCause() instanceof PaymentApiException && ((PaymentApiException)e.getCause()).getCode() == ErrorCode.PAYMENT_PLUGIN_EXCEPTION.getCode()) {
-    return new OperationException(MoreObjects.firstNonNull(e.getCause(),e),OperationResult.EXCEPTION);
+  final Throwable originalExceptionOrCause=MoreObjects.firstNonNull(e.getCause(),e);
+  if (originalExceptionOrCause instanceof LockFailedException) {
+    logger.warn("Failed to lock account {}",paymentStateContext.getAccount().getExternalKey());
   }
  else {
-    if (e.getCause() instanceof LockFailedException) {
-      logger.warn("Failed to lock account {}",paymentStateContext.getAccount().getExternalKey());
-    }
- else {
-      logger.warn("Payment plugin call threw an exception for account {}",paymentStateContext.getAccount().getExternalKey(),e);
-    }
-    convertToUnknownTransactionStatusAndErroredPaymentState(e);
-    return new OperationException(MoreObjects.firstNonNull(e.getCause(),e),OperationResult.EXCEPTION);
+    logger.warn("Payment plugin call threw an exception for account {}",paymentStateContext.getAccount().getExternalKey(),originalExceptionOrCause);
   }
+  return convertToUnknownTransactionStatusAndErroredPaymentState(originalExceptionOrCause);
 }
