@@ -1,0 +1,20 @@
+{
+  final String capture1TransactionExternalKey=UUID.randomUUID().toString();
+  final PaymentTransaction captureTransaction=new PaymentTransaction();
+  captureTransaction.setPaymentId(payment.getPaymentId());
+  captureTransaction.setAmount(BigDecimal.ONE);
+  captureTransaction.setCurrency(payment.getCurrency());
+  captureTransaction.setPaymentExternalKey(payment.getPaymentExternalKey());
+  captureTransaction.setTransactionExternalKey(capture1TransactionExternalKey);
+  try {
+    killBillClient.captureAuthorization(captureTransaction,createdBy,reason,comment);
+    if (expectException) {
+      Assert.fail("Capture should not succeed, after auth was moved to a PAYMENT_FAILURE");
+    }
+  }
+ catch (  final KillBillClientException mabeExpected) {
+    if (!expectException) {
+      throw mabeExpected;
+    }
+  }
+}

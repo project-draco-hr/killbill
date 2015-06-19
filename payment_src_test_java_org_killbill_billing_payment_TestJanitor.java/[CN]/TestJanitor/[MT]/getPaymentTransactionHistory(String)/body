@@ -1,0 +1,14 @@
+{
+  return dbi.withHandle(new HandleCallback<List<PaymentTransactionModelDao>>(){
+    @Override public List<PaymentTransactionModelDao> withHandle(    final Handle handle) throws Exception {
+      final List<Map<String,Object>> queryResult=handle.select("select * from payment_transaction_history where transaction_external_key = ? order by record_id asc",transactionExternalKey);
+      final List<PaymentTransactionModelDao> result=new ArrayList<PaymentTransactionModelDao>(queryResult.size());
+      for (      final Map<String,Object> row : queryResult) {
+        final PaymentTransactionModelDao transactionModelDao=new PaymentTransactionModelDao(UUID.fromString((String)row.get("id")),null,(String)row.get("transaction_external_key"),null,null,UUID.fromString((String)row.get("payment_id")),TransactionType.valueOf((String)row.get("transaction_type")),null,TransactionStatus.valueOf((String)row.get("transaction_status")),(BigDecimal)row.get("amount"),Currency.valueOf((String)row.get("currency")),(String)row.get("gateway_error_code"),(String)row.get("gateway_error_msg"));
+        result.add(transactionModelDao);
+      }
+      return result;
+    }
+  }
+);
+}
