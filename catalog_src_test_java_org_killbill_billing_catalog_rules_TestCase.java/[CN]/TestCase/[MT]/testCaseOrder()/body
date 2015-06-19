@@ -2,12 +2,12 @@
   final MockCatalog cat=new MockCatalog();
   final DefaultProduct product=cat.getCurrentProducts()[0];
   final DefaultPriceList priceList=cat.findCurrentPriceList(PriceListSet.DEFAULT_PRICELIST_NAME);
-  final CaseResult cr0=new CaseResult(product,ProductCategory.BASE,BillingPeriod.MONTHLY,priceList,Result.FOO);
-  final CaseResult cr1=new CaseResult(product,ProductCategory.BASE,BillingPeriod.MONTHLY,priceList,Result.BAR);
-  final CaseResult cr2=new CaseResult(product,ProductCategory.BASE,BillingPeriod.ANNUAL,priceList,Result.DIPSY);
-  final CaseResult cr3=new CaseResult(product,ProductCategory.BASE,BillingPeriod.ANNUAL,priceList,Result.LALA);
-  final Result r1=Case.getResult(new CaseResult[]{cr0,cr1,cr2,cr3},new PlanSpecifier(product.getName(),product.getCategory(),BillingPeriod.MONTHLY,priceList.getName()),cat);
+  final DefaultCaseResult cr0=new DefaultCaseResult(product,ProductCategory.BASE,BillingPeriod.MONTHLY,priceList,Result.FOO);
+  final DefaultCaseResult cr1=new DefaultCaseResult(product,ProductCategory.BASE,BillingPeriod.MONTHLY,priceList,Result.BAR);
+  final DefaultCaseResult cr2=new DefaultCaseResult(product,ProductCategory.BASE,BillingPeriod.ANNUAL,priceList,Result.DIPSY);
+  final DefaultCaseResult cr3=new DefaultCaseResult(product,ProductCategory.BASE,BillingPeriod.ANNUAL,priceList,Result.LALA);
+  final Result r1=DefaultCase.getResult(new DefaultCaseResult[]{cr0,cr1,cr2,cr3},new PlanSpecifier(product.getName(),product.getCategory(),BillingPeriod.MONTHLY,priceList.getName()),cat);
   Assert.assertEquals(r1,Result.FOO);
-  final Result r2=Case.getResult(new CaseResult[]{cr0,cr1,cr2},new PlanSpecifier(product.getName(),product.getCategory(),BillingPeriod.ANNUAL,priceList.getName()),cat);
+  final Result r2=DefaultCase.getResult(new DefaultCaseResult[]{cr0,cr1,cr2},new PlanSpecifier(product.getName(),product.getCategory(),BillingPeriod.ANNUAL,priceList.getName()),cat);
   Assert.assertEquals(r2,Result.DIPSY);
 }

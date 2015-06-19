@@ -1,0 +1,22 @@
+{
+  if (tmpDefaultPlans == null) {
+    throw new IllegalStateException("Cannot filter on uninitialized plans");
+  }
+  final List<String> inputPlanNames=ImmutableList.copyOf(Iterables.transform(input,new Function<Plan,String>(){
+    @Override public String apply(    final Plan input){
+      return input.getName();
+    }
+  }
+));
+  final List<DefaultPlan> filteredAndOrdered=new ArrayList<DefaultPlan>(inputPlanNames.size());
+  for (  final String cur : inputPlanNames) {
+    final DefaultPlan found=findOrIllegalState(tmpDefaultPlans,new Predicate<DefaultPlan>(){
+      @Override public boolean apply(      final DefaultPlan inputPredicate){
+        return inputPredicate.getName().equals(cur);
+      }
+    }
+,"Failed to find plan " + cur);
+    filteredAndOrdered.add(found);
+  }
+  return toArray(filteredAndOrdered);
+}

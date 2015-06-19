@@ -1,0 +1,23 @@
+{
+  final StandaloneCatalog result=new StandaloneCatalog();
+  result.setCatalogName(catalogName);
+  result.setEffectiveDate(pluginCatalog.getEffectiveDate().toDate());
+  result.setProducts(toDefaultProducts(pluginCatalog.getProducts()));
+  result.setPlans(toDefaultPlans(pluginCatalog.getPlans()));
+  result.setPriceLists(toDefaultPriceListSet(pluginCatalog.getDefaultPriceList(),pluginCatalog.getChildrenPriceList()));
+  result.setRecurringBillingMode(recurringBillingMode);
+  result.setSupportedCurrencies(toArray(pluginCatalog.getCurrencies()));
+  result.setUnits(toDefaultUnits(pluginCatalog.getUnits()));
+  result.setPlanRules(toDefaultPlanRules(pluginCatalog.getPlanRules()));
+  for (  final Product cur : pluginCatalog.getProducts()) {
+    for (    DefaultProduct target : result.getCurrentProducts()) {
+      if (target.getName().equals(cur.getName())) {
+        target.setAvailable(toFilteredDefaultProduct(ImmutableList.copyOf(cur.getAvailable())));
+        target.setIncluded(toFilteredDefaultProduct(ImmutableList.copyOf(cur.getIncluded())));
+        break;
+      }
+    }
+  }
+  result.initialize(result,catalogURI);
+  return result;
+}

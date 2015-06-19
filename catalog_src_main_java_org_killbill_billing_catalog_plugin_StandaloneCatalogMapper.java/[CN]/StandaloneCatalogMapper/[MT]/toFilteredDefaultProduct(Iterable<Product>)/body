@@ -1,0 +1,22 @@
+{
+  if (!input.iterator().hasNext()) {
+    return new DefaultProduct[0];
+  }
+  final List<String> inputProductNames=ImmutableList.copyOf(Iterables.transform(input,new Function<Product,String>(){
+    @Override public String apply(    final Product input){
+      return input.getName();
+    }
+  }
+));
+  final List<DefaultProduct> filteredAndOrdered=new ArrayList<DefaultProduct>(inputProductNames.size());
+  for (  final String cur : inputProductNames) {
+    final DefaultProduct found=findOrIllegalState(tmpDefaultProducts,new Predicate<DefaultProduct>(){
+      @Override public boolean apply(      final DefaultProduct inputPredicate){
+        return inputPredicate.getName().equals(cur);
+      }
+    }
+,"Failed to find product " + cur);
+    filteredAndOrdered.add(found);
+  }
+  return toArray(filteredAndOrdered);
+}

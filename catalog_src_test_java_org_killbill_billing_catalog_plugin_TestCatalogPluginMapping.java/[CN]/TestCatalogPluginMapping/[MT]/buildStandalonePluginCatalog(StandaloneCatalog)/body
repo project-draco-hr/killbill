@@ -1,0 +1,35 @@
+{
+  final TestPlanRules rules=new TestPlanRules(ImmutableList.<Product>copyOf(inputCatalog.getCurrentProducts()),ImmutableList.<Plan>copyOf(inputCatalog.getCurrentPlans()),inputCatalog.getPriceLists().getAllPriceLists());
+  if (inputCatalog.getPlanRules().getCaseChangePlanPolicy() != null) {
+    for (    final CaseChangePlanPolicy cur : inputCatalog.getPlanRules().getCaseChangePlanPolicy()) {
+      rules.addCaseChangePlanPolicyRule(cur);
+    }
+  }
+  if (inputCatalog.getPlanRules().getCaseChangePlanAlignment() != null) {
+    for (    final CaseChangePlanAlignment cur : inputCatalog.getPlanRules().getCaseChangePlanAlignment()) {
+      rules.addCaseChangeAlignmentRule(cur);
+    }
+  }
+  if (inputCatalog.getPlanRules().getCaseCancelPolicy() != null) {
+    for (    final CaseCancelPolicy cur : inputCatalog.getPlanRules().getCaseCancelPolicy()) {
+      rules.addCaseCancelRule(cur);
+    }
+  }
+  if (inputCatalog.getPlanRules().getCaseCreateAlignment() != null) {
+    for (    final CaseCreateAlignment cur : inputCatalog.getPlanRules().getCaseCreateAlignment()) {
+      rules.addCaseCreateAlignmentRule(cur);
+    }
+  }
+  if (inputCatalog.getPlanRules().getCaseBillingAlignment() != null) {
+    for (    final CaseBillingAlignment cur : inputCatalog.getPlanRules().getCaseBillingAlignment()) {
+      rules.addCaseBillingAlignmentRule(cur);
+    }
+  }
+  if (inputCatalog.getPlanRules().getCasePriceList() != null) {
+    for (    final CasePriceList cur : inputCatalog.getPlanRules().getCasePriceList()) {
+      rules.addPriceListRule(cur);
+    }
+  }
+  final TestStandalonePluginCatalog result=new TestStandalonePluginCatalog(new DateTime(inputCatalog.getEffectiveDate()),ImmutableList.<Currency>copyOf(inputCatalog.getCurrentSupportedCurrencies()),ImmutableList.<Product>copyOf(inputCatalog.getCurrentProducts()),ImmutableList.<Plan>copyOf(inputCatalog.getCurrentPlans()),inputCatalog.getPriceLists().getDefaultPricelist(),ImmutableList.<PriceList>copyOf(inputCatalog.getPriceLists().getChildPriceLists()),rules,ImmutableList.<Unit>copyOf(inputCatalog.getCurrentUnits()));
+  return result;
+}
