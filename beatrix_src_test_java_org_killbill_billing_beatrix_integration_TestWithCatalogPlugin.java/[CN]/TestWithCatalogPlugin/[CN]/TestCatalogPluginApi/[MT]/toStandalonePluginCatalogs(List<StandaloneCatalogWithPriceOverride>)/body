@@ -1,0 +1,16 @@
+{
+  return Iterables.transform(input,new Function<StandaloneCatalogWithPriceOverride,StandalonePluginCatalog>(){
+    @Override public StandalonePluginCatalog apply(    final StandaloneCatalogWithPriceOverride input){
+      try {
+        return new TestStandalonePluginCatalog(new DateTime(input.getEffectiveDate()),ImmutableList.copyOf(input.getCurrentSupportedCurrencies()),ImmutableList.<Product>copyOf(input.getCurrentProducts()),ImmutableList.<Plan>copyOf(input.getCurrentPlans()),input.getStandaloneCatalog().getPriceLists().getDefaultPricelist(),ImmutableList.<PriceList>copyOf(input.getStandaloneCatalog().getPriceLists().getChildPriceLists()),input.getStandaloneCatalog().getPlanRules(),null);
+      }
+ catch (      CatalogApiException e) {
+        throw new IllegalStateException(e);
+      }
+    }
+    private <I,C extends I>List<I> listOf(    @Nullable C[] input){
+      return (input != null) ? ImmutableList.<I>copyOf(input) : ImmutableList.<I>of();
+    }
+  }
+);
+}
