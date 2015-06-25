@@ -1,0 +1,20 @@
+{
+  if (input == null) {
+    return null;
+  }
+  if (tmpDefaultProducts != null) {
+    final DefaultProduct existingProduct=findOrIllegalState(tmpDefaultProducts,new Predicate<DefaultProduct>(){
+      @Override public boolean apply(      final DefaultProduct predicateInput){
+        return predicateInput.getName().equals(input.getName());
+      }
+    }
+,"Unknown product " + input.getName());
+    return existingProduct;
+  }
+  final DefaultProduct result=new DefaultProduct();
+  result.setCatalogName(catalogName);
+  result.setCatagory(input.getCategory());
+  result.setName(input.getName());
+  result.setRetired(input.isRetired());
+  return result;
+}

@@ -1,0 +1,20 @@
+{
+  if (tmpDefaultPlans != null) {
+    final DefaultPlan existingPlan=findOrIllegalState(tmpDefaultPlans,new Predicate<DefaultPlan>(){
+      @Override public boolean apply(      final DefaultPlan predicateInput){
+        return predicateInput.getName().equals(input.getName());
+      }
+    }
+,"Unknown plan " + input.getName());
+    return existingPlan;
+  }
+  final DefaultPlan result=new DefaultPlan();
+  result.setName(input.getName());
+  result.setRetired(input.isRetired());
+  result.setEffectiveDateForExistingSubscriptons(input.getEffectiveDateForExistingSubscriptons());
+  result.setFinalPhase(toDefaultPlanPhase(input.getFinalPhase()));
+  result.setInitialPhases(toDefaultPlanPhases(ImmutableList.copyOf(input.getInitialPhases())));
+  result.setPlansAllowedInBundle(input.getPlansAllowedInBundle());
+  result.setProduct(toDefaultProduct(input.getProduct()));
+  return result;
+}
