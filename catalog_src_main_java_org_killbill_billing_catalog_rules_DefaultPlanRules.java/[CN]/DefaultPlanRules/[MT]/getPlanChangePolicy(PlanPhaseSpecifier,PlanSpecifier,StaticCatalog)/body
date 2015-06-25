@@ -2,5 +2,6 @@
   if (from.getProductName().equals(to.getProductName()) && from.getBillingPeriod() == to.getBillingPeriod() && from.getPriceListName().equals(to.getPriceListName())) {
     return BillingActionPolicy.ILLEGAL;
   }
-  return DefaultCaseChange.getResult(changeCase,from,to,catalog);
+  final BillingActionPolicy result=DefaultCaseChange.getResult(changeCase,from,to,catalog);
+  return (result != null) ? result : BillingActionPolicy.END_OF_TERM;
 }
