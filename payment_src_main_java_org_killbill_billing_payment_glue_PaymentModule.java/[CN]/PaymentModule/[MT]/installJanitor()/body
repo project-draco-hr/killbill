@@ -1,5 +1,7 @@
 {
   final ScheduledExecutorService janitorExecutor=org.killbill.commons.concurrent.Executors.newSingleThreadScheduledExecutor("PaymentJanitor");
   bind(ScheduledExecutorService.class).annotatedWith(Names.named(JANITOR_EXECUTOR_NAMED)).toInstance(janitorExecutor);
+  bind(IncompletePaymentTransactionTask.class).asEagerSingleton();
+  bind(IncompletePaymentAttemptTask.class).asEagerSingleton();
   bind(Janitor.class).asEagerSingleton();
 }
