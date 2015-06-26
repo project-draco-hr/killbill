@@ -38,7 +38,7 @@ break;
 case PLUGIN_FAILURE:
 case UNKNOWN:
 default :
-log.info("Janitor IncompletePaymentTransactionTask repairing payment {}, transaction {}, bail early...",new Object[]{payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus});
+log.info("Janitor IncompletePaymentTransactionTask repairing payment {}, transaction {}, bail early...",payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus);
 return;
 }
 final String lastSuccessPaymentState=paymentStateMachineHelper.isSuccessState(newPaymentState) ? newPaymentState : null;
@@ -46,7 +46,7 @@ final BigDecimal processedAmount=(paymentTransactionInfoPlugin != null && isPend
 final Currency processedCurrency=(paymentTransactionInfoPlugin != null && isPendingOrFinalTransactionStatus(transactionStatus)) ? paymentTransactionInfoPlugin.getCurrency() : paymentTransaction.getProcessedCurrency();
 final String gatewayErrorCode=paymentTransactionInfoPlugin != null ? paymentTransactionInfoPlugin.getGatewayErrorCode() : paymentTransaction.getGatewayErrorCode();
 final String gatewayError=paymentTransactionInfoPlugin != null ? paymentTransactionInfoPlugin.getGatewayError() : paymentTransaction.getGatewayErrorMsg();
-log.info("Janitor IncompletePaymentTransactionTask repairing payment {}, transaction {}, transitioning transactionStatus from {} -> {}",new Object[]{payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus});
+log.info("Janitor IncompletePaymentTransactionTask repairing payment {}, transaction {}, transitioning transactionStatus from {} -> {}",payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus);
 final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(payment.getAccountId(),callContext);
 paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),payment.getId(),paymentTransaction.getTransactionType(),newPaymentState,lastSuccessPaymentState,paymentTransaction.getId(),transactionStatus,processedAmount,processedCurrency,gatewayErrorCode,gatewayError,internalCallContext);
 }
