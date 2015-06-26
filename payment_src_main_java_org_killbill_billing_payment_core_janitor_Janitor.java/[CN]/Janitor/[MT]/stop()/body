@@ -3,6 +3,8 @@
     log.warn("Janitor is already in a stopped state");
     return;
   }
+  incompletePaymentAttemptTask.stop();
+  incompletePaymentTransactionTask.stop();
   try {
     janitorExecutor.shutdown();
     final boolean success=janitorExecutor.awaitTermination(TERMINATION_TIMEOUT_SEC,TimeUnit.SECONDS);
