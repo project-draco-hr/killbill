@@ -15,11 +15,11 @@
   assertListenerStatus();
   clock.addDays(10);
   busHandler.pushExpectedEvents(NextEvent.PAUSE,NextEvent.BLOCK);
-  entitlementApi.pause(bpEntitlement.getBundleId(),clock.getUTCNow().toLocalDate(),callContext);
+  entitlementApi.pause(bpEntitlement.getBundleId(),clock.getUTCNow().toLocalDate(),ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   clock.addDays(23);
   busHandler.pushExpectedEvents(NextEvent.RESUME,NextEvent.BLOCK);
-  entitlementApi.resume(bpEntitlement.getBundleId(),clock.getUTCNow().toLocalDate(),callContext);
+  entitlementApi.resume(bpEntitlement.getBundleId(),clock.getUTCNow().toLocalDate(),ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   busHandler.pushExpectedEvents(NextEvent.TAG,NextEvent.INVOICE,NextEvent.PAYMENT);
   tagUserApi.removeTag(account.getId(),ObjectType.ACCOUNT,ControlTagType.AUTO_INVOICING_OFF.getId(),callContext);

@@ -8,7 +8,7 @@
   final DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   final SubscriptionBundle initialBundle=subscriptionApi.getActiveSubscriptionBundleForExternalKey("bundleKey",callContext);
   busHandler.pushExpectedEvents(NextEvent.BLOCK,NextEvent.CANCEL);
-  baseEntitlement.cancelEntitlementWithPolicy(EntitlementActionPolicy.IMMEDIATE,callContext);
+  baseEntitlement.cancelEntitlementWithPolicy(EntitlementActionPolicy.IMMEDIATE,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   final String newProductName="Pistol";
   final DefaultEntitlement newBaseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",newProductName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
