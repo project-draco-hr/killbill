@@ -1,0 +1,7 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final UUID uuid=UUID.fromString(subscriptionId);
+  final Entitlement current=entitlementApi.getEntitlementForId(uuid,context.createContext(createdBy,reason,comment,request));
+  current.uncancelEntitlement(pluginProperties,context.createContext(createdBy,reason,comment,request));
+  return Response.status(Status.OK).build();
+}

@@ -1,0 +1,9 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID bundleId=UUID.fromString(id);
+  final SubscriptionBundle bundle=subscriptionApi.getSubscriptionBundle(bundleId,callContext);
+  final LocalDate inputLocalDate=toLocalDate(bundle.getAccountId(),requestedDate,callContext);
+  entitlementApi.pause(bundleId,inputLocalDate,pluginProperties,callContext);
+  return Response.status(Status.OK).build();
+}

@@ -1,0 +1,21 @@
+{
+  try {
+    final PriorEntitlementResult priorEntitlementResult=executePluginPriorCalls(pluginContext);
+    if (priorEntitlementResult != null && priorEntitlementResult.isAborted()) {
+      throw new EntitlementApiException(ErrorCode.ENT_PLUGIN_API_ABORTED);
+    }
+    final EntitlementContext updatedPluginContext=new DefaultEntitlementContext(pluginContext,priorEntitlementResult);
+    try {
+      T result=callback.doCall(entitlementApi,updatedPluginContext);
+      executePluginOnSuccessCalls(updatedPluginContext);
+      return result;
+    }
+ catch (    final EntitlementApiException e) {
+      executePluginOnFailureCalls(updatedPluginContext);
+      throw e;
+    }
+  }
+ catch (  final EntitlementPluginApiException e) {
+    throw new EntitlementApiException(ErrorCode.ENT_PLUGIN_API_ABORTED,e.getMessage());
+  }
+}

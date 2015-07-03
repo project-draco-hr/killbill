@@ -1,0 +1,42 @@
+{
+  verifyNonNullOrEmpty(entitlement,"SubscriptionJson body should be specified");
+  verifyNonNullOrEmpty(entitlement.getProductName(),"SubscriptionJson productName needs to be set",entitlement.getBillingPeriod(),"SubscriptionJson billingPeriod needs to be set",entitlement.getPriceList(),"SubscriptionJson priceList needs to be set");
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final EntitlementCallCompletionCallback<Response> callback=new EntitlementCallCompletionCallback<Response>(){
+    private boolean isImmediateOp=true;
+    @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException {
+      final UUID uuid=UUID.fromString(subscriptionId);
+      final Entitlement current=entitlementApi.getEntitlementForId(uuid,callContext);
+      final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
+      final Entitlement newEntitlement;
+      final Account account=accountUserApi.getAccountById(current.getAccountId(),callContext);
+      final PlanSpecifier planSpec=new PlanSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList());
+      final List<PlanPhasePriceOverride> overrides=PhasePriceOverrideJson.toPlanPhasePriceOverrides(entitlement.getPriceOverrides(),planSpec,account.getCurrency());
+      if (requestedDate == null && policyString == null) {
+        newEntitlement=current.changePlan(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),overrides,pluginProperties,ctx);
+      }
+ else       if (policyString == null) {
+        newEntitlement=current.changePlanWithDate(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),overrides,inputLocalDate,pluginProperties,ctx);
+      }
+ else {
+        final BillingActionPolicy policy=BillingActionPolicy.valueOf(policyString.toUpperCase());
+        newEntitlement=current.changePlanOverrideBillingPolicy(entitlement.getProductName(),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),overrides,inputLocalDate,policy,pluginProperties,ctx);
+      }
+      isImmediateOp=newEntitlement.getLastActiveProduct().getName().equals(entitlement.getProductName()) && newEntitlement.getLastActivePlan().getRecurringBillingPeriod() == BillingPeriod.valueOf(entitlement.getBillingPeriod()) && newEntitlement.getLastActivePriceList().getName().equals(entitlement.getPriceList());
+      return Response.status(Status.OK).build();
+    }
+    @Override public boolean isImmOperation(){
+      return isImmediateOp;
+    }
+    @Override public Response doResponseOk(    final Response operationResponse) throws SubscriptionApiException {
+      if (operationResponse.getStatus() != Status.OK.getStatusCode()) {
+        return operationResponse;
+      }
+      return getEntitlement(subscriptionId,request);
+    }
+  }
+;
+  final EntitlementCallCompletion<Response> callCompletionCreation=new EntitlementCallCompletion<Response>();
+  return callCompletionCreation.withSynchronization(callback,timeoutSec,callCompletion,callContext);
+}

@@ -4,7 +4,7 @@
   final Account account=accountApi.createAccount(getAccountData(7),callContext);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,initialDate,callContext);
+  final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,initialDate,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   testListener.pushExpectedEvent(NextEvent.PHASE);
   clock.addDays(30);
@@ -12,11 +12,11 @@
   subscriptionInternalApi.setChargedThroughDate(entitlement.getId(),clock.getUTCNow().plusMonths(1),internalCallContext);
   final LocalDate entitlementCancelledDate=clock.getToday(account.getTimeZone());
   testListener.pushExpectedEvent(NextEvent.BLOCK);
-  final Entitlement cancelledEntitlement=entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getToday(account.getTimeZone()),BillingActionPolicy.END_OF_TERM,callContext);
+  final Entitlement cancelledEntitlement=entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getToday(account.getTimeZone()),BillingActionPolicy.END_OF_TERM,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   Assert.assertEquals(cancelledEntitlement.getEffectiveEndDate(),entitlementCancelledDate);
   testListener.pushExpectedEvent(NextEvent.UNCANCEL);
-  cancelledEntitlement.uncancelEntitlement(callContext);
+  cancelledEntitlement.uncancelEntitlement(ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   final Entitlement reactivatedEntitlement=entitlementApi.getEntitlementForId(cancelledEntitlement.getId(),callContext);
   Assert.assertNull(reactivatedEntitlement.getEffectiveEndDate());

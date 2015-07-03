@@ -1,0 +1,42 @@
+{
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final EntitlementCallCompletionCallback<Response> callback=new EntitlementCallCompletionCallback<Response>(){
+    private boolean isImmediateOp=true;
+    @Override public Response doOperation(    final CallContext ctx) throws EntitlementApiException, InterruptedException, TimeoutException, AccountApiException, SubscriptionApiException {
+      final UUID uuid=UUID.fromString(subscriptionId);
+      final Entitlement current=entitlementApi.getEntitlementForId(uuid,ctx);
+      final LocalDate inputLocalDate=toLocalDate(current.getAccountId(),requestedDate,callContext);
+      final Entitlement newEntitlement;
+      if (billingPolicyString == null && entitlementPolicyString == null) {
+        newEntitlement=current.cancelEntitlementWithDate(inputLocalDate,useRequestedDateForBilling,pluginProperties,ctx);
+      }
+ else       if (billingPolicyString == null && entitlementPolicyString != null) {
+        final EntitlementActionPolicy entitlementPolicy=EntitlementActionPolicy.valueOf(entitlementPolicyString);
+        newEntitlement=current.cancelEntitlementWithPolicy(entitlementPolicy,pluginProperties,ctx);
+      }
+ else       if (billingPolicyString != null && entitlementPolicyString == null) {
+        final BillingActionPolicy billingPolicy=BillingActionPolicy.valueOf(billingPolicyString.toUpperCase());
+        newEntitlement=current.cancelEntitlementWithDateOverrideBillingPolicy(inputLocalDate,billingPolicy,pluginProperties,ctx);
+      }
+ else {
+        final EntitlementActionPolicy entitlementPolicy=EntitlementActionPolicy.valueOf(entitlementPolicyString);
+        final BillingActionPolicy billingPolicy=BillingActionPolicy.valueOf(billingPolicyString.toUpperCase());
+        newEntitlement=current.cancelEntitlementWithPolicyOverrideBillingPolicy(entitlementPolicy,billingPolicy,pluginProperties,ctx);
+      }
+      final Subscription subscription=subscriptionApi.getSubscriptionForEntitlementId(newEntitlement.getId(),ctx);
+      final LocalDate nowInAccountTimeZone=new LocalDate(clock.getUTCNow(),subscription.getBillingEndDate().getChronology().getZone());
+      isImmediateOp=subscription.getBillingEndDate() != null && !subscription.getBillingEndDate().isAfter(nowInAccountTimeZone);
+      return Response.status(Status.OK).build();
+    }
+    @Override public boolean isImmOperation(){
+      return isImmediateOp;
+    }
+    @Override public Response doResponseOk(    final Response operationResponse){
+      return operationResponse;
+    }
+  }
+;
+  final EntitlementCallCompletion<Response> callCompletionCreation=new EntitlementCallCompletion<Response>();
+  return callCompletionCreation.withSynchronization(callback,timeoutSec,callCompletion,callContext);
+}

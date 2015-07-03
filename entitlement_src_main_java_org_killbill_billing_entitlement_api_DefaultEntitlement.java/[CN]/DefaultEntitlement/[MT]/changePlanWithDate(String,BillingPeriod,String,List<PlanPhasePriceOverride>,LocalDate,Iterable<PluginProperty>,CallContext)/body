@@ -1,0 +1,29 @@
+{
+  refresh(callContext);
+  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CHANGE_PLAN,getAccountId(),null,getBundleId(),null,getExternalKey(),null,localDate,properties,callContext);
+  final WithEntitlementPlugin<Entitlement> changePlanWithPlugin=new WithEntitlementPlugin<Entitlement>(){
+    @Override public Entitlement doCall(    final EntitlementApi entitlementApi,    final EntitlementContext updatedPluginContext) throws EntitlementApiException {
+      if (!eventsStream.isEntitlementActive()) {
+        throw new EntitlementApiException(ErrorCode.SUB_CHANGE_NON_ACTIVE,getId(),getState());
+      }
+      final InternalCallContext context=internalCallContextFactory.createInternalCallContext(getAccountId(),callContext);
+      try {
+        checker.checkBlockedChange(getSubscriptionBase(),context);
+      }
+ catch (      BlockingApiException e) {
+        throw new EntitlementApiException(e,e.getCode(),e.getMessage());
+      }
+      final DateTime effectiveChangeDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),getSubscriptionBase().getStartDate(),context);
+      try {
+        getSubscriptionBase().changePlanWithDate(productName,billingPeriod,priceList,overrides,effectiveChangeDate,callContext);
+      }
+ catch (      SubscriptionBaseApiException e) {
+        throw new EntitlementApiException(e);
+      }
+      blockAddOnsIfRequired(effectiveChangeDate,callContext,context);
+      return entitlementApi.getEntitlementForId(getId(),callContext);
+    }
+  }
+;
+  return pluginExecution.executeWithPlugin(changePlanWithPlugin,pluginContext);
+}

@@ -1,0 +1,23 @@
+{
+  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CREATE_SUBSCRIPTION,accountId,null,null,planPhaseSpecifier,externalKey,overrides,effectiveDate,properties,callContext);
+  final WithEntitlementPlugin<Entitlement> createBaseEntitlementWithPlugin=new WithEntitlementPlugin<Entitlement>(){
+    @Override public Entitlement doCall(    final EntitlementApi entitlementApi,    final EntitlementContext updatedPluginContext) throws EntitlementApiException {
+      final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
+      try {
+        if (entitlementUtils.getFirstActiveSubscriptionIdForKeyOrNull(externalKey,contextWithValidAccountRecordId) != null) {
+          throw new EntitlementApiException(new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_ACTIVE_BUNDLE_KEY_EXISTS,externalKey));
+        }
+        final SubscriptionBaseBundle bundle=subscriptionBaseInternalApi.createBundleForAccount(accountId,externalKey,contextWithValidAccountRecordId);
+        final DateTime referenceTime=clock.getUTCNow();
+        final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),referenceTime,contextWithValidAccountRecordId);
+        final SubscriptionBase subscription=subscriptionBaseInternalApi.createSubscription(bundle.getId(),updatedPluginContext.getPlanPhaseSpecifier(),updatedPluginContext.getPlanPhasePriceOverride(),requestedDate,contextWithValidAccountRecordId);
+        return new DefaultEntitlement(subscription.getId(),eventsStreamBuilder,entitlementApi,pluginExecution,blockingStateDao,subscriptionBaseInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,internalCallContextFactory,callContext);
+      }
+ catch (      SubscriptionBaseApiException e) {
+        throw new EntitlementApiException(e);
+      }
+    }
+  }
+;
+  return pluginExecution.executeWithPlugin(createBaseEntitlementWithPlugin,pluginContext);
+}

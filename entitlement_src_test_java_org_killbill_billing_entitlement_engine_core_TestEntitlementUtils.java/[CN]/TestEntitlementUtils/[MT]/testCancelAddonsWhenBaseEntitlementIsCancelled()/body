@@ -1,15 +1,15 @@
 {
   testListener.pushExpectedEvents(NextEvent.CREATE,NextEvent.PHASE);
   final PlanPhaseSpecifier addOn2Spec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
-  final Entitlement addOn2Entitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),addOn2Spec,null,initialDate,callContext);
+  final Entitlement addOn2Entitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),addOn2Spec,null,initialDate,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   final LocalDate addOn1CancellationDate=new LocalDate(2013,9,9);
-  addOnEntitlement.cancelEntitlementWithDate(addOn1CancellationDate,true,callContext);
+  addOnEntitlement.cancelEntitlementWithDate(addOn1CancellationDate,true,ImmutableList.<PluginProperty>of(),callContext);
   final LocalDate addOn2CancellationDate=new LocalDate(2013,11,11);
-  addOn2Entitlement.cancelEntitlementWithDate(addOn2CancellationDate,true,callContext);
+  addOn2Entitlement.cancelEntitlementWithDate(addOn2CancellationDate,true,ImmutableList.<PluginProperty>of(),callContext);
   Assert.assertEquals(entitlementApi.getEntitlementForId(addOn2Entitlement.getId(),callContext).getEffectiveEndDate(),addOn2CancellationDate);
   final LocalDate baseCancellationDate=new LocalDate(2013,10,10);
-  baseEntitlement.cancelEntitlementWithDate(baseCancellationDate,true,callContext);
+  baseEntitlement.cancelEntitlementWithDate(baseCancellationDate,true,ImmutableList.<PluginProperty>of(),callContext);
   Assert.assertEquals(entitlementApi.getEntitlementForId(addOn2Entitlement.getId(),callContext).getEffectiveEndDate(),baseCancellationDate);
   assertListenerStatus();
   Assert.assertEquals(entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext).getEffectiveEndDate(),baseCancellationDate);

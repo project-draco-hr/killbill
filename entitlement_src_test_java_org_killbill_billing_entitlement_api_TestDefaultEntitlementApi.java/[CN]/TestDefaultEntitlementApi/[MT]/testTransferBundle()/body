@@ -5,7 +5,7 @@
   final Account accountDesc=accountApi.createAccount(getAccountData(15),callContext);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(accountSrc.getId(),spec,accountSrc.getExternalKey(),null,initialDate,callContext);
+  final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(accountSrc.getId(),spec,accountSrc.getExternalKey(),null,initialDate,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   final DateTime ctd=clock.getUTCNow().plusDays(30).plusMonths(1);
   testListener.pushExpectedEvent(NextEvent.PHASE);
@@ -14,7 +14,7 @@
   assertListenerStatus();
   final LocalDate effectiveDate=new LocalDate(clock.getUTCNow(),accountSrc.getTimeZone());
   testListener.pushExpectedEvents(NextEvent.TRANSFER,NextEvent.BLOCK);
-  final UUID newBundleId=entitlementApi.transferEntitlementsOverrideBillingPolicy(accountSrc.getId(),accountDesc.getId(),baseEntitlement.getExternalKey(),effectiveDate,BillingActionPolicy.END_OF_TERM,callContext);
+  final UUID newBundleId=entitlementApi.transferEntitlementsOverrideBillingPolicy(accountSrc.getId(),accountDesc.getId(),baseEntitlement.getExternalKey(),effectiveDate,BillingActionPolicy.END_OF_TERM,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   final Entitlement oldBaseEntitlement=entitlementApi.getAllEntitlementsForAccountIdAndExternalKey(accountSrc.getId(),accountSrc.getExternalKey(),callContext).get(0);
   assertEquals(oldBaseEntitlement.getEffectiveEndDate(),effectiveDate);

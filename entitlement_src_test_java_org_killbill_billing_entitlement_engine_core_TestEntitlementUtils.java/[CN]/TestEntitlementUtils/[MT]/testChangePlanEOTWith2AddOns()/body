@@ -1,9 +1,9 @@
 {
   testListener.pushExpectedEvents(NextEvent.CREATE);
   final PlanPhaseSpecifier secondAddOnSpec=new PlanPhaseSpecifier("Laser-Scope",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
-  final DefaultEntitlement secondAddOnEntitlement=(DefaultEntitlement)entitlementApi.addEntitlement(baseEntitlement.getBundleId(),secondAddOnSpec,null,clock.getUTCToday(),callContext);
+  final DefaultEntitlement secondAddOnEntitlement=(DefaultEntitlement)entitlementApi.addEntitlement(baseEntitlement.getBundleId(),secondAddOnSpec,null,clock.getUTCToday(),ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
-  final DefaultEntitlement changedBaseEntitlement=(DefaultEntitlement)baseEntitlement.changePlanWithDate("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null,new LocalDate(2013,10,7),callContext);
+  final DefaultEntitlement changedBaseEntitlement=(DefaultEntitlement)baseEntitlement.changePlanWithDate("Assault-Rifle",BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null,new LocalDate(2013,10,7),ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   checkBlockingStatesDAO(changedBaseEntitlement,addOnEntitlement,baseEffectiveCancellationOrChangeDate,false);
   final List<BlockingState> blockingStatesForSecondAddOn=blockingStatesForBlockedId(secondAddOnEntitlement.getId());

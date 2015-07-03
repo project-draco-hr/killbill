@@ -4,11 +4,11 @@
   final Account account=accountApi.createAccount(getAccountData(7),callContext);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,initialDate,callContext);
+  final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,initialDate,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   final PlanPhaseSpecifier spec1=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement telescopicEntitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,null,initialDate,callContext);
+  final Entitlement telescopicEntitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,null,initialDate,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   assertEquals(telescopicEntitlement.getAccountId(),account.getId());
   assertEquals(telescopicEntitlement.getExternalKey(),account.getExternalKey());

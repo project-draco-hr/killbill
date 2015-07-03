@@ -2,7 +2,7 @@
   final DateTime cancellationDateTime=clock.getUTCNow();
   final LocalDate cancellationDate=clock.getUTCToday();
   testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.BLOCK);
-  final DefaultEntitlement cancelledBaseEntitlement=(DefaultEntitlement)baseEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.IMMEDIATE,BillingActionPolicy.IMMEDIATE,callContext);
+  final DefaultEntitlement cancelledBaseEntitlement=(DefaultEntitlement)baseEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.IMMEDIATE,BillingActionPolicy.IMMEDIATE,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   final DefaultEntitlement cancelledAddOnEntitlement=(DefaultEntitlement)entitlementApi.getEntitlementForId(addOnEntitlement.getId(),callContext);
   checkFutureBlockingStatesToCancel(cancelledBaseEntitlement,null,null);

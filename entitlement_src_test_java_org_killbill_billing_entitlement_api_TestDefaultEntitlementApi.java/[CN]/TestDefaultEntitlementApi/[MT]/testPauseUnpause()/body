@@ -4,24 +4,24 @@
   final Account account=accountApi.createAccount(getAccountData(7),callContext);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,initialDate,callContext);
+  final Entitlement baseEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,initialDate,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   clock.addDays(1);
   final LocalDate effectiveDateSpec1=new LocalDate(clock.getUTCNow(),account.getTimeZone());
   final PlanPhaseSpecifier spec1=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement telescopicEntitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,null,effectiveDateSpec1,callContext);
+  final Entitlement telescopicEntitlement=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,null,effectiveDateSpec1,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   clock.addDays(5);
   testListener.pushExpectedEvents(NextEvent.PAUSE,NextEvent.BLOCK);
-  entitlementApi.pause(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),callContext);
+  entitlementApi.pause(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   final Entitlement baseEntitlement2=entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   assertEquals(baseEntitlement2.getState(),EntitlementState.BLOCKED);
   final Entitlement telescopicEntitlement2=entitlementApi.getEntitlementForId(telescopicEntitlement.getId(),callContext);
   assertEquals(telescopicEntitlement2.getState(),EntitlementState.BLOCKED);
   try {
-    entitlementApi.pause(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),callContext);
+    entitlementApi.pause(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),ImmutableList.<PluginProperty>of(),callContext);
     Assert.fail("Should not have succeeded to block in a blocked state");
   }
  catch (  EntitlementApiException e) {
@@ -34,16 +34,16 @@
   }
   try {
     final PlanPhaseSpecifier spec3=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
-    final Entitlement telescopicEntitlement3=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,null,effectiveDateSpec1,callContext);
+    final Entitlement telescopicEntitlement3=entitlementApi.addEntitlement(baseEntitlement.getBundleId(),spec1,null,effectiveDateSpec1,ImmutableList.<PluginProperty>of(),callContext);
   }
  catch (  EntitlementApiException e) {
     assertEquals(e.getCode(),ErrorCode.SUB_GET_NO_SUCH_BASE_SUBSCRIPTION.getCode());
   }
   clock.addDays(3);
   testListener.pushExpectedEvents(NextEvent.RESUME,NextEvent.BLOCK);
-  entitlementApi.resume(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),callContext);
+  entitlementApi.resume(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
-  entitlementApi.resume(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),callContext);
+  entitlementApi.resume(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),ImmutableList.<PluginProperty>of(),callContext);
   final Entitlement baseEntitlement3=entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   assertEquals(baseEntitlement3.getState(),EntitlementState.ACTIVE);
   final Entitlement telescopicEntitlement3=entitlementApi.getEntitlementForId(telescopicEntitlement.getId(),callContext);

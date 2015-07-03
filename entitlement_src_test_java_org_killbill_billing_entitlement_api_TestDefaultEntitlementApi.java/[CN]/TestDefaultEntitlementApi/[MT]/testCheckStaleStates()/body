@@ -4,14 +4,14 @@
   final Account account=accountApi.createAccount(getAccountData(7),callContext);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,initialDate,callContext);
+  final Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,initialDate,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   final PlanPhaseSpecifier addOnSpec=new PlanPhaseSpecifier("Telescopic-Scope",ProductCategory.BASE,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
   testListener.pushExpectedEvent(NextEvent.CREATE);
-  final Entitlement addOnEntitlement=entitlementApi.addEntitlement(entitlement.getBundleId(),addOnSpec,null,initialDate,callContext);
+  final Entitlement addOnEntitlement=entitlementApi.addEntitlement(entitlement.getBundleId(),addOnSpec,null,initialDate,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   try {
-    entitlement.uncancelEntitlement(callContext);
+    entitlement.uncancelEntitlement(ImmutableList.<PluginProperty>of(),callContext);
     Assert.fail("Entitlement hasn't been cancelled yet");
   }
  catch (  final EntitlementApiException e) {
@@ -19,31 +19,31 @@
   }
   clock.addDays(3);
   testListener.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.BLOCK);
-  entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,callContext);
+  entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   try {
-    entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,callContext);
+    entitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,ImmutableList.<PluginProperty>of(),callContext);
     Assert.fail("Entitlement is already cancelled");
   }
  catch (  final EntitlementApiException e) {
     Assert.assertEquals(e.getCode(),ErrorCode.SUB_CANCEL_BAD_STATE.getCode());
   }
   try {
-    addOnEntitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,callContext);
+    addOnEntitlement.cancelEntitlementWithDateOverrideBillingPolicy(clock.getUTCToday(),BillingActionPolicy.IMMEDIATE,ImmutableList.<PluginProperty>of(),callContext);
     Assert.fail("Add-On Entitlement is already cancelled");
   }
  catch (  final EntitlementApiException e) {
     Assert.assertEquals(e.getCode(),ErrorCode.SUB_CANCEL_BAD_STATE.getCode());
   }
   try {
-    entitlement.uncancelEntitlement(callContext);
+    entitlement.uncancelEntitlement(ImmutableList.<PluginProperty>of(),callContext);
     Assert.fail("Entitlement is already cancelled");
   }
  catch (  final EntitlementApiException e) {
     Assert.assertEquals(e.getCode(),ErrorCode.SUB_CANCEL_BAD_STATE.getCode());
   }
   try {
-    addOnEntitlement.uncancelEntitlement(callContext);
+    addOnEntitlement.uncancelEntitlement(ImmutableList.<PluginProperty>of(),callContext);
     Assert.fail("Add-On Entitlement is already cancelled");
   }
  catch (  final EntitlementApiException e) {
