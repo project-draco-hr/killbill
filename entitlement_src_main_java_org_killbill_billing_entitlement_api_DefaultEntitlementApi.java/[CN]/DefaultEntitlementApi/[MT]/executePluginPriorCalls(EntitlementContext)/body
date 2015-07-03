@@ -1,0 +1,17 @@
+{
+  PriorEntitlementResult prevResult=null;
+  EntitlementContext currentContext=entitlementContextArg;
+  for (  final String pluginName : pluginRegistry.getAllServices()) {
+    final EntitlementPluginApi plugin=pluginRegistry.getServiceForName(pluginName);
+    if (plugin == null) {
+      log.warn("Skipping unknown entitlement control plugin {} when fetching results",pluginName);
+      continue;
+    }
+    prevResult=plugin.priorCall(currentContext,currentContext.getPluginProperties());
+    if (prevResult.isAborted()) {
+      break;
+    }
+    currentContext=new DefaultEntitlementContext(currentContext,prevResult);
+  }
+  return prevResult;
+}
