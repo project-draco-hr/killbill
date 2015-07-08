@@ -1,27 +1,33 @@
 {
   final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(paymentTransaction.getTenantRecordId(),paymentTransaction.getAccountRecordId());
-  final TenantContext tenantContext=internalCallContextFactory.createTenantContext(internalTenantContext);
-  final PaymentModelDao payment=paymentDao.getPayment(paymentTransaction.getPaymentId(),internalTenantContext);
-  final PaymentMethodModelDao paymentMethod=paymentDao.getPaymentMethod(payment.getPaymentMethodId(),internalTenantContext);
-  final PaymentPluginApi paymentPluginApi=getPaymentPluginApi(payment,paymentMethod.getPluginName());
-  final PaymentTransactionInfoPlugin undefinedPaymentTransaction=new DefaultNoOpPaymentInfoPlugin(payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionType(),paymentTransaction.getAmount(),paymentTransaction.getCurrency(),paymentTransaction.getCreatedDate(),paymentTransaction.getCreatedDate(),PaymentPluginStatus.UNDEFINED,null);
-  PaymentTransactionInfoPlugin paymentTransactionInfoPlugin;
-  try {
-    final List<PaymentTransactionInfoPlugin> result=paymentPluginApi.getPaymentInfo(payment.getAccountId(),payment.getId(),ImmutableList.<PluginProperty>of(),tenantContext);
-    paymentTransactionInfoPlugin=Iterables.tryFind(result,new Predicate<PaymentTransactionInfoPlugin>(){
-      @Override public boolean apply(      final PaymentTransactionInfoPlugin input){
-        return input.getKbTransactionPaymentId().equals(paymentTransaction.getId());
-      }
-    }
+  doJanitorOperationWithAccountLock(new JanitorIterationCallback(){
+    @Override public Void doIteration(){
+      final TenantContext tenantContext=internalCallContextFactory.createTenantContext(internalTenantContext);
+      final PaymentModelDao payment=paymentDao.getPayment(paymentTransaction.getPaymentId(),internalTenantContext);
+      final PaymentMethodModelDao paymentMethod=paymentDao.getPaymentMethod(payment.getPaymentMethodId(),internalTenantContext);
+      final PaymentPluginApi paymentPluginApi=getPaymentPluginApi(payment,paymentMethod.getPluginName());
+      final PaymentTransactionInfoPlugin undefinedPaymentTransaction=new DefaultNoOpPaymentInfoPlugin(payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionType(),paymentTransaction.getAmount(),paymentTransaction.getCurrency(),paymentTransaction.getCreatedDate(),paymentTransaction.getCreatedDate(),PaymentPluginStatus.UNDEFINED,null);
+      PaymentTransactionInfoPlugin paymentTransactionInfoPlugin;
+      try {
+        final List<PaymentTransactionInfoPlugin> result=paymentPluginApi.getPaymentInfo(payment.getAccountId(),payment.getId(),ImmutableList.<PluginProperty>of(),tenantContext);
+        paymentTransactionInfoPlugin=Iterables.tryFind(result,new Predicate<PaymentTransactionInfoPlugin>(){
+          @Override public boolean apply(          final PaymentTransactionInfoPlugin input){
+            return input.getKbTransactionPaymentId().equals(paymentTransaction.getId());
+          }
+        }
 ).or(new Supplier<PaymentTransactionInfoPlugin>(){
-      @Override public PaymentTransactionInfoPlugin get(){
-        return undefinedPaymentTransaction;
-      }
-    }
+          @Override public PaymentTransactionInfoPlugin get(){
+            return undefinedPaymentTransaction;
+          }
+        }
 );
+      }
+ catch (      final Exception e) {
+        paymentTransactionInfoPlugin=undefinedPaymentTransaction;
+      }
+      updatePaymentAndTransactionIfNeeded(payment,paymentTransaction,paymentTransactionInfoPlugin,internalTenantContext);
+      return null;
+    }
   }
- catch (  final Exception e) {
-    paymentTransactionInfoPlugin=undefinedPaymentTransaction;
-  }
-  updatePaymentAndTransactionIfNeeded(payment,paymentTransaction,paymentTransactionInfoPlugin,internalTenantContext);
+,paymentTransaction.getAccountRecordId(),internalTenantContext);
 }
