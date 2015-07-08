@@ -1,0 +1,14 @@
+{
+  final Collection<String> allTransactionStatus=ImmutableList.copyOf(Iterables.transform(transactionStatuses,Functions.toStringFunction()));
+  final Date createdBefore=createdBeforeDate.toDate();
+  final Date createdAfter=createdAfterDate.toDate();
+  return paginationHelper.getPagination(TransactionSqlDao.class,new PaginationIteratorBuilder<PaymentTransactionModelDao,PaymentTransaction,TransactionSqlDao>(){
+    @Override public Long getCount(    final TransactionSqlDao sqlDao,    final InternalTenantContext context){
+      return sqlDao.getCountByTransactionStatusPriorDateAcrossTenants(allTransactionStatus,createdBefore,createdAfter);
+    }
+    @Override public Iterator<PaymentTransactionModelDao> build(    final TransactionSqlDao sqlDao,    final Long limit,    final InternalTenantContext context){
+      return sqlDao.getByTransactionStatusPriorDateAcrossTenants(allTransactionStatus,createdBefore,createdAfter,offset,limit);
+    }
+  }
+,offset,limit,null);
+}

@@ -1,7 +1,7 @@
 {
-  final List<PaymentAttemptModelDao> incompleteAttempts=paymentDao.getPaymentAttemptsByStateAcrossTenants(retrySMHelper.getInitialState().getName(),getCreatedDateBefore());
-  if (!incompleteAttempts.isEmpty()) {
-    log.info("Janitor AttemptCompletionTask start run: found {} incomplete attempts",incompleteAttempts.size());
+  final Pagination<PaymentAttemptModelDao> incompleteAttempts=paymentDao.getPaymentAttemptsByStateAcrossTenants(retrySMHelper.getInitialState().getName(),getCreatedDateBefore(),0L,Long.MAX_VALUE);
+  if (incompleteAttempts.getTotalNbRecords() > 0) {
+    log.info("Janitor AttemptCompletionTask start run: found {} incomplete attempts",incompleteAttempts.getTotalNbRecords());
   }
   return incompleteAttempts;
 }

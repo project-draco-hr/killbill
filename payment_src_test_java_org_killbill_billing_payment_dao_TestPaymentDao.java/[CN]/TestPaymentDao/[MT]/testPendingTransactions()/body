@@ -21,7 +21,7 @@
   paymentDao.updatePaymentWithNewTransaction(paymentModelDao.getId(),transaction4,internalCallContextWithNewTime);
   final List<PaymentTransactionModelDao> result=getPendingTransactions(paymentModelDao.getId());
   Assert.assertEquals(result.size(),3);
-  final List<PaymentTransactionModelDao> transactions1=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.PENDING),newTime,initialTime,3);
+  final Iterable<PaymentTransactionModelDao> transactions1=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.PENDING),newTime,initialTime,0L,3L);
   for (  PaymentTransactionModelDao paymentTransaction : transactions1) {
     final String newPaymentState="XXX_FAILED";
     paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),payment.getId(),paymentTransaction.getTransactionType(),newPaymentState,payment.getLastSuccessStateName(),paymentTransaction.getId(),TransactionStatus.PAYMENT_FAILURE,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),paymentTransaction.getGatewayErrorCode(),paymentTransaction.getGatewayErrorMsg(),internalCallContext);
@@ -34,7 +34,7 @@
  catch (  InterruptedException e) {
   }
   ;
-  final List<PaymentTransactionModelDao> transactions2=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.PENDING),clock.getUTCNow(),initialTime,1);
+  final Iterable<PaymentTransactionModelDao> transactions2=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.PENDING),clock.getUTCNow(),initialTime,0L,1L);
   for (  PaymentTransactionModelDao paymentTransaction : transactions2) {
     final String newPaymentState="XXX_FAILED";
     paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),payment.getId(),paymentTransaction.getTransactionType(),newPaymentState,payment.getLastSuccessStateName(),paymentTransaction.getId(),TransactionStatus.PAYMENT_FAILURE,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),paymentTransaction.getGatewayErrorCode(),paymentTransaction.getGatewayErrorMsg(),internalCallContext);
