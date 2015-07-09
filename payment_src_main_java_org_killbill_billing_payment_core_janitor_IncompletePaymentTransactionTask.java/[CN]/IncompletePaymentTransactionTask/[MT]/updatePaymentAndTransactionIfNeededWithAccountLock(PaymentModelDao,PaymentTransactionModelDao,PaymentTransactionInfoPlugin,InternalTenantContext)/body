@@ -1,8 +1,12 @@
 {
-  return doJanitorOperationWithAccountLock(new JanitorIterationCallback(){
+  if (!TRANSACTION_STATUSES_TO_CONSIDER.contains(paymentTransaction.getTransactionStatus())) {
+    return false;
+  }
+  final Boolean result=doJanitorOperationWithAccountLock(new JanitorIterationCallback(){
     @Override public Boolean doIteration(){
-      return updatePaymentAndTransactionIfNeeded(payment,paymentTransaction,paymentTransactionInfoPlugin,internalTenantContext);
+      return updatePaymentAndTransactionInternal(payment,paymentTransaction,paymentTransactionInfoPlugin,internalTenantContext);
     }
   }
-,internalTenantContext.getAccountRecordId(),internalTenantContext);
+,internalTenantContext);
+  return result != null && result;
 }

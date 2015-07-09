@@ -7,7 +7,7 @@
     final InternalCallContext context1=new InternalCallContext(1L,1L,internalCallContext.getUserToken(),internalCallContext.getCreatedBy(),internalCallContext.getCallOrigin(),internalCallContext.getContextUserType(),internalCallContext.getReasonCode(),internalCallContext.getComments(),createdDate1,createdDate1);
     paymentDao.insertPaymentWithFirstTransaction(paymentModelDao1,transaction1,context1);
   }
-  final Pagination<PaymentTransactionModelDao> result=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.UNKNOWN),clock.getUTCNow(),createdDate1,0L,Long.MAX_VALUE);
+  final Pagination<PaymentTransactionModelDao> result=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.UNKNOWN),clock.getUTCNow(),createdDate1,0L,new Long(NB_ENTRIES));
   Assert.assertEquals(result.getTotalNbRecords(),new Long(NB_ENTRIES));
   final Iterator<PaymentTransactionModelDao> iterator=result.iterator();
   for (int i=0; i < NB_ENTRIES; i++) {
