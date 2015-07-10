@@ -4,21 +4,21 @@
   final String transactionExternalKey="plus";
   mockPaymentProviderPlugin.makeNextPaymentFailWithException();
   try {
+    testListener.pushExpectedEvent(NextEvent.PAYMENT_PLUGIN_ERROR);
     paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,account.getCurrency(),paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
   }
  catch (  PaymentApiException ignore) {
+    testListener.assertListenerStatus();
   }
   final Payment payment=paymentApi.getPaymentByExternalKey(paymentExternalKey,false,ImmutableList.<PluginProperty>of(),callContext);
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   final String paymentStateName=paymentSMHelper.getErroredStateForTransaction(TransactionType.AUTHORIZE).toString();
+  testListener.pushExpectedEvent(NextEvent.PAYMENT_PLUGIN_ERROR);
   paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,payment.getTransactions().get(0).getId(),TransactionStatus.UNKNOWN,requestedAmount,account.getCurrency(),"foo","bar",internalCallContext);
+  testListener.assertListenerStatus();
+  clock.addDeltaFromReality(5 * 60 * 1000);
   final List<PaymentTransactionModelDao> paymentTransactionHistoryBeforeJanitor=getPaymentTransactionHistory(transactionExternalKey);
   Assert.assertEquals(paymentTransactionHistoryBeforeJanitor.size(),3);
-  clock.addDays(1);
-  try {
-    Thread.sleep(1500);
-  }
- catch (  InterruptedException e) {
-  }
   final List<PaymentTransactionModelDao> paymentTransactionHistoryAfterJanitor=getPaymentTransactionHistory(transactionExternalKey);
   Assert.assertEquals(paymentTransactionHistoryAfterJanitor.size(),3);
 }

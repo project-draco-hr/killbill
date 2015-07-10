@@ -2,15 +2,16 @@
   final BigDecimal requestedAmount=BigDecimal.TEN;
   final String paymentExternalKey="jhj44";
   final String transactionExternalKey="4jhjj2";
+  testListener.pushExpectedEvent(NextEvent.PAYMENT);
   final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,account.getCurrency(),paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  testListener.assertListenerStatus();
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   final String paymentStateName=paymentSMHelper.getPendingStateForTransaction(TransactionType.AUTHORIZE).toString();
+  testListener.pushExpectedEvent(NextEvent.PAYMENT);
   paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,payment.getTransactions().get(0).getId(),TransactionStatus.PENDING,requestedAmount,account.getCurrency(),"loup","chat",internalCallContext);
-  clock.addDays(1);
-  try {
-    Thread.sleep(1500);
-  }
- catch (  InterruptedException e) {
-  }
+  testListener.assertListenerStatus();
+  clock.addDeltaFromReality(5 * 60 * 1000);
+  assertNotificationsCompleted(internalCallContext,5);
   final Payment updatedPayment=paymentApi.getPayment(payment.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
   Assert.assertEquals(updatedPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
 }

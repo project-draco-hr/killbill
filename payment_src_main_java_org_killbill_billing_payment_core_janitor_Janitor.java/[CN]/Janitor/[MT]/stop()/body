@@ -11,6 +11,10 @@
     if (!success) {
       log.warn("Janitor failed to complete termination within " + TERMINATION_TIMEOUT_SEC + "sec");
     }
+    if (janitorQueue != null) {
+      janitorQueue.stopQueue();
+      notificationQueueService.deleteNotificationQueue(DefaultPaymentService.SERVICE_NAME,QUEUE_NAME);
+    }
   }
  catch (  final InterruptedException e) {
     Thread.currentThread().interrupt();

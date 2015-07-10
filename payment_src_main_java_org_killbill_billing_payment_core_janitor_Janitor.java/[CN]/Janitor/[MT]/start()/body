@@ -3,6 +3,7 @@
     log.warn("Janitor is not a restartable service, and was already started, aborting");
     return;
   }
+  janitorQueue.startQueue();
   final TimeUnit attemptCompletionRateUnit=paymentConfig.getJanitorRunningRate().getUnit();
   final long attemptCompletionPeriod=paymentConfig.getJanitorRunningRate().getPeriod();
   janitorExecutor.scheduleAtFixedRate(incompletePaymentAttemptTask,attemptCompletionPeriod,attemptCompletionPeriod,attemptCompletionRateUnit);
