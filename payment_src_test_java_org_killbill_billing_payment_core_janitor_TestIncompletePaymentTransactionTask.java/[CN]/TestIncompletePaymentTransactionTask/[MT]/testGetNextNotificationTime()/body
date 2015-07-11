@@ -1,0 +1,37 @@
+{
+  assertNull(incompletePaymentTransactionTask.getNextNotificationTime(null));
+  final DateTime initTime=clock.getUTCNow();
+  for (int i=1; i < 10; i++) {
+    final DateTime nextTime=incompletePaymentTransactionTask.getNextNotificationTime(i);
+    assertNotNull(nextTime);
+    assertTrue(nextTime.compareTo(initTime) > 0);
+    if (i == 0) {
+      assertTrue(nextTime.compareTo(initTime.plusSeconds(3).plusSeconds(1)) < 0);
+    }
+ else     if (i == 1) {
+      assertTrue(nextTime.compareTo(initTime.plusMinutes(1).plusSeconds(1)) < 0);
+    }
+ else     if (i == 2) {
+      assertTrue(nextTime.compareTo(initTime.plusMinutes(3).plusSeconds(1)) < 0);
+    }
+ else     if (i == 3) {
+      assertTrue(nextTime.compareTo(initTime.plusHours(1).plusSeconds(1)) < 0);
+    }
+ else     if (i == 4) {
+      assertTrue(nextTime.compareTo(initTime.plusDays(1).plusSeconds(1)) < 0);
+    }
+ else     if (i == 5) {
+      assertTrue(nextTime.compareTo(initTime.plusDays(1).plusSeconds(1)) < 0);
+    }
+ else     if (i == 6) {
+      assertTrue(nextTime.compareTo(initTime.plusDays(1).plusSeconds(1)) < 0);
+    }
+ else     if (i == 7) {
+      assertTrue(nextTime.compareTo(initTime.plusDays(1).plusSeconds(1)) < 0);
+    }
+ else     if (i == 8) {
+      assertTrue(nextTime.compareTo(initTime.plusDays(1).plusSeconds(1)) < 0);
+    }
+  }
+  assertNull(incompletePaymentTransactionTask.getNextNotificationTime(10));
+}

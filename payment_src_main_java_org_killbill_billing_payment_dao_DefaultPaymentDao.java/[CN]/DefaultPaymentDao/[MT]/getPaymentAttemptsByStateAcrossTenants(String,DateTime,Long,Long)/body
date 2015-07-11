@@ -1,0 +1,12 @@
+{
+  final Date createdBefore=createdBeforeDate.toDate();
+  return paginationHelper.getPagination(PaymentAttemptSqlDao.class,new PaginationIteratorBuilder<PaymentAttemptModelDao,Entity,PaymentAttemptSqlDao>(){
+    @Override public Long getCount(    final PaymentAttemptSqlDao sqlDao,    final InternalTenantContext context){
+      return sqlDao.getCountByStateNameAcrossTenants(stateName,createdBefore);
+    }
+    @Override public Iterator<PaymentAttemptModelDao> build(    final PaymentAttemptSqlDao sqlDao,    final Long limit,    final InternalTenantContext context){
+      return sqlDao.getByStateNameAcrossTenants(stateName,createdBefore,offset,limit);
+    }
+  }
+,offset,limit,null);
+}

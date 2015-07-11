@@ -3,17 +3,18 @@
   final String paymentExternalKey="minus";
   final String transactionExternalKey="plus";
   mockPaymentProviderPlugin.makeNextPaymentFailWithError();
+  testListener.pushExpectedEvent(NextEvent.PAYMENT_ERROR);
   final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,account.getCurrency(),paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  testListener.assertListenerStatus();
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   final String paymentStateName=paymentSMHelper.getErroredStateForTransaction(TransactionType.AUTHORIZE).toString();
+  testListener.pushExpectedEvent(NextEvent.PAYMENT_PLUGIN_ERROR);
   paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,payment.getTransactions().get(0).getId(),TransactionStatus.UNKNOWN,requestedAmount,account.getCurrency(),"foo","bar",internalCallContext);
+  testListener.assertListenerStatus();
   final List<PaymentTransactionModelDao> paymentTransactionHistoryBeforeJanitor=getPaymentTransactionHistory(transactionExternalKey);
   Assert.assertEquals(paymentTransactionHistoryBeforeJanitor.size(),3);
-  clock.addDays(1);
-  try {
-    Thread.sleep(1500);
-  }
- catch (  InterruptedException e) {
-  }
+  clock.addDeltaFromReality(5 * 60 * 1000);
+  assertNotificationsCompleted(internalCallContext,5);
   final List<PaymentTransactionModelDao> paymentTransactionHistoryAfterJanitor=getPaymentTransactionHistory(transactionExternalKey);
   Assert.assertEquals(paymentTransactionHistoryAfterJanitor.size(),4);
   Assert.assertEquals(paymentTransactionHistoryAfterJanitor.get(3).getTransactionStatus(),TransactionStatus.PAYMENT_FAILURE);

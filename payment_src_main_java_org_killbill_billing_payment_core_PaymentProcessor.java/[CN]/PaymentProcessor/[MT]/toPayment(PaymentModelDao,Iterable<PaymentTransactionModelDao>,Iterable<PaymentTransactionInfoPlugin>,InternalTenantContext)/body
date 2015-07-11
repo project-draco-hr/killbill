@@ -17,7 +17,7 @@
     PaymentTransactionModelDao newPaymentTransactionModelDao=curPaymentTransactionModelDao;
     final PaymentTransactionInfoPlugin paymentTransactionInfoPlugin=findPaymentTransactionInfoPlugin(newPaymentTransactionModelDao,pluginTransactions);
     if (paymentTransactionInfoPlugin != null) {
-      final boolean hasChanged=incompletePaymentTransactionTask.updatePaymentAndTransactionIfNeeded(newPaymentModelDao,newPaymentTransactionModelDao,paymentTransactionInfoPlugin,internalTenantContext);
+      final boolean hasChanged=incompletePaymentTransactionTask.updatePaymentAndTransactionIfNeededWithAccountLock(newPaymentModelDao,newPaymentTransactionModelDao,paymentTransactionInfoPlugin,internalTenantContext);
       if (hasChanged) {
         newPaymentModelDao=paymentDao.getPayment(newPaymentModelDao.getId(),internalTenantContext);
         newPaymentTransactionModelDao=paymentDao.getPaymentTransaction(newPaymentTransactionModelDao.getId(),internalTenantContext);

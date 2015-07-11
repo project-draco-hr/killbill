@@ -6,7 +6,7 @@
     daoHelper.processPaymentInfoPlugin(transactionStatus,paymentInfoPlugin,newState.getName());
   }
  else   if (!paymentStateContext.isApiPayment()) {
-    final BusInternalEvent event=new DefaultPaymentErrorEvent(paymentStateContext.getAccount().getId(),null,paymentStateContext.getTransactionType(),"Early abortion of payment transaction",paymentStateContext.getInternalCallContext().getAccountRecordId(),paymentStateContext.getInternalCallContext().getTenantRecordId(),paymentStateContext.getInternalCallContext().getUserToken());
+    final BusInternalEvent event=new DefaultPaymentErrorEvent(paymentStateContext.getAccount().getId(),null,null,paymentStateContext.getAmount(),paymentStateContext.getCurrency(),null,paymentStateContext.getTransactionType(),null,"Early abortion of payment transaction",paymentStateContext.getInternalCallContext().getAccountRecordId(),paymentStateContext.getInternalCallContext().getTenantRecordId(),paymentStateContext.getInternalCallContext().getUserToken());
     try {
       daoHelper.getEventBus().post(event);
     }

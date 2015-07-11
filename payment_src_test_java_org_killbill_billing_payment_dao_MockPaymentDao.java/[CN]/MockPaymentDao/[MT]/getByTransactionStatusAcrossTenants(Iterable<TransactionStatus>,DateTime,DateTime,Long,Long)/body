@@ -1,0 +1,14 @@
+{
+  final List<PaymentTransactionModelDao> result=ImmutableList.copyOf(Iterables.filter(transactions.values(),new Predicate<PaymentTransactionModelDao>(){
+    @Override public boolean apply(    final PaymentTransactionModelDao input){
+      return Iterables.any(transactionStatuses,new Predicate<TransactionStatus>(){
+        @Override public boolean apply(        final TransactionStatus transactionStatus){
+          return input.getTransactionStatus() == transactionStatus;
+        }
+      }
+);
+    }
+  }
+));
+  return new DefaultPagination<PaymentTransactionModelDao>(new Long(result.size()),result.iterator());
+}

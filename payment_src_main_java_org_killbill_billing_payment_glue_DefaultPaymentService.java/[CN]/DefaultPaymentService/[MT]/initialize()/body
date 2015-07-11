@@ -1,10 +1,11 @@
 {
   try {
-    eventBus.register(invoiceHandler);
+    eventBus.register(paymentBusEventHandler);
     eventBus.register(tagHandler);
   }
  catch (  final PersistentBus.EventBusException e) {
     log.error("Unable to register with the EventBus!",e);
   }
-  retryService.initialize(SERVICE_NAME);
+  retryService.initialize();
+  janitor.initialize();
 }

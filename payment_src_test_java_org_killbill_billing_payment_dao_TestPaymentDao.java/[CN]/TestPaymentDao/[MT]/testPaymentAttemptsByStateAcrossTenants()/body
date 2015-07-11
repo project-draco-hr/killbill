@@ -15,6 +15,6 @@
   paymentDao.insertPaymentAttemptWithProperties(attempt1,context1);
   final InternalCallContext context2=new InternalCallContext(2L,2L,internalCallContext.getUserToken(),internalCallContext.getCreatedBy(),internalCallContext.getCallOrigin(),internalCallContext.getContextUserType(),internalCallContext.getReasonCode(),internalCallContext.getComments(),createdAfterDate,createdAfterDate);
   paymentDao.insertPaymentAttemptWithProperties(attempt2,context2);
-  final List<PaymentAttemptModelDao> result=paymentDao.getPaymentAttemptsByStateAcrossTenants(stateName,createdBeforeDate);
-  Assert.assertEquals(result.size(),2);
+  final Pagination<PaymentAttemptModelDao> result=paymentDao.getPaymentAttemptsByStateAcrossTenants(stateName,createdBeforeDate,0L,2L);
+  Assert.assertEquals(result.getTotalNbRecords().longValue(),2L);
 }
