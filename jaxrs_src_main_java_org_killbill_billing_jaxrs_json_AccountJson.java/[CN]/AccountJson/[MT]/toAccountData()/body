@@ -1,7 +1,12 @@
 {
   return new AccountData(){
     @Override public DateTimeZone getTimeZone(){
-      return (Strings.emptyToNull(timeZone) != null) ? DateTimeZone.forID(timeZone) : null;
+      if (Strings.emptyToNull(timeZone) == null) {
+        return null;
+      }
+ else {
+        return DateTimeZone.forID(timeZone);
+      }
     }
     @Override public String getStateOrProvince(){
       return state;
@@ -13,13 +18,18 @@
       return phone;
     }
     @Override public Boolean isMigrated(){
-      return Objects.firstNonNull(isMigrated,false);
+      return isMigrated;
     }
     @Override public Boolean isNotifiedForInvoices(){
-      return Objects.firstNonNull(isNotifiedForInvoices,false);
+      return isNotifiedForInvoices;
     }
     @Override public UUID getPaymentMethodId(){
-      return paymentMethodId != null ? UUID.fromString(paymentMethodId) : null;
+      if (Strings.emptyToNull(paymentMethodId) == null) {
+        return null;
+      }
+ else {
+        return UUID.fromString(paymentMethodId);
+      }
     }
     @Override public String getName(){
       return name;
@@ -28,15 +38,7 @@
       return locale;
     }
     @Override public Integer getFirstNameLength(){
-      if (firstNameLength == null && name == null) {
-        return 0;
-      }
- else       if (firstNameLength == null) {
-        return name.length();
-      }
- else {
-        return firstNameLength;
-      }
+      return firstNameLength;
     }
     @Override public String getExternalKey(){
       return externalKey;

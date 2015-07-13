@@ -1,5 +1,6 @@
 {
   final Account updatedAccount=new DefaultAccount(currentAccount.getId(),accountData);
-  final AccountModelDao accountToUpdate=new AccountModelDao(currentAccount.getId(),updatedAccount.mergeWithDelegate(currentAccount));
-  accountDao.update(accountToUpdate,internalCallContextFactory.createInternalCallContext(accountToUpdate.getId(),context));
+  final Account mergedAccount=updatedAccount.mergeWithDelegate(currentAccount);
+  final AccountModelDao updatedAccountModelDao=new AccountModelDao(currentAccount.getId(),mergedAccount);
+  accountDao.update(updatedAccountModelDao,internalCallContextFactory.createInternalCallContext(updatedAccountModelDao.getId(),context));
 }

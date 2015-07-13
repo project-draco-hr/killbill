@@ -1,4 +1,7 @@
 {
+  if (Strings.emptyToNull(account.getEmail()) == null) {
+    throw new InvoiceApiException(new IllegalArgumentException("Email for account " + account.getId() + " not specified"),ErrorCode.EMAIL_SENDING_FAILED);
+  }
   final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(account.getId(),context);
   final List<String> to=new ArrayList<String>();
   to.add(account.getEmail());
@@ -19,7 +22,7 @@
   try {
     htmlInvoice=generator.generateInvoice(account,invoice,manualPay,internalTenantContext);
   }
- catch (  IOException e) {
+ catch (  final IOException e) {
     throw new InvoiceApiException(e,ErrorCode.EMAIL_SENDING_FAILED);
   }
   String subject=htmlInvoice.getSubject();
@@ -30,10 +33,10 @@
   try {
     sender.sendHTMLEmail(to,cc,subject,htmlInvoice.getBody());
   }
- catch (  EmailApiException e) {
+ catch (  final EmailApiException e) {
     throw new InvoiceApiException(e,ErrorCode.EMAIL_SENDING_FAILED);
   }
-catch (  IOException e) {
+catch (  final IOException e) {
     throw new InvoiceApiException(e,ErrorCode.EMAIL_SENDING_FAILED);
   }
 }

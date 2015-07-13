@@ -1,8 +1,34 @@
 {
   final AccountData accountData=getNullAccountData();
   final Account account=new DefaultAccount(UUID.randomUUID(),accountData);
-  final AccountData secondAccountData=getAccountData();
-  final Account secondAccount=new DefaultAccount(UUID.randomUUID(),secondAccountData);
-  final Account finalAccount=account.mergeWithDelegate(secondAccount);
-  checkAccountEquals(finalAccount,secondAccount);
+  final AccountData accountDataUpdates1=getAccountData(account.getBillCycleDayLocal(),account.getCurrency(),account.getExternalKey());
+  final Account accountUpdates1=new DefaultAccount(UUID.randomUUID(),accountDataUpdates1);
+  final Account updatedAccount1=accountUpdates1.mergeWithDelegate(account);
+  checkAccountEquals(updatedAccount1,accountUpdates1);
+  final AccountData accountDataUpdates2=Mockito.mock(AccountData.class);
+  Mockito.when(accountDataUpdates2.getEmail()).thenReturn(UUID.randomUUID().toString());
+  Mockito.when(accountDataUpdates2.getName()).thenReturn(UUID.randomUUID().toString());
+  Mockito.when(accountDataUpdates2.getFirstNameLength()).thenReturn(12);
+  Mockito.when(accountDataUpdates2.isNotifiedForInvoices()).thenReturn(true);
+  final Account accountUpdates2=new DefaultAccount(UUID.randomUUID(),accountDataUpdates2);
+  final Account updatedAccount2=accountUpdates2.mergeWithDelegate(updatedAccount1);
+  Assert.assertEquals(updatedAccount2.getEmail(),accountUpdates2.getEmail());
+  Assert.assertEquals(updatedAccount2.getName(),accountUpdates2.getName());
+  Assert.assertEquals(updatedAccount2.getFirstNameLength(),updatedAccount2.getFirstNameLength());
+  Assert.assertEquals(updatedAccount2.isNotifiedForInvoices(),updatedAccount2.isNotifiedForInvoices());
+  Assert.assertEquals(updatedAccount2.getExternalKey(),updatedAccount1.getExternalKey());
+  Assert.assertEquals(updatedAccount2.getCurrency(),updatedAccount1.getCurrency());
+  Assert.assertEquals(updatedAccount2.getBillCycleDayLocal(),updatedAccount1.getBillCycleDayLocal());
+  Assert.assertEquals(updatedAccount2.getPaymentMethodId(),updatedAccount1.getPaymentMethodId());
+  Assert.assertEquals(updatedAccount2.getTimeZone(),updatedAccount1.getTimeZone());
+  Assert.assertEquals(updatedAccount2.getLocale(),updatedAccount1.getLocale());
+  Assert.assertEquals(updatedAccount2.getAddress1(),updatedAccount1.getAddress1());
+  Assert.assertEquals(updatedAccount2.getAddress2(),updatedAccount1.getAddress2());
+  Assert.assertEquals(updatedAccount2.getCompanyName(),updatedAccount1.getCompanyName());
+  Assert.assertEquals(updatedAccount2.getCity(),updatedAccount1.getCity());
+  Assert.assertEquals(updatedAccount2.getStateOrProvince(),updatedAccount1.getStateOrProvince());
+  Assert.assertEquals(updatedAccount2.getCountry(),updatedAccount1.getCountry());
+  Assert.assertEquals(updatedAccount2.getPostalCode(),updatedAccount1.getPostalCode());
+  Assert.assertEquals(updatedAccount2.getPhone(),updatedAccount1.getPhone());
+  Assert.assertEquals(updatedAccount2.isMigrated(),updatedAccount1.isMigrated());
 }

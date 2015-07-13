@@ -12,30 +12,39 @@
  else {
     accountData.setCurrency(currentAccount.getCurrency());
   }
-  if (billCycleDayLocal != null && billCycleDayLocal != 0 && currentAccount.getBillCycleDayLocal() != 0 && !billCycleDayLocal.equals(currentAccount.getBillCycleDayLocal())) {
+  if (billCycleDayLocal != null && billCycleDayLocal != DEFAULT_BILLING_CYCLE_DAY_LOCAL && currentAccount.getBillCycleDayLocal() != null && currentAccount.getBillCycleDayLocal() != DEFAULT_BILLING_CYCLE_DAY_LOCAL && !billCycleDayLocal.equals(currentAccount.getBillCycleDayLocal())) {
     throw new IllegalArgumentException(String.format("Killbill doesn't support updating the account BCD yet: new=%s, current=%s",billCycleDayLocal,currentAccount.getBillCycleDayLocal()));
   }
- else   if (billCycleDayLocal != null && billCycleDayLocal != 0) {
+ else   if (billCycleDayLocal != null && billCycleDayLocal != DEFAULT_BILLING_CYCLE_DAY_LOCAL) {
     accountData.setBillCycleDayLocal(billCycleDayLocal);
   }
  else {
-    accountData.setBillCycleDayLocal(currentAccount.getBillCycleDayLocal());
+    accountData.setBillCycleDayLocal(currentAccount.getBillCycleDayLocal() == null ? DEFAULT_BILLING_CYCLE_DAY_LOCAL : currentAccount.getBillCycleDayLocal());
   }
-  accountData.setEmail(Objects.firstNonNull(email,currentAccount.getEmail()));
-  accountData.setName(Objects.firstNonNull(name,currentAccount.getName()));
-  accountData.setFirstNameLength(Objects.firstNonNull(firstNameLength,currentAccount.getFirstNameLength()));
-  accountData.setPaymentMethodId(Optional.<UUID>fromNullable(paymentMethodId).or(Optional.<UUID>fromNullable(currentAccount.getPaymentMethodId())).orNull());
-  accountData.setTimeZone(Objects.firstNonNull(timeZone,currentAccount.getTimeZone()));
-  accountData.setLocale(Objects.firstNonNull(locale,currentAccount.getLocale()));
-  accountData.setAddress1(Objects.firstNonNull(address1,currentAccount.getAddress1()));
-  accountData.setAddress2(Objects.firstNonNull(address2,currentAccount.getAddress2()));
-  accountData.setCompanyName(Objects.firstNonNull(companyName,currentAccount.getCompanyName()));
-  accountData.setCity(Objects.firstNonNull(city,currentAccount.getCity()));
-  accountData.setStateOrProvince(Objects.firstNonNull(stateOrProvince,currentAccount.getStateOrProvince()));
-  accountData.setCountry(Objects.firstNonNull(country,currentAccount.getCountry()));
-  accountData.setPostalCode(Objects.firstNonNull(postalCode,currentAccount.getPostalCode()));
-  accountData.setPhone(Objects.firstNonNull(phone,currentAccount.getPhone()));
-  accountData.setIsMigrated(Objects.firstNonNull(isMigrated,currentAccount.isMigrated()));
-  accountData.setIsNotifiedForInvoices(Objects.firstNonNull(isNotifiedForInvoices,currentAccount.isNotifiedForInvoices()));
+  accountData.setEmail(email != null ? email : currentAccount.getEmail());
+  accountData.setName(name != null ? name : currentAccount.getName());
+  final Integer firstNameLength=this.firstNameLength != null ? this.firstNameLength : currentAccount.getFirstNameLength();
+  if (firstNameLength != null) {
+    accountData.setFirstNameLength(firstNameLength);
+  }
+  accountData.setPaymentMethodId(paymentMethodId != null ? paymentMethodId : currentAccount.getPaymentMethodId());
+  accountData.setTimeZone(timeZone != null ? timeZone : currentAccount.getTimeZone());
+  accountData.setLocale(locale != null ? locale : currentAccount.getLocale());
+  accountData.setAddress1(address1 != null ? address1 : currentAccount.getAddress1());
+  accountData.setAddress2(address2 != null ? address2 : currentAccount.getAddress2());
+  accountData.setCompanyName(companyName != null ? companyName : currentAccount.getCompanyName());
+  accountData.setCity(city != null ? city : currentAccount.getCity());
+  accountData.setStateOrProvince(stateOrProvince != null ? stateOrProvince : currentAccount.getStateOrProvince());
+  accountData.setCountry(country != null ? country : currentAccount.getCountry());
+  accountData.setPostalCode(postalCode != null ? postalCode : currentAccount.getPostalCode());
+  accountData.setPhone(phone != null ? phone : currentAccount.getPhone());
+  final Boolean isMigrated=this.isMigrated != null ? this.isMigrated : currentAccount.isMigrated();
+  if (isMigrated != null) {
+    accountData.setIsMigrated(isMigrated);
+  }
+  final Boolean isNotifiedForInvoices=this.isNotifiedForInvoices != null ? this.isNotifiedForInvoices : currentAccount.isNotifiedForInvoices();
+  if (isNotifiedForInvoices != null) {
+    accountData.setIsNotifiedForInvoices(isNotifiedForInvoices);
+  }
   return new DefaultAccount(currentAccount.getId(),accountData);
 }

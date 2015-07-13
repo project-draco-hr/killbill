@@ -2,6 +2,10 @@
   if (nextOverdueState.getEmailNotification() == null) {
     return;
   }
+  if (Strings.emptyToNull(account.getEmail()) == null) {
+    log.warn("Unable to send overdue notification email for account {} and overdueable {}: no email specified",account.getId(),account.getId());
+    return;
+  }
   final List<String> to=ImmutableList.<String>of(account.getEmail());
   final List<String> cc=ImmutableList.<String>of();
   final String subject=nextOverdueState.getEmailNotification().getSubject();
