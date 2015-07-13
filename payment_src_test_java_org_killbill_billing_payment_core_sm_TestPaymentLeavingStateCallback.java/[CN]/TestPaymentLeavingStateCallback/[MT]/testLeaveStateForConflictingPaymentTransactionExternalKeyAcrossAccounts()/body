@@ -1,0 +1,8 @@
+{
+  final UUID paymentId=UUID.randomUUID();
+  setUp(paymentId);
+  Assert.assertEquals(paymentDao.getTransactionsForPayment(paymentId,internalCallContext).size(),1);
+  final InternalCallContext internalCallContextForOtherAccount=new InternalCallContext(paymentStateContext.getInternalCallContext(),123L);
+  paymentStateContext=new PaymentStateContext(true,paymentId,null,null,paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateContext.shouldLockAccountAndDispatch,paymentStateContext.overridePluginOperationResult,paymentStateContext.getProperties(),internalCallContextForOtherAccount,callContext);
+  callback.leavingState(state);
+}

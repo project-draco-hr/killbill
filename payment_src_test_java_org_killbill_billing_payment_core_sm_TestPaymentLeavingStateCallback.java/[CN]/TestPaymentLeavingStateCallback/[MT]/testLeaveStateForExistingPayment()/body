@@ -2,6 +2,7 @@
   final UUID paymentId=UUID.randomUUID();
   setUp(paymentId);
   Assert.assertEquals(paymentDao.getTransactionsForPayment(paymentId,internalCallContext).size(),1);
+  paymentStateContext.setPaymentTransactionExternalKey(UUID.randomUUID().toString());
   callback.leavingState(state);
   verifyPaymentTransaction();
   Assert.assertEquals(paymentDao.getTransactionsForPayment(paymentId,internalCallContext).size(),2);
