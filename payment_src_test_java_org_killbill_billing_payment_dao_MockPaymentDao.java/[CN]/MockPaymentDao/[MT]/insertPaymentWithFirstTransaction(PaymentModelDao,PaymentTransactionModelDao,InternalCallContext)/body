@@ -1,11 +1,15 @@
 {
   payment.setTenantRecordId(context.getTenantRecordId());
   paymentTransaction.setTenantRecordId(context.getTenantRecordId());
+  payment.setAccountRecordId(context.getAccountRecordId());
+  paymentTransaction.setAccountRecordId(context.getAccountRecordId());
 synchronized (this) {
     payments.put(payment.getId(),payment);
     mockNonEntityDao.addTenantRecordIdMapping(payment.getId(),context);
+    mockNonEntityDao.addAccountRecordIdMapping((payment.getId()),context);
     transactions.put(paymentTransaction.getId(),paymentTransaction);
     mockNonEntityDao.addTenantRecordIdMapping(paymentTransaction.getId(),context);
+    mockNonEntityDao.addAccountRecordIdMapping((paymentTransaction.getId()),context);
   }
   return payment;
 }
