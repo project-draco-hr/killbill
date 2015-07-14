@@ -9,8 +9,11 @@
       final PaymentTransactionModelDao transactionModelDao=daoHelper.getPaymentDao().getPaymentTransaction(paymentStateContext.getTransactionId(),paymentStateContext.getInternalCallContext());
       existingPaymentTransactions=ImmutableList.of(transactionModelDao);
     }
- else {
+ else     if (paymentStateContext.getPaymentTransactionExternalKey() != null) {
       existingPaymentTransactions=daoHelper.getPaymentDao().getPaymentTransactionsByExternalKey(paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getInternalCallContext());
+    }
+ else {
+      existingPaymentTransactions=ImmutableList.of();
     }
     validateUniqueTransactionExternalKey(existingPaymentTransactions);
     final PaymentTransactionModelDao unknownPaymentTransaction=getUnknownPaymentTransaction(existingPaymentTransactions);
