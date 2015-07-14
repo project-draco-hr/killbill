@@ -2,7 +2,7 @@
   final PaymentAttemptModelDao attempt=retryablePaymentAutomatonRunner.getPaymentDao().getPaymentAttempt(paymentStateContext.getAttemptId(),paymentStateContext.getInternalCallContext());
   final UUID transactionId=paymentStateContext.getCurrentTransaction() != null ? paymentStateContext.getCurrentTransaction().getId() : null;
   retryablePaymentAutomatonRunner.getPaymentDao().updatePaymentAttempt(attempt.getId(),transactionId,state.getName(),paymentStateContext.getInternalCallContext());
-  if ("RETRIED".equals(state.getName()) && !isUnknownTransaction()) {
+  if (retriedState.getName().equals(state.getName()) && !isUnknownTransaction()) {
     retryServiceScheduler.scheduleRetry(ObjectType.PAYMENT_ATTEMPT,attempt.getId(),attempt.getId(),attempt.getTenantRecordId(),paymentStateContext.getPaymentControlPluginNames(),paymentStateContext.getRetryDate());
   }
 }

@@ -4,7 +4,7 @@
   }
   if (Iterables.any(existingPaymentTransactions,new Predicate<PaymentTransactionModelDao>(){
     @Override public boolean apply(    final PaymentTransactionModelDao input){
-      return input.getTransactionStatus() == TransactionStatus.SUCCESS || (paymentStateContext.getPaymentId() != null && input.getPaymentId().compareTo(paymentStateContext.getPaymentId()) != 0) || (input.getAccountRecordId() != paymentStateContext.getInternalCallContext().getAccountRecordId());
+      return input.getTransactionStatus() == TransactionStatus.SUCCESS || (paymentStateContext.getPaymentId() != null && input.getPaymentId().compareTo(paymentStateContext.getPaymentId()) != 0) || (!input.getAccountRecordId().equals(paymentStateContext.getInternalCallContext().getAccountRecordId()));
     }
   }
 )) {
