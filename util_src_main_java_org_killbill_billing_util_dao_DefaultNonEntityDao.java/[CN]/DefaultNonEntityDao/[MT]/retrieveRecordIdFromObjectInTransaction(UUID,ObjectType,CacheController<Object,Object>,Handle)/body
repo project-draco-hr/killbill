@@ -1,0 +1,14 @@
+{
+  if (objectId == null) {
+    return null;
+  }
+  final TableName tableName=TableName.fromObjectType(objectType);
+  Preconditions.checkNotNull(tableName,"%s is not a valid ObjectType",objectType);
+  return withCachingObjectId.withCaching(new OperationRetrieval<UUID,Long>(){
+    @Override public Long doRetrieve(    final UUID objectOrRecordId,    final ObjectType objectType){
+      final NonEntitySqlDao inTransactionNonEntitySqlDao=handle == null ? nonEntitySqlDao : SqlObjectBuilder.attach(handle,NonEntitySqlDao.class);
+      return inTransactionNonEntitySqlDao.getRecordIdFromObject(objectId.toString(),tableName.getTableName());
+    }
+  }
+,objectId,objectType,tableName,cache);
+}

@@ -1,9 +1,3 @@
 {
-  final TableName tableName=TableName.fromObjectType(objectType);
-  return withCachingObjectId.withCaching(new OperationRetrieval<UUID,Long>(){
-    @Override public Long doRetrieve(    final UUID objectOrRecordId,    final ObjectType objectType){
-      return nonEntitySqlDao.getRecordIdFromObject(objectId.toString(),tableName.getTableName());
-    }
-  }
-,objectId,objectType,tableName,cache);
+  return retrieveRecordIdFromObjectInTransaction(objectId,objectType,cache,null);
 }

@@ -1,12 +1,3 @@
 {
-  if (objectType == ObjectType.TENANT && recordId == InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID) {
-    return null;
-  }
-  final TableName tableName=TableName.fromObjectType(objectType);
-  return withCachingRecordId.withCaching(new OperationRetrieval<Long,UUID>(){
-    @Override public UUID doRetrieve(    final Long objectOrRecordId,    final ObjectType objectType){
-      return nonEntitySqlDao.getIdFromObject(recordId,tableName.getTableName());
-    }
-  }
-,recordId,objectType,tableName,cache);
+  return retrieveIdFromObjectInTransaction(recordId,objectType,cache,null);
 }

@@ -1,0 +1,17 @@
+{
+  final AccountEventHandler eventHandler=new AccountEventHandler();
+  bus.register(eventHandler);
+  final AccountModelDao accountModelDao=createTestAccount();
+  final AccountData defaultAccount=new DefaultAccount(accountModelDao);
+  final Account account=accountUserApi.createAccount(defaultAccount,callContext);
+  await().atMost(10,SECONDS).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return eventHandler.getAccountCreationInternalEvents().size() == 1;
+    }
+  }
+);
+  final AccountCreationInternalEvent accountCreationInternalEvent=eventHandler.getAccountCreationInternalEvents().get(0);
+  Assert.assertEquals(accountCreationInternalEvent.getId(),account.getId());
+  Assert.assertNotNull(accountCreationInternalEvent.getSearchKey1());
+  Assert.assertEquals(accountCreationInternalEvent.getSearchKey2(),internalCallContext.getTenantRecordId());
+}
