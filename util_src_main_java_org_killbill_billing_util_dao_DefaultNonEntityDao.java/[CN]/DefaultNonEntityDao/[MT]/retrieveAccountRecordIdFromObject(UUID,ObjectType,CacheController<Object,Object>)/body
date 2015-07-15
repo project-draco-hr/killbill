@@ -1,18 +1,3 @@
 {
-  final TableName tableName=TableName.fromObjectType(objectType);
-  return withCachingObjectId.withCaching(new OperationRetrieval<UUID,Long>(){
-    @Override public Long doRetrieve(    final UUID objectId,    final ObjectType objectType){
-switch (tableName) {
-case TENANT:
-case TAG_DEFINITIONS:
-case TAG_DEFINITION_HISTORY:
-        return null;
-case ACCOUNT:
-      return nonEntitySqlDao.getAccountRecordIdFromAccount(objectId.toString());
-default :
-    return nonEntitySqlDao.getAccountRecordIdFromObjectOtherThanAccount(objectId.toString(),tableName.getTableName());
-}
-}
-}
-,objectId,objectType,tableName,cache);
+  return retrieveAccountRecordIdFromObjectInTransaction(objectId,objectType,cache,null);
 }

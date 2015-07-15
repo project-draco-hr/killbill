@@ -8,12 +8,13 @@
   }
   final String rawKey;
   if (getCacheType().isKeyPrefixedWithTableName()) {
-    String[] parts=((String)key).split(CacheControllerDispatcher.CACHE_KEY_SEPARATOR);
+    final String[] parts=((String)key).split(CacheControllerDispatcher.CACHE_KEY_SEPARATOR);
     rawKey=parts[1];
   }
  else {
     rawKey=(String)key;
   }
   final ObjectType objectType=((CacheLoaderArgument)argument).getObjectType();
-  return doRetrieveOperation(rawKey,objectType);
+  final Handle handle=((CacheLoaderArgument)argument).getHandle();
+  return doRetrieveOperation(rawKey,objectType,handle);
 }

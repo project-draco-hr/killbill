@@ -1,0 +1,14 @@
+{
+  if (objectType == ObjectType.TENANT && recordId == InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID) {
+    return null;
+  }
+  final TableName tableName=TableName.fromObjectType(objectType);
+  Preconditions.checkNotNull(tableName,"%s is not a valid ObjectType",objectType);
+  return withCachingRecordId.withCaching(new OperationRetrieval<Long,UUID>(){
+    @Override public UUID doRetrieve(    final Long objectOrRecordId,    final ObjectType objectType){
+      final NonEntitySqlDao inTransactionNonEntitySqlDao=handle == null ? nonEntitySqlDao : SqlObjectBuilder.attach(handle,NonEntitySqlDao.class);
+      return inTransactionNonEntitySqlDao.getIdFromObject(recordId,tableName.getTableName());
+    }
+  }
+,recordId,objectType,tableName,cache);
+}

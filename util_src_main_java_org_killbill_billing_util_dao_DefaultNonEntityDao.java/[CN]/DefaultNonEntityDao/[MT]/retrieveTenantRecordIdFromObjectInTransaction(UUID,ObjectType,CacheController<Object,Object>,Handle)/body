@@ -1,0 +1,16 @@
+{
+  final TableName tableName=TableName.fromObjectType(objectType);
+  Preconditions.checkNotNull(tableName,"%s is not a valid ObjectType",objectType);
+  return withCachingObjectId.withCaching(new OperationRetrieval<UUID,Long>(){
+    @Override public Long doRetrieve(    final UUID objectId,    final ObjectType objectType){
+      final NonEntitySqlDao inTransactionNonEntitySqlDao=handle == null ? nonEntitySqlDao : SqlObjectBuilder.attach(handle,NonEntitySqlDao.class);
+switch (tableName) {
+case TENANT:
+        return objectId == null ? (Long)0L : inTransactionNonEntitySqlDao.getTenantRecordIdFromTenant(objectId.toString());
+default :
+      return inTransactionNonEntitySqlDao.getTenantRecordIdFromObjectOtherThanTenant(objectId.toString(),tableName.getTableName());
+  }
+}
+}
+,objectId,objectType,tableName,cache);
+}
