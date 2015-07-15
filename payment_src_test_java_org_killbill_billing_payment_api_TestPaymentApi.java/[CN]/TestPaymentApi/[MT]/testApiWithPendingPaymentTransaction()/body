@@ -1,0 +1,15 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  final String paymentExternalKey=UUID.randomUUID().toString();
+  final String paymentTransactionExternalKey=UUID.randomUUID().toString();
+  final Payment pendingPayment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,account.getCurrency(),paymentExternalKey,paymentTransactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  final String paymentStateName=paymentSMHelper.getPendingStateForTransaction(TransactionType.AUTHORIZE).toString();
+  paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),pendingPayment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,pendingPayment.getTransactions().get(0).getId(),TransactionStatus.PENDING,requestedAmount,account.getCurrency(),null,null,internalCallContext);
+  final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),pendingPayment.getId(),requestedAmount,account.getCurrency(),paymentExternalKey,paymentTransactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(payment.getId(),pendingPayment.getId());
+  Assert.assertEquals(payment.getExternalKey(),paymentExternalKey);
+  Assert.assertEquals(payment.getExternalKey(),paymentExternalKey);
+  Assert.assertEquals(payment.getTransactions().size(),1);
+  Assert.assertEquals(payment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
+  Assert.assertEquals(payment.getTransactions().get(0).getExternalKey(),paymentTransactionExternalKey);
+}

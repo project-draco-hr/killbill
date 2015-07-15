@@ -4,13 +4,31 @@
     if (paymentStateContext.getPaymentMethodId() == null) {
       throw new PaymentApiException(ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD,paymentStateContext.getAccount().getId());
     }
-    if (paymentStateContext.getTransactionId() == null) {
-      daoHelper.createNewPaymentTransaction();
+    final List<PaymentTransactionModelDao> existingPaymentTransactions;
+    if (paymentStateContext.getTransactionId() != null) {
+      final PaymentTransactionModelDao transactionModelDao=daoHelper.getPaymentDao().getPaymentTransaction(paymentStateContext.getTransactionId(),paymentStateContext.getInternalCallContext());
+      existingPaymentTransactions=ImmutableList.of(transactionModelDao);
+    }
+ else     if (paymentStateContext.getPaymentTransactionExternalKey() != null) {
+      existingPaymentTransactions=daoHelper.getPaymentDao().getPaymentTransactionsByExternalKey(paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getInternalCallContext());
     }
  else {
-      final PaymentTransactionModelDao transactionModelDao=daoHelper.getPaymentDao().getPaymentTransaction(paymentStateContext.getTransactionId(),paymentStateContext.getInternalCallContext());
-      paymentStateContext.setPaymentTransactionModelDao(transactionModelDao);
+      existingPaymentTransactions=ImmutableList.of();
     }
+    validateUniqueTransactionExternalKey(existingPaymentTransactions);
+    final PaymentTransactionModelDao unknownPaymentTransaction=getUnknownPaymentTransaction(existingPaymentTransactions);
+    if (unknownPaymentTransaction != null) {
+      unknownPaymentTransaction.setAttemptId(paymentStateContext.getAttemptId());
+      paymentStateContext.setPaymentTransactionModelDao(unknownPaymentTransaction);
+      paymentStateContext.setSkipOperationForUnknownTransaction(true);
+      return;
+    }
+    final PaymentTransactionModelDao pendingPaymentTransaction=getPendingPaymentTransaction(existingPaymentTransactions);
+    if (pendingPaymentTransaction != null) {
+      paymentStateContext.setPaymentTransactionModelDao(pendingPaymentTransaction);
+      return;
+    }
+    daoHelper.createNewPaymentTransaction();
   }
  catch (  PaymentApiException e) {
     throw new OperationException(e);

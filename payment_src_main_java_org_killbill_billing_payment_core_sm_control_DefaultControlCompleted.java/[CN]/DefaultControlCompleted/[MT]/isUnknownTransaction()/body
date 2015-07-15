@@ -1,0 +1,14 @@
+{
+  if (paymentStateContext.getCurrentTransaction() != null) {
+    return paymentStateContext.getCurrentTransaction().getTransactionStatus() == TransactionStatus.UNKNOWN;
+  }
+ else {
+    final List<PaymentTransactionModelDao> transactions=retryablePaymentAutomatonRunner.getPaymentDao().getPaymentTransactionsByExternalKey(paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getInternalCallContext());
+    return Iterables.any(transactions,new Predicate<PaymentTransactionModelDao>(){
+      @Override public boolean apply(      final PaymentTransactionModelDao input){
+        return input.getTransactionStatus() == TransactionStatus.UNKNOWN && input.getAccountRecordId().equals(paymentStateContext.getInternalCallContext().getAccountRecordId());
+      }
+    }
+);
+  }
+}

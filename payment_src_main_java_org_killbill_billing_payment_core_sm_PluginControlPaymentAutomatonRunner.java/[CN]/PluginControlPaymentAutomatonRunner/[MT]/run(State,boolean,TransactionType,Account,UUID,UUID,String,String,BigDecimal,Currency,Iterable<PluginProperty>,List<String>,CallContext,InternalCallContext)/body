@@ -3,7 +3,7 @@
   try {
     final OperationCallback callback=createOperationCallback(transactionType,paymentStateContext);
     final LeavingStateCallback leavingStateCallback=new DefaultControlInitiated(this,paymentStateContext,paymentDao,paymentControlStateMachineHelper.getInitialState(),paymentControlStateMachineHelper.getRetriedState(),transactionType);
-    final EnteringStateCallback enteringStateCallback=new DefaultControlCompleted(this,paymentStateContext,retryServiceScheduler);
+    final EnteringStateCallback enteringStateCallback=new DefaultControlCompleted(this,paymentStateContext,paymentControlStateMachineHelper.getRetriedState(),retryServiceScheduler);
     state.runOperation(paymentControlStateMachineHelper.getOperation(),callback,enteringStateCallback,leavingStateCallback);
   }
  catch (  final MissingEntryException e) {
