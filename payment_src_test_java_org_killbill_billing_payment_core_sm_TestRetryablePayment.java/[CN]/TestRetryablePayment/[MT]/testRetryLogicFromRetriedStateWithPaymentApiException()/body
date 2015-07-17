@@ -8,7 +8,7 @@
   final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(account.getId(),paymentMethodId,utcNow,utcNow,paymentExternalKey,transactionId,paymentTransactionExternalKey,TransactionType.AUTHORIZE,state.getName(),amount,currency,null,EMPTY_PROPERTIES);
   paymentDao.insertPaymentAttemptWithProperties(attempt,internalCallContext);
   paymentDao.insertPaymentWithFirstTransaction(new PaymentModelDao(paymentId,utcNow,utcNow,account.getId(),paymentMethodId,-1,paymentExternalKey),new PaymentTransactionModelDao(transactionId,attempt.getId(),paymentTransactionExternalKey,utcNow,utcNow,paymentId,TransactionType.AUTHORIZE,utcNow,TransactionStatus.PAYMENT_FAILURE,amount,currency,"bla","foo"),internalCallContext);
-  processor.retryPaymentTransaction(attempt.getId(),ImmutableList.<String>of(MockPaymentRoutingProviderPlugin.PLUGIN_NAME),internalCallContext);
+  processor.retryPaymentTransaction(attempt.getId(),ImmutableList.<String>of(MockPaymentControlProviderPlugin.PLUGIN_NAME),internalCallContext);
   final List<PaymentAttemptModelDao> pas=paymentDao.getPaymentAttemptByTransactionExternalKey(paymentTransactionExternalKey,internalCallContext);
   assertEquals(pas.size(),2);
   final PaymentAttemptModelDao failedAttempt=Iterables.tryFind(pas,new Predicate<PaymentAttemptModelDao>(){

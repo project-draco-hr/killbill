@@ -5,13 +5,13 @@
     final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(event.getSearchKey2(),event.getSearchKey1(),"PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken());
     account=accountApi.getAccountById(event.getAccountId(),internalContext);
     final List<PluginProperty> properties=new ArrayList<PluginProperty>();
-    final PluginProperty prop1=new PluginProperty(InvoicePaymentRoutingPluginApi.PROP_IPCD_INVOICE_ID,event.getInvoiceId().toString(),false);
+    final PluginProperty prop1=new PluginProperty(InvoicePaymentControlPluginApi.PROP_IPCD_INVOICE_ID,event.getInvoiceId().toString(),false);
     properties.add(prop1);
     final CallContext callContext=internalCallContextFactory.createCallContext(internalContext);
     final BigDecimal amountToBePaid=null;
     final List<String> paymentControlPluginNames=paymentConfig.getPaymentControlPluginNames() != null ? new LinkedList<String>(paymentConfig.getPaymentControlPluginNames()) : new LinkedList<String>();
-    paymentControlPluginNames.add(InvoicePaymentRoutingPluginApi.PLUGIN_NAME);
-    pluginRoutingPaymentProcessor.createPurchase(false,account,account.getPaymentMethodId(),null,amountToBePaid,account.getCurrency(),UUIDs.randomUUID().toString(),UUIDs.randomUUID().toString(),properties,paymentControlPluginNames,callContext,internalContext);
+    paymentControlPluginNames.add(InvoicePaymentControlPluginApi.PLUGIN_NAME);
+    pluginControlPaymentProcessor.createPurchase(false,account,account.getPaymentMethodId(),null,amountToBePaid,account.getCurrency(),UUIDs.randomUUID().toString(),UUIDs.randomUUID().toString(),properties,paymentControlPluginNames,callContext,internalContext);
   }
  catch (  final AccountApiException e) {
     log.error("Failed to process invoice payment",e);

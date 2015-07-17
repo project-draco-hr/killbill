@@ -1,7 +1,7 @@
 {
   return dispatchWithAccountLockAndTimeout(new WithAccountLockCallback<PluginDispatcherReturnType<OperationResult>,OperationException>(){
     @Override public PluginDispatcherReturnType<OperationResult> doOperation() throws OperationException {
-      final PaymentRoutingContext paymentControlContext=new DefaultPaymentRoutingContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateContext.getProperties(),paymentStateControlContext.isApiPayment(),paymentStateContext.getCallContext());
+      final PaymentRoutingContext paymentControlContext=new DefaultPaymentControlContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateContext.getProperties(),paymentStateControlContext.isApiPayment(),paymentStateContext.getCallContext());
       final PriorPaymentRoutingResult pluginResult;
       try {
         pluginResult=executePluginPriorCalls(paymentStateControlContext.getPaymentControlPluginNames(),paymentControlContext);
@@ -20,8 +20,8 @@
         final PaymentTransaction transaction=((PaymentStateControlContext)paymentStateContext).getCurrentTransaction();
         success=transaction.getTransactionStatus() == TransactionStatus.SUCCESS || transaction.getTransactionStatus() == TransactionStatus.PENDING;
         if (success) {
-          final PaymentRoutingContext updatedPaymentRoutingContext=new DefaultPaymentRoutingContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),result.getId(),result.getExternalKey(),transaction.getId(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),paymentStateContext.getProperties(),paymentStateControlContext.isApiPayment(),paymentStateContext.getCallContext());
-          executePluginOnSuccessCalls(paymentStateControlContext.getPaymentControlPluginNames(),updatedPaymentRoutingContext);
+          final PaymentRoutingContext updatedPaymentControlContext=new DefaultPaymentControlContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),result.getId(),result.getExternalKey(),transaction.getId(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),transaction.getAmount(),transaction.getCurrency(),transaction.getProcessedAmount(),transaction.getProcessedCurrency(),paymentStateContext.getProperties(),paymentStateControlContext.isApiPayment(),paymentStateContext.getCallContext());
+          executePluginOnSuccessCalls(paymentStateControlContext.getPaymentControlPluginNames(),updatedPaymentControlContext);
           return PluginDispatcher.createPluginDispatcherReturnType(OperationResult.SUCCESS);
         }
  else {

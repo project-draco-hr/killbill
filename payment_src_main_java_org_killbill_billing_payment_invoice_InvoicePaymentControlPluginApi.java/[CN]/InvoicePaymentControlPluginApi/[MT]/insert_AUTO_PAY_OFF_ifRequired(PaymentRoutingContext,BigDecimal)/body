@@ -1,0 +1,8 @@
+{
+  if (paymentControlContext.isApiPayment() || !isAccountAutoPayOff(paymentControlContext.getAccountId(),paymentControlContext)) {
+    return false;
+  }
+  final PluginAutoPayOffModelDao data=new PluginAutoPayOffModelDao(paymentControlContext.getAttemptPaymentId(),paymentControlContext.getPaymentExternalKey(),paymentControlContext.getTransactionExternalKey(),paymentControlContext.getAccountId(),PLUGIN_NAME,paymentControlContext.getPaymentId(),paymentControlContext.getPaymentMethodId(),computedAmount,paymentControlContext.getCurrency(),CREATED_BY,clock.getUTCNow());
+  controlDao.insertAutoPayOff(data);
+  return true;
+}
