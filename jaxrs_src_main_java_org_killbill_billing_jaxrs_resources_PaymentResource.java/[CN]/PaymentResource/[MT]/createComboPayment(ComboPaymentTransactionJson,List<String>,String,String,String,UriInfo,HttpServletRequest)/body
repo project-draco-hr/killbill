@@ -19,16 +19,17 @@
     }
   }
 );
+  final Currency currency=paymentTransactionJson.getCurrency() == null ? account.getCurrency() : Currency.valueOf(paymentTransactionJson.getCurrency());
   final UUID paymentId=null;
 switch (transactionType) {
 case AUTHORIZE:
-    result=paymentApi.createAuthorizationWithPaymentControl(account,paymentMethodId,paymentId,paymentTransactionJson.getAmount(),account.getCurrency(),paymentTransactionJson.getPaymentExternalKey(),paymentTransactionJson.getTransactionExternalKey(),transactionPluginProperties,paymentOptions,callContext);
+    result=paymentApi.createAuthorizationWithPaymentControl(account,paymentMethodId,paymentId,paymentTransactionJson.getAmount(),currency,paymentTransactionJson.getPaymentExternalKey(),paymentTransactionJson.getTransactionExternalKey(),transactionPluginProperties,paymentOptions,callContext);
   break;
 case PURCHASE:
-result=paymentApi.createPurchaseWithPaymentControl(account,paymentMethodId,paymentId,paymentTransactionJson.getAmount(),account.getCurrency(),paymentTransactionJson.getPaymentExternalKey(),paymentTransactionJson.getTransactionExternalKey(),transactionPluginProperties,paymentOptions,callContext);
+result=paymentApi.createPurchaseWithPaymentControl(account,paymentMethodId,paymentId,paymentTransactionJson.getAmount(),currency,paymentTransactionJson.getPaymentExternalKey(),paymentTransactionJson.getTransactionExternalKey(),transactionPluginProperties,paymentOptions,callContext);
 break;
 case CREDIT:
-result=paymentApi.createCreditWithPaymentControl(account,paymentMethodId,paymentId,paymentTransactionJson.getAmount(),account.getCurrency(),paymentTransactionJson.getPaymentExternalKey(),paymentTransactionJson.getTransactionExternalKey(),transactionPluginProperties,paymentOptions,callContext);
+result=paymentApi.createCreditWithPaymentControl(account,paymentMethodId,paymentId,paymentTransactionJson.getAmount(),currency,paymentTransactionJson.getPaymentExternalKey(),paymentTransactionJson.getTransactionExternalKey(),transactionPluginProperties,paymentOptions,callContext);
 break;
 default :
 return Response.status(Status.PRECONDITION_FAILED).entity("TransactionType " + transactionType + " is not allowed for an account").build();

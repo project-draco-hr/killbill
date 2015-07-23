@@ -3,7 +3,7 @@
   verifyNonNullOrEmpty(json.getAmount(),"PaymentTransactionJson amount needs to be set");
   final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  final Payment initialPayment=getPayment(paymentIdStr,json.getPaymentExternalKey(),pluginProperties,callContext);
+  final Payment initialPayment=getPaymentByIdOrKey(paymentIdStr,json.getPaymentExternalKey(),pluginProperties,callContext);
   final Account account=accountUserApi.getAccountById(initialPayment.getAccountId(),callContext);
   final Currency currency=json.getCurrency() == null ? account.getCurrency() : Currency.valueOf(json.getCurrency());
   final Payment payment=paymentApi.createRefund(account,initialPayment.getId(),json.getAmount(),currency,json.getTransactionExternalKey(),pluginProperties,callContext);
