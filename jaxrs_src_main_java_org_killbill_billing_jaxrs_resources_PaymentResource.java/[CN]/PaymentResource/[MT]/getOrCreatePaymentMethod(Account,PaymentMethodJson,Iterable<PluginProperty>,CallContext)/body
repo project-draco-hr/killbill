@@ -1,0 +1,17 @@
+{
+  if (paymentMethodJson.getPaymentMethodId() != null) {
+    try {
+      return paymentApi.getPaymentMethodById(UUID.fromString(paymentMethodJson.getPaymentMethodId()),false,false,pluginProperties,callContext).getId();
+    }
+ catch (    PaymentApiException ignore) {
+    }
+  }
+  verifyNonNullOrEmpty(paymentMethodJson.getExternalKey(),"PaymentMethod externalKey should be specified");
+  try {
+    return paymentApi.getPaymentMethodByExternalKey(paymentMethodJson.getExternalKey(),false,false,pluginProperties,callContext).getId();
+  }
+ catch (  PaymentApiException ignore) {
+  }
+  final PaymentMethod paymentData=paymentMethodJson.toPaymentMethod(account.getId().toString());
+  return paymentApi.addPaymentMethod(account,paymentMethodJson.getExternalKey(),paymentMethodJson.getPluginName(),paymentMethodJson.isDefault(),paymentData.getPluginDetail(),pluginProperties,callContext);
+}
