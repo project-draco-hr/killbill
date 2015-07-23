@@ -1,7 +1,7 @@
 {
   final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  final UUID paymentId=UUID.fromString(paymentIdStr);
+  final UUID paymentId=getPaymentId(json,callContext);
   final Payment initialPayment=paymentApi.getPayment(paymentId,false,pluginProperties,callContext);
   final Account account=accountUserApi.getAccountById(initialPayment.getAccountId(),callContext);
   final String transactionExternalKey=json != null ? json.getTransactionExternalKey() : null;
