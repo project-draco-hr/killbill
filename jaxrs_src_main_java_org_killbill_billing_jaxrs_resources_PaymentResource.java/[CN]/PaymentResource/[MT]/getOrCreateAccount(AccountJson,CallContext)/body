@@ -1,16 +1,9 @@
 {
   if (accountJson.getAccountId() != null) {
-    try {
-      return accountUserApi.getAccountById(UUID.fromString(accountJson.getAccountId()),callContext);
-    }
- catch (    AccountApiException ignore) {
-    }
+    return accountUserApi.getAccountById(UUID.fromString(accountJson.getAccountId()),callContext);
   }
-  verifyNonNullOrEmpty(accountJson.getExternalKey(),"Account externalKey should be specified");
-  try {
+  if (accountJson.getExternalKey() != null) {
     return accountUserApi.getAccountByKey(accountJson.getExternalKey(),callContext);
-  }
- catch (  AccountApiException ignore) {
   }
   return accountUserApi.createAccount(accountJson.toAccountData(),callContext);
 }
