@@ -1,0 +1,13 @@
+{
+  if (accountJson.getAccountId() != null) {
+    return accountUserApi.getAccountById(UUID.fromString(accountJson.getAccountId()),callContext);
+  }
+  if (accountJson.getExternalKey() != null) {
+    try {
+      return accountUserApi.getAccountByKey(accountJson.getExternalKey(),callContext);
+    }
+ catch (    final AccountApiException ignore) {
+    }
+  }
+  return accountUserApi.createAccount(accountJson.toAccountData(),callContext);
+}

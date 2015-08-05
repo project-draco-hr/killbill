@@ -1,0 +1,9 @@
+{
+  verifyNonNullOrEmpty(paymentExternalKey,"Payment externalKey needs to be specified");
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final TenantContext tenantContext=context.createContext(request);
+  final Payment payment=paymentApi.getPaymentByExternalKey(paymentExternalKey,withPluginInfo,pluginProperties,tenantContext);
+  final AccountAuditLogs accountAuditLogs=auditUserApi.getAccountAuditLogs(payment.getAccountId(),auditMode.getLevel(),tenantContext);
+  final PaymentJson result=new PaymentJson(payment,accountAuditLogs);
+  return Response.status(Response.Status.OK).entity(result).build();
+}

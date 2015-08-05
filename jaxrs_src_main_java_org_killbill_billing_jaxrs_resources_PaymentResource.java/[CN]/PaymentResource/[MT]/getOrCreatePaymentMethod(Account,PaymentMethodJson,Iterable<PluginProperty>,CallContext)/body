@@ -1,0 +1,28 @@
+{
+  final List<PaymentMethod> accountPaymentMethods=paymentApi.getAccountPaymentMethods(account.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
+  if (paymentMethodJson.getPaymentMethodId() != null) {
+    final UUID match=UUID.fromString(paymentMethodJson.getPaymentMethodId());
+    if (Iterables.any(accountPaymentMethods,new Predicate<PaymentMethod>(){
+      @Override public boolean apply(      final PaymentMethod input){
+        return input.getId().equals(match);
+      }
+    }
+)) {
+      return match;
+    }
+  }
+  if (paymentMethodJson.getExternalKey() != null) {
+    final PaymentMethod match=Iterables.tryFind(accountPaymentMethods,new Predicate<PaymentMethod>(){
+      @Override public boolean apply(      final PaymentMethod input){
+        return input.getExternalKey().equals(paymentMethodJson.getExternalKey());
+      }
+    }
+).orNull();
+    if (match != null) {
+      return match.getId();
+    }
+  }
+  final boolean isDefault=accountPaymentMethods.isEmpty();
+  final PaymentMethod paymentData=paymentMethodJson.toPaymentMethod(account.getId().toString());
+  return paymentApi.addPaymentMethod(account,paymentMethodJson.getExternalKey(),paymentMethodJson.getPluginName(),isDefault,paymentData.getPluginDetail(),pluginProperties,callContext);
+}

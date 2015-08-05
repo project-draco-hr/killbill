@@ -8,13 +8,13 @@
     return operationResult;
   }
  catch (  final ExecutionException e) {
-    throw rewrapExecutionException(paymentStateContext,e);
+    throw unwrapExceptionFromDispatchedTask(paymentStateContext,e);
   }
 catch (  final TimeoutException e) {
-    throw wrapTimeoutException(paymentStateContext,e);
+    throw unwrapExceptionFromDispatchedTask(paymentStateContext,e);
   }
 catch (  final InterruptedException e) {
     Thread.currentThread().interrupt();
-    throw wrapInterruptedException(paymentStateContext,e);
+    throw unwrapExceptionFromDispatchedTask(paymentStateContext,e);
   }
 }
