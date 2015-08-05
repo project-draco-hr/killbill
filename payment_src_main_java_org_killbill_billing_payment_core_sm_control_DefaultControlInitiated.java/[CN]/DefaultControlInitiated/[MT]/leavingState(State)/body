@@ -18,7 +18,7 @@
   }
   if (state.getName().equals(initialState.getName()) || state.getName().equals(retriedState.getName())) {
     try {
-      final byte[] serializedProperties=PluginPropertySerializer.serialize(stateContext.getProperties());
+      final byte[] serializedProperties=PluginPropertySerializer.serialize(ImmutableList.<PluginProperty>of());
       final PaymentAttemptModelDao attempt=new PaymentAttemptModelDao(stateContext.getAccount().getId(),stateContext.getPaymentMethodId(),utcNow,utcNow,stateContext.getPaymentExternalKey(),stateContext.getTransactionId(),stateContext.getPaymentTransactionExternalKey(),transactionType,initialState.getName(),stateContext.getAmount(),stateContext.getCurrency(),stateContext.getPaymentControlPluginNames(),serializedProperties);
       pluginControlPaymentAutomatonRunner.getPaymentDao().insertPaymentAttemptWithProperties(attempt,stateContext.getInternalCallContext());
       stateContext.setAttemptId(attempt.getId());
