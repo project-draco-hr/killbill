@@ -1,13 +1,18 @@
 {
+  Iterable<PluginProperty> inputPluginProperties=paymentStateContext.getProperties();
   for (  final String pluginName : paymentControlPluginNames) {
     final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
     if (plugin != null) {
       try {
-        plugin.onSuccessCall(paymentControlContext,paymentStateContext.getProperties());
+        final OnSuccessPaymentControlResult result=plugin.onSuccessCall(paymentControlContext,inputPluginProperties);
+        if (result.getAdjustedPluginProperties() != null) {
+          inputPluginProperties=result.getAdjustedPluginProperties();
+        }
       }
  catch (      final PaymentControlApiException e) {
         logger.warn("Plugin " + pluginName + " failed to complete executePluginOnSuccessCalls call for "+ paymentControlContext.getPaymentExternalKey(),e);
       }
     }
   }
+  adjustStateContextPluginProperties(paymentStateContext,inputPluginProperties);
 }

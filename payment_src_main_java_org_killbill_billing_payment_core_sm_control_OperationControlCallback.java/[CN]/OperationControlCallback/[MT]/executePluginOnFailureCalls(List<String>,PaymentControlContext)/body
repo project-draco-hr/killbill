@@ -1,15 +1,19 @@
 {
   DateTime candidate=null;
+  Iterable<PluginProperty> inputPluginProperties=paymentStateContext.getProperties();
   for (  final String pluginName : paymentControlPluginNames) {
     final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
     if (plugin != null) {
       try {
-        final OnFailurePaymentControlResult result=plugin.onFailureCall(paymentControlContext,paymentStateContext.getProperties());
+        final OnFailurePaymentControlResult result=plugin.onFailureCall(paymentControlContext,inputPluginProperties);
         if (candidate == null) {
           candidate=result.getNextRetryDate();
         }
  else         if (result.getNextRetryDate() != null) {
           candidate=candidate.compareTo(result.getNextRetryDate()) > 0 ? result.getNextRetryDate() : candidate;
+        }
+        if (result.getAdjustedPluginProperties() != null) {
+          inputPluginProperties=result.getAdjustedPluginProperties();
         }
       }
  catch (      final PaymentControlApiException e) {
@@ -18,5 +22,6 @@
       }
     }
   }
+  adjustStateContextPluginProperties(paymentStateContext,inputPluginProperties);
   return candidate;
 }
