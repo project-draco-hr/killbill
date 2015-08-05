@@ -1,7 +1,7 @@
 {
   if (invoiceItemIdsWithAmounts.size() == 0) {
     if (specifiedRefundAmount == null || specifiedRefundAmount.compareTo(BigDecimal.ZERO) <= 0) {
-      throw new PaymentRoutingApiException("You need to specify positive a refund amount");
+      throw new PaymentControlApiException("You need to specify positive a refund amount");
     }
     return specifiedRefundAmount;
   }
@@ -13,13 +13,13 @@
       final BigDecimal specifiedItemAmount=invoiceItemIdsWithAmounts.get(itemId);
       final BigDecimal itemAmount=getAmountFromItem(items,itemId);
       if (specifiedItemAmount != null && (specifiedItemAmount.compareTo(BigDecimal.ZERO) <= 0 || specifiedItemAmount.compareTo(itemAmount) > 0)) {
-        throw new PaymentRoutingApiException("You need to specify valid invoice item amount ");
+        throw new PaymentControlApiException("You need to specify valid invoice item amount ");
       }
       amountFromItems=amountFromItems.add(Objects.firstNonNull(specifiedItemAmount,itemAmount));
     }
     return amountFromItems;
   }
  catch (  final InvoiceApiException e) {
-    throw new PaymentRoutingApiException(e);
+    throw new PaymentControlApiException(e);
   }
 }

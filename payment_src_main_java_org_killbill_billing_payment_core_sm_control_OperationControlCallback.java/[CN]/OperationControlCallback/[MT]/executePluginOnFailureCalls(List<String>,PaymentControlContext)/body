@@ -1,0 +1,22 @@
+{
+  DateTime candidate=null;
+  for (  final String pluginName : paymentControlPluginNames) {
+    final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
+    if (plugin != null) {
+      try {
+        final OnFailurePaymentControlResult result=plugin.onFailureCall(paymentControlContext,paymentStateContext.getProperties());
+        if (candidate == null) {
+          candidate=result.getNextRetryDate();
+        }
+ else         if (result.getNextRetryDate() != null) {
+          candidate=candidate.compareTo(result.getNextRetryDate()) > 0 ? result.getNextRetryDate() : candidate;
+        }
+      }
+ catch (      final PaymentControlApiException e) {
+        logger.warn("Plugin " + pluginName + " failed to return next retryDate for payment "+ paymentControlContext.getPaymentExternalKey(),e);
+        return candidate;
+      }
+    }
+  }
+  return candidate;
+}

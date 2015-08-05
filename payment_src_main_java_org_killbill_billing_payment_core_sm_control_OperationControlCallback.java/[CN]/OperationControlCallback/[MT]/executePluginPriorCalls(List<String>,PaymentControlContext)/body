@@ -1,0 +1,17 @@
+{
+  PriorPaymentControlResult prevResult=null;
+  PaymentControlContext inputPaymentControlContext=paymentControlContextArg;
+  for (  final String pluginName : paymentControlPluginNames) {
+    final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
+    if (plugin == null) {
+      logger.warn("Skipping unknown payment control plugin {} when fetching results",pluginName);
+      continue;
+    }
+    prevResult=plugin.priorCall(inputPaymentControlContext,paymentStateContext.getProperties());
+    if (prevResult.isAborted()) {
+      break;
+    }
+    inputPaymentControlContext=new DefaultPaymentControlContext(paymentStateContext.getAccount(),prevResult.getAdjustedPaymentMethodId() != null ? prevResult.getAdjustedPaymentMethodId() : inputPaymentControlContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),prevResult.getAdjustedAmount() != null ? prevResult.getAdjustedAmount() : inputPaymentControlContext.getAmount(),prevResult.getAdjustedCurrency() != null ? prevResult.getAdjustedCurrency() : inputPaymentControlContext.getCurrency(),prevResult.getAdjustedPluginProperties() != null ? prevResult.getAdjustedPluginProperties() : inputPaymentControlContext.getPluginProperties(),paymentStateControlContext.isApiPayment(),paymentStateContext.getCallContext());
+  }
+  return prevResult;
+}
