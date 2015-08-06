@@ -1,16 +1,3 @@
 {
-  boolean success=false;
-synchronized (this) {
-    for (    PaymentAttemptModelDao cur : attempts.values()) {
-      if (cur.getId().equals(paymentAttemptId)) {
-        cur.setStateName(state);
-        cur.setTransactionId(transactionId);
-        success=true;
-        break;
-      }
-    }
-  }
-  if (!success) {
-    throw new RuntimeException("Could not find attempt " + paymentAttemptId);
-  }
+  updatePaymentAttemptWithProperties(paymentAttemptId,transactionId,state,null,context);
 }
