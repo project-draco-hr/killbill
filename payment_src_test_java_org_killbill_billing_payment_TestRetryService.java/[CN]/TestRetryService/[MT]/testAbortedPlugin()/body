@@ -1,3 +1,30 @@
 {
-  testSchedulesRetryInternal(0,false,FailureType.PLUGIN_EXCEPTION);
+  final Account account=testHelper.createTestAccount("yiyi.gmail.com",true);
+  final Invoice invoice=testHelper.createTestInvoice(account,clock.getUTCToday(),Currency.USD);
+  final BigDecimal amount=new BigDecimal("10.00");
+  final UUID subscriptionId=UUID.randomUUID();
+  final UUID bundleId=UUID.randomUUID();
+  final LocalDate startDate=clock.getUTCToday();
+  final LocalDate endDate=startDate.plusMonths(1);
+  invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,startDate,endDate,amount,new BigDecimal("1.0"),Currency.USD));
+  setPaymentFailure(FailureType.PLUGIN_EXCEPTION);
+  boolean failed=false;
+  final String paymentExternalKey=UUID.randomUUID().toString();
+  final String transactionExternalKey=UUID.randomUUID().toString();
+  try {
+    pluginControlPaymentProcessor.createPurchase(false,account,account.getPaymentMethodId(),null,amount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),ImmutableList.<String>of(InvoicePaymentControlPluginApi.PLUGIN_NAME),callContext,internalCallContext);
+  }
+ catch (  final PaymentApiException e) {
+    failed=true;
+  }
+  assertTrue(failed);
+  Payment payment=getPaymentForExternalKey(paymentExternalKey);
+  List<PaymentAttemptModelDao> attempts=paymentDao.getPaymentAttempts(paymentExternalKey,internalCallContext);
+  assertEquals(attempts.size(),1);
+  final List<PaymentTransactionModelDao> transactions=paymentDao.getTransactionsForPayment(payment.getId(),internalCallContext);
+  assertEquals(transactions.size(),1);
+  attempts=paymentDao.getPaymentAttempts(payment.getExternalKey(),internalCallContext);
+  final int expectedAttempts=1;
+  assertEquals(attempts.size(),expectedAttempts);
+  assertEquals(attempts.get(0).getStateName(),"ABORTED");
 }
