@@ -1,0 +1,13 @@
+{
+  verifyNonNullOrEmpty(json,"ComboHostedPaymentPageJson body should be specified");
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Account account=getOrCreateAccount(json.getAccount(),callContext);
+  final Iterable<PluginProperty> paymentMethodPluginProperties=extractPluginProperties(json.getPaymentMethodPluginProperties());
+  final UUID paymentMethodId=getOrCreatePaymentMethod(account,json.getPaymentMethod(),paymentMethodPluginProperties,callContext);
+  final HostedPaymentPageFieldsJson hostedPaymentPageFields=json.getHostedPaymentPageFieldsJson();
+  final Iterable<PluginProperty> customFields=extractPluginProperties(hostedPaymentPageFields != null ? hostedPaymentPageFields.getCustomFields() : null);
+  final HostedPaymentPageFormDescriptor descriptor=paymentGatewayApi.buildFormDescriptor(account,paymentMethodId,customFields,pluginProperties,callContext);
+  final HostedPaymentPageFormDescriptorJson result=new HostedPaymentPageFormDescriptorJson(descriptor);
+  return Response.status(Response.Status.OK).entity(result).build();
+}

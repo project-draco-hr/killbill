@@ -5,18 +5,7 @@
   final Account account=accountUserApi.getAccountById(accountId,callContext);
   final UUID paymentMethodId=paymentMethodIdStr == null ? account.getPaymentMethodId() : UUID.fromString(paymentMethodIdStr);
   validatePaymentMethodForAccount(accountId,paymentMethodId,callContext);
-  final Iterable<PluginProperty> customFields;
-  if (json == null) {
-    customFields=ImmutableList.<PluginProperty>of();
-  }
- else {
-    customFields=Iterables.<PluginPropertyJson,PluginProperty>transform(json.getCustomFields(),new Function<PluginPropertyJson,PluginProperty>(){
-      @Override public PluginProperty apply(      final PluginPropertyJson pluginPropertyJson){
-        return pluginPropertyJson.toPluginProperty();
-      }
-    }
-);
-  }
+  final Iterable<PluginProperty> customFields=extractPluginProperties(json.getCustomFields());
   final HostedPaymentPageFormDescriptor descriptor=paymentGatewayApi.buildFormDescriptor(account,paymentMethodId,customFields,pluginProperties,callContext);
   final HostedPaymentPageFormDescriptorJson result=new HostedPaymentPageFormDescriptorJson(descriptor);
   return Response.status(Response.Status.OK).entity(result).build();

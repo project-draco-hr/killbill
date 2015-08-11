@@ -4,7 +4,7 @@
       final PaymentPluginApi plugin=getPaymentPluginApi(pluginName);
       try {
         final GatewayNotification result=plugin.processNotification(notification,properties,callContext);
-        return PluginDispatcher.createPluginDispatcherReturnType(result);
+        return PluginDispatcher.createPluginDispatcherReturnType(result == null ? new DefaultNoOpGatewayNotification() : result);
       }
  catch (      final PaymentPluginApiException e) {
         throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,e.getErrorMessage());

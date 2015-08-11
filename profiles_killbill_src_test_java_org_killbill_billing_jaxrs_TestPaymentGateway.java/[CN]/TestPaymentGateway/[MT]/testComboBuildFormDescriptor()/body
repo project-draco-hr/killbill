@@ -1,0 +1,10 @@
+{
+  final Account account=getAccount();
+  account.setAccountId(null);
+  final PaymentMethodPluginDetail info=new PaymentMethodPluginDetail();
+  final PaymentMethod paymentMethod=new PaymentMethod(null,UUID.randomUUID().toString(),null,true,PLUGIN_NAME,info);
+  final HostedPaymentPageFields hppFields=new HostedPaymentPageFields();
+  final ComboHostedPaymentPage comboHostedPaymentPage=new ComboHostedPaymentPage(account,paymentMethod,ImmutableList.<PluginProperty>of(),hppFields);
+  final HostedPaymentPageFormDescriptor hostedPaymentPageFormDescriptor=killBillClient.buildFormDescriptor(comboHostedPaymentPage,ImmutableMap.<String,String>of(),createdBy,reason,comment);
+  Assert.assertNotNull(hostedPaymentPageFormDescriptor.getKbAccountId());
+}

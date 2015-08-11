@@ -2,23 +2,13 @@
   verifyNonNullOrEmpty(json,"ComboPaymentTransactionJson body should be specified");
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final Account account=getOrCreateAccount(json.getAccount(),callContext);
-  final Iterable<PluginProperty> paymentMethodPluginProperties=json.getPaymentMethodPluginProperties() != null ? Iterables.<PluginPropertyJson,PluginProperty>transform(json.getPaymentMethodPluginProperties(),new Function<PluginPropertyJson,PluginProperty>(){
-    @Override public PluginProperty apply(    final PluginPropertyJson pluginPropertyJson){
-      return pluginPropertyJson.toPluginProperty();
-    }
-  }
-) : ImmutableList.<PluginProperty>of();
+  final Iterable<PluginProperty> paymentMethodPluginProperties=extractPluginProperties(json.getPaymentMethodPluginProperties());
   final UUID paymentMethodId=getOrCreatePaymentMethod(account,json.getPaymentMethod(),paymentMethodPluginProperties,callContext);
   final PaymentTransactionJson paymentTransactionJson=json.getTransaction();
   final TransactionType transactionType=TransactionType.valueOf(paymentTransactionJson.getTransactionType());
   final PaymentOptions paymentOptions=createControlPluginApiPaymentOptions(paymentControlPluginNames);
   final Payment result;
-  final Iterable<PluginProperty> transactionPluginProperties=json.getTransactionPluginProperties() != null ? Iterables.<PluginPropertyJson,PluginProperty>transform(json.getTransactionPluginProperties(),new Function<PluginPropertyJson,PluginProperty>(){
-    @Override public PluginProperty apply(    final PluginPropertyJson pluginPropertyJson){
-      return pluginPropertyJson.toPluginProperty();
-    }
-  }
-) : ImmutableList.<PluginProperty>of();
+  final Iterable<PluginProperty> transactionPluginProperties=extractPluginProperties(json.getTransactionPluginProperties());
   final Currency currency=paymentTransactionJson.getCurrency() == null ? account.getCurrency() : Currency.valueOf(paymentTransactionJson.getCurrency());
   final UUID paymentId=null;
 switch (transactionType) {
