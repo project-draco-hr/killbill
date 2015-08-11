@@ -15,7 +15,12 @@ break;
 case PLUGIN_FAILURE:
 case UNKNOWN:
 default :
+if (transactionStatus == paymentTransaction.getTransactionStatus()) {
+log.debug("Janitor IncompletePaymentTransactionTask unable to repair payment {}, transaction {}: {} -> {}",payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus);
+}
+ else {
 log.info("Janitor IncompletePaymentTransactionTask unable to repair payment {}, transaction {}: {} -> {}",payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus);
+}
 insertNewNotificationForUnresolvedTransactionIfNeeded(paymentTransaction.getId(),attemptNumber,userToken,internalTenantContext.getAccountRecordId(),internalTenantContext.getTenantRecordId());
 return false;
 }
@@ -24,7 +29,12 @@ final BigDecimal processedAmount=(paymentTransactionInfoPlugin != null && isPend
 final Currency processedCurrency=(paymentTransactionInfoPlugin != null && isPendingOrFinalTransactionStatus(transactionStatus)) ? paymentTransactionInfoPlugin.getCurrency() : paymentTransaction.getProcessedCurrency();
 final String gatewayErrorCode=paymentTransactionInfoPlugin != null ? paymentTransactionInfoPlugin.getGatewayErrorCode() : paymentTransaction.getGatewayErrorCode();
 final String gatewayError=paymentTransactionInfoPlugin != null ? paymentTransactionInfoPlugin.getGatewayError() : paymentTransaction.getGatewayErrorMsg();
+if (transactionStatus == paymentTransaction.getTransactionStatus()) {
+log.debug("Janitor IncompletePaymentTransactionTask repairing payment {}, transaction {}, transitioning transactionStatus from {} -> {}",payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus);
+}
+ else {
 log.info("Janitor IncompletePaymentTransactionTask repairing payment {}, transaction {}, transitioning transactionStatus from {} -> {}",payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus);
+}
 final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(payment.getAccountId(),callContext);
 paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),payment.getId(),paymentTransaction.getTransactionType(),newPaymentState,lastSuccessPaymentState,paymentTransaction.getId(),transactionStatus,processedAmount,processedCurrency,gatewayErrorCode,gatewayError,internalCallContext);
 return true;
