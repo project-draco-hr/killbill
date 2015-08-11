@@ -10,6 +10,7 @@
   Assert.assertEquals(pendingPayment.getTransactions().get(0).getCurrency(),account.getCurrency());
   Assert.assertEquals(pendingPayment.getTransactions().get(0).getExternalKey(),paymentTransactionExternalKey);
   Assert.assertEquals(pendingPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.PENDING);
+  verifyPaymentViaGetPath(pendingPayment);
   final Payment pendingPayment2=createPayment(transactionType,pendingPayment.getId(),paymentExternalKey,paymentTransactionExternalKey,pendingAmount,PaymentPluginStatus.PENDING);
   Assert.assertNotNull(pendingPayment2);
   Assert.assertEquals(pendingPayment2.getExternalKey(),paymentExternalKey);
@@ -19,6 +20,7 @@
   Assert.assertEquals(pendingPayment2.getTransactions().get(0).getCurrency(),account.getCurrency());
   Assert.assertEquals(pendingPayment2.getTransactions().get(0).getExternalKey(),paymentTransactionExternalKey);
   Assert.assertEquals(pendingPayment2.getTransactions().get(0).getTransactionStatus(),TransactionStatus.PENDING);
+  verifyPaymentViaGetPath(pendingPayment2);
   final Payment completedPayment=createPayment(transactionType,pendingPayment.getId(),paymentExternalKey,paymentTransactionExternalKey,pendingAmount,PaymentPluginStatus.PROCESSED);
   Assert.assertNotNull(completedPayment);
   Assert.assertEquals(completedPayment.getExternalKey(),paymentExternalKey);
@@ -28,5 +30,6 @@
   Assert.assertEquals(completedPayment.getTransactions().get(0).getCurrency(),account.getCurrency());
   Assert.assertEquals(completedPayment.getTransactions().get(0).getExternalKey(),paymentTransactionExternalKey);
   Assert.assertEquals(completedPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
+  verifyPaymentViaGetPath(completedPayment);
   return completedPayment;
 }

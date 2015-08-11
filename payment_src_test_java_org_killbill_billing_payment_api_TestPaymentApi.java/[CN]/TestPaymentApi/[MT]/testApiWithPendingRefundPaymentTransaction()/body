@@ -16,10 +16,14 @@
   Assert.assertEquals(payment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
   final Payment pendingRefund=paymentApi.createRefund(account,payment.getId(),requestedAmount,account.getCurrency(),refundTransactionExternalKey,pendingPluginProperties,callContext);
   verifyRefund(pendingRefund,paymentExternalKey,paymentTransactionExternalKey,refundTransactionExternalKey,requestedAmount,requestedAmount,TransactionStatus.PENDING);
+  verifyPaymentViaGetPath(pendingRefund);
   final Payment pendingRefund2=paymentApi.createRefund(account,payment.getId(),null,null,refundTransactionExternalKey,pendingPluginProperties,callContext);
   verifyRefund(pendingRefund2,paymentExternalKey,paymentTransactionExternalKey,refundTransactionExternalKey,requestedAmount,requestedAmount,TransactionStatus.PENDING);
+  verifyPaymentViaGetPath(pendingRefund2);
   final Payment pendingRefund3=paymentApi.createRefund(account,payment.getId(),refundAmount,account.getCurrency(),refundTransactionExternalKey,pendingPluginProperties,callContext);
   verifyRefund(pendingRefund3,paymentExternalKey,paymentTransactionExternalKey,refundTransactionExternalKey,requestedAmount,refundAmount,TransactionStatus.PENDING);
+  verifyPaymentViaGetPath(pendingRefund3);
   final Payment pendingRefund4=paymentApi.createRefund(account,payment.getId(),null,null,refundTransactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
   verifyRefund(pendingRefund4,paymentExternalKey,paymentTransactionExternalKey,refundTransactionExternalKey,requestedAmount,requestedAmount,TransactionStatus.SUCCESS);
+  verifyPaymentViaGetPath(pendingRefund4);
 }

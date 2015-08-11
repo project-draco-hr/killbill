@@ -1,0 +1,22 @@
+{
+  final Payment refreshedPayment=paymentApi.getPayment(payment.getId(),true,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(refreshedPayment.getAccountId(),payment.getAccountId());
+  Assert.assertEquals(refreshedPayment.getTransactions().size(),payment.getTransactions().size());
+  Assert.assertEquals(refreshedPayment.getExternalKey(),payment.getExternalKey());
+  Assert.assertEquals(refreshedPayment.getPaymentMethodId(),payment.getPaymentMethodId());
+  Assert.assertEquals(refreshedPayment.getAccountId(),payment.getAccountId());
+  Assert.assertEquals(refreshedPayment.getAuthAmount().compareTo(payment.getAuthAmount()),0);
+  Assert.assertEquals(refreshedPayment.getCapturedAmount().compareTo(payment.getCapturedAmount()),0);
+  Assert.assertEquals(refreshedPayment.getPurchasedAmount().compareTo(payment.getPurchasedAmount()),0);
+  Assert.assertEquals(refreshedPayment.getRefundedAmount().compareTo(payment.getRefundedAmount()),0);
+  Assert.assertEquals(refreshedPayment.getCurrency(),payment.getCurrency());
+  for (int i=0; i < refreshedPayment.getTransactions().size(); i++) {
+    final PaymentTransaction refreshedPaymentTransaction=refreshedPayment.getTransactions().get(i);
+    final PaymentTransaction paymentTransaction=payment.getTransactions().get(i);
+    Assert.assertEquals(refreshedPaymentTransaction.getAmount().compareTo(paymentTransaction.getAmount()),0);
+    Assert.assertEquals(refreshedPaymentTransaction.getProcessedAmount().compareTo(paymentTransaction.getProcessedAmount()),0);
+    Assert.assertEquals(refreshedPaymentTransaction.getCurrency(),paymentTransaction.getCurrency());
+    Assert.assertEquals(refreshedPaymentTransaction.getExternalKey(),paymentTransaction.getExternalKey());
+    Assert.assertEquals(refreshedPaymentTransaction.getTransactionStatus(),paymentTransaction.getTransactionStatus());
+  }
+}
