@@ -1,0 +1,28 @@
+{
+  verifyNonNullOrEmpty(json,"PaymentTransactionJson body should be specified");
+  verifyNonNullOrEmpty(json.getTransactionType(),"PaymentTransactionJson transactionType needs to be set");
+  if (paymentIdStr == null) {
+    verifyNonNullOrEmpty(json.getPaymentExternalKey(),"PaymentTransactionJson externalKey needs to be set");
+  }
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Payment initialPayment=getPaymentByIdOrKey(paymentIdStr,json.getPaymentExternalKey(),pluginProperties,callContext);
+  final Account account=accountUserApi.getAccountById(initialPayment.getAccountId(),callContext);
+  final Currency currency=json.getCurrency() == null ? account.getCurrency() : Currency.valueOf(json.getCurrency());
+  final TransactionType transactionType=TransactionType.valueOf(json.getTransactionType());
+  final PaymentOptions paymentOptions=createControlPluginApiPaymentOptions(paymentControlPluginNames);
+switch (transactionType) {
+case AUTHORIZE:
+    paymentApi.createAuthorizationWithPaymentControl(account,initialPayment.getPaymentMethodId(),initialPayment.getId(),json.getAmount(),currency,json.getPaymentExternalKey(),json.getTransactionExternalKey(),pluginProperties,paymentOptions,callContext);
+  break;
+case PURCHASE:
+paymentApi.createPurchaseWithPaymentControl(account,initialPayment.getPaymentMethodId(),initialPayment.getId(),json.getAmount(),currency,json.getPaymentExternalKey(),json.getTransactionExternalKey(),pluginProperties,paymentOptions,callContext);
+break;
+case CREDIT:
+paymentApi.createCreditWithPaymentControl(account,initialPayment.getPaymentMethodId(),initialPayment.getId(),json.getAmount(),currency,json.getPaymentExternalKey(),json.getTransactionExternalKey(),pluginProperties,paymentOptions,callContext);
+break;
+default :
+return Response.status(Status.PRECONDITION_FAILED).entity("TransactionType " + transactionType + " cannot be completed").build();
+}
+return uriBuilder.buildResponse(uriInfo,PaymentResource.class,"getPayment",initialPayment.getId());
+}
