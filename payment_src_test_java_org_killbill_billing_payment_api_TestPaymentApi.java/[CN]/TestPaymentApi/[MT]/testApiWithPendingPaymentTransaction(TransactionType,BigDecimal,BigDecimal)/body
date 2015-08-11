@@ -1,0 +1,32 @@
+{
+  final String paymentExternalKey=UUID.randomUUID().toString();
+  final String paymentTransactionExternalKey=UUID.randomUUID().toString();
+  final Payment pendingPayment=createPayment(transactionType,null,paymentExternalKey,paymentTransactionExternalKey,requestedAmount,PaymentPluginStatus.PENDING);
+  Assert.assertNotNull(pendingPayment);
+  Assert.assertEquals(pendingPayment.getExternalKey(),paymentExternalKey);
+  Assert.assertEquals(pendingPayment.getTransactions().size(),1);
+  Assert.assertEquals(pendingPayment.getTransactions().get(0).getAmount().compareTo(requestedAmount),0);
+  Assert.assertEquals(pendingPayment.getTransactions().get(0).getProcessedAmount().compareTo(requestedAmount),0);
+  Assert.assertEquals(pendingPayment.getTransactions().get(0).getCurrency(),account.getCurrency());
+  Assert.assertEquals(pendingPayment.getTransactions().get(0).getExternalKey(),paymentTransactionExternalKey);
+  Assert.assertEquals(pendingPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.PENDING);
+  final Payment pendingPayment2=createPayment(transactionType,pendingPayment.getId(),paymentExternalKey,paymentTransactionExternalKey,pendingAmount,PaymentPluginStatus.PENDING);
+  Assert.assertNotNull(pendingPayment2);
+  Assert.assertEquals(pendingPayment2.getExternalKey(),paymentExternalKey);
+  Assert.assertEquals(pendingPayment2.getTransactions().size(),1);
+  Assert.assertEquals(pendingPayment2.getTransactions().get(0).getAmount().compareTo(requestedAmount),0);
+  Assert.assertEquals(pendingPayment2.getTransactions().get(0).getProcessedAmount().compareTo(pendingAmount == null ? requestedAmount : pendingAmount),0);
+  Assert.assertEquals(pendingPayment2.getTransactions().get(0).getCurrency(),account.getCurrency());
+  Assert.assertEquals(pendingPayment2.getTransactions().get(0).getExternalKey(),paymentTransactionExternalKey);
+  Assert.assertEquals(pendingPayment2.getTransactions().get(0).getTransactionStatus(),TransactionStatus.PENDING);
+  final Payment completedPayment=createPayment(transactionType,pendingPayment.getId(),paymentExternalKey,paymentTransactionExternalKey,pendingAmount,PaymentPluginStatus.PROCESSED);
+  Assert.assertNotNull(completedPayment);
+  Assert.assertEquals(completedPayment.getExternalKey(),paymentExternalKey);
+  Assert.assertEquals(completedPayment.getTransactions().size(),1);
+  Assert.assertEquals(completedPayment.getTransactions().get(0).getAmount().compareTo(requestedAmount),0);
+  Assert.assertEquals(completedPayment.getTransactions().get(0).getProcessedAmount().compareTo(pendingAmount == null ? requestedAmount : pendingAmount),0);
+  Assert.assertEquals(completedPayment.getTransactions().get(0).getCurrency(),account.getCurrency());
+  Assert.assertEquals(completedPayment.getTransactions().get(0).getExternalKey(),paymentTransactionExternalKey);
+  Assert.assertEquals(completedPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
+  return completedPayment;
+}

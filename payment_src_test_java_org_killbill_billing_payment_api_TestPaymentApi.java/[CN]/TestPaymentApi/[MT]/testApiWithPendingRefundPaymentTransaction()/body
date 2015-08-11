@@ -1,0 +1,25 @@
+{
+  final String paymentExternalKey=UUID.randomUUID().toString();
+  final String paymentTransactionExternalKey=UUID.randomUUID().toString();
+  final String refundTransactionExternalKey=UUID.randomUUID().toString();
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  final BigDecimal refundAmount=BigDecimal.ONE;
+  final Iterable<PluginProperty> pendingPluginProperties=ImmutableList.<PluginProperty>of(new PluginProperty(MockPaymentProviderPlugin.PLUGIN_PROPERTY_PAYMENT_PLUGIN_STATUS_OVERRIDE,TransactionStatus.PENDING.toString(),false));
+  final Payment payment=createPayment(TransactionType.PURCHASE,null,paymentExternalKey,paymentTransactionExternalKey,requestedAmount,PaymentPluginStatus.PROCESSED);
+  Assert.assertNotNull(payment);
+  Assert.assertEquals(payment.getExternalKey(),paymentExternalKey);
+  Assert.assertEquals(payment.getTransactions().size(),1);
+  Assert.assertEquals(payment.getTransactions().get(0).getAmount().compareTo(requestedAmount),0);
+  Assert.assertEquals(payment.getTransactions().get(0).getProcessedAmount().compareTo(requestedAmount),0);
+  Assert.assertEquals(payment.getTransactions().get(0).getCurrency(),account.getCurrency());
+  Assert.assertEquals(payment.getTransactions().get(0).getExternalKey(),paymentTransactionExternalKey);
+  Assert.assertEquals(payment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
+  final Payment pendingRefund=paymentApi.createRefund(account,payment.getId(),requestedAmount,account.getCurrency(),refundTransactionExternalKey,pendingPluginProperties,callContext);
+  verifyRefund(pendingRefund,paymentExternalKey,paymentTransactionExternalKey,refundTransactionExternalKey,requestedAmount,requestedAmount,TransactionStatus.PENDING);
+  final Payment pendingRefund2=paymentApi.createRefund(account,payment.getId(),null,null,refundTransactionExternalKey,pendingPluginProperties,callContext);
+  verifyRefund(pendingRefund2,paymentExternalKey,paymentTransactionExternalKey,refundTransactionExternalKey,requestedAmount,requestedAmount,TransactionStatus.PENDING);
+  final Payment pendingRefund3=paymentApi.createRefund(account,payment.getId(),refundAmount,account.getCurrency(),refundTransactionExternalKey,pendingPluginProperties,callContext);
+  verifyRefund(pendingRefund3,paymentExternalKey,paymentTransactionExternalKey,refundTransactionExternalKey,requestedAmount,refundAmount,TransactionStatus.PENDING);
+  final Payment pendingRefund4=paymentApi.createRefund(account,payment.getId(),null,null,refundTransactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  verifyRefund(pendingRefund4,paymentExternalKey,paymentTransactionExternalKey,refundTransactionExternalKey,requestedAmount,requestedAmount,TransactionStatus.SUCCESS);
+}
