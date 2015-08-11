@@ -1,10 +1,12 @@
 {
   checkNotNullParameter(account,"account");
   checkNotNullParameter(paymentMethodId,"paymentMethodId");
-  checkNotNullParameter(amount,"amount");
-  checkNotNullParameter(currency,"currency");
+  if (paymentId == null) {
+    checkNotNullParameter(amount,"amount");
+    checkPositiveAmount(amount);
+    checkNotNullParameter(currency,"currency");
+  }
   checkNotNullParameter(properties,"plugin properties");
-  checkPositiveAmount(amount);
   logAPICall(TransactionType.CREDIT.name(),account,paymentMethodId,paymentId,null,amount,currency,paymentExternalKey,paymentTransactionExternalKey);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   return paymentProcessor.createCredit(IS_API_PAYMENT,NULL_ATTEMPT_ID,account,paymentMethodId,paymentId,amount,currency,paymentExternalKey,paymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
