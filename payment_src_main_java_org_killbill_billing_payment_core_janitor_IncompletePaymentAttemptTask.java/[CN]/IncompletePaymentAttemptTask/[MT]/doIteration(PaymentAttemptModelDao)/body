@@ -3,18 +3,22 @@
   final CallContext callContext=createCallContext("AttemptCompletionJanitorTask",tenantContext);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(attempt.getAccountId(),callContext);
   final List<PaymentTransactionModelDao> transactions=paymentDao.getPaymentTransactionsByExternalKey(attempt.getTransactionExternalKey(),tenantContext);
-  final PaymentTransactionModelDao transaction=Iterables.tryFind(transactions,new Predicate<PaymentTransactionModelDao>(){
+  final List<PaymentTransactionModelDao> filteredTransactions=ImmutableList.copyOf(Iterables.filter(transactions,new Predicate<PaymentTransactionModelDao>(){
     @Override public boolean apply(    final PaymentTransactionModelDao input){
       return input.getAttemptId().equals(attempt.getId());
     }
   }
-).orNull();
-  if (transaction.getTransactionStatus() == TransactionStatus.UNKNOWN) {
-    return;
+));
+  if (filteredTransactions.size() > 1) {
+    log.warn("Found {} transactions for paymentAttempt {}",filteredTransactions.size(),attempt.getId());
   }
+  final PaymentTransactionModelDao transaction=filteredTransactions.isEmpty() ? null : filteredTransactions.get(0);
   if (transaction == null || transaction.getTransactionStatus() == TransactionStatus.PLUGIN_FAILURE || transaction.getTransactionStatus() == TransactionStatus.PAYMENT_FAILURE) {
     log.info("Janitor AttemptCompletionTask moving attempt " + attempt.getId() + " -> ABORTED");
     paymentDao.updatePaymentAttempt(attempt.getId(),attempt.getTransactionId(),"ABORTED",internalCallContext);
+    return;
+  }
+  if (transaction.getTransactionStatus() == TransactionStatus.UNKNOWN) {
     return;
   }
   if (transaction.getTransactionStatus() == TransactionStatus.SUCCESS || transaction.getTransactionStatus() == TransactionStatus.PENDING) {
