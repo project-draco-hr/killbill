@@ -1,11 +1,11 @@
 {
   final PaymentTransaction authTransaction=new PaymentTransaction();
-  authTransaction.setAmount(BigDecimal.TEN);
+  authTransaction.setAmount(transactionAmount);
   authTransaction.setCurrency(account.getCurrency());
   authTransaction.setPaymentExternalKey(paymentExternalKey);
   authTransaction.setTransactionExternalKey(transactionExternalKey);
   authTransaction.setTransactionType(transactionType.toString());
   final Payment payment=killBillClient.createPayment(account.getAccountId(),paymentMethodId,authTransaction,pluginProperties,createdBy,reason,comment);
-  verifyPaymentNoTransaction(account,paymentMethodId,payment,paymentExternalKey,BigDecimal.TEN,BigDecimal.ZERO,BigDecimal.ZERO,1,paymentNb);
+  verifyPayment(account,paymentMethodId,payment,paymentExternalKey,transactionExternalKey,transactionType.toString(),transactionStatus,transactionAmount,authAmount,BigDecimal.ZERO,BigDecimal.ZERO,1,paymentNb);
   return payment;
 }
