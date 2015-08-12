@@ -25,5 +25,10 @@
     completeTransactionWithTypeAndKey.setTransactionExternalKey(authPaymentTransaction.getTransactionExternalKey());
     final Payment completedPaymentByTypeAndKey=killBillClient.completePayment(completeTransactionWithTypeAndKey,pluginProperties,createdBy,reason,comment);
     verifyPayment(account,paymentMethodId,completedPaymentByTypeAndKey,paymentExternalKey,authTransactionExternalKey,transactionType.toString(),pending,amount,authAmount,BigDecimal.ZERO,BigDecimal.ZERO,1,paymentNb);
+    final PaymentTransaction completeTransactionWithTypeAndId=new PaymentTransaction();
+    completeTransactionWithTypeAndId.setPaymentId(initialPayment.getPaymentId());
+    completeTransactionWithTypeAndId.setTransactionId(authPaymentTransaction.getTransactionId());
+    final Payment completedPaymentByTypeAndId=killBillClient.completePayment(completeTransactionWithTypeAndId,pluginProperties,createdBy,reason,comment);
+    verifyPayment(account,paymentMethodId,completedPaymentByTypeAndId,paymentExternalKey,authTransactionExternalKey,transactionType.toString(),pending,amount,authAmount,BigDecimal.ZERO,BigDecimal.ZERO,1,paymentNb);
   }
 }

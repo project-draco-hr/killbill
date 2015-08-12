@@ -38,4 +38,9 @@
   completeTransactionWithTypeAndKey.setTransactionExternalKey(refundTransactionExternalKey);
   final Payment completedPaymentByTypeAndKey=killBillClient.completePayment(completeTransactionWithTypeAndKey,pluginProperties,createdBy,reason,comment);
   verifyPaymentWithPendingRefund(account,paymentMethodId,paymentExternalKey,purchaseTransactionExternalKey,purchaseAmount,refundTransactionExternalKey,completedPaymentByTypeAndKey);
+  final PaymentTransaction completeTransactionWithTypeAndId=new PaymentTransaction();
+  completeTransactionWithTypeAndId.setPaymentId(refundPayment.getPaymentId());
+  completeTransactionWithTypeAndId.setTransactionId(refundPayment.getTransactions().get(1).getTransactionId());
+  final Payment completedPaymentByTypeAndId=killBillClient.completePayment(completeTransactionWithTypeAndId,pluginProperties,createdBy,reason,comment);
+  verifyPaymentWithPendingRefund(account,paymentMethodId,paymentExternalKey,purchaseTransactionExternalKey,purchaseAmount,refundTransactionExternalKey,completedPaymentByTypeAndId);
 }
