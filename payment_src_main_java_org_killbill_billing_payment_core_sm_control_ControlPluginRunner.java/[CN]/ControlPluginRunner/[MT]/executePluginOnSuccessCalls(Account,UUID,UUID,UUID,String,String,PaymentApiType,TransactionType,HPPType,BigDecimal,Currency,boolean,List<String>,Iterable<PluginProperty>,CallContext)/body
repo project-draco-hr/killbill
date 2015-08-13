@@ -1,0 +1,22 @@
+{
+  final PaymentControlContext inputPaymentControlContext=new DefaultPaymentControlContext(account,paymentMethodId,paymentAttemptId,paymentId,paymentExternalKey,paymentTransactionExternalKey,paymentApiType,transactionType,hppType,amount,currency,isApiPayment,callContext);
+  Iterable<PluginProperty> inputPluginProperties=pluginProperties;
+  for (  final String pluginName : paymentControlPluginNames) {
+    final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
+    if (plugin != null) {
+      try {
+        final OnSuccessPaymentControlResult result=plugin.onSuccessCall(inputPaymentControlContext,inputPluginProperties);
+        if (result.getAdjustedPluginProperties() != null) {
+          inputPluginProperties=result.getAdjustedPluginProperties();
+        }
+      }
+ catch (      final PaymentControlApiException e) {
+        log.warn("Plugin " + pluginName + " failed to complete executePluginOnSuccessCalls call for "+ inputPaymentControlContext.getPaymentExternalKey(),e);
+      }
+catch (      final RuntimeException e) {
+        log.warn("Plugin " + pluginName + " failed to complete executePluginOnSuccessCalls call for "+ inputPaymentControlContext.getPaymentExternalKey(),e);
+      }
+    }
+  }
+  return new DefaultOnSuccessPaymentControlResult(inputPluginProperties);
+}

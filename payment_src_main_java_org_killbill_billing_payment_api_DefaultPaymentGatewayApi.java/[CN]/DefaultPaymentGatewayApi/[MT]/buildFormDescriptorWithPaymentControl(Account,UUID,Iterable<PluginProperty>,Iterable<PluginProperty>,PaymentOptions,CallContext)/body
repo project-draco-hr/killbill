@@ -1,3 +1,8 @@
 {
-  throw new IllegalStateException("Not implemented");
+  return executeWithPaymentControl(account,paymentMethodId,properties,paymentOptions,callContext,new WithPaymentControlCallback<HostedPaymentPageFormDescriptor>(){
+    @Override public HostedPaymentPageFormDescriptor doPaymentGatewayApiOperation(    final Iterable<PluginProperty> adjustedPluginProperties) throws PaymentApiException {
+      return buildFormDescriptor(account,paymentMethodId,customFields,adjustedPluginProperties,callContext);
+    }
+  }
+);
 }

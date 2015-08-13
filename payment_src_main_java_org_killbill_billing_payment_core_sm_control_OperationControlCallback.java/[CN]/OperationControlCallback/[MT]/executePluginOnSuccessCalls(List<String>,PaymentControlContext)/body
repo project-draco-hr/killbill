@@ -1,21 +1,4 @@
 {
-  Iterable<PluginProperty> inputPluginProperties=paymentStateContext.getProperties();
-  for (  final String pluginName : paymentControlPluginNames) {
-    final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
-    if (plugin != null) {
-      try {
-        final OnSuccessPaymentControlResult result=plugin.onSuccessCall(paymentControlContext,inputPluginProperties);
-        if (result.getAdjustedPluginProperties() != null) {
-          inputPluginProperties=result.getAdjustedPluginProperties();
-        }
-      }
- catch (      final PaymentControlApiException e) {
-        logger.warn("Plugin " + pluginName + " failed to complete executePluginOnSuccessCalls call for "+ paymentControlContext.getPaymentExternalKey(),e);
-      }
-catch (      final RuntimeException e) {
-        logger.warn("Plugin " + pluginName + " failed to complete executePluginOnSuccessCalls call for "+ paymentControlContext.getPaymentExternalKey(),e);
-      }
-    }
-  }
-  adjustStateContextPluginProperties(paymentStateContext,inputPluginProperties);
+  final OnSuccessPaymentControlResult result=controlPluginRunner.executePluginOnSuccessCalls(paymentStateContext.getAccount(),paymentControlContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),PaymentApiType.PAYMENT_TRANSACTION,paymentStateContext.getTransactionType(),null,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentStateControlContext.isApiPayment(),paymentControlPluginNames,paymentStateContext.getProperties(),paymentStateContext.getCallContext());
+  adjustStateContextPluginProperties(paymentStateContext,result.getAdjustedPluginProperties());
 }
