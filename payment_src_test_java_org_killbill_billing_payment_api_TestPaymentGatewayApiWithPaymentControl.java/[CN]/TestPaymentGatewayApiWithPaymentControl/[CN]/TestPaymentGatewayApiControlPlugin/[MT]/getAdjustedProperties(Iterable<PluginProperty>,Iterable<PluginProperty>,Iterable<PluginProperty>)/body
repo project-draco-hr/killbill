@@ -1,0 +1,15 @@
+{
+  final Iterable<PluginProperty> filtered=Iterables.filter(input,new Predicate<PluginProperty>(){
+    @Override public boolean apply(    final PluginProperty p){
+      final boolean toBeRemoved=Iterables.any(removedProperties,new Predicate<PluginProperty>(){
+        @Override public boolean apply(        final PluginProperty a){
+          return a.getKey().equals(p.getKey()) && a.getValue().equals(p.getValue());
+        }
+      }
+);
+      return !toBeRemoved;
+    }
+  }
+);
+  return Iterables.concat(filtered,newProperties);
+}

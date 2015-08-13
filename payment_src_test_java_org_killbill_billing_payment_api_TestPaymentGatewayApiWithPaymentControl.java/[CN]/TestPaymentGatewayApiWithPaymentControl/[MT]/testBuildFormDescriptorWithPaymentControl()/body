@@ -1,0 +1,27 @@
+{
+  final List<PluginProperty> initialProperties=new ArrayList<PluginProperty>();
+  initialProperties.add(new PluginProperty("keyA","valueA",true));
+  initialProperties.add(new PluginProperty("keyB","valueB",true));
+  initialProperties.add(new PluginProperty("keyC","valueC",true));
+  final List<PluginProperty> priorNewProperties=new ArrayList<PluginProperty>();
+  priorNewProperties.add(new PluginProperty("keyD","valueD",true));
+  final List<PluginProperty> priorRemovedProperties=new ArrayList<PluginProperty>();
+  priorRemovedProperties.add(new PluginProperty("keyA","valueA",true));
+  plugin.setPriorCallProperties(priorNewProperties,priorRemovedProperties);
+  final List<PluginProperty> onResultNewProperties=new ArrayList<PluginProperty>();
+  onResultNewProperties.add(new PluginProperty("keyE","valueE",true));
+  final List<PluginProperty> onResultRemovedProperties=new ArrayList<PluginProperty>();
+  onResultRemovedProperties.add(new PluginProperty("keyB","valueB",true));
+  plugin.setOnResultProperties(onResultNewProperties,onResultRemovedProperties);
+  final List<PluginProperty> expectedPriorCallProperties=new ArrayList<PluginProperty>();
+  expectedPriorCallProperties.add(new PluginProperty("keyB","valueB",true));
+  expectedPriorCallProperties.add(new PluginProperty("keyC","valueC",true));
+  expectedPriorCallProperties.add(new PluginProperty("keyD","valueD",true));
+  validationPlugin.setExpectedPriorCallProperties(expectedPriorCallProperties);
+  final List<PluginProperty> expectedProperties=new ArrayList<PluginProperty>();
+  expectedProperties.add(new PluginProperty("keyC","valueC",true));
+  expectedProperties.add(new PluginProperty("keyD","valueD",true));
+  expectedProperties.add(new PluginProperty("keyE","valueE",true));
+  validationPlugin.setExpectedProperties(expectedProperties);
+  paymentGatewayApi.buildFormDescriptorWithPaymentControl(account,account.getPaymentMethodId(),ImmutableList.<PluginProperty>of(),initialProperties,paymentOptions,callContext);
+}
