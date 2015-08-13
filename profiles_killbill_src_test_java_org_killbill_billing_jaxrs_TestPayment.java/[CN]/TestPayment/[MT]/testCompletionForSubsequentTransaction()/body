@@ -1,0 +1,46 @@
+{
+  final Account account=createAccountWithDefaultPaymentMethod();
+  final UUID paymentMethodId=account.getPaymentMethodId();
+  final String paymentExternalKey=UUID.randomUUID().toString();
+  final String purchaseTransactionExternalKey=UUID.randomUUID().toString();
+  final BigDecimal purchaseAmount=BigDecimal.TEN;
+  final Payment authPayment=createVerifyTransaction(account,paymentMethodId,paymentExternalKey,purchaseTransactionExternalKey,TransactionType.PURCHASE,"SUCCESS",purchaseAmount,BigDecimal.ZERO,ImmutableMap.<String,String>of(),1);
+  final String pending=PaymentPluginStatus.PENDING.toString();
+  final ImmutableMap<String,String> pluginProperties=ImmutableMap.<String,String>of(MockPaymentProviderPlugin.PLUGIN_PROPERTY_PAYMENT_PLUGIN_STATUS_OVERRIDE,pending);
+  final String refundTransactionExternalKey=UUID.randomUUID().toString();
+  final PaymentTransaction refundTransaction=new PaymentTransaction();
+  refundTransaction.setPaymentId(authPayment.getPaymentId());
+  refundTransaction.setTransactionExternalKey(refundTransactionExternalKey);
+  refundTransaction.setAmount(purchaseAmount);
+  refundTransaction.setCurrency(authPayment.getCurrency());
+  final Payment refundPayment=killBillClient.refundPayment(refundTransaction,pluginProperties,createdBy,reason,comment);
+  verifyPaymentWithPendingRefund(account,paymentMethodId,paymentExternalKey,purchaseTransactionExternalKey,purchaseAmount,refundTransactionExternalKey,refundPayment);
+  try {
+    final PaymentTransaction completeTransactionByPaymentId=new PaymentTransaction();
+    completeTransactionByPaymentId.setPaymentId(refundPayment.getPaymentId());
+    killBillClient.completePayment(completeTransactionByPaymentId,pluginProperties,createdBy,reason,comment);
+    Assert.fail();
+  }
+ catch (  final KillBillClientException e) {
+    Assert.assertEquals(e.getMessage(),"PaymentTransactionJson transactionType and externalKey need to be set");
+  }
+  try {
+    final PaymentTransaction completeTransactionByPaymentExternalKey=new PaymentTransaction();
+    completeTransactionByPaymentExternalKey.setPaymentExternalKey(refundPayment.getPaymentExternalKey());
+    killBillClient.completePayment(completeTransactionByPaymentExternalKey,pluginProperties,createdBy,reason,comment);
+    Assert.fail();
+  }
+ catch (  final KillBillClientException e) {
+    Assert.assertEquals(e.getMessage(),"PaymentTransactionJson transactionType and externalKey need to be set");
+  }
+  final PaymentTransaction completeTransactionWithTypeAndKey=new PaymentTransaction();
+  completeTransactionWithTypeAndKey.setPaymentId(refundPayment.getPaymentId());
+  completeTransactionWithTypeAndKey.setTransactionExternalKey(refundTransactionExternalKey);
+  final Payment completedPaymentByTypeAndKey=killBillClient.completePayment(completeTransactionWithTypeAndKey,pluginProperties,createdBy,reason,comment);
+  verifyPaymentWithPendingRefund(account,paymentMethodId,paymentExternalKey,purchaseTransactionExternalKey,purchaseAmount,refundTransactionExternalKey,completedPaymentByTypeAndKey);
+  final PaymentTransaction completeTransactionWithTypeAndId=new PaymentTransaction();
+  completeTransactionWithTypeAndId.setPaymentId(refundPayment.getPaymentId());
+  completeTransactionWithTypeAndId.setTransactionId(refundPayment.getTransactions().get(1).getTransactionId());
+  final Payment completedPaymentByTypeAndId=killBillClient.completePayment(completeTransactionWithTypeAndId,pluginProperties,createdBy,reason,comment);
+  verifyPaymentWithPendingRefund(account,paymentMethodId,paymentExternalKey,purchaseTransactionExternalKey,purchaseAmount,refundTransactionExternalKey,completedPaymentByTypeAndId);
+}
