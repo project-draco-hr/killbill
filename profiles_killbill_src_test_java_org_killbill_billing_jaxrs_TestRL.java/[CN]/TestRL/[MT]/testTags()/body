@@ -1,0 +1,20 @@
+{
+  final Account input=createAccount();
+  final UUID autoPayOffId=new UUID(0,1);
+  killBillClient.createAccountTag(input.getAccountId(),autoPayOffId,createdBy,reason,comment);
+  final List<Tag> tags1=killBillClient.getAccountTags(input.getAccountId(),AuditLevel.FULL);
+  Assert.assertEquals(tags1.size(),1);
+  Assert.assertEquals(tags1.get(0).getTagDefinitionId(),autoPayOffId);
+  killBillClient.createAccountTag(input.getAccountId(),autoPayOffId,createdBy,reason,comment);
+  killBillClient.createAccountTag(input.getAccountId(),autoPayOffId,createdBy,reason,comment);
+  final List<Tag> tags2=killBillClient.getAccountTags(input.getAccountId(),AuditLevel.FULL);
+  Assert.assertEquals(tags2,tags1);
+  Assert.assertEquals(tags2.get(0).getAuditLogs().size(),1);
+  final AuditLog auditLogJson=tags2.get(0).getAuditLogs().get(0);
+  Assert.assertEquals(auditLogJson.getChangeType(),"INSERT");
+  Assert.assertEquals(auditLogJson.getChangedBy(),createdBy);
+  Assert.assertEquals(auditLogJson.getReasonCode(),reason);
+  Assert.assertEquals(auditLogJson.getComments(),comment);
+  Assert.assertNotNull(auditLogJson.getChangeDate());
+  Assert.assertNotNull(auditLogJson.getUserToken());
+}

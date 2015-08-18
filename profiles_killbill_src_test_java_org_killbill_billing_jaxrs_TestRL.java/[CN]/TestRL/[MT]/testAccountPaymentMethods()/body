@@ -1,0 +1,44 @@
+{
+  final Account accountJson=createAccount();
+  assertNotNull(accountJson);
+  final PaymentMethodPluginDetail info=new PaymentMethodPluginDetail();
+  info.setProperties(getPaymentMethodCCProperties());
+  PaymentMethod paymentMethodJson=new PaymentMethod(null,UUID.randomUUID().toString(),accountJson.getAccountId(),true,PLUGIN_NAME,info);
+  final PaymentMethod paymentMethodCC=killBillClient.createPaymentMethod(paymentMethodJson,createdBy,reason,comment);
+  assertTrue(paymentMethodCC.getIsDefault());
+  final PaymentMethodPluginDetail info2=new PaymentMethodPluginDetail();
+  info2.setProperties(getPaymentMethodPaypalProperties());
+  paymentMethodJson=new PaymentMethod(null,UUID.randomUUID().toString(),accountJson.getAccountId(),false,PLUGIN_NAME,info2);
+  final PaymentMethod paymentMethodPP=killBillClient.createPaymentMethod(paymentMethodJson,createdBy,reason,comment);
+  assertFalse(paymentMethodPP.getIsDefault());
+  List<PaymentMethod> paymentMethods=killBillClient.getPaymentMethodsForAccount(accountJson.getAccountId());
+  assertEquals(paymentMethods.size(),2);
+  assertTrue(killBillClient.getPaymentMethod(paymentMethodCC.getPaymentMethodId()).getIsDefault());
+  assertFalse(killBillClient.getPaymentMethod(paymentMethodPP.getPaymentMethodId()).getIsDefault());
+  killBillClient.updateDefaultPaymentMethod(accountJson.getAccountId(),paymentMethodPP.getPaymentMethodId(),createdBy,reason,comment);
+  assertTrue(killBillClient.getPaymentMethod(paymentMethodPP.getPaymentMethodId()).getIsDefault());
+  assertFalse(killBillClient.getPaymentMethod(paymentMethodCC.getPaymentMethodId()).getIsDefault());
+  killBillClient.deletePaymentMethod(paymentMethodCC.getPaymentMethodId(),false,createdBy,reason,comment);
+  paymentMethods=killBillClient.getPaymentMethodsForAccount(accountJson.getAccountId());
+  assertEquals(paymentMethods.size(),1);
+  try {
+    killBillClient.deletePaymentMethod(paymentMethodPP.getPaymentMethodId(),false,createdBy,reason,comment);
+    fail();
+  }
+ catch (  final KillBillClientException e) {
+  }
+  killBillClient.deletePaymentMethod(paymentMethodPP.getPaymentMethodId(),true,createdBy,reason,comment);
+  final List<Tag> tagsJson=killBillClient.getAccountTags(accountJson.getAccountId());
+  Assert.assertEquals(tagsJson.size(),1);
+  final Tag tagJson=tagsJson.get(0);
+  Assert.assertEquals(tagJson.getTagDefinitionName(),"AUTO_PAY_OFF");
+  Assert.assertEquals(tagJson.getTagDefinitionId(),new UUID(0,1));
+  final Account updatedAccount=killBillClient.getAccount(accountJson.getAccountId());
+  Assert.assertEquals(updatedAccount.getAccountId(),accountJson.getAccountId());
+  Assert.assertNull(updatedAccount.getPaymentMethodId());
+  try {
+    killBillClient.deleteAccountTag(accountJson.getAccountId(),new UUID(0,1),createdBy,reason,comment);
+  }
+ catch (  final KillBillClientException e) {
+  }
+}
