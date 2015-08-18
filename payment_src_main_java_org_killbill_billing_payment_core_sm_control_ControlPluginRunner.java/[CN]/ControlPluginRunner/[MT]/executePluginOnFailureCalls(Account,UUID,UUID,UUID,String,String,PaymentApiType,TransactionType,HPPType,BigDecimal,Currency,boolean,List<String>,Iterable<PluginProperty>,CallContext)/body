@@ -1,0 +1,27 @@
+{
+  final PaymentControlContext inputPaymentControlContext=new DefaultPaymentControlContext(account,paymentMethodId,paymentAttemptId,paymentId,paymentExternalKey,paymentTransactionExternalKey,paymentApiType,transactionType,hppType,amount,currency,isApiPayment,callContext);
+  DateTime candidate=null;
+  Iterable<PluginProperty> inputPluginProperties=pluginProperties;
+  for (  final String pluginName : paymentControlPluginNames) {
+    final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
+    if (plugin != null) {
+      try {
+        final OnFailurePaymentControlResult result=plugin.onFailureCall(inputPaymentControlContext,inputPluginProperties);
+        if (candidate == null) {
+          candidate=result.getNextRetryDate();
+        }
+ else         if (result.getNextRetryDate() != null) {
+          candidate=candidate.compareTo(result.getNextRetryDate()) > 0 ? result.getNextRetryDate() : candidate;
+        }
+        if (result.getAdjustedPluginProperties() != null) {
+          inputPluginProperties=result.getAdjustedPluginProperties();
+        }
+      }
+ catch (      final PaymentControlApiException e) {
+        log.warn("Plugin " + pluginName + " failed to return next retryDate for payment "+ inputPaymentControlContext.getPaymentExternalKey(),e);
+        return new DefaultFailureCallResult(candidate,inputPluginProperties);
+      }
+    }
+  }
+  return new DefaultFailureCallResult(candidate,inputPluginProperties);
+}

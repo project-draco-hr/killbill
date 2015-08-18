@@ -1,23 +1,5 @@
 {
-  PriorPaymentControlResult prevResult=null;
-  PaymentControlContext inputPaymentControlContext=paymentControlContextArg;
-  Iterable<PluginProperty> inputPluginProperties=paymentStateContext.getProperties();
-  for (  final String pluginName : paymentControlPluginNames) {
-    final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
-    if (plugin == null) {
-      logger.warn("Skipping unknown payment control plugin {} when fetching results",pluginName);
-      continue;
-    }
-    prevResult=plugin.priorCall(inputPaymentControlContext,inputPluginProperties);
-    if (prevResult.getAdjustedPluginProperties() != null) {
-      inputPluginProperties=prevResult.getAdjustedPluginProperties();
-    }
-    if (prevResult.isAborted()) {
-      break;
-    }
-    inputPaymentControlContext=new DefaultPaymentControlContext(paymentStateContext.getAccount(),prevResult.getAdjustedPaymentMethodId() != null ? prevResult.getAdjustedPaymentMethodId() : inputPaymentControlContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),prevResult.getAdjustedAmount() != null ? prevResult.getAdjustedAmount() : inputPaymentControlContext.getAmount(),prevResult.getAdjustedCurrency() != null ? prevResult.getAdjustedCurrency() : inputPaymentControlContext.getCurrency(),paymentStateControlContext.isApiPayment(),paymentStateContext.getCallContext());
-  }
-  prevResult=new DefaultPriorPaymentControlResult(prevResult,inputPluginProperties);
-  adjustStateContextForPriorCall(paymentStateContext,prevResult);
-  return prevResult;
+  final PriorPaymentControlResult result=controlPluginRunner.executePluginPriorCalls(paymentStateContext.getAccount(),paymentControlContextArg.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),PaymentApiType.PAYMENT_TRANSACTION,paymentStateContext.getTransactionType(),null,paymentControlContextArg.getAmount(),paymentControlContextArg.getCurrency(),paymentStateControlContext.isApiPayment(),paymentControlPluginNames,paymentStateContext.getProperties(),paymentStateContext.getCallContext());
+  adjustStateContextForPriorCall(paymentStateContext,result);
+  return result;
 }

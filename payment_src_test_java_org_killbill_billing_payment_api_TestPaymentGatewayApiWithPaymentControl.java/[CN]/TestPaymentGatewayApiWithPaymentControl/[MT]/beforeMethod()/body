@@ -1,0 +1,33 @@
+{
+  super.beforeMethod();
+  account=testHelper.createTestAccount("arthur@gmail.com",true);
+  paymentOptions=new PaymentOptions(){
+    @Override public boolean isExternalPayment(){
+      return false;
+    }
+    @Override public List<String> getPaymentControlPluginNames(){
+      return ImmutableList.of(TestPaymentGatewayApiControlPlugin.PLUGIN_NAME,TestPaymentGatewayApiValidationPlugin.VALIDATION_PLUGIN_NAME);
+    }
+  }
+;
+  plugin=new TestPaymentGatewayApiControlPlugin();
+  controlPluginRegistry.registerService(new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getRegistrationName(){
+      return TestPaymentGatewayApiControlPlugin.PLUGIN_NAME;
+    }
+  }
+,plugin);
+  validationPlugin=new TestPaymentGatewayApiValidationPlugin();
+  controlPluginRegistry.registerService(new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getRegistrationName(){
+      return TestPaymentGatewayApiValidationPlugin.VALIDATION_PLUGIN_NAME;
+    }
+  }
+,validationPlugin);
+}

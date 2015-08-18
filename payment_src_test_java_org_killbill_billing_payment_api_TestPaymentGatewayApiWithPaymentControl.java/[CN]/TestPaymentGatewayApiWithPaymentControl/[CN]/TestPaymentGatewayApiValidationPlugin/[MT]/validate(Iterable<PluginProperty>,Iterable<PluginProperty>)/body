@@ -1,0 +1,11 @@
+{
+  Assert.assertEquals(Iterables.size(properties),Iterables.size(expected),"Got " + Iterables.size(properties) + "properties"+ ", expected "+ Iterables.size(expected));
+  for (  final PluginProperty curExpected : expected) {
+    Assert.assertTrue(Iterables.any(properties,new Predicate<PluginProperty>(){
+      @Override public boolean apply(      final PluginProperty input){
+        return input.getKey().equals(curExpected.getKey()) && input.getValue().equals(curExpected.getValue());
+      }
+    }
+),"Cannot find expected property" + curExpected.getKey());
+  }
+}
