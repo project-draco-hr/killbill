@@ -1,5 +1,6 @@
 {
-  final Future<PluginDispatcherReturnType<ReturnType>> future=executor.submit(task);
+  final Callable<PluginDispatcherReturnType<ReturnType>> callableWithRequestData=new CallableWithRequestData(Request.getPerThreadRequestData(),task);
+  final Future<PluginDispatcherReturnType<ReturnType>> future=executor.submit(callableWithRequestData);
   final PluginDispatcherReturnType<ReturnType> pluginDispatcherResult=future.get(timeout,unit);
   if (pluginDispatcherResult instanceof WithProfilingPluginDispatcherReturnType) {
     final ProfilingData currentThreadProfilingData=Profiling.getPerThreadProfilingData();
