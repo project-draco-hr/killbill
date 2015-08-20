@@ -1,0 +1,15 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final PaymentOptions paymentOptions=createControlPluginApiPaymentOptions(paymentControlPluginNames);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final String notificationPayload;
+  if (Strings.emptyToNull(body) == null && uriInfo.getRequestUri() != null) {
+    notificationPayload=uriInfo.getRequestUri().getRawQuery();
+  }
+ else {
+    notificationPayload=body;
+  }
+  final GatewayNotification notification=paymentGatewayApi.processNotificationWithPaymentControl(notificationPayload,pluginName,pluginProperties,paymentOptions,callContext);
+  final GatewayNotificationJson result=new GatewayNotificationJson(notification);
+  return result.toResponse();
+}
