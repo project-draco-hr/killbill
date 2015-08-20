@@ -1,0 +1,18 @@
+{
+  final Account account=Mockito.mock(Account.class);
+  final UUID paymentMethodId=UUIDs.randomUUID();
+  final UUID paymentId=UUIDs.randomUUID();
+  final String paymentExternalKey=UUIDs.randomUUID().toString();
+  final String paymentTransactionExternalKey=UUIDs.randomUUID().toString();
+  final BigDecimal amount=BigDecimal.ONE;
+  final Currency currency=Currency.USD;
+  final ImmutableList<String> paymentControlPluginNames=ImmutableList.<String>of("not-registered");
+  final ImmutableList<PluginProperty> pluginProperties=ImmutableList.<PluginProperty>of();
+  final ControlPluginRunner controlPluginRunner=new ControlPluginRunner(new DefaultPaymentControlProviderPluginRegistry());
+  final PriorPaymentControlResult paymentControlResult=controlPluginRunner.executePluginPriorCalls(account,paymentMethodId,null,paymentId,paymentExternalKey,paymentTransactionExternalKey,PaymentApiType.PAYMENT_TRANSACTION,TransactionType.AUTHORIZE,null,amount,currency,true,paymentControlPluginNames,pluginProperties,callContext);
+  Assert.assertEquals(paymentControlResult.getAdjustedAmount(),amount);
+  Assert.assertEquals(paymentControlResult.getAdjustedCurrency(),currency);
+  Assert.assertEquals(paymentControlResult.getAdjustedPaymentMethodId(),paymentMethodId);
+  Assert.assertEquals(paymentControlResult.getAdjustedPluginProperties(),pluginProperties);
+  Assert.assertFalse(paymentControlResult.isAborted());
+}
