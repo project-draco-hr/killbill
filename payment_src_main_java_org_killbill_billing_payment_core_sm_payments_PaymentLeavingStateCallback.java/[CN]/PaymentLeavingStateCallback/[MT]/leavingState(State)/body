@@ -15,14 +15,8 @@
  else {
       existingPaymentTransactions=ImmutableList.of();
     }
+    validatePaymentId(existingPaymentTransactions);
     validateUniqueTransactionExternalKey(existingPaymentTransactions);
-    final PaymentTransactionModelDao unknownPaymentTransaction=getUnknownPaymentTransaction(existingPaymentTransactions);
-    if (unknownPaymentTransaction != null) {
-      unknownPaymentTransaction.setAttemptId(paymentStateContext.getAttemptId());
-      paymentStateContext.setPaymentTransactionModelDao(unknownPaymentTransaction);
-      paymentStateContext.setSkipOperationForUnknownTransaction(true);
-      return;
-    }
     final PaymentTransactionModelDao pendingPaymentTransaction=getPendingPaymentTransaction(existingPaymentTransactions);
     if (pendingPaymentTransaction != null) {
       paymentStateContext.setPaymentTransactionModelDao(pendingPaymentTransaction);
