@@ -1,0 +1,10 @@
+{
+  return new WithProfilingThreadPoolExecutor(paymentConfig.getPaymentPluginThreadNb(),paymentConfig.getPaymentPluginThreadNb(),0L,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>(),new ThreadFactory(){
+    @Override public Thread newThread(    final Runnable r){
+      final Thread th=new Thread(new ThreadGroup(PAYMENT_PLUGIN_TH_GROUP_NAME),r);
+      th.setName(PLUGIN_THREAD_PREFIX + th.getId());
+      return th;
+    }
+  }
+);
+}

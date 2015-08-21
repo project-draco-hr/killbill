@@ -8,4 +8,11 @@
   }
   retryService.stop();
   janitor.stop();
+  try {
+    paymentExecutors.stop();
+  }
+ catch (  InterruptedException e) {
+    Thread.currentThread().interrupt();
+    log.error("PaymentService got interrupted",e);
+  }
 }
