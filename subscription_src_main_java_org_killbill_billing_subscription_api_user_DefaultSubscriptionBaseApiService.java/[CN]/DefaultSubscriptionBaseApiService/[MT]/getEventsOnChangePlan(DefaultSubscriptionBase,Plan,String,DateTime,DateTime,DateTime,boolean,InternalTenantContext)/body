@@ -1,6 +1,6 @@
 {
   final TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(subscription,newPlan,newPriceList,requestedDate,effectiveDate,internalTenantContext);
-  final SubscriptionBaseEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList).setActiveVersion(subscription.getActiveVersion()).setProcessedDate(processedDate).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true));
+  final SubscriptionBaseEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList).setActiveVersion(subscription.getActiveVersion()).setEffectiveDate(effectiveDate).setRequestedDate(requestedDate).setFromDisk(true));
   final TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(subscription,newPlan,newPriceList,processedDate,effectiveDate,internalTenantContext);
   final PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(subscription.getId(),subscription.getActiveVersion(),nextTimedPhase.getPhase().getName(),processedDate,nextTimedPhase.getStartPhase()) : null;
   final List<SubscriptionBaseEvent> changeEvents=new ArrayList<SubscriptionBaseEvent>();
