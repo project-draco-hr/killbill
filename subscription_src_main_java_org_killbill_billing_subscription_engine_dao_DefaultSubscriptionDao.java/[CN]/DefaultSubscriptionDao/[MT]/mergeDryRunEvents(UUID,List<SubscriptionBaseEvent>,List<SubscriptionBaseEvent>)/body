@@ -11,10 +11,16 @@
           it.remove();
         }
       }
+      final SubscriptionBaseEvent curAdjustedDryRun;
       if (!events.isEmpty()) {
-        curDryRun.setTotalOrdering(events.get(events.size() - 1).getTotalOrdering() + 1);
+        final EventBaseBuilder eventBuilder=(curDryRun.getType() == EventType.API_USER) ? new ApiEventBuilder((ApiEvent)curDryRun) : new PhaseEventBuilder((PhaseEvent)curDryRun);
+        eventBuilder.setTotalOrdering(events.get(events.size() - 1).getTotalOrdering() + 1);
+        curAdjustedDryRun=eventBuilder.build();
       }
-      events.add(curDryRun);
+ else {
+        curAdjustedDryRun=curDryRun;
+      }
+      events.add(curAdjustedDryRun);
     }
   }
 }
