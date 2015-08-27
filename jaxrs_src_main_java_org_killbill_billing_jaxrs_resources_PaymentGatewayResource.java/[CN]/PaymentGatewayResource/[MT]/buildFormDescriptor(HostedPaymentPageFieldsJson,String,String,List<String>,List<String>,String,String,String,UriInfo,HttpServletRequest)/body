@@ -1,0 +1,13 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final PaymentOptions paymentOptions=createControlPluginApiPaymentOptions(paymentControlPluginNames);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID accountId=UUID.fromString(accountIdString);
+  final Account account=accountUserApi.getAccountById(accountId,callContext);
+  final UUID paymentMethodId=paymentMethodIdStr == null ? account.getPaymentMethodId() : UUID.fromString(paymentMethodIdStr);
+  validatePaymentMethodForAccount(accountId,paymentMethodId,callContext);
+  final Iterable<PluginProperty> customFields=extractPluginProperties(json.getCustomFields());
+  final HostedPaymentPageFormDescriptor descriptor=paymentGatewayApi.buildFormDescriptorWithPaymentControl(account,paymentMethodId,customFields,pluginProperties,paymentOptions,callContext);
+  final HostedPaymentPageFormDescriptorJson result=new HostedPaymentPageFormDescriptorJson(descriptor);
+  return Response.status(Response.Status.OK).entity(result).build();
+}

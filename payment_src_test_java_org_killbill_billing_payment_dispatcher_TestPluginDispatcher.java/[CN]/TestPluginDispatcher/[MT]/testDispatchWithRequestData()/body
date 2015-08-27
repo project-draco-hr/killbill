@@ -1,0 +1,12 @@
+{
+  final String requestId="vive la vie et les coquillettes";
+  final Callable<PluginDispatcherReturnType<String>> delegate=new Callable<PluginDispatcherReturnType<String>>(){
+    @Override public PluginDispatcherReturnType<String> call() throws Exception {
+      return PluginDispatcher.<String>createPluginDispatcherReturnType(Request.getPerThreadRequestData().getRequestId());
+    }
+  }
+;
+  final CallableWithRequestData<PluginDispatcherReturnType<String>> callable=new CallableWithRequestData<PluginDispatcherReturnType<String>>(new RequestData(requestId),delegate);
+  final String actualRequestId=stringPluginDispatcher.dispatchWithTimeout(callable,100,TimeUnit.MILLISECONDS);
+  Assert.assertEquals(actualRequestId,requestId);
+}

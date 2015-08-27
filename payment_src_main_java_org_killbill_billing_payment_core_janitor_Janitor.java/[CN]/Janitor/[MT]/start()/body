@@ -1,8 +1,6 @@
 {
-  if (isStopped) {
-    log.warn("Janitor is not a restartable service, and was already started, aborting");
-    return;
-  }
+  this.isStopped=false;
+  janitorExecutor=paymentExecutors.getJanitorExecutorService();
   janitorQueue.startQueue();
   final TimeUnit attemptCompletionRateUnit=paymentConfig.getJanitorRunningRate().getUnit();
   final long attemptCompletionPeriod=paymentConfig.getJanitorRunningRate().getPeriod();
