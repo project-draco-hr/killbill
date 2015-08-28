@@ -6,7 +6,7 @@
   final LocalDate adjustedTargetDate=adjustTargetDate(existingInvoices,targetDate);
   final Invoice invoice=new DefaultInvoice(account.getId(),new LocalDate(clock.getUTCNow(),account.getTimeZone()),adjustedTargetDate,targetCurrency);
   final UUID invoiceId=invoice.getId();
-  final List<InvoiceItem> inAdvanceItems=generateInAdvanceInvoiceItems(account.getId(),invoiceId,events,existingInvoices,adjustedTargetDate,targetCurrency);
+  final List<InvoiceItem> inAdvanceItems=generateFixedAndRecurringInvoiceItems(account.getId(),invoiceId,events,existingInvoices,adjustedTargetDate,targetCurrency);
   invoice.addInvoiceItems(inAdvanceItems);
   final List<InvoiceItem> usageItems=generateUsageConsumableInArrearItems(account,invoiceId,events,existingInvoices,targetDate,context);
   invoice.addInvoiceItems(usageItems);

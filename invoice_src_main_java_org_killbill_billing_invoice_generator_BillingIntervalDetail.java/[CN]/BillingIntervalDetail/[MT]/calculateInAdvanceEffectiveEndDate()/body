@@ -1,0 +1,24 @@
+{
+  if (endDate != null && !targetDate.isBefore(endDate)) {
+    effectiveEndDate=endDate;
+    return;
+  }
+  if (targetDate.isBefore(firstBillingCycleDate)) {
+    effectiveEndDate=firstBillingCycleDate;
+    return;
+  }
+  final int numberOfMonthsInPeriod=billingPeriod.getNumberOfMonths();
+  int numberOfPeriods=0;
+  LocalDate proposedDate=firstBillingCycleDate;
+  while (!proposedDate.isAfter(targetDate)) {
+    proposedDate=firstBillingCycleDate.plusMonths(numberOfPeriods * numberOfMonthsInPeriod);
+    numberOfPeriods+=1;
+  }
+  proposedDate=alignProposedBillCycleDate(proposedDate,billingCycleDay);
+  if (endDate != null && endDate.isBefore(proposedDate)) {
+    effectiveEndDate=endDate;
+  }
+ else {
+    effectiveEndDate=proposedDate;
+  }
+}

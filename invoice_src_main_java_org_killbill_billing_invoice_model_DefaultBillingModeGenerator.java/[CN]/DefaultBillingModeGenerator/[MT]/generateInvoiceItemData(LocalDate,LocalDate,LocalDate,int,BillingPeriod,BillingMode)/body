@@ -6,8 +6,8 @@
     throw new InvalidDateSequenceException();
   }
   final List<RecurringInvoiceItemData> results=new ArrayList<RecurringInvoiceItemData>();
-  final BillingIntervalDetail billingIntervalDetail=new BillingIntervalDetail(startDate,endDate,targetDate,billingCycleDayLocal,billingPeriod);
-  if (endDate != null && endDate.equals(startDate)) {
+  final BillingIntervalDetail billingIntervalDetail=new BillingIntervalDetail(startDate,endDate,targetDate,billingCycleDayLocal,billingPeriod,billingMode);
+  if (!billingIntervalDetail.hasSomethingToBill()) {
     return results;
   }
   if (endDate != null && !endDate.isAfter(billingIntervalDetail.getFirstBillingCycleDate())) {

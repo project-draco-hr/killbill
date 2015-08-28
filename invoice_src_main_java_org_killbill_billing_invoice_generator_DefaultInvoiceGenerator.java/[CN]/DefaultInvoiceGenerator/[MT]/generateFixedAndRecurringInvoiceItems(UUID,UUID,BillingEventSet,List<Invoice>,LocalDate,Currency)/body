@@ -9,7 +9,9 @@
       }
     }
   }
-  final List<InvoiceItem> proposedItems=generateInAdvanceInvoiceItems(invoiceId,accountId,eventSet,targetDate,targetCurrency);
+  final List<InvoiceItem> proposedItems=new ArrayList<InvoiceItem>();
+  generateRecurringInvoiceItems(invoiceId,accountId,eventSet,targetDate,targetCurrency,proposedItems);
+  processFixedPriceEvents(invoiceId,accountId,eventSet,targetDate,targetCurrency,proposedItems);
   accountItemTree.mergeWithProposedItems(proposedItems);
   return accountItemTree.getResultingItemList();
 }
