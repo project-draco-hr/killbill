@@ -1,6 +1,7 @@
 {
   final Currency currency=Currency.USD;
-  final Invoice invoice=generator.generateInvoice(account,events,existingInvoices,targetDate,currency,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata=generator.generateInvoice(account,events,existingInvoices,targetDate,currency,internalCallContext);
+  final Invoice invoice=invoiceWithMetadata.getInvoice();
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),expectedNumberOfItems);
   existingInvoices.add(invoice);

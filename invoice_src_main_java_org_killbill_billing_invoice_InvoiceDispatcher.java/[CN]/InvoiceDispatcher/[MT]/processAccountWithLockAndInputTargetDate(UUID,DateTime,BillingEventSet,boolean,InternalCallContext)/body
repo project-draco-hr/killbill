@@ -1,7 +1,7 @@
 {
   try {
     final Account account=accountApi.getAccountById(accountId,context);
-    final DateAndTimeZoneContext dateAndTimeZoneContext=billingEvents.iterator().hasNext() ? new DateAndTimeZoneContext(billingEvents.iterator().next().getEffectiveDate(),account.getTimeZone(),clock) : null;
+    final DateAndTimeZoneContext dateAndTimeZoneContext=new DateAndTimeZoneContext(billingEvents.iterator().next().getEffectiveDate(),account.getTimeZone(),clock);
     final List<Invoice> invoices=billingEvents.isAccountAutoInvoiceOff() ? ImmutableList.<Invoice>of() : ImmutableList.<Invoice>copyOf(Collections2.transform(invoiceDao.getInvoicesByAccount(context),new Function<InvoiceModelDao,Invoice>(){
       @Override public Invoice apply(      final InvoiceModelDao input){
         return new DefaultInvoice(input);
@@ -9,15 +9,21 @@
     }
 ));
     final Currency targetCurrency=account.getCurrency();
-    final LocalDate targetDate=(dateAndTimeZoneContext != null && targetDateTime != null) ? dateAndTimeZoneContext.computeTargetDate(targetDateTime) : null;
-    final Invoice invoice=targetDate != null ? generator.generateInvoice(account,billingEvents,invoices,targetDate,targetCurrency,context) : null;
+    final LocalDate targetDate=dateAndTimeZoneContext.computeTargetDate(targetDateTime);
+    final InvoiceWithMetadata invoiceWithMetadata=generator.generateInvoice(account,billingEvents,invoices,targetDate,targetCurrency,context);
+    final Invoice invoice=invoiceWithMetadata.getInvoice();
+    final FutureAccountNotifications futureAccountNotifications=createNextFutureNotificationDate(invoiceWithMetadata,billingEvents,dateAndTimeZoneContext,context);
     if (invoice == null) {
-      log.info("Generated null invoice for accountId {} and targetDate {} (targetDateTime {})",new Object[]{accountId,targetDate,targetDateTime});
-      if (!isDryRun) {
+      if (isDryRun) {
+        log.info("Generated null dryRun invoice for accountId {} and targetDate {} (targetDateTime {})",new Object[]{accountId,targetDate,targetDateTime});
+      }
+ else {
+        log.info("Generated null invoice for accountId {} and targetDate {} (targetDateTime {})",new Object[]{accountId,targetDate,targetDateTime});
         final BusInternalEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+        commitInvoiceAndSetFutureNotifications(account,null,ImmutableList.<InvoiceItemModelDao>of(),futureAccountNotifications,false,context);
         postEvent(event,accountId,context);
       }
-      return invoice;
+      return null;
     }
     final InvoiceItem cbaItem=computeCBAOnExistingInvoice(invoice,context);
     if (cbaItem != null) {
@@ -26,7 +32,17 @@
     final CallContext callContext=buildCallContext(context);
     invoice.addInvoiceItems(invoicePluginDispatcher.getAdditionalInvoiceItems(invoice,callContext));
     if (!isDryRun) {
-      commitInvoiceStateAndNotifyAccountIfConfigured(account,invoice,billingEvents,dateAndTimeZoneContext,targetDate,context);
+      final Set<UUID> uniqueInvoiceIds=getUniqueInvoiceIds(invoice);
+      final boolean isRealInvoiceWithItems=uniqueInvoiceIds.remove(invoice.getId());
+      final Set<UUID> adjustedUniqueOtherInvoiceId=uniqueInvoiceIds;
+      logInvoiceWithItems(account,invoice,targetDate,adjustedUniqueOtherInvoiceId,isRealInvoiceWithItems);
+      final InvoiceModelDao invoiceModelDao=new InvoiceModelDao(invoice);
+      final Iterable<InvoiceItemModelDao> invoiceItemModelDaos=transformToInvoiceModelDao(invoice.getInvoiceItems());
+      final boolean isThereAnyItemsLeft=commitInvoiceAndSetFutureNotifications(account,invoiceModelDao,invoiceItemModelDaos,futureAccountNotifications,isRealInvoiceWithItems,context);
+      final boolean isRealInvoiceWithNonEmptyItems=isThereAnyItemsLeft ? isRealInvoiceWithItems : false;
+      setChargedThroughDates(dateAndTimeZoneContext,invoice.getInvoiceItems(FixedPriceInvoiceItem.class),invoice.getInvoiceItems(RecurringInvoiceItem.class),context);
+      postEvents(account,invoice,adjustedUniqueOtherInvoiceId,isRealInvoiceWithNonEmptyItems,context);
+      notifyAccountIfEnabled(account,invoice,isRealInvoiceWithNonEmptyItems,context);
     }
     return invoice;
   }

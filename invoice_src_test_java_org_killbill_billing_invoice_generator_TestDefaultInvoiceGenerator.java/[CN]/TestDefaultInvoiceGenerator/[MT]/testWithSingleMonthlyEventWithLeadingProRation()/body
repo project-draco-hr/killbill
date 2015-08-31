@@ -8,7 +8,8 @@
   final BillingEvent event=createBillingEvent(sub.getId(),sub.getBundleId(),startDate,plan,phase,15);
   events.add(event);
   final LocalDate targetDate=invoiceUtil.buildDate(2011,10,3);
-  final Invoice invoice=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
+  final Invoice invoice=invoiceWithMetadata.getInvoice();
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
   final BigDecimal expectedNumberOfBillingCycles;

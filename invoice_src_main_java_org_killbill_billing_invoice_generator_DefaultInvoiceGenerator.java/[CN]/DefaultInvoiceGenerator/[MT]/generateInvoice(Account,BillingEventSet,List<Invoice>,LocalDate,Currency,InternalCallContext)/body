@@ -1,14 +1,15 @@
 {
   if ((events == null) || (events.size() == 0) || events.isAccountAutoInvoiceOff()) {
-    return null;
+    return new InvoiceWithMetadata(null,ImmutableMap.<UUID,SubscriptionFutureNotificationDates>of());
   }
   validateTargetDate(targetDate);
   final LocalDate adjustedTargetDate=adjustTargetDate(existingInvoices,targetDate);
   final Invoice invoice=new DefaultInvoice(account.getId(),new LocalDate(clock.getUTCNow(),account.getTimeZone()),adjustedTargetDate,targetCurrency);
   final UUID invoiceId=invoice.getId();
-  final List<InvoiceItem> inAdvanceItems=generateFixedAndRecurringInvoiceItems(account.getId(),invoiceId,events,existingInvoices,adjustedTargetDate,targetCurrency);
-  invoice.addInvoiceItems(inAdvanceItems);
-  final List<InvoiceItem> usageItems=generateUsageConsumableInArrearItems(account,invoiceId,events,existingInvoices,targetDate,context);
+  final Map<UUID,SubscriptionFutureNotificationDates> perSubscriptionFutureNotificationDates=new HashMap<UUID,SubscriptionFutureNotificationDates>();
+  final List<InvoiceItem> fixedAndRecurringItems=generateFixedAndRecurringInvoiceItems(account.getId(),invoiceId,events,existingInvoices,adjustedTargetDate,targetCurrency,perSubscriptionFutureNotificationDates);
+  invoice.addInvoiceItems(fixedAndRecurringItems);
+  final List<InvoiceItem> usageItems=generateUsageConsumableInArrearItems(account,invoiceId,events,existingInvoices,targetDate,perSubscriptionFutureNotificationDates,context);
   invoice.addInvoiceItems(usageItems);
-  return invoice.getInvoiceItems().size() != 0 ? invoice : null;
+  return new InvoiceWithMetadata(invoice.getInvoiceItems().isEmpty() ? null : invoice,perSubscriptionFutureNotificationDates);
 }

@@ -4,6 +4,7 @@
   final BillingEventSet events=new MockBillingEventSet();
   final LocalDate targetDate=invoiceUtil.buildDate(2011,1,1);
   events.add(createBillingEvent(UUID.randomUUID(),UUID.randomUUID(),targetDate,plan,planPhase,1));
-  final Invoice invoice=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
+  final Invoice invoice=invoiceWithMetadata.getInvoice();
   assertEquals(invoice.getNumberOfItems(),1);
 }

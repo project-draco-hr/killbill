@@ -9,14 +9,16 @@
   final LocalDate startDate=new LocalDate(2011,1,1);
   final BillingEvent event1=createBillingEvent(subscriptionId,bundleId,startDate,plan1,phase1,1);
   events.add(event1);
-  final Invoice invoice1=generator.generateInvoice(account,events,null,startDate,Currency.USD,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata1=generator.generateInvoice(account,events,null,startDate,Currency.USD,internalCallContext);
+  final Invoice invoice1=invoiceWithMetadata1.getInvoice();
   assertNotNull(invoice1);
   assertEquals(invoice1.getNumberOfItems(),2);
   assertEquals(invoice1.getBalance(),KillBillMoney.of(FIFTEEN,invoice1.getCurrency()));
   final List<Invoice> invoiceList=new ArrayList<Invoice>();
   invoiceList.add(invoice1);
   final LocalDate currentDate=startDate.plusMonths(1);
-  final Invoice invoice2=generator.generateInvoice(account,events,invoiceList,currentDate,Currency.USD,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata2=generator.generateInvoice(account,events,invoiceList,currentDate,Currency.USD,internalCallContext);
+  final Invoice invoice2=invoiceWithMetadata2.getInvoice();
   assertNotNull(invoice2);
   assertEquals(invoice2.getNumberOfItems(),1);
   assertEquals(invoice2.getBalance(),KillBillMoney.of(FIVE,invoice2.getCurrency()));

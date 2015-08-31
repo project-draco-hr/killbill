@@ -1,0 +1,34 @@
+{
+  final Map<UUID,List<SubscriptionNotification>> result=new HashMap<UUID,List<SubscriptionNotification>>();
+  for (  final UUID subscriptionId : invoiceWithMetadata.getPerSubscriptionFutureNotificationDates().keySet()) {
+    final List<SubscriptionNotification> perSubscriptionNotifications=new ArrayList<SubscriptionNotification>();
+    final SubscriptionFutureNotificationDates subscriptionFutureNotificationDates=invoiceWithMetadata.getPerSubscriptionFutureNotificationDates().get(subscriptionId);
+    if (subscriptionFutureNotificationDates.getNextRecurringDate() != null) {
+      perSubscriptionNotifications.add(new SubscriptionNotification(dateAndTimeZoneContext.computeUTCDateTimeFromLocalDate(subscriptionFutureNotificationDates.getNextRecurringDate()),true));
+    }
+    if (subscriptionFutureNotificationDates.getNextUsageDates() != null) {
+      for (      String usageName : subscriptionFutureNotificationDates.getNextUsageDates().keySet()) {
+        final LocalDate nextNotificationDateForUsage=subscriptionFutureNotificationDates.getNextUsageDates().get(usageName);
+        final DateTime subscriptionUsageCallbackDate=getNextUsageBillingDate(subscriptionId,usageName,nextNotificationDateForUsage,dateAndTimeZoneContext,billingEvents);
+        perSubscriptionNotifications.add(new SubscriptionNotification(subscriptionUsageCallbackDate,true));
+      }
+    }
+    if (!perSubscriptionNotifications.isEmpty()) {
+      result.put(subscriptionId,perSubscriptionNotifications);
+    }
+  }
+  final boolean isInvoiceNotificationEnabled=invoiceConfig.getDryRunNotificationSchedule().getMillis() > 0;
+  if (isInvoiceNotificationEnabled) {
+    final Map<UUID,DateTime> upcomingPhasesForSubscriptions=subscriptionApi.getNextFutureEventForSubscriptions(SubscriptionBaseTransitionType.PHASE,context);
+    for (    UUID cur : upcomingPhasesForSubscriptions.keySet()) {
+      final DateTime curDate=upcomingPhasesForSubscriptions.get(cur);
+      List<SubscriptionNotification> resultValue=result.get(cur);
+      if (resultValue == null) {
+        resultValue=new ArrayList<SubscriptionNotification>();
+      }
+      resultValue.add(new SubscriptionNotification(curDate,false));
+      result.put(cur,resultValue);
+    }
+  }
+  return new FutureAccountNotifications(dateAndTimeZoneContext,result);
+}

@@ -1,0 +1,13 @@
+{
+  final List<InvoiceInternalEvent> events=new ArrayList<InvoiceInternalEvent>();
+  if (isRealInvoiceWithNonEmptyItems) {
+    events.add(new DefaultInvoiceCreationEvent(invoice.getId(),invoice.getAccountId(),invoice.getBalance(),invoice.getCurrency(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken()));
+  }
+  for (  final UUID cur : adjustedUniqueOtherInvoiceId) {
+    final InvoiceAdjustmentInternalEvent event=new DefaultInvoiceAdjustmentEvent(cur,invoice.getAccountId(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+    events.add(event);
+  }
+  for (  final InvoiceInternalEvent event : events) {
+    postEvent(event,account.getId(),context);
+  }
+}

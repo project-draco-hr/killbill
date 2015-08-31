@@ -9,7 +9,8 @@
   final BillingEvent event=createBillingEvent(sub.getId(),sub.getBundleId(),startDate,plan,phase,bcdLocal);
   events.add(event);
   final LocalDate targetDate=invoiceUtil.buildDate(2012,8,bcdLocal);
-  final Invoice invoice=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
+  final Invoice invoice=invoiceWithMetadata.getInvoice();
   assertNotNull(invoice);
   assertEquals(invoice.getNumberOfItems(),2);
   assertEquals(invoice.getInvoiceItems().get(0).getStartDate(),invoiceUtil.buildDate(2012,7,16));

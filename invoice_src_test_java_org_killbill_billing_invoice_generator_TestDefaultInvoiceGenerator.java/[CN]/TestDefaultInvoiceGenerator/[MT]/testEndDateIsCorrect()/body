@@ -5,7 +5,8 @@
   final LocalDate startDate=clock.getUTCToday().minusDays(1);
   final LocalDate targetDate=startDate.plusDays(1);
   events.add(createBillingEvent(UUID.randomUUID(),UUID.randomUUID(),startDate,plan,planPhase,startDate.getDayOfMonth()));
-  final Invoice invoice=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
+  final Invoice invoice=invoiceWithMetadata.getInvoice();
   final RecurringInvoiceItem item=(RecurringInvoiceItem)invoice.getInvoiceItems().get(0);
   assertEquals(item.getEndDate(),startDate.plusMonths(1));
 }

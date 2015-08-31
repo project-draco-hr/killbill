@@ -21,7 +21,8 @@
   events.add(event);
   final List<Invoice> existingInvoices=new LinkedList<Invoice>();
   existingInvoices.add(existingInvoice);
-  final Invoice invoice=generator.generateInvoice(account,events,existingInvoices,targetDate,currency,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata=generator.generateInvoice(account,events,existingInvoices,targetDate,currency,internalCallContext);
+  final Invoice invoice=invoiceWithMetadata.getInvoice();
   assertEquals(invoice.getNumberOfItems(),7);
   assertEquals(invoice.getInvoiceItems().get(0).getInvoiceItemType(),InvoiceItemType.RECURRING);
   assertEquals(invoice.getInvoiceItems().get(0).getStartDate(),new LocalDate(2013,6,15));
@@ -45,6 +46,7 @@
   assertEquals(invoice.getInvoiceItems().get(6).getStartDate(),new LocalDate(2013,10,15));
   assertEquals(invoice.getInvoiceItems().get(6).getEndDate(),new LocalDate(2013,11,15));
   existingInvoices.add(invoice);
-  final Invoice newInvoice=generator.generateInvoice(account,events,existingInvoices,targetDate,currency,internalCallContext);
+  final InvoiceWithMetadata newInvoiceWithMetdata=generator.generateInvoice(account,events,existingInvoices,targetDate,currency,internalCallContext);
+  final Invoice newInvoice=newInvoiceWithMetdata.getInvoice();
   assertNull(newInvoice);
 }

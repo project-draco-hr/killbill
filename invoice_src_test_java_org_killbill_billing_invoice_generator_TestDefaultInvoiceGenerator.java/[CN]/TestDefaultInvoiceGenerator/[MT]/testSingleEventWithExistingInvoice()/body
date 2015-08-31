@@ -8,10 +8,12 @@
   final BillingEvent event1=createBillingEvent(sub.getId(),sub.getBundleId(),startDate,plan1,phase1,1);
   events.add(event1);
   LocalDate targetDate=invoiceUtil.buildDate(2011,12,1);
-  final Invoice invoice1=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata1=generator.generateInvoice(account,events,null,targetDate,Currency.USD,internalCallContext);
   final List<Invoice> existingInvoices=new ArrayList<Invoice>();
+  final Invoice invoice1=invoiceWithMetadata1.getInvoice();
   existingInvoices.add(invoice1);
   targetDate=invoiceUtil.buildDate(2011,12,3);
-  final Invoice invoice2=generator.generateInvoice(account,events,existingInvoices,targetDate,Currency.USD,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata2=generator.generateInvoice(account,events,existingInvoices,targetDate,Currency.USD,internalCallContext);
+  final Invoice invoice2=invoiceWithMetadata2.getInvoice();
   assertNull(invoice2);
 }

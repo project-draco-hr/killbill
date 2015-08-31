@@ -11,7 +11,8 @@
   final LocalDate startDate=new LocalDate(2011,1,1);
   final BillingEvent event1=createBillingEvent(subscriptionId,bundleId,startDate,plan1,phase1,1);
   events.add(event1);
-  final Invoice invoice1=generator.generateInvoice(account,events,null,startDate,Currency.USD,internalCallContext);
+  final InvoiceWithMetadata invoiceWithMetadata1=generator.generateInvoice(account,events,null,startDate,Currency.USD,internalCallContext);
+  final Invoice invoice1=invoiceWithMetadata1.getInvoice();
   assertNotNull(invoice1);
   assertEquals(invoice1.getNumberOfItems(),1);
   assertEquals(invoice1.getBalance(),KillBillMoney.of(fixedCost1,invoice1.getCurrency()));
@@ -20,8 +21,8 @@
   final LocalDate phaseChangeDate=startDate.plusMonths(1);
   final BillingEvent event2=createBillingEvent(subscriptionId,bundleId,phaseChangeDate,plan1,phase2,1);
   events.add(event2);
-  final Invoice invoice2=generator.generateInvoice(account,events,invoiceList,phaseChangeDate,Currency.USD,internalCallContext);
-  assertNotNull(invoice2);
+  final InvoiceWithMetadata invoiceWithMetadata2=generator.generateInvoice(account,events,invoiceList,phaseChangeDate,Currency.USD,internalCallContext);
+  final Invoice invoice2=invoiceWithMetadata2.getInvoice();
   assertEquals(invoice2.getNumberOfItems(),1);
   assertEquals(invoice2.getBalance(),KillBillMoney.of(fixedCost2,invoice2.getCurrency()));
 }

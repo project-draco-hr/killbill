@@ -33,7 +33,8 @@
   Mockito.when(phase1.getName()).thenReturn("plan-phase1");
   final BillingEvent event1=invoiceUtil.createMockBillingEvent(null,subscription,recuringStartDate.toDateTimeAtStartOfDay(),plan,phase1,null,TEN,Currency.USD,BillingPeriod.MONTHLY,31,BillingMode.IN_ADVANCE,"new-event",1L,SubscriptionBaseTransitionType.CREATE);
   events.add(event1);
-  final Invoice newInvoice=generator.generateInvoice(account,events,invoices,targetDate,Currency.USD,context);
+  final InvoiceWithMetadata newInvoiceWithMetadata=generator.generateInvoice(account,events,invoices,targetDate,Currency.USD,context);
+  final Invoice newInvoice=newInvoiceWithMetadata.getInvoice();
   invoiceUtil.createInvoice(newInvoice,true,context);
   final Invoice firstInvoice=new DefaultInvoice(invoiceDao.getById(invoiceId,context));
   assertNotNull(firstInvoice);
