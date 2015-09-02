@@ -1,0 +1,30 @@
+{
+  LocalDate nextNotificationDate=null;
+switch (billingMode) {
+case IN_ADVANCE:
+    for (    final InvoiceItem item : newProposedItems) {
+      if ((item.getEndDate() != null) && (item.getAmount() == null || item.getAmount().compareTo(BigDecimal.ZERO) >= 0)) {
+        if (nextNotificationDate == null) {
+          nextNotificationDate=item.getEndDate();
+        }
+ else {
+          nextNotificationDate=nextNotificationDate.compareTo(item.getEndDate()) > 0 ? nextNotificationDate : item.getEndDate();
+        }
+      }
+    }
+  break;
+case IN_ARREAR:
+nextNotificationDate=nextBillingCycleDate;
+break;
+default :
+throw new IllegalStateException("Unrecognized billing mode " + billingMode);
+}
+if (nextNotificationDate != null) {
+SubscriptionFutureNotificationDates subscriptionFutureNotificationDates=perSubscriptionFutureNotificationDates.get(subscriptionId);
+if (subscriptionFutureNotificationDates == null) {
+subscriptionFutureNotificationDates=new SubscriptionFutureNotificationDates(billingMode);
+perSubscriptionFutureNotificationDates.put(subscriptionId,subscriptionFutureNotificationDates);
+}
+subscriptionFutureNotificationDates.updateNextRecurringDateIfRequired(nextNotificationDate);
+}
+}

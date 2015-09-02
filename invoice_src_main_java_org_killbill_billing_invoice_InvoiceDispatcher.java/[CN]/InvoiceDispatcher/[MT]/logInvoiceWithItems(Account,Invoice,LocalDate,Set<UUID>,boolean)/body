@@ -1,10 +1,14 @@
 {
+  final StringBuilder tmp=new StringBuilder();
   if (isRealInvoiceWithItems) {
-    log.info("Generated invoice {} with {} items for accountId {} and targetDate {}",new Object[]{invoice.getId(),invoice.getNumberOfItems(),account.getId(),targetDate});
+    tmp.append(String.format("Generated invoice %s with %d items for accountId %s and targetDate %s:\n",invoice.getId(),invoice.getNumberOfItems(),account.getId(),targetDate));
   }
  else {
-    final Joiner joiner=Joiner.on(",");
-    final String adjustedInvoices=joiner.join(adjustedUniqueOtherInvoiceId.toArray(new UUID[adjustedUniqueOtherInvoiceId.size()]));
-    log.info("Adjusting existing invoices {} with {} items for accountId {} and targetDate {})",new Object[]{adjustedInvoices,invoice.getNumberOfItems(),account.getId(),targetDate});
+    final String adjustedInvoices=JOINER_COMMA.join(adjustedUniqueOtherInvoiceId.toArray(new UUID[adjustedUniqueOtherInvoiceId.size()]));
+    tmp.append(String.format("Adjusting existing invoices %s with %d items for accountId %s and targetDate %s:\n",adjustedInvoices,invoice.getNumberOfItems(),account.getId(),targetDate));
   }
+  for (  InvoiceItem item : invoice.getInvoiceItems()) {
+    tmp.append(String.format("\t item = %s\n",item));
+  }
+  log.info(tmp.toString());
 }

@@ -1,5 +1,4 @@
 {
-  final Map<String,LocalDate> perSubscriptionUsage=new HashMap<String,LocalDate>();
   final Map<UUID,List<InvoiceItem>> perSubscriptionConsumableInArrearUsageItems=extractPerSubscriptionExistingConsumableInArrearUsageItems(eventSet.getUsages(),existingInvoices);
   try {
     final List<InvoiceItem> items=Lists.newArrayList();
@@ -28,9 +27,9 @@
       if (curSubscriptionId != null && !curSubscriptionId.equals(subscriptionId)) {
         final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,rawUsageOptimizerResult.getRawUsage(),targetDate,rawUsageOptimizerResult.getRawUsageStartDate());
         final List<InvoiceItem> consumableInUsageArrearItems=perSubscriptionConsumableInArrearUsageItems.get(curSubscriptionId);
-        final List<InvoiceItem> newProposedItems=subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(consumableInUsageArrearItems != null ? consumableInUsageArrearItems : ImmutableList.<InvoiceItem>of());
-        items.addAll(newProposedItems);
-        updatePerSubscriptionNextNotificationUsageDate(curSubscriptionId,newProposedItems,perSubscriptionFutureNotificationDates);
+        final List<InvoiceItem> newInArrearUsageItems=subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(consumableInUsageArrearItems != null ? consumableInUsageArrearItems : ImmutableList.<InvoiceItem>of());
+        items.addAll(newInArrearUsageItems);
+        updatePerSubscriptionNextNotificationUsageDate(curSubscriptionId,newInArrearUsageItems,BillingMode.IN_ARREAR,perSubscriptionFutureNotificationDates);
         curEvents=Lists.newArrayList();
       }
       curSubscriptionId=subscriptionId;
@@ -39,9 +38,9 @@
     if (curSubscriptionId != null) {
       final SubscriptionConsumableInArrear subscriptionConsumableInArrear=new SubscriptionConsumableInArrear(invoiceId,curEvents,rawUsageOptimizerResult.getRawUsage(),targetDate,rawUsageOptimizerResult.getRawUsageStartDate());
       final List<InvoiceItem> consumableInUsageArrearItems=perSubscriptionConsumableInArrearUsageItems.get(curSubscriptionId);
-      final List<InvoiceItem> newProposedItems=subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(consumableInUsageArrearItems != null ? consumableInUsageArrearItems : ImmutableList.<InvoiceItem>of());
-      items.addAll(newProposedItems);
-      updatePerSubscriptionNextNotificationUsageDate(curSubscriptionId,newProposedItems,perSubscriptionFutureNotificationDates);
+      final List<InvoiceItem> newInArrearUsageItems=subscriptionConsumableInArrear.computeMissingUsageInvoiceItems(consumableInUsageArrearItems != null ? consumableInUsageArrearItems : ImmutableList.<InvoiceItem>of());
+      items.addAll(newInArrearUsageItems);
+      updatePerSubscriptionNextNotificationUsageDate(curSubscriptionId,newInArrearUsageItems,BillingMode.IN_ARREAR,perSubscriptionFutureNotificationDates);
     }
     return items;
   }

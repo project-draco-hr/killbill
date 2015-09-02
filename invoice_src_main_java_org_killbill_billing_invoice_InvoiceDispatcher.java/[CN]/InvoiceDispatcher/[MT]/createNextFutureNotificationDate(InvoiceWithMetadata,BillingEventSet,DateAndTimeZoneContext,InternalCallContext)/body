@@ -7,9 +7,9 @@
       perSubscriptionNotifications.add(new SubscriptionNotification(dateAndTimeZoneContext.computeUTCDateTimeFromLocalDate(subscriptionFutureNotificationDates.getNextRecurringDate()),true));
     }
     if (subscriptionFutureNotificationDates.getNextUsageDates() != null) {
-      for (      String usageName : subscriptionFutureNotificationDates.getNextUsageDates().keySet()) {
-        final LocalDate nextNotificationDateForUsage=subscriptionFutureNotificationDates.getNextUsageDates().get(usageName);
-        final DateTime subscriptionUsageCallbackDate=getNextUsageBillingDate(subscriptionId,usageName,nextNotificationDateForUsage,dateAndTimeZoneContext,billingEvents);
+      for (      UsageDef usageDef : subscriptionFutureNotificationDates.getNextUsageDates().keySet()) {
+        final LocalDate nextNotificationDateForUsage=subscriptionFutureNotificationDates.getNextUsageDates().get(usageDef);
+        final DateTime subscriptionUsageCallbackDate=getNextUsageBillingDate(subscriptionId,usageDef.getUsageName(),nextNotificationDateForUsage,dateAndTimeZoneContext,billingEvents);
         perSubscriptionNotifications.add(new SubscriptionNotification(subscriptionUsageCallbackDate,true));
       }
     }

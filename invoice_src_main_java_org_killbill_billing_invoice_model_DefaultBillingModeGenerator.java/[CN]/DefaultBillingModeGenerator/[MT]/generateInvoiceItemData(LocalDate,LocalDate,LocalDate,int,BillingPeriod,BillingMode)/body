@@ -8,13 +8,13 @@
   final List<RecurringInvoiceItemData> results=new ArrayList<RecurringInvoiceItemData>();
   final BillingIntervalDetail billingIntervalDetail=new BillingIntervalDetail(startDate,endDate,targetDate,billingCycleDayLocal,billingPeriod,billingMode);
   if (!billingIntervalDetail.hasSomethingToBill()) {
-    return results;
+    return new RecurringInvoiceItemDataWithNextBillingCycleDate(results,billingIntervalDetail,billingMode);
   }
   if (endDate != null && !endDate.isAfter(billingIntervalDetail.getFirstBillingCycleDate())) {
     final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,endDate,billingPeriod);
     final RecurringInvoiceItemData itemData=new RecurringInvoiceItemData(startDate,endDate,leadingProRationPeriods);
     results.add(itemData);
-    return results;
+    return new RecurringInvoiceItemDataWithNextBillingCycleDate(results,billingIntervalDetail,billingMode);
   }
   if (billingIntervalDetail.getFirstBillingCycleDate().isAfter(startDate)) {
     final BigDecimal leadingProRationPeriods=calculateProRationBeforeFirstBillingPeriod(startDate,billingIntervalDetail.getFirstBillingCycleDate(),billingPeriod);
@@ -49,5 +49,5 @@
       results.add(itemData);
     }
   }
-  return results;
+  return new RecurringInvoiceItemDataWithNextBillingCycleDate(results,billingIntervalDetail,billingMode);
 }

@@ -1,0 +1,17 @@
+{
+  for (  final UUID subscriptionId : perSubscriptionFutureNotificationDates.keySet()) {
+    final SubscriptionFutureNotificationDates tmp=perSubscriptionFutureNotificationDates.get(subscriptionId);
+    if (tmp.getRecurringBillingMode() == BillingMode.IN_ADVANCE && !hasItemsForSubscription(subscriptionId,InvoiceItemType.RECURRING)) {
+      tmp.resetNextRecurringDate();
+    }
+    if (tmp.getNextUsageDates() != null) {
+      final Iterator<UsageDef> it=tmp.getNextUsageDates().keySet().iterator();
+      while (it.hasNext()) {
+        final UsageDef usageDef=it.next();
+        if (usageDef.getBillingMode() == BillingMode.IN_ADVANCE && !hasItemsForSubscription(subscriptionId,InvoiceItemType.USAGE)) {
+          it.remove();
+        }
+      }
+    }
+  }
+}
