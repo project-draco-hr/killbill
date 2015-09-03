@@ -9,7 +9,7 @@
     if (subscriptionFutureNotificationDates.getNextUsageDates() != null) {
       for (      UsageDef usageDef : subscriptionFutureNotificationDates.getNextUsageDates().keySet()) {
         final LocalDate nextNotificationDateForUsage=subscriptionFutureNotificationDates.getNextUsageDates().get(usageDef);
-        final DateTime subscriptionUsageCallbackDate=getNextUsageBillingDate(subscriptionId,usageDef.getUsageName(),nextNotificationDateForUsage,dateAndTimeZoneContext,billingEvents);
+        final DateTime subscriptionUsageCallbackDate=nextNotificationDateForUsage != null ? dateAndTimeZoneContext.computeUTCDateTimeFromLocalDate(nextNotificationDateForUsage) : null;
         perSubscriptionNotifications.add(new SubscriptionNotification(subscriptionUsageCallbackDate,true));
       }
     }

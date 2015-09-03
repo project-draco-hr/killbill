@@ -10,15 +10,16 @@
   final DefaultTier tier=createDefaultTier(block);
   final DefaultUsage usage=createDefaultUsage(usageName,BillingPeriod.MONTHLY,tier);
   final LocalDate targetDate=endDate;
-  final BillingEvent event1=createMockBillingEvent(startDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),Collections.<Usage>emptyList());
-  final BillingEvent event2=createMockBillingEvent(endDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),Collections.<Usage>emptyList());
+  final BillingEvent event1=createMockBillingEvent(startDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),BillingPeriod.MONTHLY,Collections.<Usage>emptyList());
+  final BillingEvent event2=createMockBillingEvent(endDate.toDateTimeAtStartOfDay(DateTimeZone.UTC),BillingPeriod.MONTHLY,Collections.<Usage>emptyList());
   final ContiguousIntervalConsumableInArrear intervalConsumableInArrear=createContiguousIntervalConsumableInArrear(usage,rawUsages,targetDate,true,event1,event2);
   final List<InvoiceItem> invoiceItems=new ArrayList<InvoiceItem>();
   final InvoiceItem ii1=new UsageInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,usage.getName(),startDate,firstBCDDate,BigDecimal.ONE,currency);
   invoiceItems.add(ii1);
   final InvoiceItem ii2=new UsageInvoiceItem(invoiceId,accountId,bundleId,subscriptionId,planName,phaseName,usage.getName(),firstBCDDate,endDate,BigDecimal.ONE,currency);
   invoiceItems.add(ii2);
-  final List<InvoiceItem> rawResults=intervalConsumableInArrear.computeMissingItems(invoiceItems);
+  final ConsumableInArrearItemsAndNextNotificationDate usageResult=intervalConsumableInArrear.computeMissingItemsAndNextNotificationDate(invoiceItems);
+  final List<InvoiceItem> rawResults=usageResult.getInvoiceItems();
   assertEquals(rawResults.size(),4);
   final List<InvoiceItem> result=ImmutableList.copyOf(Iterables.filter(rawResults,new Predicate<InvoiceItem>(){
     @Override public boolean apply(    final InvoiceItem input){

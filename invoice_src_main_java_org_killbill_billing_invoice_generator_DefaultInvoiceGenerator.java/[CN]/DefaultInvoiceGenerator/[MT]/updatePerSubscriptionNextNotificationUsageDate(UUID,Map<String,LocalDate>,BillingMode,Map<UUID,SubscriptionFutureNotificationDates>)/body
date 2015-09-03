@@ -1,0 +1,13 @@
+{
+  if (usageBillingMode == BillingMode.IN_ADVANCE) {
+    throw new IllegalStateException("Not implemented Yet)");
+  }
+  SubscriptionFutureNotificationDates subscriptionFutureNotificationDates=perSubscriptionFutureNotificationDates.get(subscriptionId);
+  if (subscriptionFutureNotificationDates == null) {
+    subscriptionFutureNotificationDates=new SubscriptionFutureNotificationDates(null);
+    perSubscriptionFutureNotificationDates.put(subscriptionId,subscriptionFutureNotificationDates);
+  }
+  for (  final String usageName : nextBillingCycleDates.keySet()) {
+    subscriptionFutureNotificationDates.updateNextUsageDateIfRequired(usageName,usageBillingMode,nextBillingCycleDates.get(usageName));
+  }
+}

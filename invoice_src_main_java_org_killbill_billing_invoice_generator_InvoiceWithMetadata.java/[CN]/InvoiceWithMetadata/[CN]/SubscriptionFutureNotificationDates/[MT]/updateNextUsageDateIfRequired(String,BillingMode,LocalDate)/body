@@ -1,8 +1,10 @@
 {
-  if (nextUsageDates == null) {
-    nextUsageDates=new HashMap<UsageDef,LocalDate>();
+  if (nextUsageDateCandidate != null) {
+    if (nextUsageDates == null) {
+      nextUsageDates=new HashMap<UsageDef,LocalDate>();
+    }
+    final UsageDef usageDef=new UsageDef(usageName,billingMode);
+    final LocalDate nextUsageDate=getMaxDate(nextUsageDates.get(usageDef),nextUsageDateCandidate);
+    nextUsageDates.put(usageDef,nextUsageDate);
   }
-  final UsageDef usageDef=new UsageDef(usageName,billingMode);
-  final LocalDate nextUsageDate=getMaxDate(nextUsageDates.get(usageDef),nextUsageDateCandidate);
-  nextUsageDates.put(usageDef,nextUsageDate);
 }

@@ -1,7 +1,7 @@
 {
   Preconditions.checkState(isBuilt.get());
   if (transitionTimes.size() < 2) {
-    return ImmutableList.of();
+    return new ConsumableInArrearItemsAndNextNotificationDate(ImmutableList.<InvoiceItem>of(),null);
   }
   final List<InvoiceItem> result=Lists.newLinkedList();
   final List<RolledUpUsage> allUsage=getRolledUpUsage();
@@ -33,5 +33,6 @@
       }
     }
   }
-  return result;
+  final LocalDate nextNotificationdate=computeNextNotificationDate();
+  return new ConsumableInArrearItemsAndNextNotificationDate(result,nextNotificationdate);
 }
