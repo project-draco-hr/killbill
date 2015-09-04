@@ -13,7 +13,7 @@
     throw new PaymentApiException(ErrorCode.PAYMENT_REFRESH_PAYMENT_METHOD,account.getId(),e.getErrorMessage());
   }
   try {
-    final PluginDispatcherReturnType<List<PaymentMethod>> result=new WithAccountLock<List<PaymentMethod>,PaymentApiException>().processAccountWithLock(locker,account.getExternalKey(),new WithAccountLockCallback<PluginDispatcherReturnType<List<PaymentMethod>>,PaymentApiException>(){
+    final PluginDispatcherReturnType<List<PaymentMethod>> result=new WithAccountLock<List<PaymentMethod>,PaymentApiException>(paymentConfig).processAccountWithLock(locker,account.getExternalKey(),new DispatcherCallback<PluginDispatcherReturnType<List<PaymentMethod>>,PaymentApiException>(){
       @Override public PluginDispatcherReturnType<List<PaymentMethod>> doOperation() throws PaymentApiException {
         UUID defaultPaymentMethodId=null;
         final List<PaymentMethodInfoPlugin> pluginPmsWithId=new ArrayList<PaymentMethodInfoPlugin>();
