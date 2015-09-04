@@ -1,0 +1,17 @@
+{
+  final AccountItemTree accountItemTree=new AccountItemTree(account.getId(),invoiceId);
+  if (existingInvoices != null) {
+    for (    final Invoice invoice : existingInvoices) {
+      for (      final InvoiceItem item : invoice.getInvoiceItems()) {
+        if (item.getSubscriptionId() == null || !eventSet.getSubscriptionIdsWithAutoInvoiceOff().contains(item.getSubscriptionId())) {
+          accountItemTree.addExistingItem(item);
+        }
+      }
+    }
+  }
+  final List<InvoiceItem> proposedItems=new ArrayList<InvoiceItem>();
+  processRecurringBillingEvents(invoiceId,account.getId(),eventSet,targetDate,targetCurrency,proposedItems,perSubscriptionFutureNotificationDate);
+  processFixedBillingEvents(invoiceId,account.getId(),eventSet,targetDate,targetCurrency,proposedItems);
+  accountItemTree.mergeWithProposedItems(proposedItems);
+  return accountItemTree.getResultingItemList();
+}

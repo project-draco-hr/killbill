@@ -7,9 +7,9 @@
   final Invoice invoice=new DefaultInvoice(account.getId(),new LocalDate(clock.getUTCNow(),account.getTimeZone()),adjustedTargetDate,targetCurrency);
   final UUID invoiceId=invoice.getId();
   final Map<UUID,SubscriptionFutureNotificationDates> perSubscriptionFutureNotificationDates=new HashMap<UUID,SubscriptionFutureNotificationDates>();
-  final List<InvoiceItem> fixedAndRecurringItems=generateFixedAndRecurringInvoiceItems(account.getId(),invoiceId,events,existingInvoices,adjustedTargetDate,targetCurrency,perSubscriptionFutureNotificationDates);
+  final List<InvoiceItem> fixedAndRecurringItems=recurringInvoiceItemGenerator.generateItems(account,invoiceId,events,existingInvoices,adjustedTargetDate,targetCurrency,perSubscriptionFutureNotificationDates,context);
   invoice.addInvoiceItems(fixedAndRecurringItems);
-  final List<InvoiceItem> usageItems=generateUsageConsumableInArrearItems(account,invoiceId,events,existingInvoices,targetDate,perSubscriptionFutureNotificationDates,context);
+  final List<InvoiceItem> usageItems=usageInvoiceItemGenerator.generateItems(account,invoiceId,events,existingInvoices,adjustedTargetDate,targetCurrency,perSubscriptionFutureNotificationDates,context);
   invoice.addInvoiceItems(usageItems);
   return new InvoiceWithMetadata(invoice.getInvoiceItems().isEmpty() ? null : invoice,perSubscriptionFutureNotificationDates);
 }

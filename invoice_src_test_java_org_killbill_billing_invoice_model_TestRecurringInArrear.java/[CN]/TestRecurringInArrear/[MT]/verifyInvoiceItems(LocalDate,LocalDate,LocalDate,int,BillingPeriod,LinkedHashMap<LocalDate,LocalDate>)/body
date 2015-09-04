@@ -1,0 +1,12 @@
+{
+  final RecurringInvoiceItemDataWithNextBillingCycleDate invoiceItemsWithDates=fixedAndRecurringInvoiceItemGenerator.generateInvoiceItemData(startDate,endDate,targetDate,billingCycleDayLocal,billingPeriod,BillingMode.IN_ARREAR);
+  final List<RecurringInvoiceItemData> invoiceItems=invoiceItemsWithDates.getItemData();
+  int i=0;
+  for (  final LocalDate periodStartDate : expectedDates.keySet()) {
+    Assert.assertEquals(invoiceItems.get(i).getStartDate(),periodStartDate);
+    Assert.assertEquals(invoiceItems.get(i).getEndDate(),expectedDates.get(periodStartDate));
+    Assert.assertTrue(invoiceItems.get(0).getNumberOfCycles().compareTo(BigDecimal.ONE) <= 0);
+    i++;
+  }
+  Assert.assertEquals(invoiceItems.size(),i);
+}
