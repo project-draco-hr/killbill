@@ -1,0 +1,26 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  final String paymentExternalKey="haha";
+  final String transactionExternalKey="hoho!";
+  testListener.pushExpectedEvent(NextEvent.PAYMENT);
+  final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,account.getCurrency(),paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  testListener.assertListenerStatus();
+  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
+  final List<PaymentTransactionInfoPlugin> paymentTransactions=mockPaymentProviderPlugin.getPaymentInfo(account.getId(),payment.getId(),ImmutableList.<PluginProperty>of(),callContext);
+  final PaymentTransactionInfoPlugin oTx=paymentTransactions.remove(0);
+  final PaymentTransactionInfoPlugin updatePaymentTransaction=new DefaultNoOpPaymentInfoPlugin(oTx.getKbPaymentId(),oTx.getKbTransactionPaymentId(),oTx.getTransactionType(),oTx.getAmount(),oTx.getCurrency(),oTx.getCreatedDate(),oTx.getCreatedDate(),PaymentPluginStatus.PENDING,null);
+  paymentTransactions.add(updatePaymentTransaction);
+  mockPaymentProviderPlugin.updatePaymentTransactions(payment.getId(),paymentTransactions);
+  final String paymentStateName=paymentSMHelper.getPendingStateForTransaction(TransactionType.AUTHORIZE).toString();
+  testListener.pushExpectedEvent(NextEvent.PAYMENT);
+  paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,payment.getTransactions().get(0).getId(),TransactionStatus.PENDING,requestedAmount,account.getCurrency(),"loup","chat",internalCallContext);
+  testListener.assertListenerStatus();
+  for (  TimeSpan cur : paymentConfig.getIncompleteTransactionsRetries()) {
+    assertEquals(getPendingNotificationCnt(internalCallContext),1);
+    clock.addDeltaFromReality(cur.getMillis() + 1);
+    Thread.sleep(1000);
+    final Payment updatedPayment=paymentApi.getPayment(payment.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
+    Assert.assertEquals(updatedPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.PENDING);
+  }
+  assertEquals(getPendingNotificationCnt(internalCallContext),0);
+}

@@ -1,6 +1,10 @@
 {
-  final NotificationEvent key=new JanitorNotificationKey(paymentTransactionId,IncompletePaymentTransactionTask.class.toString(),attemptNumber);
-  final DateTime notificationTime=getNextNotificationTime(attemptNumber);
+  if (attemptNumber == null) {
+    return;
+  }
+  final Integer newAttemptNumber=attemptNumber.intValue() + 1;
+  final NotificationEvent key=new JanitorNotificationKey(paymentTransactionId,IncompletePaymentTransactionTask.class.toString(),newAttemptNumber);
+  final DateTime notificationTime=getNextNotificationTime(newAttemptNumber);
   if (notificationTime != null) {
     try {
       janitorQueue.recordFutureNotification(notificationTime,key,userToken,accountRecordId,tenantRecordId);

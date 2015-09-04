@@ -4,6 +4,6 @@
   this.utcNow=clock.getUTCNow();
   runner=new MockRetryablePaymentAutomatonRunner(paymentDao,locker,pluginRegistry,retryPluginRegistry,clock,tagApi,paymentProcessor,retryServiceScheduler,paymentConfig,paymentExecutors,paymentSMHelper,retrySMHelper,controlPluginRunner,eventBus);
   paymentStateContext=new PaymentStateControlContext(ImmutableList.<String>of(MockPaymentControlProviderPlugin.PLUGIN_NAME),true,null,paymentExternalKey,paymentTransactionExternalKey,TransactionType.AUTHORIZE,account,paymentMethodId,amount,currency,emptyProperties,internalCallContext,callContext);
-  mockRetryAuthorizeOperationCallback=new MockRetryAuthorizeOperationCallback(locker,runner.getPaymentPluginDispatcher(),paymentStateContext,null,controlPluginRunner,paymentDao,clock);
+  mockRetryAuthorizeOperationCallback=new MockRetryAuthorizeOperationCallback(locker,runner.getPaymentPluginDispatcher(),paymentConfig,paymentStateContext,null,controlPluginRunner,paymentDao,clock);
   processor=new PluginControlPaymentProcessor(pluginRegistry,accountInternalApi,null,tagApi,paymentDao,locker,internalCallContextFactory,runner,retrySMHelper,clock);
 }
