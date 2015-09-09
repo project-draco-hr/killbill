@@ -2,6 +2,8 @@
   final InvoicePayment paymentJson=setupScenarioWithPayment();
   final BigDecimal refundAmount=paymentJson.getPurchasedAmount();
   final BigDecimal expectedInvoiceBalance=BigDecimal.ZERO;
+  final InvoicePayments invoicePayments=killBillClient.getInvoicePayment(paymentJson.getTargetInvoiceId());
+  Assert.assertEquals(invoicePayments.size(),1);
   final InvoicePaymentTransaction refund=new InvoicePaymentTransaction();
   refund.setPaymentId(paymentJson.getPaymentId());
   refund.setAmount(refundAmount);
@@ -9,4 +11,6 @@
   final Payment paymentAfterRefundJson=killBillClient.createInvoicePaymentRefund(refund,createdBy,reason,comment);
   verifyRefund(paymentJson,paymentAfterRefundJson,refundAmount);
   verifyInvoice(paymentJson,expectedInvoiceBalance);
+  final InvoicePayments invoicePaymentsAfterRefund=killBillClient.getInvoicePayment(paymentJson.getTargetInvoiceId());
+  Assert.assertEquals(invoicePaymentsAfterRefund.size(),1);
 }
