@@ -1,15 +1,4 @@
 {
   final List<Tag> tags=tagUserApi.getTagsForObject(taggedObjectId,getObjectType(),includeDeleted,context);
-  final AccountAuditLogsForObjectType tagsAuditLogs=auditUserApi.getAccountAuditLogs(accountId,ObjectType.TAG,auditMode.getLevel(),context);
-  final Map<UUID,TagDefinition> tagDefinitionsCache=new HashMap<UUID,TagDefinition>();
-  final Collection<TagJson> result=new LinkedList<TagJson>();
-  for (  final Tag tag : tags) {
-    if (tagDefinitionsCache.get(tag.getTagDefinitionId()) == null) {
-      tagDefinitionsCache.put(tag.getTagDefinitionId(),tagUserApi.getTagDefinition(tag.getTagDefinitionId(),context));
-    }
-    final TagDefinition tagDefinition=tagDefinitionsCache.get(tag.getTagDefinitionId());
-    final List<AuditLog> auditLogs=tagsAuditLogs.getAuditLogs(tag.getId());
-    result.add(new TagJson(tag,tagDefinition,auditLogs));
-  }
-  return Response.status(Response.Status.OK).entity(result).build();
+  return createTagResponse(accountId,tags,auditMode,context);
 }
