@@ -1,0 +1,21 @@
+{
+  try {
+    return Iterables.transform(inputItems,new Function<InvoiceItemJson,InvoiceItemJson>(){
+      @Override public InvoiceItemJson apply(      final InvoiceItemJson input){
+        if (input.getCurrency() != null) {
+          if (!input.getCurrency().equals(accountCurrency)) {
+            throw new IllegalArgumentException(input.getCurrency().toString());
+          }
+          return input;
+        }
+ else {
+          return new InvoiceItemJson(null,input.getInvoiceId(),null,input.getAccountId(),input.getBundleId(),input.getSubscriptionId(),input.getPlanName(),input.getPhaseName(),input.getUsageName(),input.getItemType(),input.getDescription(),input.getStartDate(),input.getEndDate(),input.getAmount(),accountCurrency,null);
+        }
+      }
+    }
+);
+  }
+ catch (  IllegalArgumentException e) {
+    throw new InvoiceApiException(ErrorCode.CURRENCY_INVALID,accountCurrency,e.getMessage());
+  }
+}
