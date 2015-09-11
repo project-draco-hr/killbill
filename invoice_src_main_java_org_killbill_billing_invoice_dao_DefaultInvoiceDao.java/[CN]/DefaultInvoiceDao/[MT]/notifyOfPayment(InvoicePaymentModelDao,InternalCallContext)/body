@@ -12,6 +12,9 @@
       if (existingAttempt == null) {
         transactional.create(invoicePayment,context);
       }
+ else       if (!existingAttempt.getSuccess() && invoicePayment.getSuccess()) {
+        transactional.updateAttempt(existingAttempt.getRecordId(),invoicePayment.getPaymentDate().toDate(),invoicePayment.getAmount(),invoicePayment.getCurrency(),invoicePayment.getProcessedCurrency(),context);
+      }
       return null;
     }
   }

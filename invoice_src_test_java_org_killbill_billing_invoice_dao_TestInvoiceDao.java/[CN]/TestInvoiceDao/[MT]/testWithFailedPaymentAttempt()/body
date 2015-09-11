@@ -1,0 +1,22 @@
+{
+  final UUID accountId=account.getId();
+  final Invoice invoice=new DefaultInvoice(accountId,clock.getUTCToday(),clock.getUTCToday(),Currency.USD);
+  invoiceUtil.createInvoice(invoice,true,context);
+  final UUID bundleId=UUID.randomUUID();
+  final UUID subscriptionId=UUID.randomUUID();
+  final RecurringInvoiceItem item1=new RecurringInvoiceItem(invoice.getId(),accountId,bundleId,subscriptionId,"test plan","test ZOO",clock.getUTCNow().plusMonths(-1).toLocalDate(),clock.getUTCNow().toLocalDate(),BigDecimal.TEN,BigDecimal.TEN,Currency.USD);
+  invoiceUtil.createInvoiceItem(item1,context);
+  final InvoiceModelDao retrievedInvoice=invoiceDao.getById(invoice.getId(),context);
+  assertEquals(retrievedInvoice.getInvoicePayments().size(),0);
+  final UUID paymentId=UUID.randomUUID();
+  final DefaultInvoicePayment defaultInvoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice.getId(),clock.getUTCNow().plusDays(12),BigDecimal.TEN,Currency.USD,Currency.USD,false);
+  invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment),context);
+  final InvoiceModelDao retrievedInvoice1=invoiceDao.getById(invoice.getId(),context);
+  assertEquals(retrievedInvoice1.getInvoicePayments().size(),1);
+  assertEquals(retrievedInvoice1.getInvoicePayments().get(0).getSuccess(),Boolean.FALSE);
+  final DefaultInvoicePayment defaultInvoicePayment2=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice.getId(),clock.getUTCNow().plusDays(12),BigDecimal.TEN,Currency.USD,Currency.USD,true);
+  invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment2),context);
+  final InvoiceModelDao retrievedInvoice2=invoiceDao.getById(invoice.getId(),context);
+  assertEquals(retrievedInvoice2.getInvoicePayments().size(),1);
+  assertEquals(retrievedInvoice2.getInvoicePayments().get(0).getSuccess(),Boolean.TRUE);
+}

@@ -3,8 +3,17 @@
   final TransactionType transactionType=paymentControlContext.getTransactionType();
 switch (transactionType) {
 case PURCHASE:
-    final DateTime nextRetryDate=computeNextRetryDate(paymentControlContext.getPaymentExternalKey(),paymentControlContext.isApiPayment(),internalContext);
-  return new DefaultFailureCallResult(nextRetryDate);
+    final UUID invoiceId=getInvoiceId(pluginProperties);
+  if (paymentControlContext.getPaymentId() != null) {
+    try {
+      invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),false,internalContext);
+    }
+ catch (    InvoiceApiException e) {
+      log.error("InvoicePaymentControlPluginApi onFailureCall failed ton update invoice for attemptId = " + paymentControlContext.getAttemptPaymentId() + ", transactionType  = "+ transactionType,e);
+    }
+  }
+final DateTime nextRetryDate=computeNextRetryDate(paymentControlContext.getPaymentExternalKey(),paymentControlContext.isApiPayment(),internalContext);
+return new DefaultFailureCallResult(nextRetryDate);
 case REFUND:
 case CHARGEBACK:
 return new DefaultFailureCallResult(null);

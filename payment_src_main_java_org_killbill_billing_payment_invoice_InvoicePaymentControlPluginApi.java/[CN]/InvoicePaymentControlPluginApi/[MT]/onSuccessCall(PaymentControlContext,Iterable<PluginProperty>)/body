@@ -8,11 +8,11 @@ switch (transactionType) {
 case PURCHASE:
       final UUID invoiceId=getInvoiceId(pluginProperties);
     existingInvoicePayment=invoiceApi.getInvoicePaymentForAttempt(paymentControlContext.getPaymentId(),internalContext);
-  if (existingInvoicePayment != null) {
+  if (existingInvoicePayment != null && existingInvoicePayment.isSuccess()) {
     log.info("onSuccessCall was already completed for payment purchase :" + paymentControlContext.getPaymentId());
   }
  else {
-    invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),internalContext);
+    invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),true,internalContext);
   }
 break;
 case REFUND:
