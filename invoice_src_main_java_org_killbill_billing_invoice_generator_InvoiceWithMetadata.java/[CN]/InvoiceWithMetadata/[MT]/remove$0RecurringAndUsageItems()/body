@@ -1,0 +1,14 @@
+{
+  if (invoice != null) {
+    final Iterator<InvoiceItem> it=invoice.getInvoiceItems().iterator();
+    while (it.hasNext()) {
+      final InvoiceItem item=it.next();
+      if ((item.getInvoiceItemType() == InvoiceItemType.RECURRING || item.getInvoiceItemType() == InvoiceItemType.USAGE) && item.getAmount().compareTo(BigDecimal.ZERO) == 0) {
+        it.remove();
+      }
+    }
+    if (invoice.getInvoiceItems().isEmpty()) {
+      invoice=null;
+    }
+  }
+}
