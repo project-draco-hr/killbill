@@ -1,0 +1,11 @@
+{
+  DateTime minDate=null;
+  final Iterator<BillingEvent> events=eventSet.iterator();
+  while (events.hasNext()) {
+    final BillingEvent cur=events.next();
+    if (minDate == null || minDate.compareTo(cur.getEffectiveDate()) > 0) {
+      minDate=cur.getEffectiveDate();
+    }
+  }
+  return new LocalDate(minDate,accountTimeZone);
+}

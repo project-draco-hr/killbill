@@ -1,6 +1,7 @@
 {
   final Map<UUID,List<InvoiceItem>> perSubscriptionConsumableInArrearUsageItems=extractPerSubscriptionExistingConsumableInArrearUsageItems(eventSet.getUsages(),existingInvoices);
   try {
+    final LocalDate minBillingEventDate=getMinBillingEventDate(eventSet,account.getTimeZone());
     final List<InvoiceItem> items=Lists.newArrayList();
     final Iterator<BillingEvent> events=eventSet.iterator();
     RawUsageOptimizerResult rawUsageOptimizerResult=null;
@@ -18,7 +19,7 @@
         }
       }
 )) {
-        rawUsageOptimizerResult=rawUsageOptimizer.getConsumableInArrearUsage(new LocalDate(event.getEffectiveDate(),account.getTimeZone()),targetDate,Iterables.concat(perSubscriptionConsumableInArrearUsageItems.values()),eventSet.getUsages(),internalCallContext);
+        rawUsageOptimizerResult=rawUsageOptimizer.getConsumableInArrearUsage(minBillingEventDate,targetDate,Iterables.concat(perSubscriptionConsumableInArrearUsageItems.values()),eventSet.getUsages(),internalCallContext);
       }
       if (rawUsageOptimizerResult == null) {
         continue;
