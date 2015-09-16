@@ -3,9 +3,9 @@
   this.accountBalance=accountBalance;
   this.externalKey=externalKey;
   this.accountId=accountId;
-  this.name=name;
-  this.firstNameLength=firstNameLength;
-  this.email=email;
+  this.name=MoreObjects.firstNonNull(name,UUIDs.randomUUID().toString());
+  this.firstNameLength=MoreObjects.firstNonNull(firstNameLength,this.name.length());
+  this.email=MoreObjects.firstNonNull(email,"");
   this.billCycleDayLocal=billCycleDayLocal;
   this.currency=currency;
   this.paymentMethodId=paymentMethodId;
@@ -20,6 +20,6 @@
   this.locale=locale;
   this.phone=phone;
   this.isMigrated=isMigrated;
-  this.isNotifiedForInvoices=isNotifiedForInvoices;
+  this.isNotifiedForInvoices=isNotifiedForInvoices != null ? isNotifiedForInvoices : false;
   this.accountCBA=accountCBA;
 }
