@@ -7,12 +7,7 @@
   while (count-- > 0) {
     assertNotNull(killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment));
   }
-  try {
-    killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment);
-    fail();
-  }
- catch (  final KillBillClientException e) {
-  }
+  final InvoicePayment foo=killBillClient.createInvoicePaymentChargeback(input,createdBy,reason,comment);
   final List<InvoicePayment> payments=killBillClient.getInvoicePaymentsForAccount(payment.getAccountId());
   final List<PaymentTransaction> transactions=getPaymentTransactions(payments,TransactionType.CHARGEBACK.toString());
   Assert.assertEquals(transactions.size(),5);
