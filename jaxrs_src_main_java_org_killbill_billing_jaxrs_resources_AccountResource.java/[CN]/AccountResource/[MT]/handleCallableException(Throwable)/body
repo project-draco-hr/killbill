@@ -1,0 +1,20 @@
+{
+  if (causeOrException instanceof AccountApiException) {
+    throw (AccountApiException)causeOrException;
+  }
+ else   if (causeOrException instanceof SubscriptionApiException) {
+    throw (SubscriptionApiException)causeOrException;
+  }
+ else   if (causeOrException instanceof InvoiceApiException) {
+    throw (InvoiceApiException)causeOrException;
+  }
+ else   if (causeOrException instanceof PaymentApiException) {
+    throw (PaymentApiException)causeOrException;
+  }
+ else {
+    if (causeOrException instanceof InterruptedException) {
+      Thread.currentThread().interrupt();
+    }
+    throw new RuntimeException(causeOrException.getMessage(),causeOrException);
+  }
+}

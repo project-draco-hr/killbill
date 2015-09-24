@@ -1,0 +1,83 @@
+{
+  final TenantContext tenantContext=context.createContext(request);
+  final UUID accountId=UUID.fromString(accountIdString);
+  final Account account=accountUserApi.getAccountById(accountId,tenantContext);
+  final Callable<List<SubscriptionBundle>> bundlesCallable=new Callable<List<SubscriptionBundle>>(){
+    @Override public List<SubscriptionBundle> call() throws Exception {
+      return subscriptionApi.getSubscriptionBundlesForAccountId(account.getId(),tenantContext);
+    }
+  }
+;
+  final Callable<List<Invoice>> invoicesCallable=new Callable<List<Invoice>>(){
+    @Override public List<Invoice> call() throws Exception {
+      return invoiceApi.getInvoicesByAccount(account.getId(),tenantContext);
+    }
+  }
+;
+  final Callable<List<InvoicePayment>> invoicePaymentsCallable=new Callable<List<InvoicePayment>>(){
+    @Override public List<InvoicePayment> call() throws Exception {
+      return invoicePaymentApi.getInvoicePaymentsByAccount(accountId,tenantContext);
+    }
+  }
+;
+  final Callable<List<Payment>> paymentsCallable=new Callable<List<Payment>>(){
+    @Override public List<Payment> call() throws Exception {
+      return paymentApi.getAccountPayments(accountId,false,ImmutableList.<PluginProperty>of(),tenantContext);
+    }
+  }
+;
+  final Callable<AccountAuditLogs> auditsCallable=new Callable<AccountAuditLogs>(){
+    @Override public AccountAuditLogs call() throws Exception {
+      return auditUserApi.getAccountAuditLogs(accountId,auditMode.getLevel(),tenantContext);
+    }
+  }
+;
+  final AccountTimelineJson json;
+  List<Invoice> invoices=null;
+  List<SubscriptionBundle> bundles=null;
+  List<InvoicePayment> invoicePayments=null;
+  List<Payment> payments=null;
+  AccountAuditLogs accountAuditLogs=null;
+  if (parallel) {
+    final ExecutorService executor=jaxrsExecutors.getJaxrsExecutorService();
+    final Future<List<SubscriptionBundle>> futureBundlesCallable=executor.submit(bundlesCallable);
+    final Future<List<Invoice>> futureInvoicesCallable=executor.submit(invoicesCallable);
+    final Future<List<InvoicePayment>> futureInvoicePaymentsCallable=executor.submit(invoicePaymentsCallable);
+    final Future<List<Payment>> futurePaymentsCallable=executor.submit(paymentsCallable);
+    final Future<AccountAuditLogs> futureAuditsCallable=executor.submit(auditsCallable);
+    try {
+      long ini=System.currentTimeMillis();
+      do {
+        bundles=(bundles == null) ? runCallableAndHandleTimeout(futureBundlesCallable,100) : bundles;
+        invoices=(invoices == null) ? runCallableAndHandleTimeout(futureInvoicesCallable,100) : invoices;
+        invoicePayments=(invoicePayments == null) ? runCallableAndHandleTimeout(futureInvoicePaymentsCallable,100) : invoicePayments;
+        payments=(payments == null) ? runCallableAndHandleTimeout(futurePaymentsCallable,100) : payments;
+        accountAuditLogs=(accountAuditLogs == null) ? runCallableAndHandleTimeout(futureAuditsCallable,100) : accountAuditLogs;
+      }
+ while ((System.currentTimeMillis() - ini < jaxrsConfig.getJaxrsTimeout().getMillis()) && (bundles == null || invoices == null || invoicePayments == null || payments == null || accountAuditLogs == null));
+      if (bundles == null || invoices == null || invoicePayments == null || payments == null || accountAuditLogs == null) {
+        Response.status(Status.SERVICE_UNAVAILABLE).build();
+      }
+    }
+ catch (    InterruptedException e) {
+      handleCallableException(e,ImmutableList.<Future>of(futureBundlesCallable,futureInvoicesCallable,futureInvoicePaymentsCallable,futurePaymentsCallable,futureAuditsCallable));
+    }
+catch (    ExecutionException e) {
+      handleCallableException(e.getCause(),ImmutableList.<Future>of(futureBundlesCallable,futureInvoicesCallable,futureInvoicePaymentsCallable,futurePaymentsCallable,futureAuditsCallable));
+    }
+  }
+ else {
+    try {
+      invoices=invoicesCallable.call();
+      payments=paymentsCallable.call();
+      bundles=bundlesCallable.call();
+      accountAuditLogs=auditsCallable.call();
+      invoicePayments=invoicePaymentsCallable.call();
+    }
+ catch (    Exception e) {
+      handleCallableException(e);
+    }
+  }
+  json=new AccountTimelineJson(account,invoices,payments,invoicePayments,bundles,accountAuditLogs);
+  return Response.status(Status.OK).entity(json).build();
+}

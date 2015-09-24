@@ -1,0 +1,10 @@
+{
+  return new WithProfilingThreadPoolExecutor(JaxrsConfig.getJaxrsThreadNb(),JaxrsConfig.getJaxrsThreadNb(),0L,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>(),new ThreadFactory(){
+    @Override public Thread newThread(    final Runnable r){
+      final Thread th=new Thread(new ThreadGroup(JAXRS_TH_GROUP_NAME),r);
+      th.setName(JAXRS_THREAD_PREFIX + th.getId());
+      return th;
+    }
+  }
+);
+}
