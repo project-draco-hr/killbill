@@ -1,0 +1,20 @@
+{
+  if (pm.getExternalKey() != null) {
+    return pm.getExternalKey();
+  }
+  final PaymentMethodPlugin paymentMethodPlugin;
+  try {
+    paymentMethodPlugin=pluginApi.getPaymentMethodDetail(account.getId(),pm.getId(),properties,callContext);
+  }
+ catch (  final PaymentPluginApiException e) {
+    log.warn("Error retrieving payment method " + pm.getId() + " from plugin "+ pm.getPluginName(),e);
+    return null;
+  }
+  if (paymentMethodPlugin != null && paymentMethodPlugin.getExternalPaymentMethodId() != null) {
+    final String externalKey=paymentMethodPlugin.getExternalPaymentMethodId();
+    return paymentDao.getPaymentMethodByExternalKeyIncludedDeleted(externalKey,context) == null ? externalKey : null;
+  }
+ else {
+    return null;
+  }
+}
