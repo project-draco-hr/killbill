@@ -5,7 +5,7 @@
       try {
         final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundleId,ObjectType.BUNDLE,context);
         final SubscriptionBaseBundle bundle=subscriptionBaseInternalApi.getBundleFromId(bundleId,contextWithValidAccountRecordId);
-        final Account account=accountApi.getAccountById(bundle.getAccountId(),contextWithValidAccountRecordId);
+        final ImmutableAccountData account=accountApi.getImmutableAccountDataById(bundle.getAccountId(),contextWithValidAccountRecordId);
         final SubscriptionBase baseSubscription=subscriptionBaseInternalApi.getBaseSubscription(bundleId,contextWithValidAccountRecordId);
         final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),baseSubscription.getStartDate(),contextWithValidAccountRecordId);
         if (!dateHelper.isBeforeOrEqualsToday(effectiveDate,account.getTimeZone())) {

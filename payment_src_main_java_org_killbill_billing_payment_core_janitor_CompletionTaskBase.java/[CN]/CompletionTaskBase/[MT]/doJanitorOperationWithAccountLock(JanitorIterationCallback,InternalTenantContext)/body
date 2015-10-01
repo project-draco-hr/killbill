@@ -1,7 +1,7 @@
 {
   GlobalLock lock=null;
   try {
-    final Account account=accountInternalApi.getAccountByRecordId(internalTenantContext.getAccountRecordId(),internalTenantContext);
+    final ImmutableAccountData account=accountInternalApi.getImmutableAccountDataByRecordId(internalTenantContext.getAccountRecordId(),internalTenantContext);
     lock=locker.lockWithNumberOfTries(LockerType.ACCNT_INV_PAY.toString(),account.getExternalKey(),paymentConfig.getMaxGlobalLockRetries());
     return callback.doIteration();
   }

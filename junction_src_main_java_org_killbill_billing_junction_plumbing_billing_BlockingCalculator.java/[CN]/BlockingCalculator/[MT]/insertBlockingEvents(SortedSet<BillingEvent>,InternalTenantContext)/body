@@ -2,7 +2,6 @@
   if (billingEvents.size() <= 0) {
     return;
   }
-  final Account account=billingEvents.first().getAccount();
   final Hashtable<UUID,List<SubscriptionBase>> bundleMap=createBundleSubscriptionMap(billingEvents);
   final SortedSet<BillingEvent> billingEventsToAdd=new TreeSet<BillingEvent>();
   final SortedSet<BillingEvent> billingEventsToRemove=new TreeSet<BillingEvent>();
@@ -10,7 +9,7 @@
   final List<DisabledDuration> blockingDurations=createBlockingDurations(blockingEvents);
   for (  final UUID bundleId : bundleMap.keySet()) {
     for (    final SubscriptionBase subscription : bundleMap.get(bundleId)) {
-      billingEventsToAdd.addAll(createNewEvents(blockingDurations,billingEvents,account,subscription));
+      billingEventsToAdd.addAll(createNewEvents(blockingDurations,billingEvents,subscription));
       billingEventsToRemove.addAll(eventsToRemove(blockingDurations,billingEvents,subscription));
     }
   }

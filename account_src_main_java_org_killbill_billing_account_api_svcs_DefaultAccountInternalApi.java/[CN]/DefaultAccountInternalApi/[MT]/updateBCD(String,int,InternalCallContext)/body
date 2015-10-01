@@ -1,0 +1,10 @@
+{
+  final Account currentAccount=getAccountByKey(externalKey,context);
+  if (currentAccount == null) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_KEY,externalKey);
+  }
+  final MutableAccountData mutableAccountData=currentAccount.toMutableAccountData();
+  mutableAccountData.setBillCycleDayLocal(bcd);
+  final AccountModelDao accountToUpdate=new AccountModelDao(currentAccount.getId(),mutableAccountData);
+  accountDao.update(accountToUpdate,context);
+}
