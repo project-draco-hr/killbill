@@ -1,0 +1,9 @@
+{
+  final AccountModelDao accountModelDao=accountDao.getAccountByKey(key,context);
+  if (accountModelDao == null) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_KEY,key);
+  }
+  final Account account=new DefaultAccount(accountModelDao);
+  accountCacheController.putIfAbsent(account.getId(),new DefaultImmutableAccountData(account));
+  return account;
+}

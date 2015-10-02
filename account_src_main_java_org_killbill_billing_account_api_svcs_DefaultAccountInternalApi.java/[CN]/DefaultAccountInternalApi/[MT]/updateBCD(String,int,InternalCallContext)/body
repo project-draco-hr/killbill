@@ -6,5 +6,6 @@
   final MutableAccountData mutableAccountData=currentAccount.toMutableAccountData();
   mutableAccountData.setBillCycleDayLocal(bcd);
   final AccountModelDao accountToUpdate=new AccountModelDao(currentAccount.getId(),mutableAccountData);
+  bcdCacheController.putIfAbsent(currentAccount.getId(),new Integer(bcd));
   accountDao.update(accountToUpdate,context);
 }
