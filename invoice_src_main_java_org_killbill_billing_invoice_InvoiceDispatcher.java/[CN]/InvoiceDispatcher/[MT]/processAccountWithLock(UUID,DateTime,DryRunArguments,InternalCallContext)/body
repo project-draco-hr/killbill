@@ -6,10 +6,12 @@
     if (billingEvents.isEmpty()) {
       return null;
     }
-    final List<DateTime> candidateDateTimes=(inputTargetDateTime != null) ? ImmutableList.of(inputTargetDateTime) : getUpcomingInvoiceCandidateDates(getFilteredSubscriptionIds(dryRunArguments,billingEvents),context);
+    final Iterable<UUID> filteredSubscriptionIdsForDryRun=getFilteredSubscriptionIdsForDryRun(dryRunArguments,billingEvents);
+    final List<DateTime> candidateDateTimes=(inputTargetDateTime != null) ? ImmutableList.of(inputTargetDateTime) : getUpcomingInvoiceCandidateDates(filteredSubscriptionIdsForDryRun,context);
     for (    final DateTime curTargetDateTime : candidateDateTimes) {
       final Invoice invoice=processAccountWithLockAndInputTargetDate(accountId,curTargetDateTime,billingEvents,isDryRun,context);
       if (invoice != null) {
+        filterInvoiceItemsForDryRun(filteredSubscriptionIdsForDryRun,invoice);
         return invoice;
       }
     }
