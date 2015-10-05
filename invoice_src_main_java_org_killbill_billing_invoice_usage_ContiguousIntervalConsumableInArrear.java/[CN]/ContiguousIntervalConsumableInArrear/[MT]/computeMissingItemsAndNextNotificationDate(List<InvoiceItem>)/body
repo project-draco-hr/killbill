@@ -8,7 +8,7 @@
   LocalDate prevDate=null;
   for (  LocalDate curDate : transitionTimes) {
     if (prevDate != null) {
-      InvoiceItem item=new UsageInvoiceItem(invoiceId,getAccountId(),getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),usage.getName(),prevDate,curDate,BigDecimal.ZERO,getCurrency());
+      InvoiceItem item=new UsageInvoiceItem(invoiceId,accountId,getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),usage.getName(),prevDate,curDate,BigDecimal.ZERO,getCurrency());
       result.add(item);
     }
     prevDate=curDate;
@@ -28,7 +28,7 @@
     if (!billedItems.iterator().hasNext() || billedUsage.compareTo(toBeBilledUsage) < 0) {
       final BigDecimal amountToBill=toBeBilledUsage.subtract(billedUsage);
       if (amountToBill.compareTo(BigDecimal.ZERO) > 0) {
-        InvoiceItem item=new UsageInvoiceItem(invoiceId,getAccountId(),getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),usage.getName(),ru.getStart(),ru.getEnd(),amountToBill,getCurrency());
+        InvoiceItem item=new UsageInvoiceItem(invoiceId,accountId,getBundleId(),getSubscriptionId(),getPlanName(),getPhaseName(),usage.getName(),ru.getStart(),ru.getEnd(),amountToBill,getCurrency());
         result.add(item);
       }
     }

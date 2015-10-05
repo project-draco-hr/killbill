@@ -1,0 +1,29 @@
+{
+  boolean updatedAccountBCD=dryRunMode;
+  int currentAccountBCD=accountApi.getBCD(account.getId(),context);
+  for (  final SubscriptionBase subscription : subscriptions) {
+    if (subscription.getState() == null) {
+      continue;
+    }
+    for (    final EffectiveSubscriptionInternalEvent transition : subscriptionApi.getBillingTransitions(subscription,context)) {
+      try {
+        final int bcdLocal=bcdCalculator.calculateBcd(account,currentAccountBCD,bundleId,subscription,transition,context);
+        if (currentAccountBCD == 0 && !updatedAccountBCD) {
+          accountApi.updateBCD(account.getExternalKey(),bcdLocal,context);
+          updatedAccountBCD=true;
+        }
+        final BillingEvent event=new DefaultBillingEvent(account,transition,subscription,bcdLocal,account.getCurrency(),catalogService.getFullCatalog(context));
+        result.add(event);
+      }
+ catch (      CatalogApiException e) {
+        log.error("Failing to identify catalog components while creating BillingEvent from transition: " + transition.getId().toString(),e);
+      }
+catch (      AccountApiException e) {
+        throw e;
+      }
+catch (      Exception e) {
+        log.warn("Failed while getting BillingEvent",e);
+      }
+    }
+  }
+}

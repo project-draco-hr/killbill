@@ -1,7 +1,4 @@
 {
-  final AccountModelDao account=accountDao.getById(id,internalCallContextFactory.createInternalTenantContext(context));
-  if (account == null) {
-    throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,id);
-  }
-  return new DefaultAccount(account);
+  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(context);
+  return getAccountById(id,internalTenantContext);
 }

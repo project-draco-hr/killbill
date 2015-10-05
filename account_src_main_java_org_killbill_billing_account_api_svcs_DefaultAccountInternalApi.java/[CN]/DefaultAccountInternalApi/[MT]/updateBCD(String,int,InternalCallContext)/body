@@ -1,0 +1,15 @@
+{
+  final Account currentAccount=getAccountByKey(externalKey,context);
+  if (currentAccount == null) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_KEY,externalKey);
+  }
+  if (currentAccount.getBillCycleDayLocal() != DefaultMutableAccountData.DEFAULT_BILLING_CYCLE_DAY_LOCAL) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_UPDATE_FAILED);
+  }
+  final MutableAccountData mutableAccountData=currentAccount.toMutableAccountData();
+  mutableAccountData.setBillCycleDayLocal(bcd);
+  final AccountModelDao accountToUpdate=new AccountModelDao(currentAccount.getId(),mutableAccountData);
+  bcdCacheController.remove(currentAccount.getId());
+  bcdCacheController.putIfAbsent(currentAccount.getId(),new Integer(bcd));
+  accountDao.update(accountToUpdate,context);
+}

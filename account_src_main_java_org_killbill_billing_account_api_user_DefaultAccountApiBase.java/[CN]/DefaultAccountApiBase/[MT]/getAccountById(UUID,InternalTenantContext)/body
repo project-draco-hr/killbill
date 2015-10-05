@@ -1,0 +1,9 @@
+{
+  final Long recordId=nonEntityDao.retrieveRecordIdFromObject(accountId,ObjectType.ACCOUNT,cacheControllerDispatcher.getCacheController(CacheType.RECORD_ID));
+  final Account account=getAccountByRecordIdInternal(recordId,context);
+  if (account == null) {
+    throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
+  }
+  accountCacheController.putIfAbsent(accountId,new DefaultImmutableAccountData(account));
+  return account;
+}

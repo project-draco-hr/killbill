@@ -1,6 +1,6 @@
 {
   try {
-    final Account account=accountApi.getAccountById(accountId,context);
+    final ImmutableAccountData account=accountApi.getImmutableAccountDataById(accountId,context);
     final DateAndTimeZoneContext dateAndTimeZoneContext=new DateAndTimeZoneContext(billingEvents.iterator().next().getEffectiveDate(),account.getTimeZone(),clock);
     final List<Invoice> invoices=billingEvents.isAccountAutoInvoiceOff() ? ImmutableList.<Invoice>of() : ImmutableList.<Invoice>copyOf(Collections2.transform(invoiceDao.getInvoicesByAccount(context),new Function<InvoiceModelDao,Invoice>(){
       @Override public Invoice apply(      final InvoiceModelDao input){

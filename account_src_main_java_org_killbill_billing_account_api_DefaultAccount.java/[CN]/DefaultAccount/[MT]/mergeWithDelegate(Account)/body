@@ -12,14 +12,14 @@
  else {
     accountData.setCurrency(currentAccount.getCurrency());
   }
-  if (billCycleDayLocal != null && billCycleDayLocal != DEFAULT_BILLING_CYCLE_DAY_LOCAL && currentAccount.getBillCycleDayLocal() != null && currentAccount.getBillCycleDayLocal() != DEFAULT_BILLING_CYCLE_DAY_LOCAL && !billCycleDayLocal.equals(currentAccount.getBillCycleDayLocal())) {
+  if (currentAccount.getBillCycleDayLocal() != DEFAULT_BILLING_CYCLE_DAY_LOCAL && billCycleDayLocal != null && billCycleDayLocal != DEFAULT_BILLING_CYCLE_DAY_LOCAL && !currentAccount.getBillCycleDayLocal().equals(billCycleDayLocal)) {
     throw new IllegalArgumentException(String.format("Killbill doesn't support updating the account BCD yet: new=%s, current=%s",billCycleDayLocal,currentAccount.getBillCycleDayLocal()));
   }
- else   if (billCycleDayLocal != null && billCycleDayLocal != DEFAULT_BILLING_CYCLE_DAY_LOCAL) {
+ else   if (currentAccount.getBillCycleDayLocal() == DEFAULT_BILLING_CYCLE_DAY_LOCAL && billCycleDayLocal != null && billCycleDayLocal != DEFAULT_BILLING_CYCLE_DAY_LOCAL) {
     accountData.setBillCycleDayLocal(billCycleDayLocal);
   }
  else {
-    accountData.setBillCycleDayLocal(currentAccount.getBillCycleDayLocal() == null ? DEFAULT_BILLING_CYCLE_DAY_LOCAL : currentAccount.getBillCycleDayLocal());
+    accountData.setBillCycleDayLocal(currentAccount.getBillCycleDayLocal());
   }
   accountData.setEmail(email != null ? email : currentAccount.getEmail());
   accountData.setName(name != null ? name : currentAccount.getName());

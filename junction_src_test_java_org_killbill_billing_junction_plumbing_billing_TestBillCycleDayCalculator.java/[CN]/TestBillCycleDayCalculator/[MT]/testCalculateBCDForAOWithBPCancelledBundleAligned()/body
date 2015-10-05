@@ -11,8 +11,8 @@
   final Catalog catalog=Mockito.mock(Catalog.class);
   Mockito.when(catalog.findPlan(Mockito.anyString(),Mockito.<DateTime>any(),Mockito.<DateTime>any())).thenReturn(plan);
   Mockito.when(subscription.getLastActivePlan()).thenReturn(plan);
-  final Account account=Mockito.mock(Account.class);
+  final ImmutableAccountData account=Mockito.mock(ImmutableAccountData.class);
   Mockito.when(account.getTimeZone()).thenReturn(accountTimeZone);
-  final Integer billCycleDayLocal=billCycleDayCalculator.calculateBcdForAlignment(BillingAlignment.BUNDLE,bundle.getId(),subscription,account,catalog,null,internalCallContext);
+  final Integer billCycleDayLocal=billCycleDayCalculator.calculateBcdForAlignment(account,0,subscription,BillingAlignment.BUNDLE,bundle.getId(),catalog,null,internalCallContext);
   Assert.assertEquals(billCycleDayLocal,(Integer)expectedBCDUTC);
 }

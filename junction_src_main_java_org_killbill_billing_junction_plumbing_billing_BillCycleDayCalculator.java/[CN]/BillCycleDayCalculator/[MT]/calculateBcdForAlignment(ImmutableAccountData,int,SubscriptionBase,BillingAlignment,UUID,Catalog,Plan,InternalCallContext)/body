@@ -1,0 +1,23 @@
+{
+  int result=0;
+switch (alignment) {
+case ACCOUNT:
+    result=accountBillCycleDayLocal != 0 ? accountBillCycleDayLocal : calculateBcdFromSubscription(subscription,plan,account,catalog,context);
+  break;
+case BUNDLE:
+final SubscriptionBase baseSub=subscriptionApi.getBaseSubscription(bundleId,context);
+Plan basePlan=baseSub.getCurrentPlan();
+if (basePlan == null) {
+basePlan=baseSub.getLastActivePlan();
+}
+result=calculateBcdFromSubscription(baseSub,basePlan,account,catalog,context);
+break;
+case SUBSCRIPTION:
+result=calculateBcdFromSubscription(subscription,plan,account,catalog,context);
+break;
+}
+if (result == 0) {
+throw new CatalogApiException(ErrorCode.CAT_INVALID_BILLING_ALIGNMENT,alignment.toString());
+}
+return result;
+}

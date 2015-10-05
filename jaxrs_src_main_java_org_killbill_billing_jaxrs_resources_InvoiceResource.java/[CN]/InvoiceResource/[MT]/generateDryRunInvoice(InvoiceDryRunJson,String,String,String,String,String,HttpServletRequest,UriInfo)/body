@@ -1,11 +1,16 @@
 {
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final LocalDate inputDate;
-  if (dryRunSubscriptionSpec != null && dryRunSubscriptionSpec.getEffectiveDate() != null) {
-    inputDate=dryRunSubscriptionSpec.getEffectiveDate();
-  }
- else   if (targetDate != null && targetDate.equals(UPCOMING_INVOICE_TARGET_DATE)) {
-    inputDate=null;
+  if (dryRunSubscriptionSpec != null) {
+    if (DryRunType.UPCOMING_INVOICE.name().equals(dryRunSubscriptionSpec.getDryRunType())) {
+      inputDate=null;
+    }
+ else     if (DryRunType.SUBSCRIPTION_ACTION.name().equals(dryRunSubscriptionSpec.getDryRunType()) && dryRunSubscriptionSpec.getEffectiveDate() != null) {
+      inputDate=dryRunSubscriptionSpec.getEffectiveDate();
+    }
+ else {
+      inputDate=toLocalDate(UUID.fromString(accountId),targetDate,callContext);
+    }
   }
  else {
     inputDate=toLocalDate(UUID.fromString(accountId),targetDate,callContext);
