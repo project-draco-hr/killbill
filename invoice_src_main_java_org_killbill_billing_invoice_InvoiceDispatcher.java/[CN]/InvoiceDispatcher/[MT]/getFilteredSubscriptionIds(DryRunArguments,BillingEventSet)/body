@@ -1,0 +1,19 @@
+{
+  if (!dryRunArguments.getDryRunType().equals(DryRunType.UPCOMING_INVOICE) || (dryRunArguments.getSubscriptionId() == null && dryRunArguments.getBundleId() == null)) {
+    return ImmutableList.<UUID>of();
+  }
+  if (dryRunArguments.getSubscriptionId() != null) {
+    return ImmutableList.of(dryRunArguments.getSubscriptionId());
+  }
+  return Iterables.transform(Iterables.filter(billingEvents,new Predicate<BillingEvent>(){
+    @Override public boolean apply(    final BillingEvent input){
+      return input.getSubscription().getBundleId().equals(dryRunArguments.getBundleId());
+    }
+  }
+),new Function<BillingEvent,UUID>(){
+    @Override public UUID apply(    final BillingEvent input){
+      return input.getSubscription().getId();
+    }
+  }
+);
+}

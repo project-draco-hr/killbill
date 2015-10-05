@@ -18,7 +18,7 @@
   setDateAndCheckForCompletion(new DateTime(2012,3,2,23,59,59,0,testTimeZone),NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
   invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,3,2),new LocalDate(2012,4,2),InvoiceItemType.RECURRING,new BigDecimal("599.95")));
   invoiceChecker.checkChargedThroughDate(subscription.getId(),new LocalDate(2012,4,2),callContext);
-  TestDryRunArguments dryRun=new TestDryRunArguments("Pistol",ProductCategory.BASE,BillingPeriod.MONTHLY,null,null,SubscriptionEventType.CHANGE,subscription.getId(),subscription.getBundleId(),null,null);
+  TestDryRunArguments dryRun=new TestDryRunArguments(DryRunType.SUBSCRIPTION_ACTION,"Pistol",ProductCategory.BASE,BillingPeriod.MONTHLY,null,null,SubscriptionEventType.CHANGE,subscription.getId(),subscription.getBundleId(),null,null);
   try {
     invoiceUserApi.triggerInvoiceGeneration(account.getId(),clock.getUTCToday(),dryRun,callContext);
     Assert.fail("Call should return no invoices");
