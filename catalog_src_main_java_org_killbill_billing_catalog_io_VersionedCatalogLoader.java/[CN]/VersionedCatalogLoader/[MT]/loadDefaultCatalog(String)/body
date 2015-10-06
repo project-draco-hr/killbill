@@ -3,18 +3,7 @@
     List<URI> xmlURIs;
     if (uriString.endsWith(XML_EXTENSION)) {
       xmlURIs=new ArrayList<URI>();
-      URI uri=new URI(uriString);
-      final String schemeSpecificPart=uri.getSchemeSpecificPart();
-      if (schemeSpecificPart != null) {
-        final String[] split=schemeSpecificPart.split("/");
-        final String fileName=split[split.length - 1];
-        try {
-          uri=new URI(Resources.getResource(fileName).toExternalForm());
-        }
- catch (        IllegalArgumentException ignored) {
-        }
-      }
-      xmlURIs.add(uri);
+      xmlURIs.add(new URI(uriString));
     }
  else {
       final String directoryContents=UriAccessor.accessUriAsString(uriString);
