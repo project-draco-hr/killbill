@@ -4,7 +4,7 @@
   Assert.assertEquals(tenantDao.getTenantByApiKey(tenant.getApiKey()).getId(),tenant.getId());
   final AuthenticationInfo authenticationInfo=tenantDao.getAuthenticationInfoForTenant(tenant.getId());
   final AuthenticationToken goodToken=new UsernamePasswordToken(tenant.getApiKey(),tenant.getApiSecret());
-  Assert.assertTrue(KillbillCredentialsMatcher.getCredentialsMatcher().doCredentialsMatch(goodToken,authenticationInfo));
+  Assert.assertTrue(KillbillCredentialsMatcher.getCredentialsMatcher(securityConfig).doCredentialsMatch(goodToken,authenticationInfo));
   final AuthenticationToken badToken=new UsernamePasswordToken(tenant.getApiKey(),tenant.getApiSecret() + "T");
-  Assert.assertFalse(KillbillCredentialsMatcher.getCredentialsMatcher().doCredentialsMatch(badToken,authenticationInfo));
+  Assert.assertFalse(KillbillCredentialsMatcher.getCredentialsMatcher(securityConfig).doCredentialsMatch(badToken,authenticationInfo));
 }

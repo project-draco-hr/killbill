@@ -1,6 +1,6 @@
 {
   final ByteSource salt=rng.nextBytes();
-  final String hashedPasswordBase64=new SimpleHash(KillbillCredentialsMatcher.HASH_ALGORITHM_NAME,entity.getApiSecret(),salt,KillbillCredentialsMatcher.HASH_ITERATIONS).toBase64();
+  final String hashedPasswordBase64=new SimpleHash(KillbillCredentialsMatcher.HASH_ALGORITHM_NAME,entity.getApiSecret(),salt,securityConfig.getShiroNbHashIterations()).toBase64();
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final TenantModelDao tenantModelDaoWithSecret=new TenantModelDao(entity.getId(),context.getCreatedDate(),context.getUpdatedDate(),entity.getExternalKey(),entity.getApiKey(),hashedPasswordBase64,salt.toBase64());
