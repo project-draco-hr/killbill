@@ -1,6 +1,6 @@
 {
   final ByteSource salt=rng.nextBytes();
-  final String hashedPasswordBase64=new SimpleHash(KillbillCredentialsMatcher.HASH_ALGORITHM_NAME,password,salt.toBase64(),KillbillCredentialsMatcher.HASH_ITERATIONS).toBase64();
+  final String hashedPasswordBase64=new SimpleHash(KillbillCredentialsMatcher.HASH_ALGORITHM_NAME,password,salt.toBase64(),securityConfig.getShiroNbHashIterations()).toBase64();
   dbi.inTransaction(new TransactionCallback<Void>(){
     @Override public Void inTransaction(    final Handle handle,    final TransactionStatus status) throws Exception {
       final DateTime updatedDate=clock.getUTCNow();

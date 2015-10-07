@@ -1,0 +1,15 @@
+{
+  final Invoice clonedInvoice=(Invoice)((DefaultInvoice)originalInvoice).clone();
+  final List<InvoiceItem> additionalInvoiceItems=new LinkedList<InvoiceItem>();
+  final List<InvoicePluginApi> invoicePlugins=getInvoicePlugins();
+  for (  final InvoicePluginApi invoicePlugin : invoicePlugins) {
+    final List<InvoiceItem> items=invoicePlugin.getAdditionalInvoiceItems(clonedInvoice,isDryRun,ImmutableList.<PluginProperty>of(),callContext);
+    if (items != null) {
+      for (      final InvoiceItem item : items) {
+        validateInvoiceItemFromPlugin(item,invoicePlugin);
+        additionalInvoiceItems.add(item);
+      }
+    }
+  }
+  return additionalInvoiceItems;
+}

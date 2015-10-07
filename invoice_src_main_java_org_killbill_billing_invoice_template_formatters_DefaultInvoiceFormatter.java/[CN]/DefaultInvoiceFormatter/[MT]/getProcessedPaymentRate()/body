@@ -4,20 +4,20 @@
     return null;
   }
   DateTime latestPaymentDate=null;
-  final Iterator<InvoicePayment> paymentIterator=((DefaultInvoice)invoice).getPayments().iterator();
+  final Iterator<InvoicePayment> paymentIterator=invoice.getPayments().iterator();
   while (paymentIterator.hasNext()) {
     final InvoicePayment cur=paymentIterator.next();
     latestPaymentDate=latestPaymentDate != null && latestPaymentDate.isAfter(cur.getPaymentDate()) ? latestPaymentDate : cur.getPaymentDate();
   }
   try {
     final CurrencyConversion conversion=currencyConversionApi.getCurrencyConversion(currency,latestPaymentDate);
-    for (    Rate rate : conversion.getRates()) {
+    for (    final Rate rate : conversion.getRates()) {
       if (rate.getCurrency() == getCurrency()) {
         return rate.getValue().toString();
       }
     }
   }
- catch (  CurrencyConversionException e) {
+ catch (  final CurrencyConversionException e) {
     logger.warn("Failed to retrieve currency conversion rates for currency = " + currency + " and date = "+ latestPaymentDate,e);
     return null;
   }
