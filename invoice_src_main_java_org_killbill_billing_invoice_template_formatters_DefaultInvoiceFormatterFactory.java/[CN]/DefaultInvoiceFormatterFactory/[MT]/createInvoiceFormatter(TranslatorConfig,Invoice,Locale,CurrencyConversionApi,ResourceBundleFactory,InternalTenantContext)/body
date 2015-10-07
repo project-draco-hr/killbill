@@ -1,3 +1,12 @@
 {
-  return new DefaultInvoiceFormatter(config,invoice,locale,currencyConversionApi,bundleFactory,context);
+  Map<Currency,Locale> currencyLocaleMap=new HashMap<Currency,Locale>();
+  for (  Locale localeItem : Locale.getAvailableLocales()) {
+    try {
+      java.util.Currency currency=java.util.Currency.getInstance(localeItem);
+      currencyLocaleMap.put(currency,localeItem);
+    }
+ catch (    Exception e) {
+    }
+  }
+  return new DefaultInvoiceFormatter(config,invoice,locale,currencyConversionApi,bundleFactory,context,currencyLocaleMap);
 }
