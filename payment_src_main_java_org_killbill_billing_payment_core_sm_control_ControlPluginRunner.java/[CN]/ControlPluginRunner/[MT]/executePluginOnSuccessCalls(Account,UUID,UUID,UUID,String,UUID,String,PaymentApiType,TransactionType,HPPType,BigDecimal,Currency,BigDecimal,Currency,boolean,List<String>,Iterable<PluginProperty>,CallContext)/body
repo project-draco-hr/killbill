@@ -5,7 +5,9 @@
     final PaymentControlPluginApi plugin=paymentControlPluginRegistry.getServiceForName(pluginName);
     if (plugin != null) {
       try {
+        log.debug("Calling onSuccessCall of plugin {}",pluginName);
         final OnSuccessPaymentControlResult result=plugin.onSuccessCall(inputPaymentControlContext,inputPluginProperties);
+        log.debug("Successful executed onSuccessCall of plugin {}",pluginName);
         if (result.getAdjustedPluginProperties() != null) {
           inputPluginProperties=result.getAdjustedPluginProperties();
         }

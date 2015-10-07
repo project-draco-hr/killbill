@@ -1,0 +1,12 @@
+{
+  final Logger regularLogger=LoggerFactory.getLogger(loggingClass);
+  final SpyLogger spyLogger=new SpyLogger(loggingClass.getName());
+  try {
+    injectLoggerIntoLoggerFactory(loggingClass,spyLogger);
+    callable.call();
+  }
+  finally {
+    injectLoggerIntoLoggerFactory(loggingClass,regularLogger);
+  }
+  return spyLogger;
+}

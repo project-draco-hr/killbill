@@ -1,0 +1,23 @@
+{
+  final Account account=paymentStateContext.getAccount();
+  logger.debug("Dispatching plugin call for account {}",account.getExternalKey());
+  try {
+    final Callable<PluginDispatcherReturnType<OperationResult>> task=new CallableWithAccountLock<OperationResult,ExceptionType>(locker,account.getExternalKey(),paymentConfig,callback);
+    logger.debug("Calling plugin(s) {}",pluginNames);
+    final OperationResult operationResult=paymentPluginDispatcher.dispatchWithTimeout(task);
+    logger.debug("Successful plugin(s) call of {} for account {} with result {}",pluginNames,account.getExternalKey(),operationResult);
+    return operationResult;
+  }
+ catch (  final ExecutionException e) {
+    throw unwrapExceptionFromDispatchedTask(paymentStateContext,e);
+  }
+catch (  final TimeoutException e) {
+    logger.warn("TimeoutException while executing the plugin(s) {}",pluginNames);
+    throw unwrapExceptionFromDispatchedTask(paymentStateContext,e);
+  }
+catch (  final InterruptedException e) {
+    Thread.currentThread().interrupt();
+    logger.warn("InterruptedException while executing the following plugin(s): {}",pluginNames);
+    throw unwrapExceptionFromDispatchedTask(paymentStateContext,e);
+  }
+}

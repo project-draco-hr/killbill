@@ -1,8 +1,9 @@
 {
   try {
-    this.plugin=daoHelper.getPaymentProviderPlugin();
+    final String pluginName=daoHelper.getPaymentProviderPluginName();
+    this.plugin=daoHelper.getPaymentPluginApi(pluginName);
     if (paymentStateContext.shouldLockAccountAndDispatch()) {
-      return doOperationCallbackWithDispatchAndAccountLock();
+      return doOperationCallbackWithDispatchAndAccountLock(pluginName);
     }
  else {
       return doSimpleOperationCallback();

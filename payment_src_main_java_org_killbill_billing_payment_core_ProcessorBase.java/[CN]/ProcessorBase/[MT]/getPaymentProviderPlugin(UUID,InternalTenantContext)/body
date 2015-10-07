@@ -1,8 +1,4 @@
 {
-  final PaymentMethodModelDao methodDao=paymentDao.getPaymentMethodIncludedDeleted(paymentMethodId,context);
-  if (methodDao == null) {
-    log.error("PaymentMethod does not exist",paymentMethodId);
-    throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,paymentMethodId);
-  }
-  return getPaymentPluginApi(methodDao.getPluginName());
+  final String pluginName=getPaymentProviderPluginName(paymentMethodId,context);
+  return getPaymentPluginApi(pluginName);
 }
