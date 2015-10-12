@@ -13,7 +13,8 @@
   for (  final Invoice invoice : unpaidInvoices) {
     final BigDecimal amountToPay=(remainingRequestPayment.compareTo(invoice.getBalance()) >= 0) ? invoice.getBalance() : remainingRequestPayment;
     if (amountToPay.compareTo(BigDecimal.ZERO) > 0) {
-      createPurchaseForInvoice(account,invoice.getId(),amountToPay,externalPayment,pluginProperties,callContext);
+      final UUID paymentMethodId=externalPayment ? null : account.getPaymentMethodId();
+      createPurchaseForInvoice(account,invoice.getId(),amountToPay,paymentMethodId,externalPayment,pluginProperties,callContext);
     }
     remainingRequestPayment=remainingRequestPayment.subtract(amountToPay);
     if (remainingRequestPayment.compareTo(BigDecimal.ZERO) == 0) {

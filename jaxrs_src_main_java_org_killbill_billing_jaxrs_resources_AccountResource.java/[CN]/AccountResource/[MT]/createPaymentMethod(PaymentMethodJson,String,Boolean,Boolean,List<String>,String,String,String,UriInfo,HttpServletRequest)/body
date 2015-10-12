@@ -13,7 +13,7 @@
   final UUID paymentMethodId=paymentApi.addPaymentMethod(account,data.getExternalKey(),data.getPluginName(),isDefault,data.getPluginDetail(),pluginProperties,callContext);
   if (payAllUnpaidInvoices && unpaidInvoices.size() > 0) {
     for (    final Invoice invoice : unpaidInvoices) {
-      createPurchaseForInvoice(account,invoice.getId(),invoice.getBalance(),false,pluginProperties,callContext);
+      createPurchaseForInvoice(account,invoice.getId(),invoice.getBalance(),paymentMethodId,false,pluginProperties,callContext);
     }
   }
   return uriBuilder.buildResponse(PaymentMethodResource.class,"getPaymentMethod",paymentMethodId,uriInfo.getBaseUri().toString());
