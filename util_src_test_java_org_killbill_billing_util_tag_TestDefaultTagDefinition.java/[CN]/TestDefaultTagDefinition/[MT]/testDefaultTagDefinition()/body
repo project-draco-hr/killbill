@@ -1,0 +1,15 @@
+{
+  final DefaultTagDefinition def1=new DefaultTagDefinition(UUID.randomUUID(),"foo","nothing",false);
+  Assert.assertTrue(def1.getApplicableObjectTypes().isEmpty());
+  for (  final ControlTagType cur : ControlTagType.values()) {
+    final DefaultTagDefinition curDef=new DefaultTagDefinition(cur.getId(),cur.name(),cur.getDescription(),true);
+    Assert.assertFalse(curDef.getApplicableObjectTypes().isEmpty());
+    Assert.assertEquals(curDef.getApplicableObjectTypes(),cur.getApplicableObjectTypes());
+  }
+  try {
+    new DefaultTagDefinition(UUID.randomUUID(),"bar","nothing again",true);
+    Assert.fail("Not a control tag type");
+  }
+ catch (  final IllegalStateException e) {
+  }
+}
