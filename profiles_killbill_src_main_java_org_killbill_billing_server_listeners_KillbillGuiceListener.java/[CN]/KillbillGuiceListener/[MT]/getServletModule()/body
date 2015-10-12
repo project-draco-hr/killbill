@@ -2,7 +2,7 @@
   final BaseServerModuleBuilder builder=new BaseServerModuleBuilder().setJaxrsUriPattern("/" + SWAGGER_PATH + "|((/"+ SWAGGER_PATH+ "|"+ JaxRsResourceBase.PREFIX+ "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*)").addJaxrsResource("org.killbill.billing.jaxrs.mappers").addJaxrsResource("org.killbill.billing.jaxrs.resources").addJaxrsResource("com.wordnik.swagger.jersey.listing");
   builder.addJerseyFilter("com.sun.jersey.api.container.filter.LoggingFilter");
   builder.addJerseyParam("com.sun.jersey.config.feature.DisableWADL","true");
-  if (Boolean.valueOf(System.getProperty(ENABLE_HTTP_GZIP_RESPONSES,"false"))) {
+  if (config.isConfiguredToReturnGZIPResponses()) {
     logger.info("Enable http gzip responses");
     builder.addJerseyFilter(GZIPContentEncodingFilter.class.getName());
   }
