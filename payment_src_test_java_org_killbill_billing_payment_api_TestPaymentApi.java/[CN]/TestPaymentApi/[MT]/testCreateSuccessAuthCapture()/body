@@ -22,8 +22,8 @@
   assertEquals(payment.getTransactions().get(0).getProcessedCurrency(),Currency.AED);
   assertEquals(payment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
   assertEquals(payment.getTransactions().get(0).getTransactionType(),TransactionType.AUTHORIZE);
-  assertNull(payment.getTransactions().get(0).getGatewayErrorMsg());
-  assertNull(payment.getTransactions().get(0).getGatewayErrorCode());
+  assertNotNull(payment.getTransactions().get(0).getGatewayErrorMsg());
+  assertNotNull(payment.getTransactions().get(0).getGatewayErrorCode());
   final Payment payment2=paymentApi.createCapture(account,payment.getId(),captureAmount,Currency.AED,transactionExternalKey2,ImmutableList.<PluginProperty>of(),callContext);
   assertEquals(payment2.getExternalKey(),paymentExternalKey);
   assertEquals(payment2.getPaymentMethodId(),account.getPaymentMethodId());
@@ -42,6 +42,6 @@
   assertEquals(payment2.getTransactions().get(1).getProcessedCurrency(),Currency.AED);
   assertEquals(payment2.getTransactions().get(1).getTransactionStatus(),TransactionStatus.SUCCESS);
   assertEquals(payment2.getTransactions().get(1).getTransactionType(),TransactionType.CAPTURE);
-  assertNull(payment2.getTransactions().get(1).getGatewayErrorMsg());
-  assertNull(payment2.getTransactions().get(1).getGatewayErrorCode());
+  assertNotNull(payment2.getTransactions().get(1).getGatewayErrorMsg());
+  assertNotNull(payment2.getTransactions().get(1).getGatewayErrorCode());
 }
