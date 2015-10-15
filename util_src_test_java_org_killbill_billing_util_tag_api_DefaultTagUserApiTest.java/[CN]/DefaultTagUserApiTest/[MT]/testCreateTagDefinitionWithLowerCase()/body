@@ -1,0 +1,8 @@
+{
+  final String tagDefinitionName="lowercase";
+  final TagDefinitionModelDao tagDefinitionModelDao=new TagDefinitionModelDao();
+  tagDefinitionModelDao.setName(tagDefinitionName);
+  Mockito.when(tagDefinitionDao.create(Mockito.anyString(),Mockito.anyString(),Mockito.any(InternalCallContext.class))).thenReturn(tagDefinitionModelDao);
+  final TagDefinition tagDefinition=tagUserApi.createTagDefinition(tagDefinitionName,"description",context);
+  assertEquals(tagDefinitionName,tagDefinition.getName());
+}
