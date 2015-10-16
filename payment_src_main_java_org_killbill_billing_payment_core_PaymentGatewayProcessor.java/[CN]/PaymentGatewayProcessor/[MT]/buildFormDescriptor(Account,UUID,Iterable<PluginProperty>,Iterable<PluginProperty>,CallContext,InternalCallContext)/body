@@ -1,7 +1,8 @@
 {
-  return dispatchWithExceptionHandling(account,new Callable<PluginDispatcherReturnType<HostedPaymentPageFormDescriptor>>(){
+  final String pluginName=getPaymentProviderPluginName(paymentMethodId,internalCallContext);
+  return dispatchWithExceptionHandling(account,pluginName,new Callable<PluginDispatcherReturnType<HostedPaymentPageFormDescriptor>>(){
     @Override public PluginDispatcherReturnType<HostedPaymentPageFormDescriptor> call() throws PaymentApiException {
-      final PaymentPluginApi plugin=getPaymentProviderPlugin(paymentMethodId,internalCallContext);
+      final PaymentPluginApi plugin=getPaymentPluginApi(pluginName);
       try {
         final HostedPaymentPageFormDescriptor result=plugin.buildFormDescriptor(account.getId(),customFields,properties,callContext);
         return PluginDispatcher.createPluginDispatcherReturnType(result == null ? new DefaultNoOpHostedPaymentPageFormDescriptor(account.getId()) : result);

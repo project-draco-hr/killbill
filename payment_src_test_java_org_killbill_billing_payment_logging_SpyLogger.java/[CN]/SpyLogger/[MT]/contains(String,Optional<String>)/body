@@ -1,0 +1,11 @@
+{
+  Pattern pattern=Pattern.compile(regex);
+  for (  LogMessage logMessage : logMessageList) {
+    final boolean messageMatches=pattern.matcher(logMessage.message).find();
+    final boolean logLevelMatches=logLevel.isPresent() ? logLevel.get().equals(logMessage.logLevel) : true;
+    if (messageMatches && logLevelMatches) {
+      return true;
+    }
+  }
+  return false;
+}

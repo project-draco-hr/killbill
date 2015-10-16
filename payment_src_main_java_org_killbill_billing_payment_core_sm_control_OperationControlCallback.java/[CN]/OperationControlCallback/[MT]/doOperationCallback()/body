@@ -1,5 +1,7 @@
 {
-  return dispatchWithAccountLockAndTimeout(new DispatcherCallback<PluginDispatcherReturnType<OperationResult>,OperationException>(){
+  final List<String> pluginNameList=paymentStateControlContext.getPaymentControlPluginNames();
+  final String pluginNames=JOINER.join(pluginNameList);
+  return dispatchWithAccountLockAndTimeout(pluginNames,new DispatcherCallback<PluginDispatcherReturnType<OperationResult>,OperationException>(){
     @Override public PluginDispatcherReturnType<OperationResult> doOperation() throws OperationException {
       final PaymentControlContext paymentControlContext=new DefaultPaymentControlContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),PaymentApiType.PAYMENT_TRANSACTION,paymentStateContext.getTransactionType(),null,paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateControlContext.isApiPayment(),paymentStateContext.getCallContext());
       final PriorPaymentControlResult pluginResult;
