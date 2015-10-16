@@ -1,0 +1,28 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  final String paymentExternalKey="externalKey";
+  final String transactionExternalKey="transactionKey";
+  final Payment payment=paymentApi.createPurchase(account,account.getPaymentMethodId(),null,requestedAmount,Currency.AED,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  final Payment paymentPluginInfoFalse=paymentApi.getPayment(payment.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
+  final Payment paymentPluginInfoTrue=paymentApi.getPayment(payment.getId(),true,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(paymentPluginInfoFalse.getAccountId(),paymentPluginInfoTrue.getAccountId());
+  Assert.assertEquals(paymentPluginInfoFalse.getTransactions().size(),paymentPluginInfoTrue.getTransactions().size());
+  Assert.assertEquals(paymentPluginInfoFalse.getExternalKey(),paymentPluginInfoTrue.getExternalKey());
+  Assert.assertEquals(paymentPluginInfoFalse.getPaymentMethodId(),paymentPluginInfoTrue.getPaymentMethodId());
+  Assert.assertEquals(paymentPluginInfoFalse.getAccountId(),paymentPluginInfoTrue.getAccountId());
+  Assert.assertEquals(paymentPluginInfoFalse.getAuthAmount().compareTo(paymentPluginInfoTrue.getAuthAmount()),0);
+  Assert.assertEquals(paymentPluginInfoFalse.getCapturedAmount().compareTo(paymentPluginInfoTrue.getCapturedAmount()),0);
+  Assert.assertEquals(paymentPluginInfoFalse.getPurchasedAmount().compareTo(paymentPluginInfoTrue.getPurchasedAmount()),0);
+  Assert.assertEquals(paymentPluginInfoFalse.getRefundedAmount().compareTo(paymentPluginInfoTrue.getRefundedAmount()),0);
+  Assert.assertEquals(paymentPluginInfoFalse.getCurrency(),paymentPluginInfoTrue.getCurrency());
+  for (int i=0; i < paymentPluginInfoFalse.getTransactions().size(); i++) {
+    final PaymentTransaction noPluginInfoPaymentTransaction=paymentPluginInfoFalse.getTransactions().get(i);
+    final PaymentTransaction paymentTransaction=paymentPluginInfoTrue.getTransactions().get(i);
+    Assert.assertEquals(noPluginInfoPaymentTransaction.getAmount().compareTo(paymentTransaction.getAmount()),0);
+    Assert.assertEquals(noPluginInfoPaymentTransaction.getProcessedAmount().compareTo(paymentTransaction.getProcessedAmount()),0);
+    Assert.assertEquals(noPluginInfoPaymentTransaction.getCurrency(),paymentTransaction.getCurrency());
+    Assert.assertEquals(noPluginInfoPaymentTransaction.getExternalKey(),paymentTransaction.getExternalKey());
+    Assert.assertEquals(noPluginInfoPaymentTransaction.getTransactionStatus(),paymentTransaction.getTransactionStatus());
+    Assert.assertEquals(noPluginInfoPaymentTransaction.getPaymentInfoPlugin(),paymentTransaction.getPaymentInfoPlugin());
+  }
+}

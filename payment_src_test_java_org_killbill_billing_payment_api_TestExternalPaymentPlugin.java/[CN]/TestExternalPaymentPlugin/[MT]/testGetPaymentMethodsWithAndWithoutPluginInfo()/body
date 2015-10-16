@@ -1,0 +1,19 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  final String paymentExternalKey="externalKey";
+  final String transactionExternalKey="transactionKey";
+  final Payment payment=paymentApi.createPurchase(account,account.getPaymentMethodId(),null,requestedAmount,Currency.AED,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  final Pagination<PaymentMethod> paymentMethods=paymentApi.getPaymentMethods(0L,10L,false,null,callContext);
+  final Pagination<PaymentMethod> paymentMethodsPlugin=paymentApi.getPaymentMethods(0L,10L,true,null,callContext);
+  Assert.assertTrue(paymentMethods.getTotalNbRecords() == 1);
+  Assert.assertTrue(paymentMethodsPlugin.getTotalNbRecords() == 1);
+  PaymentMethod paymentMethod=paymentMethods.iterator().next();
+  PaymentMethod paymentMethodPlugin=paymentMethodsPlugin.iterator().next();
+  Assert.assertEquals(paymentMethod.getAccountId(),paymentMethodPlugin.getAccountId());
+  Assert.assertEquals(paymentMethod.getId(),paymentMethodPlugin.getId());
+  Assert.assertEquals(paymentMethod.getExternalKey(),paymentMethodPlugin.getExternalKey());
+  Assert.assertEquals(paymentMethod.getPluginName(),paymentMethodPlugin.getPluginName());
+  Assert.assertNull(paymentMethod.getPluginDetail());
+  Assert.assertNotNull(paymentMethodPlugin.getPluginDetail());
+  Assert.assertTrue(paymentMethodPlugin.getPluginDetail().getProperties().isEmpty());
+}
