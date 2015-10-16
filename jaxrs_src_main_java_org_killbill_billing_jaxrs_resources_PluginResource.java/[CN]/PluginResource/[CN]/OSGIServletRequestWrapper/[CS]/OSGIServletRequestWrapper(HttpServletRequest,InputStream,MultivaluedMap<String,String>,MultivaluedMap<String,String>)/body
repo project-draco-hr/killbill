@@ -1,0 +1,18 @@
+{
+  super(request);
+  this.inputStream=inputStream;
+  this.parameterMap=new HashMap<String,String[]>();
+  final LinkedHashMultimap<String,String> tmpParameterMap=LinkedHashMultimap.<String,String>create();
+  for (  final String formDataKey : formData.keySet()) {
+    tmpParameterMap.putAll(formDataKey,formData.get(formDataKey));
+  }
+  for (  final String queryParameterKey : queryParameters.keySet()) {
+    tmpParameterMap.putAll(queryParameterKey,queryParameters.get(queryParameterKey));
+  }
+  for (  final String parameterKey : request.getParameterMap().keySet()) {
+    tmpParameterMap.putAll(parameterKey,ImmutableList.<String>copyOf(request.getParameterMap().get(parameterKey)));
+  }
+  for (  final String value : tmpParameterMap.keys()) {
+    parameterMap.put(value,tmpParameterMap.get(value).toArray(new String[0]));
+  }
+}
