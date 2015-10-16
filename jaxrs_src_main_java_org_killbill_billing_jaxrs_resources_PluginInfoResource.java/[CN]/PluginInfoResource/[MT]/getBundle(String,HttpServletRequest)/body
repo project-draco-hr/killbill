@@ -1,3 +1,8 @@
 {
-  return Response.status(Status.OK).entity(ImmutableList.copyOf(pluginsInfoApi.getPluginsInfo())).build();
+  return Response.status(Status.OK).entity(ImmutableList.copyOf(Iterables.transform(pluginsInfoApi.getPluginsInfo(),new Function<PluginInfo,PluginInfoJson>(){
+    @Override public PluginInfoJson apply(    final PluginInfo input){
+      return new PluginInfoJson(input);
+    }
+  }
+))).build();
 }
