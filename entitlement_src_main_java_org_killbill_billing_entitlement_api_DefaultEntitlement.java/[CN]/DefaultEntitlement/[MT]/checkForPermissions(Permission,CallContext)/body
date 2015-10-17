@@ -1,0 +1,10 @@
+{
+  if (SecurityUtils.getSubject().isAuthenticated()) {
+    try {
+      securityApi.checkCurrentUserPermissions(ImmutableList.of(permission),Logical.AND,callContext);
+    }
+ catch (    final SecurityApiException e) {
+      throw new EntitlementApiException(ErrorCode.SECURITY_INVALID_PERMISSIONS,permission.toString());
+    }
+  }
+}

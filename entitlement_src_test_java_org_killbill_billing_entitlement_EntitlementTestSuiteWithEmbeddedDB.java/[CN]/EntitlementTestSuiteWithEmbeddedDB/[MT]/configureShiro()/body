@@ -1,0 +1,11 @@
+{
+  final Ini config=new Ini();
+  config.addSection("users");
+  config.getSection("users").put("EntitlementUser","password, entitlement");
+  config.addSection("roles");
+  config.getSection("roles").put("entitlement",Permission.ACCOUNT_CAN_CREATE.toString() + "," + Permission.ENTITLEMENT_CAN_CREATE.toString()+ ","+ Permission.ENTITLEMENT_CAN_CHANGE_PLAN.toString()+ ","+ Permission.ENTITLEMENT_CAN_PAUSE_RESUME.toString()+ ","+ Permission.ENTITLEMENT_CAN_TRANSFER.toString()+ ","+ Permission.ENTITLEMENT_CAN_CANCEL.toString());
+  ThreadContext.unbindSecurityManager();
+  final Factory<SecurityManager> factory=new IniSecurityManagerFactory(config);
+  final SecurityManager securityManager=factory.getInstance();
+  SecurityUtils.setSecurityManager(securityManager);
+}
