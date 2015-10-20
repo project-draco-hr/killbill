@@ -1,8 +1,9 @@
 {
-  final UUID accountId=internalCallContextFactory.getAccountId(entitlementId,ObjectType.SUBSCRIPTION,context);
   final AccountEntitlements accountEntitlements;
   try {
-    accountEntitlements=entitlementInternalApi.getAllEntitlementsForAccountId(accountId,context);
+    final UUID accountId=internalCallContextFactory.getAccountId(entitlementId,ObjectType.SUBSCRIPTION,tenantContext);
+    final InternalTenantContext internalTenantContextWithValidAccountRecordId=internalCallContextFactory.createInternalTenantContext(accountId,tenantContext);
+    accountEntitlements=entitlementInternalApi.getAllEntitlementsForAccountId(accountId,internalTenantContextWithValidAccountRecordId);
   }
  catch (  final EntitlementApiException e) {
     throw new SubscriptionApiException(e);

@@ -1,41 +1,4 @@
 {
-  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.RESUME_SUBSCRIPTION,null,null,bundleId,null,null,null,localEffectiveDate,properties,context);
-  final WithEntitlementPlugin<Void> resumeWithPlugin=new WithEntitlementPlugin<Void>(){
-    @Override public Void doCall(    final EntitlementApi entitlementApi,    final EntitlementContext updatedPluginContext) throws EntitlementApiException {
-      try {
-        final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundleId,ObjectType.BUNDLE,context);
-        final SubscriptionBaseBundle bundle=subscriptionBaseInternalApi.getBundleFromId(bundleId,contextWithValidAccountRecordId);
-        final ImmutableAccountData account=accountApi.getImmutableAccountDataById(bundle.getAccountId(),contextWithValidAccountRecordId);
-        final SubscriptionBase baseSubscription=subscriptionBaseInternalApi.getBaseSubscription(bundleId,contextWithValidAccountRecordId);
-        final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),baseSubscription.getStartDate(),contextWithValidAccountRecordId);
-        if (!dateHelper.isBeforeOrEqualsToday(effectiveDate,account.getTimeZone())) {
-          recordPauseResumeNotificationEntry(baseSubscription.getId(),bundleId,effectiveDate,false,contextWithValidAccountRecordId);
-          return null;
-        }
-        final BlockingState currentState=blockingStateDao.getBlockingStateForService(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,EntitlementService.ENTITLEMENT_SERVICE_NAME,contextWithValidAccountRecordId);
-        if (currentState == null || currentState.getStateName().equals(ENT_STATE_CLEAR)) {
-          log.warn("Current state is {}, nothing to resume",currentState);
-          return null;
-        }
-        final BlockingState state=new DefaultBlockingState(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,ENT_STATE_CLEAR,EntitlementService.ENTITLEMENT_SERVICE_NAME,false,false,false,effectiveDate);
-        entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(state,contextWithValidAccountRecordId);
-        final DefaultEffectiveEntitlementEvent event=new DefaultEffectiveEntitlementEvent(state.getId(),baseSubscription.getId(),bundleId,bundle.getAccountId(),EntitlementTransitionType.UNBLOCK_BUNDLE,effectiveDate,clock.getUTCNow(),contextWithValidAccountRecordId.getAccountRecordId(),contextWithValidAccountRecordId.getTenantRecordId(),contextWithValidAccountRecordId.getUserToken());
-        try {
-          eventBus.post(event);
-        }
- catch (        EventBusException e) {
-          log.warn("Failed to post bus event for resume operation on bundle " + bundleId);
-        }
-      }
- catch (      SubscriptionBaseApiException e) {
-        throw new EntitlementApiException(e);
-      }
-catch (      AccountApiException e) {
-        throw new EntitlementApiException(e);
-      }
-      return null;
-    }
-  }
-;
-  pluginExecution.executeWithPlugin(resumeWithPlugin,pluginContext);
+  final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(bundleId,ObjectType.BUNDLE,context);
+  super.resume(bundleId,localEffectiveDate,properties,contextWithValidAccountRecordId);
 }

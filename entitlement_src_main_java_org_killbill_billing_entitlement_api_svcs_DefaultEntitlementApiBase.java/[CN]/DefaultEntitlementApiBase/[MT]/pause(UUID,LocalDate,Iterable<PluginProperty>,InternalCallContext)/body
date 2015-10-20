@@ -1,0 +1,39 @@
+{
+  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.PAUSE_SUBSCRIPTION,null,null,bundleId,null,null,null,localEffectiveDate,properties,internalCallContextFactory.createCallContext(internalCallContext));
+  final WithEntitlementPlugin<Void> pauseWithPlugin=new WithEntitlementPlugin<Void>(){
+    @Override public Void doCall(    final EntitlementApi entitlementApi,    final EntitlementContext updatedPluginContext) throws EntitlementApiException {
+      try {
+        final BlockingState currentState=blockingStateDao.getBlockingStateForService(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalCallContext);
+        if (currentState != null && currentState.getStateName().equals(DefaultEntitlementApi.ENT_STATE_BLOCKED)) {
+          throw new EntitlementApiException(ErrorCode.ENT_ALREADY_BLOCKED,bundleId);
+        }
+        final SubscriptionBaseBundle bundle=subscriptionInternalApi.getBundleFromId(bundleId,internalCallContext);
+        final ImmutableAccountData account=accountApi.getImmutableAccountDataById(bundle.getAccountId(),internalCallContext);
+        final SubscriptionBase baseSubscription=subscriptionInternalApi.getBaseSubscription(bundleId,internalCallContext);
+        final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),baseSubscription.getStartDate(),internalCallContext);
+        if (!dateHelper.isBeforeOrEqualsToday(effectiveDate,account.getTimeZone())) {
+          recordPauseResumeNotificationEntry(baseSubscription.getId(),bundleId,effectiveDate,true,internalCallContext);
+          return null;
+        }
+        final BlockingState state=new DefaultBlockingState(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,DefaultEntitlementApi.ENT_STATE_BLOCKED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,true,effectiveDate);
+        entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(state,internalCallContext);
+        final DefaultEffectiveEntitlementEvent event=new DefaultEffectiveEntitlementEvent(state.getId(),baseSubscription.getId(),bundleId,bundle.getAccountId(),EntitlementTransitionType.BLOCK_BUNDLE,effectiveDate,clock.getUTCNow(),internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId(),internalCallContext.getUserToken());
+        try {
+          eventBus.post(event);
+        }
+ catch (        EventBusException e) {
+          log.warn("Failed to post bus event for pause operation on bundle " + bundleId);
+        }
+      }
+ catch (      SubscriptionBaseApiException e) {
+        throw new EntitlementApiException(e);
+      }
+catch (      AccountApiException e) {
+        throw new EntitlementApiException(e);
+      }
+      return null;
+    }
+  }
+;
+  pluginExecution.executeWithPlugin(pauseWithPlugin,pluginContext);
+}

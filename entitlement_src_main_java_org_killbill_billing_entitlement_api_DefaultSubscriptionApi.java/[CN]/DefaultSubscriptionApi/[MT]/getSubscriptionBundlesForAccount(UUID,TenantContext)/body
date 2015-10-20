@@ -1,7 +1,8 @@
 {
   final AccountEntitlements accountEntitlements;
   try {
-    accountEntitlements=entitlementInternalApi.getAllEntitlementsForAccountId(accountId,tenantContext);
+    final InternalTenantContext internalTenantContextWithValidAccountRecordId=internalCallContextFactory.createInternalTenantContext(accountId,tenantContext);
+    accountEntitlements=entitlementInternalApi.getAllEntitlementsForAccountId(accountId,internalTenantContextWithValidAccountRecordId);
   }
  catch (  final EntitlementApiException e) {
     throw new SubscriptionApiException(e);
