@@ -5,7 +5,7 @@
   final WithAccountLock withAccountLock=new WithAccountLock(){
     @Override public Iterable<Invoice> prepareInvoices() throws InvoiceApiException {
       final Invoice invoice=getInvoiceAndCheckCurrency(invoiceId,currency,context);
-      final InvoiceItem adjustmentItem=invoiceApiHelper.createAdjustmentItem(invoice,invoiceItemId,amount,currency,effectiveDate,internalCallContextFactory.createInternalCallContext(context));
+      final InvoiceItem adjustmentItem=invoiceApiHelper.createAdjustmentItem(invoice,invoiceItemId,amount,currency,effectiveDate,internalCallContextFactory.createInternalCallContext(accountId,context));
       invoice.addInvoiceItem(adjustmentItem);
       return ImmutableList.<Invoice>of(invoice);
     }

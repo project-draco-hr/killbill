@@ -1,7 +1,7 @@
 {
-  final Builder<UUID,BigDecimal> invoiceItemIdsWithAmountsBuilder=new Builder<UUID,BigDecimal>();
+  final Map<UUID,BigDecimal> outputItemIdsWithAmounts=new HashMap<UUID,BigDecimal>();
   if (invoiceItemIdsWithNullAmounts.size() == 0) {
-    return invoiceItemIdsWithAmountsBuilder.build();
+    return outputItemIdsWithAmounts;
   }
   final InvoiceModelDao invoice=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class).getById(invoiceId,context);
   if (invoice != null) {
@@ -11,16 +11,8 @@
     throw new IllegalStateException("Invoice shouldn't be null for id " + invoiceId);
   }
   for (  final UUID invoiceItemId : invoiceItemIdsWithNullAmounts.keySet()) {
-    final BigDecimal originalItemAmount=getInvoiceItemAmountForId(invoice,invoiceItemId);
-    final BigDecimal maxAdjAmount=computeItemAdjustmentAmount(invoiceItemId,originalItemAmount,invoice.getInvoiceItems());
-    final BigDecimal proposedItemAmount=invoiceItemIdsWithNullAmounts.get(invoiceItemId);
-    if (proposedItemAmount != null && proposedItemAmount.compareTo(maxAdjAmount) > 0) {
-      throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_ADJUSTMENT_AMOUNT_INVALID,proposedItemAmount,maxAdjAmount);
-    }
-    final BigDecimal itemAmountToAdjust=Objects.firstNonNull(proposedItemAmount,maxAdjAmount);
-    if (itemAmountToAdjust.compareTo(BigDecimal.ZERO) > 0) {
-      invoiceItemIdsWithAmountsBuilder.put(invoiceItemId,itemAmountToAdjust);
-    }
+    final List<InvoiceItemModelDao> adjustedOrRepairedItems=entitySqlDaoWrapperFactory.become(InvoiceItemSqlDao.class).getAdjustedOrRepairedInvoiceItemsByLinkedId(invoiceItemId.toString(),context);
+    computeItemAdjustmentsForTargetInvoiceItem(getInvoiceItemForId(invoice,invoiceItemId),adjustedOrRepairedItems,invoiceItemIdsWithNullAmounts,outputItemIdsWithAmounts);
   }
-  return invoiceItemIdsWithAmountsBuilder.build();
+  return outputItemIdsWithAmounts;
 }

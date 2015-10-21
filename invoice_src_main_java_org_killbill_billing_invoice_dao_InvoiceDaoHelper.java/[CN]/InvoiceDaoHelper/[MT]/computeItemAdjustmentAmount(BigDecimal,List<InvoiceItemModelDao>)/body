@@ -1,0 +1,7 @@
+{
+  BigDecimal positiveAdjustedOrRepairedAmount=BigDecimal.ZERO;
+  for (  final InvoiceItemModelDao cur : adjustedOrRepairedItems) {
+    positiveAdjustedOrRepairedAmount=positiveAdjustedOrRepairedAmount.add(cur.getAmount().negate());
+  }
+  return (positiveAdjustedOrRepairedAmount.compareTo(requestedPositiveAmountToAdjust) >= 0) ? BigDecimal.ZERO : requestedPositiveAmountToAdjust.subtract(positiveAdjustedOrRepairedAmount);
+}

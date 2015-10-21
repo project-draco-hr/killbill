@@ -8,10 +8,13 @@
   if (invoiceItemToBeAdjusted == null) {
     throw new InvoiceApiException(ErrorCode.INVOICE_ITEM_NOT_FOUND,invoiceItemId);
   }
-  final BigDecimal amountToAdjust=Objects.firstNonNull(positiveAdjAmount,invoiceItemToBeAdjusted.getAmount());
   final Currency currencyForAdjustment=Objects.firstNonNull(currency,invoiceItemToBeAdjusted.getCurrency());
   if (invoiceItemToBeAdjusted.getCurrency() != currencyForAdjustment) {
     throw new InvoiceApiException(ErrorCode.CURRENCY_INVALID,currency,invoiceItemToBeAdjusted.getCurrency());
   }
-  return new ItemAdjInvoiceItem(UUIDs.randomUUID(),context.getCreatedDate(),invoiceItemToBeAdjusted.getInvoiceId(),invoiceItemToBeAdjusted.getAccountId(),effectiveDate,null,amountToAdjust.negate(),currencyForAdjustment,invoiceItemToBeAdjusted.getId());
+  final Map<UUID,BigDecimal> input=new HashMap<UUID,BigDecimal>();
+  input.put(invoiceItemId,positiveAdjAmount);
+  final Map<UUID,BigDecimal> output=dao.computeItemAdjustments(invoiceToBeAdjusted.getId().toString(),input,context);
+  final BigDecimal amountToAdjust=output.get(invoiceItemId).negate();
+  return new ItemAdjInvoiceItem(UUIDs.randomUUID(),context.getCreatedDate(),invoiceItemToBeAdjusted.getInvoiceId(),invoiceItemToBeAdjusted.getAccountId(),effectiveDate,null,amountToAdjust,currencyForAdjustment,invoiceItemToBeAdjusted.getId());
 }

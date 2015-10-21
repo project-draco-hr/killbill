@@ -1,0 +1,8 @@
+{
+  return transactionalSqlDao.execute(InvoiceApiException.class,new EntitySqlDaoTransactionWrapper<Map<UUID,BigDecimal>>(){
+    @Override public Map<UUID,BigDecimal> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
+      return invoiceDaoHelper.computeItemAdjustments(invoiceId,entitySqlDaoWrapperFactory,invoiceItemIdsWithNullAmounts,context);
+    }
+  }
+);
+}
