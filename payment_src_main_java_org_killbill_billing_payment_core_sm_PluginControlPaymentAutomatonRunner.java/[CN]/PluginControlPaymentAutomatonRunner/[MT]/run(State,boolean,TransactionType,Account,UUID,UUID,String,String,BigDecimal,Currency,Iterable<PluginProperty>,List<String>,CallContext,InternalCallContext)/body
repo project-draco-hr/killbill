@@ -13,6 +13,9 @@ catch (  final OperationException e) {
     if (e.getCause() instanceof PaymentApiException) {
       throw (PaymentApiException)e.getCause();
     }
+ else     if (e.getCause() instanceof PaymentControlApiException && e.getCause().getCause() instanceof PaymentApiException) {
+      throw (PaymentApiException)e.getCause().getCause();
+    }
  else     if (e.getCause() != null || paymentStateContext.getResult() == null) {
       throw new PaymentApiException(e.getCause(),ErrorCode.PAYMENT_INTERNAL_ERROR,MoreObjects.firstNonNull(e.getMessage(),""));
     }
