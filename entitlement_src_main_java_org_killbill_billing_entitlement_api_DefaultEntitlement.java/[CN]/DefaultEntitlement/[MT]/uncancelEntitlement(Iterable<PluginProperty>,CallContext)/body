@@ -2,7 +2,7 @@
   checkForPermissions(Permission.ENTITLEMENT_CAN_CANCEL,callContext);
   refresh(callContext);
   if (eventsStream.isSubscriptionCancelled()) {
-    throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
+    throw new EntitlementApiException(ErrorCode.SUB_UNCANCEL_BAD_STATE,getId());
   }
   final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(getAccountId(),callContext);
   final Collection<BlockingState> pendingEntitlementCancellationEvents=eventsStream.getPendingEntitlementCancellationEvents();
@@ -16,7 +16,7 @@
     }
   }
  else {
-    throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
+    throw new EntitlementApiException(ErrorCode.SUB_UNCANCEL_BAD_STATE,getId());
   }
   if (getSubscriptionBase().getFutureEndDate() != null) {
     try {
