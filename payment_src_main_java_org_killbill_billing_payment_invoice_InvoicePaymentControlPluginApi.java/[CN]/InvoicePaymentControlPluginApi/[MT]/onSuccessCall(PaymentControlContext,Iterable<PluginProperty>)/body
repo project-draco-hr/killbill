@@ -9,7 +9,7 @@ case PURCHASE:
       final UUID invoiceId=getInvoiceId(pluginProperties);
     existingInvoicePayment=invoiceApi.getInvoicePaymentForAttempt(paymentControlContext.getPaymentId(),internalContext);
   if (existingInvoicePayment != null && existingInvoicePayment.isSuccess()) {
-    log.info("onSuccessCall was already completed for payment purchase :" + paymentControlContext.getPaymentId());
+    log.info("onSuccessCall was already completed for payment purchase: " + paymentControlContext.getPaymentId());
   }
  else {
     invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),true,internalContext);
@@ -18,7 +18,7 @@ break;
 case REFUND:
 existingInvoicePayment=invoiceApi.getInvoicePaymentForRefund(paymentControlContext.getPaymentId(),internalContext);
 if (existingInvoicePayment != null) {
-log.info("onSuccessCall was already completed for payment refund :" + paymentControlContext.getPaymentId());
+log.info("onSuccessCall was already completed for payment refund: " + paymentControlContext.getPaymentId());
 }
  else {
 final Map<UUID,BigDecimal> idWithAmount=extractIdsWithAmountFromProperties(pluginProperties);
@@ -30,7 +30,7 @@ break;
 case CHARGEBACK:
 existingInvoicePayment=invoiceApi.getInvoicePaymentForChargeback(paymentControlContext.getPaymentId(),internalContext);
 if (existingInvoicePayment != null) {
-log.info("onSuccessCall was already completed for payment chargeback :" + paymentControlContext.getPaymentId());
+log.info("onSuccessCall was already completed for payment chargeback: " + paymentControlContext.getPaymentId());
 }
  else {
 invoiceApi.createChargeback(paymentControlContext.getPaymentId(),paymentControlContext.getProcessedAmount(),paymentControlContext.getProcessedCurrency(),internalContext);

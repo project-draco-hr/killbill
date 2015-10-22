@@ -1,7 +1,7 @@
 {
   if (specifiedRefundAmount != null) {
     if (specifiedRefundAmount.compareTo(BigDecimal.ZERO) <= 0) {
-      throw new PaymentControlApiException("Failed to compute refund:",new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,"You need to specify positive a refund amount"));
+      throw new PaymentControlApiException("Failed to compute refund: ",new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,"You need to specify a positive refund amount"));
     }
     return specifiedRefundAmount;
   }
@@ -12,7 +12,7 @@
       final BigDecimal specifiedItemAmount=invoiceItemIdsWithAmounts.get(itemId);
       final BigDecimal itemAmount=getAmountFromItem(items,itemId);
       if (specifiedItemAmount != null && (specifiedItemAmount.compareTo(BigDecimal.ZERO) <= 0 || specifiedItemAmount.compareTo(itemAmount) > 0)) {
-        throw new PaymentControlApiException("Failed to compute refund:",new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,"You need to specify valid invoice item amount "));
+        throw new PaymentControlApiException("Failed to compute refund: ",new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,"You need to specify a valid invoice item amount"));
       }
       amountFromItems=amountFromItems.add(Objects.firstNonNull(specifiedItemAmount,itemAmount));
     }
