@@ -1,0 +1,23 @@
+{
+  final LocalDate initialDate=new LocalDate(2013,8,7);
+  clock.setDay(initialDate);
+  final Account account=accountApi.createAccount(getAccountData(7),callContext);
+  final PlanPhaseSpecifier baseSpec=new PlanPhaseSpecifier("Cleaning",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  final PlanPhaseSpecifier addOnSpec=new PlanPhaseSpecifier("Bullets",ProductCategory.ADD_ON,BillingPeriod.MONTHLY,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  EntitlementSpecifier addOnEntitlementSpecifier1=new DefaultEntitlementSpecifier("addOnExternalKey",baseSpec,null);
+  EntitlementSpecifier addOnEntitlementSpecifier2=new DefaultEntitlementSpecifier("addOnExternalKey2",addOnSpec,null);
+  final List<EntitlementSpecifier> specifierList=new ArrayList<EntitlementSpecifier>();
+  specifierList.add(addOnEntitlementSpecifier1);
+  specifierList.add(addOnEntitlementSpecifier2);
+  testListener.pushExpectedEvents();
+  try {
+    entitlementApi.createBaseEntitlementWithAddOns(account.getId(),specifierList,initialDate,ImmutableList.<PluginProperty>of(),callContext);
+    fail();
+  }
+ catch (  EntitlementApiException e) {
+    assertEquals(e.getMessage(),"Missing Base Subscription.");
+  }
+  assertListenerStatus();
+  final List<Entitlement> allEntitlementsForAccount=entitlementApi.getAllEntitlementsForAccountId(account.getId(),callContext);
+  assertTrue(allEntitlementsForAccount.size() == 0);
+}

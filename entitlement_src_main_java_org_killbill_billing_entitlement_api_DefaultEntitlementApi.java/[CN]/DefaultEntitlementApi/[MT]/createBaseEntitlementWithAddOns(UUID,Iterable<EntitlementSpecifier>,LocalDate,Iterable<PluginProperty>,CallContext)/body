@@ -1,0 +1,29 @@
+{
+  final EntitlementSpecifier baseSpecifier=Iterables.tryFind(entitlementSpecifier,new Predicate<EntitlementSpecifier>(){
+    @Override public boolean apply(    final EntitlementSpecifier specifier){
+      return specifier.getPlanPhaseSpecifier() != null && ProductCategory.BASE.equals(specifier.getPlanPhaseSpecifier().getProductCategory());
+    }
+  }
+).orNull();
+  if (baseSpecifier == null) {
+    throw new EntitlementApiException(new IllegalArgumentException(),ErrorCode.SUB_CREATE_NO_BP.getCode(),"Missing Base Subscription.");
+  }
+  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CREATE_SUBSCRIPTION,accountId,null,null,baseSpecifier.getPlanPhaseSpecifier(),baseSpecifier.getExternalkey(),baseSpecifier.getOverrides(),effectiveDate,properties,callContext);
+  final WithEntitlementPlugin<Entitlement> createBaseEntitlementWithAddOn=new WithEntitlementPlugin<Entitlement>(){
+    @Override public Entitlement doCall(    final EntitlementApi entitlementApi,    final EntitlementContext updatedPluginContext) throws EntitlementApiException {
+      final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
+      try {
+        final SubscriptionBaseBundle bundle=subscriptionBaseInternalApi.createBundleForAccount(accountId,baseSpecifier.getExternalkey(),contextWithValidAccountRecordId);
+        final DateTime referenceTime=clock.getUTCNow();
+        final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),referenceTime,contextWithValidAccountRecordId);
+        final SubscriptionBase subscription=subscriptionBaseInternalApi.createBaseSubscriptionWithAddOns(bundle.getId(),entitlementSpecifier,requestedDate,contextWithValidAccountRecordId);
+        return new DefaultEntitlement(subscription.getId(),eventsStreamBuilder,entitlementApi,pluginExecution,blockingStateDao,subscriptionBaseInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,securityApi,internalCallContextFactory,callContext);
+      }
+ catch (      SubscriptionBaseApiException e) {
+        throw new EntitlementApiException(e);
+      }
+    }
+  }
+;
+  return pluginExecution.executeWithPlugin(createBaseEntitlementWithAddOn,pluginContext);
+}

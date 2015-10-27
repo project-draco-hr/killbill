@@ -1,0 +1,14 @@
+{
+synchronized (events) {
+    for (    DefaultSubscriptionBase subscription : subscriptions) {
+      final List<SubscriptionBaseEvent> initialEvents=initialEventsMap.get(subscription.getId());
+      events.addAll(initialEvents);
+      for (      final SubscriptionBaseEvent cur : initialEvents) {
+        recordFutureNotificationFromTransaction(null,cur.getEffectiveDate(),new SubscriptionNotificationKey(cur.getId()),context);
+      }
+      final SubscriptionBase updatedSubscription=buildSubscription(subscription,context);
+      this.subscriptions.add(updatedSubscription);
+      mockNonEntityDao.addTenantRecordIdMapping(updatedSubscription.getId(),context);
+    }
+  }
+}
