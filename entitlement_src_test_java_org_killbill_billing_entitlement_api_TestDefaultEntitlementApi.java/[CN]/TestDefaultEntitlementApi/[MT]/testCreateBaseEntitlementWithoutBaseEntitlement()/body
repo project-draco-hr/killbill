@@ -9,7 +9,6 @@
   final List<EntitlementSpecifier> specifierList=new ArrayList<EntitlementSpecifier>();
   specifierList.add(addOnEntitlementSpecifier1);
   specifierList.add(addOnEntitlementSpecifier2);
-  testListener.pushExpectedEvents();
   try {
     entitlementApi.createBaseEntitlementWithAddOns(account.getId(),specifierList,initialDate,ImmutableList.<PluginProperty>of(),callContext);
     fail();
@@ -17,7 +16,6 @@
  catch (  EntitlementApiException e) {
     assertEquals(e.getMessage(),"Missing Base Subscription.");
   }
-  assertListenerStatus();
   final List<Entitlement> allEntitlementsForAccount=entitlementApi.getAllEntitlementsForAccountId(account.getId(),callContext);
   assertTrue(allEntitlementsForAccount.size() == 0);
 }

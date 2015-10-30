@@ -1,7 +1,7 @@
 {
   Map<UUID,List<SubscriptionBaseEvent>> eventsMap=new HashMap<UUID,List<SubscriptionBaseEvent>>();
   List<DefaultSubscriptionBase> subscriptionBaseList=new ArrayList<DefaultSubscriptionBase>();
-  for (  SubscriptionEspecifier subscription : subscriptions) {
+  for (  SubscriptionSpecifier subscription : subscriptions) {
     try {
       final DefaultSubscriptionBase subscriptionBase=new DefaultSubscriptionBase(subscription.getBuilder(),this,clock);
       final InternalCallContext internalCallContext=createCallContextFromBundleId(subscriptionBase.getBundleId(),context);
@@ -15,13 +15,12 @@
   }
   final InternalCallContext internalCallContext=createCallContextFromBundleId(subscriptionBaseList.get(0).getBundleId(),context);
   dao.createSubscriptionWithAddOns(subscriptionBaseList,eventsMap,internalCallContext);
+  final DefaultSubscriptionBase baseSubscription=findBaseSubscription(subscriptionBaseList);
   try {
-    for (    DefaultSubscriptionBase subscriptionBase : subscriptionBaseList) {
-      subscriptionBase.rebuildTransitions(dao.getEventsForSubscription(subscriptionBase.getId(),internalCallContext),catalogService.getFullCatalog(internalCallContext));
-    }
+    baseSubscription.rebuildTransitions(dao.getEventsForSubscription(baseSubscription.getId(),internalCallContext),catalogService.getFullCatalog(internalCallContext));
   }
  catch (  CatalogApiException e) {
     throw new SubscriptionBaseApiException(e);
   }
-  return findBaseSubscription(subscriptionBaseList);
+  return baseSubscription;
 }
