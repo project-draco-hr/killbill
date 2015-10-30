@@ -15,9 +15,8 @@
           recordPauseResumeNotificationEntry(baseSubscription.getId(),bundleId,effectiveDate,true,internalCallContext);
           return null;
         }
-        final BlockingState state=new DefaultBlockingState(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,DefaultEntitlementApi.ENT_STATE_BLOCKED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,true,effectiveDate);
-        entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(state,internalCallContext);
-        final DefaultEffectiveEntitlementEvent event=new DefaultEffectiveEntitlementEvent(state.getId(),baseSubscription.getId(),bundleId,bundle.getAccountId(),EntitlementTransitionType.BLOCK_BUNDLE,effectiveDate,clock.getUTCNow(),internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId(),internalCallContext.getUserToken());
+        final UUID blockingId=blockUnblockBundle(bundleId,DefaultEntitlementApi.ENT_STATE_BLOCKED,EntitlementService.ENTITLEMENT_SERVICE_NAME,localEffectiveDate,true,true,true,baseSubscription,internalCallContext);
+        final DefaultEffectiveEntitlementEvent event=new DefaultEffectiveEntitlementEvent(blockingId,baseSubscription.getId(),bundleId,bundle.getAccountId(),EntitlementTransitionType.BLOCK_BUNDLE,effectiveDate,clock.getUTCNow(),internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId(),internalCallContext.getUserToken());
         try {
           eventBus.post(event);
         }
