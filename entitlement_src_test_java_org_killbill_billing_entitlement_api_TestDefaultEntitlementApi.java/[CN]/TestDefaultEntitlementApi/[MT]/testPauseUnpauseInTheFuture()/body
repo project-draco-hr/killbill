@@ -16,12 +16,12 @@
   entitlementApi.resume(baseEntitlement.getBundleId(),resumeDate,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   testListener.pushExpectedEvents(NextEvent.PAUSE,NextEvent.BLOCK);
-  clock.setDay(pauseDate.plusDays(1));
+  clock.setDay(pauseDate);
   assertListenerStatus();
   final Entitlement baseEntitlementPaused=entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   assertEquals(baseEntitlementPaused.getState(),EntitlementState.BLOCKED);
   testListener.pushExpectedEvents(NextEvent.RESUME,NextEvent.BLOCK);
-  clock.setDay(resumeDate.plusDays(1));
+  clock.setDay(resumeDate);
   assertListenerStatus();
   final Entitlement baseEntitlementUnpaused=entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   assertEquals(baseEntitlementUnpaused.getState(),EntitlementState.ACTIVE);
