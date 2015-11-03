@@ -1,0 +1,10 @@
+{
+  final SubscriptionBase subscription;
+  try {
+    subscription=subscriptionApi.getSubscriptionFromId(subscriptionId,context);
+    return getBlockedStateSubscription(subscription,upToDate,context);
+  }
+ catch (  SubscriptionBaseApiException e) {
+    throw new BlockingApiException(e,ErrorCode.fromCode(e.getCode()));
+  }
+}
