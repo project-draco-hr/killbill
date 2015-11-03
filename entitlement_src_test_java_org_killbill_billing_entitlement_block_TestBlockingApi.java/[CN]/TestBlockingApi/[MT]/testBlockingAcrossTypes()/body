@@ -18,7 +18,7 @@
   assertEquals(baseEntitlement.getState(),EntitlementState.BLOCKED);
   clock.addDays(1);
   testListener.pushExpectedEvent(NextEvent.BLOCK);
-  entitlementApi.block(baseEntitlement.getBundleId(),stateNameBlock,service,clock.getUTCToday(),blockBilling,blockEntitlement,blockChange,ImmutableList.<PluginProperty>of(),callContext);
+  entitlementApi.setBlockingState(baseEntitlement.getBundleId(),stateNameBlock,service,clock.getUTCToday(),blockBilling,blockEntitlement,blockChange,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   baseEntitlement=entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   assertEquals(baseEntitlement.getState(),EntitlementState.BLOCKED);
@@ -31,7 +31,7 @@
   assertEquals(baseEntitlement.getState(),EntitlementState.BLOCKED);
   clock.addDays(1);
   testListener.pushExpectedEvent(NextEvent.BLOCK);
-  entitlementApi.unblock(baseEntitlement.getBundleId(),stateNameUnBlock,service,clock.getUTCToday(),ImmutableList.<PluginProperty>of(),callContext);
+  entitlementApi.setBlockingState(baseEntitlement.getBundleId(),stateNameUnBlock,service,clock.getUTCToday(),false,false,false,ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   baseEntitlement=entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   assertEquals(baseEntitlement.getState(),EntitlementState.ACTIVE);
