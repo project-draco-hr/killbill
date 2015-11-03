@@ -1,0 +1,26 @@
+{
+  final Account account=createAccountWithDefaultPaymentMethod();
+  final UUID paymentMethodId=account.getPaymentMethodId();
+  final CustomField customField=new CustomField();
+  customField.setObjectId(paymentMethodId);
+  customField.setObjectType(ObjectType.PAYMENT_METHOD);
+  customField.setName("testKey");
+  customField.setValue("testValue");
+  final CustomFields createdCustomFields=killBillClient.createPaymentMethodCustomField(paymentMethodId,customField,createdBy,reason,comment);
+  Assert.assertEquals(createdCustomFields.size(),1);
+  final CustomField createdCustomField=createdCustomFields.get(0);
+  Assert.assertEquals(createdCustomField.getName(),"testKey");
+  Assert.assertEquals(createdCustomField.getValue(),"testValue");
+  Assert.assertEquals(createdCustomField.getObjectId(),paymentMethodId);
+  Assert.assertEquals(createdCustomField.getObjectType(),ObjectType.PAYMENT_METHOD);
+  final CustomFields retrievedCustomFields=killBillClient.getPaymentMethodCustomFields(paymentMethodId,AuditLevel.NONE);
+  Assert.assertEquals(retrievedCustomFields.size(),1);
+  final CustomField retrievedCustomField=retrievedCustomFields.get(0);
+  Assert.assertEquals(retrievedCustomField.getName(),"testKey");
+  Assert.assertEquals(retrievedCustomField.getValue(),"testValue");
+  Assert.assertEquals(retrievedCustomField.getObjectId(),paymentMethodId);
+  Assert.assertEquals(retrievedCustomField.getObjectType(),ObjectType.PAYMENT_METHOD);
+  killBillClient.deletePaymentMethodCustomFields(paymentMethodId,Collections.<UUID>singletonList(createdCustomField.getCustomFieldId()),createdBy,reason,comment);
+  final CustomFields deletedCustomFields=killBillClient.getPaymentMethodCustomFields(paymentMethodId,AuditLevel.NONE);
+  Assert.assertEquals(deletedCustomFields.size(),0);
+}
