@@ -1,5 +1,4 @@
 {
-  final UUID uuid=UUID.randomUUID();
   final String overdueStateName="WayPassedItMan";
   final String service="TEST";
   final boolean blockChange=true;
@@ -8,13 +7,13 @@
   final Account account=accountApi.createAccount(getAccountData(7),callContext);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   testListener.pushExpectedEvent(NextEvent.BLOCK);
-  final BlockingState state1=new DefaultBlockingState(uuid,BlockingStateType.ACCOUNT,overdueStateName,service,blockChange,blockEntitlement,blockBilling,clock.getUTCNow());
+  final BlockingState state1=new DefaultBlockingState(account.getId(),BlockingStateType.ACCOUNT,overdueStateName,service,blockChange,blockEntitlement,blockBilling,clock.getUTCNow());
   blockingInternalApi.setBlockingState(state1,internalCallContext);
   assertListenerStatus();
   clock.setDeltaFromReality(1000 * 3600 * 24);
   testListener.pushExpectedEvent(NextEvent.BLOCK);
   final String overdueStateName2="NoReallyThisCantGoOn";
-  final BlockingState state2=new DefaultBlockingState(uuid,BlockingStateType.ACCOUNT,overdueStateName2,service,blockChange,blockEntitlement,blockBilling,clock.getUTCNow());
+  final BlockingState state2=new DefaultBlockingState(account.getId(),BlockingStateType.ACCOUNT,overdueStateName2,service,blockChange,blockEntitlement,blockBilling,clock.getUTCNow());
   blockingInternalApi.setBlockingState(state2,internalCallContext);
   assertListenerStatus();
   final List<BlockingState> blockingAll=blockingInternalApi.getBlockingAllForAccount(internalCallContext);

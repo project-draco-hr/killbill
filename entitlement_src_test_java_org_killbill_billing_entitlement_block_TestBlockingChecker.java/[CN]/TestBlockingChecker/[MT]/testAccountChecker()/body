@@ -2,37 +2,37 @@
   setStateAccount(false,false,false);
   setStateBundle(false,false,false);
   setStateSubscription(false,false,false);
-  blockingChecker.checkBlockedChange(account,internalCallContext);
-  blockingChecker.checkBlockedEntitlement(account,internalCallContext);
-  blockingChecker.checkBlockedBilling(account,internalCallContext);
+  blockingChecker.checkBlockedChange(account,clock.getUTCNow(),internalCallContext);
+  blockingChecker.checkBlockedEntitlement(account,clock.getUTCNow(),internalCallContext);
+  blockingChecker.checkBlockedBilling(account,clock.getUTCNow(),internalCallContext);
   clock.addDays(1);
   setStateSubscription(false,false,false);
   setStateBundle(false,false,false);
   setStateAccount(true,false,false);
-  blockingChecker.checkBlockedEntitlement(account,internalCallContext);
-  blockingChecker.checkBlockedBilling(account,internalCallContext);
+  blockingChecker.checkBlockedEntitlement(account,clock.getUTCNow(),internalCallContext);
+  blockingChecker.checkBlockedBilling(account,clock.getUTCNow(),internalCallContext);
   try {
-    blockingChecker.checkBlockedChange(account,internalCallContext);
+    blockingChecker.checkBlockedChange(account,clock.getUTCNow(),internalCallContext);
     Assert.fail("The call should have been blocked!");
   }
  catch (  BlockingApiException e) {
   }
   clock.addDays(1);
   setStateAccount(false,true,false);
-  blockingChecker.checkBlockedChange(account,internalCallContext);
-  blockingChecker.checkBlockedBilling(account,internalCallContext);
+  blockingChecker.checkBlockedChange(account,clock.getUTCNow(),internalCallContext);
+  blockingChecker.checkBlockedBilling(account,clock.getUTCNow(),internalCallContext);
   try {
-    blockingChecker.checkBlockedEntitlement(account,internalCallContext);
+    blockingChecker.checkBlockedEntitlement(account,clock.getUTCNow(),internalCallContext);
     Assert.fail("The call should have been blocked!");
   }
  catch (  BlockingApiException e) {
   }
   clock.addDays(1);
   setStateAccount(false,false,true);
-  blockingChecker.checkBlockedChange(account,internalCallContext);
-  blockingChecker.checkBlockedEntitlement(account,internalCallContext);
+  blockingChecker.checkBlockedChange(account,clock.getUTCNow(),internalCallContext);
+  blockingChecker.checkBlockedEntitlement(account,clock.getUTCNow(),internalCallContext);
   try {
-    blockingChecker.checkBlockedBilling(account,internalCallContext);
+    blockingChecker.checkBlockedBilling(account,clock.getUTCNow(),internalCallContext);
     Assert.fail("The call should have been blocked!");
   }
  catch (  BlockingApiException e) {

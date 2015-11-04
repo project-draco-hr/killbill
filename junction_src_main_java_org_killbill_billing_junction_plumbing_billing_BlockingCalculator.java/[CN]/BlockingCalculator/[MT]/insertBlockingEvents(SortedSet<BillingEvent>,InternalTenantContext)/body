@@ -6,11 +6,22 @@
   final SortedSet<BillingEvent> billingEventsToAdd=new TreeSet<BillingEvent>();
   final SortedSet<BillingEvent> billingEventsToRemove=new TreeSet<BillingEvent>();
   final List<BlockingState> blockingEvents=blockingApi.getBlockingAllForAccount(context);
-  final List<DisabledDuration> blockingDurations=createBlockingDurations(blockingEvents);
+  final Iterable<BlockingState> accountBlockingEvents=Iterables.filter(blockingEvents,new Predicate<BlockingState>(){
+    @Override public boolean apply(    final BlockingState input){
+      return BlockingStateType.ACCOUNT == input.getType();
+    }
+  }
+);
+  final Map<UUID,List<BlockingState>> perBundleBlockingEvents=getPerTypeBlockingEvents(BlockingStateType.SUBSCRIPTION_BUNDLE,blockingEvents);
+  final Map<UUID,List<BlockingState>> perSubscriptionBlockingEvents=getPerTypeBlockingEvents(BlockingStateType.SUBSCRIPTION,blockingEvents);
   for (  final UUID bundleId : bundleMap.keySet()) {
     for (    final SubscriptionBase subscription : bundleMap.get(bundleId)) {
-      billingEventsToAdd.addAll(createNewEvents(blockingDurations,billingEvents,subscription));
-      billingEventsToRemove.addAll(eventsToRemove(blockingDurations,billingEvents,subscription));
+      final List<BlockingState> subscriptionBlockingEvents=perSubscriptionBlockingEvents.get(subscription.getId()) != null ? perSubscriptionBlockingEvents.get(subscription.getId()) : ImmutableList.<BlockingState>of();
+      final List<BlockingState> bundleBlockingEvents=perBundleBlockingEvents.get(bundleId) != null ? perBundleBlockingEvents.get(bundleId) : ImmutableList.<BlockingState>of();
+      final List<BlockingState> aggregateSubscriptionBlockingEvents=getAggregateBlockingEventsPerSubscription(subscriptionBlockingEvents,bundleBlockingEvents,accountBlockingEvents);
+      final List<DisabledDuration> accountBlockingDurations=createBlockingDurations(aggregateSubscriptionBlockingEvents);
+      billingEventsToAdd.addAll(createNewEvents(accountBlockingDurations,billingEvents,subscription));
+      billingEventsToRemove.addAll(eventsToRemove(accountBlockingDurations,billingEvents,subscription));
     }
   }
   for (  final BillingEvent eventToAdd : billingEventsToAdd) {

@@ -1,0 +1,18 @@
+{
+  final Map<String,BlockingState> currentBlockingStatePerService=new HashMap<String,BlockingState>();
+  for (  final BlockingState blockingState : blockingStates) {
+    if (!blockingState.getBlockedId().equals(blockableId)) {
+      continue;
+    }
+    if (blockingState.getType() != type) {
+      continue;
+    }
+    if (blockingState.getEffectiveDate().isAfter(utcNow)) {
+      continue;
+    }
+    if (currentBlockingStatePerService.get(blockingState.getService()) == null || !currentBlockingStatePerService.get(blockingState.getService()).getEffectiveDate().isAfter(blockingState.getEffectiveDate())) {
+      currentBlockingStatePerService.put(blockingState.getService(),blockingState);
+    }
+  }
+  return ImmutableList.<BlockingState>copyOf(currentBlockingStatePerService.values());
+}

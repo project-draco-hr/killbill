@@ -37,6 +37,19 @@ eventBusType=ExtBusEventType.SUBSCRIPTION_CHANGE;
 eventBusType=ExtBusEventType.SUBSCRIPTION_UNCANCEL;
 }
 break;
+case BLOCKING_STATE:
+final BlockingTransitionInternalEvent realEventBS=(BlockingTransitionInternalEvent)event;
+if (realEventBS.getBlockingType() == BlockingStateType.ACCOUNT) {
+objectType=ObjectType.ACCOUNT;
+}
+ else if (realEventBS.getBlockingType() == BlockingStateType.SUBSCRIPTION_BUNDLE) {
+objectType=ObjectType.BUNDLE;
+}
+ else if (realEventBS.getBlockingType() == BlockingStateType.SUBSCRIPTION) {
+objectType=ObjectType.SUBSCRIPTION;
+}
+objectId=realEventBS.getBlockableId();
+break;
 case ENTITLEMENT_TRANSITION:
 final EntitlementInternalEvent realEventET=(EntitlementInternalEvent)event;
 objectType=ObjectType.BUNDLE;

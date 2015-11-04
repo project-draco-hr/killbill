@@ -1,0 +1,16 @@
+{
+  final Iterable<BlockingState> bundleBlockingEvents=Iterables.filter(blockingEvents,new Predicate<BlockingState>(){
+    @Override public boolean apply(    final BlockingState input){
+      return type == input.getType();
+    }
+  }
+);
+  final Map<UUID,List<BlockingState>> perTypeBlockingEvents=new HashMap<UUID,List<BlockingState>>();
+  for (  final BlockingState cur : bundleBlockingEvents) {
+    if (!perTypeBlockingEvents.containsKey(cur.getBlockedId())) {
+      perTypeBlockingEvents.put(cur.getBlockedId(),new ArrayList<BlockingState>());
+    }
+    perTypeBlockingEvents.get(cur.getBlockedId()).add(cur);
+  }
+  return perTypeBlockingEvents;
+}

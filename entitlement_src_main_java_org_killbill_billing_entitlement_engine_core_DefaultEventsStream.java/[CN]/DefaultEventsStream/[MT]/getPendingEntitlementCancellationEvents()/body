@@ -1,3 +1,8 @@
 {
-  return getPendingEntitlementEvents(DefaultEntitlementApi.ENT_STATE_CANCELLED);
+  return Collections2.<BlockingState>filter(subscriptionEntitlementStates,new Predicate<BlockingState>(){
+    @Override public boolean apply(    final BlockingState input){
+      return !input.getEffectiveDate().isBefore(utcNow) && DefaultEntitlementApi.ENT_STATE_CANCELLED.equals(input.getStateName()) && (BlockingStateType.SUBSCRIPTION.equals(input.getType()) && input.getBlockedId().equals(subscription.getId()) || BlockingStateType.SUBSCRIPTION.equals(input.getType()) && input.getBlockedId().equals(baseSubscription.getId()));
+    }
+  }
+);
 }

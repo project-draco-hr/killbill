@@ -1,0 +1,10 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final UUID bundleId=UUID.fromString(id);
+  final boolean isBlockBilling=(json.isBlockBilling() != null && json.isBlockBilling());
+  final boolean isBlockEntitlement=(json.isBlockEntitlement() != null && json.isBlockEntitlement());
+  final boolean isBlockChange=(json.isBlockChange() != null && json.isBlockChange());
+  entitlementApi.setBlockingState(bundleId,json.getStateName(),json.getService(),json.getEffectiveDate(),isBlockBilling,isBlockEntitlement,isBlockChange,pluginProperties,callContext);
+  return Response.status(Status.OK).build();
+}
