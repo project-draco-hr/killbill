@@ -1,9 +1,13 @@
 {
   try {
     Request.setPerThreadRequestData(requestData);
+    ThreadContext.bind(securityManager);
+    ThreadContext.bind(subject);
     return delegate.call();
   }
   finally {
     Request.resetPerThreadRequestData();
+    ThreadContext.unbindSecurityManager();
+    ThreadContext.unbindSubject();
   }
 }
