@@ -1,5 +1,8 @@
 {
-  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CREATE_SUBSCRIPTION,accountId,null,null,planPhaseSpecifier,externalKey,overrides,effectiveDate,properties,callContext);
+  EntitlementSpecifier entitlementSpecifier=new DefaultEntitlementSpecifier(planPhaseSpecifier,overrides);
+  final List<EntitlementSpecifier> entitlementSpecifierList=new ArrayList<EntitlementSpecifier>();
+  entitlementSpecifierList.add(entitlementSpecifier);
+  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CREATE_SUBSCRIPTION,accountId,null,null,externalKey,entitlementSpecifierList,effectiveDate,properties,callContext);
   final WithEntitlementPlugin<Entitlement> createBaseEntitlementWithPlugin=new WithEntitlementPlugin<Entitlement>(){
     @Override public Entitlement doCall(    final EntitlementApi entitlementApi,    final EntitlementContext updatedPluginContext) throws EntitlementApiException {
       final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
@@ -10,7 +13,8 @@
         final SubscriptionBaseBundle bundle=subscriptionBaseInternalApi.createBundleForAccount(accountId,externalKey,contextWithValidAccountRecordId);
         final DateTime referenceTime=clock.getUTCNow();
         final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),referenceTime,contextWithValidAccountRecordId);
-        final SubscriptionBase subscription=subscriptionBaseInternalApi.createSubscription(bundle.getId(),updatedPluginContext.getPlanPhaseSpecifier(),updatedPluginContext.getPlanPhasePriceOverride(),requestedDate,contextWithValidAccountRecordId);
+        final EntitlementSpecifier specifier=getFirstEntitlementSpecifier(updatedPluginContext.getEntitlementSpecifiers());
+        final SubscriptionBase subscription=subscriptionBaseInternalApi.createSubscription(bundle.getId(),specifier.getPlanPhaseSpecifier(),specifier.getOverrides(),requestedDate,contextWithValidAccountRecordId);
         return new DefaultEntitlement(subscription.getId(),eventsStreamBuilder,entitlementApi,pluginExecution,blockingStateDao,subscriptionBaseInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,securityApi,internalCallContextFactory,callContext);
       }
  catch (      SubscriptionBaseApiException e) {

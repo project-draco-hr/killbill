@@ -1,17 +1,17 @@
 {
   if (planPhasePriceOverride != null) {
+    final EntitlementSpecifier entitlementSpecifier=new DefaultEntitlementSpecifier(null,planPhasePriceOverride);
+    final List<EntitlementSpecifier> entitlementSpecifiers=new ArrayList<EntitlementSpecifier>();
+    entitlementSpecifiers.add(entitlementSpecifier);
     return new PriorEntitlementResult(){
       @Override public boolean isAborted(){
         return false;
       }
-      @Override public PlanPhaseSpecifier getAdjustedPlanPhaseSpecifier(){
-        return null;
-      }
       @Override public LocalDate getAdjustedEffectiveDate(){
         return null;
       }
-      @Override public List<PlanPhasePriceOverride> getAdjustedPlanPhasePriceOverride(){
-        return planPhasePriceOverride;
+      @Override public List<EntitlementSpecifier> getAdjustedEntitlementSpecifiers(){
+        return entitlementSpecifiers;
       }
       @Override public Iterable<PluginProperty> getAdjustedPluginProperties(){
         return null;
