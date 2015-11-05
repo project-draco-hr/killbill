@@ -8,15 +8,15 @@
   if (baseSpecifier == null) {
     throw new EntitlementApiException(new IllegalArgumentException(),ErrorCode.SUB_CREATE_NO_BP.getCode(),"Missing Base Subscription.");
   }
-  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CREATE_SUBSCRIPTION,accountId,null,null,baseSpecifier.getPlanPhaseSpecifier(),baseSpecifier.getExternalkey(),baseSpecifier.getOverrides(),effectiveDate,properties,callContext);
+  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CREATE_SUBSCRIPTION,accountId,null,null,baseSpecifier.getPlanPhaseSpecifier(),externalKey,baseSpecifier.getOverrides(),effectiveDate,properties,callContext);
   final WithEntitlementPlugin<Entitlement> createBaseEntitlementWithAddOn=new WithEntitlementPlugin<Entitlement>(){
     @Override public Entitlement doCall(    final EntitlementApi entitlementApi,    final EntitlementContext updatedPluginContext) throws EntitlementApiException {
       final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(accountId,callContext);
       try {
-        if (entitlementUtils.getFirstActiveSubscriptionIdForKeyOrNull(baseSpecifier.getExternalkey(),contextWithValidAccountRecordId) != null) {
-          throw new EntitlementApiException(new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_ACTIVE_BUNDLE_KEY_EXISTS,baseSpecifier.getExternalkey()));
+        if (entitlementUtils.getFirstActiveSubscriptionIdForKeyOrNull(externalKey,contextWithValidAccountRecordId) != null) {
+          throw new EntitlementApiException(new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_ACTIVE_BUNDLE_KEY_EXISTS,externalKey));
         }
-        final SubscriptionBaseBundle bundle=subscriptionBaseInternalApi.createBundleForAccount(accountId,baseSpecifier.getExternalkey(),contextWithValidAccountRecordId);
+        final SubscriptionBaseBundle bundle=subscriptionBaseInternalApi.createBundleForAccount(accountId,externalKey,contextWithValidAccountRecordId);
         final DateTime referenceTime=clock.getUTCNow();
         final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),referenceTime,contextWithValidAccountRecordId);
         final SubscriptionBase subscription=subscriptionBaseInternalApi.createBaseSubscriptionWithAddOns(bundle.getId(),entitlementSpecifier,requestedDate,contextWithValidAccountRecordId);
