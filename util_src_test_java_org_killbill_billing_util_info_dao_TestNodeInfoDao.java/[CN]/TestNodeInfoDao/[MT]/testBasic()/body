@@ -1,0 +1,29 @@
+{
+  DateTime now=clock.getUTCNow();
+  final DateTime initialBootTime1=clock.getUTCNow().minusDays(1);
+  final NodeInfoModelDao node1=new NodeInfoModelDao(-1L,"node1",initialBootTime1,now,"nodeInfo",true);
+  nodeInfoDao.create(node1);
+  List<NodeInfoModelDao> all=nodeInfoDao.getAll();
+  assertEquals(all.size(),1);
+  assertEquals(all.get(0),node1);
+  final DateTime secondBootTime1=clock.getUTCNow();
+  now=clock.getUTCNow().plusSeconds(1);
+  final NodeInfoModelDao newNode1=new NodeInfoModelDao(-1L,"node1",secondBootTime1,now,"nodeInfo",true);
+  nodeInfoDao.create(newNode1);
+  all=nodeInfoDao.getAll();
+  assertEquals(all.size(),1);
+  assertEquals(all.get(0),newNode1);
+  final DateTime initialBootTime2=clock.getUTCNow();
+  final NodeInfoModelDao node2=new NodeInfoModelDao(-1L,"node2",initialBootTime2,now,"nodeInfo",true);
+  nodeInfoDao.create(node2);
+  all=nodeInfoDao.getAll();
+  assertEquals(all.size(),2);
+  assertEquals(all.get(0),newNode1);
+  assertEquals(all.get(1),node2);
+  final NodeInfoModelDao newNode2=new NodeInfoModelDao(-1L,"node2",initialBootTime2,now,"nodeInfo2",true);
+  nodeInfoDao.updateNodeInfo(newNode2.getNodeName(),newNode2.getNodeInfo());
+  all=nodeInfoDao.getAll();
+  assertEquals(all.size(),2);
+  assertEquals(all.get(0),newNode1);
+  assertEquals(all.get(1),newNode2);
+}
