@@ -5,13 +5,18 @@
   final BillingPeriod term=BillingPeriod.MONTHLY;
   final String externalKey="bundleKey";
   final Subscription baseEntitlementJson=createEntitlement(accountJson.getAccountId(),externalKey,"Shotgun",ProductCategory.BASE,term,true);
-  Bundle bundleJson=killBillClient.getBundle(externalKey);
   final Subscription input=new Subscription();
   input.setAccountId(accountJson.getAccountId());
-  input.setBundleId(UUID.randomUUID());
+  input.setBundleId(baseEntitlementJson.getBundleId());
+  input.setExternalKey("ignoreExternalkey");
   input.setProductName("Telescopic-Scope");
   input.setProductCategory(ProductCategory.ADD_ON);
   input.setBillingPeriod(term);
   input.setPriceList(PriceListSet.DEFAULT_PRICELIST_NAME);
-  killBillClient.createSubscription(input,DEFAULT_WAIT_COMPLETION_TIMEOUT_SEC,createdBy,reason,comment);
+  final Subscription addOnEntitlementJson=killBillClient.createSubscription(input,DEFAULT_WAIT_COMPLETION_TIMEOUT_SEC,createdBy,reason,comment);
+  Bundle bundleJson=killBillClient.getBundle(externalKey);
+  final List<Subscription> subscriptions=bundleJson.getSubscriptions();
+  assertEquals(subscriptions.size(),2);
+  assertTrue(baseEntitlementJson.equals(subscriptions.get(0)));
+  assertTrue(addOnEntitlementJson.equals(subscriptions.get(1)));
 }
