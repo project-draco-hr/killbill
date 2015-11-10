@@ -3,15 +3,25 @@
     final Factory<SecurityManager> factory=new IniSecurityManagerFactory(securityConfig.getShiroResourcePath());
     final DefaultSecurityManager securityManager=(DefaultSecurityManager)factory.getInstance();
     final Collection<Realm> realms=securityManager.getRealms();
+    IniRealm iniRealm=null;
     if (realms == null || realms.isEmpty()) {
-      return new IniRealm(securityConfig.getShiroResourcePath());
+      iniRealm=new IniRealm(securityConfig.getShiroResourcePath());
     }
-    for (    final Realm cur : realms) {
-      if (cur instanceof IniRealm) {
-        return (IniRealm)cur;
+ else {
+      for (      final Realm cur : realms) {
+        if (cur instanceof IniRealm) {
+          iniRealm=(IniRealm)cur;
+          break;
+        }
       }
     }
-    throw new ConfigurationException();
+    if (iniRealm != null) {
+      iniRealm.setAuthenticationCachingEnabled(true);
+      return iniRealm;
+    }
+ else {
+      throw new ConfigurationException();
+    }
   }
  catch (  final ConfigurationException e) {
     log.warn("Unable to configure RBAC",e);
