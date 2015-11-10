@@ -1,34 +1,5 @@
 {
-  final RbacConfig config=new ConfigurationObjectFactory(configSource).build(RbacConfig.class);
-  bind(RbacConfig.class).toInstance(config);
-  bindRealm().toProvider(IniRealmProvider.class).asEagerSingleton();
-  bindRealm().to(KillBillJdbcRealm.class).asEagerSingleton();
-  if (KillBillShiroModule.isLDAPEnabled()) {
-    bindRealm().to(KillBillJndiLdapRealm.class).asEagerSingleton();
-  }
   bind(CacheManager.class).toProvider(EhCacheManagerProvider.class).asEagerSingleton();
-  if (KillBillShiroModule.isRBACEnabled()) {
-    addFilterChain(JaxrsResource.PREFIX + "/**",Key.get(CorsBasicHttpAuthenticationFilter.class));
-  }
-  bindListener(new AbstractMatcher<TypeLiteral<?>>(){
-    @Override public boolean matches(    final TypeLiteral<?> o){
-      return Matchers.subclassesOf(WebSecurityManager.class).matches(o.getRawType());
-    }
-  }
-,new TypeListener(){
-    @Override public <I>void hear(    final TypeLiteral<I> typeLiteral,    final TypeEncounter<I> typeEncounter){
-      typeEncounter.register(new InjectionListener<I>(){
-        @Override public void afterInjection(        final Object o){
-          final DefaultWebSecurityManager webSecurityManager=(DefaultWebSecurityManager)o;
-          if (webSecurityManager.getAuthenticator() instanceof ModularRealmAuthenticator) {
-            final ModularRealmAuthenticator authenticator=(ModularRealmAuthenticator)webSecurityManager.getAuthenticator();
-            authenticator.setAuthenticationStrategy(new FirstSuccessfulStrategyWith540());
-            webSecurityManager.setAuthenticator(new ModularRealmAuthenticatorWith540(authenticator));
-          }
-        }
-      }
-);
-    }
-  }
-);
+  configureShiroForRBAC();
+  configureShiroForTenants();
 }

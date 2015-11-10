@@ -1,15 +1,6 @@
 {
   final EhCacheManager shiroEhCacheManager=new EhCacheManager();
   shiroEhCacheManager.setCacheManager(ehCacheCacheManager);
-  shiroEhCacheManager.getCache(CachingSessionDAO.ACTIVE_SESSION_CACHE_NAME);
-  final Ehcache shiroActiveSessionEhcache=ehCacheCacheManager.getEhcache(CachingSessionDAO.ACTIVE_SESSION_CACHE_NAME);
-  final Ehcache decoratedCache=InstrumentedEhcache.instrument(metricRegistry,shiroActiveSessionEhcache);
-  try {
-    ehCacheCacheManager.replaceCacheWithDecoratedCache(shiroActiveSessionEhcache,decoratedCache);
-  }
- catch (  final CacheException e) {
-    logger.warn("Unable to instrument cache {}: {}",shiroActiveSessionEhcache.getName(),e.getMessage());
-  }
   if (securityManager instanceof DefaultSecurityManager) {
     ((DefaultSecurityManager)securityManager).setCacheManager(shiroEhCacheManager);
   }
