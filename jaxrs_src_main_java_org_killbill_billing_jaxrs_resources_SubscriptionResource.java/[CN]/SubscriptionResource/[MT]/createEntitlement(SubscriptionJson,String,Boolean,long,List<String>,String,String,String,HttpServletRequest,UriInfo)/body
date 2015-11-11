@@ -1,2 +1,34 @@
 {
+  verifyNonNullOrEmpty(entitlement,"SubscriptionJson body should be specified");
+  verifyNonNullOrEmpty(entitlement.getProductName(),"SubscriptionJson productName needs to be set",entitlement.getProductCategory(),"SubscriptionJson productCategory needs to be set",entitlement.getBillingPeriod(),"SubscriptionJson billingPeriod needs to be set",entitlement.getPriceList(),"SubscriptionJson priceList needs to be set");
+  Preconditions.checkArgument(entitlement.getExternalKey() != null || entitlement.getBundleId() != null,"SubscriptionJson bundleId or externalKey should be specified");
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final boolean createAddOnEntitlement=ProductCategory.ADD_ON.toString().equals(entitlement.getProductCategory());
+  final EntitlementCallCompletionCallback<Entitlement> callback=new EntitlementCallCompletionCallback<Entitlement>(){
+    @Override public Entitlement doOperation(    final CallContext ctx) throws InterruptedException, TimeoutException, EntitlementApiException, SubscriptionApiException, AccountApiException {
+      final Account account=getAccountFromSubscriptionJson(entitlement,callContext);
+      final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),null);
+      final LocalDate inputLocalDate=toLocalDate(account,requestedDate,callContext);
+      final PlanSpecifier planSpec=new PlanSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList());
+      final List<PlanPhasePriceOverride> overrides=PhasePriceOverrideJson.toPlanPhasePriceOverrides(entitlement.getPriceOverrides(),planSpec,account.getCurrency());
+      return createAddOnEntitlement ? entitlementApi.addEntitlement(getBundleIdForAddOnCreation(entitlement),spec,overrides,inputLocalDate,pluginProperties,callContext) : entitlementApi.createBaseEntitlement(account.getId(),spec,entitlement.getExternalKey(),overrides,inputLocalDate,pluginProperties,callContext);
+    }
+    private UUID getBundleIdForAddOnCreation(    final SubscriptionJson entitlement) throws SubscriptionApiException {
+      if (entitlement.getBundleId() != null) {
+        return UUID.fromString(entitlement.getBundleId());
+      }
+      final SubscriptionBundle bundle=subscriptionApi.getActiveSubscriptionBundleForExternalKey(entitlement.getExternalKey(),callContext);
+      return bundle.getId();
+    }
+    @Override public boolean isImmOperation(){
+      return true;
+    }
+    @Override public Response doResponseOk(    final Entitlement createdEntitlement){
+      return uriBuilder.buildResponse(uriInfo,SubscriptionResource.class,"getEntitlement",createdEntitlement.getId());
+    }
+  }
+;
+  final EntitlementCallCompletion<Entitlement> callCompletionCreation=new EntitlementCallCompletion<Entitlement>();
+  return callCompletionCreation.withSynchronization(callback,timeoutSec,callCompletion,callContext);
 }
