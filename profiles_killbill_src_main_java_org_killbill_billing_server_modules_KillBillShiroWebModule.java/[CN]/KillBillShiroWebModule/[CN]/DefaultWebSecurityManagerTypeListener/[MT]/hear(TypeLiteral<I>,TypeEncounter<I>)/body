@@ -1,0 +1,18 @@
+{
+  typeEncounter.register(new InjectionListener<I>(){
+    @Override public void afterInjection(    final Object o){
+      final ShiroEhCacheInstrumentor ehCacheInstrumentor=instrumentorProvider.get();
+      ehCacheInstrumentor.instrument(CachingSessionDAO.ACTIVE_SESSION_CACHE_NAME);
+      final DefaultWebSecurityManager webSecurityManager=(DefaultWebSecurityManager)o;
+      if (webSecurityManager.getAuthenticator() instanceof ModularRealmAuthenticator) {
+        final ModularRealmAuthenticator authenticator=(ModularRealmAuthenticator)webSecurityManager.getAuthenticator();
+        authenticator.setAuthenticationStrategy(new FirstSuccessfulStrategyWith540());
+        webSecurityManager.setAuthenticator(new ModularRealmAuthenticatorWith540(authenticator));
+        for (        final Realm realm : webSecurityManager.getRealms()) {
+          ehCacheInstrumentor.instrument(realm);
+        }
+      }
+    }
+  }
+);
+}

@@ -1,0 +1,18 @@
+{
+  final RbacConfig config=new ConfigurationObjectFactory(configSource).build(RbacConfig.class);
+  bind(RbacConfig.class).toInstance(config);
+  bindRealm().toProvider(IniRealmProvider.class).asEagerSingleton();
+  bindRealm().to(KillBillJdbcRealm.class).asEagerSingleton();
+  if (KillBillShiroModule.isLDAPEnabled()) {
+    bindRealm().to(KillBillJndiLdapRealm.class).asEagerSingleton();
+  }
+  bindListener(new AbstractMatcher<TypeLiteral<?>>(){
+    @Override public boolean matches(    final TypeLiteral<?> o){
+      return Matchers.subclassesOf(WebSecurityManager.class).matches(o.getRawType());
+    }
+  }
+,new DefaultWebSecurityManagerTypeListener(getProvider(ShiroEhCacheInstrumentor.class)));
+  if (KillBillShiroModule.isRBACEnabled()) {
+    addFilterChain(JaxrsResource.PREFIX + "/**",Key.get(CorsBasicHttpAuthenticationFilter.class));
+  }
+}

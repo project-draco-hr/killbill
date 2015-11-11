@@ -1,0 +1,11 @@
+{
+  bindBeanType(TypeLiteral.get(ServletContext.class),Key.get(ServletContext.class,Names.named(NAME)));
+  bind(Key.get(ServletContext.class,Names.named(NAME))).toInstance(this.servletContext);
+  bindWebSecurityManager(bind(WebSecurityManager.class));
+  bindWebEnvironment(bind(WebEnvironment.class));
+  bind(GuiceShiroFilter.class).asEagerSingleton();
+  expose(GuiceShiroFilter.class);
+  this.configureShiroWeb();
+  setupFilterChainConfigs();
+  bind(FilterChainResolver.class).toProvider(new FilterChainResolverProvider(filterChains));
+}

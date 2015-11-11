@@ -1,0 +1,11 @@
+{
+  shiroEhCacheManager.getCache(cacheName);
+  final Ehcache shiroEhcache=ehCacheCacheManager.getEhcache(cacheName);
+  final Ehcache decoratedCache=InstrumentedEhcache.instrument(metricRegistry,shiroEhcache);
+  try {
+    ehCacheCacheManager.replaceCacheWithDecoratedCache(shiroEhcache,decoratedCache);
+  }
+ catch (  final CacheException e) {
+    logger.warn("Unable to instrument cache {}: {}",shiroEhcache.getName(),e.getMessage());
+  }
+}

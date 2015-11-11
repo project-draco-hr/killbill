@@ -1,0 +1,23 @@
+{
+  Table<Key<? extends PathMatchingFilter>,String,String> configs=HashBasedTable.create();
+  for (  Map.Entry<String,Key<? extends Filter>[]> filterChain : filterChains.entrySet()) {
+    for (int i=0; i < filterChain.getValue().length; i++) {
+      Key<? extends Filter> key=filterChain.getValue()[i];
+      if (key instanceof FilterConfigKey) {
+        FilterConfigKey<? extends PathMatchingFilter> configKey=(FilterConfigKey<? extends PathMatchingFilter>)key;
+        key=configKey.getKey();
+        filterChain.getValue()[i]=key;
+        if (!PathMatchingFilter.class.isAssignableFrom(key.getTypeLiteral().getRawType())) {
+          throw new ConfigurationException("Config information requires a PathMatchingFilter - can't apply to " + key.getTypeLiteral().getRawType());
+        }
+        configs.put(castToPathMatching(key),filterChain.getKey(),configKey.getConfigValue());
+      }
+ else       if (PathMatchingFilter.class.isAssignableFrom(key.getTypeLiteral().getRawType())) {
+        configs.put(castToPathMatching(key),filterChain.getKey(),"");
+      }
+    }
+  }
+  for (  Key<? extends PathMatchingFilter> filterKey : configs.rowKeySet()) {
+    bindPathMatchingFilter(filterKey,configs.row(filterKey));
+  }
+}
