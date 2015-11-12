@@ -1,10 +1,12 @@
 {
   verifyNonNullOrEmpty(entitlement,"SubscriptionJson body should be specified");
   verifyNonNullOrEmpty(entitlement.getProductName(),"SubscriptionJson productName needs to be set",entitlement.getProductCategory(),"SubscriptionJson productCategory needs to be set",entitlement.getBillingPeriod(),"SubscriptionJson billingPeriod needs to be set",entitlement.getPriceList(),"SubscriptionJson priceList needs to be set");
-  Preconditions.checkArgument(entitlement.getExternalKey() != null || entitlement.getBundleId() != null,"SubscriptionJson bundleId or externalKey should be specified");
+  final boolean createAddOnEntitlement=ProductCategory.ADD_ON.toString().equals(entitlement.getProductCategory());
+  if (createAddOnEntitlement) {
+    Preconditions.checkArgument(entitlement.getExternalKey() != null || entitlement.getBundleId() != null,"SubscriptionJson bundleId or externalKey should be specified for ADD_ON");
+  }
   final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
-  final boolean createAddOnEntitlement=ProductCategory.ADD_ON.toString().equals(entitlement.getProductCategory());
   final EntitlementCallCompletionCallback<Entitlement> callback=new EntitlementCallCompletionCallback<Entitlement>(){
     @Override public Entitlement doOperation(    final CallContext ctx) throws InterruptedException, TimeoutException, EntitlementApiException, SubscriptionApiException, AccountApiException {
       final Account account=getAccountFromSubscriptionJson(entitlement,callContext);
