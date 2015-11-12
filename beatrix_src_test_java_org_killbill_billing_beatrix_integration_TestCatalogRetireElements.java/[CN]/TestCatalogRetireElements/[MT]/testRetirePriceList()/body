@@ -1,0 +1,41 @@
+{
+  final LocalDate today=new LocalDate(2015,11,1);
+  clock.setDay(today);
+  final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(1));
+  final String productName="Pistol";
+  final BillingPeriod term=BillingPeriod.MONTHLY;
+  final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(productName,ProductCategory.BASE,term,"SpecialDiscount",null);
+  LocalDate effectiveDate=new LocalDate(clock.getUTCNow());
+  busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE);
+  final Entitlement bpEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,"externalKey",null,effectiveDate,ImmutableList.<PluginProperty>of(),callContext);
+  assertListenerStatus();
+  assertNotNull(bpEntitlement);
+  assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).size(),1);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  clock.addMonths(1);
+  assertListenerStatus();
+  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT);
+  clock.addMonths(1);
+  assertListenerStatus();
+  effectiveDate=new LocalDate(clock.getUTCNow());
+  try {
+    entitlementApi.createBaseEntitlement(account.getId(),spec,"externalKey2",null,effectiveDate,ImmutableList.<PluginProperty>of(),callContext);
+    fail();
+  }
+ catch (  EntitlementApiException e) {
+    assertTrue(e.getLocalizedMessage().startsWith("Could not find any product named 'Pistol'"));
+  }
+  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT);
+  clock.addMonths(1);
+  assertListenerStatus();
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  clock.addMonths(1);
+  assertListenerStatus();
+  final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
+  assertEquals(invoices.size(),5);
+  assertTrue(invoices.get(0).getInvoiceItems().get(0).getPhaseName().equals("discount-pistol-monthly-trial"));
+  assertTrue(invoices.get(1).getInvoiceItems().get(0).getPhaseName().equals("discount-pistol-monthly-discount"));
+  assertTrue(invoices.get(2).getInvoiceItems().get(0).getPhaseName().equals("discount-pistol-monthly-discount"));
+  assertTrue(invoices.get(3).getInvoiceItems().get(0).getPhaseName().equals("discount-pistol-monthly-discount"));
+  assertTrue(invoices.get(4).getInvoiceItems().get(0).getPhaseName().equals("discount-pistol-monthly-evergreen"));
+}
