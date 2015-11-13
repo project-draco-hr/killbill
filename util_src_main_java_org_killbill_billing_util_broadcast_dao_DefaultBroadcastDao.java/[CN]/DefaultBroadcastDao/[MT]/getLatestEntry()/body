@@ -1,0 +1,9 @@
+{
+  return dbi.inTransaction(new TransactionCallback<BroadcastModelDao>(){
+    @Override public BroadcastModelDao inTransaction(    final Handle handle,    final TransactionStatus status) throws Exception {
+      final BroadcastSqlDao sqlDao=handle.attach(BroadcastSqlDao.class);
+      return sqlDao.getLatestEntry();
+    }
+  }
+);
+}

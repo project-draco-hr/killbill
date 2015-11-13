@@ -1,0 +1,13 @@
+{
+  DateTime now=clock.getUTCNow();
+  final BroadcastModelDao b1=new BroadcastModelDao("svc1","type1","{attribute: kewl}",now,"tester");
+  broadcastDao.create(b1);
+  final BroadcastModelDao res=broadcastDao.getLatestEntry();
+  assertEquals(res.getEvent(),b1.getEvent());
+  assertEquals(res.getServiceName(),b1.getServiceName());
+  assertEquals(res.getType(),b1.getType());
+  final List<BroadcastModelDao> all=broadcastDao.getLatestEntriesFrom(0L);
+  assertEquals(all.size(),1);
+  final List<BroadcastModelDao> none=broadcastDao.getLatestEntriesFrom(1L);
+  assertEquals(none.size(),0);
+}
