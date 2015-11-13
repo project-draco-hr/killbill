@@ -7,8 +7,13 @@
   final String kbPluginApiVersion=org.killbill.billing.util.info.KillbillVersions.getPluginApiVersion();
   final String kbPlatformVersion=org.killbill.billing.util.info.KillbillVersions.getPlatformVersion();
   final String kbCommonVersion=org.killbill.billing.util.info.KillbillVersions.getCommonVersion();
-  final NodeInfo nodeInfo=new DefaultNodeInfo(CreatorName.get(),bootTime,bootTime,kbVersion,kbApiVersion,kbPluginApiVersion,kbCommonVersion,kbPlatformVersion,pluginInfo);
-  final String nodeInfoValue=mapper.writeValueAsString(nodeInfo);
+  final NodeInfoModelJson nodeInfo=new NodeInfoModelJson(CreatorName.get(),bootTime,bootTime,kbVersion,kbApiVersion,kbPluginApiVersion,kbCommonVersion,kbPlatformVersion,ImmutableList.copyOf(Iterables.transform(pluginInfo,new Function<PluginInfo,PluginInfoModelJson>(){
+    @Override public PluginInfoModelJson apply(    final PluginInfo input){
+      return new PluginInfoModelJson(input);
+    }
+  }
+)));
+  final String nodeInfoValue=mapper.serialize(nodeInfo);
   final NodeInfoModelDao bootNodeInfo=new NodeInfoModelDao(CreatorName.get(),clock.getUTCNow(),nodeInfoValue);
   nodeInfoDao.create(bootNodeInfo);
 }
