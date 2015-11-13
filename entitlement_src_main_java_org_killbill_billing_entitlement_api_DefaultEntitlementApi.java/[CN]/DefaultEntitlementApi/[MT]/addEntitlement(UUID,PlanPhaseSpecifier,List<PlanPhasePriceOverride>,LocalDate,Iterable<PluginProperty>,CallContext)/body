@@ -1,5 +1,8 @@
 {
-  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CREATE_SUBSCRIPTION,null,null,bundleId,planPhaseSpecifier,null,overrides,effectiveDate,properties,callContext);
+  EntitlementSpecifier entitlementSpecifier=new DefaultEntitlementSpecifier(planPhaseSpecifier,overrides);
+  final List<EntitlementSpecifier> entitlementSpecifierList=new ArrayList<EntitlementSpecifier>();
+  entitlementSpecifierList.add(entitlementSpecifier);
+  final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CREATE_SUBSCRIPTION,null,null,bundleId,null,entitlementSpecifierList,effectiveDate,properties,callContext);
   final WithEntitlementPlugin<Entitlement> addEntitlementWithPlugin=new WithEntitlementPlugin<Entitlement>(){
     @Override public Entitlement doCall(    final EntitlementApi entitlementApi,    final EntitlementContext updatedPluginContext) throws EntitlementApiException {
       final EventsStream eventsStreamForBaseSubscription=eventsStreamBuilder.buildForBaseSubscription(bundleId,callContext);
@@ -12,7 +15,8 @@
       final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),eventsStreamForBaseSubscription.getSubscriptionBase().getStartDate(),eventsStreamForBaseSubscription.getInternalTenantContext());
       try {
         final InternalCallContext context=internalCallContextFactory.createInternalCallContext(callContext);
-        final SubscriptionBase subscription=subscriptionBaseInternalApi.createSubscription(bundleId,updatedPluginContext.getPlanPhaseSpecifier(),updatedPluginContext.getPlanPhasePriceOverride(),requestedDate,context);
+        final EntitlementSpecifier specifier=getFirstEntitlementSpecifier(updatedPluginContext.getEntitlementSpecifiers());
+        final SubscriptionBase subscription=subscriptionBaseInternalApi.createSubscription(bundleId,specifier.getPlanPhaseSpecifier(),specifier.getOverrides(),requestedDate,context);
         return new DefaultEntitlement(subscription.getId(),eventsStreamBuilder,entitlementApi,pluginExecution,blockingStateDao,subscriptionBaseInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,securityApi,internalCallContextFactory,callContext);
       }
  catch (      SubscriptionBaseApiException e) {

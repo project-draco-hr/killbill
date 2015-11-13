@@ -1,0 +1,62 @@
+{
+  Preconditions.checkArgument(Iterables.size(entitlements) > 0,"Subscription list mustn't be null or empty.");
+  for (  SubscriptionJson entitlement : entitlements) {
+    verifyNonNullOrEmpty(entitlement,"SubscriptionJson body should be specified for each element");
+    verifyNonNullOrEmpty(entitlement.getProductName(),"SubscriptionJson productName needs to be set for each element",entitlement.getProductCategory(),"SubscriptionJson productCategory needs to be set for each element",entitlement.getBillingPeriod(),"SubscriptionJson billingPeriod needs to be set for each element",entitlement.getPriceList(),"SubscriptionJson priceList needs to be set for each element");
+  }
+  final int baseSubscriptionsSize=Iterables.size(Iterables.filter(entitlements,new Predicate<SubscriptionJson>(){
+    @Override public boolean apply(    final SubscriptionJson subscription){
+      return subscription.getProductCategory().equals(ProductCategory.BASE.toString());
+    }
+  }
+));
+  verifyNumberOfElements(baseSubscriptionsSize,1,"Only one BASE product is allowed.");
+  final int addOnSubscriptionsSize=Iterables.size(Iterables.filter(entitlements,new Predicate<SubscriptionJson>(){
+    @Override public boolean apply(    final SubscriptionJson subscription){
+      return subscription.getProductCategory().equals(ProductCategory.ADD_ON.toString());
+    }
+  }
+));
+  verifyNumberOfElements(addOnSubscriptionsSize,entitlements.size() - 1,"It should be " + (entitlements.size() - 1) + " ADD_ON products.");
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final SubscriptionJson baseEntitlement=Iterables.tryFind(entitlements,new Predicate<SubscriptionJson>(){
+    @Override public boolean apply(    final SubscriptionJson subscription){
+      return ProductCategory.BASE.toString().equalsIgnoreCase(subscription.getProductCategory());
+    }
+  }
+).orNull();
+  verifyNonNull(baseEntitlement.getAccountId(),"SubscriptionJson accountId needs to be set for BASE product.");
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final EntitlementCallCompletionCallback<Entitlement> callback=new EntitlementCallCompletionCallback<Entitlement>(){
+    @Override public Entitlement doOperation(    final CallContext ctx) throws InterruptedException, TimeoutException, EntitlementApiException, SubscriptionApiException, AccountApiException {
+      List<EntitlementSpecifier> entitlementSpecifierList=new ArrayList<EntitlementSpecifier>();
+      final Account account=getAccountFromSubscriptionJson(baseEntitlement,callContext);
+      for (      final SubscriptionJson entitlement : entitlements) {
+        final PlanPhaseSpecifier planPhaseSpecifier=new PlanPhaseSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),null);
+        final PlanSpecifier planSpec=new PlanSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList());
+        final List<PlanPhasePriceOverride> overrides=PhasePriceOverrideJson.toPlanPhasePriceOverrides(entitlement.getPriceOverrides(),planSpec,account.getCurrency());
+        EntitlementSpecifier specifier=new EntitlementSpecifier(){
+          @Override public PlanPhaseSpecifier getPlanPhaseSpecifier(){
+            return planPhaseSpecifier;
+          }
+          @Override public List<PlanPhasePriceOverride> getOverrides(){
+            return overrides;
+          }
+        }
+;
+        entitlementSpecifierList.add(specifier);
+      }
+      final LocalDate inputLocalDate=toLocalDate(account,requestedDate,callContext);
+      return entitlementApi.createBaseEntitlementWithAddOns(account.getId(),baseEntitlement.getExternalKey(),entitlementSpecifierList,inputLocalDate,pluginProperties,callContext);
+    }
+    @Override public boolean isImmOperation(){
+      return true;
+    }
+    @Override public Response doResponseOk(    final Entitlement entitlement){
+      return uriBuilder.buildResponse(uriInfo,BundleResource.class,"getBundle",entitlement.getBundleId());
+    }
+  }
+;
+  final EntitlementCallCompletion<Entitlement> callCompletionCreation=new EntitlementCallCompletion<Entitlement>();
+  return callCompletionCreation.withSynchronization(callback,timeoutSec,callCompletion,callContext);
+}

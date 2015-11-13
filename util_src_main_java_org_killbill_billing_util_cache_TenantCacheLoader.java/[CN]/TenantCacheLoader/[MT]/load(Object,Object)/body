@@ -1,0 +1,15 @@
+{
+  checkCacheLoaderStatus();
+  if (!(key instanceof String)) {
+    throw new IllegalArgumentException("Unexpected key type of " + key.getClass().getName());
+  }
+  if (!(argument instanceof CacheLoaderArgument)) {
+    throw new IllegalArgumentException("Unexpected key type of " + argument.getClass().getName());
+  }
+  try {
+    return tenantApi.getTenantByApiKey((String)key);
+  }
+ catch (  TenantApiException e) {
+    throw new IllegalStateException("TenantCacheLoader cannot find value for key " + key);
+  }
+}
