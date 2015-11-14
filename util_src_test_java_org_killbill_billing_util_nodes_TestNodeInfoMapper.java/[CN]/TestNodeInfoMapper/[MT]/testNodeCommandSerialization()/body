@@ -1,0 +1,10 @@
+{
+  final NodeCommandProperty prop=new NodeCommandProperty("something","nothing");
+  final NodeCommandMetadata nodeCommandMetadata=new DefaultNodeCommandMetadata(ImmutableList.<NodeCommandProperty>of(prop));
+  final String nodeCmdStr=nodeInfoMapper.serializeNodeCommand(nodeCommandMetadata);
+  final NodeCommandMetadata res=nodeInfoMapper.deserializeNodeCommand(nodeCmdStr,"opaque type");
+  Assert.assertTrue(res instanceof NodeCommandMetadata);
+  Assert.assertEquals(res.getProperties().size(),1);
+  Assert.assertEquals(res.getProperties().get(0).getKey(),"something");
+  Assert.assertEquals(res.getProperties().get(0).getValue(),"nothing");
+}

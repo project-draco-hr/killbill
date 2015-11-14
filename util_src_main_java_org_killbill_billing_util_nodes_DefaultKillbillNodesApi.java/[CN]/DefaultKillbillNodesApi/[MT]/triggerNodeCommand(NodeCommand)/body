@@ -1,0 +1,10 @@
+{
+  final String event;
+  try {
+    event=mapper.serializeNodeCommand(nodeCommand.getNodeCommandMetadata());
+    broadcastApi.broadcast(DefaultKillbillNodesService.NODES_SERVICE_NAME,nodeCommand.getNodeCommandType(),event,clock.getUTCNow(),"unset");
+  }
+ catch (  JsonProcessingException e) {
+    throw new RuntimeException(e);
+  }
+}

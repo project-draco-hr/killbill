@@ -1,0 +1,12 @@
+{
+  final NodeCommandProperty prop=new NodeCommandProperty("something","nothing");
+  final PluginNodeCommandMetadata nodeCommandMetadata=new PluginNodeCommandMetadata("foo","1.2.3",ImmutableList.<NodeCommandProperty>of(prop));
+  final String nodeCmdStr=nodeInfoMapper.serializeNodeCommand(nodeCommandMetadata);
+  final NodeCommandMetadata res=nodeInfoMapper.deserializeNodeCommand(nodeCmdStr,SystemNodeCommandType.START_PLUGIN.name());
+  Assert.assertTrue(res instanceof PluginNodeCommandMetadata);
+  Assert.assertEquals(((PluginNodeCommandMetadata)res).getPluginName(),nodeCommandMetadata.getPluginName());
+  Assert.assertEquals(((PluginNodeCommandMetadata)res).getPluginVersion(),nodeCommandMetadata.getPluginVersion());
+  Assert.assertEquals(res.getProperties().size(),1);
+  Assert.assertEquals(res.getProperties().get(0).getKey(),"something");
+  Assert.assertEquals(res.getProperties().get(0).getValue(),"nothing");
+}

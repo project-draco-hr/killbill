@@ -1,0 +1,9 @@
+{
+  final SystemNodeCommandType systemType=Iterables.tryFind(ImmutableList.copyOf(SystemNodeCommandType.values()),new Predicate<SystemNodeCommandType>(){
+    @Override public boolean apply(    final SystemNodeCommandType input){
+      return input.name().equals(type);
+    }
+  }
+).orNull();
+  return (systemType != null) ? mapper.readValue(nodeCommand,systemType.getCommandMetadataClass()) : mapper.readValue(nodeCommand,DefaultNodeCommandMetadata.class);
+}

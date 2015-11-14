@@ -1,0 +1,20 @@
+{
+  final List<NodeInfoModelDao> allNodes=nodeInfoDao.getAll();
+  final Iterable<NodeInfoModelJson> allModelNodes=Iterables.transform(allNodes,new Function<NodeInfoModelDao,NodeInfoModelJson>(){
+    @Override public NodeInfoModelJson apply(    final NodeInfoModelDao input){
+      try {
+        return mapper.deserializeNodeInfo(input.getNodeInfo());
+      }
+ catch (      IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+);
+  return Iterables.transform(allModelNodes,new Function<NodeInfoModelJson,NodeInfo>(){
+    @Override public NodeInfo apply(    final NodeInfoModelJson input){
+      return new DefaultNodeInfo(input);
+    }
+  }
+);
+}
