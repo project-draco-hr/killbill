@@ -1,0 +1,21 @@
+{
+  if (parent.isStopped) {
+    return;
+  }
+  final List<BroadcastModelDao> entries=broadcastDao.getLatestEntriesFrom(parent.getLatestRecordIdProcessed().get());
+  for (  BroadcastModelDao cur : entries) {
+    if (parent.isStopped()) {
+      return;
+    }
+    try {
+      final BroadcastInternalEvent event=new DefaultBroadcastInternalEvent(cur.getServiceName(),cur.getType(),cur.getEvent());
+      eventBus.post(event);
+    }
+ catch (    final EventBusException e) {
+      logger.error("Failed to send event BroadcastInternalEvent: ",e);
+    }
+ finally {
+      parent.setLatestRecordIdProcessed(cur.getRecordId());
+    }
+  }
+}

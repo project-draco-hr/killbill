@@ -1,2 +1,20 @@
 {
+  if (isStopped) {
+    logger.warn("BroadcastExecutor is already in a stopped state");
+    return;
+  }
+  try {
+    broadcastExecutor.shutdown();
+    boolean success=broadcastExecutor.awaitTermination(TERMINATION_TIMEOUT_SEC,TimeUnit.SECONDS);
+    if (!success) {
+      logger.warn("BroadcastExecutor failed to complete termination within " + TERMINATION_TIMEOUT_SEC + "sec");
+    }
+  }
+ catch (  InterruptedException e) {
+    Thread.currentThread().interrupt();
+    logger.warn("BroadcastExecutor stop sequence got interrupted");
+  }
+ finally {
+    isStopped=true;
+  }
 }

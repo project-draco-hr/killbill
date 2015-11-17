@@ -1,0 +1,23 @@
+{
+  final NodeCommand nodeCommand=new NodeCommand(){
+    @Override public boolean isSystemCommandType(){
+      return true;
+    }
+    @Override public String getNodeCommandType(){
+      return SystemNodeCommandType.START_PLUGIN.name();
+    }
+    @Override public NodeCommandMetadata getNodeCommandMetadata(){
+      return new PluginNodeCommandMetadata("pluginName","4.5.6",ImmutableList.of(new NodeCommandProperty("key","value")));
+    }
+  }
+;
+  busHandler.pushExpectedEvent(NextEvent.BROADCAST_SERVICE);
+  nodesApi.triggerNodeCommand(nodeCommand);
+  assertListenerStatus();
+  await().atMost(10,SECONDS).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return externalBusCount.get() == 1;
+    }
+  }
+);
+}

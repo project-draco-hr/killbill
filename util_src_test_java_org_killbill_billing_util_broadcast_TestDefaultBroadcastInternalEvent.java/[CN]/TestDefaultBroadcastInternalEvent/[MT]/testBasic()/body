@@ -1,0 +1,12 @@
+{
+  final ObjectMapper objectMapper=new ObjectMapper();
+  objectMapper.registerModule(new JodaModule());
+  objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+  final String eventJson="\"{\"pluginName\":\"foo\",\"pluginVersion\":\"1.2.3\",\"properties\":[{\"key\":\"something\",\"value\":\"nothing\"}]}\"";
+  final BroadcastInternalEvent broadcastEvent=new DefaultBroadcastInternalEvent("service","PLUGIN_INSTALL",eventJson);
+  final String broadcastEventStr=objectMapper.writeValueAsString(broadcastEvent);
+  final BroadcastInternalEvent res=objectMapper.readValue(broadcastEventStr,DefaultBroadcastInternalEvent.class);
+  Assert.assertEquals(res.getServiceName(),"service");
+  Assert.assertEquals(res.getType(),"PLUGIN_INSTALL");
+  Assert.assertEquals(res.getJsonEvent(),eventJson);
+}
