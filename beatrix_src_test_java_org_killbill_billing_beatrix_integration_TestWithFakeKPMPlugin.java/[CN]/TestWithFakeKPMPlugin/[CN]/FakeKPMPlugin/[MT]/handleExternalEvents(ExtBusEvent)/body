@@ -1,0 +1,13 @@
+{
+  if (extBusEvent.getEventType().equals(ExtBusEventType.BROADCAST_SERVICE)) {
+    final String metadata=extBusEvent.getMetaData();
+    try {
+      final BroadcastMetadata broadcastMetadata=objectMapper.readValue(metadata,BroadcastMetadata.class);
+      final PluginNodeCommandMetadata nodeCommandMetadata=(PluginNodeCommandMetadata)nodeInfoMapper.deserializeNodeCommand(broadcastMetadata.getEventJson(),broadcastMetadata.getCommandType());
+      pluginsInfoApi.notifyOfStateChanged(PluginStateChange.NEW_VERSION,nodeCommandMetadata.getPluginName(),nodeCommandMetadata.getPluginVersion(),PluginLanguage.JAVA);
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}

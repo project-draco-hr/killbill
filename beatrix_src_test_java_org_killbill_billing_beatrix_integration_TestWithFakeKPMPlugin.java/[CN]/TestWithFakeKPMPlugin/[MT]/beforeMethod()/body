@@ -1,0 +1,15 @@
+{
+  try {
+    DBTestingHelper.get().getInstance().cleanupAllTables();
+  }
+ catch (  final Exception ignored) {
+  }
+  log.debug("RESET TEST FRAMEWORK");
+  clock.resetDeltaFromReality();
+  busHandler.reset();
+  lifecycle.fireStartupSequencePriorEventRegistration();
+  busService.getBus().register(busHandler);
+  externalBus.register(new FakeKPMPlugin());
+  lifecycle.fireStartupSequencePostEventRegistration();
+  assertListenerStatus();
+}
