@@ -1,0 +1,17 @@
+{
+  final NodeCommandMetadata metadata=toNodeCommandMetadata(json);
+  final NodeCommand nodeCommand=new NodeCommand(){
+    @Override public boolean isSystemCommandType(){
+      return json.isSystemCommandType();
+    }
+    @Override public String getNodeCommandType(){
+      return json.getNodeCommandType();
+    }
+    @Override public NodeCommandMetadata getNodeCommandMetadata(){
+      return metadata;
+    }
+  }
+;
+  killbillInfoApi.triggerNodeCommand(nodeCommand);
+  return Response.status(Status.CREATED).build();
+}

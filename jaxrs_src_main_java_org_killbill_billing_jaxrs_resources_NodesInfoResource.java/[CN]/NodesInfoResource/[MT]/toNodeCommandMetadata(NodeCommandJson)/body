@@ -1,0 +1,38 @@
+{
+  if (input.getNodeCommandProperties() == null || input.getNodeCommandProperties().isEmpty()) {
+    return new NodeCommandMetadata(){
+      @Override public List<NodeCommandProperty> getProperties(){
+        return ImmutableList.<NodeCommandProperty>of();
+      }
+    }
+;
+  }
+  String pluginName=null;
+  String pluginVersion=null;
+  final Iterator<NodeCommandProperty> it=input.getNodeCommandProperties().iterator();
+  while (it.hasNext()) {
+    final NodeCommandProperty cur=it.next();
+    if (PluginNodeCommandMetadata.PLUGIN_NAME.equals(cur.getKey())) {
+      pluginName=(String)cur.getValue();
+      it.remove();
+    }
+ else     if (PluginNodeCommandMetadata.PLUGIN_VERSION.equals(cur.getKey())) {
+      pluginVersion=(String)cur.getValue();
+      it.remove();
+    }
+    if (pluginName != null && pluginVersion != null) {
+      break;
+    }
+  }
+  if (pluginName != null && pluginVersion != null) {
+    return new PluginNodeCommandMetadata(pluginName,pluginVersion,input.getNodeCommandProperties());
+  }
+ else {
+    return new NodeCommandMetadata(){
+      @Override public List<NodeCommandProperty> getProperties(){
+        return input.getNodeCommandProperties();
+      }
+    }
+;
+  }
+}
