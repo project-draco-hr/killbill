@@ -9,7 +9,7 @@
   }
   String pluginName=null;
   String pluginVersion=null;
-  final Iterator<NodeCommandProperty> it=input.getNodeCommandProperties().iterator();
+  final Iterator<NodeCommandPropertyJson> it=input.getNodeCommandProperties().iterator();
   while (it.hasNext()) {
     final NodeCommandProperty cur=it.next();
     if (PluginNodeCommandMetadata.PLUGIN_NAME.equals(cur.getKey())) {
@@ -25,12 +25,12 @@
     }
   }
   if (pluginName != null) {
-    return new PluginNodeCommandMetadata(pluginName,pluginVersion,input.getNodeCommandProperties());
+    return new PluginNodeCommandMetadata(pluginName,pluginVersion,toNodeCommandProperties(input.getNodeCommandProperties()));
   }
  else {
     return new NodeCommandMetadata(){
       @Override public List<NodeCommandProperty> getProperties(){
-        return input.getNodeCommandProperties();
+        return toNodeCommandProperties(input.getNodeCommandProperties());
       }
     }
 ;
