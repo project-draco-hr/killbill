@@ -1,27 +1,25 @@
 {
-  final Bundle bundle=Mockito.mock(Bundle.class);
-  Mockito.when(bundle.getSymbolicName()).thenReturn(pluginName);
-  final BundleWithConfig config=new BundleWithConfig(bundle,new PluginConfig(){
+  return new PluginConfig(){
     @Override public int compareTo(    final PluginConfig o){
       return 0;
     }
     @Override public String getPluginName(){
-      return pluginName;
+      return nodeCommandMetadata.getPluginName();
     }
     @Override public PluginType getPluginType(){
       return PluginType.NOTIFICATION;
     }
     @Override public String getVersion(){
-      return version;
+      return nodeCommandMetadata.getPluginVersion();
     }
     @Override public String getPluginVersionnedName(){
-      return null;
+      return getPluginName() + "-" + getVersion();
     }
     @Override public File getPluginVersionRoot(){
       return null;
     }
     @Override public PluginLanguage getPluginLanguage(){
-      return pluginLanguage;
+      return PluginLanguage.JAVA;
     }
     @Override public boolean isSelectedForStart(){
       return true;
@@ -30,6 +28,5 @@
       return false;
     }
   }
-);
-  bundles.add(new BundleWithMetadata(config));
+;
 }
