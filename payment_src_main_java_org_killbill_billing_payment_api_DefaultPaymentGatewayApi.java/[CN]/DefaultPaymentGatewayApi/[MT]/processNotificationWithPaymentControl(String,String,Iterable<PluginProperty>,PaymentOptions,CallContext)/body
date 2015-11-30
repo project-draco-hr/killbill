@@ -1,7 +1,12 @@
 {
   return executeWithPaymentControl(null,null,properties,paymentOptions,callContext,new WithPaymentControlCallback<GatewayNotification>(){
-    @Override public GatewayNotification doPaymentGatewayApiOperation(    final Iterable<PluginProperty> adjustedPluginProperties) throws PaymentApiException {
-      return processNotification(notification,pluginName,adjustedPluginProperties,callContext);
+    @Override public GatewayNotification doPaymentGatewayApiOperation(    final UUID adjustedPaymentMethodId,    final Iterable<PluginProperty> adjustedPluginProperties) throws PaymentApiException {
+      if (adjustedPaymentMethodId == null) {
+        return paymentGatewayProcessor.processNotification(notification,pluginName,properties,callContext);
+      }
+ else {
+        return paymentGatewayProcessor.processNotification(notification,adjustedPaymentMethodId,properties,callContext);
+      }
     }
   }
 );
