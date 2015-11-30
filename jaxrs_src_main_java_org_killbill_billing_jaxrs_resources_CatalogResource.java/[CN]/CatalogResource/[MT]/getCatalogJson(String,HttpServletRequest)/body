@@ -1,0 +1,10 @@
+{
+  DateTime catalogDateVersion=clock.getUTCNow();
+  if (requestedDate != null) {
+    catalogDateVersion=DATE_TIME_FORMATTER.parseDateTime(requestedDate).toDateTime(DateTimeZone.UTC);
+  }
+  final TenantContext tenantContext=context.createContext(request);
+  final Catalog catalog=catalogUserApi.getCatalog(catalogName,tenantContext);
+  final CatalogJson json=new CatalogJson((VersionedCatalog)catalog,catalogDateVersion);
+  return Response.status(Status.OK).entity(json).build();
+}
