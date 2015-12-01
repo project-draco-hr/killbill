@@ -1,0 +1,21 @@
+{
+  Account account=createAccountWithDefaultPaymentMethod("someExternalKey");
+  final PaymentMethods paymentMethodsBeforeRefreshing=killBillClient.getPaymentMethodsForAccount(account.getAccountId());
+  assertEquals(1,paymentMethodsBeforeRefreshing.size());
+  assertEquals("someExternalKey",paymentMethodsBeforeRefreshing.get(0).getExternalKey());
+  killBillClient.refreshPaymentMethods(account.getAccountId(),PLUGIN_NAME,ImmutableMap.<String,String>of(),createdBy,reason,comment);
+  final PaymentMethods paymentMethodsAfterExistingPluginCall=killBillClient.getPaymentMethodsForAccount(account.getAccountId());
+  assertEquals(1,paymentMethodsAfterExistingPluginCall.size());
+  assertEquals("someExternalKey",paymentMethodsAfterExistingPluginCall.get(0).getExternalKey());
+  killBillClient.refreshPaymentMethods(account.getAccountId(),ImmutableMap.<String,String>of(),createdBy,reason,comment);
+  final PaymentMethods paymentMethodsAfterNoPluginNameCall=killBillClient.getPaymentMethodsForAccount(account.getAccountId());
+  assertEquals(1,paymentMethodsAfterNoPluginNameCall.size());
+  assertEquals("someExternalKey",paymentMethodsAfterNoPluginNameCall.get(0).getExternalKey());
+  try {
+    killBillClient.refreshPaymentMethods(account.getAccountId(),"GreatestPluginEver",ImmutableMap.<String,String>of(),createdBy,reason,comment);
+    Assert.fail();
+  }
+ catch (  KillBillClientException e) {
+    Assert.assertEquals(e.getBillingException().getCode(),(Integer)ErrorCode.PAYMENT_NO_SUCH_PAYMENT_PLUGIN.getCode());
+  }
+}
