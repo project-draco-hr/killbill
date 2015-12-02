@@ -1,0 +1,34 @@
+{
+  name=catalog.getCatalogName();
+  effectiveDate=catalog.getEffectiveDate(requestedDate);
+  currencies=Arrays.asList(catalog.getSupportedCurrencies(requestedDate));
+  priceLists=new ArrayList<PriceListJson>();
+  final Plan[] plans=catalog.getPlans(requestedDate);
+  final Map<String,ProductJson> productMap=new HashMap<String,ProductJson>();
+  for (  final Plan plan : plans) {
+    final Product product=plan.getProduct();
+    ProductJson productJson=productMap.get(product.getName());
+    if (productJson == null) {
+      productJson=new ProductJson(product.getCategory().toString(),product.getName(),toProductNames(product.getIncluded()),toProductNames(product.getAvailable()));
+      productMap.put(product.getName(),productJson);
+    }
+    final List<PhaseJson> phases=new LinkedList<PhaseJson>();
+    for (    final PlanPhase phase : plan.getAllPhases()) {
+      final List<PriceJson> prices=new LinkedList<PriceJson>();
+      if (phase.getRecurring() != null && phase.getRecurring().getRecurringPrice() != null) {
+        for (        final Price price : phase.getRecurring().getRecurringPrice().getPrices()) {
+          prices.add(new PriceJson(price));
+        }
+      }
+      final PhaseJson phaseJson=new PhaseJson(phase.getPhaseType().toString(),prices);
+      phases.add(phaseJson);
+    }
+    final PlanJson planJson=new PlanJson(plan.getName(),plan.getRecurringBillingPeriod(),phases);
+    productJson.getPlans().add(planJson);
+  }
+  products=ImmutableList.<ProductJson>copyOf(productMap.values());
+  final DefaultPriceListSet priceLists=catalog.getPriceLists(requestedDate);
+  for (  PriceList childPriceList : priceLists.getAllPriceLists()) {
+    this.priceLists.add(new PriceListJson(childPriceList));
+  }
+}

@@ -1,0 +1,31 @@
+{
+  final Set<String> allBasePlans=new HashSet<String>();
+  final Catalog catalogJson=killBillClient.getJSONCatalog();
+  Assert.assertEquals(catalogJson.getName(),"Firearms");
+  Assert.assertEquals(catalogJson.getEffectiveDate(),Date.valueOf("2011-01-01"));
+  Assert.assertEquals(catalogJson.getCurrencies().size(),3);
+  Assert.assertEquals(catalogJson.getProducts().size(),11);
+  Assert.assertEquals(catalogJson.getPriceLists().size(),3);
+  for (  final Product productJson : catalogJson.getProducts()) {
+    if (!"BASE".equals(productJson.getType())) {
+      Assert.assertEquals(productJson.getIncluded().size(),0);
+      Assert.assertEquals(productJson.getAvailable().size(),0);
+      continue;
+    }
+    for (    final Plan planJson : productJson.getPlans()) {
+      allBasePlans.add(planJson.getName());
+    }
+    final List<PlanDetail> availableAddons=killBillClient.getAvailableAddons(productJson.getName());
+    final Set<String> availableAddonsNames=new HashSet<String>();
+    for (    final PlanDetail planDetailJson : availableAddons) {
+      availableAddonsNames.add(planDetailJson.getProduct());
+    }
+    Assert.assertEquals(availableAddonsNames,new HashSet<String>(productJson.getAvailable()));
+  }
+  final List<PlanDetail> basePlans=killBillClient.getBasePlans();
+  final Set<String> foundBasePlans=new HashSet<String>();
+  for (  final PlanDetail planDetailJson : basePlans) {
+    foundBasePlans.add(planDetailJson.getPlan());
+  }
+  Assert.assertEquals(foundBasePlans,allBasePlans);
+}
