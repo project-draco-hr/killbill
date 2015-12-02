@@ -1,6 +1,6 @@
 {
   name=catalog.getCatalogName();
-  effectiveDate=catalog.getEffectiveDate(requestedDate);
+  effectiveDate=catalog.getStandaloneCatalogEffectiveDate(requestedDate);
   currencies=Arrays.asList(catalog.getSupportedCurrencies(requestedDate));
   priceLists=new ArrayList<PriceListJson>();
   final Plan[] plans=catalog.getPlans(requestedDate);
@@ -27,7 +27,7 @@
     productJson.getPlans().add(planJson);
   }
   products=ImmutableList.<ProductJson>copyOf(productMap.values());
-  final DefaultPriceListSet priceLists=catalog.getPriceLists(requestedDate);
+  final PriceListSet priceLists=catalog.getPriceLists(requestedDate);
   for (  PriceList childPriceList : priceLists.getAllPriceLists()) {
     this.priceLists.add(new PriceListJson(childPriceList));
   }
