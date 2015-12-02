@@ -1,0 +1,12 @@
+{
+  final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
+  final CallContext callContext=context.createContext(createdBy,reason,comment,request);
+  final Account account=accountUserApi.getAccountById(UUID.fromString(accountId),callContext);
+  if (pluginName != null && !pluginName.isEmpty()) {
+    paymentApi.refreshPaymentMethods(account,pluginName,pluginProperties,callContext);
+  }
+ else {
+    paymentApi.refreshPaymentMethods(account,pluginProperties,callContext);
+  }
+  return Response.status(Status.OK).build();
+}
