@@ -1,7 +1,7 @@
 {
-  return executeWithPaymentControl(account,paymentMethodId,properties,paymentOptions,callContext,new WithPaymentControlCallback<HostedPaymentPageFormDescriptor>(){
-    @Override public HostedPaymentPageFormDescriptor doPaymentGatewayApiOperation(    final Iterable<PluginProperty> adjustedPluginProperties) throws PaymentApiException {
-      return buildFormDescriptor(account,paymentMethodId,customFields,adjustedPluginProperties,callContext);
+  return executeWithPaymentControl(account,paymentMethodId,properties,paymentOptions,callContext,paymentPluginFormDispatcher,new WithPaymentControlCallback<HostedPaymentPageFormDescriptor>(){
+    @Override public HostedPaymentPageFormDescriptor doPaymentGatewayApiOperation(    final UUID adjustedPaymentMethodId,    final Iterable<PluginProperty> adjustedPluginProperties) throws PaymentApiException {
+      return buildFormDescriptor(false,account,adjustedPaymentMethodId,customFields,adjustedPluginProperties,callContext);
     }
   }
 );

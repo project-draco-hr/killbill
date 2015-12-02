@@ -1,0 +1,34 @@
+{
+  final UUID accountId=account != null ? account.getId() : null;
+  final String accountExternalKey=account != null ? account.getExternalKey() : "";
+  try {
+    log.debug("Calling plugin(s) {}",pluginNames);
+    final ReturnType result=pluginDispatcher.dispatchWithTimeout(callable);
+    log.debug("Successful plugin(s) call of {} for account {} with result {}",pluginNames,accountId,result);
+    return result;
+  }
+ catch (  final TimeoutException e) {
+    final String errorMessage=String.format("TimeoutException while executing the plugin(s) %s",pluginNames);
+    log.warn(errorMessage,e);
+    throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,accountId,errorMessage);
+  }
+catch (  final InterruptedException e) {
+    Thread.currentThread().interrupt();
+    final String errorMessage=String.format("InterruptedException while executing the following plugin(s): %s",pluginNames);
+    log.warn(errorMessage,e);
+    throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,MoreObjects.firstNonNull(e.getMessage(),errorMessage));
+  }
+catch (  final ExecutionException e) {
+    if (e.getCause() instanceof PaymentApiException) {
+      throw (PaymentApiException)e.getCause();
+    }
+ else     if (e.getCause() instanceof LockFailedException) {
+      final String format=String.format("Failed to lock account %s",accountExternalKey);
+      log.error(format,e);
+      throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,format);
+    }
+ else {
+      throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,MoreObjects.firstNonNull(e.getMessage(),""));
+    }
+  }
+}

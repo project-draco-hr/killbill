@@ -1,0 +1,9 @@
+{
+  super(paymentConfig);
+  this.paymentGatewayProcessor=paymentGatewayProcessor;
+  this.controlPluginRunner=controlPluginRunner;
+  final long paymentPluginTimeoutSec=TimeUnit.SECONDS.convert(paymentConfig.getPaymentPluginTimeout().getPeriod(),paymentConfig.getPaymentPluginTimeout().getUnit());
+  this.paymentPluginFormDispatcher=new PluginDispatcher<HostedPaymentPageFormDescriptor>(paymentPluginTimeoutSec,executors);
+  this.paymentPluginNotificationDispatcher=new PluginDispatcher<GatewayNotification>(paymentPluginTimeoutSec,executors);
+  this.internalCallContextFactory=internalCallContextFactory;
+}

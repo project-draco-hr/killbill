@@ -1,0 +1,26 @@
+{
+  if (shouldDispatch) {
+    return dispatchWithExceptionHandling(null,pluginName,new Callable<PluginDispatcherReturnType<GatewayNotification>>(){
+      @Override public PluginDispatcherReturnType<GatewayNotification> call() throws PaymentApiException {
+        final PaymentPluginApi plugin=getPaymentPluginApi(pluginName);
+        try {
+          final GatewayNotification result=plugin.processNotification(notification,properties,callContext);
+          return PluginDispatcher.createPluginDispatcherReturnType(result == null ? new DefaultNoOpGatewayNotification() : result);
+        }
+ catch (        final PaymentPluginApiException e) {
+          throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,e.getErrorMessage());
+        }
+      }
+    }
+,paymentPluginNotificationDispatcher);
+  }
+ else {
+    final PaymentPluginApi plugin=getPaymentPluginApi(pluginName);
+    try {
+      return plugin.processNotification(notification,properties,callContext);
+    }
+ catch (    final PaymentPluginApiException e) {
+      throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,e.getErrorMessage());
+    }
+  }
+}

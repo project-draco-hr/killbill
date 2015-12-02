@@ -1,0 +1,7 @@
+{
+  final Account account=testHelper.createTestAccount("foo@bar.com",true);
+  final UUID newPaymentMethod=paymentMethodProcessor.createOrGetExternalPaymentMethod("pmExternalKey",account,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  paymentMethodProcessor.setDefaultPaymentMethod(account,newPaymentMethod,PLUGIN_PROPERTIES,callContext,internalCallContext);
+  final Account accountById=accountApi.getAccountById(account.getId(),internalCallContext);
+  Assert.assertEquals(accountById.getPaymentMethodId(),newPaymentMethod);
+}
