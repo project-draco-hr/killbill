@@ -1,16 +1,22 @@
 {
   Account account=createAccountWithDefaultPaymentMethod("someExternalKey");
   final PaymentMethods paymentMethodsBeforeRefreshing=killBillClient.getPaymentMethodsForAccount(account.getAccountId());
-  assertEquals(1,paymentMethodsBeforeRefreshing.size());
-  assertEquals("someExternalKey",paymentMethodsBeforeRefreshing.get(0).getExternalKey());
+  assertEquals(paymentMethodsBeforeRefreshing.size(),1);
+  assertEquals(paymentMethodsBeforeRefreshing.get(0).getExternalKey(),"someExternalKey");
   killBillClient.refreshPaymentMethods(account.getAccountId(),PLUGIN_NAME,ImmutableMap.<String,String>of(),createdBy,reason,comment);
   final PaymentMethods paymentMethodsAfterExistingPluginCall=killBillClient.getPaymentMethodsForAccount(account.getAccountId());
-  assertEquals(1,paymentMethodsAfterExistingPluginCall.size());
-  assertEquals("someExternalKey",paymentMethodsAfterExistingPluginCall.get(0).getExternalKey());
+  System.err.println("PAYMENT METHODS (2)");
+  final Iterator it=paymentMethodsAfterExistingPluginCall.iterator();
+  while (it.hasNext()) {
+    PaymentMethod pm=(PaymentMethod)it.next();
+    System.err.println("PAYMENT METHOD " + pm.toString());
+  }
+  assertEquals(paymentMethodsAfterExistingPluginCall.size(),1);
+  assertEquals(paymentMethodsAfterExistingPluginCall.get(0).getExternalKey(),"someExternalKey");
   killBillClient.refreshPaymentMethods(account.getAccountId(),ImmutableMap.<String,String>of(),createdBy,reason,comment);
   final PaymentMethods paymentMethodsAfterNoPluginNameCall=killBillClient.getPaymentMethodsForAccount(account.getAccountId());
-  assertEquals(1,paymentMethodsAfterNoPluginNameCall.size());
-  assertEquals("someExternalKey",paymentMethodsAfterNoPluginNameCall.get(0).getExternalKey());
+  assertEquals(paymentMethodsAfterNoPluginNameCall.size(),1);
+  assertEquals(paymentMethodsAfterNoPluginNameCall.get(0).getExternalKey(),"someExternalKey");
   try {
     killBillClient.refreshPaymentMethods(account.getAccountId(),"GreatestPluginEver",ImmutableMap.<String,String>of(),createdBy,reason,comment);
     Assert.fail();
