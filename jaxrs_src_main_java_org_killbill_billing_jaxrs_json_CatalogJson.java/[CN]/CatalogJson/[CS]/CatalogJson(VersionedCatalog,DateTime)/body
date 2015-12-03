@@ -20,7 +20,14 @@
           prices.add(new PriceJson(price));
         }
       }
-      final PhaseJson phaseJson=new PhaseJson(phase.getPhaseType().toString(),prices);
+      final List<PriceJson> fixedPrices=new LinkedList<PriceJson>();
+      if (phase.getFixed() != null && phase.getFixed().getPrice() != null) {
+        for (        final Price price : phase.getFixed().getPrice().getPrices()) {
+          fixedPrices.add(new PriceJson(price));
+        }
+      }
+      final DurationJson durationJson=new DurationJson(phase.getDuration().getUnit(),phase.getDuration().getNumber());
+      final PhaseJson phaseJson=new PhaseJson(phase.getPhaseType().toString(),prices,fixedPrices,durationJson);
       phases.add(phaseJson);
     }
     final PlanJson planJson=new PlanJson(plan.getName(),plan.getRecurringBillingPeriod(),phases);
