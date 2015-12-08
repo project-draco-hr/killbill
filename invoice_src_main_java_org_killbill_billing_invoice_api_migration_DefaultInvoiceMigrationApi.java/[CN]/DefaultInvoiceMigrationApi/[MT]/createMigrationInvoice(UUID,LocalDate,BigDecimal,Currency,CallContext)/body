@@ -10,7 +10,7 @@
   final InvoiceModelDao migrationInvoice=new InvoiceModelDao(accountId,clock.getUTCToday(),targetDate,currency,true);
   final InvoiceItemModelDao migrationInvoiceItem=new InvoiceItemModelDao(context.getCreatedDate(),InvoiceItemType.FIXED,migrationInvoice.getId(),accountId,null,null,null,MigrationPlan.MIGRATION_PLAN_NAME,MigrationPlan.MIGRATION_PLAN_PHASE_NAME,null,targetDate,null,balance,null,currency,null);
   final DateTime wrongEffectiveDateButDoesNotMatter=null;
-  final DateAndTimeZoneContext dateAndTimeZoneContext=new DateAndTimeZoneContext(wrongEffectiveDateButDoesNotMatter,account.getTimeZone(),clock);
+  final DefaultAccountDateAndTimeZoneContext dateAndTimeZoneContext=new DefaultAccountDateAndTimeZoneContext(wrongEffectiveDateButDoesNotMatter,account.getTimeZone());
   dao.createInvoice(migrationInvoice,ImmutableList.<InvoiceItemModelDao>of(migrationInvoiceItem),true,new FutureAccountNotifications(dateAndTimeZoneContext,ImmutableMap.<UUID,List<SubscriptionNotification>>of()),internalCallContextFactory.createInternalCallContext(accountId,context));
   return migrationInvoice.getId();
 }

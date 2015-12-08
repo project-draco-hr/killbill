@@ -24,7 +24,7 @@
     invoiceItems.add(invoiceItem);
   }
   Mockito.when(invoice.getInvoiceItems()).thenReturn(invoiceItems);
-  final DateAndTimeZoneContext dateAndTimeZoneContext=new DateAndTimeZoneContext(clock.getUTCNow(),DateTimeZone.UTC,clock);
+  final DefaultAccountDateAndTimeZoneContext dateAndTimeZoneContext=new DefaultAccountDateAndTimeZoneContext(clock.getUTCNow(),DateTimeZone.UTC);
   invoiceDao.createInvoice(new InvoiceModelDao(invoice),invoiceModelItems,true,new FutureAccountNotifications(dateAndTimeZoneContext,ImmutableMap.<UUID,List<SubscriptionNotification>>of()),internalCallContext);
   return invoice;
 }

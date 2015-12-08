@@ -1,0 +1,15 @@
+{
+  final LocalDate roundedStartDate=dateAndTimeZoneContext.computeLocalDateFromFixedAccountOffset(thisEvent.getEffectiveDate());
+  if (roundedStartDate.isAfter(targetDate)) {
+    return null;
+  }
+ else {
+    final BigDecimal fixedPrice=thisEvent.getFixedPrice();
+    if (fixedPrice != null) {
+      return new FixedPriceInvoiceItem(invoiceId,accountId,thisEvent.getSubscription().getBundleId(),thisEvent.getSubscription().getId(),thisEvent.getPlan().getName(),thisEvent.getPlanPhase().getName(),roundedStartDate,fixedPrice,currency);
+    }
+ else {
+      return null;
+    }
+  }
+}

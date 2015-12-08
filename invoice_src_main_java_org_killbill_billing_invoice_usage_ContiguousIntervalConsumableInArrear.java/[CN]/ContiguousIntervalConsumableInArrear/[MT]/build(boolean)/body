@@ -1,11 +1,11 @@
 {
   Preconditions.checkState(!isBuilt.get());
   Preconditions.checkState((!closedInterval && billingEvents.size() >= 1) || (closedInterval && billingEvents.size() >= 2));
-  final LocalDate startDate=new LocalDate(billingEvents.get(0).getEffectiveDate(),getAccountTimeZone());
+  final LocalDate startDate=dateAndTimeZoneContext.computeLocalDateFromFixedAccountOffset(billingEvents.get(0).getEffectiveDate());
   if (targetDate.isBefore(startDate)) {
     return this;
   }
-  final LocalDate endDate=closedInterval ? new LocalDate(billingEvents.get(billingEvents.size() - 1).getEffectiveDate(),getAccountTimeZone()) : targetDate;
+  final LocalDate endDate=closedInterval ? dateAndTimeZoneContext.computeLocalDateFromFixedAccountOffset(billingEvents.get(billingEvents.size() - 1).getEffectiveDate()) : targetDate;
   final BillingIntervalDetail bid=new BillingIntervalDetail(startDate,endDate,targetDate,getBCD(),usage.getBillingPeriod(),usage.getBillingMode());
   int numberOfPeriod=0;
   LocalDate nextBillCycleDate=bid.getFutureBillingDateFor(numberOfPeriod);
