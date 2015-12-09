@@ -1,0 +1,15 @@
+{
+  final List<Tag> tags=tagInternalApi.getTagsForAccountType(ObjectType.INVOICE,false,internalTenantContext);
+  final Iterable<Tag> writtenOffTags=filterForWrittenOff(tags);
+  for (  final Tag cur : writtenOffTags) {
+    final InvoiceModelDao foundInvoice=Iterables.tryFind(invoices,new Predicate<InvoiceModelDao>(){
+      @Override public boolean apply(      final InvoiceModelDao input){
+        return input.getId().equals(cur.getObjectId());
+      }
+    }
+).orNull();
+    if (foundInvoice != null) {
+      foundInvoice.setIsWrittenOff(true);
+    }
+  }
+}

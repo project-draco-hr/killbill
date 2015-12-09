@@ -1,0 +1,8 @@
+{
+  return ImmutableList.<Tag>copyOf(Iterables.transform(input,new Function<TagModelDao,Tag>(){
+    @Override public Tag apply(    final TagModelDao input){
+      return TagModelDaoHelper.isControlTag(input.getTagDefinitionId()) ? new DefaultControlTag(ControlTagType.getTypeFromId(input.getTagDefinitionId()),input.getObjectType(),input.getObjectId(),input.getCreatedDate()) : new DescriptiveTag(input.getTagDefinitionId(),input.getObjectType(),input.getObjectId(),input.getCreatedDate());
+    }
+  }
+));
+}
