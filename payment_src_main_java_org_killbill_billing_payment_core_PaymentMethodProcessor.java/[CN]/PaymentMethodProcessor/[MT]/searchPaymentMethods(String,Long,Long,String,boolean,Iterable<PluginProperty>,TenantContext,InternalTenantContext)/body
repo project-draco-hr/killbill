@@ -1,43 +1,28 @@
 {
-  if (withPluginInfo) {
-    final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
-    return getEntityPagination(limit,new SourcePaginationBuilder<PaymentMethodPlugin,PaymentApiException>(){
-      @Override public Pagination<PaymentMethodPlugin> build() throws PaymentApiException {
-        try {
-          return pluginApi.searchPaymentMethods(searchKey,offset,limit,properties,tenantContext);
-        }
- catch (        final PaymentPluginApiException e) {
-          throw new PaymentApiException(e,ErrorCode.PAYMENT_PLUGIN_SEARCH_PAYMENT_METHODS,pluginName,searchKey);
-        }
+  final PaymentPluginApi pluginApi=getPaymentPluginApi(pluginName);
+  return getEntityPagination(limit,new SourcePaginationBuilder<PaymentMethodPlugin,PaymentApiException>(){
+    @Override public Pagination<PaymentMethodPlugin> build() throws PaymentApiException {
+      try {
+        return pluginApi.searchPaymentMethods(searchKey,offset,limit,properties,tenantContext);
+      }
+ catch (      final PaymentPluginApiException e) {
+        throw new PaymentApiException(e,ErrorCode.PAYMENT_PLUGIN_SEARCH_PAYMENT_METHODS,pluginName,searchKey);
       }
     }
+  }
 ,new Function<PaymentMethodPlugin,PaymentMethod>(){
-      @Override public PaymentMethod apply(      final PaymentMethodPlugin paymentMethodPlugin){
-        if (paymentMethodPlugin.getKbPaymentMethodId() == null) {
-          log.debug("Plugin {} returned a payment method without a kbPaymentMethodId for searchKey {}",pluginName,searchKey);
-          return null;
-        }
-        final PaymentMethodModelDao paymentMethodModelDao=paymentDao.getPaymentMethodIncludedDeleted(paymentMethodPlugin.getKbPaymentMethodId(),internalTenantContext);
-        if (paymentMethodModelDao == null) {
-          log.warn("Unable to find payment method id " + paymentMethodPlugin.getKbPaymentMethodId() + " present in plugin "+ pluginName);
-          return null;
-        }
-        return new DefaultPaymentMethod(paymentMethodModelDao,paymentMethodPlugin);
+    @Override public PaymentMethod apply(    final PaymentMethodPlugin paymentMethodPlugin){
+      if (paymentMethodPlugin.getKbPaymentMethodId() == null) {
+        log.debug("Plugin {} returned a payment method without a kbPaymentMethodId for searchKey {}",pluginName,searchKey);
+        return null;
       }
+      final PaymentMethodModelDao paymentMethodModelDao=paymentDao.getPaymentMethodIncludedDeleted(paymentMethodPlugin.getKbPaymentMethodId(),internalTenantContext);
+      if (paymentMethodModelDao == null) {
+        log.warn("Unable to find payment method id " + paymentMethodPlugin.getKbPaymentMethodId() + " present in plugin "+ pluginName);
+        return null;
+      }
+      return new DefaultPaymentMethod(paymentMethodModelDao,withPluginInfo ? paymentMethodPlugin : null);
     }
-);
   }
- else {
-    return getEntityPagination(limit,new SourcePaginationBuilder<PaymentMethodModelDao,PaymentApiException>(){
-      @Override public Pagination<PaymentMethodModelDao> build(){
-        return paymentDao.searchPaymentMethods(searchKey,offset,limit,internalTenantContext);
-      }
-    }
-,new Function<PaymentMethodModelDao,PaymentMethod>(){
-      @Override public PaymentMethod apply(      final PaymentMethodModelDao paymentMethodModelDao){
-        return new DefaultPaymentMethod(paymentMethodModelDao,null);
-      }
-    }
 );
-  }
 }

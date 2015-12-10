@@ -8,12 +8,14 @@
     }
   }
 );
+  checkPagination(0);
   final String cfName=UUID.randomUUID().toString().substring(1,4);
   final String cfValue=UUID.randomUUID().toString().substring(1,4);
   final CustomField customField=new StringCustomField(cfName,cfValue,ObjectType.ACCOUNT,accountId,callContext.getCreatedDate());
   eventsListener.pushExpectedEvent(NextEvent.CUSTOM_FIELD);
   customFieldUserApi.addCustomFields(ImmutableList.<CustomField>of(customField),callContext);
   assertListenerStatus();
+  checkPagination(1);
   final List<CustomField> customFields=customFieldUserApi.getCustomFieldsForObject(accountId,ObjectType.ACCOUNT,callContext);
   Assert.assertEquals(customFields.size(),1);
   Assert.assertEquals(customFields.get(0).getFieldName(),customField.getFieldName());
@@ -33,12 +35,15 @@
   customFieldUserApi.removeCustomFields(customFields,callContext);
   List<CustomField> remainingCustomFields=customFieldUserApi.getCustomFieldsForObject(accountId,ObjectType.ACCOUNT,callContext);
   Assert.assertEquals(remainingCustomFields.size(),0);
+  checkPagination(0);
   final CustomField newCustomField=new StringCustomField(cfName,cfValue,ObjectType.ACCOUNT,accountId,callContext.getCreatedDate());
   eventsListener.pushExpectedEvent(NextEvent.CUSTOM_FIELD);
   customFieldUserApi.addCustomFields(ImmutableList.<CustomField>of(newCustomField),callContext);
   remainingCustomFields=customFieldUserApi.getCustomFieldsForObject(accountId,ObjectType.ACCOUNT,callContext);
   Assert.assertEquals(remainingCustomFields.size(),1);
+  checkPagination(1);
   customFieldUserApi.removeCustomFields(remainingCustomFields,callContext);
   remainingCustomFields=customFieldUserApi.getCustomFieldsForObject(accountId,ObjectType.ACCOUNT,callContext);
   Assert.assertEquals(remainingCustomFields.size(),0);
+  checkPagination(0);
 }

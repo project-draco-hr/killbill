@@ -1,9 +1,11 @@
 {
   final List<InvoiceModelDao> results=new LinkedList<InvoiceModelDao>();
+  int maxNbRecords=0;
   for (  final InvoiceModelDao invoice : getAll(context)) {
+    maxNbRecords++;
     if (invoice.getId().toString().equals(searchKey) || invoice.getAccountId().toString().equals(searchKey) || invoice.getInvoiceNumber().toString().equals(searchKey)|| invoice.getCurrency().toString().equals(searchKey)) {
       results.add(invoice);
     }
   }
-  return DefaultPagination.<InvoiceModelDao>build(offset,limit,results);
+  return DefaultPagination.<InvoiceModelDao>build(offset,limit,maxNbRecords,results);
 }

@@ -1,0 +1,34 @@
+{
+  final Pagination<PaymentMethod> foundPaymentMethods=paymentApi.searchPaymentMethods(paymentMethodId.toString(),0L,maxNbRecords + 1,false,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(foundPaymentMethods.iterator().hasNext(),!deleted);
+  Assert.assertEquals(foundPaymentMethods.getMaxNbRecords(),maxNbRecords);
+  Assert.assertEquals(foundPaymentMethods.getTotalNbRecords(),(Long)(!deleted ? 1L : 0L));
+  final Pagination<PaymentMethod> foundPaymentMethodsWithPluginInfo=paymentApi.searchPaymentMethods(paymentMethodId.toString(),0L,maxNbRecords + 1,true,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(foundPaymentMethodsWithPluginInfo.iterator().hasNext(),!deleted);
+  Assert.assertEquals(foundPaymentMethodsWithPluginInfo.getMaxNbRecords(),maxNbRecords);
+  Assert.assertEquals(foundPaymentMethodsWithPluginInfo.getTotalNbRecords(),(Long)(!deleted ? 1L : 0L));
+  final Pagination<PaymentMethod> foundPaymentMethods2=paymentApi.searchPaymentMethods(paymentMethodId.toString(),0L,maxNbRecords + 1,MockPaymentProviderPlugin.PLUGIN_NAME,false,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(foundPaymentMethods2.iterator().hasNext(),!deleted);
+  Assert.assertEquals(foundPaymentMethods2.getMaxNbRecords(),maxNbRecords);
+  Assert.assertEquals(foundPaymentMethods2.getTotalNbRecords(),(Long)(!deleted ? 1L : 0L));
+  final Pagination<PaymentMethod> foundPaymentMethods2WithPluginInfo=paymentApi.searchPaymentMethods(paymentMethodId.toString(),0L,maxNbRecords + 1,MockPaymentProviderPlugin.PLUGIN_NAME,true,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(foundPaymentMethods2WithPluginInfo.iterator().hasNext(),!deleted);
+  Assert.assertEquals(foundPaymentMethods2WithPluginInfo.getMaxNbRecords(),maxNbRecords);
+  Assert.assertEquals(foundPaymentMethods2WithPluginInfo.getTotalNbRecords(),(Long)(!deleted ? 1L : 0L));
+  final Pagination<PaymentMethod> gotPaymentMethods=paymentApi.getPaymentMethods(0L,maxNbRecords + 1L,false,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(gotPaymentMethods.iterator().hasNext(),maxNbRecords > 0);
+  Assert.assertEquals(gotPaymentMethods.getMaxNbRecords(),maxNbRecords);
+  Assert.assertEquals(gotPaymentMethods.getTotalNbRecords(),maxNbRecords);
+  final Pagination<PaymentMethod> gotPaymentMethodsWithPluginInfo=paymentApi.getPaymentMethods(0L,maxNbRecords + 1L,true,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(gotPaymentMethodsWithPluginInfo.iterator().hasNext(),maxNbRecords > 0);
+  Assert.assertEquals(gotPaymentMethodsWithPluginInfo.getMaxNbRecords(),maxNbRecords);
+  Assert.assertEquals(gotPaymentMethodsWithPluginInfo.getTotalNbRecords(),maxNbRecords);
+  final Pagination<PaymentMethod> gotPaymentMethods2=paymentApi.getPaymentMethods(0L,maxNbRecords + 1L,MockPaymentProviderPlugin.PLUGIN_NAME,false,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(gotPaymentMethods2.iterator().hasNext(),maxNbRecords > 0);
+  Assert.assertEquals(gotPaymentMethods2.getMaxNbRecords(),maxNbRecords);
+  Assert.assertEquals(gotPaymentMethods2.getTotalNbRecords(),maxNbRecords);
+  final Pagination<PaymentMethod> gotPaymentMethods2WithPluginInfo=paymentApi.getPaymentMethods(0L,maxNbRecords + 1L,MockPaymentProviderPlugin.PLUGIN_NAME,true,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(gotPaymentMethods2WithPluginInfo.iterator().hasNext(),maxNbRecords > 0);
+  Assert.assertEquals(gotPaymentMethods2WithPluginInfo.getMaxNbRecords(),maxNbRecords);
+  Assert.assertEquals(gotPaymentMethods2WithPluginInfo.getTotalNbRecords(),maxNbRecords);
+}

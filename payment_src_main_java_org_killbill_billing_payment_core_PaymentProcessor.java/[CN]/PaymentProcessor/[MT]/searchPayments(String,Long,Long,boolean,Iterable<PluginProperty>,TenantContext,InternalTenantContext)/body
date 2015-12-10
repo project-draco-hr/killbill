@@ -1,8 +1,29 @@
 {
-  return getEntityPaginationFromPlugins(getAvailablePlugins(),offset,limit,new EntityPaginationBuilder<Payment,PaymentApiException>(){
-    @Override public Pagination<Payment> build(    final Long offset,    final Long limit,    final String pluginName) throws PaymentApiException {
-      return searchPayments(searchKey,offset,limit,pluginName,withPluginInfo,properties,tenantContext,internalTenantContext);
+  if (withPluginInfo) {
+    return getEntityPaginationFromPlugins(false,getAvailablePlugins(),offset,limit,new EntityPaginationBuilder<Payment,PaymentApiException>(){
+      @Override public Pagination<Payment> build(      final Long offset,      final Long limit,      final String pluginName) throws PaymentApiException {
+        return searchPayments(searchKey,offset,limit,pluginName,withPluginInfo,properties,tenantContext,internalTenantContext);
+      }
+    }
+);
+  }
+ else {
+    try {
+      return getEntityPagination(limit,new SourcePaginationBuilder<PaymentModelDao,PaymentApiException>(){
+        @Override public Pagination<PaymentModelDao> build(){
+          return paymentDao.searchPayments(searchKey,offset,limit,internalTenantContext);
+        }
+      }
+,new Function<PaymentModelDao,Payment>(){
+        @Override public Payment apply(        final PaymentModelDao paymentModelDao){
+          return toPayment(paymentModelDao.getId(),null,internalTenantContext);
+        }
+      }
+);
+    }
+ catch (    final PaymentApiException e) {
+      log.warn("Unable to search through payments",e);
+      return new DefaultPagination<Payment>(offset,limit,null,null,Iterators.<Payment>emptyIterator());
     }
   }
-);
 }

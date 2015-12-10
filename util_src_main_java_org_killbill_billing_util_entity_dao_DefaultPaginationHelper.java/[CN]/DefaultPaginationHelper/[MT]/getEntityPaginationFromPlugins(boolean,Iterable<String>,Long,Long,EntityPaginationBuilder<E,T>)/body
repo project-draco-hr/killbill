@@ -16,7 +16,12 @@
       }
       firstSearch=allResults.isEmpty();
       totalNbRecords+=pages.getTotalNbRecords();
-      maxNbRecords+=pages.getMaxNbRecords();
+      if (!maxStatsCrossPlugins) {
+        maxNbRecords+=pages.getMaxNbRecords();
+      }
+ else {
+        maxNbRecords=Math.max(maxNbRecords,pages.getMaxNbRecords());
+      }
     }
  catch (    final BillingExceptionBase e) {
       log.warn("Error while searching plugin " + pluginName,e);

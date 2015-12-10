@@ -1,8 +1,29 @@
 {
-  return getEntityPaginationFromPlugins(getAvailablePlugins(),offset,limit,new EntityPaginationBuilder<PaymentMethod,PaymentApiException>(){
-    @Override public Pagination<PaymentMethod> build(    final Long offset,    final Long limit,    final String pluginName) throws PaymentApiException {
-      return searchPaymentMethods(searchKey,offset,limit,pluginName,withPluginInfo,properties,tenantContext,internalTenantContext);
+  if (withPluginInfo) {
+    return getEntityPaginationFromPlugins(false,getAvailablePlugins(),offset,limit,new EntityPaginationBuilder<PaymentMethod,PaymentApiException>(){
+      @Override public Pagination<PaymentMethod> build(      final Long offset,      final Long limit,      final String pluginName) throws PaymentApiException {
+        return searchPaymentMethods(searchKey,offset,limit,pluginName,withPluginInfo,properties,tenantContext,internalTenantContext);
+      }
+    }
+);
+  }
+ else {
+    try {
+      return getEntityPagination(limit,new SourcePaginationBuilder<PaymentMethodModelDao,PaymentApiException>(){
+        @Override public Pagination<PaymentMethodModelDao> build(){
+          return paymentDao.searchPaymentMethods(searchKey,offset,limit,internalTenantContext);
+        }
+      }
+,new Function<PaymentMethodModelDao,PaymentMethod>(){
+        @Override public PaymentMethod apply(        final PaymentMethodModelDao paymentMethodModelDao){
+          return new DefaultPaymentMethod(paymentMethodModelDao,null);
+        }
+      }
+);
+    }
+ catch (    final PaymentApiException e) {
+      log.warn("Unable to search through payment methods",e);
+      return new DefaultPagination<PaymentMethod>(offset,limit,null,null,Iterators.<PaymentMethod>emptyIterator());
     }
   }
-);
 }

@@ -1,0 +1,44 @@
+{
+  final UUID accountId=UUID.randomUUID();
+  final Long accountRecordId=19384012L;
+  dbi.withHandle(new HandleCallback<Void>(){
+    @Override public Void withHandle(    final Handle handle) throws Exception {
+      handle.execute("insert into accounts (record_id, id, email, name, first_name_length, is_notified_for_invoices, created_date, created_by, updated_date, updated_by) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",accountRecordId,accountId.toString(),"yo@t.com","toto",4,false,new Date(),"i",new Date(),"j");
+      return null;
+    }
+  }
+);
+  checkPagination(0);
+  eventsListener.pushExpectedEvent(NextEvent.TAG);
+  tagUserApi.addTags(accountId,ObjectType.ACCOUNT,ImmutableList.<UUID>of(ControlTagType.WRITTEN_OFF.getId()),callContext);
+  assertListenerStatus();
+  checkPagination(1);
+  final List<Tag> tags=tagUserApi.getTagsForObject(accountId,ObjectType.ACCOUNT,true,callContext);
+  Assert.assertEquals(tags.size(),1);
+  Assert.assertEquals(tags.get(0).getTagDefinitionId(),ControlTagType.WRITTEN_OFF.getId());
+  Assert.assertEquals(tags.get(0).getObjectId(),accountId);
+  Assert.assertEquals(tags.get(0).getObjectType(),ObjectType.ACCOUNT);
+  dbi.withHandle(new HandleCallback<Void>(){
+    @Override public Void withHandle(    final Handle handle) throws Exception {
+      final List<Map<String,Object>> values=handle.select("select account_record_id from tags where object_id = ?",accountId.toString());
+      Assert.assertEquals(values.size(),1);
+      Assert.assertEquals(values.get(0).keySet().size(),1);
+      Assert.assertEquals(Long.valueOf(values.get(0).get("account_record_id").toString()),accountRecordId);
+      return null;
+    }
+  }
+);
+  tagUserApi.removeTags(accountId,ObjectType.ACCOUNT,ImmutableList.<UUID>of(ControlTagType.WRITTEN_OFF.getId()),callContext);
+  List<Tag> remainingTags=tagUserApi.getTagsForObject(accountId,ObjectType.ACCOUNT,false,callContext);
+  Assert.assertEquals(remainingTags.size(),0);
+  checkPagination(0);
+  eventsListener.pushExpectedEvent(NextEvent.TAG);
+  tagUserApi.addTags(accountId,ObjectType.ACCOUNT,ImmutableList.<UUID>of(ControlTagType.WRITTEN_OFF.getId()),callContext);
+  remainingTags=tagUserApi.getTagsForObject(accountId,ObjectType.ACCOUNT,false,callContext);
+  Assert.assertEquals(remainingTags.size(),1);
+  checkPagination(1);
+  tagUserApi.removeTags(accountId,ObjectType.ACCOUNT,ImmutableList.<UUID>of(ControlTagType.WRITTEN_OFF.getId()),callContext);
+  remainingTags=tagUserApi.getTagsForObject(accountId,ObjectType.ACCOUNT,false,callContext);
+  Assert.assertEquals(remainingTags.size(),0);
+  checkPagination(0);
+}

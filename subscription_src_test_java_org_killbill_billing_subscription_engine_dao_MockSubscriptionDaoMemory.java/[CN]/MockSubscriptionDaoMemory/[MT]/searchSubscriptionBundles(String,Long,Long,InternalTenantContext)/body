@@ -1,9 +1,11 @@
 {
   final List<SubscriptionBundleModelDao> results=new LinkedList<SubscriptionBundleModelDao>();
+  int maxNbRecords=0;
   for (  final SubscriptionBundleModelDao bundleModelDao : getAll(context)) {
+    maxNbRecords++;
     if (bundleModelDao.getId().toString().equals(searchKey) || bundleModelDao.getExternalKey().equals(searchKey) || bundleModelDao.getAccountId().toString().equals(searchKey)) {
       results.add(bundleModelDao);
     }
   }
-  return DefaultPagination.<SubscriptionBundleModelDao>build(offset,limit,results);
+  return DefaultPagination.<SubscriptionBundleModelDao>build(offset,limit,maxNbRecords,results);
 }
