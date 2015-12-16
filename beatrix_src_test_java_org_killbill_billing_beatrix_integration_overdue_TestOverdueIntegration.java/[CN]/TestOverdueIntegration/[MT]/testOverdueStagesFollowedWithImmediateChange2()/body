@@ -20,11 +20,11 @@
   checkODState("OD2");
   addDaysAndCheckForCompletion(8,NextEvent.PAYMENT_ERROR);
   checkODState("OD2");
-  addDaysAndCheckForCompletion(5,NextEvent.BLOCK);
+  addDaysAndCheckForCompletion(2,NextEvent.BLOCK);
   checkODState("OD3");
   allowPaymentsAndResetOverdueToClearByPayingAllUnpaidInvoices(false);
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2013,5,31),InvoiceItemType.RECURRING,new BigDecimal("2399.95")));
-  invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,10),new LocalDate(2012,7,23),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-85.4588")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2013,5,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-1998.9012")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,23),new LocalDate(2012,7,23),InvoiceItemType.CBA_ADJ,new BigDecimal("2084.36")));
+  invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,10),new LocalDate(2012,7,20),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-85.4588")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2013,5,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-1998.9012")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,20),new LocalDate(2012,7,20),InvoiceItemType.CBA_ADJ,new BigDecimal("2084.36")));
   addDaysAndCheckForCompletion(8,NextEvent.INVOICE,NextEvent.PAYMENT);
   invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2013,7,31),InvoiceItemType.RECURRING,new BigDecimal("2399.95")));
   checkChangePlanWithOverdueState(baseEntitlement,false,false);
