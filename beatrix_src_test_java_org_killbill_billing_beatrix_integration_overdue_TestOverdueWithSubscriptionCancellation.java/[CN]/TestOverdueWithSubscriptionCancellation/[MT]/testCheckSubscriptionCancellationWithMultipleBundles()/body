@@ -7,17 +7,24 @@
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,5,1),callContext);
   final DefaultEntitlement baseEntitlement2=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey2",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   final SubscriptionBundle bundle2=subscriptionApi.getSubscriptionBundle(baseEntitlement.getBundleId(),callContext);
+  invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
+  invoiceChecker.checkChargedThroughDate(baseEntitlement2.getId(),new LocalDate(2012,5,1),callContext);
   final DefaultEntitlement baseEntitlement3=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey3",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   final SubscriptionBundle bundle3=subscriptionApi.getSubscriptionBundle(baseEntitlement.getBundleId(),callContext);
+  invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
+  invoiceChecker.checkChargedThroughDate(baseEntitlement2.getId(),new LocalDate(2012,5,1),callContext);
   clock.addDays(1);
   cancelEntitlementAndCheckForCompletion(baseEntitlement2,clock.getUTCNow(),NextEvent.BLOCK,NextEvent.CANCEL);
+  final SubscriptionBase cancelledBaseSubscription2=((DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement2.getId(),callContext)).getSubscriptionBase();
+  assertTrue(cancelledBaseSubscription2.getState() == EntitlementState.CANCELLED);
   addDaysAndCheckForCompletion(29,NextEvent.PHASE,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
+  invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,6,30),callContext);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(6,NextEvent.BLOCK,NextEvent.BLOCK,NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.CANCEL,NextEvent.INVOICE,NextEvent.INVOICE);
   checkODState("OD1");
   final SubscriptionBase cancelledBaseSubscription=((DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext)).getSubscriptionBase();
   assertTrue(cancelledBaseSubscription.getState() == EntitlementState.CANCELLED);
-  final SubscriptionBase cancelledbaseEntitlement3=((DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement3.getId(),callContext)).getSubscriptionBase();
-  assertTrue(cancelledbaseEntitlement3.getState() == EntitlementState.CANCELLED);
+  final SubscriptionBase cancelledBaseEntitlement3=((DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement3.getId(),callContext)).getSubscriptionBase();
+  assertTrue(cancelledBaseEntitlement3.getState() == EntitlementState.CANCELLED);
 }

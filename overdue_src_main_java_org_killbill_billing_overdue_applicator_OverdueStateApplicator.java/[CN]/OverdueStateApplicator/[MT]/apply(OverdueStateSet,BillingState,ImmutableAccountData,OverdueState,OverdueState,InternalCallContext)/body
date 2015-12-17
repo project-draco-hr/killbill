@@ -8,7 +8,7 @@
     final OverdueState firstOverdueState=overdueStateSet.getFirstState();
     final boolean conditionForNextNotfication=!nextOverdueState.isClearState() || (firstOverdueState != null && billingState != null && billingState.getDateOfEarliestUnpaidInvoice() != null);
     if (conditionForNextNotfication) {
-      final Period reevaluationInterval=nextOverdueState.isClearState() ? overdueStateSet.getInitialReevaluationInterval() : nextOverdueState.getAutoReevaluationInterval();
+      final Period reevaluationInterval=getReevaluationInterval(overdueStateSet,nextOverdueState);
       if (reevaluationInterval == null) {
         log.debug("OverdueStateApplicator <notificationQ> : Missing InitialReevaluationInterval from config, NOT inserting notification for account " + account.getId());
       }
@@ -28,12 +28,7 @@
     avoid_extra_credit_by_toggling_AUTO_INVOICE_OFF(account,previousOverdueState,nextOverdueState,context);
     storeNewState(account,nextOverdueState,context);
   }
- catch (  final OverdueApiException e) {
-    if (e.getCode() != ErrorCode.OVERDUE_NO_REEVALUATION_INTERVAL.getCode()) {
-      throw new OverdueException(e);
-    }
-  }
-catch (  AccountApiException e) {
+ catch (  final AccountApiException e) {
     throw new OverdueException(e);
   }
   try {
