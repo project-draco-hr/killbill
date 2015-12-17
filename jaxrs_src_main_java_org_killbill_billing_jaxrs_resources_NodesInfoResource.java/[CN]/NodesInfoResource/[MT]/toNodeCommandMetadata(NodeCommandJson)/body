@@ -7,6 +7,7 @@
     }
 ;
   }
+  String pluginKey=null;
   String pluginName=null;
   String pluginVersion=null;
   final Iterator<NodeCommandPropertyJson> it=input.getNodeCommandProperties().iterator();
@@ -18,14 +19,16 @@
  else     if (PluginNodeCommandMetadata.PLUGIN_VERSION.equals(cur.getKey())) {
       pluginVersion=(String)cur.getValue();
     }
-    if (pluginName != null && pluginVersion != null) {
+ else     if (PluginNodeCommandMetadata.PLUGIN_KEY.equals(cur.getKey())) {
+      pluginKey=(String)cur.getValue();
+    }
+    if (pluginName != null && pluginVersion != null && pluginKey != null) {
       break;
     }
   }
-  if (pluginName != null) {
-    input.getNodeCommandProperties().remove(PluginNodeCommandMetadata.PLUGIN_NAME);
-    input.getNodeCommandProperties().remove(PluginNodeCommandMetadata.PLUGIN_VERSION);
-    return new PluginNodeCommandMetadata(pluginName,pluginVersion,toNodeCommandProperties(input.getNodeCommandProperties()));
+  if (pluginName != null || pluginKey != null) {
+    removeFirstClassProperties(input.getNodeCommandProperties(),PluginNodeCommandMetadata.PLUGIN_NAME,PluginNodeCommandMetadata.PLUGIN_VERSION,PluginNodeCommandMetadata.PLUGIN_KEY);
+    return new PluginNodeCommandMetadata(pluginKey,pluginName,pluginVersion,toNodeCommandProperties(input.getNodeCommandProperties()));
   }
  else {
     return new NodeCommandMetadata(){
