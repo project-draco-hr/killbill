@@ -1,0 +1,25 @@
+{
+switch (plan.getProduct().getCategory()) {
+case BASE:
+    if (baseSubscription != null && baseSubscription.getState() == EntitlementState.ACTIVE) {
+      throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_BP_EXISTS,bundleId);
+    }
+  return effectiveDate;
+case ADD_ON:
+if (baseSubscription == null) {
+  throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_NO_BP,bundleId);
+}
+if (effectiveDate.isBefore(baseSubscription.getStartDate())) {
+throw new SubscriptionBaseApiException(ErrorCode.SUB_INVALID_REQUESTED_DATE,effectiveDate.toString(),baseSubscription.getStartDate().toString());
+}
+addonUtils.checkAddonCreationRights(baseSubscription,plan,effectiveDate,context);
+return baseSubscription.getStartDate();
+case STANDALONE:
+if (baseSubscription != null) {
+throw new SubscriptionBaseApiException(ErrorCode.SUB_CREATE_BP_EXISTS,bundleId);
+}
+return effectiveDate;
+default :
+throw new SubscriptionBaseError(String.format("Can't create subscription of type %s",plan.getProduct().getCategory().toString()));
+}
+}

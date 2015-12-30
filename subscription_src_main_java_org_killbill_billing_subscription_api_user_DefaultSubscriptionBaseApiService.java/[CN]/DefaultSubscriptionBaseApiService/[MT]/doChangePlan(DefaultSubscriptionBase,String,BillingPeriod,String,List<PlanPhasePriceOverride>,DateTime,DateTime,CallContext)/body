@@ -5,7 +5,7 @@
   if (newPlan.getProduct().getCategory() != subscription.getCategory()) {
     throw new SubscriptionBaseApiException(ErrorCode.SUB_CHANGE_INVALID,subscription.getId());
   }
-  final List<SubscriptionBaseEvent> changeEvents=getEventsOnChangePlan(subscription,newPlan,newPriceList,now,effectiveDate,now,false,internalCallContext);
+  final List<SubscriptionBaseEvent> changeEvents=getEventsOnChangePlan(subscription,newPlan,newPriceList,effectiveDate,now,false,internalCallContext);
   dao.changePlan(subscription,changeEvents,internalCallContext);
   subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),catalogService.getFullCatalog(internalCallContext));
   if (subscription.getCategory() == ProductCategory.BASE) {

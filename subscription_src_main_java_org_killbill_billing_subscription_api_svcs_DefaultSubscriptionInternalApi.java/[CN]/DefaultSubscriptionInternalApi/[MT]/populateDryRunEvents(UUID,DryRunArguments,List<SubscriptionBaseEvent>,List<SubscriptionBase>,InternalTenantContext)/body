@@ -16,9 +16,9 @@ switch (dryRunArguments.getAction()) {
 case START_BILLING:
         final DefaultSubscriptionBase baseSubscription=(DefaultSubscriptionBase)dao.getBaseSubscription(bundleId,context);
       final DateTime startEffectiveDate=dryRunArguments.getEffectiveDate() != null ? dryRunArguments.getEffectiveDate() : utcNow;
-    final DateTime bundleStartDate=getBundleStartDateWithSanity(bundleId,baseSubscription,plan,startEffectiveDate,startEffectiveDate,context);
+    final DateTime bundleStartDate=getBundleStartDateWithSanity(bundleId,baseSubscription,plan,startEffectiveDate,context);
   final UUID subscriptionId=UUIDs.randomUUID();
-dryRunEvents=apiService.getEventsOnCreation(bundleId,subscriptionId,startEffectiveDate,bundleStartDate,1L,plan,inputSpec.getPhaseType(),realPriceList,utcNow,startEffectiveDate,utcNow,false,context);
+dryRunEvents=apiService.getEventsOnCreation(bundleId,subscriptionId,startEffectiveDate,bundleStartDate,1L,plan,inputSpec.getPhaseType(),realPriceList,startEffectiveDate,utcNow,false,context);
 final SubscriptionBuilder builder=new SubscriptionBuilder().setId(subscriptionId).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(bundleStartDate).setAlignStartDate(startEffectiveDate);
 final DefaultSubscriptionBase newSubscription=new DefaultSubscriptionBase(builder,apiService,clock);
 newSubscription.rebuildTransitions(dryRunEvents,catalog);
@@ -35,7 +35,7 @@ policy=planChangeResult.getPolicy();
 }
 changeEffectiveDate=subscriptionForChange.getPlanChangeEffectiveDate(policy);
 }
-dryRunEvents=apiService.getEventsOnChangePlan(subscriptionForChange,plan,realPriceList,utcNow,changeEffectiveDate,utcNow,true,context);
+dryRunEvents=apiService.getEventsOnChangePlan(subscriptionForChange,plan,realPriceList,changeEffectiveDate,utcNow,true,context);
 break;
 case STOP_BILLING:
 final DefaultSubscriptionBase subscriptionForCancellation=(DefaultSubscriptionBase)dao.getSubscriptionFromId(dryRunArguments.getSubscriptionId(),context);
@@ -49,7 +49,7 @@ policy=catalogService.getFullCatalog(context).planCancelPolicy(spec,utcNow);
 }
 cancelEffectiveDate=subscriptionForCancellation.getPlanChangeEffectiveDate(policy);
 }
-dryRunEvents=apiService.getEventsOnCancelPlan(subscriptionForCancellation,utcNow,cancelEffectiveDate,utcNow,true,context);
+dryRunEvents=apiService.getEventsOnCancelPlan(subscriptionForCancellation,cancelEffectiveDate,utcNow,true,context);
 break;
 default :
 throw new IllegalArgumentException("Unexpected dryRunArguments action " + dryRunArguments.getAction());

@@ -1,6 +1,6 @@
 {
   final DateTime now=clock.getUTCNow();
-  final DateTime requestedDate=(requestedDateWithMs != null) ? DefaultClock.truncateMs(requestedDateWithMs) : now;
+  final DateTime effectiveDate=(requestedDateWithMs != null) ? DefaultClock.truncateMs(requestedDateWithMs) : now;
   try {
     final List<SubscriptionSpecifier> subscriptions=new ArrayList<SubscriptionSpecifier>();
     final Catalog catalog=catalogService.getFullCatalog(context);
@@ -9,7 +9,7 @@
       final PlanPhaseSpecifier spec=entitlement.getPlanPhaseSpecifier();
       final String realPriceList=(spec.getPriceListName() == null) ? PriceListSet.DEFAULT_PRICELIST_NAME : spec.getPriceListName();
       final PlanPhasePriceOverridesWithCallContext overridesWithContext=new DefaultPlanPhasePriceOverridesWithCallContext(entitlement.getOverrides(),callContext);
-      final Plan plan=catalog.createOrFindPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,overridesWithContext,requestedDate);
+      final Plan plan=catalog.createOrFindPlan(spec.getProductName(),spec.getBillingPeriod(),realPriceList,overridesWithContext,effectiveDate);
       final PlanPhase phase=plan.getAllPhases()[0];
       if (phase == null) {
         throw new SubscriptionBaseError(String.format("No initial PlanPhase for Product %s, term %s and set %s does not exist in the catalog",spec.getProductName(),spec.getBillingPeriod().toString(),realPriceList));
@@ -20,12 +20,11 @@
       }
       SubscriptionSpecifier subscription=new SubscriptionSpecifier();
       subscription.setRealPriceList(realPriceList);
-      subscription.setRequestedDate(requestedDate);
-      subscription.setEffectiveDate(requestedDate);
+      subscription.setEffectiveDate(effectiveDate);
       subscription.setProcessedDate(now);
       subscription.setPlan(plan);
       subscription.setInitialPhase(spec.getPhaseType());
-      subscription.setBuilder(new SubscriptionBuilder().setId(UUIDs.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(requestedDate).setAlignStartDate(requestedDate));
+      subscription.setBuilder(new SubscriptionBuilder().setId(UUIDs.randomUUID()).setBundleId(bundleId).setCategory(plan.getProduct().getCategory()).setBundleStartDate(effectiveDate).setAlignStartDate(effectiveDate));
       subscriptions.add(subscription);
     }
     return apiService.createPlans(subscriptions,callContext);

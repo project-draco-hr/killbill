@@ -1,0 +1,17 @@
+{
+  final List<DefaultSubscriptionBase> subscriptionsToBeCancelled=new ArrayList<DefaultSubscriptionBase>();
+  final List<SubscriptionBase> subscriptions=dao.getSubscriptions(bundleId,ImmutableList.<SubscriptionBaseEvent>of(),internalTenantContext);
+  for (  final SubscriptionBase subscription : subscriptions) {
+    final DefaultSubscriptionBase cur=(DefaultSubscriptionBase)subscription;
+    if (cur.getState() == EntitlementState.CANCELLED || cur.getCategory() != ProductCategory.ADD_ON) {
+      continue;
+    }
+    final Plan addonCurrentPlan=cur.getCurrentPlan();
+    if (baseProduct == null || addonUtils.isAddonIncludedFromProdName(baseProduct.getName(),addonCurrentPlan,effectiveDate,internalTenantContext) || !addonUtils.isAddonAvailableFromProdName(baseProduct.getName(),addonCurrentPlan,effectiveDate,internalTenantContext)) {
+      final SubscriptionBaseEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(cur.getId()).setActiveVersion(cur.getActiveVersion()).setEffectiveDate(effectiveDate).setRequestedDate(effectiveDate).setFromDisk(true));
+      subscriptionsToBeCancelled.add(cur);
+      events.add(cancelEvent);
+    }
+  }
+  return subscriptionsToBeCancelled;
+}

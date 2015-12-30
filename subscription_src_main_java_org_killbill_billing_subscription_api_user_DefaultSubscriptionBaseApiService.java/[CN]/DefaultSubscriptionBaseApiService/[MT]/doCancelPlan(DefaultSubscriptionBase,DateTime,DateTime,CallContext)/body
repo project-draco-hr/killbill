@@ -2,7 +2,7 @@
   try {
     validateEffectiveDate(subscription,effectiveDate);
     final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
-    final List<SubscriptionBaseEvent> cancelEvents=getEventsOnCancelPlan(subscription,now,effectiveDate,now,false,internalCallContext);
+    final List<SubscriptionBaseEvent> cancelEvents=getEventsOnCancelPlan(subscription,effectiveDate,now,false,internalCallContext);
     dao.cancelSubscription(subscription,cancelEvents.get(0),internalCallContext,0);
     final Catalog fullCatalog=catalogService.getFullCatalog(internalCallContext);
     subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),fullCatalog);

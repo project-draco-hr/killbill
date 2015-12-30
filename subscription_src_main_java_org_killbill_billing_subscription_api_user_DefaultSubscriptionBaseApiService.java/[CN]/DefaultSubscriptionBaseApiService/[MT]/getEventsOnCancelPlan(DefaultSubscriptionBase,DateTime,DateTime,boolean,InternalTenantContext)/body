@@ -1,0 +1,10 @@
+{
+  final List<SubscriptionBaseEvent> cancelEvents=new ArrayList<SubscriptionBaseEvent>();
+  final SubscriptionBaseEvent cancelEvent=new ApiEventCancel(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setActiveVersion(subscription.getActiveVersion()).setEffectiveDate(effectiveDate).setRequestedDate(effectiveDate).setFromDisk(true));
+  cancelEvents.add(cancelEvent);
+  if (subscription.getCategory() == ProductCategory.BASE && addCancellationAddOnForEventsIfRequired) {
+    final Product currentBaseProduct=cancelEvent.getEffectiveDate().compareTo(clock.getUTCNow()) <= 0 ? null : subscription.getCurrentPlan().getProduct();
+    addCancellationAddOnForEventsIfRequired(cancelEvents,currentBaseProduct,subscription.getBundleId(),effectiveDate,internalTenantContext);
+  }
+  return cancelEvents;
+}

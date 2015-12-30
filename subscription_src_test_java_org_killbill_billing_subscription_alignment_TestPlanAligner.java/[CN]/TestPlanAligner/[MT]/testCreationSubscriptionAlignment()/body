@@ -6,14 +6,14 @@
   final TimedPhase[] phases=getTimedPhasesOnCreate(productName,initialPhase,defaultSubscriptionBase,effectiveDate);
   Assert.assertEquals(phases[0].getStartPhase(),defaultSubscriptionBase.getStartDate());
   Assert.assertEquals(phases[1].getStartPhase(),defaultSubscriptionBase.getStartDate().plusMonths(1));
-  final TimedPhase nextTimePhase=planAligner.getNextTimedPhase(defaultSubscriptionBase,effectiveDate,effectiveDate,internalCallContext);
+  final TimedPhase nextTimePhase=planAligner.getNextTimedPhase(defaultSubscriptionBase,effectiveDate,internalCallContext);
   Assert.assertEquals(nextTimePhase.getStartPhase(),defaultSubscriptionBase.getStartDate().plusMonths(1));
   final DateTime effectiveDateInThePast=defaultSubscriptionBase.getStartDate().minusHours(10);
   final TimedPhase[] phasesInThePast=getTimedPhasesOnCreate(productName,initialPhase,defaultSubscriptionBase,effectiveDateInThePast);
   Assert.assertNull(phasesInThePast[0]);
   Assert.assertEquals(phasesInThePast[1].getStartPhase(),defaultSubscriptionBase.getStartDate());
   try {
-    planAligner.getNextTimedPhase(defaultSubscriptionBase,effectiveDateInThePast,effectiveDateInThePast,internalCallContext);
+    planAligner.getNextTimedPhase(defaultSubscriptionBase,effectiveDateInThePast,internalCallContext);
     Assert.fail("Can't use getNextTimedPhase(): the effective date is before the initial plan");
   }
  catch (  SubscriptionBaseError e) {
