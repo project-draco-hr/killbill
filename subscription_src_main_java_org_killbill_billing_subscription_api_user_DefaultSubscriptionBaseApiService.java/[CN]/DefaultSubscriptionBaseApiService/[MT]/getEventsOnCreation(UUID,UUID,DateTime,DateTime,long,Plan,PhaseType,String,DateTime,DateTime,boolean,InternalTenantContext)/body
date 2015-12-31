@@ -1,9 +1,9 @@
 {
   final TimedPhase[] curAndNextPhases=planAligner.getCurrentAndNextTimedPhaseOnCreate(alignStartDate,bundleStartDate,plan,initialPhase,realPriceList,effectiveDate,internalTenantContext);
-  final ApiEventBuilder createBuilder=new ApiEventBuilder().setSubscriptionId(subscriptionId).setEventPlan(plan.getName()).setEventPlanPhase(curAndNextPhases[0].getPhase().getName()).setEventPriceList(realPriceList).setActiveVersion(activeVersion).setEffectiveDate(effectiveDate).setRequestedDate(effectiveDate).setFromDisk(true);
+  final ApiEventBuilder createBuilder=new ApiEventBuilder().setSubscriptionId(subscriptionId).setEventPlan(plan.getName()).setEventPlanPhase(curAndNextPhases[0].getPhase().getName()).setEventPriceList(realPriceList).setActiveVersion(activeVersion).setEffectiveDate(effectiveDate).setFromDisk(true);
   final ApiEvent creationEvent=(reCreate) ? new ApiEventReCreate(createBuilder) : new ApiEventCreate(createBuilder);
   final TimedPhase nextTimedPhase=curAndNextPhases[1];
-  final PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(subscriptionId,activeVersion,nextTimedPhase.getPhase().getName(),processedDate,nextTimedPhase.getStartPhase()) : null;
+  final PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(subscriptionId,activeVersion,nextTimedPhase.getPhase().getName(),nextTimedPhase.getStartPhase()) : null;
   final List<SubscriptionBaseEvent> events=new ArrayList<SubscriptionBaseEvent>();
   events.add(creationEvent);
   if (nextPhaseEvent != null) {

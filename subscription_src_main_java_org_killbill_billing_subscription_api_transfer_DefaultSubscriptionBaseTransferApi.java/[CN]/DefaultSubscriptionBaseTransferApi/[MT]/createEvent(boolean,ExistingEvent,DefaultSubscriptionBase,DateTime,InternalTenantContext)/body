@@ -7,7 +7,7 @@
   if (spec == null || currentPhase == null) {
     return null;
   }
-  final ApiEventBuilder apiBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(existingEvent.getPlanName()).setEventPlanPhase(currentPhase.getName()).setEventPriceList(spec.getPriceListName()).setActiveVersion(subscription.getActiveVersion()).setEffectiveDate(effectiveDate).setRequestedDate(effectiveDate).setFromDisk(true);
+  final ApiEventBuilder apiBuilder=new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(existingEvent.getPlanName()).setEventPlanPhase(currentPhase.getName()).setEventPriceList(spec.getPriceListName()).setActiveVersion(subscription.getActiveVersion()).setEffectiveDate(effectiveDate).setFromDisk(true);
 switch (existingEvent.getSubscriptionTransitionType()) {
 case TRANSFER:
 case MIGRATE_ENTITLEMENT:
@@ -19,7 +19,7 @@ case CHANGE:
 newEvent=firstEvent ? new ApiEventTransfer(apiBuilder) : new ApiEventChange(apiBuilder);
 break;
 case PHASE:
-newEvent=firstEvent ? new ApiEventTransfer(apiBuilder) : PhaseEventData.createNextPhaseEvent(subscription.getId(),subscription.getActiveVersion(),currentPhase.getName(),clock.getUTCNow(),effectiveDate);
+newEvent=firstEvent ? new ApiEventTransfer(apiBuilder) : PhaseEventData.createNextPhaseEvent(subscription.getId(),subscription.getActiveVersion(),currentPhase.getName(),effectiveDate);
 break;
 case MIGRATE_BILLING:
 if (firstEvent) {
