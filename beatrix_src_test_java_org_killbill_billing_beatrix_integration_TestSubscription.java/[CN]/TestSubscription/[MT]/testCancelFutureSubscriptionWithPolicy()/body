@@ -7,6 +7,7 @@
   final Entitlement createdEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,futureDate,ImmutableList.<PluginProperty>of(),callContext);
   assertEquals(createdEntitlement.getEffectiveStartDate().compareTo(futureDate),0);
   assertEquals(createdEntitlement.getEffectiveEndDate(),null);
+  assertListenerStatus();
   final Entitlement cancelledEntitlement=createdEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.IMMEDIATE,BillingActionPolicy.IMMEDIATE,null,callContext);
   assertEquals(cancelledEntitlement.getEffectiveEndDate().compareTo(futureDate),0);
   assertListenerStatus();

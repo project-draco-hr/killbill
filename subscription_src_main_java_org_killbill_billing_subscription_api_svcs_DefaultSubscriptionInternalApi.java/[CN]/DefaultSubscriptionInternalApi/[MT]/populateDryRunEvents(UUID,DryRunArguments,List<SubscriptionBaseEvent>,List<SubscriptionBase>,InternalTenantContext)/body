@@ -33,7 +33,7 @@ if (policy == null) {
 final PlanChangeResult planChangeResult=apiService.getPlanChangeResult(subscriptionForChange,dryRunArguments.getPlanPhaseSpecifier().getProductName(),dryRunArguments.getPlanPhaseSpecifier().getBillingPeriod(),dryRunArguments.getPlanPhaseSpecifier().getPriceListName(),utcNow,tenantContext);
 policy=planChangeResult.getPolicy();
 }
-changeEffectiveDate=subscriptionForChange.getPlanChangeEffectiveDate(subscriptionForChange.getStartDate(),policy);
+changeEffectiveDate=subscriptionForChange.getPlanChangeEffectiveDate(policy);
 }
 dryRunEvents=apiService.getEventsOnChangePlan(subscriptionForChange,plan,realPriceList,changeEffectiveDate,utcNow,true,context);
 break;
@@ -47,7 +47,7 @@ final Plan currentPlan=subscriptionForCancellation.getCurrentPlan();
 final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),subscriptionForCancellation.getCurrentPlan().getRecurringBillingPeriod(),subscriptionForCancellation.getCurrentPriceList().getName(),subscriptionForCancellation.getCurrentPhase().getPhaseType());
 policy=catalogService.getFullCatalog(context).planCancelPolicy(spec,utcNow);
 }
-cancelEffectiveDate=subscriptionForCancellation.getPlanChangeEffectiveDate(subscriptionForCancellation.getStartDate(),policy);
+cancelEffectiveDate=subscriptionForCancellation.getPlanChangeEffectiveDate(policy);
 }
 dryRunEvents=apiService.getEventsOnCancelPlan(subscriptionForCancellation,cancelEffectiveDate,utcNow,true,context);
 break;

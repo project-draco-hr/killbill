@@ -1,6 +1,7 @@
 {
   final SubscriptionBaseTransition previousTransition=subscription.getPreviousTransition();
-  if (previousTransition != null && previousTransition.getEffectiveTransitionTime().isAfter(effectiveDate)) {
-    throw new SubscriptionBaseApiException(ErrorCode.SUB_INVALID_REQUESTED_DATE,effectiveDate.toString(),previousTransition.getEffectiveTransitionTime());
+  final DateTime earliestValidDate=previousTransition != null ? previousTransition.getEffectiveTransitionTime() : subscription.getStartDate();
+  if (effectiveDate.isBefore(earliestValidDate)) {
+    throw new SubscriptionBaseApiException(ErrorCode.SUB_INVALID_REQUESTED_DATE,effectiveDate.toString(),previousTransition != null ? previousTransition.getEffectiveTransitionTime() : "null");
   }
 }
