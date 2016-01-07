@@ -1,0 +1,18 @@
+{
+  final LocalDate initialDate=new LocalDate(2015,9,1);
+  clock.setDay(initialDate);
+  final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(1));
+  final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Shotgun",ProductCategory.BASE,BillingPeriod.ANNUAL,PriceListSet.DEFAULT_PRICELIST_NAME,null);
+  final LocalDate futureDate=new LocalDate(2015,10,1);
+  final Entitlement createdEntitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,account.getExternalKey(),null,futureDate,ImmutableList.<PluginProperty>of(),callContext);
+  assertEquals(createdEntitlement.getEffectiveStartDate().compareTo(futureDate),0);
+  assertEquals(createdEntitlement.getEffectiveEndDate(),null);
+  final Entitlement cancelledEntitlement=createdEntitlement.cancelEntitlementWithPolicyOverrideBillingPolicy(EntitlementActionPolicy.IMMEDIATE,BillingActionPolicy.IMMEDIATE,null,callContext);
+  assertEquals(cancelledEntitlement.getEffectiveEndDate().compareTo(futureDate),0);
+  assertListenerStatus();
+  busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE,NextEvent.BLOCK,NextEvent.CANCEL);
+  clock.addDays(30);
+  assertListenerStatus();
+  clock.addMonths(1);
+  assertListenerStatus();
+}
