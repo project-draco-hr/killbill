@@ -7,7 +7,7 @@
     final Catalog fullCatalog=catalogService.getFullCatalog(internalCallContext);
     subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),fullCatalog);
     if (subscription.getCategory() == ProductCategory.BASE) {
-      final Product baseProduct=(subscription.getState() == EntitlementState.CANCELLED) ? null : subscription.getCurrentPlan().getProduct();
+      final Product baseProduct=(subscription.getState() == null || subscription.getState() == EntitlementState.CANCELLED) ? null : subscription.getCurrentPlan().getProduct();
       cancelAddOnsIfRequired(baseProduct,subscription.getBundleId(),effectiveDate,context);
     }
     final boolean isImmediate=subscription.getState() == EntitlementState.CANCELLED;

@@ -1,0 +1,14 @@
+{
+  final DateTime candidateResult;
+switch (policy) {
+case IMMEDIATE:
+    candidateResult=clock.getUTCNow();
+  break;
+case END_OF_TERM:
+candidateResult=(chargedThroughDate != null && chargedThroughDate.isAfter(clock.getUTCNow())) ? chargedThroughDate : clock.getUTCNow();
+break;
+default :
+throw new SubscriptionBaseError(String.format("Unexpected policy type %s",policy.toString()));
+}
+return (candidateResult.compareTo(subscriptionStartDate) < 0) ? subscriptionStartDate : candidateResult;
+}

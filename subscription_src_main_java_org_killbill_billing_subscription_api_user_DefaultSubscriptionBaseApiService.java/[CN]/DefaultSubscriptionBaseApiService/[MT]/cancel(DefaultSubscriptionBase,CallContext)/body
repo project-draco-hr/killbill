@@ -1,6 +1,6 @@
 {
   final EntitlementState currentState=subscription.getState();
-  if (currentState != EntitlementState.ACTIVE) {
+  if (currentState != null && currentState != EntitlementState.ACTIVE) {
     throw new SubscriptionBaseApiException(ErrorCode.SUB_CANCEL_BAD_STATE,subscription.getId(),currentState);
   }
   final DateTime now=clock.getUTCNow();
@@ -9,7 +9,7 @@
   try {
     final InternalTenantContext internalCallContext=createTenantContextFromBundleId(subscription.getBundleId(),context);
     final BillingActionPolicy policy=catalogService.getFullCatalog(internalCallContext).planCancelPolicy(planPhase,now);
-    final DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy);
+    final DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(subscription.getStartDate(),policy);
     return doCancelPlan(subscription,now,effectiveDate,context);
   }
  catch (  final CatalogApiException e) {

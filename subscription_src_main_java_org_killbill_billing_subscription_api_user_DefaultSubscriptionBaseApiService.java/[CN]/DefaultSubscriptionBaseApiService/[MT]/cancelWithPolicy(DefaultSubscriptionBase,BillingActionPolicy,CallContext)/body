@@ -1,9 +1,9 @@
 {
   final EntitlementState currentState=subscription.getState();
-  if (currentState != EntitlementState.ACTIVE) {
+  if (currentState != null && currentState != EntitlementState.ACTIVE) {
     throw new SubscriptionBaseApiException(ErrorCode.SUB_CANCEL_BAD_STATE,subscription.getId(),currentState);
   }
   final DateTime now=clock.getUTCNow();
-  final DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy);
+  final DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(subscription.getStartDate(),policy);
   return doCancelPlan(subscription,now,effectiveDate,context);
 }
