@@ -1,11 +1,37 @@
 {
   super(toAuditLogJson(accountAuditLogs == null ? null : accountAuditLogs.getAuditLogsForSubscription(subscription.getId())));
   this.startDate=subscription.getEffectiveStartDate();
-  this.productName=subscription.getLastActiveProduct() == null ? null : subscription.getLastActiveProduct().getName();
-  this.productCategory=subscription.getLastActiveProductCategory() == null ? null : subscription.getLastActiveProductCategory().name();
-  this.billingPeriod=subscription.getLastActivePlan() == null ? null : subscription.getLastActivePlan().getRecurringBillingPeriod().toString();
-  this.phaseType=subscription.getLastActivePhase() == null ? null : subscription.getLastActivePhase().getPhaseType().toString();
-  this.priceList=subscription.getLastActivePriceList() == null ? null : subscription.getLastActivePriceList().getName();
+  final SubscriptionEvent firstEvent=subscription.getSubscriptionEvents().isEmpty() ? null : subscription.getSubscriptionEvents().get(0);
+  if (subscription.getLastActiveProduct() == null) {
+    this.productName=firstEvent == null ? null : firstEvent.getNextProduct().getName();
+  }
+ else {
+    this.productName=subscription.getLastActiveProduct().getName();
+  }
+  if (subscription.getLastActiveProductCategory() == null) {
+    this.productCategory=firstEvent == null ? null : firstEvent.getNextProduct().getCategory().name();
+  }
+ else {
+    this.productCategory=subscription.getLastActiveProductCategory().name();
+  }
+  if (subscription.getLastActivePlan() == null) {
+    this.billingPeriod=firstEvent == null ? null : firstEvent.getNextPlan().getRecurringBillingPeriod().name();
+  }
+ else {
+    this.billingPeriod=subscription.getLastActivePlan().getRecurringBillingPeriod().toString();
+  }
+  if (subscription.getLastActivePhase() == null) {
+    this.phaseType=firstEvent == null ? null : firstEvent.getNextPhase().getPhaseType().name();
+  }
+ else {
+    this.phaseType=subscription.getLastActivePhase().getPhaseType().toString();
+  }
+  if (subscription.getLastActivePriceList() == null) {
+    this.priceList=firstEvent == null ? null : firstEvent.getNextPriceList().getName();
+  }
+ else {
+    this.priceList=subscription.getLastActivePriceList().getName();
+  }
   this.state=subscription.getState().name();
   this.sourceType=subscription.getSourceType().name();
   this.cancelledDate=subscription.getEffectiveEndDate();
