@@ -1,6 +1,6 @@
 {
   final UUID subscriptionId=subscription.getId();
-  cancelFutureEventsFromTransaction(subscriptionId,entitySqlDaoWrapperFactory,context);
+  cancelFutureEventsFromTransaction(subscriptionId,cancelEvent.getEffectiveDate(),entitySqlDaoWrapperFactory,context);
   entitySqlDaoWrapperFactory.become(SubscriptionEventSqlDao.class).create(new SubscriptionEventModelDao(cancelEvent),context);
   final boolean isBusEvent=cancelEvent.getEffectiveDate().compareTo(clock.getUTCNow()) <= 0;
   recordBusOrFutureNotificationFromTransaction(subscription,cancelEvent,entitySqlDaoWrapperFactory,isBusEvent,seqId,context);
