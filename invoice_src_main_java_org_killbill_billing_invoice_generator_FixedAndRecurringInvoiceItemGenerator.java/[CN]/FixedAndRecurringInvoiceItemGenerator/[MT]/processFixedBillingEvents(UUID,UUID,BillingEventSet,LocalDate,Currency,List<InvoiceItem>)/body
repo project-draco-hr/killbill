@@ -1,11 +1,17 @@
 {
+  final AccountDateAndTimeZoneContext dateAndTimeZoneContext=events.getAccountDateAndTimeZoneContext();
+  InvoiceItem prevItem=null;
   final Iterator<BillingEvent> eventIt=events.iterator();
   while (eventIt.hasNext()) {
     final BillingEvent thisEvent=eventIt.next();
-    final InvoiceItem fixedPriceInvoiceItem=generateFixedPriceItem(invoiceId,accountId,thisEvent,targetDate,currency,events.getAccountDateAndTimeZoneContext());
-    if (fixedPriceInvoiceItem != null) {
-      proposedItems.add(fixedPriceInvoiceItem);
+    final InvoiceItem currentFixedPriceItem=generateFixedPriceItem(invoiceId,accountId,thisEvent,targetDate,currency,dateAndTimeZoneContext);
+    if (!isSameDayAndSameSubscription(prevItem,thisEvent,dateAndTimeZoneContext) && prevItem != null) {
+      proposedItems.add(prevItem);
     }
+    prevItem=currentFixedPriceItem;
+  }
+  if (prevItem != null) {
+    proposedItems.add(prevItem);
   }
   return proposedItems;
 }
