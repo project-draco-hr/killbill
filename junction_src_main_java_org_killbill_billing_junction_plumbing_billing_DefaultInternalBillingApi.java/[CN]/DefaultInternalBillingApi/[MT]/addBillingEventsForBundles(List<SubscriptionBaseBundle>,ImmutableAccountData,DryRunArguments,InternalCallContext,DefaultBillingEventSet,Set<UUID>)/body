@@ -3,7 +3,7 @@
   if (dryRunArguments != null && dryRunArguments.getAction() == SubscriptionEventType.START_BILLING && dryRunArguments.getBundleId() == null) {
     final UUID fakeBundleId=UUIDs.randomUUID();
     final List<SubscriptionBase> subscriptions=subscriptionApi.getSubscriptionsForBundle(fakeBundleId,dryRunArguments,context);
-    addBillingEventsForSubscription(account,subscriptions,fakeBundleId,dryRunMode,context,result);
+    addBillingEventsForSubscription(account,subscriptions,fakeBundleId,dryRunMode,context,result,skipSubscriptionsSet);
   }
   for (  final SubscriptionBaseBundle bundle : bundles) {
     final DryRunArguments dryRunArgumentsForBundle=(dryRunArguments != null && dryRunArguments.getBundleId() != null && dryRunArguments.getBundleId().equals(bundle.getId())) ? dryRunArguments : null;
@@ -16,7 +16,7 @@
       }
     }
  else {
-      addBillingEventsForSubscription(account,subscriptions,bundle.getId(),dryRunMode,context,result);
+      addBillingEventsForSubscription(account,subscriptions,bundle.getId(),dryRunMode,context,result,skipSubscriptionsSet);
     }
   }
 }
