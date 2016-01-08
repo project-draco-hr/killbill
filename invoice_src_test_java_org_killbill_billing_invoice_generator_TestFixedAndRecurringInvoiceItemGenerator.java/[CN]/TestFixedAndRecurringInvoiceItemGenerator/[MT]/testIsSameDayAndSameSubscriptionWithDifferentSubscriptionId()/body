@@ -1,0 +1,11 @@
+{
+  final Plan plan=new MockPlan("my-plan");
+  final LocalDate invoiceItemDate=new LocalDate("2016-01-08");
+  final BigDecimal fixedPriceAmount=BigDecimal.TEN;
+  final MockInternationalPrice fixedPrice=new MockInternationalPrice(new DefaultPrice(fixedPriceAmount,Currency.USD));
+  final PlanPhase phase=new MockPlanPhase(null,fixedPrice,BillingPeriod.NO_BILLING_PERIOD,PhaseType.TRIAL);
+  final UUID invoiceId=UUID.randomUUID();
+  final InvoiceItem prevInvoiceItem=new FixedPriceInvoiceItem(invoiceId,account.getId(),UUID.randomUUID(),UUID.randomUUID(),plan.getName(),phase.getName(),invoiceItemDate,fixedPriceAmount,Currency.USD);
+  final BillingEvent event=invoiceUtil.createMockBillingEvent(account,subscription,new DateTime("2016-01-08"),plan,phase,fixedPriceAmount,null,Currency.USD,BillingPeriod.NO_BILLING_PERIOD,1,BillingMode.IN_ADVANCE,"Billing Event Desc",1L,SubscriptionBaseTransitionType.CREATE);
+  assertFalse(fixedAndRecurringInvoiceItemGenerator.isSameDayAndSameSubscription(prevInvoiceItem,event,dateAndTimeZoneContext));
+}
