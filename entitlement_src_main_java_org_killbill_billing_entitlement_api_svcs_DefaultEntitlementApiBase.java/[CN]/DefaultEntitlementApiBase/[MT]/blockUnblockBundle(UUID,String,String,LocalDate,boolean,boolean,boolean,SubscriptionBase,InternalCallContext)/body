@@ -3,10 +3,10 @@
     final SubscriptionBase baseSubscription=inputBaseSubscription == null ? subscriptionInternalApi.getBaseSubscription(bundleId,internalCallContext) : inputBaseSubscription;
     final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(localEffectiveDate,baseSubscription.getStartDate(),internalCallContext);
     final BlockingState state=new DefaultBlockingState(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,stateName,serviceName,blockChange,blockEntitlement,blockBilling,effectiveDate);
-    entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(state,internalCallContext);
+    entitlementUtils.setBlockingStatesAndPostBlockingTransitionEvent(ImmutableList.<BlockingState>of(state),bundleId,internalCallContext);
     return state.getId();
   }
- catch (  SubscriptionBaseApiException e) {
+ catch (  final SubscriptionBaseApiException e) {
     throw new EntitlementApiException(e);
   }
 }

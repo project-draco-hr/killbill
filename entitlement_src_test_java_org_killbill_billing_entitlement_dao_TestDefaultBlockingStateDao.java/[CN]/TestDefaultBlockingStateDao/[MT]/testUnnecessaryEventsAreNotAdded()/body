@@ -9,6 +9,6 @@
   Assert.assertEquals(blockingStateDao.getBlockingAllForAccountRecordId(internalCallContext).size(),0);
   final DateTime stateDateTime=new DateTime(2013,5,6,10,11,12,DateTimeZone.UTC);
   final BlockingState blockingState=new DefaultBlockingState(entitlement.getId(),type,state,service,false,false,false,stateDateTime);
-  blockingStateDao.setBlockingStateAndPostBlockingTransitionEvent(blockingState,entitlement.getBundleId(),internalCallContext);
+  blockingStateDao.setBlockingStatesAndPostBlockingTransitionEvent(ImmutableMap.<BlockingState,Optional<UUID>>of(blockingState,Optional.<UUID>of(entitlement.getBundleId())),internalCallContext);
   Assert.assertEquals(blockingStateDao.getBlockingAllForAccountRecordId(internalCallContext).size(),1);
 }

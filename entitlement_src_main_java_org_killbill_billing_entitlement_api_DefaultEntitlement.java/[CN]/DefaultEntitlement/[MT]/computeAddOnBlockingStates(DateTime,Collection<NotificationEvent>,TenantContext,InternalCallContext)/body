@@ -1,17 +1,14 @@
 {
   if (!ProductCategory.BASE.equals(getSubscriptionBase().getCategory())) {
-    return;
+    return ImmutableList.<BlockingState>of();
   }
   refresh(context);
   final DateTime now=clock.getUTCNow();
   if (effectiveDate.compareTo(now) > 0) {
     final boolean isBaseEntitlementCancelled=eventsStream.isEntitlementCancelled();
     final NotificationEvent notificationEvent=new EntitlementNotificationKey(getId(),getBundleId(),isBaseEntitlementCancelled ? EntitlementNotificationKeyAction.CANCEL : EntitlementNotificationKeyAction.CHANGE,effectiveDate);
-    recordFutureNotification(effectiveDate,notificationEvent,internalCallContext);
-    return;
+    notificationEvents.add(notificationEvent);
+    return ImmutableList.<BlockingState>of();
   }
-  final Collection<BlockingState> addOnsBlockingStates=eventsStream.computeAddonsBlockingStatesForNextSubscriptionBaseEvent(effectiveDate);
-  for (  final BlockingState addOnBlockingState : addOnsBlockingStates) {
-    entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(addOnBlockingState,internalCallContext);
-  }
+  return eventsStream.computeAddonsBlockingStatesForNextSubscriptionBaseEvent(effectiveDate);
 }

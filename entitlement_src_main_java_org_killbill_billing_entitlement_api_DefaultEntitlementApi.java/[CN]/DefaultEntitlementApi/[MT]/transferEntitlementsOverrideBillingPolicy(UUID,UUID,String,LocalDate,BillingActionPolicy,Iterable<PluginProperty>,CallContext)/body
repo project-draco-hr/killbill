@@ -23,16 +23,18 @@ throw new EntitlementApiException(new SubscriptionBaseApiException(ErrorCode.SUB
 }
 final DateTime requestedDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),baseSubscription.getStartDate(),contextWithValidAccountRecordId);
 final SubscriptionBaseBundle newBundle=subscriptionBaseTransferApi.transferBundle(sourceAccountId,destAccountId,externalKey,requestedDate,true,cancelImm,context);
+final Map<BlockingState,UUID> blockingStates=new HashMap<BlockingState,UUID>();
 for (final SubscriptionBase subscriptionBase : subscriptionBaseInternalApi.getSubscriptionsForBundle(baseBundle.getId(),null,contextWithValidAccountRecordId)) {
 final BlockingState blockingState=new DefaultBlockingState(subscriptionBase.getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,requestedDate);
-entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(blockingState,contextWithValidAccountRecordId);
+blockingStates.put(blockingState,subscriptionBase.getBundleId());
 }
+entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(blockingStates,contextWithValidAccountRecordId);
 return newBundle.getId();
 }
- catch (SubscriptionBaseTransferApiException e) {
+ catch (final SubscriptionBaseTransferApiException e) {
 throw new EntitlementApiException(e);
 }
-catch (SubscriptionBaseApiException e) {
+catch (final SubscriptionBaseApiException e) {
 throw new EntitlementApiException(e);
 }
 }

@@ -9,10 +9,9 @@
   billingEvents.add(B);
   billingEvents.add(C);
   billingEvents.add(D);
-  final List<BlockingState> blockingStates=new ArrayList<BlockingState>();
-  blockingStates.add(new DefaultBlockingState(bundleId1,BlockingStateType.SUBSCRIPTION_BUNDLE,DISABLED_BUNDLE,"test",true,true,true,now));
-  blockingStates.add(new DefaultBlockingState(bundleId1,BlockingStateType.SUBSCRIPTION_BUNDLE,CLEAR_BUNDLE,"test",false,false,false,now.plusDays(2)));
-  setBlockingStates(blockingStates);
+  final BlockingState blockingState1=new DefaultBlockingState(bundleId1,BlockingStateType.SUBSCRIPTION_BUNDLE,DISABLED_BUNDLE,"test",true,true,true,now);
+  final BlockingState blockingState2=new DefaultBlockingState(bundleId1,BlockingStateType.SUBSCRIPTION_BUNDLE,CLEAR_BUNDLE,"test",false,false,false,now.plusDays(2));
+  blockingStateDao.setBlockingStatesAndPostBlockingTransitionEvent(ImmutableMap.<BlockingState,Optional<UUID>>of(blockingState1,Optional.<UUID>absent(),blockingState2,Optional.<UUID>absent()),internalCallContext);
   blockingCalculator.insertBlockingEvents(billingEvents,new HashSet<UUID>(),internalCallContext);
   assertEquals(billingEvents.size(),7);
   final SortedSet<BillingEvent> s1Events=blockingCalculator.filter(billingEvents,subscription1);

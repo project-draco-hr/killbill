@@ -1,0 +1,8 @@
+{
+  final Collection<NotificationEvent> notificationEvents=new ArrayList<NotificationEvent>();
+  final Collection<BlockingState> blockingStates=entitlement.computeAddOnBlockingStates(key.getEffectiveDate(),notificationEvents,callContext,internalCallContext);
+  entitlementUtils.setBlockingStatesAndPostBlockingTransitionEvent(blockingStates,entitlement.getBundleId(),internalCallContext);
+  for (  final NotificationEvent notificationEvent : notificationEvents) {
+    recordFutureNotification(key.getEffectiveDate(),notificationEvent,internalCallContext);
+  }
+}

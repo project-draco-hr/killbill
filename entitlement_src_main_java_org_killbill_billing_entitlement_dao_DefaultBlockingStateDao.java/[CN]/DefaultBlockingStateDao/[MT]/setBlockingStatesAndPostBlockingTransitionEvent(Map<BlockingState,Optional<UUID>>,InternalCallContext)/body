@@ -1,0 +1,38 @@
+{
+  transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
+    @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
+      final DateTime upToDate=clock.getUTCNow();
+      final BlockingStateSqlDao sqlDao=entitySqlDaoWrapperFactory.become(BlockingStateSqlDao.class);
+      for (      final BlockingState state : states.keySet()) {
+        final UUID bundleId=states.get(state).orNull();
+        final BlockingAggregator previousState=getBlockedStatus(sqlDao,entitySqlDaoWrapperFactory.getHandle(),state.getBlockedId(),state.getType(),bundleId,upToDate,context);
+        final BlockingStateModelDao newBlockingStateModelDao=new BlockingStateModelDao(state,context);
+        final List<BlockingStateModelDao> allForBlockedItAndService=sqlDao.getBlockingHistoryForService(state.getBlockedId(),state.getService(),context);
+        allForBlockedItAndService.add(newBlockingStateModelDao);
+        final List<BlockingStateModelDao> allForBlockedItAndServiceOrdered=BLOCKING_STATE_MODEL_DAO_ORDERING.immutableSortedCopy(allForBlockedItAndService);
+        final Collection<UUID> blockingStatesToRemove=new HashSet<UUID>();
+        BlockingStateModelDao prevBlockingStateModelDao=null;
+        for (        final BlockingStateModelDao blockingStateModelDao : allForBlockedItAndServiceOrdered) {
+          if (prevBlockingStateModelDao != null && prevBlockingStateModelDao.getState().equals(blockingStateModelDao.getState())) {
+            blockingStatesToRemove.add(blockingStateModelDao.getId());
+          }
+          prevBlockingStateModelDao=blockingStateModelDao;
+        }
+        for (        final UUID blockedId : blockingStatesToRemove) {
+          if (!newBlockingStateModelDao.getId().equals(blockedId)) {
+            sqlDao.unactiveEvent(blockedId.toString(),context);
+          }
+        }
+        if (!blockingStatesToRemove.contains(newBlockingStateModelDao.getId())) {
+          sqlDao.create(newBlockingStateModelDao,context);
+        }
+        final BlockingAggregator currentState=getBlockedStatus(sqlDao,entitySqlDaoWrapperFactory.getHandle(),state.getBlockedId(),state.getType(),bundleId,upToDate,context);
+        if (previousState != null && currentState != null) {
+          recordBusOrFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,state.getId(),state.getEffectiveDate(),state.getBlockedId(),state.getType(),state.getService(),previousState,currentState,context);
+        }
+      }
+      return null;
+    }
+  }
+);
+}

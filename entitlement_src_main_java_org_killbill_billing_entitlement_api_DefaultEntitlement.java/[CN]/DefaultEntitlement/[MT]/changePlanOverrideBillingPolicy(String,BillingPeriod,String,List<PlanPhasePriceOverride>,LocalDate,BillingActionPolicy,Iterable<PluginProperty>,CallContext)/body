@@ -12,16 +12,21 @@
       try {
         effectiveChangeDate=getSubscriptionBase().changePlanWithPolicy(productName,billingPeriod,priceList,overrides,actionPolicy,callContext);
       }
- catch (      SubscriptionBaseApiException e) {
+ catch (      final SubscriptionBaseApiException e) {
         throw new EntitlementApiException(e);
       }
       try {
         checker.checkBlockedChange(getSubscriptionBase(),effectiveChangeDate,context);
       }
- catch (      BlockingApiException e) {
+ catch (      final BlockingApiException e) {
         throw new EntitlementApiException(e,e.getCode(),e.getMessage());
       }
-      blockAddOnsIfRequired(effectiveChangeDate,callContext,context);
+      final Collection<NotificationEvent> notificationEvents=new ArrayList<NotificationEvent>();
+      final Iterable<BlockingState> addOnsBlockingStates=computeAddOnBlockingStates(effectiveChangeDate,notificationEvents,callContext,context);
+      setBlockingStates(addOnsBlockingStates,context);
+      for (      final NotificationEvent notificationEvent : notificationEvents) {
+        recordFutureNotification(effectiveChangeDate,notificationEvent,context);
+      }
       return entitlementApi.getEntitlementForId(getId(),callContext);
     }
   }
