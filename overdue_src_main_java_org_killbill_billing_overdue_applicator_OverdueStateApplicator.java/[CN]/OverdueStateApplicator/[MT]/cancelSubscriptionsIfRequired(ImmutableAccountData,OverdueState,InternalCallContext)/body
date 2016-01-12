@@ -17,15 +17,11 @@ throw new IllegalStateException("Unexpected OverdueCancellationPolicy " + nextOv
 }
 final List<Entitlement> toBeCancelled=new LinkedList<Entitlement>();
 computeEntitlementsToCancel(account,toBeCancelled,callContext);
-for (final Entitlement cur : toBeCancelled) {
 try {
-cur.cancelEntitlementWithDateOverrideBillingPolicy(new LocalDate(clock.getUTCNow(),account.getTimeZone()),actionPolicy,ImmutableList.<PluginProperty>of(),callContext);
+entitlementInternalApi.cancel(toBeCancelled,new LocalDate(clock.getUTCNow(),account.getTimeZone()),actionPolicy,ImmutableList.<PluginProperty>of(),context);
 }
  catch (final EntitlementApiException e) {
-if (e.getCode() != ErrorCode.SUB_CANCEL_BAD_STATE.getCode()) {
 throw new OverdueException(e);
-}
-}
 }
 }
  catch (final EntitlementApiException e) {
