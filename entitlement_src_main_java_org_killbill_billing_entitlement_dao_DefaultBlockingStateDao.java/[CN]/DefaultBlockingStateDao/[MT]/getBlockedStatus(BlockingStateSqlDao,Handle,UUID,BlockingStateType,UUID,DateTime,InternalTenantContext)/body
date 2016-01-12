@@ -1,0 +1,23 @@
+{
+  final List<BlockingState> accountBlockingStates;
+  final List<BlockingState> bundleBlockingStates;
+  final List<BlockingState> subscriptionBlockingStates;
+  if (type == BlockingStateType.SUBSCRIPTION) {
+    final UUID accountId=nonEntityDao.retrieveIdFromObjectInTransaction(context.getAccountRecordId(),ObjectType.ACCOUNT,cacheControllerDispatcher.getCacheController(CacheType.OBJECT_ID),handle);
+    accountBlockingStates=getBlockingState(sqlDao,accountId,BlockingStateType.ACCOUNT,upToDate,context);
+    bundleBlockingStates=getBlockingState(sqlDao,bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,upToDate,context);
+    subscriptionBlockingStates=getBlockingState(sqlDao,blockableId,BlockingStateType.SUBSCRIPTION,upToDate,context);
+  }
+ else   if (type == BlockingStateType.SUBSCRIPTION_BUNDLE) {
+    final UUID accountId=nonEntityDao.retrieveIdFromObjectInTransaction(context.getAccountRecordId(),ObjectType.ACCOUNT,cacheControllerDispatcher.getCacheController(CacheType.OBJECT_ID),handle);
+    accountBlockingStates=getBlockingState(sqlDao,accountId,BlockingStateType.ACCOUNT,upToDate,context);
+    bundleBlockingStates=getBlockingState(sqlDao,blockableId,BlockingStateType.SUBSCRIPTION_BUNDLE,upToDate,context);
+    subscriptionBlockingStates=ImmutableList.<BlockingState>of();
+  }
+ else {
+    accountBlockingStates=getBlockingState(sqlDao,blockableId,BlockingStateType.ACCOUNT,upToDate,context);
+    bundleBlockingStates=ImmutableList.<BlockingState>of();
+    subscriptionBlockingStates=ImmutableList.<BlockingState>of();
+  }
+  return statelessBlockingChecker.getBlockedState(accountBlockingStates,bundleBlockingStates,subscriptionBlockingStates);
+}

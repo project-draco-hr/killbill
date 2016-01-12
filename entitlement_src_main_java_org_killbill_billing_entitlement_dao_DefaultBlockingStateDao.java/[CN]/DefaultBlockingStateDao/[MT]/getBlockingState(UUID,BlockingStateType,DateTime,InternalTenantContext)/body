@@ -1,15 +1,8 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<BlockingState>>(){
     @Override public List<BlockingState> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
-      final Date upTo=upToDate.toDate();
-      final List<BlockingStateModelDao> models=entitySqlDaoWrapperFactory.become(BlockingStateSqlDao.class).getBlockingState(blockableId,upTo,context);
-      final Collection<BlockingStateModelDao> modelsFiltered=filterBlockingStates(models,blockingStateType);
-      return new ArrayList<BlockingState>(Collections2.transform(modelsFiltered,new Function<BlockingStateModelDao,BlockingState>(){
-        @Override public BlockingState apply(        @Nullable final BlockingStateModelDao src){
-          return BlockingStateModelDao.toBlockingState(src);
-        }
-      }
-));
+      final BlockingStateSqlDao sqlDao=entitySqlDaoWrapperFactory.become(BlockingStateSqlDao.class);
+      return getBlockingState(sqlDao,blockableId,blockingStateType,upToDate,context);
     }
   }
 );

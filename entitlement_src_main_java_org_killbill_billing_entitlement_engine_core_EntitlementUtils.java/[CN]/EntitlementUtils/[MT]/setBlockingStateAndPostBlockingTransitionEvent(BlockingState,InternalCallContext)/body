@@ -1,8 +1,12 @@
 {
-  final BlockingAggregator previousState=getBlockingStateFor(state.getBlockedId(),state.getType(),clock.getUTCNow(),context);
-  dao.setBlockingState(state,context);
-  final BlockingAggregator currentState=getBlockingStateFor(state.getBlockedId(),state.getType(),state.getEffectiveDate(),context);
-  if (previousState != null && currentState != null) {
-    postBlockingTransitionEvent(state.getId(),state.getEffectiveDate(),state.getBlockedId(),state.getType(),state.getService(),previousState,currentState,context);
+  UUID bundleId=null;
+  if (state.getType() == BlockingStateType.SUBSCRIPTION) {
+    try {
+      bundleId=subscriptionBaseInternalApi.getSubscriptionFromId(state.getBlockedId(),context).getBundleId();
+    }
+ catch (    final SubscriptionBaseApiException e) {
+      throw new RuntimeException(e);
+    }
   }
+  dao.setBlockingStateAndPostBlockingTransitionEvent(state,bundleId,context);
 }
