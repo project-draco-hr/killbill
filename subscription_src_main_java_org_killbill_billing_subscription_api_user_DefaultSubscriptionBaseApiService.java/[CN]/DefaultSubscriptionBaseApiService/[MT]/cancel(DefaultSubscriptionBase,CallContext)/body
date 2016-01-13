@@ -7,10 +7,10 @@
   final Plan currentPlan=subscription.getCurrentPlan();
   final PlanPhaseSpecifier planPhase=new PlanPhaseSpecifier(currentPlan.getProduct().getName(),currentPlan.getProduct().getCategory(),subscription.getCurrentPlan().getRecurringBillingPeriod(),subscription.getCurrentPriceList().getName(),subscription.getCurrentPhase().getPhaseType());
   try {
-    final InternalTenantContext internalCallContext=createTenantContextFromBundleId(subscription.getBundleId(),context);
+    final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
     final BillingActionPolicy policy=catalogService.getFullCatalog(internalCallContext).planCancelPolicy(planPhase,now);
     final DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy);
-    return doCancelPlan(subscription,now,effectiveDate,context);
+    return doCancelPlan(ImmutableMap.<DefaultSubscriptionBase,DateTime>of(subscription,effectiveDate),now,internalCallContext);
   }
  catch (  final CatalogApiException e) {
     throw new SubscriptionBaseApiException(e);

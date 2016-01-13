@@ -1,0 +1,33 @@
+{
+  final List<EntitlementContext> updatedPluginContexts=new LinkedList<EntitlementContext>();
+  try {
+    for (    final EntitlementContext pluginContext : pluginContexts) {
+      final PriorEntitlementResult priorEntitlementResult=executePluginPriorCalls(pluginContext);
+      if (priorEntitlementResult != null && priorEntitlementResult.isAborted()) {
+        throw new EntitlementApiException(ErrorCode.ENT_PLUGIN_API_ABORTED);
+      }
+      updatedPluginContexts.add(new DefaultEntitlementContext(pluginContext,priorEntitlementResult));
+    }
+    preCallbacksCallback.call();
+    try {
+      for (int i=0; i < updatedPluginContexts.size(); i++) {
+        final EntitlementContext updatedPluginContext=updatedPluginContexts.get(i);
+        final WithEntitlementPlugin callback=callbacks.get(i);
+        callback.doCall(entitlementApi,updatedPluginContext);
+        executePluginOnSuccessCalls(updatedPluginContext);
+      }
+    }
+ catch (    final EntitlementApiException e) {
+      for (      final EntitlementContext updatedPluginContext : updatedPluginContexts) {
+        executePluginOnFailureCalls(updatedPluginContext);
+      }
+      throw e;
+    }
+  }
+ catch (  final EntitlementPluginApiException e) {
+    throw new EntitlementApiException(ErrorCode.ENT_PLUGIN_API_ABORTED,e.getMessage());
+  }
+catch (  final Exception e) {
+    throw new EntitlementApiException(ErrorCode.ENT_PLUGIN_API_ABORTED,e.getMessage());
+  }
+}

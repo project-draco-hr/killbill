@@ -1,23 +1,24 @@
 {
   final CallContext callContext=internalCallContextFactory.createCallContext(internalCallContext);
-  final ImmutableMap.Builder<BlockingState,Optional<UUID>> states=new ImmutableMap.Builder<BlockingState,Optional<UUID>>();
+  final ImmutableMap.Builder<BlockingState,Optional<UUID>> blockingStates=new ImmutableMap.Builder<BlockingState,Optional<UUID>>();
   final Map<DateTime,Collection<NotificationEvent>> notificationEvents=new HashMap<DateTime,Collection<NotificationEvent>>();
+  final Collection<EntitlementContext> pluginContexts=new LinkedList<EntitlementContext>();
+  final List<WithEntitlementPlugin> callbacks=new LinkedList<WithEntitlementPlugin>();
+  final List<SubscriptionBase> subscriptions=new LinkedList<SubscriptionBase>();
   for (  final Entitlement entitlement : entitlements) {
+    if (entitlement.getState() == EntitlementState.CANCELLED) {
+      continue;
+    }
+    final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CANCEL_SUBSCRIPTION,entitlement.getAccountId(),null,entitlement.getBundleId(),entitlement.getExternalKey(),null,effectiveDate,properties,callContext);
+    pluginContexts.add(pluginContext);
     final DefaultEntitlement defaultEntitlement=getDefaultEntitlement(entitlement,internalCallContext);
-    final Collection<BlockingState> blockingStates=new ArrayList<BlockingState>();
-    try {
-      cancelEntitlementWithDateOverrideBillingPolicy(defaultEntitlement,effectiveDate,billingPolicy,blockingStates,notificationEvents,properties,callContext,internalCallContext);
-    }
- catch (    final EntitlementApiException e) {
-      if (e.getCode() != ErrorCode.SUB_CANCEL_BAD_STATE.getCode()) {
-        throw e;
-      }
-    }
-    for (    final BlockingState blockingState : blockingStates) {
-      states.put(blockingState,Optional.<UUID>fromNullable(entitlement.getBundleId()));
-    }
+    final WithEntitlementPlugin<Entitlement> cancelEntitlementWithPlugin=new WithDateOverrideBillingPolicyEntitlementCanceler(defaultEntitlement,blockingStates,notificationEvents,callContext,internalCallContext);
+    callbacks.add(cancelEntitlementWithPlugin);
+    subscriptions.add(defaultEntitlement.getSubscriptionBase());
   }
-  blockingStateDao.setBlockingStatesAndPostBlockingTransitionEvent(states.build(),internalCallContext);
+  final Callable<Void> preCallbacksCallback=new BulkSubscriptionBaseCancellation(subscriptions,billingPolicy,internalCallContext);
+  pluginExecution.executeWithPlugin(preCallbacksCallback,callbacks,pluginContexts);
+  blockingStateDao.setBlockingStatesAndPostBlockingTransitionEvent(blockingStates.build(),internalCallContext);
   for (  final DateTime effectiveDateForNotification : notificationEvents.keySet()) {
     for (    final NotificationEvent notificationEvent : notificationEvents.get(effectiveDateForNotification)) {
       recordFutureNotification(effectiveDateForNotification,notificationEvent,internalCallContext);

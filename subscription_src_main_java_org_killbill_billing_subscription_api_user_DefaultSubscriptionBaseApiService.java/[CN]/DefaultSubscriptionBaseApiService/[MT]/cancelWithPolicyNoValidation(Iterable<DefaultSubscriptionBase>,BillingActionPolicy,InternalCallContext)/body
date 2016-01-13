@@ -1,0 +1,9 @@
+{
+  final Map<DefaultSubscriptionBase,DateTime> subscriptionsWithEffectiveDate=new HashMap<DefaultSubscriptionBase,DateTime>();
+  final DateTime now=clock.getUTCNow();
+  for (  final DefaultSubscriptionBase subscription : subscriptions) {
+    final DateTime effectiveDate=subscription.getPlanChangeEffectiveDate(policy);
+    subscriptionsWithEffectiveDate.put(subscription,effectiveDate);
+  }
+  return doCancelPlan(subscriptionsWithEffectiveDate,now,context);
+}
