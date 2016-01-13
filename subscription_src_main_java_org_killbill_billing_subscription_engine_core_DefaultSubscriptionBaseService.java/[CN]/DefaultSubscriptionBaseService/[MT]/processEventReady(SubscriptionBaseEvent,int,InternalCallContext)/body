@@ -11,17 +11,19 @@
     if (subscription.getActiveVersion() > event.getActiveVersion()) {
       return;
     }
-    int theRealSeqId=seqId;
+    boolean eventSent=false;
     if (event.getType() == EventType.PHASE) {
-      onPhaseEvent(subscription,context);
+      eventSent=onPhaseEvent(subscription,event,context);
     }
  else     if (event.getType() == EventType.API_USER && subscription.getCategory() == ProductCategory.BASE) {
       final CallContext callContext=internalCallContextFactory.createCallContext(context);
-      theRealSeqId=onBasePlanEvent(subscription,(ApiEvent)event,callContext);
+      eventSent=onBasePlanEvent(subscription,event,callContext);
     }
-    final SubscriptionBaseTransitionData transition=(subscription.getTransitionFromEvent(event,theRealSeqId));
-    final EffectiveSubscriptionInternalEvent busEvent=new DefaultEffectiveSubscriptionEvent(transition,subscription.getAlignStartDate(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
-    eventBus.post(busEvent);
+    if (!eventSent) {
+      final SubscriptionBaseTransitionData transition=subscription.getTransitionFromEvent(event,seqId);
+      final BusEvent busEvent=new DefaultEffectiveSubscriptionEvent(transition,subscription.getAlignStartDate(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
+      eventBus.post(busEvent);
+    }
   }
  catch (  final EventBusException e) {
     log.warn("Failed to post subscription event " + event,e);

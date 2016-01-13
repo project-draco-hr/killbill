@@ -2,7 +2,7 @@
   try {
     final SubscriptionBaseTransitionData transition=subscription.getTransitionFromEvent(immediateEvent,seqId);
     final BusEvent busEvent=new DefaultEffectiveSubscriptionEvent(transition,subscription.getAlignStartDate(),context.getUserToken(),context.getAccountRecordId(),context.getTenantRecordId());
-    eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory.getHandle().getConnection());
+    eventBus.post(busEvent);
   }
  catch (  final EventBusException e) {
     log.warn("Failed to post effective event for subscription " + subscription.getId(),e);
