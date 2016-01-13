@@ -1,11 +1,7 @@
 {
-  final DateTime now=clock.getUTCNow();
-  if (effectiveDate.compareTo(now) > 0) {
-    return 0;
-  }
   final List<SubscriptionBaseEvent> cancelEvents=new LinkedList<SubscriptionBaseEvent>();
   final InternalCallContext internalCallContext=createCallContextFromBundleId(bundleId,context);
-  final List<DefaultSubscriptionBase> subscriptionsToBeCancelled=addCancellationAddOnForEventsIfRequired(cancelEvents,baseProduct,bundleId,effectiveDate,internalCallContext);
+  final List<DefaultSubscriptionBase> subscriptionsToBeCancelled=computeAddOnsToCancel(cancelEvents,baseProduct,bundleId,effectiveDate,internalCallContext);
   if (!subscriptionsToBeCancelled.isEmpty()) {
     dao.cancelSubscriptions(subscriptionsToBeCancelled,cancelEvents,internalCallContext);
   }

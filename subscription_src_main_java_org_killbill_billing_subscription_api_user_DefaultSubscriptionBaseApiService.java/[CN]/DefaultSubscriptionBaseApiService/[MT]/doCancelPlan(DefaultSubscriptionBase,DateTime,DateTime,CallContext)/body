@@ -1,17 +1,18 @@
 {
+  validateEffectiveDate(subscription,effectiveDate);
+  final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
+  final List<DefaultSubscriptionBase> subscriptionsToBeCancelled=new LinkedList<DefaultSubscriptionBase>();
+  final List<SubscriptionBaseEvent> cancelEvents=new LinkedList<SubscriptionBaseEvent>();
   try {
-    validateEffectiveDate(subscription,effectiveDate);
-    final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
-    final List<SubscriptionBaseEvent> cancelEvents=getEventsOnCancelPlan(subscription,effectiveDate,now,false,internalCallContext);
-    dao.cancelSubscription(subscription,cancelEvents.get(0),internalCallContext,0);
+    subscriptionsToBeCancelled.add(subscription);
+    cancelEvents.addAll(getEventsOnCancelPlan(subscription,effectiveDate,now,false,internalCallContext));
+    if (subscription.getCategory() == ProductCategory.BASE) {
+      subscriptionsToBeCancelled.addAll(computeAddOnsToCancel(cancelEvents,null,subscription.getBundleId(),effectiveDate,internalCallContext));
+    }
+    dao.cancelSubscriptions(subscriptionsToBeCancelled,cancelEvents,internalCallContext);
     final Catalog fullCatalog=catalogService.getFullCatalog(internalCallContext);
     subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),fullCatalog);
-    if (subscription.getCategory() == ProductCategory.BASE) {
-      final Product baseProduct=(subscription.getState() == null || subscription.getState() == EntitlementState.CANCELLED) ? null : subscription.getCurrentPlan().getProduct();
-      cancelAddOnsIfRequired(baseProduct,subscription.getBundleId(),effectiveDate,context);
-    }
-    final boolean isImmediate=subscription.getState() == EntitlementState.CANCELLED;
-    return isImmediate;
+    return subscription.getState() == EntitlementState.CANCELLED;
   }
  catch (  final CatalogApiException e) {
     throw new SubscriptionBaseApiException(e);

@@ -5,12 +5,11 @@
   if (newPlan.getProduct().getCategory() != subscription.getCategory()) {
     throw new SubscriptionBaseApiException(ErrorCode.SUB_CHANGE_INVALID,subscription.getId());
   }
-  final List<SubscriptionBaseEvent> changeEvents=getEventsOnChangePlan(subscription,newPlan,newPriceList,effectiveDate,now,false,internalCallContext);
-  dao.changePlan(subscription,changeEvents,internalCallContext);
-  subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),catalogService.getFullCatalog(internalCallContext));
-  if (subscription.getCategory() == ProductCategory.BASE) {
-    final Product baseProduct=(subscription.getState() == EntitlementState.CANCELLED) ? null : subscription.getCurrentPlan().getProduct();
-    cancelAddOnsIfRequired(baseProduct,subscription.getBundleId(),effectiveDate,context);
-  }
+  final List<DefaultSubscriptionBase> addOnSubscriptionsToBeCancelled=new ArrayList<DefaultSubscriptionBase>();
+  final List<SubscriptionBaseEvent> addOnCancelEvents=new ArrayList<SubscriptionBaseEvent>();
+  final List<SubscriptionBaseEvent> changeEvents=getEventsOnChangePlan(subscription,newPlan,newPriceList,effectiveDate,true,addOnSubscriptionsToBeCancelled,addOnCancelEvents,internalCallContext);
+  dao.changePlan(subscription,changeEvents,addOnSubscriptionsToBeCancelled,addOnCancelEvents,internalCallContext);
+  final Catalog fullCatalog=catalogService.getFullCatalog(internalCallContext);
+  subscription.rebuildTransitions(dao.getEventsForSubscription(subscription.getId(),internalCallContext),fullCatalog);
   return effectiveDate;
 }

@@ -1,16 +1,7 @@
 {
-  final TimedPhase currentTimedPhase=planAligner.getCurrentTimedPhaseOnChange(subscription,newPlan,newPriceList,effectiveDate,internalTenantContext);
-  final SubscriptionBaseEvent changeEvent=new ApiEventChange(new ApiEventBuilder().setSubscriptionId(subscription.getId()).setEventPlan(newPlan.getName()).setEventPlanPhase(currentTimedPhase.getPhase().getName()).setEventPriceList(newPriceList).setActiveVersion(subscription.getActiveVersion()).setEffectiveDate(effectiveDate).setFromDisk(true));
-  final TimedPhase nextTimedPhase=planAligner.getNextTimedPhaseOnChange(subscription,newPlan,newPriceList,effectiveDate,internalTenantContext);
-  final PhaseEvent nextPhaseEvent=(nextTimedPhase != null) ? PhaseEventData.createNextPhaseEvent(subscription.getId(),subscription.getActiveVersion(),nextTimedPhase.getPhase().getName(),nextTimedPhase.getStartPhase()) : null;
-  final List<SubscriptionBaseEvent> changeEvents=new ArrayList<SubscriptionBaseEvent>();
-  changeEvents.add(changeEvent);
-  if (nextPhaseEvent != null && !nextPhaseEvent.getEffectiveDate().equals(changeEvent.getEffectiveDate())) {
-    changeEvents.add(nextPhaseEvent);
-  }
-  if (subscription.getCategory() == ProductCategory.BASE && addCancellationAddOnForEventsIfRequired) {
-    final Product currentBaseProduct=changeEvent.getEffectiveDate().compareTo(clock.getUTCNow()) <= 0 ? newPlan.getProduct() : subscription.getCurrentPlan().getProduct();
-    addCancellationAddOnForEventsIfRequired(changeEvents,currentBaseProduct,subscription.getBundleId(),effectiveDate,internalTenantContext);
-  }
+  final Collection<DefaultSubscriptionBase> addOnSubscriptionsToBeCancelled=new ArrayList<DefaultSubscriptionBase>();
+  final List<SubscriptionBaseEvent> addOnCancelEvents=new ArrayList<SubscriptionBaseEvent>();
+  final List<SubscriptionBaseEvent> changeEvents=getEventsOnChangePlan(subscription,newPlan,newPriceList,effectiveDate,addCancellationAddOnForEventsIfRequired,addOnSubscriptionsToBeCancelled,addOnCancelEvents,internalTenantContext);
+  changeEvents.addAll(addOnCancelEvents);
   return changeEvents;
 }
