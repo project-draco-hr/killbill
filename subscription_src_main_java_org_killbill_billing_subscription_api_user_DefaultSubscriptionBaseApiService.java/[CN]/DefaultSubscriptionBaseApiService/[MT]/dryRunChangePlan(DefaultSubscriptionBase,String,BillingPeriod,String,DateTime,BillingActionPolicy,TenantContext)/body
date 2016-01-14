@@ -1,0 +1,17 @@
+{
+  final DateTime now=clock.getUTCNow();
+  BillingActionPolicy policyMaybeNull=requestedPolicy;
+  if (requestedDateWithMs == null && requestedPolicy == null) {
+    final PlanChangeResult planChangeResult=getPlanChangeResult(subscription,productName,term,priceList,now,context);
+    policyMaybeNull=planChangeResult.getPolicy();
+  }
+  if (policyMaybeNull != null) {
+    return subscription.getPlanChangeEffectiveDate(policyMaybeNull);
+  }
+ else   if (requestedDateWithMs != null) {
+    return DefaultClock.truncateMs(requestedDateWithMs);
+  }
+ else {
+    return now;
+  }
+}

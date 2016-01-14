@@ -1,12 +1,12 @@
 {
-  final DateTime now=clock.getUTCNow();
-  final DateTime effectiveDate=(requestedDateWithMs != null) ? DefaultClock.truncateMs(requestedDateWithMs) : now;
+  final DateTime effectiveDate=dryRunChangePlan(subscription,productName,term,priceList,requestedDateWithMs,null,context);
   validateEffectiveDate(subscription,effectiveDate);
   validateEntitlementState(subscription);
   try {
-    return doChangePlan(subscription,productName,term,priceList,overrides,now,effectiveDate,context);
+    doChangePlan(subscription,productName,term,priceList,overrides,effectiveDate,context);
   }
  catch (  final CatalogApiException e) {
     throw new SubscriptionBaseApiException(e);
   }
+  return effectiveDate;
 }
