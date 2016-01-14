@@ -1,6 +1,9 @@
 {
   final LocalDate effectiveLocalDate=new LocalDate(updatedPluginContext.getEffectiveDate(),entitlement.getAccountTimeZone());
-  final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(effectiveLocalDate,entitlement.getSubscriptionBase().getStartDate(),internalCallContext);
+  DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(effectiveLocalDate,entitlement.getSubscriptionBase().getStartDate(),internalCallContext);
+  if (effectiveDate.compareTo(entitlement.getSubscriptionBase().getEndDate()) > 0) {
+    effectiveDate=entitlement.getSubscriptionBase().getEndDate();
+  }
   final BlockingState newBlockingState=new DefaultBlockingState(entitlement.getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveDate);
   final Collection<NotificationEvent> notificationEvents=new ArrayList<NotificationEvent>();
   final Collection<BlockingState> addOnsBlockingStates=entitlement.computeAddOnBlockingStates(effectiveDate,notificationEvents,callContext,internalCallContext);
