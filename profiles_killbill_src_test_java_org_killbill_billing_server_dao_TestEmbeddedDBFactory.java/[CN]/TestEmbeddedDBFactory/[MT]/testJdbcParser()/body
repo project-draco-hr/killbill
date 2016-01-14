@@ -5,6 +5,9 @@
   final EmbeddedDB h2EmbeddedDb=EmbeddedDBFactory.get(createDaoConfig("jdbc:h2:file:killbill;MODE=MYSQL;DB_CLOSE_DELAY=-1;MVCC=true;DB_CLOSE_ON_EXIT=FALSE","root","root"));
   Assert.assertEquals(h2EmbeddedDb.getDBEngine(),DBEngine.H2);
   checkEmbeddedDb(h2EmbeddedDb);
+  final EmbeddedDB postgresEmbeddedDb=EmbeddedDBFactory.get(createDaoConfig("jdbc:postgresql://127.0.0.1:5432/killbill","root","root"));
+  Assert.assertEquals(postgresEmbeddedDb.getDBEngine(),DBEngine.POSTGRESQL);
+  checkEmbeddedDb(postgresEmbeddedDb);
   final EmbeddedDB genericEmbeddedDb=EmbeddedDBFactory.get(createDaoConfig("jdbc:derby://localhost:1527/killbill;collation=TERRITORY_BASED:PRIMARY","root","root"));
   Assert.assertEquals(genericEmbeddedDb.getDBEngine(),DBEngine.GENERIC);
   checkEmbeddedDb(genericEmbeddedDb);
