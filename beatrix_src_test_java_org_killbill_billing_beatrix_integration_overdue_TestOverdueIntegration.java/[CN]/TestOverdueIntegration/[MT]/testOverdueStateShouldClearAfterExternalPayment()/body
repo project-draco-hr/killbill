@@ -16,6 +16,7 @@
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseEntitlement,true,true);
+  paymentPlugin.makeAllInvoicesFailWithError(false);
   final Invoice firstNonZeroInvoice=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext).iterator().next();
   createExternalPaymentAndCheckForCompletion(account,firstNonZeroInvoice,NextEvent.PAYMENT,NextEvent.BLOCK);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
