@@ -6,12 +6,16 @@
   final boolean blockEntitlement=false;
   final boolean blockBilling=false;
   clock.setDay(new LocalDate(2012,4,1));
+  testListener.pushExpectedEvent(NextEvent.BLOCK);
   final BlockingState state1=new DefaultBlockingState(uuid,BlockingStateType.ACCOUNT,overdueStateName,service,blockChange,blockEntitlement,blockBilling,clock.getUTCNow());
   blockingStateDao.setBlockingStatesAndPostBlockingTransitionEvent(ImmutableMap.<BlockingState,Optional<UUID>>of(state1,Optional.<UUID>absent()),internalCallContext);
+  assertListenerStatus();
   clock.addDays(1);
+  testListener.pushExpectedEvent(NextEvent.BLOCK);
   final String overdueStateName2="NoReallyThisCantGoOn";
   final BlockingState state2=new DefaultBlockingState(uuid,BlockingStateType.ACCOUNT,overdueStateName2,service,blockChange,blockEntitlement,blockBilling,clock.getUTCNow());
   blockingStateDao.setBlockingStatesAndPostBlockingTransitionEvent(ImmutableMap.<BlockingState,Optional<UUID>>of(state2,Optional.<UUID>absent()),internalCallContext);
+  assertListenerStatus();
   Assert.assertEquals(blockingStateDao.getBlockingStateForService(uuid,BlockingStateType.ACCOUNT,service,internalCallContext).getStateName(),state2.getStateName());
   final List<BlockingState> states=blockingStateDao.getBlockingAllForAccountRecordId(internalCallContext);
   Assert.assertEquals(states.size(),2);
