@@ -1,0 +1,8 @@
+{
+  final BillingState billingState=billingState(context);
+  final String previousOverdueStateName=api.getBlockingStateForService(overdueable.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,context).getStateName();
+  final OverdueState currentOverdueState=overdueStateSet.findState(previousOverdueStateName);
+  final OverdueState nextOverdueState=overdueStateSet.calculateOverdueState(billingState,clock.getToday(billingState.getAccountTimeZone()));
+  overdueStateApplicator.apply(overdueStateSet,billingState,overdueable,currentOverdueState,nextOverdueState,context);
+  return nextOverdueState;
+}

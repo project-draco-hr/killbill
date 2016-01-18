@@ -1,6 +1,7 @@
 {
   final TransactionType transactionType=paymentControlContext.getTransactionType();
   Preconditions.checkArgument(transactionType == TransactionType.PURCHASE || transactionType == TransactionType.REFUND || transactionType == TransactionType.CHARGEBACK);
+  boolean refreshOverdue=false;
   final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(paymentControlContext.getAccountId(),paymentControlContext);
   try {
     final InvoicePayment existingInvoicePayment;
@@ -14,6 +15,7 @@ case PURCHASE:
  else {
     log.debug("Notifying invoice of successful payment: id={}, amount={}, currency={}, invoiceId={}",paymentControlContext.getPaymentId(),paymentControlContext.getAmount(),paymentControlContext.getCurrency(),invoiceId);
     invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),true,internalContext);
+    refreshOverdue=true;
   }
 break;
 case REFUND:
@@ -26,6 +28,7 @@ final Map<UUID,BigDecimal> idWithAmount=extractIdsWithAmountFromProperties(plugi
 final PluginProperty prop=getPluginProperty(pluginProperties,PROP_IPCD_REFUND_WITH_ADJUSTMENTS);
 final boolean isAdjusted=prop != null ? Boolean.valueOf((String)prop.getValue()) : false;
 invoiceApi.createRefund(paymentControlContext.getPaymentId(),paymentControlContext.getAmount(),isAdjusted,idWithAmount,paymentControlContext.getTransactionExternalKey(),internalContext);
+refreshOverdue=true;
 }
 break;
 case CHARGEBACK:
@@ -35,6 +38,7 @@ log.info("onSuccessCall was already completed for payment chargeback: " + paymen
 }
  else {
 invoiceApi.createChargeback(paymentControlContext.getPaymentId(),paymentControlContext.getProcessedAmount(),paymentControlContext.getProcessedCurrency(),internalContext);
+refreshOverdue=true;
 }
 break;
 default :
@@ -43,6 +47,9 @@ throw new IllegalStateException("Unexpected transactionType " + transactionType)
 }
  catch (final InvoiceApiException e) {
 log.error("InvoicePaymentControlPluginApi onSuccessCall failed for attemptId = " + paymentControlContext.getAttemptPaymentId() + ", transactionType  = "+ transactionType,e);
+}
+if (refreshOverdue) {
+refreshOverdue(paymentControlContext,internalContext);
 }
 return new DefaultOnSuccessPaymentControlResult();
 }
