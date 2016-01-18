@@ -1,19 +1,19 @@
 {
   try {
     if (isAccountTaggedWith_OVERDUE_ENFORCEMENT_OFF(context)) {
-      log.debug("OverdueStateApplicator:apply returns because account (recordId = " + context.getAccountRecordId() + ") is set with OVERDUE_ENFORCEMENT_OFF ");
+      log.debug("OverdueStateApplicator: apply returns because account (recordId={}) is set with OVERDUE_ENFORCEMENT_OFF",context.getAccountRecordId());
       return;
     }
-    log.debug("OverdueStateApplicator:apply <enter> : time = " + clock.getUTCNow() + ", previousState = "+ previousOverdueState.getName()+ ", nextState = "+ nextOverdueState);
+    log.debug("OverdueStateApplicator: time={}, previousState={}, nextState={}, billingState={}",clock.getUTCNow(),previousOverdueState,nextOverdueState,billingState);
     final OverdueState firstOverdueState=overdueStateSet.getFirstState();
     final boolean conditionForNextNotfication=!nextOverdueState.isClearState() || (firstOverdueState != null && billingState != null && billingState.getDateOfEarliestUnpaidInvoice() != null);
     if (conditionForNextNotfication) {
       final Period reevaluationInterval=getReevaluationInterval(overdueStateSet,nextOverdueState);
       if (reevaluationInterval == null) {
-        log.debug("OverdueStateApplicator <notificationQ> : Missing InitialReevaluationInterval from config, NOT inserting notification for account " + account.getId());
+        log.debug("OverdueStateApplicator <notificationQ>: missing InitialReevaluationInterval from config, NOT inserting notification for account {}",account.getId());
       }
  else {
-        log.debug("OverdueStateApplicator <notificationQ> : inserting notification for account " + account.getId() + ", time = "+ clock.getUTCNow().plus(reevaluationInterval));
+        log.debug("OverdueStateApplicator <notificationQ>: inserting notification for account={}, time={}",account.getId(),clock.getUTCNow().plus(reevaluationInterval));
         createFutureNotification(account,clock.getUTCNow().plus(reevaluationInterval),context);
       }
     }
@@ -21,6 +21,7 @@
       clearFutureNotification(account,context);
     }
     if (previousOverdueState.getName().equals(nextOverdueState.getName())) {
+      log.debug("OverdueStateApplicator is no-op: previousState={}, nextState={}",previousOverdueState,nextOverdueState);
       return;
     }
     cancelSubscriptionsIfRequired(account,nextOverdueState,context);

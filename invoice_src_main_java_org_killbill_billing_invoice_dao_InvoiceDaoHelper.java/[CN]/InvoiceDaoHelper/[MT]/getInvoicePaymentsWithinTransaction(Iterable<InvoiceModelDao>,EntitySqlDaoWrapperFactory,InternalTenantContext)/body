@@ -10,6 +10,7 @@
   }
   for (  final InvoiceModelDao invoice : invoices) {
     final List<InvoicePaymentModelDao> invoicePaymentsForInvoice=Objects.firstNonNull(invoicePaymentsPerInvoiceId.get(invoice.getId()),ImmutableList.<InvoicePaymentModelDao>of());
+    log.debug("Found payments={} for invoice={}",invoicePaymentsForInvoice,invoice);
     invoice.addPayments(invoicePaymentsForInvoice);
     for (    final InvoicePaymentModelDao invoicePayment : invoicePaymentsForInvoice) {
       if (invoicePayment.getCurrency() != invoicePayment.getProcessedCurrency()) {

@@ -6,6 +6,7 @@ case PURCHASE:
     final UUID invoiceId=getInvoiceId(pluginProperties);
   if (paymentControlContext.getPaymentId() != null) {
     try {
+      log.debug("Notifying invoice of failed payment: id={}, amount={}, currency={}, invoiceId={}",paymentControlContext.getPaymentId(),paymentControlContext.getAmount(),paymentControlContext.getCurrency(),invoiceId);
       invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),false,internalContext);
     }
  catch (    InvoiceApiException e) {
