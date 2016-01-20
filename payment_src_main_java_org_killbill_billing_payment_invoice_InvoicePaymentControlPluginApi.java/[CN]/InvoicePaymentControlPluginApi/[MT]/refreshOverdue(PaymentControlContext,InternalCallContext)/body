@@ -1,15 +1,3 @@
 {
-  try {
-    final Account account=accountApi.getAccountById(paymentControlContext.getAccountId(),internalContext);
-    overdueApi.refreshOverdueStateFor(account,internalContext.toCallContext(paymentControlContext.getTenantId()));
-  }
- catch (  final AccountApiException e) {
-    log.warn("Unable to refresh overdue for accountId={}: {}",paymentControlContext.getAccountId(),e);
-  }
-catch (  final OverdueApiException e) {
-    log.warn("Unable to refresh overdue for accountId={}: {}",paymentControlContext.getAccountId(),e);
-  }
-catch (  final OverdueException e) {
-    log.warn("Unable to refresh overdue for accountId={}: {}",paymentControlContext.getAccountId(),e);
-  }
+  overdueApi.scheduleOverdueRefresh(paymentControlContext.getAccountId(),internalContext);
 }

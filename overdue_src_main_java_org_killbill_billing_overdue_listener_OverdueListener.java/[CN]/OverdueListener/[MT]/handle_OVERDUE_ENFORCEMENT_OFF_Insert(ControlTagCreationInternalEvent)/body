@@ -1,5 +1,6 @@
 {
   if (event.getTagDefinition().getName().equals(ControlTagType.OVERDUE_ENFORCEMENT_OFF.toString()) && event.getObjectType() == ObjectType.ACCOUNT) {
-    insertBusEventIntoNotificationQueue(event.getObjectId(),event,OverdueAsyncBusNotificationAction.CLEAR,event.getSearchKey2());
+    final InternalCallContext callContext=createCallContext(event.getUserToken(),event.getSearchKey1(),event.getSearchKey2());
+    overdueInternalApi.scheduleOverdueClear(event.getObjectId(),callContext);
   }
 }
