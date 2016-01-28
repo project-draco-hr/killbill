@@ -17,9 +17,7 @@
           transactional.updateAttempt(existingAttempt.getRecordId(),invoicePayment.getPaymentDate().toDate(),invoicePayment.getAmount(),invoicePayment.getCurrency(),invoicePayment.getProcessedCurrency(),context);
         }
       }
-      final InvoiceSqlDao invoiceSqlDao=entitySqlDaoWrapperFactory.become(InvoiceSqlDao.class);
-      final InvoiceModelDao invoice=invoiceSqlDao.getById(invoicePayment.getInvoiceId().toString(),context);
-      final UUID accountId=invoice == null ? null : invoice.getAccountId();
+      final UUID accountId=nonEntityDao.retrieveIdFromObjectInTransaction(context.getAccountRecordId(),ObjectType.ACCOUNT,cacheControllerDispatcher.getCacheController(CacheType.OBJECT_ID),entitySqlDaoWrapperFactory.getHandle());
       notifyBusOfInvoicePayment(entitySqlDaoWrapperFactory,invoicePayment,accountId,context.getUserToken(),context);
       return null;
     }
