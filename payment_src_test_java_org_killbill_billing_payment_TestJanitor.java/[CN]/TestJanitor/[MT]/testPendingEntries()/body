@@ -10,8 +10,10 @@
   testListener.pushExpectedEvent(NextEvent.PAYMENT);
   paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,payment.getTransactions().get(0).getId(),TransactionStatus.PENDING,requestedAmount,account.getCurrency(),"loup","chat",internalCallContext);
   testListener.assertListenerStatus();
+  testListener.pushExpectedEvent(NextEvent.PAYMENT);
   clock.addDeltaFromReality(5 * 60 * 1000);
   assertNotificationsCompleted(internalCallContext,5);
+  testListener.assertListenerStatus();
   final Payment updatedPayment=paymentApi.getPayment(payment.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
   Assert.assertEquals(updatedPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
 }

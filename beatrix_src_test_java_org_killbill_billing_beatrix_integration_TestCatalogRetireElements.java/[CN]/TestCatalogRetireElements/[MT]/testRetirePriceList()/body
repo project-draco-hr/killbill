@@ -11,10 +11,10 @@
   assertListenerStatus();
   assertNotNull(bpEntitlement);
   assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).size(),1);
-  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addMonths(1);
   assertListenerStatus();
-  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addMonths(1);
   assertListenerStatus();
   effectiveDate=new LocalDate(clock.getUTCNow());
@@ -25,10 +25,10 @@
  catch (  EntitlementApiException e) {
     assertTrue(e.getLocalizedMessage().startsWith("Could not find any product named 'Pistol'"));
   }
-  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addMonths(1);
   assertListenerStatus();
-  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addMonths(1);
   assertListenerStatus();
   final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);

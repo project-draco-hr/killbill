@@ -5,19 +5,19 @@
   bundle=subscriptionApi.getSubscriptionBundle(baseEntitlement.getBundleId(),callContext);
   invoiceChecker.checkInvoice(account.getId(),1,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,5,1),callContext);
-  addDaysAndCheckForCompletion(30,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
+  addDaysAndCheckForCompletion(30,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE_PAYMENT_ERROR);
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,6,30),callContext);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
-  addDaysAndCheckForCompletion(15,NextEvent.PAYMENT_ERROR);
+  addDaysAndCheckForCompletion(15,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE_PAYMENT_ERROR);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
-  addDaysAndCheckForCompletion(20,NextEvent.BLOCK,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.PAYMENT_ERROR);
+  addDaysAndCheckForCompletion(20,NextEvent.BLOCK,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE_PAYMENT_ERROR,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE_PAYMENT_ERROR);
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseEntitlement,true,true);
   paymentPlugin.makeAllInvoicesFailWithError(false);
   final Invoice firstNonZeroInvoice=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext).iterator().next();
-  createExternalPaymentAndCheckForCompletion(account,firstNonZeroInvoice,NextEvent.PAYMENT,NextEvent.BLOCK);
+  createExternalPaymentAndCheckForCompletion(account,firstNonZeroInvoice,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT,NextEvent.BLOCK);
   checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
 }

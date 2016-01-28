@@ -24,7 +24,7 @@
   final Invoice unpaidInvoice2=invoiceUserApi.getInvoice(unpaidInvoiceId,callContext);
   assertTrue(unpaidInvoice2.getBalance().compareTo(BigDecimal.ZERO) == 0);
   remove_AUTO_PAY_OFF_Tag(account.getId(),ObjectType.ACCOUNT);
-  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addDays(31);
   assertListenerStatus();
   final BigDecimal accountBalance3=invoiceUserApi.getAccountBalance(account.getId(),callContext);

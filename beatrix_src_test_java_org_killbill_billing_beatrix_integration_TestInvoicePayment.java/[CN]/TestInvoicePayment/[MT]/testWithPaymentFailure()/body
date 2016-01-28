@@ -5,7 +5,7 @@
   accountChecker.checkAccount(account.getId(),accountData,callContext);
   paymentPlugin.makeNextPaymentFailWithError();
   createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
-  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE_PAYMENT_ERROR);
   clock.addDays(30);
   assertListenerStatus();
   final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
@@ -20,7 +20,7 @@
   assertTrue(accountBalance1.compareTo(new BigDecimal("249.95")) == 0);
   final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
   assertEquals(payments.size(),1);
-  busHandler.pushExpectedEvents(NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addDays(8);
   assertListenerStatus();
   Invoice invoice2=invoiceUserApi.getInvoice(invoice1.getId(),callContext);
