@@ -1,0 +1,9 @@
+{
+  if (event.getTagDefinition().getName().equals(ControlTagType.OVERDUE_ENFORCEMENT_OFF.toString()) && event.getObjectType() == ObjectType.ACCOUNT) {
+    insertBusEventIntoNotificationQueue(event.getObjectId(),event);
+  }
+ else   if (event.getTagDefinition().getName().equals(ControlTagType.WRITTEN_OFF.toString()) && event.getObjectType() == ObjectType.INVOICE) {
+    final UUID accountId=nonEntityDao.retrieveIdFromObject(event.getSearchKey1(),ObjectType.ACCOUNT,cacheControllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+    insertBusEventIntoNotificationQueue(accountId,event);
+  }
+}
