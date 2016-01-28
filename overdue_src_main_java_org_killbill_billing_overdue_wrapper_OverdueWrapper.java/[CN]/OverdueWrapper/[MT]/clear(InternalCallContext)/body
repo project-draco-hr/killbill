@@ -1,5 +1,15 @@
 {
-  final String previousOverdueStateName=api.getBlockingStateForService(overdueable.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,context).getStateName();
-  final OverdueState previousOverdueState=overdueStateSet.findState(previousOverdueStateName);
-  overdueStateApplicator.clear(overdueable,previousOverdueState,overdueStateSet.getClearState(),context);
+  GlobalLock lock=null;
+  try {
+    lock=locker.lockWithNumberOfTries(LockerType.ACCNT_INV_PAY.toString(),overdueable.getId().toString(),MAX_LOCK_RETRIES);
+    clearWithLock(context);
+  }
+ catch (  final LockFailedException e) {
+    log.error(String.format("Failed to clear overdue for account %s",overdueable.getId()),e);
+  }
+ finally {
+    if (lock != null) {
+      lock.release();
+    }
+  }
 }

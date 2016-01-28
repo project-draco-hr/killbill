@@ -22,5 +22,10 @@
     final Payment updatedPayment=paymentApi.getPayment(payment.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
     Assert.assertEquals(updatedPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.PENDING);
   }
-  assertEquals(getPendingNotificationCnt(internalCallContext),0);
+  await().atMost(5,TimeUnit.SECONDS).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return getPendingNotificationCnt(internalCallContext) == 0;
+    }
+  }
+);
 }

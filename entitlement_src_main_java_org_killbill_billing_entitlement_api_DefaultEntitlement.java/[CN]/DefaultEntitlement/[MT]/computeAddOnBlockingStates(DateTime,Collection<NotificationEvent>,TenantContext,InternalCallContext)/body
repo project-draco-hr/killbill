@@ -1,0 +1,14 @@
+{
+  if (!ProductCategory.BASE.equals(getSubscriptionBase().getCategory())) {
+    return ImmutableList.<BlockingState>of();
+  }
+  refresh(context);
+  final DateTime now=clock.getUTCNow();
+  if (effectiveDate.compareTo(now) > 0) {
+    final boolean isBaseEntitlementCancelled=eventsStream.isEntitlementCancelled();
+    final NotificationEvent notificationEvent=new EntitlementNotificationKey(getId(),getBundleId(),isBaseEntitlementCancelled ? EntitlementNotificationKeyAction.CANCEL : EntitlementNotificationKeyAction.CHANGE,effectiveDate);
+    notificationEvents.add(notificationEvent);
+    return ImmutableList.<BlockingState>of();
+  }
+  return eventsStream.computeAddonsBlockingStatesForNextSubscriptionBaseEvent(effectiveDate);
+}

@@ -1,7 +1,9 @@
 {
   final Collection<InvoiceModelDao> unpaidInvoices=Collections2.filter(invoices,new Predicate<InvoiceModelDao>(){
     @Override public boolean apply(    final InvoiceModelDao in){
-      return (InvoiceModelDaoHelper.getBalance(in).compareTo(BigDecimal.ZERO) >= 1) && (upToDate == null || !in.getTargetDate().isAfter(upToDate));
+      final BigDecimal balance=InvoiceModelDaoHelper.getBalance(in);
+      log.debug("Computed balance={} for invoice={}",balance,in);
+      return (balance.compareTo(BigDecimal.ZERO) >= 1) && (upToDate == null || !in.getTargetDate().isAfter(upToDate));
     }
   }
 );

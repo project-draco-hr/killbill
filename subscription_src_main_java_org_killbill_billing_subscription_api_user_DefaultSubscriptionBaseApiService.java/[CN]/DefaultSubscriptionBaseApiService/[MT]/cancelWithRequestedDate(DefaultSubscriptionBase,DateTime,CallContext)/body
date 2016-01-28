@@ -5,5 +5,6 @@
   }
   final DateTime now=clock.getUTCNow();
   final DateTime effectiveDate=(requestedDateWithMs != null) ? DefaultClock.truncateMs(requestedDateWithMs) : now;
-  return doCancelPlan(subscription,now,effectiveDate,context);
+  final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
+  return doCancelPlan(ImmutableMap.<DefaultSubscriptionBase,DateTime>of(subscription,effectiveDate),now,internalCallContext);
 }

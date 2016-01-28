@@ -10,18 +10,29 @@
       final InternalCallContext context=internalCallContextFactory.createInternalCallContext(getAccountId(),callContext);
       final DateTime effectiveChangeDate;
       try {
-        effectiveChangeDate=getSubscriptionBase().changePlanWithPolicy(productName,billingPeriod,priceList,overrides,actionPolicy,callContext);
+        effectiveChangeDate=subscriptionInternalApi.getDryRunChangePlanEffectiveDate(getSubscriptionBase(),productName,billingPeriod,priceList,null,actionPolicy,context);
       }
- catch (      SubscriptionBaseApiException e) {
-        throw new EntitlementApiException(e);
+ catch (      final SubscriptionBaseApiException e) {
+        throw new EntitlementApiException(e,e.getCode(),e.getMessage());
       }
       try {
         checker.checkBlockedChange(getSubscriptionBase(),effectiveChangeDate,context);
       }
- catch (      BlockingApiException e) {
+ catch (      final BlockingApiException e) {
         throw new EntitlementApiException(e,e.getCode(),e.getMessage());
       }
-      blockAddOnsIfRequired(effectiveChangeDate,callContext,context);
+      try {
+        getSubscriptionBase().changePlanWithPolicy(productName,billingPeriod,priceList,overrides,actionPolicy,callContext);
+      }
+ catch (      final SubscriptionBaseApiException e) {
+        throw new EntitlementApiException(e);
+      }
+      final Collection<NotificationEvent> notificationEvents=new ArrayList<NotificationEvent>();
+      final Iterable<BlockingState> addOnsBlockingStates=computeAddOnBlockingStates(effectiveChangeDate,notificationEvents,callContext,context);
+      setBlockingStates(addOnsBlockingStates,context);
+      for (      final NotificationEvent notificationEvent : notificationEvents) {
+        recordFutureNotification(effectiveChangeDate,notificationEvent,context);
+      }
       return entitlementApi.getEntitlementForId(getId(),callContext);
     }
   }

@@ -7,6 +7,7 @@
     final Account account=accountInternalApi.getAccountById(attempt.getAccountId(),internalCallContext);
     final CallContext callContext=buildCallContext(internalCallContext);
     final State state=paymentControlStateMachineHelper.getState(attempt.getStateName());
+    log.debug("Retrying attemptId={}, paymentExternalKey={}, transactionExternalKey={}. paymentControlPluginNames={}, now={}",attemptId,attempt.getPaymentExternalKey(),attempt.getTransactionExternalKey(),paymentControlPluginNames,clock.getUTCNow());
     pluginControlledPaymentAutomatonRunner.run(state,false,attempt.getTransactionType(),account,attempt.getPaymentMethodId(),paymentId,attempt.getPaymentExternalKey(),attempt.getTransactionExternalKey(),attempt.getAmount(),attempt.getCurrency(),pluginProperties,paymentControlPluginNames,callContext,internalCallContext);
   }
  catch (  final AccountApiException e) {

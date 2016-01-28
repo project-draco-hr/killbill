@@ -13,12 +13,16 @@
       try {
         getSubscriptionBase().cancelWithPolicy(billingPolicy,callContext);
       }
- catch (      SubscriptionBaseApiException e) {
+ catch (      final SubscriptionBaseApiException e) {
         throw new EntitlementApiException(e);
       }
       final BlockingState newBlockingState=new DefaultBlockingState(getId(),BlockingStateType.SUBSCRIPTION,DefaultEntitlementApi.ENT_STATE_CANCELLED,EntitlementService.ENTITLEMENT_SERVICE_NAME,true,true,false,effectiveDate);
-      entitlementUtils.setBlockingStateAndPostBlockingTransitionEvent(newBlockingState,contextWithValidAccountRecordId);
-      blockAddOnsIfRequired(effectiveDate,callContext,contextWithValidAccountRecordId);
+      final Collection<NotificationEvent> notificationEvents=new ArrayList<NotificationEvent>();
+      final Collection<BlockingState> addOnsBlockingStates=computeAddOnBlockingStates(effectiveDate,notificationEvents,callContext,contextWithValidAccountRecordId);
+      setBlockingStates(newBlockingState,addOnsBlockingStates,contextWithValidAccountRecordId);
+      for (      final NotificationEvent notificationEvent : notificationEvents) {
+        recordFutureNotification(effectiveDate,notificationEvent,contextWithValidAccountRecordId);
+      }
       return entitlementApi.getEntitlementForId(getId(),callContext);
     }
   }

@@ -1,11 +1,7 @@
 {
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
-      for (int i=0; i < subscriptions.size(); i++) {
-        final DefaultSubscriptionBase subscription=subscriptions.get(i);
-        final SubscriptionBaseEvent cancelEvent=cancelEvents.get(i);
-        cancelSubscriptionFromTransaction(subscription,cancelEvent,entitySqlDaoWrapperFactory,context,i);
-      }
+      cancelSubscriptionsFromTransaction(entitySqlDaoWrapperFactory,subscriptions,cancelEvents,context);
       return null;
     }
   }

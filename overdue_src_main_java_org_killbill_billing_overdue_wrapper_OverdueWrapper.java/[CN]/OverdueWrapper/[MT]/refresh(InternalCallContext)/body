@@ -2,10 +2,18 @@
   if (overdueStateSet.size() < 1) {
     return overdueStateSet.getClearState();
   }
-  final BillingState billingState=billingState(context);
-  final String previousOverdueStateName=api.getBlockingStateForService(overdueable.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,context).getStateName();
-  final OverdueState currentOverdueState=overdueStateSet.findState(previousOverdueStateName);
-  final OverdueState nextOverdueState=overdueStateSet.calculateOverdueState(billingState,clock.getToday(billingState.getAccountTimeZone()));
-  overdueStateApplicator.apply(overdueStateSet,billingState,overdueable,currentOverdueState,nextOverdueState,context);
-  return nextOverdueState;
+  GlobalLock lock=null;
+  try {
+    lock=locker.lockWithNumberOfTries(LockerType.ACCNT_INV_PAY.toString(),overdueable.getId().toString(),MAX_LOCK_RETRIES);
+    return refreshWithLock(context);
+  }
+ catch (  final LockFailedException e) {
+    log.error(String.format("Failed to process overdue for account %s",overdueable.getId()),e);
+  }
+ finally {
+    if (lock != null) {
+      lock.release();
+    }
+  }
+  return null;
 }

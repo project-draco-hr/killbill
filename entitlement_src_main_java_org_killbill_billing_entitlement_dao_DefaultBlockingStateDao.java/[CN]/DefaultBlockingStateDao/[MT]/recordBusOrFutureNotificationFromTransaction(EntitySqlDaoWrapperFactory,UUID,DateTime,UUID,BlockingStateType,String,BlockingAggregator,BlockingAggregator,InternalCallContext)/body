@@ -1,0 +1,19 @@
+{
+  final boolean isTransitionToBlockedBilling=!previousState.isBlockBilling() && currentState.isBlockBilling();
+  final boolean isTransitionToUnblockedBilling=previousState.isBlockBilling() && !currentState.isBlockBilling();
+  final boolean isTransitionToBlockedEntitlement=!previousState.isBlockEntitlement() && currentState.isBlockEntitlement();
+  final boolean isTransitionToUnblockedEntitlement=previousState.isBlockEntitlement() && !currentState.isBlockEntitlement();
+  if (effectiveDate.compareTo(clock.getUTCNow()) > 0) {
+    final NotificationEvent notificationEvent=new BlockingTransitionNotificationKey(blockingStateId,blockableId,type,isTransitionToBlockedBilling,isTransitionToUnblockedBilling,isTransitionToBlockedEntitlement,isTransitionToUnblockedEntitlement);
+    recordFutureNotificationFromTransaction(entitySqlDaoWrapperFactory,effectiveDate,notificationEvent,context);
+  }
+ else {
+    if (!serviceName.equals(EntitlementService.ENTITLEMENT_SERVICE_NAME) || !previousState.equals(currentState)) {
+      final BusEvent event=new DefaultBlockingTransitionInternalEvent(blockableId,type,isTransitionToBlockedBilling,isTransitionToUnblockedBilling,isTransitionToBlockedEntitlement,isTransitionToUnblockedEntitlement,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+      notifyBusFromTransaction(entitySqlDaoWrapperFactory,event);
+    }
+ else {
+      log.debug("Skipping event for service {} and blockableId {} (previousState={}, currentState={})",serviceName,blockableId,previousState,currentState);
+    }
+  }
+}

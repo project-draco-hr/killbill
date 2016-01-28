@@ -1,0 +1,12 @@
+{
+  final DateTime effectiveDate=clock.getUTCNow();
+  final BlockingState bs1=new DefaultBlockingState(UUID.randomUUID(),UUID.randomUUID(),BlockingStateType.ACCOUNT,"OD3","test",true,true,true,effectiveDate,effectiveDate,effectiveDate,3L);
+  final BlockingState bs2=new DefaultBlockingState(UUID.randomUUID(),UUID.randomUUID(),BlockingStateType.ACCOUNT,DefaultBlockingState.CLEAR_STATE_NAME,"test",false,false,false,effectiveDate,effectiveDate,effectiveDate,4L);
+  final BlockingState bs3=new DefaultBlockingState(UUID.randomUUID(),UUID.randomUUID(),BlockingStateType.ACCOUNT,"OD1","test",true,true,true,effectiveDate.plusMillis(1),effectiveDate,effectiveDate,5L);
+  Assert.assertTrue(bs1.compareTo(bs2) < 0);
+  Assert.assertTrue(bs1.compareTo(bs3) < 0);
+  Assert.assertTrue(bs2.compareTo(bs1) > 0);
+  Assert.assertTrue(bs2.compareTo(bs3) < 0);
+  Assert.assertTrue(bs3.compareTo(bs2) > 0);
+  Assert.assertTrue(bs3.compareTo(bs1) > 0);
+}

@@ -1,5 +1,5 @@
 {
-  EntitlementSpecifier entitlementSpecifier=new DefaultEntitlementSpecifier(planPhaseSpecifier,overrides);
+  final EntitlementSpecifier entitlementSpecifier=new DefaultEntitlementSpecifier(planPhaseSpecifier,overrides);
   final List<EntitlementSpecifier> entitlementSpecifierList=new ArrayList<EntitlementSpecifier>();
   entitlementSpecifierList.add(entitlementSpecifier);
   final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CREATE_SUBSCRIPTION,null,null,bundleId,null,entitlementSpecifierList,effectiveDate,properties,callContext);
@@ -19,7 +19,7 @@
         final SubscriptionBase subscription=subscriptionBaseInternalApi.createSubscription(bundleId,specifier.getPlanPhaseSpecifier(),specifier.getOverrides(),requestedDate,context);
         return new DefaultEntitlement(subscription.getId(),eventsStreamBuilder,entitlementApi,pluginExecution,blockingStateDao,subscriptionBaseInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,securityApi,internalCallContextFactory,callContext);
       }
- catch (      SubscriptionBaseApiException e) {
+ catch (      final SubscriptionBaseApiException e) {
         throw new EntitlementApiException(e);
       }
     }

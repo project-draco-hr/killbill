@@ -1,0 +1,11 @@
+{
+synchronized (events) {
+    cancelNextChangeEvent(subscription.getId());
+    cancelNextPhaseEvent(subscription.getId(),context);
+    events.addAll(changeEvents);
+    for (    final SubscriptionBaseEvent cur : changeEvents) {
+      recordFutureNotificationFromTransaction(null,cur.getEffectiveDate(),new SubscriptionNotificationKey(cur.getId()),context);
+    }
+  }
+  cancelSubscriptions(subscriptionsToBeCancelled,cancelEvents,context);
+}

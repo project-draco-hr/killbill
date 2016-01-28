@@ -1,0 +1,27 @@
+{
+  final CallContext callContext=internalCallContextFactory.createCallContext(internalCallContext);
+  final ImmutableMap.Builder<BlockingState,Optional<UUID>> blockingStates=new ImmutableMap.Builder<BlockingState,Optional<UUID>>();
+  final Map<DateTime,Collection<NotificationEvent>> notificationEvents=new HashMap<DateTime,Collection<NotificationEvent>>();
+  final Collection<EntitlementContext> pluginContexts=new LinkedList<EntitlementContext>();
+  final List<WithEntitlementPlugin> callbacks=new LinkedList<WithEntitlementPlugin>();
+  final List<SubscriptionBase> subscriptions=new LinkedList<SubscriptionBase>();
+  for (  final Entitlement entitlement : entitlements) {
+    if (entitlement.getState() == EntitlementState.CANCELLED) {
+      continue;
+    }
+    final EntitlementContext pluginContext=new DefaultEntitlementContext(OperationType.CANCEL_SUBSCRIPTION,entitlement.getAccountId(),null,entitlement.getBundleId(),entitlement.getExternalKey(),null,effectiveDate,properties,callContext);
+    pluginContexts.add(pluginContext);
+    final DefaultEntitlement defaultEntitlement=getDefaultEntitlement(entitlement,internalCallContext);
+    final WithEntitlementPlugin<Entitlement> cancelEntitlementWithPlugin=new WithDateOverrideBillingPolicyEntitlementCanceler(defaultEntitlement,blockingStates,notificationEvents,callContext,internalCallContext);
+    callbacks.add(cancelEntitlementWithPlugin);
+    subscriptions.add(defaultEntitlement.getSubscriptionBase());
+  }
+  final Callable<Void> preCallbacksCallback=new BulkSubscriptionBaseCancellation(subscriptions,billingPolicy,internalCallContext);
+  pluginExecution.executeWithPlugin(preCallbacksCallback,callbacks,pluginContexts);
+  blockingStateDao.setBlockingStatesAndPostBlockingTransitionEvent(blockingStates.build(),internalCallContext);
+  for (  final DateTime effectiveDateForNotification : notificationEvents.keySet()) {
+    for (    final NotificationEvent notificationEvent : notificationEvents.get(effectiveDateForNotification)) {
+      recordFutureNotification(effectiveDateForNotification,notificationEvent,internalCallContext);
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  final Product baseProduct=(subscription.getState() == EntitlementState.CANCELLED) ? null : subscription.getCurrentPlan().getProduct();
+  final List<SubscriptionBaseEvent> cancelEvents=new LinkedList<SubscriptionBaseEvent>();
+  final InternalCallContext internalCallContext=createCallContextFromBundleId(subscription.getBundleId(),context);
+  final List<DefaultSubscriptionBase> subscriptionsToBeCancelled=computeAddOnsToCancel(cancelEvents,baseProduct,subscription.getBundleId(),event.getEffectiveDate(),internalCallContext);
+  dao.cancelSubscriptionsOnBasePlanEvent(subscription,event,subscriptionsToBeCancelled,cancelEvents,internalCallContext);
+  return subscriptionsToBeCancelled.size();
+}

@@ -1,0 +1,19 @@
+{
+  final VersionedCatalog result=new VersionedCatalog(clock);
+  final URI uri;
+  try {
+    uri=new URI("/tenantCatalog");
+    for (    final String cur : catalogXMLs) {
+      final InputStream curCatalogStream=new ByteArrayInputStream(cur.getBytes());
+      final StandaloneCatalog catalog=XMLLoader.getObjectFromStream(uri,curCatalogStream,StandaloneCatalog.class);
+      result.add(new StandaloneCatalogWithPriceOverride(catalog,priceOverride,tenantRecordId,internalCallContextFactory));
+    }
+    return result;
+  }
+ catch (  final CatalogApiException e) {
+    throw e;
+  }
+catch (  final Exception e) {
+    throw new CatalogApiException(ErrorCode.CAT_INVALID_DEFAULT,"Problem encountered loading catalog ",e);
+  }
+}

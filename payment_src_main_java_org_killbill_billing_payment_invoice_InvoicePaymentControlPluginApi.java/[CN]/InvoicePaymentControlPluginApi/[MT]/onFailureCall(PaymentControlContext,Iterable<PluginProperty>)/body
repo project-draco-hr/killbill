@@ -1,23 +1,24 @@
 {
   final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(paymentControlContext.getAccountId(),paymentControlContext);
   final TransactionType transactionType=paymentControlContext.getTransactionType();
+  DateTime nextRetryDate=null;
 switch (transactionType) {
 case PURCHASE:
     final UUID invoiceId=getInvoiceId(pluginProperties);
-  if (paymentControlContext.getPaymentId() != null) {
-    try {
-      invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),false,internalContext);
-    }
- catch (    InvoiceApiException e) {
-      log.error("InvoicePaymentControlPluginApi onFailureCall failed ton update invoice for attemptId = " + paymentControlContext.getAttemptPaymentId() + ", transactionType  = "+ transactionType,e);
-    }
+  try {
+    log.debug("Notifying invoice of failed payment: id={}, amount={}, currency={}, invoiceId={}",paymentControlContext.getPaymentId(),paymentControlContext.getAmount(),paymentControlContext.getCurrency(),invoiceId);
+    invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),false,internalContext);
   }
-final DateTime nextRetryDate=computeNextRetryDate(paymentControlContext.getPaymentExternalKey(),paymentControlContext.isApiPayment(),internalContext);
-return new DefaultFailureCallResult(nextRetryDate);
+ catch (  final InvoiceApiException e) {
+    log.error("InvoicePaymentControlPluginApi onFailureCall failed ton update invoice for attemptId = " + paymentControlContext.getAttemptPaymentId() + ", transactionType  = "+ transactionType,e);
+  }
+nextRetryDate=computeNextRetryDate(paymentControlContext.getPaymentExternalKey(),paymentControlContext.isApiPayment(),internalContext);
+break;
 case REFUND:
 case CHARGEBACK:
-return new DefaultFailureCallResult(null);
+break;
 default :
 throw new IllegalStateException("Unexpected transactionType " + transactionType);
 }
+return new DefaultFailureCallResult(nextRetryDate);
 }

@@ -9,15 +9,11 @@
   assertNotNull(bpEntitlement);
   assertEquals(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).size(),1);
   assertEquals(bpEntitlement.getSubscriptionBase().getCurrentPlan().getRecurringBillingPeriod(),BillingPeriod.ANNUAL);
-  busHandler.pushExpectedEvent(NextEvent.PHASE);
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addDays(40);
   assertListenerStatus();
   final Account newAccount=createAccountWithNonOsgiPaymentMethod(getAccountData(17));
-  busHandler.pushExpectedEvent(NextEvent.TRANSFER);
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.TRANSFER,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   transferApi.transferBundle(account.getId(),newAccount.getId(),"externalKey",clock.getUTCNow(),false,false,callContext);
   assertListenerStatus();
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(newAccount.getId(),callContext);

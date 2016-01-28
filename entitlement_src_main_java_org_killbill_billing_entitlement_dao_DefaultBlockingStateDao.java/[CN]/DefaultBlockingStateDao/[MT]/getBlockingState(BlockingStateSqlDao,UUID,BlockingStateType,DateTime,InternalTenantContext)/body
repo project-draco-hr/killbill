@@ -1,0 +1,11 @@
+{
+  final Date upTo=upToDate.toDate();
+  final List<BlockingStateModelDao> models=sqlDao.getBlockingState(blockableId,upTo,context);
+  final Collection<BlockingStateModelDao> modelsFiltered=filterBlockingStates(models,blockingStateType);
+  return new ArrayList<BlockingState>(Collections2.transform(modelsFiltered,new Function<BlockingStateModelDao,BlockingState>(){
+    @Override public BlockingState apply(    @Nullable final BlockingStateModelDao src){
+      return BlockingStateModelDao.toBlockingState(src);
+    }
+  }
+));
+}
