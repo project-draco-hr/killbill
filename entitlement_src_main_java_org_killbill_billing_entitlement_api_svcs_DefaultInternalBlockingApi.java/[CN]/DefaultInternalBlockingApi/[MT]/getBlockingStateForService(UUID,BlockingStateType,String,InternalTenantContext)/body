@@ -1,7 +1,7 @@
 {
   final BlockingState blockingStateForService=dao.getBlockingStateForService(overdueableId,blockingStateType,serviceName,context);
-  if (blockingStateForService == null) {
-    return DefaultBlockingState.getClearState(blockingStateType,serviceName,clock);
+  if (blockingStateForService == null && serviceName.equals(OverdueService.OVERDUE_SERVICE_NAME)) {
+    return DefaultBlockingState.getOverdueClearState(blockingStateType,serviceName,clock);
   }
  else {
     return blockingStateForService;
