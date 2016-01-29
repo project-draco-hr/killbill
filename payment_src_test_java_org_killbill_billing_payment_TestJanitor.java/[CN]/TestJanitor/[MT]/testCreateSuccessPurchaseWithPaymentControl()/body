@@ -3,11 +3,15 @@
   final UUID subscriptionId=UUID.randomUUID();
   final UUID bundleId=UUID.randomUUID();
   final LocalDate now=clock.getUTCToday();
+  testListener.pushExpectedEvent(NextEvent.INVOICE);
   final Invoice invoice=testHelper.createTestInvoice(account,now,Currency.USD);
+  testListener.assertListenerStatus();
   final String paymentExternalKey=invoice.getId().toString();
   final String transactionExternalKey="wouf wouf";
   invoice.addInvoiceItem(new MockRecurringInvoiceItem(invoice.getId(),account.getId(),subscriptionId,bundleId,"test plan","test phase",null,now,now.plusMonths(1),requestedAmount,new BigDecimal("1.0"),Currency.USD));
+  testListener.pushExpectedEvent(NextEvent.PAYMENT);
   final Payment payment=paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,paymentExternalKey,transactionExternalKey,createPropertiesForInvoice(invoice),INVOICE_PAYMENT,callContext);
+  testListener.assertListenerStatus();
   assertEquals(payment.getTransactions().size(),1);
   assertEquals(payment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
   assertEquals(payment.getTransactions().get(0).getTransactionType(),TransactionType.PURCHASE);

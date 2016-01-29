@@ -10,9 +10,7 @@
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(accountId,callContext);
   assertNotNull(invoices);
   assertTrue(invoices.size() == 1);
-  busHandler.pushExpectedEvent(NextEvent.PHASE);
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(accountId,callContext);
@@ -20,14 +18,11 @@
   assertEquals(invoices.size(),2);
   for (int i=0; i < 5; i++) {
     log.info("============== loop number " + i + "=======================");
-    busHandler.pushExpectedEvent(NextEvent.INVOICE);
-    busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+    busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
     clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
     assertListenerStatus();
   }
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  busHandler.pushExpectedEvent(NextEvent.PAYMENT);
-  busHandler.pushExpectedEvent(NextEvent.PHASE);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(accountId,callContext);
@@ -35,8 +30,7 @@
   assertEquals(invoices.size(),8);
   for (int i=0; i <= 5; i++) {
     log.info("============== second loop number " + i + "=======================");
-    busHandler.pushExpectedEvent(NextEvent.INVOICE);
-    busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+    busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
     clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
     assertListenerStatus();
   }

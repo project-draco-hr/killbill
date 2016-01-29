@@ -15,9 +15,7 @@
   final DateTime startDate=subscription.getCurrentPhaseStart();
   final BigDecimal rate=subscription.getCurrentPhase().getFixed().getPrice().getPrice(Currency.USD);
   verifyTestResult(accountId,subscription.getId(),startDate,null,rate,clock.getUTCNow(),1);
-  busHandler.pushExpectedEvent(NextEvent.PHASE);
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
-  busHandler.pushExpectedEvent(NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
   assertListenerStatus();
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,3,2),new LocalDate(2012,4,2),InvoiceItemType.RECURRING,new BigDecimal("249.95")));

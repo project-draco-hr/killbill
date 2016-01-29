@@ -13,8 +13,10 @@
   testListener.assertListenerStatus();
   final List<PaymentTransactionModelDao> paymentTransactionHistoryBeforeJanitor=getPaymentTransactionHistory(transactionExternalKey);
   Assert.assertEquals(paymentTransactionHistoryBeforeJanitor.size(),3);
+  testListener.pushExpectedEvent(NextEvent.PAYMENT_ERROR);
   clock.addDeltaFromReality(5 * 60 * 1000);
   assertNotificationsCompleted(internalCallContext,5);
+  testListener.assertListenerStatus();
   final List<PaymentTransactionModelDao> paymentTransactionHistoryAfterJanitor=getPaymentTransactionHistory(transactionExternalKey);
   Assert.assertEquals(paymentTransactionHistoryAfterJanitor.size(),4);
   Assert.assertEquals(paymentTransactionHistoryAfterJanitor.get(3).getTransactionStatus(),TransactionStatus.PAYMENT_FAILURE);
