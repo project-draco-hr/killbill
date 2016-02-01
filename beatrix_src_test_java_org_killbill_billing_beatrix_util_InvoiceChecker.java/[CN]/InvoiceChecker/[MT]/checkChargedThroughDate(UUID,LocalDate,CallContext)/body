@@ -6,10 +6,11 @@
       assertNull(subscription.getChargedThroughDate());
     }
  else {
-      assertTrue(expectedLocalCTD.compareTo(subscription.getChargedThroughDate().toLocalDate()) == 0);
+      final String msg=String.format("Checking CTD for entitlement %s : expectedLocalCTD = %s, got %s",entitlementId,expectedLocalCTD,subscription.getChargedThroughDate().toLocalDate());
+      assertTrue(expectedLocalCTD.compareTo(subscription.getChargedThroughDate().toLocalDate()) == 0,msg);
     }
   }
- catch (  EntitlementApiException e) {
+ catch (  final EntitlementApiException e) {
     fail("Failed to retrieve entitlement for " + entitlementId);
   }
 }
