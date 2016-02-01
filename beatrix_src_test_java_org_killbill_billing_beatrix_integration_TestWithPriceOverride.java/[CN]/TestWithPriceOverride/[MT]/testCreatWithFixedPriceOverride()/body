@@ -5,7 +5,7 @@
   clock.setDay(new LocalDate(2012,4,1));
   final List<PlanPhasePriceOverride> overrides=new ArrayList<PlanPhasePriceOverride>();
   overrides.add(new DefaultPlanPhasePriceOverride("shotgun-monthly-trial",account.getCurrency(),BigDecimal.ONE,null));
-  final DefaultEntitlement bpSubscription=createBaseEntitlementWithPriceOverrideAndCheckForCompletion(account.getId(),"bundleKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,overrides,NextEvent.CREATE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  final DefaultEntitlement bpSubscription=createBaseEntitlementWithPriceOverrideAndCheckForCompletion(account.getId(),"bundleKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,overrides,NextEvent.CREATE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   subscriptionChecker.checkSubscriptionCreated(bpSubscription.getId(),internalCallContext);
   invoiceChecker.checkInvoice(account.getId(),1,callContext,new ExpectedInvoiceItemCheck(clock.getUTCToday(),null,InvoiceItemType.FIXED,new BigDecimal("1")));
 }

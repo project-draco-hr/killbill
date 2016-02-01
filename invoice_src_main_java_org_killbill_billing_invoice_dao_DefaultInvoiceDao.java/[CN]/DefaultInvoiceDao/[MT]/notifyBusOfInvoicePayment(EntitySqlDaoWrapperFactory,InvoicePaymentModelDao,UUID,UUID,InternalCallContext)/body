@@ -1,0 +1,15 @@
+{
+  final BusEvent busEvent;
+  if (invoicePaymentModelDao.getSuccess() == Boolean.TRUE) {
+    busEvent=new DefaultInvoicePaymentInfoEvent(accountId,invoicePaymentModelDao.getPaymentId(),invoicePaymentModelDao.getType(),invoicePaymentModelDao.getInvoiceId(),invoicePaymentModelDao.getPaymentDate(),invoicePaymentModelDao.getAmount(),invoicePaymentModelDao.getCurrency(),invoicePaymentModelDao.getLinkedInvoicePaymentId(),invoicePaymentModelDao.getPaymentCookieId(),invoicePaymentModelDao.getProcessedCurrency(),context.getAccountRecordId(),context.getTenantRecordId(),userToken);
+  }
+ else {
+    busEvent=new DefaultInvoicePaymentErrorEvent(accountId,invoicePaymentModelDao.getPaymentId(),invoicePaymentModelDao.getType(),invoicePaymentModelDao.getInvoiceId(),invoicePaymentModelDao.getPaymentDate(),invoicePaymentModelDao.getAmount(),invoicePaymentModelDao.getCurrency(),invoicePaymentModelDao.getLinkedInvoicePaymentId(),invoicePaymentModelDao.getPaymentCookieId(),invoicePaymentModelDao.getProcessedCurrency(),context.getAccountRecordId(),context.getTenantRecordId(),userToken);
+  }
+  try {
+    eventBus.postFromTransaction(busEvent,entitySqlDaoWrapperFactory.getHandle().getConnection());
+  }
+ catch (  final EventBusException e) {
+    log.warn("Failed to post invoice payment event for invoice " + invoicePaymentModelDao.getInvoiceId(),e);
+  }
+}

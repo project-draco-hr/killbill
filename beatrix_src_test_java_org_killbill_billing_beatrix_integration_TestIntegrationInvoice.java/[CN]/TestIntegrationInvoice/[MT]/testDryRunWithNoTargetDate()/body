@@ -14,7 +14,7 @@
   DryRunArguments dryRun=new TestDryRunArguments(DryRunType.UPCOMING_INVOICE);
   Invoice dryRunInvoice=invoiceUserApi.triggerInvoiceGeneration(account.getId(),null,dryRun,callContext);
   invoiceChecker.checkInvoiceNoAudits(dryRunInvoice,callContext,expectedInvoices);
-  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addDays(30);
   assertListenerStatus();
   List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
@@ -23,7 +23,7 @@
   expectedInvoices.add(new ExpectedInvoiceItemCheck(new LocalDate(2015,7,14),new LocalDate(2015,8,14),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   dryRunInvoice=invoiceUserApi.triggerInvoiceGeneration(account.getId(),null,dryRun,callContext);
   invoiceChecker.checkInvoiceNoAudits(dryRunInvoice,callContext,expectedInvoices);
-  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addMonths(1);
   assertListenerStatus();
   invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);

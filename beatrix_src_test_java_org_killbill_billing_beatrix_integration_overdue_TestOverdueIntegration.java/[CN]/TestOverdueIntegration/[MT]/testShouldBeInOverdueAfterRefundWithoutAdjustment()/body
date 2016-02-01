@@ -4,18 +4,18 @@
   bundle=subscriptionApi.getSubscriptionBundle(baseEntitlement.getBundleId(),callContext);
   invoiceChecker.checkInvoice(account.getId(),1,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,5,1),callContext);
-  addDaysAndCheckForCompletion(30,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  addDaysAndCheckForCompletion(30,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,6,30),callContext);
   checkODState(OverdueWrapper.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(15);
   checkODState(OverdueWrapper.CLEAR_STATE_NAME);
-  addDaysAndCheckForCompletion(20,NextEvent.INVOICE,NextEvent.PAYMENT);
+  addDaysAndCheckForCompletion(20,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   checkODState(OverdueWrapper.CLEAR_STATE_NAME);
   final Payment payment=paymentApi.getPayment(invoiceUserApi.getInvoicesByAccount(account.getId(),callContext).get(1).getPayments().get(0).getPaymentId(),false,PLUGIN_PROPERTIES,callContext);
-  refundPaymentAndCheckForCompletion(account,payment,NextEvent.PAYMENT,NextEvent.BLOCK,NextEvent.INVOICE_ADJUSTMENT);
+  refundPaymentAndCheckForCompletion(account,payment,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT,NextEvent.BLOCK);
   checkODState("OD1");
   checkChangePlanWithOverdueState(baseEntitlement,true,true);
 }

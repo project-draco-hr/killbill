@@ -1,7 +1,7 @@
 {
   final Map<UUID,BigDecimal> iias=new HashMap<UUID,BigDecimal>();
   iias.put(invoice.getInvoiceItems().get(0).getId(),null);
-  refundPaymentWithInvoiceItemAdjAndCheckForCompletion(account,payment,iias,NextEvent.PAYMENT,NextEvent.INVOICE_ADJUSTMENT);
+  refundPaymentWithInvoiceItemAdjAndCheckForCompletion(account,payment,iias,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT,NextEvent.INVOICE_ADJUSTMENT);
   refundChecker.checkRefund(payment.getId(),callContext,new ExpectedRefundCheck(payment.getId(),true,new BigDecimal("233.82"),Currency.USD,initialCreationDate.toLocalDate()));
   invoice=invoiceChecker.checkInvoice(account.getId(),invoiceItemCount++,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,3,2),new LocalDate(2012,3,31),InvoiceItemType.RECURRING,new BigDecimal("233.82")),new ExpectedInvoiceItemCheck(InvoiceItemType.ITEM_ADJ,new BigDecimal("-233.82")));
 }

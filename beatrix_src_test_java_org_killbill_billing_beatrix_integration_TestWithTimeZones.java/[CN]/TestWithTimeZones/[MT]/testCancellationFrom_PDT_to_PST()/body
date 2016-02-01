@@ -4,7 +4,7 @@
   final AccountData accountData=new MockAccountBuilder().name(UUID.randomUUID().toString().substring(1,8)).firstNameLength(6).email(UUID.randomUUID().toString().substring(1,8)).phone(UUID.randomUUID().toString().substring(1,8)).migrated(false).isNotifiedForInvoices(false).externalKey(UUID.randomUUID().toString().substring(1,8)).billingCycleDayLocal(1).currency(Currency.USD).paymentMethodId(UUID.randomUUID()).timeZone(tz).build();
   final Account account=createAccountWithNonOsgiPaymentMethod(accountData);
   accountChecker.checkAccount(account.getId(),accountData,callContext);
-  busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE,NextEvent.PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.CREATE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   final PlanPhaseSpecifier spec=new PlanPhaseSpecifier("Blowdart",ProductCategory.BASE,BillingPeriod.MONTHLY,"notrial",null);
   final LocalDate effectiveDate=new LocalDate(clock.getUTCNow());
   Entitlement entitlement=entitlementApi.createBaseEntitlement(account.getId(),spec,"Something",ImmutableList.<PlanPhasePriceOverride>of(),effectiveDate,ImmutableList.<PluginProperty>of(),callContext);
