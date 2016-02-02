@@ -1,29 +1,36 @@
 {
-  final AtomicBoolean threadStarted=new AtomicBoolean(false);
+  final AtomicBoolean threadRunning=new AtomicBoolean(false);
+  final AtomicBoolean threadHasRun=new AtomicBoolean(false);
   final Thread t1=new Thread(new Runnable(){
     @Override public void run(){
-      threadStarted.set(true);
-      if (shouldFailBecauseOfLockFailure) {
-        try {
-          pluginOperation.dispatchWithAccountLockAndTimeout(PLUGIN_NAME_PLACEHOLDER,callback);
-          Assert.fail();
+      threadRunning.set(true);
+      try {
+        if (shouldFailBecauseOfLockFailure) {
+          try {
+            pluginOperation.dispatchWithAccountLockAndTimeout(PLUGIN_NAME_PLACEHOLDER,callback);
+            Assert.fail();
+          }
+ catch (          final OperationException e) {
+            Assert.assertTrue(e.getCause() instanceof PaymentApiException);
+            Assert.assertEquals(((PaymentApiException)e.getCause()).getCode(),ErrorCode.PAYMENT_INTERNAL_ERROR.getCode());
+          }
         }
- catch (        final OperationException e) {
-          Assert.assertTrue(e.getCause() instanceof PaymentApiException);
-          Assert.assertEquals(((PaymentApiException)e.getCause()).getCode(),ErrorCode.PAYMENT_INTERNAL_ERROR.getCode());
+ else {
+          try {
+            pluginOperation.dispatchWithAccountLockAndTimeout(PLUGIN_NAME_PLACEHOLDER,callback);
+          }
+ catch (          final OperationException e) {
+            Assert.fail(e.getMessage());
+          }
         }
       }
- else {
-        try {
-          pluginOperation.dispatchWithAccountLockAndTimeout(PLUGIN_NAME_PLACEHOLDER,callback);
-        }
- catch (        final OperationException e) {
-          Assert.fail(e.getMessage());
-        }
+  finally {
+        threadHasRun.set(true);
       }
     }
   }
 );
   t1.start();
-  Awaitility.await().untilTrue(threadStarted);
+  Awaitility.await().untilTrue(threadRunning);
+  return threadRunning;
 }
