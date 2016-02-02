@@ -11,11 +11,6 @@
           recordPauseResumeNotificationEntry(baseSubscription.getId(),bundleId,effectiveDate,false,internalCallContext);
           return null;
         }
-        final BlockingState currentState=blockingStateDao.getBlockingStateForService(bundleId,BlockingStateType.SUBSCRIPTION_BUNDLE,EntitlementService.ENTITLEMENT_SERVICE_NAME,internalCallContext);
-        if (currentState == null || currentState.getStateName().equals(DefaultEntitlementApi.ENT_STATE_CLEAR)) {
-          log.warn("Current state is {}, nothing to resume",currentState);
-          return null;
-        }
         final UUID blockingId=blockUnblockBundle(bundleId,DefaultEntitlementApi.ENT_STATE_CLEAR,EntitlementService.ENTITLEMENT_SERVICE_NAME,localEffectiveDate,false,false,false,baseSubscription,internalCallContext);
         final DefaultEffectiveEntitlementEvent event=new DefaultEffectiveEntitlementEvent(blockingId,baseSubscription.getId(),bundleId,bundle.getAccountId(),EntitlementTransitionType.UNBLOCK_BUNDLE,effectiveDate,clock.getUTCNow(),internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId(),internalCallContext.getUserToken());
         try {

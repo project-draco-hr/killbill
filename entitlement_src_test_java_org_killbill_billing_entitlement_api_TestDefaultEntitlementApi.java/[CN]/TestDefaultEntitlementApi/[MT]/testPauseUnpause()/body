@@ -20,13 +20,6 @@
   assertEquals(baseEntitlement2.getState(),EntitlementState.BLOCKED);
   final Entitlement telescopicEntitlement2=entitlementApi.getEntitlementForId(telescopicEntitlement.getId(),callContext);
   assertEquals(telescopicEntitlement2.getState(),EntitlementState.BLOCKED);
-  try {
-    entitlementApi.pause(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),ImmutableList.<PluginProperty>of(),callContext);
-    Assert.fail("Should not have succeeded to block in a blocked state");
-  }
- catch (  EntitlementApiException e) {
-    assertEquals(e.getCode(),ErrorCode.ENT_ALREADY_BLOCKED.getCode());
-  }
   final List<Entitlement> bundleEntitlements2=entitlementApi.getAllEntitlementsForBundle(telescopicEntitlement2.getBundleId(),callContext);
   assertEquals(bundleEntitlements2.size(),2);
   for (  final Entitlement cur : bundleEntitlements2) {
@@ -43,7 +36,9 @@
   testListener.pushExpectedEvents(NextEvent.RESUME,NextEvent.BLOCK);
   entitlementApi.resume(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
+  testListener.pushExpectedEvents(NextEvent.RESUME);
   entitlementApi.resume(baseEntitlement.getBundleId(),new LocalDate(clock.getUTCNow()),ImmutableList.<PluginProperty>of(),callContext);
+  assertListenerStatus();
   final Entitlement baseEntitlement3=entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   assertEquals(baseEntitlement3.getState(),EntitlementState.ACTIVE);
   final Entitlement telescopicEntitlement3=entitlementApi.getEntitlementForId(telescopicEntitlement.getId(),callContext);
