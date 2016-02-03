@@ -16,19 +16,19 @@
   assertTrue(invoice1.getChargedAmount().compareTo(new BigDecimal("249.95")) == 0);
   assertEquals(invoice1.getPayments().size(),1);
   assertFalse(invoice1.getPayments().get(0).isSuccess());
-  BigDecimal accountBalance1=invoiceUserApi.getAccountBalance(account.getId(),callContext);
+  final BigDecimal accountBalance1=invoiceUserApi.getAccountBalance(account.getId(),callContext);
   assertTrue(accountBalance1.compareTo(new BigDecimal("249.95")) == 0);
   final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
   assertEquals(payments.size(),1);
   busHandler.pushExpectedEvents(NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addDays(8);
   assertListenerStatus();
-  Invoice invoice2=invoiceUserApi.getInvoice(invoice1.getId(),callContext);
+  final Invoice invoice2=invoiceUserApi.getInvoice(invoice1.getId(),callContext);
   assertTrue(invoice2.getBalance().compareTo(BigDecimal.ZERO) == 0);
   assertTrue(invoice2.getPaidAmount().compareTo(new BigDecimal("249.95")) == 0);
   assertTrue(invoice2.getChargedAmount().compareTo(new BigDecimal("249.95")) == 0);
   assertEquals(invoice2.getPayments().size(),1);
   assertTrue(invoice2.getPayments().get(0).isSuccess());
-  BigDecimal accountBalance2=invoiceUserApi.getAccountBalance(account.getId(),callContext);
+  final BigDecimal accountBalance2=invoiceUserApi.getAccountBalance(account.getId(),callContext);
   assertTrue(accountBalance2.compareTo(BigDecimal.ZERO) == 0);
 }
