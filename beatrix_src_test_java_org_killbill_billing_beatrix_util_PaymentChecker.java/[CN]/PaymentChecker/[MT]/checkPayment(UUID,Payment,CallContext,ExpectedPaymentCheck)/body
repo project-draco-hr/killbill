@@ -1,8 +1,14 @@
 {
   Assert.assertEquals(payment.getAccountId(),accountId);
-  final PaymentTransaction transaction=getPurchaseTransaction(payment);
-  Assert.assertTrue(transaction.getAmount().compareTo(expected.getAmount()) == 0);
-  Assert.assertEquals(transaction.getTransactionStatus(),expected.getStatus());
   Assert.assertEquals(payment.getCurrency(),expected.getCurrency());
+  if (expected.getInvoiceId() != null) {
+    for (    final InvoicePayment invoicePayment : invoicePaymentApi.getInvoicePayments(payment.getId(),context)) {
+      Assert.assertEquals(invoicePayment.getInvoiceId(),expected.getInvoiceId());
+    }
+  }
+  final PaymentTransaction transaction=getPurchaseTransaction(payment);
+  Assert.assertTrue(transaction.getAmount().compareTo(expected.getAmount()) == 0,"Actual amount " + transaction.getAmount() + ", expected amount "+ expected.getAmount());
+  Assert.assertEquals(transaction.getTransactionStatus(),expected.getStatus());
+  Assert.assertEquals(transaction.getEffectiveDate().toLocalDate().compareTo(expected.getPaymentDate()),0);
   auditChecker.checkPaymentCreated(payment,context);
 }
