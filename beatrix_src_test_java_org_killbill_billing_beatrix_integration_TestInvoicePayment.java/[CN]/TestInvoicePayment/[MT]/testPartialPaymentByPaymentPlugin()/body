@@ -20,6 +20,7 @@
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
   final Payment payment2=paymentChecker.checkPayment(account.getId(),2,callContext,new ExpectedPaymentCheck(new LocalDate(2012,6,30),new BigDecimal("249.95"),TransactionStatus.SUCCESS,invoice3.getId(),Currency.USD));
   Assert.assertEquals(payment2.getPurchasedAmount().compareTo(new BigDecimal("249.95")),0);
+  Assert.assertEquals(payment2.getTransactions().get(0).getProcessedAmount().compareTo(new BigDecimal("249.95")),0);
   invoice2=invoiceUserApi.getInvoice(invoice2.getId(),callContext);
   Assert.assertEquals(invoice2.getBalance().compareTo(new BigDecimal("239.95")),0);
   Assert.assertEquals(invoice3.getBalance().compareTo(BigDecimal.ZERO),0);
@@ -27,9 +28,10 @@
   final Payment payment3=createPaymentAndCheckForCompletion(account,invoice2,invoice2.getBalance(),account.getCurrency(),NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   paymentChecker.checkPayment(account.getId(),3,callContext,new ExpectedPaymentCheck(new LocalDate(2012,6,30),new BigDecimal("239.95"),TransactionStatus.SUCCESS,invoice2.getId(),Currency.USD));
   Assert.assertEquals(payment3.getPurchasedAmount().compareTo(new BigDecimal("239.95")),0);
+  Assert.assertEquals(payment3.getTransactions().get(0).getProcessedAmount().compareTo(new BigDecimal("239.95")),0);
   invoice2=invoiceUserApi.getInvoice(invoice2.getId(),callContext);
   invoice3=invoiceUserApi.getInvoice(invoice3.getId(),callContext);
   Assert.assertEquals(invoice2.getBalance().compareTo(BigDecimal.ZERO),0);
   Assert.assertEquals(invoice3.getBalance().compareTo(BigDecimal.ZERO),0);
-  assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(BigDecimal.ZERO),0);
+  Assert.assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(BigDecimal.ZERO),0);
 }
