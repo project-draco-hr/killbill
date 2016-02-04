@@ -1,18 +1,17 @@
 {
   BigDecimal result=BigDecimal.ZERO;
-  final Iterable<PaymentTransaction> filtered=Iterables.filter(transactions,new Predicate<PaymentTransaction>(){
-    @Override public boolean apply(    final PaymentTransaction input){
-      return input.getTransactionType() == transactiontype && TransactionStatus.SUCCESS.equals(input.getTransactionStatus());
+  BigDecimal processedResult=BigDecimal.ZERO;
+  boolean shouldUseProcessedAmount=true;
+  for (  final PaymentTransaction transaction : transactions) {
+    if (transaction.getTransactionType() != transactiontype || !TransactionStatus.SUCCESS.equals(transaction.getTransactionStatus())) {
+      continue;
+    }
+    result=result.add(transaction.getAmount());
+    shouldUseProcessedAmount=shouldUseProcessedAmount && transaction.getCurrency().equals(transaction.getProcessedCurrency()) && transaction.getProcessedAmount() != null;
+    processedResult=shouldUseProcessedAmount ? processedResult.add(transaction.getProcessedAmount()) : BigDecimal.ZERO;
+    if (TransactionType.AUTHORIZE.equals(transactiontype)) {
+      break;
     }
   }
-);
-  if (TransactionType.AUTHORIZE.equals(transactiontype) && filtered.iterator().hasNext()) {
-    result=filtered.iterator().next().getAmount();
-  }
- else {
-    for (    final PaymentTransaction dpt : filtered) {
-      result=result.add(dpt.getAmount());
-    }
-  }
-  return result;
+  return shouldUseProcessedAmount ? processedResult : result;
 }
