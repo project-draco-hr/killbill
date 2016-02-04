@@ -12,7 +12,7 @@
       if (invoicePayment == null) {
         throw new InvoiceApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT,paymentId);
       }
-      Preconditions.checkArgument(invoicePayment.getCurrency() == currency);
+      Preconditions.checkArgument(invoicePayment.getCurrency() == currency,String.format("Invoice payment currency %s doesn't match chargeback currency %s",invoicePayment.getCurrency(),currency));
       final UUID invoicePaymentId=invoicePayment.getId();
       final BigDecimal maxChargedBackAmount=invoiceDaoHelper.getRemainingAmountPaidFromTransaction(invoicePaymentId,entitySqlDaoWrapperFactory,context);
       final BigDecimal requestedChargedBackAmount=(amount == null) ? maxChargedBackAmount : amount;

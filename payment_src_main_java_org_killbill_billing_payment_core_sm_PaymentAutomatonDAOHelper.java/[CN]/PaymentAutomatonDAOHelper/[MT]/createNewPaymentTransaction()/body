@@ -13,7 +13,7 @@
     if (existingTransactions.isEmpty()) {
       throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_SUCCESS_PAYMENT,paymentStateContext.getPaymentId());
     }
-    if (paymentStateContext.getCurrency() != null && existingTransactions.get(0).getCurrency() != paymentStateContext.getCurrency()) {
+    if (paymentStateContext.getCurrency() != null && existingTransactions.get(0).getCurrency() != paymentStateContext.getCurrency() && !TransactionType.CHARGEBACK.equals(paymentStateContext.getTransactionType())) {
       throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_PARAMETER,"currency"," should be " + existingTransactions.get(0).getCurrency() + " to match other existing transactions");
     }
     final PaymentTransactionModelDao newPaymentTransactionModelDao=buildNewPaymentTransactionModelDao(paymentStateContext.getPaymentId());
