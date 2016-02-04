@@ -11,9 +11,10 @@
   Invoice invoice2=invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,6,30),callContext);
   final Payment payment1=paymentChecker.checkPayment(account.getId(),1,callContext,new ExpectedPaymentCheck(new LocalDate(2012,5,31),new BigDecimal("249.95"),TransactionStatus.SUCCESS,invoice2.getId(),Currency.USD));
+  Assert.assertEquals(payment1.getPurchasedAmount().compareTo(BigDecimal.TEN),0);
   Assert.assertEquals(payment1.getTransactions().get(0).getProcessedAmount().compareTo(BigDecimal.TEN),0);
   Assert.assertEquals(invoice2.getBalance().compareTo(new BigDecimal("239.95")),0);
-  assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(invoice2.getBalance()),0);
+  Assert.assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(invoice2.getBalance()),0);
   addDaysAndCheckForCompletion(30,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   Invoice invoice3=invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
@@ -22,7 +23,7 @@
   invoice2=invoiceUserApi.getInvoice(invoice2.getId(),callContext);
   Assert.assertEquals(invoice2.getBalance().compareTo(new BigDecimal("239.95")),0);
   Assert.assertEquals(invoice3.getBalance().compareTo(BigDecimal.ZERO),0);
-  assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(invoice2.getBalance()),0);
+  Assert.assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(invoice2.getBalance()),0);
   final Payment payment3=createPaymentAndCheckForCompletion(account,invoice2,invoice2.getBalance(),account.getCurrency(),NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   paymentChecker.checkPayment(account.getId(),3,callContext,new ExpectedPaymentCheck(new LocalDate(2012,6,30),new BigDecimal("239.95"),TransactionStatus.SUCCESS,invoice2.getId(),Currency.USD));
   Assert.assertEquals(payment3.getPurchasedAmount().compareTo(new BigDecimal("239.95")),0);
