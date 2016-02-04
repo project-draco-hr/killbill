@@ -1,14 +1,3 @@
 {
-  return doCallAndCheckForCompletion(new Function<Void,Payment>(){
-    @Override public Payment apply(    @Nullable final Void input){
-      try {
-        return paymentApi.createRefundWithPaymentControl(account,payment.getId(),payment.getPurchasedAmount(),payment.getCurrency(),UUID.randomUUID().toString(),PLUGIN_PROPERTIES,PAYMENT_OPTIONS,refreshedCallContext());
-      }
- catch (      final PaymentApiException e) {
-        fail(e.toString());
-        return null;
-      }
-    }
-  }
-,events);
+  return refundPaymentAndCheckForCompletion(account,payment,payment.getPurchasedAmount(),payment.getCurrency(),events);
 }

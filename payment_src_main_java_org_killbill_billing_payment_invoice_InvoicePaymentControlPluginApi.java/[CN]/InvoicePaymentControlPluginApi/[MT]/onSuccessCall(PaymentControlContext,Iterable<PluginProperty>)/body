@@ -25,16 +25,10 @@ case PURCHASE:
   }
 break;
 case REFUND:
-existingInvoicePayment=invoiceApi.getInvoicePaymentForRefund(paymentControlContext.getPaymentId(),internalContext);
-if (existingInvoicePayment != null) {
-log.info("onSuccessCall was already completed for payment refund: " + paymentControlContext.getPaymentId());
-}
- else {
 final Map<UUID,BigDecimal> idWithAmount=extractIdsWithAmountFromProperties(pluginProperties);
 final PluginProperty prop=getPluginProperty(pluginProperties,PROP_IPCD_REFUND_WITH_ADJUSTMENTS);
 final boolean isAdjusted=prop != null ? Boolean.valueOf((String)prop.getValue()) : false;
 invoiceApi.createRefund(paymentControlContext.getPaymentId(),paymentControlContext.getAmount(),isAdjusted,idWithAmount,paymentControlContext.getTransactionExternalKey(),internalContext);
-}
 break;
 case CHARGEBACK:
 existingInvoicePayment=invoiceApi.getInvoicePaymentForChargeback(paymentControlContext.getPaymentId(),internalContext);
