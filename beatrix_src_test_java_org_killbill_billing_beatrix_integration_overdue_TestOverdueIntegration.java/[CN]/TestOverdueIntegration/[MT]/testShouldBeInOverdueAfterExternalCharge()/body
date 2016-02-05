@@ -13,10 +13,10 @@
   addDaysAndCheckForCompletion(25,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,6,30),callContext);
-  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
+  checkODState(OverdueWrapper.CLEAR_STATE_NAME);
   addDaysAndCheckForCompletion(6,NextEvent.BLOCK);
   checkODState("OD1");
   final Invoice externalChargeInvoice=invoiceUserApi.getUnpaidInvoicesByAccountId(account.getId(),clock.getUTCToday(),callContext).iterator().next();
   createExternalPaymentAndCheckForCompletion(account,externalChargeInvoice,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT,NextEvent.BLOCK);
-  checkODState(DefaultBlockingState.CLEAR_STATE_NAME);
+  checkODState(OverdueWrapper.CLEAR_STATE_NAME);
 }

@@ -29,8 +29,25 @@ insertNewNotificationForUnresolvedTransactionIfNeeded(paymentTransaction.getId()
 return false;
 }
 final String lastSuccessPaymentState=paymentStateMachineHelper.isSuccessState(newPaymentState) ? newPaymentState : null;
-final BigDecimal processedAmount=(paymentTransactionInfoPlugin != null && isPendingOrFinalTransactionStatus(transactionStatus)) ? paymentTransactionInfoPlugin.getAmount() : paymentTransaction.getProcessedAmount();
-final Currency processedCurrency=(paymentTransactionInfoPlugin != null && isPendingOrFinalTransactionStatus(transactionStatus)) ? paymentTransactionInfoPlugin.getCurrency() : paymentTransaction.getProcessedCurrency();
+final BigDecimal processedAmount;
+if (TransactionStatus.SUCCESS.equals(transactionStatus) || TransactionStatus.PENDING.equals(transactionStatus)) {
+if (paymentTransactionInfoPlugin == null || paymentTransactionInfoPlugin.getAmount() == null) {
+processedAmount=paymentTransaction.getProcessedAmount();
+}
+ else {
+processedAmount=paymentTransactionInfoPlugin.getAmount();
+}
+}
+ else {
+processedAmount=BigDecimal.ZERO;
+}
+final Currency processedCurrency;
+if (paymentTransactionInfoPlugin == null || paymentTransactionInfoPlugin.getCurrency() == null) {
+processedCurrency=paymentTransaction.getProcessedCurrency();
+}
+ else {
+processedCurrency=paymentTransactionInfoPlugin.getCurrency();
+}
 final String gatewayErrorCode=paymentTransactionInfoPlugin != null ? paymentTransactionInfoPlugin.getGatewayErrorCode() : paymentTransaction.getGatewayErrorCode();
 final String gatewayError=paymentTransactionInfoPlugin != null ? paymentTransactionInfoPlugin.getGatewayError() : paymentTransaction.getGatewayErrorMsg();
 log.info("Janitor IncompletePaymentTransactionTask repairing payment {}, transaction {}, transitioning transactionStatus from {} -> {}",payment.getId(),paymentTransaction.getId(),paymentTransaction.getTransactionStatus(),transactionStatus);

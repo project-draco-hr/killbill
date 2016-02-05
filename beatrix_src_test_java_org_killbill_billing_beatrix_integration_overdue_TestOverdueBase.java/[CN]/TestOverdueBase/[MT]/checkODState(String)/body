@@ -2,12 +2,16 @@
   try {
     await().atMost(10,SECONDS).until(new Callable<Boolean>(){
       @Override public Boolean call() throws Exception {
-        return expected.equals(blockingApi.getBlockingStateForService(account.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,internalCallContext).getStateName());
+        final BlockingState blockingStateForService=blockingApi.getBlockingStateForService(account.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,internalCallContext);
+        final String stateName=blockingStateForService != null ? blockingStateForService.getStateName() : OverdueWrapper.CLEAR_STATE_NAME;
+        return expected.equals(stateName);
       }
     }
 );
   }
  catch (  final Exception e) {
-    Assert.assertEquals(blockingApi.getBlockingStateForService(account.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,internalCallContext).getStateName(),expected,"Got exception: " + e.toString());
+    final BlockingState blockingStateForService=blockingApi.getBlockingStateForService(account.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,internalCallContext);
+    final String stateName=blockingStateForService != null ? blockingStateForService.getStateName() : OverdueWrapper.CLEAR_STATE_NAME;
+    Assert.assertEquals(stateName,expected,"Got exception: " + e.toString());
   }
 }

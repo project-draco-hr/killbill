@@ -1,0 +1,10 @@
+{
+  if (event.getTagDefinition().getName().equals(ControlTagType.OVERDUE_ENFORCEMENT_OFF.toString()) && event.getObjectType() == ObjectType.ACCOUNT) {
+    final InternalCallContext callContext=createCallContext(event.getUserToken(),event.getSearchKey1(),event.getSearchKey2());
+    overdueInternalApi.scheduleOverdueClear(event.getObjectId(),callContext);
+  }
+ else   if (event.getTagDefinition().getName().equals(ControlTagType.WRITTEN_OFF.toString()) && event.getObjectType() == ObjectType.INVOICE) {
+    final UUID accountId=nonEntityDao.retrieveIdFromObject(event.getSearchKey1(),ObjectType.ACCOUNT,cacheControllerDispatcher.getCacheController(CacheType.OBJECT_ID));
+    insertBusEventIntoNotificationQueue(accountId,event);
+  }
+}

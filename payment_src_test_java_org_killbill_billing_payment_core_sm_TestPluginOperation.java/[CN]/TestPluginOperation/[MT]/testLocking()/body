@@ -1,0 +1,24 @@
+{
+  final Semaphore available=new Semaphore(1,true);
+  final CallbackTest callback=new CallbackTest(available);
+  final PaymentOperation pluginOperation=getPluginOperation(true);
+  available.acquire();
+  runPluginOperationInBackground(pluginOperation,callback,false);
+  Awaitility.await().until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return callback.getStartCount() == 1;
+    }
+  }
+);
+  Assert.assertEquals(callback.getRunCount(),0);
+  Awaitility.await().atMost(2 * TIMEOUT,TimeUnit.SECONDS).untilTrue(runPluginOperationInBackground(pluginOperation,callback,true));
+  Assert.assertEquals(callback.getRunCount(),0);
+  available.release();
+  Awaitility.await().until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return callback.getRunCount() == 1;
+    }
+  }
+);
+  Assert.assertEquals(available.availablePermits(),1);
+}

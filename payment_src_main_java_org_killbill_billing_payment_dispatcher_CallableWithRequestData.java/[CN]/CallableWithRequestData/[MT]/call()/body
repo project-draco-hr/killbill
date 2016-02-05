@@ -1,12 +1,14 @@
 {
   try {
     Request.setPerThreadRequestData(requestData);
+    UUIDs.setRandom(random);
     ThreadContext.bind(securityManager);
     ThreadContext.bind(subject);
     return delegate.call();
   }
   finally {
     Request.resetPerThreadRequestData();
+    UUIDs.setRandom(null);
     ThreadContext.unbindSecurityManager();
     ThreadContext.unbindSubject();
   }

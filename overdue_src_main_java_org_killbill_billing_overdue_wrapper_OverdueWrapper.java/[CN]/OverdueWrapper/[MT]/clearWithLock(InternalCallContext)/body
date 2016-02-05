@@ -1,5 +1,6 @@
 {
-  final String previousOverdueStateName=api.getBlockingStateForService(overdueable.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,context).getStateName();
+  final BlockingState blockingStateForService=api.getBlockingStateForService(overdueable.getId(),BlockingStateType.ACCOUNT,OverdueService.OVERDUE_SERVICE_NAME,context);
+  final String previousOverdueStateName=blockingStateForService != null ? blockingStateForService.getStateName() : OverdueWrapper.CLEAR_STATE_NAME;
   final OverdueState previousOverdueState=overdueStateSet.findState(previousOverdueStateName);
   overdueStateApplicator.clear(overdueable,previousOverdueState,overdueStateSet.getClearState(),context);
 }

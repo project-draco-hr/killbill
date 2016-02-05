@@ -33,11 +33,11 @@
   final PaymentAttemptModelDao attempt2=paymentDao.getPaymentAttempt(refundAttempt.getId(),internalCallContext);
   assertEquals(attempt2.getStateName(),"INIT");
   clock.addDays(1);
-  try {
-    Thread.sleep(1500);
+  await().atMost(TIMEOUT,TimeUnit.SECONDS).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      final PaymentAttemptModelDao attempt3=paymentDao.getPaymentAttempt(refundAttempt.getId(),internalCallContext);
+      return "SUCCESS".equals(attempt3.getStateName());
+    }
   }
- catch (  InterruptedException e) {
-  }
-  final PaymentAttemptModelDao attempt3=paymentDao.getPaymentAttempt(refundAttempt.getId(),internalCallContext);
-  assertEquals(attempt3.getStateName(),"SUCCESS");
+);
 }

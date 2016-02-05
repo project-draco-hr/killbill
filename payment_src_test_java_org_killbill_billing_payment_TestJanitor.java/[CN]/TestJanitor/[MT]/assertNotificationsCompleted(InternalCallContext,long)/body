@@ -2,8 +2,12 @@
   try {
     await().atMost(timeoutSec,SECONDS).until(new Callable<Boolean>(){
       @Override public Boolean call() throws Exception {
-        final List<NotificationEventWithMetadata<NotificationEvent>> notifications=notificationQueueService.getNotificationQueue(DefaultPaymentService.SERVICE_NAME,Janitor.QUEUE_NAME).getFutureOrInProcessingNotificationForSearchKeys(internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId());
-        return notifications.isEmpty();
+        for (        final NotificationEventWithMetadata<NotificationEvent> notificationEvent : notificationQueueService.getNotificationQueue(DefaultPaymentService.SERVICE_NAME,Janitor.QUEUE_NAME).getFutureOrInProcessingNotificationForSearchKeys(internalCallContext.getAccountRecordId(),internalCallContext.getTenantRecordId())) {
+          if (!notificationEvent.getEffectiveDate().isAfter(clock.getUTCNow())) {
+            return false;
+          }
+        }
+        return true;
       }
     }
 );

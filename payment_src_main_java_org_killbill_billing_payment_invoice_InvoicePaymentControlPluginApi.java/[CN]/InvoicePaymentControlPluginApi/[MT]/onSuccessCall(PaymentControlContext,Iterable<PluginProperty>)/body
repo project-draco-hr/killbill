@@ -12,21 +12,23 @@ case PURCHASE:
     log.info("onSuccessCall was already completed for payment purchase: " + paymentControlContext.getPaymentId());
   }
  else {
-    log.debug("Notifying invoice of successful payment: id={}, amount={}, currency={}, invoiceId={}",paymentControlContext.getPaymentId(),paymentControlContext.getAmount(),paymentControlContext.getCurrency(),invoiceId);
-    invoiceApi.notifyOfPayment(invoiceId,paymentControlContext.getAmount(),paymentControlContext.getCurrency(),paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),true,internalContext);
+    final BigDecimal invoicePaymentAmount;
+    if (paymentControlContext.getCurrency() == paymentControlContext.getProcessedCurrency()) {
+      invoicePaymentAmount=paymentControlContext.getProcessedAmount();
+    }
+ else {
+      log.warn("Currency {} of invoice payment {} doesn't match invoice currency {}, assuming it is a full payment",paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCurrency());
+      invoicePaymentAmount=paymentControlContext.getAmount();
+    }
+    log.debug("Notifying invoice of successful payment: id={}, amount={}, currency={}, invoiceId={}",paymentControlContext.getPaymentId(),invoicePaymentAmount,paymentControlContext.getCurrency(),invoiceId);
+    invoiceApi.notifyOfPayment(invoiceId,invoicePaymentAmount,paymentControlContext.getCurrency(),paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),true,internalContext);
   }
 break;
 case REFUND:
-existingInvoicePayment=invoiceApi.getInvoicePaymentForRefund(paymentControlContext.getPaymentId(),internalContext);
-if (existingInvoicePayment != null) {
-log.info("onSuccessCall was already completed for payment refund: " + paymentControlContext.getPaymentId());
-}
- else {
 final Map<UUID,BigDecimal> idWithAmount=extractIdsWithAmountFromProperties(pluginProperties);
 final PluginProperty prop=getPluginProperty(pluginProperties,PROP_IPCD_REFUND_WITH_ADJUSTMENTS);
 final boolean isAdjusted=prop != null ? Boolean.valueOf((String)prop.getValue()) : false;
 invoiceApi.createRefund(paymentControlContext.getPaymentId(),paymentControlContext.getAmount(),isAdjusted,idWithAmount,paymentControlContext.getTransactionExternalKey(),internalContext);
-}
 break;
 case CHARGEBACK:
 existingInvoicePayment=invoiceApi.getInvoicePaymentForChargeback(paymentControlContext.getPaymentId(),internalContext);
@@ -34,7 +36,22 @@ if (existingInvoicePayment != null) {
 log.info("onSuccessCall was already completed for payment chargeback: " + paymentControlContext.getPaymentId());
 }
  else {
-invoiceApi.createChargeback(paymentControlContext.getPaymentId(),paymentControlContext.getProcessedAmount(),paymentControlContext.getProcessedCurrency(),internalContext);
+final InvoicePayment linkedInvoicePayment=invoiceApi.getInvoicePaymentForAttempt(paymentControlContext.getPaymentId(),internalContext);
+final BigDecimal amount;
+final Currency currency;
+if (linkedInvoicePayment.getCurrency().equals(paymentControlContext.getProcessedCurrency()) && paymentControlContext.getProcessedAmount() != null) {
+amount=paymentControlContext.getProcessedAmount();
+currency=paymentControlContext.getProcessedCurrency();
+}
+ else if (linkedInvoicePayment.getCurrency().equals(paymentControlContext.getCurrency()) && paymentControlContext.getAmount() != null) {
+amount=paymentControlContext.getAmount();
+currency=paymentControlContext.getCurrency();
+}
+ else {
+amount=linkedInvoicePayment.getAmount();
+currency=linkedInvoicePayment.getCurrency();
+}
+invoiceApi.createChargeback(paymentControlContext.getPaymentId(),amount,currency,internalContext);
 }
 break;
 default :

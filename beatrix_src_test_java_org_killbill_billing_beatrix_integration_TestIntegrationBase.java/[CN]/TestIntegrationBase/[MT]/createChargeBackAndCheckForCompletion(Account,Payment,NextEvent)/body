@@ -1,15 +1,3 @@
 {
-  doCallAndCheckForCompletion(new Function<Void,Void>(){
-    @Override public Void apply(    @Nullable final Void input){
-      try {
-        paymentApi.createChargebackWithPaymentControl(account,payment.getId(),payment.getPurchasedAmount(),payment.getCurrency(),UUID.randomUUID().toString(),PAYMENT_OPTIONS,callContext);
-      }
- catch (      PaymentApiException e) {
-        fail(e.toString());
-        return null;
-      }
-      return null;
-    }
-  }
-,events);
+  return createChargeBackAndCheckForCompletion(account,payment,payment.getPurchasedAmount(),payment.getCurrency(),events);
 }

@@ -31,7 +31,12 @@
     info=new InternalPaymentInfo();
     payments.put(kbPaymentId.toString(),info);
   }
-  final PaymentTransactionInfoPlugin result=new DefaultNoOpPaymentInfoPlugin(kbPaymentId,kbTransactionId,type,amount,currency,clock.getUTCNow(),clock.getUTCNow(),status,errorCode,error);
+  final BigDecimal processedAmount=MoreObjects.firstNonNull(overrideNextProcessedAmount.getAndSet(null),amount);
+  Currency processedCurrency=overrideNextProcessedCurrency.getAndSet(null);
+  if (processedCurrency == null) {
+    processedCurrency=currency;
+  }
+  final PaymentTransactionInfoPlugin result=new DefaultNoOpPaymentInfoPlugin(kbPaymentId,kbTransactionId,type,processedAmount,processedCurrency,clock.getUTCNow(),clock.getUTCNow(),status,errorCode,error);
   List<PaymentTransactionInfoPlugin> existingTransactions=paymentTransactions.get(kbPaymentId.toString());
   if (existingTransactions == null) {
     existingTransactions=new ArrayList<PaymentTransactionInfoPlugin>();
