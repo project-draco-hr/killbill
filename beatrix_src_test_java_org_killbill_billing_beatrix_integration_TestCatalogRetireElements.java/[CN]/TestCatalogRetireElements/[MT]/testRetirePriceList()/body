@@ -22,13 +22,13 @@
     entitlementApi.createBaseEntitlement(account.getId(),spec,"externalKey2",null,effectiveDate,ImmutableList.<PluginProperty>of(),callContext);
     fail();
   }
- catch (  EntitlementApiException e) {
+ catch (  final EntitlementApiException e) {
     assertTrue(e.getLocalizedMessage().startsWith("Could not find any product named 'Pistol'"));
   }
   busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addMonths(1);
   assertListenerStatus();
-  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
+  busHandler.pushExpectedEvents(NextEvent.PHASE,NextEvent.NULL_INVOICE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   clock.addMonths(1);
   assertListenerStatus();
   final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);

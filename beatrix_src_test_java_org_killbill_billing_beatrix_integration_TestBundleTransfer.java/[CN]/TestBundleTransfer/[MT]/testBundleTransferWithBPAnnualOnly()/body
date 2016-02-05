@@ -16,11 +16,11 @@
   busHandler.pushExpectedEvents(NextEvent.TRANSFER,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
   transferApi.transferBundle(account.getId(),newAccount.getId(),"externalKey",clock.getUTCNow(),false,false,callContext);
   assertListenerStatus();
-  List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(newAccount.getId(),callContext);
+  final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(newAccount.getId(),callContext);
   assertEquals(invoices.size(),1);
   final List<InvoiceItem> invoiceItems=invoices.get(0).getInvoiceItems();
   assertEquals(invoiceItems.size(),1);
-  InvoiceItem theItem=invoiceItems.get(0);
+  final InvoiceItem theItem=invoiceItems.get(0);
   assertTrue(theItem.getStartDate().compareTo(new LocalDate(2012,5,11)) == 0);
   assertTrue(theItem.getEndDate().compareTo(new LocalDate(2013,5,11)) == 0);
   assertTrue(theItem.getAmount().compareTo(new BigDecimal("2399.9500")) == 0);
