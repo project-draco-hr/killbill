@@ -1,7 +1,7 @@
 {
+  final InternalTenantContext internalTenantContextWithValidAccountRecordId=internalCallContextFactory.createInternalTenantContext(accountId,tenantContext);
   final AccountEntitlements accountEntitlements;
   try {
-    final InternalTenantContext internalTenantContextWithValidAccountRecordId=internalCallContextFactory.createInternalTenantContext(accountId,tenantContext);
     accountEntitlements=entitlementInternalApi.getAllEntitlementsForAccountId(accountId,internalTenantContextWithValidAccountRecordId);
   }
  catch (  final EntitlementApiException e) {
@@ -13,7 +13,7 @@
   for (  final UUID bundleId : subscriptionsPerBundle.keySet()) {
     final List<Subscription> subscriptionsForBundle=subscriptionsPerBundle.get(bundleId);
     final String externalKey=subscriptionsForBundle.get(0).getExternalKey();
-    final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,accountEntitlements.getEntitlements().get(bundleId));
+    final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,accountEntitlements.getEntitlements().get(bundleId),internalTenantContextWithValidAccountRecordId);
     final SubscriptionBaseBundle baseBundle=accountEntitlements.getBundles().get(bundleId);
     final SubscriptionBundle subscriptionBundle=new DefaultSubscriptionBundle(bundleId,accountId,externalKey,subscriptionsForBundle,timeline,baseBundle.getOriginalCreatedDate(),baseBundle.getCreatedDate(),baseBundle.getUpdatedDate());
     bundles.add(subscriptionBundle);

@@ -8,8 +8,7 @@
         throw new EntitlementApiException(ErrorCode.SUB_CANCEL_BAD_STATE,getId(),EntitlementState.CANCELLED);
       }
       final InternalCallContext contextWithValidAccountRecordId=internalCallContextFactory.createInternalCallContext(getAccountId(),callContext);
-      final LocalDate effectiveLocalDate=new LocalDate(updatedPluginContext.getEffectiveDate(),eventsStream.getAccountTimeZone());
-      final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(effectiveLocalDate,getSubscriptionBase().getStartDate(),contextWithValidAccountRecordId);
+      final DateTime effectiveDate=dateHelper.fromLocalDateAndReferenceTime(updatedPluginContext.getEffectiveDate(),getSubscriptionBase().getStartDate(),contextWithValidAccountRecordId);
       try {
         getSubscriptionBase().cancelWithPolicy(billingPolicy,callContext);
       }

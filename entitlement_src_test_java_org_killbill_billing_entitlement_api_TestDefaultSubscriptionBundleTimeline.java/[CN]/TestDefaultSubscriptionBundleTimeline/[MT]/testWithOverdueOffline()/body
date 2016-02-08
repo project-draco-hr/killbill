@@ -20,7 +20,7 @@
   final SubscriptionBaseTransition tr3=createTransition(entitlementId,EventType.API_USER,ApiEventType.CANCEL,requestedDate,effectiveDate,clock.getUTCNow(),"phase",null);
   allTransitions.add(tr3);
   final ImmutableList<Entitlement> entitlementsWithoutBlockingStates=ImmutableList.<Entitlement>of(createEntitlement(entitlementId,allTransitions,blockingStates));
-  final List<SubscriptionEvent> eventsWithoutBlockingStates=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlementsWithoutBlockingStates).getSubscriptionEvents();
+  final List<SubscriptionEvent> eventsWithoutBlockingStates=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlementsWithoutBlockingStates,internalCallContext).getSubscriptionEvents();
   assertEquals(eventsWithoutBlockingStates.size(),4);
   assertEquals(eventsWithoutBlockingStates.get(0).getSubscriptionEventType(),SubscriptionEventType.START_ENTITLEMENT);
   assertEquals(eventsWithoutBlockingStates.get(1).getSubscriptionEventType(),SubscriptionEventType.START_BILLING);
@@ -30,7 +30,7 @@
   final BlockingState bs1=new DefaultBlockingState(UUID.randomUUID(),entitlementId,BlockingStateType.ACCOUNT,"OFFLINE",service,true,true,false,effectiveDate,clock.getUTCNow(),clock.getUTCNow(),0L);
   blockingStates.add(bs1);
   final ImmutableList<Entitlement> entitlementsWithOverdueEvent=ImmutableList.<Entitlement>of(createEntitlement(entitlementId,allTransitions,blockingStates));
-  final List<SubscriptionEvent> eventsWithOverdueEvent=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlementsWithOverdueEvent).getSubscriptionEvents();
+  final List<SubscriptionEvent> eventsWithOverdueEvent=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlementsWithOverdueEvent,internalCallContext).getSubscriptionEvents();
   assertEquals(eventsWithOverdueEvent.size(),5);
   assertEquals(eventsWithOverdueEvent.get(0).getSubscriptionEventType(),SubscriptionEventType.START_ENTITLEMENT);
   assertEquals(eventsWithOverdueEvent.get(1).getSubscriptionEventType(),SubscriptionEventType.START_BILLING);
@@ -42,7 +42,7 @@
   final List<Entitlement> entitlements=new ArrayList<Entitlement>();
   final Entitlement entitlement=createEntitlement(entitlementId,allTransitions,blockingStates);
   entitlements.add(entitlement);
-  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlements);
+  final SubscriptionBundleTimeline timeline=new DefaultSubscriptionBundleTimeline(accountTimeZone,accountId,bundleId,externalKey,entitlements,internalCallContext);
   assertEquals(timeline.getAccountId(),accountId);
   assertEquals(timeline.getBundleId(),bundleId);
   assertEquals(timeline.getExternalKey(),externalKey);
