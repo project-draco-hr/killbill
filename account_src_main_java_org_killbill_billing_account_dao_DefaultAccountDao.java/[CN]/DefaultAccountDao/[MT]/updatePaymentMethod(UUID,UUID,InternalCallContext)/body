@@ -12,7 +12,7 @@
       final String thePaymentMethodId=paymentMethodId != null ? paymentMethodId.toString() : null;
       transactional.updatePaymentMethod(accountId.toString(),thePaymentMethodId,context);
       final AccountModelDao account=transactional.getById(accountId.toString(),context);
-      final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(accountId,currentAccount,account,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+      final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(accountId,currentAccount,account,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken(),clock.getUTCNow());
       try {
         eventBus.postFromTransaction(changeEvent,entitySqlDaoWrapperFactory.getHandle().getConnection());
       }

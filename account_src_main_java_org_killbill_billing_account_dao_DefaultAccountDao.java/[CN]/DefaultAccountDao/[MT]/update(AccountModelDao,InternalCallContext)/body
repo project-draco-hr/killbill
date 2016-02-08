@@ -8,7 +8,7 @@
         throw new AccountApiException(ErrorCode.ACCOUNT_DOES_NOT_EXIST_FOR_ID,accountId);
       }
       transactional.update(specifiedAccount,context);
-      final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(accountId,currentAccount,specifiedAccount,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
+      final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(accountId,currentAccount,specifiedAccount,context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken(),clock.getUTCNow());
       try {
         eventBus.postFromTransaction(changeEvent,entitySqlDaoWrapperFactory.getHandle().getConnection());
       }
