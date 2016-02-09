@@ -11,12 +11,10 @@
   assertListenerStatus();
   final LocalDate cancellationDate=new LocalDate("2015-12-01",tz);
   entitlement=entitlement.cancelEntitlementWithDate(cancellationDate,true,ImmutableList.<PluginProperty>of(),callContext);
-  Assert.assertEquals(entitlement.getEffectiveEndDate(),cancellationDate);
-  busHandler.pushExpectedEvent(NextEvent.NULL_INVOICE);
-  clock.setTime(new DateTime("2015-12-01T07:01:02"));
   assertListenerStatus();
-  busHandler.pushExpectedEvents(NextEvent.CANCEL,NextEvent.BLOCK,NextEvent.NULL_INVOICE);
-  clock.setTime(new DateTime("2015-12-01T08:01:02"));
+  Assert.assertEquals(entitlement.getEffectiveEndDate(),cancellationDate);
+  busHandler.pushExpectedEvents(NextEvent.NULL_INVOICE,NextEvent.CANCEL,NextEvent.BLOCK,NextEvent.NULL_INVOICE);
+  clock.setTime(new DateTime("2015-12-01T07:01:02Z"));
   assertListenerStatus();
   final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   Assert.assertEquals(invoices.size(),1);

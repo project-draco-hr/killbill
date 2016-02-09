@@ -1,3 +1,6 @@
 {
-  return toUTCDateTime(toDateTime(localDate,referenceDateTime,accountTimeZone));
+  final DateTimeZone normalizedAccountTimezone=getNormalizedAccountTimezone(referenceDateTime,accountTimeZone);
+  final LocalTime referenceLocalTime=toDateTime(referenceDateTime,normalizedAccountTimezone).toLocalTime();
+  final DateTime targetDateTime=new DateTime(localDate.getYear(),localDate.getMonthOfYear(),localDate.getDayOfMonth(),referenceLocalTime.getHourOfDay(),referenceLocalTime.getMinuteOfHour(),referenceLocalTime.getSecondOfMinute(),normalizedAccountTimezone);
+  return toUTCDateTime(targetDateTime);
 }

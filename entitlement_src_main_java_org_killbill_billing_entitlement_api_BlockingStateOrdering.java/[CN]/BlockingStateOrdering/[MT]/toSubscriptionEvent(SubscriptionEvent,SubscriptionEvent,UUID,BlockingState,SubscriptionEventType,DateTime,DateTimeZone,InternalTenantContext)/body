@@ -1,0 +1,58 @@
+{
+  final Product prevProduct;
+  final Plan prevPlan;
+  final PlanPhase prevPlanPhase;
+  final PriceList prevPriceList;
+  final BillingPeriod prevBillingPeriod;
+  if (prev == null || SubscriptionEventType.START_ENTITLEMENT.equals(eventType) || SubscriptionEventType.START_BILLING.equals(eventType)) {
+    prevProduct=null;
+    prevPlan=null;
+    prevPlanPhase=null;
+    prevPriceList=null;
+    prevBillingPeriod=null;
+  }
+ else {
+    prevProduct=(prev.getNextProduct() != null ? prev.getNextProduct() : prev.getPrevProduct());
+    prevPlan=(prev.getNextPlan() != null ? prev.getNextPlan() : prev.getPrevPlan());
+    prevPlanPhase=(prev.getNextPhase() != null ? prev.getNextPhase() : prev.getPrevPhase());
+    prevPriceList=(prev.getNextPriceList() != null ? prev.getNextPriceList() : prev.getPrevPriceList());
+    prevBillingPeriod=(prev.getNextBillingPeriod() != null ? prev.getNextBillingPeriod() : prev.getPrevBillingPeriod());
+  }
+  final Product nextProduct;
+  final Plan nextPlan;
+  final PlanPhase nextPlanPhase;
+  final PriceList nextPriceList;
+  final BillingPeriod nextBillingPeriod;
+  if (SubscriptionEventType.PAUSE_ENTITLEMENT.equals(eventType) || SubscriptionEventType.PAUSE_BILLING.equals(eventType) || SubscriptionEventType.RESUME_ENTITLEMENT.equals(eventType)|| SubscriptionEventType.RESUME_BILLING.equals(eventType)|| (SubscriptionEventType.SERVICE_STATE_CHANGE.equals(eventType) && (prev == null || (!SubscriptionEventType.STOP_ENTITLEMENT.equals(prev.getSubscriptionEventType()) && !SubscriptionEventType.STOP_BILLING.equals(prev.getSubscriptionEventType()))))) {
+    nextProduct=prevProduct;
+    nextPlan=prevPlan;
+    nextPlanPhase=prevPlanPhase;
+    nextPriceList=prevPriceList;
+    nextBillingPeriod=prevBillingPeriod;
+  }
+ else   if (next == null) {
+    if (prev == null || SubscriptionEventType.STOP_ENTITLEMENT.equals(eventType) || SubscriptionEventType.STOP_BILLING.equals(eventType)) {
+      nextProduct=null;
+      nextPlan=null;
+      nextPlanPhase=null;
+      nextPriceList=null;
+      nextBillingPeriod=null;
+    }
+ else {
+      nextProduct=prev.getNextProduct();
+      nextPlan=prev.getNextPlan();
+      nextPlanPhase=prev.getNextPhase();
+      nextPriceList=prev.getNextPriceList();
+      nextBillingPeriod=prev.getNextBillingPeriod();
+    }
+  }
+ else {
+    nextProduct=next.getNextProduct();
+    nextPlan=next.getNextPlan();
+    nextPlanPhase=next.getNextPhase();
+    nextPriceList=next.getNextPriceList();
+    nextBillingPeriod=next.getNextBillingPeriod();
+  }
+  final String serviceName=getRealServiceNameForEntitlementOrExternalServiceName(in.getService(),eventType);
+  return new DefaultSubscriptionEvent(in.getId(),entitlementId,in.getEffectiveDate(),eventType,in.isBlockEntitlement(),in.isBlockBilling(),serviceName,in.getStateName(),prevProduct,prevPlan,prevPlanPhase,prevPriceList,prevBillingPeriod,nextProduct,nextPlan,nextPlanPhase,nextPriceList,nextBillingPeriod,in.getCreatedDate(),referenceTime,accountTimeZone,internalTenantContext);
+}
