@@ -16,7 +16,7 @@
   final BigDecimal repairAmount=new BigDecimal("0.4900").negate();
   final InvoiceItem repairItem=new RepairAdjInvoiceItem(existingInvoice.getId(),accountId,repairStartDate,repairEndDate,repairAmount,currency,recurringInvoiceItem.getId());
   existingInvoice.addInvoiceItem(repairItem);
-  final BillingEventSet events=new MockBillingEventSet();
+  final BillingEventSet events=new MockBillingEventSet(internalCallContext);
   final BillingEvent event=invoiceUtil.createMockBillingEvent(null,subscription,new DateTime("2013-06-15",DateTimeZone.UTC),plan,phase,null,recurringPrice.getPrice(currency),currency,BillingPeriod.MONTHLY,15,BillingMode.IN_ADVANCE,"testEvent",1L,SubscriptionBaseTransitionType.CREATE);
   events.add(event);
   final List<Invoice> existingInvoices=new LinkedList<Invoice>();
