@@ -17,7 +17,7 @@
         final InternalCallContext context=internalCallContextFactory.createInternalCallContext(callContext);
         final EntitlementSpecifier specifier=getFirstEntitlementSpecifier(updatedPluginContext.getEntitlementSpecifiers());
         final SubscriptionBase subscription=subscriptionBaseInternalApi.createSubscription(bundleId,specifier.getPlanPhaseSpecifier(),specifier.getOverrides(),requestedDate,context);
-        return new DefaultEntitlement(subscription.getId(),eventsStreamBuilder,entitlementApi,pluginExecution,blockingStateDao,subscriptionBaseInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,securityApi,internalCallContextFactory,callContext);
+        return new DefaultEntitlement(eventsStreamForBaseSubscription.getAccountId(),subscription.getId(),eventsStreamBuilder,entitlementApi,pluginExecution,blockingStateDao,subscriptionBaseInternalApi,checker,notificationQueueService,entitlementUtils,dateHelper,clock,securityApi,internalCallContextFactory,callContext);
       }
  catch (      final SubscriptionBaseApiException e) {
         throw new EntitlementApiException(e);
