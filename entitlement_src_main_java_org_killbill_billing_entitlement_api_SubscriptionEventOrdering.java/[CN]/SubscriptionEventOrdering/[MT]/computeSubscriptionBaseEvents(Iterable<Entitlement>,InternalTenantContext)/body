@@ -1,0 +1,16 @@
+{
+  final LinkedList<SubscriptionEvent> result=new LinkedList<SubscriptionEvent>();
+  for (  final Entitlement cur : entitlements) {
+    Preconditions.checkState(cur instanceof DefaultEntitlement,"Entitlement %s is not a DefaultEntitlement",cur);
+    final SubscriptionBase base=((DefaultEntitlement)cur).getSubscriptionBase();
+    final List<SubscriptionBaseTransition> baseTransitions=base.getAllTransitions();
+    for (    final SubscriptionBaseTransition tr : baseTransitions) {
+      final List<SubscriptionEventType> eventTypes=toEventTypes(tr.getTransitionType());
+      for (      final SubscriptionEventType eventType : eventTypes) {
+        final SubscriptionEvent event=toSubscriptionEvent(tr,eventType,base.getStartDate(),internalTenantContext);
+        insertSubscriptionEvent(event,result);
+      }
+    }
+  }
+  return result;
+}
