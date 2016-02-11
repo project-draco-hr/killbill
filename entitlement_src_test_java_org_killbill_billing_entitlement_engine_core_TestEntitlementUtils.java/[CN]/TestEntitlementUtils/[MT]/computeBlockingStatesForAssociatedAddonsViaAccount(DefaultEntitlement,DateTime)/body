@@ -1,6 +1,7 @@
 {
-  final InternalTenantContext context=internalCallContextFactory.createInternalTenantContext(baseEntitlement.getAccountId(),callContext);
-  final EventsStream eventsStream=Iterables.<EventsStream>find(Iterables.<EventsStream>concat(eventsStreamBuilder.buildForAccount(context).getEventsStreams().values()),new Predicate<EventsStream>(){
+  setContextAccountRecordId();
+  final AccountEventsStreams accountEventsStreams=eventsStreamBuilder.buildForAccount(internalCallContext);
+  final EventsStream eventsStream=Iterables.<EventsStream>find(Iterables.<EventsStream>concat(accountEventsStreams.getEventsStreams().values()),new Predicate<EventsStream>(){
     @Override public boolean apply(    final EventsStream input){
       return input.getSubscriptionBase().getId().equals(baseEntitlement.getId());
     }

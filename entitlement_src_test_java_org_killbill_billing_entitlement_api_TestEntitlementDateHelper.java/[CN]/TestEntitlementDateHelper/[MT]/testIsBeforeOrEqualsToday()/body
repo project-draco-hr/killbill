@@ -1,6 +1,8 @@
 {
   clock.setTime(new DateTime(2013,8,7,3,28,10,0,DateTimeZone.UTC));
   final DateTimeZone timeZoneUtcMinus8=DateTimeZone.forOffsetHours(-8);
+  Mockito.when(account.getTimeZone()).thenReturn(timeZoneUtcMinus8);
+  internalCallContext.setReferenceDateTimeZone(account.getTimeZone());
   final DateTime inputDateEquals=new DateTime(2013,8,6,23,28,10,0,timeZoneUtcMinus8);
   assertTrue(inputDateEquals.compareTo(clock.getUTCNow()) > 0);
   final DateTime referenceDateTimeThatDoesNotMatter=new DateTime();

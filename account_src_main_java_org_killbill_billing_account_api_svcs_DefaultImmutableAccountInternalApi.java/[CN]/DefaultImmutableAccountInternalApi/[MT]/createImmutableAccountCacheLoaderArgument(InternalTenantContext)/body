@@ -1,0 +1,11 @@
+{
+  final LoaderCallback loaderCallback=new LoaderCallback(){
+    @Override public Object loadAccount(    final Long recordId,    final InternalTenantContext context){
+      final Account account=getAccountByRecordIdInternal(recordId,context);
+      return account != null ? new DefaultImmutableAccountData(account) : null;
+    }
+  }
+;
+  final Object[] args={loaderCallback};
+  return new CacheLoaderArgument(null,args,context);
+}

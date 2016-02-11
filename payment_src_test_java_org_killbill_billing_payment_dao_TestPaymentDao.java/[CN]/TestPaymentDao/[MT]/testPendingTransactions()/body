@@ -16,9 +16,10 @@
   paymentDao.updatePaymentWithNewTransaction(paymentModelDao.getId(),transaction3,internalCallContext);
   clock.addDays(1);
   final DateTime newTime=clock.getUTCNow();
-  final InternalCallContext internalCallContextWithNewTime=new InternalCallContext(InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID,1687L,UUID.randomUUID(),UUID.randomUUID().toString(),CallOrigin.TEST,UserType.TEST,"Testing","This is a test",newTime,newTime);
+  internalCallContext.setCreatedDate(newTime);
+  internalCallContext.setUpdatedDate(newTime);
   final PaymentTransactionModelDao transaction4=new PaymentTransactionModelDao(initialTime,initialTime,null,transactionExternalKey4,paymentModelDao.getId(),TransactionType.AUTHORIZE,newTime,TransactionStatus.PENDING,BigDecimal.TEN,Currency.AED,"pending","");
-  paymentDao.updatePaymentWithNewTransaction(paymentModelDao.getId(),transaction4,internalCallContextWithNewTime);
+  paymentDao.updatePaymentWithNewTransaction(paymentModelDao.getId(),transaction4,internalCallContext);
   final List<PaymentTransactionModelDao> result=getPendingTransactions(paymentModelDao.getId());
   Assert.assertEquals(result.size(),3);
   final Iterable<PaymentTransactionModelDao> transactions1=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.PENDING),newTime,initialTime,0L,3L);

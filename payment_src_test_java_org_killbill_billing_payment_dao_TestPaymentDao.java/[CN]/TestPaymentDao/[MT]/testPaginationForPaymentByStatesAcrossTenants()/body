@@ -4,8 +4,10 @@
   for (int i=0; i < NB_ENTRIES; i++) {
     final PaymentModelDao paymentModelDao1=new PaymentModelDao(createdDate1,createdDate1,UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID().toString());
     final PaymentTransactionModelDao transaction1=new PaymentTransactionModelDao(createdDate1,createdDate1,null,UUID.randomUUID().toString(),paymentModelDao1.getId(),TransactionType.AUTHORIZE,createdDate1,TransactionStatus.UNKNOWN,BigDecimal.TEN,Currency.AED,"unknown","");
-    final InternalCallContext context1=new InternalCallContext(1L,1L,internalCallContext.getUserToken(),internalCallContext.getCreatedBy(),internalCallContext.getCallOrigin(),internalCallContext.getContextUserType(),internalCallContext.getReasonCode(),internalCallContext.getComments(),createdDate1,createdDate1);
-    paymentDao.insertPaymentWithFirstTransaction(paymentModelDao1,transaction1,context1);
+    internalCallContext.setAccountRecordId(1L);
+    internalCallContext.setCreatedDate(createdDate1);
+    internalCallContext.setUpdatedDate(createdDate1);
+    paymentDao.insertPaymentWithFirstTransaction(paymentModelDao1,transaction1,internalCallContext);
   }
   final Pagination<PaymentTransactionModelDao> result=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.UNKNOWN),clock.getUTCNow(),createdDate1,0L,new Long(NB_ENTRIES));
   Assert.assertEquals(result.getTotalNbRecords(),new Long(NB_ENTRIES));

@@ -1,3 +1,15 @@
 {
-  bind(AccountInternalApi.class).toInstance(Mockito.mock(AccountInternalApi.class));
+  final ImmutableAccountData immutableAccountData=Mockito.mock(ImmutableAccountData.class);
+  Mockito.when(immutableAccountData.getTimeZone()).thenReturn(DateTimeZone.UTC);
+  final AccountInternalApi accountInternalApi=Mockito.mock(AccountInternalApi.class);
+  final ImmutableAccountInternalApi immutableAccountInternalApi=Mockito.mock(ImmutableAccountInternalApi.class);
+  try {
+    Mockito.when(accountInternalApi.getImmutableAccountDataByRecordId(Mockito.anyLong(),Mockito.<InternalTenantContext>any())).thenReturn(immutableAccountData);
+    Mockito.when(immutableAccountInternalApi.getImmutableAccountDataByRecordId(Mockito.anyLong(),Mockito.<InternalTenantContext>any())).thenReturn(immutableAccountData);
+  }
+ catch (  final AccountApiException e) {
+    Assert.fail(e.getMessage());
+  }
+  bind(AccountInternalApi.class).toInstance(accountInternalApi);
+  bind(ImmutableAccountInternalApi.class).toInstance(immutableAccountInternalApi);
 }

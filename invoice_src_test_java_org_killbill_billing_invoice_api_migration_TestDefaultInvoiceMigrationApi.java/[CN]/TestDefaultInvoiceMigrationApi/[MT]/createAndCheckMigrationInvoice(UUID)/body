@@ -1,8 +1,7 @@
 {
   final UUID migrationInvoiceId=migrationApi.createMigrationInvoice(accountId,date_migrated,MIGRATION_INVOICE_AMOUNT,MIGRATION_INVOICE_CURRENCY,callContext);
   Assert.assertNotNull(migrationInvoiceId);
-  final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(accountId,callContext);
-  final InvoiceModelDao invoice=invoiceDao.getById(migrationInvoiceId,internalTenantContext);
+  final InvoiceModelDao invoice=invoiceDao.getById(migrationInvoiceId,internalCallContext);
   Assert.assertNotNull(invoice);
   Assert.assertEquals(invoice.getAccountId(),accountId);
   Assert.assertEquals(invoice.getTargetDate().compareTo(date_migrated),0);

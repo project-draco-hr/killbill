@@ -1,0 +1,13 @@
+{
+  if (accountRecordId == null || accountInternalApi == null) {
+    return null;
+  }
+  final InternalTenantContext tmp=new InternalTenantContext(tenantRecordId,accountRecordId,null);
+  try {
+    final ImmutableAccountData immutableAccountData=accountInternalApi.getImmutableAccountDataByRecordId(accountRecordId,tmp);
+    return immutableAccountData == null ? null : immutableAccountData.getTimeZone();
+  }
+ catch (  final AccountApiException e) {
+    return null;
+  }
+}
