@@ -11,7 +11,7 @@
     @Override public Entitlement doOperation(    final CallContext ctx) throws InterruptedException, TimeoutException, EntitlementApiException, SubscriptionApiException, AccountApiException {
       final Account account=getAccountFromSubscriptionJson(entitlement,callContext);
       final PlanPhaseSpecifier spec=new PlanPhaseSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList(),null);
-      final LocalDate inputLocalDate=toLocalDate(account,requestedDate,callContext);
+      final LocalDate inputLocalDate=requestedDate == null ? null : toLocalDate(account,requestedDate,callContext);
       final PlanSpecifier planSpec=new PlanSpecifier(entitlement.getProductName(),ProductCategory.valueOf(entitlement.getProductCategory()),BillingPeriod.valueOf(entitlement.getBillingPeriod()),entitlement.getPriceList());
       final List<PlanPhasePriceOverride> overrides=PhasePriceOverrideJson.toPlanPhasePriceOverrides(entitlement.getPriceOverrides(),planSpec,account.getCurrency());
       return createAddOnEntitlement ? entitlementApi.addEntitlement(getBundleIdForAddOnCreation(entitlement),spec,overrides,inputLocalDate,pluginProperties,callContext) : entitlementApi.createBaseEntitlement(account.getId(),spec,entitlement.getExternalKey(),overrides,inputLocalDate,pluginProperties,callContext);

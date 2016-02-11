@@ -1,14 +1,3 @@
 {
-  final ImmutableAccountData account;
-  try {
-    account=accountApi.getImmutableAccountDataByRecordId(callContext.getAccountRecordId(),callContext);
-  }
- catch (  final AccountApiException e) {
-    throw new EntitlementApiException(e);
-  }
-  final Interval interval=requestedDate.toInterval(account.getTimeZone());
-  if (interval.contains(clock.getUTCNow())) {
-    return clock.getUTCNow();
-  }
-  return callContext.toUTCDateTime(requestedDate,referenceDateTime);
+  return requestedDate == null ? clock.getUTCNow() : callContext.toUTCDateTime(requestedDate,referenceDateTime);
 }
