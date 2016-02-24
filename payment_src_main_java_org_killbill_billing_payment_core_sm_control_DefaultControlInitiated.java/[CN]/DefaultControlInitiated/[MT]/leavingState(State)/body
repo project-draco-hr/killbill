@@ -4,6 +4,7 @@
     final PaymentModelDao payment=paymentDao.getPayment(stateContext.getPaymentId(),stateContext.getInternalCallContext());
     Preconditions.checkNotNull(payment,"payment cannot be null for id " + stateContext.getPaymentId());
     stateContext.setPaymentExternalKey(payment.getExternalKey());
+    stateContext.setPaymentMethodId(payment.getPaymentMethodId());
   }
  else   if (stateContext.getPaymentExternalKey() == null) {
     stateContext.setPaymentExternalKey(UUIDs.randomUUID().toString());
@@ -15,6 +16,9 @@
   }
  else   if (stateContext.getPaymentTransactionExternalKey() == null) {
     stateContext.setPaymentTransactionExternalKey(UUIDs.randomUUID().toString());
+  }
+  if (stateContext.getPaymentMethodId() == null) {
+    stateContext.setPaymentMethodId(stateContext.getAccount().getPaymentMethodId());
   }
   if (state.getName().equals(initialState.getName()) || state.getName().equals(retriedState.getName())) {
     try {

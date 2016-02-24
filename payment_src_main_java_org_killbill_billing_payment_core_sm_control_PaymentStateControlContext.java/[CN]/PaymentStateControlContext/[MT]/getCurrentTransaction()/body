@@ -4,7 +4,8 @@
   }
   return Iterables.tryFind(result.getTransactions(),new Predicate<PaymentTransaction>(){
     @Override public boolean apply(    final PaymentTransaction input){
-      return ((DefaultPaymentTransaction)input).getAttemptId().equals(getAttemptId());
+      final DefaultPaymentTransaction defaultPaymentTransaction=(DefaultPaymentTransaction)input;
+      return defaultPaymentTransaction.getAttemptId() == null ? getAttemptId() == null : defaultPaymentTransaction.getAttemptId().equals(getAttemptId());
     }
   }
 ).orNull();

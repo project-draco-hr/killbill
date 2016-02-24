@@ -1,0 +1,14 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  Payment payment=paymentApi.createAuthorizationWithPaymentControl(account,account.getPaymentMethodId(),null,requestedAmount,Currency.USD,UUID.randomUUID().toString(),UUID.randomUUID().toString(),ImmutableList.<PluginProperty>of(),PAYMENT_OPTIONS,callContext);
+  Assert.assertEquals(payment.getAuthAmount().compareTo(requestedAmount),0);
+  Assert.assertEquals(payment.getCapturedAmount().compareTo(BigDecimal.ZERO),0);
+  Assert.assertEquals(payment.getTransactions().size(),1);
+  Assert.assertNotNull(((DefaultPaymentTransaction)payment.getTransactions().get(0)).getAttemptId());
+  payment=paymentApi.createCapture(account,payment.getId(),payment.getAuthAmount(),payment.getCurrency(),UUID.randomUUID().toString(),ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(payment.getAuthAmount().compareTo(requestedAmount),0);
+  Assert.assertEquals(payment.getCapturedAmount().compareTo(requestedAmount),0);
+  Assert.assertEquals(payment.getTransactions().size(),2);
+  Assert.assertNotNull(((DefaultPaymentTransaction)payment.getTransactions().get(0)).getAttemptId());
+  Assert.assertNull(((DefaultPaymentTransaction)payment.getTransactions().get(1)).getAttemptId());
+}
