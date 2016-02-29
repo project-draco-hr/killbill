@@ -1,0 +1,56 @@
+{
+  final Account accountJson=createAccountWithDefaultPaymentMethod();
+  final Subscription base=new Subscription();
+  base.setAccountId(accountJson.getAccountId());
+  base.setProductName("Pistol");
+  base.setProductCategory(ProductCategory.BASE);
+  base.setBillingPeriod(BillingPeriod.MONTHLY);
+  base.setPriceList(PriceListSet.DEFAULT_PRICELIST_NAME);
+  final Subscription addOn=new Subscription();
+  addOn.setAccountId(accountJson.getAccountId());
+  addOn.setProductName("Bullets");
+  addOn.setProductCategory(ProductCategory.ADD_ON);
+  addOn.setBillingPeriod(BillingPeriod.NO_BILLING_PERIOD);
+  addOn.setPriceList(PriceListSet.DEFAULT_PRICELIST_NAME);
+  final Bundle bundle=killBillClient.createSubscriptionWithAddOns(ImmutableList.<Subscription>of(base,addOn),null,DEFAULT_WAIT_COMPLETION_TIMEOUT_SEC,createdBy,reason,comment);
+  final UUID addOnSubscriptionId=Iterables.<Subscription>find(bundle.getSubscriptions(),new Predicate<Subscription>(){
+    @Override public boolean apply(    final Subscription input){
+      return ProductCategory.ADD_ON.equals(input.getProductCategory());
+    }
+  }
+).getSubscriptionId();
+  clock.addDays(1);
+  final UsageRecord usageRecord1=new UsageRecord();
+  usageRecord1.setAmount(10L);
+  usageRecord1.setRecordDate(clock.getUTCToday().minusDays(1));
+  final UsageRecord usageRecord2=new UsageRecord();
+  usageRecord2.setAmount(5L);
+  usageRecord2.setRecordDate(clock.getUTCToday());
+  final UnitUsageRecord unitUsageRecord=new UnitUsageRecord();
+  unitUsageRecord.setUnitType("bullets");
+  unitUsageRecord.setUsageRecords(ImmutableList.<UsageRecord>of(usageRecord1,usageRecord2));
+  final SubscriptionUsageRecord usage=new SubscriptionUsageRecord();
+  usage.setSubscriptionId(addOnSubscriptionId);
+  usage.setUnitUsageRecords(ImmutableList.<UnitUsageRecord>of(unitUsageRecord));
+  killBillClient.createSubscriptionUsageRecord(usage,createdBy,reason,comment);
+  final RolledUpUsage retrievedUsage1=killBillClient.getRolledUpUsage(addOnSubscriptionId,unitUsageRecord.getUnitType(),clock.getUTCToday().minusDays(1),clock.getUTCToday());
+  Assert.assertEquals(retrievedUsage1.getSubscriptionId(),usage.getSubscriptionId());
+  Assert.assertEquals(retrievedUsage1.getRolledUpUnits().size(),1);
+  Assert.assertEquals(retrievedUsage1.getRolledUpUnits().get(0).getUnitType(),unitUsageRecord.getUnitType());
+  Assert.assertEquals((long)retrievedUsage1.getRolledUpUnits().get(0).getAmount(),10);
+  final RolledUpUsage retrievedUsage2=killBillClient.getRolledUpUsage(addOnSubscriptionId,unitUsageRecord.getUnitType(),clock.getUTCToday().minusDays(1),clock.getUTCToday().plusDays(1));
+  Assert.assertEquals(retrievedUsage2.getSubscriptionId(),usage.getSubscriptionId());
+  Assert.assertEquals(retrievedUsage2.getRolledUpUnits().size(),1);
+  Assert.assertEquals(retrievedUsage2.getRolledUpUnits().get(0).getUnitType(),unitUsageRecord.getUnitType());
+  Assert.assertEquals((long)retrievedUsage2.getRolledUpUnits().get(0).getAmount(),15);
+  final RolledUpUsage retrievedUsage3=killBillClient.getRolledUpUsage(addOnSubscriptionId,unitUsageRecord.getUnitType(),clock.getUTCToday(),clock.getUTCToday().plusDays(1));
+  Assert.assertEquals(retrievedUsage3.getSubscriptionId(),usage.getSubscriptionId());
+  Assert.assertEquals(retrievedUsage3.getRolledUpUnits().size(),1);
+  Assert.assertEquals(retrievedUsage3.getRolledUpUnits().get(0).getUnitType(),unitUsageRecord.getUnitType());
+  Assert.assertEquals((long)retrievedUsage3.getRolledUpUnits().get(0).getAmount(),5);
+  final RolledUpUsage retrievedUsage4=killBillClient.getRolledUpUsage(addOnSubscriptionId,null,clock.getUTCToday(),clock.getUTCToday().plusDays(1));
+  Assert.assertEquals(retrievedUsage4.getSubscriptionId(),usage.getSubscriptionId());
+  Assert.assertEquals(retrievedUsage4.getRolledUpUnits().size(),1);
+  Assert.assertEquals(retrievedUsage4.getRolledUpUnits().get(0).getUnitType(),"bullets");
+  Assert.assertEquals((long)retrievedUsage4.getRolledUpUnits().get(0).getAmount(),5);
+}
