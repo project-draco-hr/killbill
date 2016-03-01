@@ -10,11 +10,11 @@
     nextEvent=eventIt.next();
     if (!events.getSubscriptionIdsWithAutoInvoiceOff().contains(thisEvent.getSubscription().getId())) {
       final BillingEvent adjustedNextEvent=(thisEvent.getSubscription().getId() == nextEvent.getSubscription().getId()) ? nextEvent : null;
-      final List<InvoiceItem> newProposedItems=processRecurringEvent(invoiceId,accountId,thisEvent,adjustedNextEvent,targetDate,currency,logStringBuilder,events.getRecurringBillingMode(),perSubscriptionFutureNotificationDate,events.getAccountDateAndTimeZoneContext(),existingInvoices);
+      final List<InvoiceItem> newProposedItems=processRecurringEvent(invoiceId,accountId,thisEvent,adjustedNextEvent,targetDate,currency,logStringBuilder,events.getRecurringBillingMode(),perSubscriptionFutureNotificationDate,events.getAccountDateAndTimeZoneContext());
       proposedItems.addAll(newProposedItems);
     }
   }
-  final List<InvoiceItem> newProposedItems=processRecurringEvent(invoiceId,accountId,nextEvent,null,targetDate,currency,logStringBuilder,events.getRecurringBillingMode(),perSubscriptionFutureNotificationDate,events.getAccountDateAndTimeZoneContext(),existingInvoices);
+  final List<InvoiceItem> newProposedItems=processRecurringEvent(invoiceId,accountId,nextEvent,null,targetDate,currency,logStringBuilder,events.getRecurringBillingMode(),perSubscriptionFutureNotificationDate,events.getAccountDateAndTimeZoneContext());
   proposedItems.addAll(newProposedItems);
   log.info(logStringBuilder.toString());
   return;
