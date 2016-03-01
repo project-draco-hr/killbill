@@ -1,0 +1,21 @@
+{
+  if (existingInvoices == null || existingInvoices.isEmpty()) {
+    return null;
+  }
+  LocalDate firstStartDate=null;
+  for (int i=existingInvoices.size() - 1; i >= 0; i--) {
+    final Invoice cur=existingInvoices.get(i);
+    final InvoiceItem matchItem=Iterables.tryFind(cur.getInvoiceItems(),new Predicate<InvoiceItem>(){
+      @Override public boolean apply(      final InvoiceItem input){
+        return input.getInvoiceItemType() == InvoiceItemType.RECURRING && thisEvent.getSubscription().getId().equals(input.getSubscriptionId()) && thisEvent.getPlanPhase().getName().equals(input.getPhaseName());
+      }
+    }
+).orNull();
+    if (matchItem == null) {
+      break;
+    }
+    firstStartDate=matchItem.getStartDate();
+  }
+  final LocalDate result=addDurationToLocalDate(firstStartDate,thisEvent.getPlanPhase().getDuration());
+  return result;
+}

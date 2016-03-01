@@ -1,5 +1,6 @@
 {
   final List<InvoiceItem> items=new ArrayList<InvoiceItem>();
+  final LocalDate maxEndDate=thisEvent.getPlanPhase().getPhaseType() == PhaseType.FIXEDTERM ? computeMaxEndDateForFixedTermPlanPhase(thisEvent,existingInvoices) : null;
   final BillingPeriod billingPeriod=thisEvent.getBillingPeriod();
   if (billingPeriod != BillingPeriod.NO_BILLING_PERIOD) {
     final LocalDate startDate=dateAndTimeZoneContext.computeLocalDateFromFixedAccountOffset(thisEvent.getEffectiveDate());
@@ -14,6 +15,9 @@
         throw new InvoiceApiException(ErrorCode.INVOICE_INVALID_DATE_SEQUENCE,startDate,endDate,targetDate);
       }
       for (      final RecurringInvoiceItemData itemDatum : itemDataWithNextBillingCycleDate.getItemData()) {
+        if (maxEndDate != null && maxEndDate.compareTo(itemDatum.getEndDate()) < 0) {
+          break;
+        }
         final BigDecimal rate=thisEvent.getRecurringPrice();
         if (rate != null) {
           final BigDecimal amount=KillBillMoney.of(itemDatum.getNumberOfCycles().multiply(rate),currency);
