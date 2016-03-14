@@ -8,7 +8,7 @@
       throw new PaymentPluginApiException("An Interruption occurred while the Thread was sleeping.",e);
     }
   }
-  if (makeNextInvoiceFailWithException.getAndSet(false)) {
+  if (makeNextPaymentFailWithException.getAndSet(false)) {
     throw new PaymentPluginApiException("","test error");
   }
   final PluginProperty paymentPluginStatusOverride=Iterables.tryFind(pluginProperties,new Predicate<PluginProperty>(){
@@ -21,8 +21,14 @@
   if (paymentPluginStatusOverride != null && paymentPluginStatusOverride.getValue() != null) {
     status=PaymentPluginStatus.valueOf(paymentPluginStatusOverride.getValue().toString());
   }
+ else   if (makeAllPaymentsFailWithError.get() || makeNextPaymentFailWithError.getAndSet(false)) {
+    status=PaymentPluginStatus.ERROR;
+  }
+ else   if (makeNextPaymentFailWithCancellation.getAndSet(false)) {
+    status=PaymentPluginStatus.CANCELED;
+  }
  else {
-    status=(makeAllInvoicesFailWithError.get() || makeNextInvoiceFailWithError.getAndSet(false)) ? PaymentPluginStatus.ERROR : PaymentPluginStatus.PROCESSED;
+    status=PaymentPluginStatus.PROCESSED;
   }
   final String errorCode=status == PaymentPluginStatus.PROCESSED ? "" : GATEWAY_ERROR_CODE;
   final String error=status == PaymentPluginStatus.PROCESSED ? "" : GATEWAY_ERROR;
