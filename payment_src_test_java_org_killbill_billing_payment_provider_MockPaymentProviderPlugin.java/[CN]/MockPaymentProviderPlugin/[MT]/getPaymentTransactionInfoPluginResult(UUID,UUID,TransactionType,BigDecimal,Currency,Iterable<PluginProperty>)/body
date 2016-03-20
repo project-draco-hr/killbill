@@ -37,7 +37,8 @@
     info=new InternalPaymentInfo();
     payments.put(kbPaymentId.toString(),info);
   }
-  final BigDecimal processedAmount=MoreObjects.firstNonNull(overrideNextProcessedAmount.getAndSet(null),amount);
+  final BigDecimal overrideNextProcessedAmount=this.overrideNextProcessedAmount.getAndSet(null);
+  final BigDecimal processedAmount=overrideNextProcessedAmount != null ? overrideNextProcessedAmount : amount;
   Currency processedCurrency=overrideNextProcessedCurrency.getAndSet(null);
   if (processedCurrency == null) {
     processedCurrency=currency;
