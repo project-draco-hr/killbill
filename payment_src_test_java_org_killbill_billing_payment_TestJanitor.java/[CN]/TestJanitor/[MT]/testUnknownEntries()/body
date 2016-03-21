@@ -5,7 +5,6 @@
   testListener.pushExpectedEvent(NextEvent.PAYMENT);
   final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,account.getCurrency(),paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
   testListener.assertListenerStatus();
-  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   final String paymentStateName=paymentSMHelper.getErroredStateForTransaction(TransactionType.AUTHORIZE).toString();
   testListener.pushExpectedEvent(NextEvent.PAYMENT_PLUGIN_ERROR);
   paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,payment.getTransactions().get(0).getId(),TransactionStatus.UNKNOWN,requestedAmount,account.getCurrency(),"foo","bar",internalCallContext);

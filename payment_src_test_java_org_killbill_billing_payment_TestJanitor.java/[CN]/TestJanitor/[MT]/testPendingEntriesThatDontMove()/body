@@ -5,7 +5,6 @@
   testListener.pushExpectedEvent(NextEvent.PAYMENT);
   final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,account.getCurrency(),paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
   testListener.assertListenerStatus();
-  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   final List<PaymentTransactionInfoPlugin> paymentTransactions=mockPaymentProviderPlugin.getPaymentInfo(account.getId(),payment.getId(),ImmutableList.<PluginProperty>of(),callContext);
   final PaymentTransactionInfoPlugin oTx=paymentTransactions.remove(0);
   final PaymentTransactionInfoPlugin updatePaymentTransaction=new DefaultNoOpPaymentInfoPlugin(oTx.getKbPaymentId(),oTx.getKbTransactionPaymentId(),oTx.getTransactionType(),oTx.getAmount(),oTx.getCurrency(),oTx.getCreatedDate(),oTx.getCreatedDate(),PaymentPluginStatus.PENDING,null,null);

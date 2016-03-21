@@ -7,7 +7,7 @@
   final SubscriptionBase subscription=getZombieSubscription();
   final DateTime effectiveDate=invoiceUtil.buildDate(2011,1,1).toDateTimeAtStartOfDay();
   final BillingEvent event=invoiceUtil.createMockBillingEvent(null,subscription,effectiveDate,plan,phase,fixedPrice.getPrice(currency),null,currency,BillingPeriod.MONTHLY,15,BillingMode.IN_ADVANCE,"testEvent",1L,SubscriptionBaseTransitionType.CREATE);
-  final BillingEventSet events=new MockBillingEventSet();
+  final BillingEventSet events=new MockBillingEventSet(internalCallContext);
   events.add(event);
   final LocalDate targetDate=invoiceUtil.buildDate(2011,1,15);
   final InvoiceWithMetadata invoiceWithMetadata=generator.generateInvoice(account,events,null,targetDate,Currency.USD,context);

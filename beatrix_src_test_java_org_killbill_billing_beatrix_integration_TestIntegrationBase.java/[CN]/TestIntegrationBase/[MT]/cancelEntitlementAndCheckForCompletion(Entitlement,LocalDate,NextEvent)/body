@@ -1,0 +1,16 @@
+{
+  return (DefaultEntitlement)doCallAndCheckForCompletion(new Function<Void,Entitlement>(){
+    @Override public Entitlement apply(    @Nullable final Void dontcare){
+      try {
+        Entitlement refreshedEntitlement=entitlementApi.getEntitlementForId(entitlement.getId(),callContext);
+        refreshedEntitlement=refreshedEntitlement.cancelEntitlementWithDate(requestedDate,false,ImmutableList.<PluginProperty>of(),callContext);
+        return refreshedEntitlement;
+      }
+ catch (      final EntitlementApiException e) {
+        fail(e.getMessage());
+        return null;
+      }
+    }
+  }
+,events);
+}

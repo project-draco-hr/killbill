@@ -1,17 +1,16 @@
 {
   final DateTime initialDate=new DateTime(2012,2,1,0,3,42,0,testTimeZone);
   final int billingDay=2;
-  log.info("Beginning test with BCD of " + billingDay);
   final Account account=createAccountWithNonOsgiPaymentMethod(getAccountData(billingDay));
   final UUID accountId=account.getId();
   assertNotNull(account);
   clock.setDeltaFromReality(initialDate.getMillis() - clock.getUTCNow().getMillis());
-  String productName="Shotgun";
-  BillingPeriod term=BillingPeriod.MONTHLY;
-  String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
+  final String productName="Shotgun";
+  final BillingPeriod term=BillingPeriod.MONTHLY;
+  final String planSetName=PriceListSet.DEFAULT_PRICELIST_NAME;
   final DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"bundleKey",productName,ProductCategory.BASE,term,NextEvent.CREATE,NextEvent.INVOICE);
   assertNotNull(baseEntitlement);
-  DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)baseEntitlement.getSubscriptionBase();
+  final DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)baseEntitlement.getSubscriptionBase();
   final DateTime startDate=subscription.getCurrentPhaseStart();
   final BigDecimal rate=subscription.getCurrentPhase().getFixed().getPrice().getPrice(Currency.USD);
   verifyTestResult(accountId,subscription.getId(),startDate,null,rate,clock.getUTCNow(),1);
@@ -20,8 +19,7 @@
   assertListenerStatus();
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,3,2),new LocalDate(2012,4,2),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   DefaultEntitlement entitlement=(DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
-  busHandler.pushExpectedEvents(NextEvent.PAUSE,NextEvent.BLOCK);
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
+  busHandler.pushExpectedEvents(NextEvent.PAUSE,NextEvent.BLOCK,NextEvent.NULL_INVOICE,NextEvent.INVOICE);
   entitlementApi.pause(entitlement.getBundleId(),clock.getUTCNow().toLocalDate(),ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,3,2),new LocalDate(2012,4,2),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
@@ -29,8 +27,7 @@
   entitlement=(DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement.getId(),callContext);
   Assert.assertEquals(entitlement.getState(),EntitlementState.BLOCKED);
   clock.addDeltaFromReality(AT_LEAST_ONE_MONTH_MS);
-  busHandler.pushExpectedEvents(NextEvent.RESUME,NextEvent.BLOCK);
-  busHandler.pushExpectedEvent(NextEvent.INVOICE);
+  busHandler.pushExpectedEvents(NextEvent.RESUME,NextEvent.BLOCK,NextEvent.NULL_INVOICE,NextEvent.NULL_INVOICE,NextEvent.INVOICE);
   entitlementApi.resume(entitlement.getBundleId(),clock.getUTCNow().toLocalDate(),ImmutableList.<PluginProperty>of(),callContext);
   assertListenerStatus();
   invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,4,5),new LocalDate(2012,5,2),InvoiceItemType.RECURRING,new BigDecimal("224.96")),new ExpectedInvoiceItemCheck(new LocalDate(2012,4,5),new LocalDate(2012,4,5),InvoiceItemType.CBA_ADJ,new BigDecimal("-224.96")));

@@ -2,8 +2,8 @@
   final String planName=DefaultPlanPhase.planName(phaseName);
   final Matcher m=DefaultPriceOverride.CUSTOM_PLAN_NAME_PATTERN.matcher(planName);
   if (m.matches()) {
-    final InternalTenantContext internalTenantContext=internalCallContextFactory.createInternalTenantContext(tenantRecordId,null);
-    Plan plan=priceOverride.getOverriddenPlan(planName,standaloneCatalog,internalTenantContext);
+    final InternalTenantContext internalTenantContext=createInternalTenantContext();
+    final Plan plan=priceOverride.getOverriddenPlan(planName,standaloneCatalog,internalTenantContext);
     return plan.findPhase(phaseName);
   }
   return standaloneCatalog.findCurrentPhase(phaseName);

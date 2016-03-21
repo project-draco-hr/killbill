@@ -14,10 +14,10 @@
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement2.getId(),new LocalDate(2012,5,1),callContext);
   clock.addDays(1);
-  cancelEntitlementAndCheckForCompletion(baseEntitlement2,clock.getUTCNow(),NextEvent.BLOCK,NextEvent.CANCEL);
+  cancelEntitlementAndCheckForCompletion(baseEntitlement2,NextEvent.BLOCK,NextEvent.CANCEL,NextEvent.NULL_INVOICE);
   final SubscriptionBase cancelledBaseSubscription2=((DefaultEntitlement)entitlementApi.getEntitlementForId(baseEntitlement2.getId(),callContext)).getSubscriptionBase();
   assertTrue(cancelledBaseSubscription2.getState() == EntitlementState.CANCELLED);
-  addDaysAndCheckForCompletion(29,NextEvent.PHASE,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE_PAYMENT_ERROR);
+  addDaysAndCheckForCompletion(29,NextEvent.PHASE,NextEvent.PHASE,NextEvent.NULL_INVOICE,NextEvent.INVOICE,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE_PAYMENT_ERROR);
   invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,6,30),callContext);
   checkODState(OverdueWrapper.CLEAR_STATE_NAME);

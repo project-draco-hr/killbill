@@ -1,4 +1,8 @@
 {
   final AccountData accountData=new MockAccountBuilder().name(UUID.randomUUID().toString().substring(1,8)).firstNameLength(6).email(UUID.randomUUID().toString().substring(1,8)).phone(UUID.randomUUID().toString().substring(1,8)).migrated(false).isNotifiedForInvoices(true).externalKey(UUID.randomUUID().toString().substring(1,8)).billingCycleDayLocal(31).currency(accountCurrency).paymentMethodId(UUID.randomUUID()).timeZone(DateTimeZone.UTC).build();
-  return accountUserApi.createAccount(accountData,callContext);
+  final Account account=accountUserApi.createAccount(accountData,callContext);
+  final Long accountRecordId=nonEntityDao.retrieveRecordIdFromObject(account.getId(),ObjectType.ACCOUNT,cacheControllerDispatcher.getCacheController(CacheType.RECORD_ID));
+  internalCallContext.setAccountRecordId(accountRecordId);
+  internalCallContext.setReferenceDateTimeZone(account.getTimeZone());
+  return account;
 }

@@ -11,7 +11,6 @@
     testListener.assertListenerStatus();
   }
   final Payment payment=paymentApi.getPaymentByExternalKey(paymentExternalKey,false,ImmutableList.<PluginProperty>of(),callContext);
-  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   final String paymentStateName=paymentSMHelper.getErroredStateForTransaction(TransactionType.AUTHORIZE).toString();
   testListener.pushExpectedEvent(NextEvent.PAYMENT_PLUGIN_ERROR);
   paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,payment.getTransactions().get(0).getId(),TransactionStatus.UNKNOWN,requestedAmount,account.getCurrency(),"foo","bar",internalCallContext);

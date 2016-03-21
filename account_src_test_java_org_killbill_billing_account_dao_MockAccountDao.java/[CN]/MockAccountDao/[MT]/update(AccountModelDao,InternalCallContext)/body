@@ -3,7 +3,7 @@
   final AccountModelDao currentAccount=getById(account.getId(),context);
   final Long accountRecordId=getRecordId(account.getId(),context);
   final long tenantRecordId=context == null ? InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID : context.getTenantRecordId();
-  final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(account.getId(),currentAccount,account,accountRecordId,tenantRecordId,UUID.randomUUID());
+  final AccountChangeInternalEvent changeEvent=new DefaultAccountChangeEvent(account.getId(),currentAccount,account,accountRecordId,tenantRecordId,UUID.randomUUID(),clock.getUTCNow());
   if (changeEvent.hasChanges()) {
     try {
       eventBus.post(changeEvent);

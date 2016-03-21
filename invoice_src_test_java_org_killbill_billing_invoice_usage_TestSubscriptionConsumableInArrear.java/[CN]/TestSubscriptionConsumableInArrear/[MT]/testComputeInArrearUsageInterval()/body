@@ -18,7 +18,7 @@
   final BillingEvent evt3=createMockBillingEvent(dt3,BillingPeriod.MONTHLY,ImmutableList.<Usage>builder().add(usage1).add(usage2).build());
   billingEvents.add(evt3);
   LocalDate targetDate=new LocalDate(2013,6,23);
-  final AccountDateAndTimeZoneContext accountDateAndTimeZoneContext=new DefaultAccountDateAndTimeZoneContext(clock.getUTCNow(),DateTimeZone.UTC);
+  final AccountDateAndTimeZoneContext accountDateAndTimeZoneContext=new DefaultAccountDateAndTimeZoneContext(clock.getUTCNow(),internalCallContext);
   final SubscriptionConsumableInArrear foo=new SubscriptionConsumableInArrear(accountId,invoiceId,billingEvents,ImmutableList.<RawUsage>of(),targetDate,new LocalDate(dt1,DateTimeZone.UTC),accountDateAndTimeZoneContext);
   final List<ContiguousIntervalConsumableInArrear> result=foo.computeInArrearUsageInterval();
   assertEquals(result.size(),3);

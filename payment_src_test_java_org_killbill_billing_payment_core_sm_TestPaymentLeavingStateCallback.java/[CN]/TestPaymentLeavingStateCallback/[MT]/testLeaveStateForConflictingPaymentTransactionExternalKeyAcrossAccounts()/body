@@ -5,7 +5,7 @@
   Assert.assertEquals(transactions.size(),1);
   final String paymentStateName=paymentSMHelper.getErroredStateForTransaction(TransactionType.CAPTURE).toString();
   paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),paymentId,TransactionType.AUTHORIZE,paymentStateName,paymentStateName,transactions.get(0).getId(),TransactionStatus.SUCCESS,BigDecimal.ONE,Currency.BRL,"foo","bar",internalCallContext);
-  final InternalCallContext internalCallContextForOtherAccount=new InternalCallContext(paymentStateContext.getInternalCallContext(),123L);
-  paymentStateContext=new PaymentStateContext(true,paymentId,null,null,paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateContext.shouldLockAccountAndDispatch(),paymentStateContext.getOverridePluginOperationResult(),paymentStateContext.getProperties(),internalCallContextForOtherAccount,callContext);
+  internalCallContext.setAccountRecordId(123L);
+  paymentStateContext=new PaymentStateContext(true,paymentId,null,null,paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getTransactionType(),paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateContext.shouldLockAccountAndDispatch(),paymentStateContext.getOverridePluginOperationResult(),paymentStateContext.getProperties(),internalCallContext,callContext);
   callback.leavingState(state);
 }

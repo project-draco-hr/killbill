@@ -17,7 +17,7 @@
     entitlementApi.createBaseEntitlement(account.getId(),spec,"externalKey2",null,effectiveDate,ImmutableList.<PluginProperty>of(),callContext);
     fail();
   }
- catch (  EntitlementApiException e) {
+ catch (  final EntitlementApiException e) {
     assertTrue(e.getLocalizedMessage().startsWith("Could not find a plan matching: (product: 'Pistol', billing period: 'MONTHLY'"));
   }
   busHandler.pushExpectedEvents(NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
@@ -25,7 +25,7 @@
   assertListenerStatus();
   final List<Invoice> invoices=invoiceUserApi.getInvoicesByAccount(account.getId(),callContext);
   assertEquals(invoices.size(),3);
-  for (  Invoice invoice : invoices) {
+  for (  final Invoice invoice : invoices) {
     assertEquals(invoice.getInvoiceItems().get(0).getPlanName(),"pistol-monthly");
   }
 }

@@ -1,7 +1,7 @@
 {
   final PhaseType initialPhaseType;
   final List<EffectiveSubscriptionInternalEvent> transitions=subscriptionApi.getAllTransitions(subscription,context);
-  if (transitions.size() == 0) {
+  if (transitions.isEmpty()) {
     initialPhaseType=null;
   }
  else {
@@ -21,8 +21,7 @@
     }
   }
   final DateTime date=plan.dateOfFirstRecurringNonZeroCharge(subscription.getStartDate(),initialPhaseType);
-  final int bcdUTC=date.toDateTime(DateTimeZone.UTC).getDayOfMonth();
-  final int bcdLocal=date.toDateTime(account.getTimeZone()).getDayOfMonth();
-  log.info("Calculated BCD: subscription id {}, subscription start {}, timezone {}, bcd UTC {}, bcd local {}",subscription.getId(),date.toDateTimeISO(),account.getTimeZone(),bcdUTC,bcdLocal);
+  final int bcdLocal=context.toDateTime(date,account.getTimeZone()).getDayOfMonth();
+  log.info("Calculated BCD: subscription id {}, subscription start {}, timezone {}, bcd {}",subscription.getId(),date.toDateTimeISO(),account.getTimeZone(),bcdLocal);
   return bcdLocal;
 }

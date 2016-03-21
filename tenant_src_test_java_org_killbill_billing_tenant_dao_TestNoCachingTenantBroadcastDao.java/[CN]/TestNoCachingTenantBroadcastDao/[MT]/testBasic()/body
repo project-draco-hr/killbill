@@ -1,10 +1,11 @@
 {
   final TenantBroadcastModelDao model=new TenantBroadcastModelDao(0L,"foo",UUID.randomUUID());
-  final InternalCallContext context79=createContext(79L);
-  tenantBroadcastDao.create(model,context79);
-  final TenantBroadcastModelDao result1=tenantBroadcastDao.getById(model.getId(),context79);
+  internalCallContext.setTenantRecordId(79L);
+  tenantBroadcastDao.create(model,internalCallContext);
+  final TenantBroadcastModelDao result1=tenantBroadcastDao.getById(model.getId(),internalCallContext);
   Assert.assertEquals(result1.getTenantRecordId(),new Long(79L));
   Assert.assertEquals(result1.getType(),"foo");
+  internalCallContext.reset();
   final TenantBroadcastModelDao resultNull=tenantBroadcastDao.getById(model.getId(),internalCallContext);
   Assert.assertNull(resultNull);
   final TenantBroadcastModelDao result2=noCachingTenantBroadcastDao.getLatestEntry();

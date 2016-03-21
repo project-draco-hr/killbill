@@ -1,9 +1,3 @@
 {
-  try {
-    final ImmutableAccountData account=accountApi.getImmutableAccountDataByRecordId(callContext.getAccountRecordId(),callContext);
-    return ClockUtil.computeDateTimeWithUTCReferenceTime(requestedDate,referenceDateTime.toDateTime(DateTimeZone.UTC).toLocalTime(),account.getTimeZone(),clock);
-  }
- catch (  AccountApiException e) {
-    throw new EntitlementApiException(e);
-  }
+  return requestedDate == null ? clock.getUTCNow() : callContext.toUTCDateTime(requestedDate,referenceDateTime);
 }

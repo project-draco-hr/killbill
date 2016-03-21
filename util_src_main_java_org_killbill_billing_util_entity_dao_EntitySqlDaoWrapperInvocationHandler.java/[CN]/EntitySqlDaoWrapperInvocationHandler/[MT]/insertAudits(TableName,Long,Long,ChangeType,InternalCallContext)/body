@@ -3,7 +3,7 @@
   final EntityAudit audit=new EntityAudit(destinationTableName,historyRecordId,changeType,clock.getUTCNow());
   final InternalCallContext context;
   if (TableName.ACCOUNT.equals(tableName) && ChangeType.INSERT.equals(changeType)) {
-    context=new InternalCallContext(contextMaybeWithoutAccountRecordId,entityRecordId);
+    context=internalCallContextFactory.createInternalCallContext(entityRecordId,contextMaybeWithoutAccountRecordId);
   }
  else {
     context=contextMaybeWithoutAccountRecordId;

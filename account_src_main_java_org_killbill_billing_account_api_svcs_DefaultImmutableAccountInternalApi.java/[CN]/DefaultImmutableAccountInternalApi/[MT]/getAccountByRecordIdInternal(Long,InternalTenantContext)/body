@@ -1,0 +1,10 @@
+{
+  final AccountModelDao accountModelDao=transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<AccountModelDao>(){
+    @Override public AccountModelDao inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
+      final EntitySqlDao<AccountModelDao,Account> transactional=entitySqlDaoWrapperFactory.become(AccountSqlDao.class);
+      return transactional.getByRecordId(recordId,context);
+    }
+  }
+);
+  return accountModelDao != null ? new DefaultAccount(accountModelDao) : null;
+}

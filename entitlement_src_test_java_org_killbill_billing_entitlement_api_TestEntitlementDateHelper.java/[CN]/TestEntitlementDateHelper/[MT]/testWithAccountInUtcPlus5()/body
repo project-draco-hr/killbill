@@ -3,6 +3,7 @@
   clock.setDay(inputDate.plusDays(1));
   final DateTimeZone timeZoneUtcPlus5=DateTimeZone.forOffsetHours(+5);
   Mockito.when(account.getTimeZone()).thenReturn(timeZoneUtcPlus5);
+  internalCallContext.setReferenceDateTimeZone(account.getTimeZone());
   final DateTime refererenceDateTime=new DateTime(2013,1,1,20,28,10,0,DateTimeZone.UTC);
   final DateTime targetDate=dateHelper.fromLocalDateAndReferenceTime(inputDate,refererenceDateTime,internalCallContext);
   Assert.assertEquals(new LocalDate(targetDate,timeZoneUtcPlus5),inputDate);

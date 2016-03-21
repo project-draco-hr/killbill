@@ -23,4 +23,12 @@
   assertEquals(payment.getTransactions().get(0).getTransactionType(),TransactionType.PURCHASE);
   assertNotNull(payment.getTransactions().get(0).getGatewayErrorMsg());
   assertNotNull(payment.getTransactions().get(0).getGatewayErrorCode());
+  final Payment payment2=paymentApi.createPurchase(account,account.getPaymentMethodId(),null,requestedAmount,Currency.AED,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+  assertEquals(payment2.getExternalKey(),paymentExternalKey);
+  assertEquals(payment2.getTransactions().get(0).getExternalKey(),transactionExternalKey);
+  assertEquals(payment2.getTransactions().get(0).getTransactionStatus(),TransactionStatus.PAYMENT_FAILURE);
+  assertEquals(payment2.getTransactions().get(0).getTransactionType(),TransactionType.PURCHASE);
+  assertEquals(payment2.getTransactions().get(1).getExternalKey(),transactionExternalKey);
+  assertEquals(payment2.getTransactions().get(1).getTransactionStatus(),TransactionStatus.SUCCESS);
+  assertEquals(payment2.getTransactions().get(1).getTransactionType(),TransactionType.PURCHASE);
 }

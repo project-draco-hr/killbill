@@ -11,10 +11,14 @@
   final String pluginName="miraculous";
   final PaymentAttemptModelDao attempt1=new PaymentAttemptModelDao(accountId,paymentMethodId,createdAfterDate,createdAfterDate,externalKey1,UUID.randomUUID(),transactionExternalKey1,TransactionType.AUTHORIZE,stateName,BigDecimal.ONE,Currency.USD,ImmutableList.<String>of(pluginName),null);
   final PaymentAttemptModelDao attempt2=new PaymentAttemptModelDao(accountId,paymentMethodId,createdAfterDate,createdAfterDate,externalKey2,UUID.randomUUID(),transactionExternalKey2,TransactionType.AUTHORIZE,stateName,BigDecimal.ONE,Currency.USD,ImmutableList.<String>of(pluginName),null);
-  final InternalCallContext context1=new InternalCallContext(1L,1L,internalCallContext.getUserToken(),internalCallContext.getCreatedBy(),internalCallContext.getCallOrigin(),internalCallContext.getContextUserType(),internalCallContext.getReasonCode(),internalCallContext.getComments(),createdAfterDate,createdAfterDate);
-  paymentDao.insertPaymentAttemptWithProperties(attempt1,context1);
-  final InternalCallContext context2=new InternalCallContext(2L,2L,internalCallContext.getUserToken(),internalCallContext.getCreatedBy(),internalCallContext.getCallOrigin(),internalCallContext.getContextUserType(),internalCallContext.getReasonCode(),internalCallContext.getComments(),createdAfterDate,createdAfterDate);
-  paymentDao.insertPaymentAttemptWithProperties(attempt2,context2);
+  internalCallContext.setAccountRecordId(1L);
+  internalCallContext.setCreatedDate(createdAfterDate);
+  internalCallContext.setUpdatedDate(createdAfterDate);
+  paymentDao.insertPaymentAttemptWithProperties(attempt1,internalCallContext);
+  internalCallContext.setAccountRecordId(2L);
+  internalCallContext.setCreatedDate(createdAfterDate);
+  internalCallContext.setUpdatedDate(createdAfterDate);
+  paymentDao.insertPaymentAttemptWithProperties(attempt2,internalCallContext);
   final Pagination<PaymentAttemptModelDao> result=paymentDao.getPaymentAttemptsByStateAcrossTenants(stateName,createdBeforeDate,0L,2L);
   Assert.assertEquals(result.getTotalNbRecords().longValue(),2L);
 }

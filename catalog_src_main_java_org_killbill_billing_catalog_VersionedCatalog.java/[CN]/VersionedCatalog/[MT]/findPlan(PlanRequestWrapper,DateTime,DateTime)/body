@@ -1,15 +1,15 @@
 {
   final List<StandaloneCatalogWithPriceOverride> catalogs=versionsBeforeDate(requestedDate.toDate());
-  if (catalogs.size() == 0) {
+  if (catalogs.isEmpty()) {
     throw new CatalogApiException(ErrorCode.CAT_NO_CATALOG_FOR_GIVEN_DATE,requestedDate.toDate().toString());
   }
   for (int i=catalogs.size() - 1; i >= 0; i--) {
     final StandaloneCatalogWithPriceOverride c=catalogs.get(i);
-    Plan plan;
+    final Plan plan;
     try {
       plan=wrapper.findPlan(c);
     }
- catch (    CatalogApiException e) {
+ catch (    final CatalogApiException e) {
       if (e.getCode() != ErrorCode.CAT_NO_SUCH_PLAN.getCode()) {
         throw e;
       }
@@ -17,13 +17,13 @@
         continue;
       }
     }
-    DateTime catalogEffectiveDate=new DateTime(c.getEffectiveDate());
+    final DateTime catalogEffectiveDate=CatalogDateHelper.toUTCDateTime(c.getEffectiveDate());
     if (!subscriptionStartDate.isBefore(catalogEffectiveDate)) {
       return plan;
     }
  else {
       if (plan.getEffectiveDateForExistingSubscriptons() != null) {
-        final DateTime existingSubscriptionDate=new DateTime(plan.getEffectiveDateForExistingSubscriptons());
+        final DateTime existingSubscriptionDate=CatalogDateHelper.toUTCDateTime(plan.getEffectiveDateForExistingSubscriptons());
         if (requestedDate.isAfter(existingSubscriptionDate)) {
           return plan;
         }

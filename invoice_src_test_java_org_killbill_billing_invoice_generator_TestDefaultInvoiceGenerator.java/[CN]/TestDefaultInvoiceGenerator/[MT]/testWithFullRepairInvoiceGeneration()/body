@@ -6,7 +6,7 @@
   final MockInternationalPrice price10=new MockInternationalPrice(new DefaultPrice(TEN,Currency.USD));
   final MockInternationalPrice price20=new MockInternationalPrice(new DefaultPrice(TWENTY,Currency.USD));
   final PlanPhase basePlanEvergreen=new MockPlanPhase(price10,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
-  final BillingEventSet events=new MockBillingEventSet();
+  final BillingEventSet events=new MockBillingEventSet(internalCallContext);
   events.add(createBillingEvent(baseSubscription.getId(),baseSubscription.getBundleId(),april25,basePlan,basePlanEvergreen,25));
   final InvoiceWithMetadata invoiceWithMetadata1=generator.generateInvoice(account,events,null,april25,Currency.USD,internalCallContext);
   final Invoice invoice1=invoiceWithMetadata1.getInvoice();
@@ -30,7 +30,7 @@
   assertNotNull(invoice2);
   assertEquals(invoice2.getNumberOfItems(),2);
   assertEquals(invoice2.getBalance().compareTo(KillBillMoney.of(TWENTY_FIVE.multiply(new BigDecimal("0.9")),invoice2.getCurrency())),0);
-  final MockBillingEventSet newEvents=new MockBillingEventSet();
+  final MockBillingEventSet newEvents=new MockBillingEventSet(internalCallContext);
   final Plan basePlan2=new MockPlan("base plan 2");
   final MockInternationalPrice price13=new MockInternationalPrice(new DefaultPrice(THIRTEEN,Currency.USD));
   final PlanPhase basePlan2Phase=new MockPlanPhase(price13,null,BillingPeriod.MONTHLY,PhaseType.EVERGREEN);
