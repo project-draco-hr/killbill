@@ -1,0 +1,16 @@
+{
+  final List<SqlStatement> sqlStatements=new LinkedList<SqlStatement>();
+  final FlywayWithDryRun flyway=new FlywayWithDryRun(sqlStatements);
+  flyway.configure(System.getProperties());
+  flyway.dryRunMigrate();
+  System.out.flush();
+  if (sqlStatements.isEmpty()) {
+    return;
+  }
+  final StringBuilder stringBuffer=new StringBuilder("BEGIN;\n");
+  for (  final SqlStatement sqlStatement : sqlStatements) {
+    stringBuffer.append(sqlStatement.getSql()).append(";\n");
+  }
+  stringBuffer.append("COMMIT;");
+  System.out.println(stringBuffer.toString());
+}

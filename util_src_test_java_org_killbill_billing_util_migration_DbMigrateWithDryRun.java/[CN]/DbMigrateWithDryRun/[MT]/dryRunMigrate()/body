@@ -1,0 +1,42 @@
+{
+  try {
+    for (    final FlywayCallback callback : callbacks) {
+      new TransactionTemplate(connectionUserObjects).execute(new TransactionCallback<Object>(){
+        @Override public Object doInTransaction() throws SQLException {
+          dbSupportUserObjects.changeCurrentSchemaTo(schema);
+          callback.beforeMigrate(connectionUserObjects);
+          return null;
+        }
+      }
+);
+    }
+    final MigrationInfoServiceImpl infoService=new MigrationInfoServiceImpl(migrationResolver,metaDataTableForDryRun,target,outOfOrder,true,true);
+    infoService.refresh();
+    final MigrationInfoImpl[] pendingMigrations=infoService.pending();
+    new TransactionTemplate(connectionMetaDataTable,false).execute(new TransactionCallback<Boolean>(){
+      public Boolean doInTransaction(){
+        int i=1;
+        for (        final MigrationInfoImpl migrationInfo : pendingMigrations) {
+          applyMigration(i,migrationInfo);
+          i++;
+        }
+        return true;
+      }
+    }
+);
+    for (    final FlywayCallback callback : callbacks) {
+      new TransactionTemplate(connectionUserObjects).execute(new TransactionCallback<Object>(){
+        @Override public Object doInTransaction() throws SQLException {
+          dbSupportUserObjects.changeCurrentSchemaTo(schema);
+          callback.afterMigrate(connectionUserObjects);
+          return null;
+        }
+      }
+);
+    }
+    return pendingMigrations.length;
+  }
+  finally {
+    dbSupportUserObjects.restoreCurrentSchema();
+  }
+}

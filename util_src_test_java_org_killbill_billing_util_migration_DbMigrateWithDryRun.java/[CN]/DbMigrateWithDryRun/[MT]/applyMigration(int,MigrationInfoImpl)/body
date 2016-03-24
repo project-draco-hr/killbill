@@ -1,0 +1,21 @@
+{
+  final MigrationVersion version=migration.getVersion();
+  final String migrationText;
+  if (version != null) {
+    migrationText="schema " + schema + " to version "+ version+ " - "+ migration.getDescription();
+  }
+ else {
+    migrationText="schema " + schema + " with repeatable migration "+ migration.getDescription();
+  }
+  LOG.info("Migrating " + migrationText);
+  final FileSystemResource sqlScriptResource=new FileSystemResource(migration.getResolvedMigration().getPhysicalLocation());
+  final MigrationExecutor migrationExecutor=new CapturingSqlMigrationExecutor(sqlStatements,dbSupport,sqlScriptResource,placeholderReplacer,encoding);
+  try {
+    doMigrate(migration,migrationExecutor,migrationText);
+  }
+ catch (  final SQLException e) {
+    throw new FlywayException("Unable to apply migration",e);
+  }
+  final AppliedMigration appliedMigration=new AppliedMigration(installedRnk,version,migration.getDescription(),migration.getType(),migration.getScript(),migration.getResolvedMigration().getChecksum(),null,null,-1,true);
+  metaDataTableForDryRun.addAppliedMigration(appliedMigration);
+}
