@@ -2,7 +2,7 @@
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<PaymentMethodModelDao>>(){
     @Override public List<PaymentMethodModelDao> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final PaymentMethodSqlDao transactional=entitySqlDaoWrapperFactory.become(PaymentMethodSqlDao.class);
-      final List<PaymentMethodModelDao> allPaymentMethodsForAccount=transactional.getByAccountIdIncludedDelete(accountId.toString(),context);
+      final List<PaymentMethodModelDao> allPaymentMethodsForAccount=transactional.getForAccountIncludedDelete(context);
       final Collection<PaymentMethodModelDao> existingPaymentMethods=Collections2.filter(allPaymentMethodsForAccount,new Predicate<PaymentMethodModelDao>(){
         @Override public boolean apply(        final PaymentMethodModelDao paymentMethod){
           return pluginName.equals(paymentMethod.getPluginName());
@@ -34,7 +34,7 @@
           deletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),context);
         }
       }
-      return transactional.getByAccountId(accountId.toString(),context);
+      return transactional.getForAccount(context);
     }
   }
 );

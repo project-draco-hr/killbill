@@ -25,7 +25,7 @@ catch (      final AccountApiException e) {
     }
     private void validateUniqueExternalPaymentMethod(    final UUID accountId,    final String pluginName) throws PaymentApiException {
       if (ExternalPaymentProviderPlugin.PLUGIN_NAME.equals(pluginName)) {
-        final List<PaymentMethodModelDao> accountPaymentMethods=paymentDao.getPaymentMethods(accountId,context);
+        final List<PaymentMethodModelDao> accountPaymentMethods=paymentDao.getPaymentMethods(context);
         if (Iterables.any(accountPaymentMethods,new Predicate<PaymentMethodModelDao>(){
           @Override public boolean apply(          final PaymentMethodModelDao input){
             return ExternalPaymentProviderPlugin.PLUGIN_NAME.equals(input.getPluginName());
