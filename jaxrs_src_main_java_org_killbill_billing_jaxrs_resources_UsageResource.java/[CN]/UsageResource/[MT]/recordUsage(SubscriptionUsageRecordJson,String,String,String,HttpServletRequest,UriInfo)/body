@@ -2,6 +2,14 @@
   verifyNonNullOrEmpty(json,"SubscriptionUsageRecordJson body should be specified");
   verifyNonNullOrEmpty(json.getSubscriptionId(),"SubscriptionUsageRecordJson subscriptionId needs to be set",json.getUnitUsageRecords(),"SubscriptionUsageRecordJson unitUsageRecords needs to be set");
   Preconditions.checkArgument(!json.getUnitUsageRecords().isEmpty());
+  for (  final UnitUsageRecordJson unitUsageRecordJson : json.getUnitUsageRecords()) {
+    verifyNonNullOrEmpty(unitUsageRecordJson.getUnitType(),"UnitUsageRecordJson unitType need to be set");
+    Preconditions.checkArgument(Iterables.size(unitUsageRecordJson.getUsageRecords()) > 0,"UnitUsageRecordJson usageRecords must have at least one element.");
+    for (    final UsageRecordJson usageRecordJson : unitUsageRecordJson.getUsageRecords()) {
+      verifyNonNull(usageRecordJson.getAmount(),"UsageRecordJson amount needs to be set");
+      verifyNonNull(usageRecordJson.getRecordDate(),"UsageRecordJson recordDate needs to be set");
+    }
+  }
   final CallContext callContext=context.createContext(createdBy,reason,comment,request);
   final Entitlement entitlement=entitlementApi.getEntitlementForId(UUID.fromString(json.getSubscriptionId()),callContext);
   if (entitlement.getState() != EntitlementState.ACTIVE) {
