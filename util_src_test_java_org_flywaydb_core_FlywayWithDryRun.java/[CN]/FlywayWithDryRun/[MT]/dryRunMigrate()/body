@@ -3,7 +3,7 @@
   return execute(new Command<Integer>(){
     public Integer execute(    final Connection connectionMetaDataTable,    final Connection connectionUserObjects,    final MigrationResolver migrationResolver,    final MetaDataTable metaDataTable,    final DbSupport dbSupport,    final Schema[] schemas,    final FlywayCallback[] flywayCallbacks){
       final Table metaDataDBTable=schemas[0].getTable(getTable());
-      @SuppressWarnings("deprecation") final DbMigrateWithDryRun dbMigrate=new DbMigrateWithDryRun(sqlStatements,placeholderReplacer,getEncoding(),metaDataDBTable,connectionMetaDataTable,connectionUserObjects,dbSupport,metaDataTable,schemas[0],migrationResolver,getTarget(),isIgnoreFutureMigrations(),isIgnoreFailedFutureMigration(),isOutOfOrder(),flywayCallbacks);
+      final DbMigrateWithDryRun dbMigrate=new DbMigrateWithDryRun(sqlStatements,placeholderReplacer,getEncoding(),metaDataDBTable,connectionMetaDataTable,connectionUserObjects,dbSupport,metaDataTable,schemas[0],migrationResolver,getTarget(),isIgnoreFutureMigrations(),false,isOutOfOrder(),flywayCallbacks);
       return dbMigrate.dryRunMigrate();
     }
   }

@@ -1,0 +1,15 @@
+{
+  final File driversDir=new File(getInstallationDir(),"drivers");
+  final File[] files=driversDir.listFiles(new FilenameFilter(){
+    public boolean accept(    final File dir,    final String name){
+      return name.endsWith(".jar");
+    }
+  }
+);
+  if (files == null) {
+    return;
+  }
+  for (  final File file : files) {
+    addJarOrDirectoryToClasspath(file.getPath());
+  }
+}

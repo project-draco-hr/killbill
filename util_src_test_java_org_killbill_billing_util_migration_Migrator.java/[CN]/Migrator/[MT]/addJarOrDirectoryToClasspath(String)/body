@@ -1,0 +1,13 @@
+{
+  LOG.debug("Adding location to classpath: " + name);
+  try {
+    final URL url=new File(name).toURI().toURL();
+    final URLClassLoader sysloader=(URLClassLoader)ClassLoader.getSystemClassLoader();
+    final Method method=URLClassLoader.class.getDeclaredMethod("addURL",URL.class);
+    method.setAccessible(true);
+    method.invoke(sysloader,url);
+  }
+ catch (  final Exception e) {
+    throw new FlywayException("Unable to load " + name,e);
+  }
+}

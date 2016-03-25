@@ -1,0 +1,34 @@
+{
+  if ("clean".equals(operation)) {
+    flyway.clean();
+  }
+ else   if ("baseline".equals(operation)) {
+    flyway.baseline();
+  }
+ else   if ("migrate".equals(operation)) {
+    flyway.migrate();
+  }
+ else   if ("dryRunMigrate".equals(operation)) {
+    flyway.dryRunMigrate();
+    final StringBuilder stringBuilder=new StringBuilder("BEGIN;\n");
+    for (    final SqlStatement sqlStatement : sqlStatements) {
+      stringBuilder.append(sqlStatement.getSql()).append(";\n");
+    }
+    stringBuilder.append("COMMIT;");
+    LOG.info("\n" + stringBuilder.toString());
+  }
+ else   if ("validate".equals(operation)) {
+    flyway.validate();
+  }
+ else   if ("info".equals(operation)) {
+    LOG.info("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
+  }
+ else   if ("repair".equals(operation)) {
+    flyway.repair();
+  }
+ else {
+    LOG.error("Invalid operation: " + operation);
+    printUsage();
+    System.exit(1);
+  }
+}
