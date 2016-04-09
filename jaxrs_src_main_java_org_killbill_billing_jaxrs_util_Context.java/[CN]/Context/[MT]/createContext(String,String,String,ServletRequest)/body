@@ -2,7 +2,7 @@
   try {
     Preconditions.checkNotNull(createdBy,String.format("Header %s needs to be set",JaxrsResource.HDR_CREATED_BY));
     final Tenant tenant=getTenantFromRequest(request);
-    return contextFactory.createCallContext(tenant == null ? null : tenant.getId(),createdBy,origin,userType,reason,comment,UUIDs.randomUUID());
+    return contextFactory.createCallContext(tenant == null ? null : tenant.getId(),createdBy,origin,userType,reason,comment,getOrCreateUserToken());
   }
  catch (  final NullPointerException e) {
     throw new IllegalArgumentException(e.getMessage());
