@@ -5,7 +5,7 @@
   try {
     final DefaultSubscriptionBase subscription=(DefaultSubscriptionBase)dao.getSubscriptionFromId(event.getSubscriptionId(),context);
     if (subscription == null) {
-      log.warn("Failed to retrieve subscription for id %s",event.getSubscriptionId());
+      log.warn("Error retrieving subscriptionId='{}'",event.getSubscriptionId());
       return;
     }
     if (subscription.getActiveVersion() > event.getActiveVersion()) {
@@ -26,9 +26,9 @@
     }
   }
  catch (  final EventBusException e) {
-    log.warn("Failed to post subscription event " + event,e);
+    log.warn(String.format("Failed to post event %s",event),e);
   }
 catch (  final CatalogApiException e) {
-    log.warn("Failed to post subscription event " + event,e);
+    log.warn(String.format("Failed to post event %s",event),e);
   }
 }

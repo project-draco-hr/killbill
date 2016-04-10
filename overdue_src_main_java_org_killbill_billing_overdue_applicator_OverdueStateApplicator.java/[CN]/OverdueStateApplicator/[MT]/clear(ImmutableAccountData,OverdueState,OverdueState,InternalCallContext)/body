@@ -8,10 +8,18 @@
  catch (  final OverdueApiException e) {
     throw new OverdueException(e);
   }
+  final OverdueChangeInternalEvent event;
   try {
-    bus.post(createOverdueEvent(account,previousOverdueState.getName(),clearState.getName(),isBlockBillingTransition(previousOverdueState,clearState),isUnblockBillingTransition(previousOverdueState,clearState),context));
+    event=createOverdueEvent(account,previousOverdueState.getName(),clearState.getName(),isBlockBillingTransition(previousOverdueState,clearState),isUnblockBillingTransition(previousOverdueState,clearState),context);
+  }
+ catch (  final BlockingApiException e) {
+    log.warn(String.format("Failed to create OverdueChangeInternalEvent for accountId='%s'",account.getId()),e);
+    return;
+  }
+  try {
+    bus.post(event);
   }
  catch (  final Exception e) {
-    log.error("Error posting overdue change event to bus",e);
+    log.warn(String.format("Failed to post event %s",event),e);
   }
 }

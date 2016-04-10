@@ -7,12 +7,12 @@
     if (parent.isStopped()) {
       return;
     }
+    final BroadcastInternalEvent event=new DefaultBroadcastInternalEvent(cur.getServiceName(),cur.getType(),cur.getEvent());
     try {
-      final BroadcastInternalEvent event=new DefaultBroadcastInternalEvent(cur.getServiceName(),cur.getType(),cur.getEvent());
       eventBus.post(event);
     }
  catch (    final EventBusException e) {
-      logger.error("Failed to send event BroadcastInternalEvent: ",e);
+      logger.warn(String.format("Failed to post event %s",event),e);
     }
  finally {
       parent.setLatestRecordIdProcessed(cur.getRecordId());
