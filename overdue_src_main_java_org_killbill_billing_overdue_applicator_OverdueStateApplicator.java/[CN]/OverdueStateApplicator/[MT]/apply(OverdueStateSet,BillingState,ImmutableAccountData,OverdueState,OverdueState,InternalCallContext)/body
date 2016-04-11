@@ -37,13 +37,13 @@
     event=createOverdueEvent(account,previousOverdueState.getName(),nextOverdueState.getName(),isBlockBillingTransition(previousOverdueState,nextOverdueState),isUnblockBillingTransition(previousOverdueState,nextOverdueState),context);
   }
  catch (  final BlockingApiException e) {
-    log.warn(String.format("Failed to create OverdueChangeInternalEvent for accountId='%s'",account.getId()),e);
+    log.warn("Failed to create OverdueChangeInternalEvent for accountId='{}'",account.getId(),e);
     return;
   }
   try {
     bus.post(event);
   }
  catch (  final Exception e) {
-    log.warn(String.format("Failed to post event %s",event),e);
+    log.warn("Failed to post event {}",event,e);
   }
 }
