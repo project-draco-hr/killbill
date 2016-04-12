@@ -1,16 +1,17 @@
 {
-  final Throwable originalExceptionOrCause=e instanceof ExecutionException ? MoreObjects.firstNonNull(e.getCause(),e) : e;
+  final Throwable originalExceptionOrCausePossiblyOperationException=e instanceof ExecutionException ? MoreObjects.firstNonNull(e.getCause(),e) : e;
+  final Throwable originalExceptionOrCause=originalExceptionOrCausePossiblyOperationException instanceof OperationException ? MoreObjects.firstNonNull(originalExceptionOrCausePossiblyOperationException.getCause(),originalExceptionOrCausePossiblyOperationException) : originalExceptionOrCausePossiblyOperationException;
   if (originalExceptionOrCause instanceof LockFailedException) {
-    logger.warn("Failed to lock account {}",paymentStateContext.getAccount().getExternalKey());
+    logger.warn("Failed to lock accountExternalKey='{}'",paymentStateContext.getAccount().getExternalKey());
   }
  else   if (originalExceptionOrCause instanceof TimeoutException) {
-    logger.error("Plugin call TIMEOUT for account {}",paymentStateContext.getAccount().getExternalKey());
+    logger.warn("Plugin call TIMEOUT for accountExternalKey='{}'",paymentStateContext.getAccount().getExternalKey());
   }
  else   if (originalExceptionOrCause instanceof InterruptedException) {
-    logger.error("Plugin call was interrupted for account {}",paymentStateContext.getAccount().getExternalKey());
+    logger.warn("Plugin call was interrupted for accountExternalKey='{}'",paymentStateContext.getAccount().getExternalKey());
   }
  else {
-    logger.warn("Payment plugin call threw an exception for account {}",paymentStateContext.getAccount().getExternalKey(),originalExceptionOrCause);
+    logger.warn("Payment plugin call threw an exception for accountExternalKey='{}'",paymentStateContext.getAccount().getExternalKey(),originalExceptionOrCause);
   }
   return convertToUnknownTransactionStatusAndErroredPaymentState(originalExceptionOrCause);
 }

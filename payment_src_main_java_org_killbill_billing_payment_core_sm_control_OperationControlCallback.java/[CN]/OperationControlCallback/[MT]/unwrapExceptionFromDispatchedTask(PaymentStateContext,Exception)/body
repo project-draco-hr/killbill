@@ -1,5 +1,6 @@
 {
-  final Throwable originalExceptionOrCause=e instanceof ExecutionException ? MoreObjects.firstNonNull(e.getCause(),e) : e;
+  final Throwable originalExceptionOrCausePossiblyOperationException=e instanceof ExecutionException ? MoreObjects.firstNonNull(e.getCause(),e) : e;
+  final Throwable originalExceptionOrCause=originalExceptionOrCausePossiblyOperationException instanceof OperationException ? MoreObjects.firstNonNull(originalExceptionOrCausePossiblyOperationException.getCause(),originalExceptionOrCausePossiblyOperationException) : originalExceptionOrCausePossiblyOperationException;
   if (originalExceptionOrCause instanceof OperationException) {
     return (OperationException)originalExceptionOrCause;
   }
@@ -15,5 +16,5 @@
  else {
     logger.warn("Operation failed for accountId='{}'",paymentStateContext.getAccount().getId(),e);
   }
-  return new OperationException(e,getOperationResultOnException(paymentStateContext));
+  return new OperationException(originalExceptionOrCause,getOperationResultOnException(paymentStateContext));
 }
