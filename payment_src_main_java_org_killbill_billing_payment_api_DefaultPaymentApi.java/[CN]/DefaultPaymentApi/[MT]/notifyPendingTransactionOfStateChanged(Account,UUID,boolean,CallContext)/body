@@ -1,7 +1,16 @@
 {
   checkNotNullParameter(account,"account");
   checkNotNullParameter(paymentTransactionId,"paymentTransactionId");
-  logAPICall("NOTIFY_STATE_CHANGE",account,null,null,paymentTransactionId,null,null,null,null);
+  final String transactionType="NOTIFY_STATE_CHANGE";
+  logAPICall(transactionType,account,null,null,paymentTransactionId,null,null,null,null,null,null);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
-  return paymentProcessor.notifyPendingPaymentOfStateChanged(account,paymentTransactionId,isSuccess,callContext,internalCallContext);
+  final Payment payment=paymentProcessor.notifyPendingPaymentOfStateChanged(account,paymentTransactionId,isSuccess,callContext,internalCallContext);
+  final PaymentTransaction paymentTransaction=Iterables.<PaymentTransaction>tryFind(payment.getTransactions(),new Predicate<PaymentTransaction>(){
+    @Override public boolean apply(    final PaymentTransaction transaction){
+      return transaction.getId().equals(paymentTransactionId);
+    }
+  }
+).orNull();
+  logAPICall(transactionType,account,payment.getPaymentMethodId(),payment.getId(),paymentTransaction == null ? null : paymentTransaction.getId(),paymentTransaction == null ? null : paymentTransaction.getProcessedAmount(),paymentTransaction == null ? null : paymentTransaction.getProcessedCurrency(),payment.getExternalKey(),paymentTransaction == null ? null : paymentTransaction.getExternalKey(),paymentTransaction == null ? null : paymentTransaction.getTransactionStatus(),null);
+  return payment;
 }
