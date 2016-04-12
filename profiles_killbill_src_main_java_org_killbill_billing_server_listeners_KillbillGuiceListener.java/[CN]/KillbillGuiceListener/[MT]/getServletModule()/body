@@ -1,5 +1,6 @@
 {
   final BaseServerModuleBuilder builder=new BaseServerModuleBuilder().setJaxrsUriPattern("/" + SWAGGER_PATH + "|((/"+ SWAGGER_PATH+ "|"+ JaxRsResourceBase.PREFIX+ "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*)").addJaxrsResource("org.killbill.billing.jaxrs.mappers").addJaxrsResource("org.killbill.billing.jaxrs.resources").addJaxrsResource("com.wordnik.swagger.jersey.listing");
+  builder.addJerseyFilter(RequestDataFilter.class.getName());
   builder.addJerseyFilter("com.sun.jersey.api.container.filter.LoggingFilter");
   builder.addJerseyParam("com.sun.jersey.config.feature.DisableWADL","true");
   if (config.isConfiguredToReturnGZIPResponses()) {
@@ -7,7 +8,6 @@
     builder.addJerseyFilter(GZIPContentEncodingFilter.class.getName());
   }
   builder.addJerseyFilter(ProfilingContainerResponseFilter.class.getName());
-  builder.addJerseyFilter(RequestDataFilter.class.getName());
   builder.addFilter("/*",ResponseCorsFilter.class);
   if (config.isMultiTenancyEnabled()) {
     builder.addFilter("/*",TenantFilter.class);
