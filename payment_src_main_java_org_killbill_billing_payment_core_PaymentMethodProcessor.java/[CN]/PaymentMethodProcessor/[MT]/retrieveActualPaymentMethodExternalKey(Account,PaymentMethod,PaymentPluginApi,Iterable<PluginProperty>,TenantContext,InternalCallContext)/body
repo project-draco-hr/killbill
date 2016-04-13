@@ -7,7 +7,12 @@
     paymentMethodPlugin=pluginApi.getPaymentMethodDetail(account.getId(),pm.getId(),properties,callContext);
   }
  catch (  final PaymentPluginApiException e) {
-    log.warn("Error retrieving paymentMethodId='{}', plugin='{}'",pm.getId(),pm.getPluginName(),e);
+    if (e.getCause() == null) {
+      log.warn("Error retrieving paymentMethodId='{}', plugin='{}', errorMessage='{}', errorType='{}'",pm.getId(),pm.getPluginName(),e.getErrorMessage(),e.getErrorType());
+    }
+ else {
+      log.warn("Error retrieving paymentMethodId='{}', plugin='{}', errorMessage='{}', errorType='{}'",pm.getId(),pm.getPluginName(),e.getErrorMessage(),e.getErrorType(),e);
+    }
     return null;
   }
   if (paymentMethodPlugin != null && paymentMethodPlugin.getExternalPaymentMethodId() != null) {
