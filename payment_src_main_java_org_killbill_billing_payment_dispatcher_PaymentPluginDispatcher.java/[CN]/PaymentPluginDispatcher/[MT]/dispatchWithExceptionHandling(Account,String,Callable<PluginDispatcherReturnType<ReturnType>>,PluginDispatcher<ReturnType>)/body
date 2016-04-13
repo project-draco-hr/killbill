@@ -9,7 +9,7 @@
   }
  catch (  final TimeoutException e) {
     final String errorMessage=String.format("TimeoutException while executing plugin='%s'",pluginNames);
-    log.warn(errorMessage,e);
+    log.warn(errorMessage);
     throw new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_TIMEOUT,accountId,errorMessage);
   }
 catch (  final InterruptedException e) {
@@ -24,7 +24,7 @@ catch (  final ExecutionException e) {
     }
  else     if (e.getCause() instanceof LockFailedException) {
       final String format=String.format("Failed to lock accountExternalKey='%s'",accountExternalKey);
-      log.warn(format,e);
+      log.warn(format);
       throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,format);
     }
  else {
