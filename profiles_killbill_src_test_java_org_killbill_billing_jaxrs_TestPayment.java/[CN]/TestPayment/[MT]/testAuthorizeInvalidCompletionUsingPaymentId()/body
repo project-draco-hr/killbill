@@ -1,0 +1,18 @@
+{
+  final Account account=createAccountWithDefaultPaymentMethod();
+  final UUID paymentMethodId=account.getPaymentMethodId();
+  final BigDecimal amount=BigDecimal.TEN;
+  final ImmutableMap<String,String> pluginProperties=ImmutableMap.of();
+  TransactionType transactionType=TransactionType.AUTHORIZE;
+  final String paymentExternalKey=UUID.randomUUID().toString();
+  final String authTransactionExternalKey=UUID.randomUUID().toString();
+  final Payment initialPayment=createVerifyTransaction(account,paymentMethodId,paymentExternalKey,authTransactionExternalKey,transactionType,TransactionStatus.SUCCESS.name(),amount,amount,pluginProperties,1);
+  final PaymentTransaction completeTransactionByPaymentId=new PaymentTransaction();
+  completeTransactionByPaymentId.setPaymentId(initialPayment.getPaymentId());
+  try {
+    killBillClient.completePayment(completeTransactionByPaymentId,pluginProperties,createdBy,reason,comment);
+    fail("Completion should not succeed, there is no PENDING payment transaction");
+  }
+ catch (  final KillBillClientException expected) {
+  }
+}

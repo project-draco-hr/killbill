@@ -1,0 +1,26 @@
+{
+  final Account account=createAccountWithDefaultPaymentMethod();
+  final UUID paymentMethodId=account.getPaymentMethodId();
+  final BigDecimal amount=BigDecimal.TEN;
+  final String pending=PaymentPluginStatus.PENDING.toString();
+  final ImmutableMap<String,String> pendingPluginProperties=ImmutableMap.<String,String>of(MockPaymentProviderPlugin.PLUGIN_PROPERTY_PAYMENT_PLUGIN_STATUS_OVERRIDE,pending);
+  final ImmutableMap<String,String> pluginProperties=ImmutableMap.of();
+  TransactionType transactionType=TransactionType.AUTHORIZE;
+  final String paymentExternalKey=UUID.randomUUID().toString();
+  final String authTransactionExternalKey=UUID.randomUUID().toString();
+  final Payment initialPayment=createVerifyTransaction(account,paymentMethodId,paymentExternalKey,authTransactionExternalKey,transactionType,pending,amount,BigDecimal.ZERO,pendingPluginProperties,1);
+  final PaymentTransaction completeTransactionByPaymentIdAndInvalidTransactionId=new PaymentTransaction();
+  completeTransactionByPaymentIdAndInvalidTransactionId.setPaymentId(initialPayment.getPaymentId());
+  completeTransactionByPaymentIdAndInvalidTransactionId.setTransactionId(UUID.randomUUID());
+  try {
+    killBillClient.completePayment(completeTransactionByPaymentIdAndInvalidTransactionId,pluginProperties,createdBy,reason,comment);
+    fail("Payment completion should fail when invalid transaction id has been provided");
+  }
+ catch (  final KillBillClientException expected) {
+  }
+  final PaymentTransaction completeTransactionByPaymentIdAndTransactionId=new PaymentTransaction();
+  completeTransactionByPaymentIdAndTransactionId.setPaymentId(initialPayment.getPaymentId());
+  completeTransactionByPaymentIdAndTransactionId.setTransactionId(initialPayment.getTransactions().get(0).getTransactionId());
+  final Payment completedPaymentByPaymentId=killBillClient.completePayment(completeTransactionByPaymentIdAndTransactionId,pluginProperties,createdBy,reason,comment);
+  verifyPayment(account,paymentMethodId,completedPaymentByPaymentId,paymentExternalKey,authTransactionExternalKey,transactionType.toString(),TransactionStatus.SUCCESS.name(),amount,amount,BigDecimal.ZERO,BigDecimal.ZERO,1,1);
+}
