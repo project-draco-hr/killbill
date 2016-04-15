@@ -4,7 +4,7 @@
   final Invoice invoice1=new DefaultInvoice(accountId,clock.getUTCToday(),targetDate1,Currency.USD);
   invoiceUtil.createInvoice(invoice1,true,context);
   final BigDecimal payment1=new BigDecimal("48.0");
-  final InvoicePayment payment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice1.getId(),new DateTime(),payment1,Currency.USD,Currency.USD,true);
+  final InvoicePayment payment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice1.getId(),new DateTime(),payment1,Currency.USD,Currency.USD,null,true);
   invoiceUtil.createPayment(payment,context);
   final BigDecimal balance=invoiceDao.getAccountBalance(accountId,context);
   assertEquals(balance.compareTo(BigDecimal.ZERO.subtract(payment1)),0);

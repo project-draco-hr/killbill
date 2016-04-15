@@ -10,7 +10,7 @@
   invoiceUtil.createInvoiceItem(creditBalanceAdjInvoiceItem1,context);
   final BigDecimal paymentAmount=new BigDecimal("10.00");
   final UUID paymentId=UUID.randomUUID();
-  final DefaultInvoicePayment defaultInvoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice1.getId(),clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD,Currency.USD,true);
+  final DefaultInvoicePayment defaultInvoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice1.getId(),clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD,Currency.USD,null,true);
   invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment),context);
   final DefaultInvoice invoice2=new DefaultInvoice(accountId,clock.getUTCToday(),clock.getUTCToday(),Currency.USD);
   final InvoiceItem fixedItem2=new FixedPriceInvoiceItem(invoice2.getId(),invoice1.getAccountId(),null,null,UUID.randomUUID().toString(),UUID.randomUUID().toString(),clock.getUTCToday(),new BigDecimal("5"),Currency.USD);

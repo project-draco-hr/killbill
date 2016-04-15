@@ -13,7 +13,7 @@
   final RecurringInvoiceItem item2=new RecurringInvoiceItem(invoice1.getId(),accountId,bundleId,UUID.randomUUID(),"test plan","test phase B",startDate,endDate,rate2,rate2,Currency.USD);
   invoiceUtil.createInvoiceItem(item2,context);
   final BigDecimal payment1=new BigDecimal("48.0");
-  final InvoicePayment payment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice1.getId(),new DateTime(),payment1,Currency.USD,Currency.USD,true);
+  final InvoicePayment payment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,UUID.randomUUID(),invoice1.getId(),new DateTime(),payment1,Currency.USD,Currency.USD,null,true);
   invoiceUtil.createPayment(payment,context);
   final BigDecimal balance=invoiceDao.getAccountBalance(accountId,context);
   assertEquals(balance.compareTo(rate1.add(rate2).subtract(payment1)),0);
