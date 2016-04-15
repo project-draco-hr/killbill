@@ -4,20 +4,13 @@
     if (paymentStateContext.getPaymentMethodId() == null) {
       throw new PaymentApiException(ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD,paymentStateContext.getAccount().getId());
     }
-    final List<PaymentTransactionModelDao> existingPaymentTransactions;
-    if (paymentStateContext.getTransactionId() != null) {
-      final PaymentTransactionModelDao transactionModelDao=daoHelper.getPaymentDao().getPaymentTransaction(paymentStateContext.getTransactionId(),paymentStateContext.getInternalCallContext());
-      existingPaymentTransactions=ImmutableList.of(transactionModelDao);
-    }
- else     if (paymentStateContext.getPaymentTransactionExternalKey() != null) {
-      existingPaymentTransactions=daoHelper.getPaymentDao().getPaymentTransactionsByExternalKey(paymentStateContext.getPaymentTransactionExternalKey(),paymentStateContext.getInternalCallContext());
-    }
- else {
-      existingPaymentTransactions=ImmutableList.of();
-    }
-    validatePaymentIdAndTransactionType(existingPaymentTransactions);
-    validateUniqueTransactionExternalKey(existingPaymentTransactions);
-    final PaymentTransactionModelDao pendingPaymentTransaction=getPendingPaymentTransaction(existingPaymentTransactions);
+    final List<PaymentTransactionModelDao> paymentTransactionsForCurrentPayment=paymentStateContext.getPaymentId() != null ? daoHelper.getPaymentDao().getTransactionsForPayment(paymentStateContext.getPaymentId(),paymentStateContext.getInternalCallContext()) : ImmutableList.<PaymentTransactionModelDao>of();
+    final Iterable<PaymentTransactionModelDao> existingPaymentTransactionsForTransactionIdOrKey=filterExistingPaymentTransactionsForTransactionIdOrKey(paymentTransactionsForCurrentPayment,paymentStateContext.getTransactionId(),paymentStateContext.getPaymentTransactionExternalKey());
+    validatePaymentIdAndTransactionType(existingPaymentTransactionsForTransactionIdOrKey);
+    validateUniqueTransactionExternalKey(existingPaymentTransactionsForTransactionIdOrKey);
+    final Iterable<PaymentTransactionModelDao> pendingTransactionsForPaymentAndTransactionType=filterPendingTransactionsForPaymentAndTransactionType(paymentTransactionsForCurrentPayment,paymentStateContext.getTransactionType());
+    validateUniqueInitialPendingTransaction(pendingTransactionsForPaymentAndTransactionType,paymentStateContext.getTransactionType(),paymentStateContext.getPaymentTransactionExternalKey());
+    final PaymentTransactionModelDao pendingPaymentTransaction=filterPendingTransactionsForTransactionKey(pendingTransactionsForPaymentAndTransactionType,paymentStateContext.getPaymentTransactionExternalKey());
     if (pendingPaymentTransaction != null) {
       paymentStateContext.setPaymentTransactionModelDao(pendingPaymentTransaction);
       return;

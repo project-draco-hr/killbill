@@ -1,0 +1,16 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  for (  final TransactionType transactionType : ImmutableList.<TransactionType>of(TransactionType.AUTHORIZE,TransactionType.PURCHASE,TransactionType.CREDIT)) {
+    final String paymentExternalKey=UUID.randomUUID().toString();
+    final String keyA=UUID.randomUUID().toString();
+    final Payment errorPayment=createPayment(transactionType,null,paymentExternalKey,keyA,requestedAmount,PaymentPluginStatus.ERROR);
+    assertNotNull(errorPayment);
+    Assert.assertEquals(errorPayment.getTransactions().size(),1);
+    Assert.assertEquals(errorPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.PAYMENT_FAILURE);
+    final String keyB=UUID.randomUUID().toString();
+    final Payment successfulPayment=createPayment(transactionType,errorPayment.getId(),paymentExternalKey,keyB,requestedAmount,PaymentPluginStatus.PROCESSED);
+    assertNotNull(successfulPayment);
+    Assert.assertEquals(successfulPayment.getId(),errorPayment.getId());
+    Assert.assertEquals(successfulPayment.getTransactions().size(),2);
+  }
+}

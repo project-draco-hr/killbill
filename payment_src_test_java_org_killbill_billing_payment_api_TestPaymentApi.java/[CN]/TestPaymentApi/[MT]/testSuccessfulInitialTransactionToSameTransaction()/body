@@ -1,0 +1,24 @@
+{
+  final BigDecimal requestedAmount=BigDecimal.TEN;
+  for (  final TransactionType transactionType : ImmutableList.<TransactionType>of(TransactionType.AUTHORIZE,TransactionType.PURCHASE,TransactionType.CREDIT)) {
+    final String paymentExternalKey=UUID.randomUUID().toString();
+    final String keyA=UUID.randomUUID().toString();
+    final Payment processedPayment=createPayment(transactionType,null,paymentExternalKey,keyA,requestedAmount,PaymentPluginStatus.PROCESSED);
+    assertNotNull(processedPayment);
+    Assert.assertEquals(processedPayment.getTransactions().size(),1);
+    Assert.assertEquals(processedPayment.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
+    final String keyB=UUID.randomUUID().toString();
+    try {
+      createPayment(transactionType,processedPayment.getId(),paymentExternalKey,keyB,requestedAmount,PaymentPluginStatus.PROCESSED);
+      Assert.fail("Retrying initial successful transaction (AUTHORIZE, PURCHASE, CREDIT) with same different key should fail");
+    }
+ catch (    final PaymentApiException e) {
+    }
+    try {
+      createPayment(transactionType,processedPayment.getId(),paymentExternalKey,keyA,requestedAmount,PaymentPluginStatus.PROCESSED);
+      Assert.fail("Retrying initial successful transaction (AUTHORIZE, PURCHASE, CREDIT) with same transaction key should fail");
+    }
+ catch (    final PaymentApiException e) {
+    }
+  }
+}
