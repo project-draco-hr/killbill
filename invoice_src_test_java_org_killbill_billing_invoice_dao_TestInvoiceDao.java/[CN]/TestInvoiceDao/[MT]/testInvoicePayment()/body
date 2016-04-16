@@ -15,8 +15,8 @@
   assertEquals(savedInvoice.getInvoiceItems().size(),1);
   final BigDecimal paymentAmount=new BigDecimal("11.00");
   final UUID paymentId=UUID.randomUUID();
-  final DefaultInvoicePayment defaultInvoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoiceId,clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD,Currency.USD,null,true);
-  invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment),context);
+  final DefaultInvoicePayment defaultInvoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoiceId,clock.getUTCNow().plusDays(12),paymentAmount,Currency.USD,Currency.USD,"cookie",true);
+  invoiceDao.notifyOfPaymentCompletion(new InvoicePaymentModelDao(defaultInvoicePayment),context);
   final InvoiceModelDao retrievedInvoice=invoiceDao.getById(invoiceId,context);
   assertNotNull(retrievedInvoice);
   assertEquals(retrievedInvoice.getInvoiceItems().size(),1);

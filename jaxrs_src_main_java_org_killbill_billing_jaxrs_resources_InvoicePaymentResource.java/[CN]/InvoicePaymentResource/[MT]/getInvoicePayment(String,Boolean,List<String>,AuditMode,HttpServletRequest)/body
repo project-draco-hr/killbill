@@ -7,7 +7,7 @@
   final List<InvoicePayment> invoicePayments=invoicePaymentApi.getInvoicePayments(paymentIdId,tenantContext);
   final InvoicePayment invoicePayment=Iterables.tryFind(invoicePayments,new Predicate<InvoicePayment>(){
     @Override public boolean apply(    final InvoicePayment input){
-      return input.getType() == InvoicePaymentType.ATTEMPT;
+      return input.getType() == InvoicePaymentType.ATTEMPT && input.isSuccess();
     }
   }
 ).orNull();

@@ -1,16 +1,17 @@
 {
   try {
     final UUID invoiceId=getInvoiceId(pluginProperties);
-    final Invoice invoice=rebalanceAndGetInvoice(invoiceId,internalContext);
+    final Invoice invoice=getAndSanitizeInvoice(invoiceId,internalContext);
     final BigDecimal requestedAmount=validateAndComputePaymentAmount(invoice,paymentControlPluginContext.getAmount(),paymentControlPluginContext.isApiPayment());
     final boolean isAborted=requestedAmount.compareTo(BigDecimal.ZERO) == 0;
     if (!isAborted && insert_AUTO_PAY_OFF_ifRequired(paymentControlPluginContext,requestedAmount)) {
       return new DefaultPriorPaymentControlResult(true);
     }
     if (paymentControlPluginContext.isApiPayment() && isAborted) {
-      throw new PaymentControlApiException("Abort purchase call: ",new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,String.format("Payment for invoice %s aborted : invoice balance is = %s, requested payment amount is = %s",invoice.getId(),invoice.getBalance(),paymentControlPluginContext.getAmount())));
+      throw new PaymentControlApiException("Abort purchase call: ",new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_EXCEPTION,String.format("Aborted Payment for invoice %s : invoice balance is = %s, requested payment amount is = %s",invoice.getId(),invoice.getBalance(),paymentControlPluginContext.getAmount())));
     }
  else {
+      invoiceApi.recordPaymentAttemptInit(invoice.getId(),BigDecimal.ZERO,paymentControlPluginContext.getCurrency(),paymentControlPluginContext.getCurrency(),paymentControlPluginContext.getPaymentId(),paymentControlPluginContext.getTransactionExternalKey(),paymentControlPluginContext.getCreatedDate(),internalContext);
       return new DefaultPriorPaymentControlResult(isAborted,requestedAmount);
     }
   }

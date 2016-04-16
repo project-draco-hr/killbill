@@ -1,0 +1,51 @@
+{
+  clock.setTime(new DateTime(2012,5,1,0,3,42,0));
+  final AccountData accountData=getAccountData(0);
+  final Account account=createAccountWithNonOsgiPaymentMethod(accountData);
+  accountChecker.checkAccount(account.getId(),accountData,callContext);
+  final DefaultEntitlement baseEntitlement=createBaseEntitlementAndCheckForCompletion(account.getId(),"externalKey","Shotgun",ProductCategory.BASE,BillingPeriod.MONTHLY,NextEvent.CREATE,NextEvent.INVOICE);
+  invoiceChecker.checkInvoice(account.getId(),1,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,1),null,InvoiceItemType.FIXED,new BigDecimal("0")));
+  invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,5,1),callContext);
+  addDaysAndCheckForCompletion(30,NextEvent.PHASE,NextEvent.INVOICE,NextEvent.PAYMENT,NextEvent.INVOICE_PAYMENT);
+  Invoice invoice2=invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
+  invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,6,30),callContext);
+  final Payment originalPayment=paymentChecker.checkPayment(account.getId(),1,callContext,new ExpectedPaymentCheck(new LocalDate(2012,5,31),new BigDecimal("249.95"),TransactionStatus.SUCCESS,invoice2.getId(),Currency.USD));
+  Assert.assertEquals(originalPayment.getPurchasedAmount().compareTo(new BigDecimal("249.95")),0);
+  Assert.assertEquals(originalPayment.getRefundedAmount().compareTo(BigDecimal.ZERO),0);
+  Assert.assertEquals(originalPayment.getTransactions().get(0).getProcessedAmount().compareTo(new BigDecimal("249.95")),0);
+  Assert.assertEquals(invoice2.getBalance().compareTo(BigDecimal.ZERO),0);
+  Assert.assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(invoice2.getBalance()),0);
+  final PaymentTransaction originalTransaction=originalPayment.getTransactions().get(0);
+  dbi.withHandle(new HandleCallback<Void>(){
+    @Override public Void withHandle(    final Handle handle) throws Exception {
+      handle.execute("update invoice_payments set success = false where payment_cookie_id = ?",originalTransaction.getExternalKey());
+      return null;
+    }
+  }
+);
+  final Invoice updateInvoice2=invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
+  Assert.assertEquals(updateInvoice2.getBalance().compareTo(originalPayment.getPurchasedAmount()),0);
+  Assert.assertEquals(updateInvoice2.getPayments().size(),1);
+  Assert.assertEquals(updateInvoice2.getPayments().get(0).getPaymentCookieId(),originalTransaction.getExternalKey());
+  busHandler.pushExpectedEvents(NextEvent.INVOICE_PAYMENT);
+  final List<PluginProperty> properties=new ArrayList<PluginProperty>();
+  final PluginProperty prop1=new PluginProperty(InvoicePaymentControlPluginApi.PROP_IPCD_INVOICE_ID,updateInvoice2.getId().toString(),false);
+  properties.add(prop1);
+  try {
+    paymentApi.createPurchaseWithPaymentControl(account,account.getPaymentMethodId(),null,updateInvoice2.getBalance(),updateInvoice2.getCurrency(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),properties,PAYMENT_OPTIONS,refreshedCallContext());
+    Assert.fail("The payment should not succeed (and yet it will repair the broken state....)");
+  }
+ catch (  final PaymentApiException expected) {
+    Assert.assertEquals(expected.getCode(),ErrorCode.PAYMENT_PLUGIN_EXCEPTION.getCode());
+  }
+  assertListenerStatus();
+  final Invoice updateInvoice3=invoiceChecker.checkInvoice(account.getId(),2,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,5,31),new LocalDate(2012,6,30),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
+  Assert.assertEquals(updateInvoice3.getBalance().compareTo(BigDecimal.ZERO),0);
+  Assert.assertEquals(updateInvoice3.getPayments().size(),1);
+  Assert.assertEquals(updateInvoice3.getPayments().get(0).getPaymentCookieId(),originalTransaction.getExternalKey());
+  Assert.assertTrue(updateInvoice3.getPayments().get(0).isSuccess());
+  Assert.assertEquals(invoiceUserApi.getAccountBalance(account.getId(),callContext).compareTo(invoice2.getBalance()),0);
+  final List<Payment> payments=paymentApi.getAccountPayments(account.getId(),false,ImmutableList.<PluginProperty>of(),callContext);
+  Assert.assertEquals(payments.size(),1);
+  Assert.assertEquals(payments.get(0).getTransactions().size(),1);
+}
