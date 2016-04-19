@@ -1,5 +1,5 @@
 {
-  log.info("Received invoice creation notification for account {} and invoice {}",event.getAccountId(),event.getInvoiceId());
+  log.info("Received invoice creation notification for accountId='{}', invoiceId='{}'",event.getAccountId(),event.getInvoiceId());
   final Account account;
   try {
     final InternalCallContext internalContext=internalCallContextFactory.createInternalCallContext(event.getSearchKey2(),event.getSearchKey1(),"PaymentRequestProcessor",CallOrigin.INTERNAL,UserType.SYSTEM,event.getUserToken());
@@ -14,7 +14,7 @@
     pluginControlPaymentProcessor.createPurchase(false,account,account.getPaymentMethodId(),null,amountToBePaid,account.getCurrency(),UUIDs.randomUUID().toString(),UUIDs.randomUUID().toString(),properties,paymentControlPluginNames,callContext,internalContext);
   }
  catch (  final AccountApiException e) {
-    log.error("Failed to process invoice payment",e);
+    log.warn("Failed to process invoice payment",e);
   }
 catch (  final PaymentApiException e) {
     if (e.getCode() != ErrorCode.PAYMENT_NULL_INVOICE.getCode() && e.getCode() != ErrorCode.PAYMENT_CREATE_PAYMENT.getCode()) {

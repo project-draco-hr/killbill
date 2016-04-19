@@ -11,7 +11,11 @@
     checkNotNullParameter(currency,"currency");
   }
   checkNotNullParameter(properties,"plugin properties");
-  logAPICall(TransactionType.CREDIT.name(),account,paymentMethodId,paymentId,null,amount,currency,paymentExternalKey,paymentTransactionExternalKey);
+  final String transactionType=TransactionType.CREDIT.name();
+  logAPICall(transactionType,account,paymentMethodId,paymentId,null,amount,currency,paymentExternalKey,paymentTransactionExternalKey,null,paymentControlPluginNames);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
-  return pluginControlPaymentProcessor.createCredit(IS_API_PAYMENT,account,paymentMethodId,paymentId,amount,currency,paymentExternalKey,paymentTransactionExternalKey,properties,paymentControlPluginNames,callContext,internalCallContext);
+  final Payment payment=pluginControlPaymentProcessor.createCredit(IS_API_PAYMENT,account,paymentMethodId,paymentId,amount,currency,paymentExternalKey,paymentTransactionExternalKey,properties,paymentControlPluginNames,callContext,internalCallContext);
+  final PaymentTransaction paymentTransaction=payment.getTransactions().get(payment.getTransactions().size() - 1);
+  logAPICall(transactionType,account,payment.getPaymentMethodId(),payment.getId(),paymentTransaction.getId(),paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),payment.getExternalKey(),paymentTransaction.getExternalKey(),paymentTransaction.getTransactionStatus(),paymentControlPluginNames);
+  return payment;
 }

@@ -1,0 +1,20 @@
+{
+  final Throwable originalExceptionOrCausePossiblyOperationException=e instanceof ExecutionException ? MoreObjects.firstNonNull(e.getCause(),e) : e;
+  final Throwable originalExceptionOrCause=originalExceptionOrCausePossiblyOperationException instanceof OperationException ? MoreObjects.firstNonNull(originalExceptionOrCausePossiblyOperationException.getCause(),originalExceptionOrCausePossiblyOperationException) : originalExceptionOrCausePossiblyOperationException;
+  if (originalExceptionOrCause instanceof OperationException) {
+    return (OperationException)originalExceptionOrCause;
+  }
+ else   if (originalExceptionOrCause instanceof LockFailedException) {
+    logger.warn("Failed to lock accountId='{}'",paymentStateContext.getAccount().getId());
+  }
+ else   if (originalExceptionOrCause instanceof TimeoutException) {
+    logger.warn("Call TIMEOUT for accountId='{}'",paymentStateContext.getAccount().getId());
+  }
+ else   if (originalExceptionOrCause instanceof InterruptedException) {
+    logger.warn("Call was interrupted for accountId='{}'",paymentStateContext.getAccount().getId());
+  }
+ else {
+    logger.warn("Operation failed for accountId='{}'",paymentStateContext.getAccount().getId(),e);
+  }
+  return new OperationException(originalExceptionOrCause,getOperationResultOnException(paymentStateContext));
+}

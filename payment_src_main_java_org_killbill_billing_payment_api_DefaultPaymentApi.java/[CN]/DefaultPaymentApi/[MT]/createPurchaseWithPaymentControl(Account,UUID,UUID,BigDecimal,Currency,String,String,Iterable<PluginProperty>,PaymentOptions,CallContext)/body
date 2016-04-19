@@ -11,11 +11,15 @@
   }
   checkNotNullParameter(paymentTransactionExternalKey,"paymentTransactionExternalKey");
   checkNotNullParameter(properties,"plugin properties");
-  logAPICall(TransactionType.PURCHASE.name(),account,paymentMethodId,paymentId,null,amount,currency,paymentExternalKey,paymentTransactionExternalKey);
   if (paymentMethodId == null && !paymentOptions.isExternalPayment()) {
     throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_PARAMETER,"paymentMethodId","should not be null");
   }
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
   final UUID nonNulPaymentMethodId=(paymentMethodId != null) ? paymentMethodId : paymentMethodProcessor.createOrGetExternalPaymentMethod(UUIDs.randomUUID().toString(),account,properties,callContext,internalCallContext);
-  return pluginControlPaymentProcessor.createPurchase(IS_API_PAYMENT,account,nonNulPaymentMethodId,paymentId,amount,currency,paymentExternalKey,paymentTransactionExternalKey,properties,paymentControlPluginNames,callContext,internalCallContext);
+  final String transactionType=TransactionType.PURCHASE.name();
+  logAPICall(transactionType,account,paymentMethodId,paymentId,null,amount,currency,paymentExternalKey,paymentTransactionExternalKey,null,paymentControlPluginNames);
+  final Payment payment=pluginControlPaymentProcessor.createPurchase(IS_API_PAYMENT,account,nonNulPaymentMethodId,paymentId,amount,currency,paymentExternalKey,paymentTransactionExternalKey,properties,paymentControlPluginNames,callContext,internalCallContext);
+  final PaymentTransaction paymentTransaction=payment.getTransactions().get(payment.getTransactions().size() - 1);
+  logAPICall(transactionType,account,payment.getPaymentMethodId(),payment.getId(),paymentTransaction.getId(),paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),payment.getExternalKey(),paymentTransaction.getExternalKey(),paymentTransaction.getTransactionStatus(),paymentControlPluginNames);
+  return payment;
 }

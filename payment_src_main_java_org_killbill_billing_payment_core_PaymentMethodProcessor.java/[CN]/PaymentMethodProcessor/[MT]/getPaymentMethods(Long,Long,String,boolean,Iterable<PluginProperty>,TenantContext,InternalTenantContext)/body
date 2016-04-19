@@ -13,7 +13,12 @@
           paymentMethodPlugin=pluginApi.getPaymentMethodDetail(paymentMethodModelDao.getAccountId(),paymentMethodModelDao.getId(),properties,tenantContext);
         }
  catch (        final PaymentPluginApiException e) {
-          log.warn("Unable to find payment method id " + paymentMethodModelDao.getId() + " in plugin "+ pluginName);
+          if (e.getCause() == null) {
+            log.warn("Error retrieving paymentMethodId='{}', plugin='{}', errorMessage='{}', errorType='{}'",paymentMethodModelDao.getId(),pluginName,e.getErrorMessage(),e.getErrorType());
+          }
+ else {
+            log.warn("Error retrieving paymentMethodId='{}', plugin='{}', errorMessage='{}', errorType='{}'",paymentMethodModelDao.getId(),pluginName,e.getErrorMessage(),e.getErrorType(),e);
+          }
         }
       }
       return new DefaultPaymentMethod(paymentMethodModelDao,paymentMethodPlugin);

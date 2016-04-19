@@ -1,6 +1,6 @@
 {
   final ExecutorService pluginExecutor=paymentExecutors.getPluginExecutorService();
-  final Callable<PluginDispatcherReturnType<ReturnType>> callableWithRequestData=new CallableWithRequestData(Request.getPerThreadRequestData(),UUIDs.getRandom(),ThreadContext.getSecurityManager(),ThreadContext.getSubject(),task);
+  final Callable<PluginDispatcherReturnType<ReturnType>> callableWithRequestData=new CallableWithRequestData(Request.getPerThreadRequestData(),UUIDs.getRandom(),ThreadContext.getSecurityManager(),ThreadContext.getSubject(),MDC.getCopyOfContextMap(),task);
   final Future<PluginDispatcherReturnType<ReturnType>> future=pluginExecutor.submit(callableWithRequestData);
   final PluginDispatcherReturnType<ReturnType> pluginDispatcherResult=future.get(timeout,unit);
   if (pluginDispatcherResult instanceof WithProfilingPluginDispatcherReturnType) {

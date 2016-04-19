@@ -1,9 +1,12 @@
 {
+  final TenantContext tenantContext;
   final Tenant tenant=getTenantFromRequest(request);
   if (tenant == null) {
-    return contextFactory.createTenantContext(null);
+    tenantContext=contextFactory.createTenantContext(null);
   }
  else {
-    return contextFactory.createTenantContext(tenant.getId());
+    tenantContext=contextFactory.createTenantContext(tenant.getId());
   }
+  populateMDCContext(tenantContext);
+  return tenantContext;
 }
