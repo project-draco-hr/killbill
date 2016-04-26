@@ -1,7 +1,7 @@
 {
   final BaseServerModuleBuilder builder=new BaseServerModuleBuilder().setJaxrsUriPattern("/" + SWAGGER_PATH + "|((/"+ SWAGGER_PATH+ "|"+ JaxRsResourceBase.PREFIX+ "|"+ JaxRsResourceBase.PLUGINS_PATH+ ")"+ "/.*)").addJaxrsResource("org.killbill.billing.jaxrs.mappers").addJaxrsResource("org.killbill.billing.jaxrs.resources").addJaxrsResource("com.wordnik.swagger.jersey.listing");
   builder.addJerseyFilter(RequestDataFilter.class.getName());
-  builder.addJerseyFilter(MDCInsertingServletFilter.class.getName());
+  builder.addFilter("/*",MDCInsertingServletFilter.class);
   builder.addJerseyFilter(KillbillMDCInsertingServletFilter.class.getName());
   builder.addJerseyParam("com.sun.jersey.config.feature.DisableWADL","true");
   if (config.isConfiguredToReturnGZIPResponses()) {
