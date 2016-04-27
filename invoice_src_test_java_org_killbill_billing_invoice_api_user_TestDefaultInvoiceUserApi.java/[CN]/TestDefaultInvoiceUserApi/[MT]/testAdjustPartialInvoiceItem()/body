@@ -5,7 +5,7 @@
   Assert.assertEquals(invoiceBalance.compareTo(BigDecimal.ZERO),1);
   final BigDecimal accountBalance=invoiceUserApi.getAccountBalance(accountId,callContext);
   Assert.assertEquals(accountBalance,invoiceBalance);
-  final BigDecimal adjAmount=invoiceItem.getAmount().divide(BigDecimal.TEN);
+  final BigDecimal adjAmount=invoiceItem.getAmount().divide(BigDecimal.TEN,BigDecimal.ROUND_HALF_UP);
   final InvoiceItem adjInvoiceItem=invoiceUserApi.insertInvoiceItemAdjustment(accountId,invoiceId,invoiceItem.getId(),clock.getUTCToday(),adjAmount,accountCurrency,callContext);
   Assert.assertEquals(adjInvoiceItem.getInvoiceId(),invoiceId);
   Assert.assertEquals(adjInvoiceItem.getInvoiceItemType(),InvoiceItemType.ITEM_ADJ);
