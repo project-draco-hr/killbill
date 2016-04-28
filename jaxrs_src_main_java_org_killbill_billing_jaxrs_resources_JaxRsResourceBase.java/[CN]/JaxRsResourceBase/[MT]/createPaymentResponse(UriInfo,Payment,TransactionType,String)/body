@@ -1,0 +1,16 @@
+{
+  final PaymentTransaction createdTransaction=findCreatedTransaction(payment,transactionType,transactionExternalKey);
+switch (createdTransaction.getTransactionStatus()) {
+case PENDING:
+case SUCCESS:
+    return uriBuilder.buildResponse(uriInfo,PaymentResource.class,"getPayment",payment.getId());
+case PAYMENT_FAILURE:
+  return Response.status(402).build();
+case PAYMENT_SYSTEM_OFF:
+case UNKNOWN:
+return Response.status(Status.SERVICE_UNAVAILABLE).build();
+case PLUGIN_FAILURE:
+return Response.status(502).build();
+}
+return Response.serverError().build();
+}

@@ -6,5 +6,5 @@
   final String transactionExternalKey=json != null ? json.getTransactionExternalKey() : null;
   final PaymentOptions paymentOptions=createControlPluginApiPaymentOptions(paymentControlPluginNames);
   final Payment payment=paymentApi.createVoidWithPaymentControl(account,initialPayment.getId(),transactionExternalKey,pluginProperties,paymentOptions,callContext);
-  return uriBuilder.buildResponse(uriInfo,PaymentResource.class,"getPayment",payment.getId());
+  return createPaymentResponse(uriInfo,payment,TransactionType.VOID,json.getTransactionExternalKey());
 }
