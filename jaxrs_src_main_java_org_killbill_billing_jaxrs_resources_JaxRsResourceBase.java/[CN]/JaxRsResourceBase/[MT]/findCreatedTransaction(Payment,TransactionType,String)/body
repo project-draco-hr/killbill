@@ -1,8 +1,17 @@
 {
-  for (  PaymentTransaction transaction : payment.getTransactions()) {
-    if (transaction.getTransactionType() == transactionType && Objects.equals(transaction.getExternalKey(),transactionExternalKey)) {
-      return transaction;
+  final List<PaymentTransaction> reversedTransactions=Lists.reverse(payment.getTransactions());
+  final Iterable<PaymentTransaction> matchingTransactions=Iterables.filter(reversedTransactions,new Predicate<PaymentTransaction>(){
+    @Override public boolean apply(    final PaymentTransaction input){
+      return input.getTransactionType() == transactionType;
     }
   }
-  return Iterables.getLast(payment.getTransactions());
+);
+  if (transactionExternalKey != null) {
+    for (    final PaymentTransaction transaction : matchingTransactions) {
+      if (Objects.equal(transaction.getExternalKey(),transactionExternalKey)) {
+        return transaction;
+      }
+    }
+  }
+  return Iterables.getFirst(matchingTransactions,null);
 }
