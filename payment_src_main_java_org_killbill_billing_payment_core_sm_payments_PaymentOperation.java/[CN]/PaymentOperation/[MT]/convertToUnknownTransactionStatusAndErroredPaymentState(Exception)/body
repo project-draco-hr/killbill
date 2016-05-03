@@ -1,5 +1,8 @@
 {
   final PaymentTransactionInfoPlugin paymentInfoPlugin=new DefaultNoOpPaymentInfoPlugin(paymentStateContext.getPaymentId(),paymentStateContext.getTransactionId(),paymentStateContext.getTransactionType(),paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateContext.getCallContext().getCreatedDate(),paymentStateContext.getCallContext().getCreatedDate(),PaymentPluginStatus.UNDEFINED,null,null);
   paymentStateContext.setPaymentTransactionInfoPlugin(paymentInfoPlugin);
+  if (e instanceof OperationException) {
+    return (OperationException)e;
+  }
   return new OperationException(e,OperationResult.EXCEPTION);
 }
