@@ -33,8 +33,9 @@
   checkODState("OD3");
   addDaysAndCheckForCompletion(4,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE_PAYMENT_ERROR);
   addDaysAndCheckForCompletion(2,NextEvent.PAYMENT_ERROR,NextEvent.INVOICE_PAYMENT_ERROR);
-  addDaysAndCheckForCompletion(5);
+  addDaysAndCheckForCompletion(5,NextEvent.NULL_INVOICE);
   invoiceChecker.checkChargedThroughDate(baseEntitlement.getId(),new LocalDate(2012,7,31),callContext);
+  Thread.sleep(1000);
   allowPaymentsAndResetOverdueToClearByPayingAllUnpaidInvoices(true);
   invoiceChecker.checkInvoice(account.getId(),3,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,6,30),new LocalDate(2012,7,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")));
   invoiceChecker.checkInvoice(account.getId(),4,callContext,new ExpectedInvoiceItemCheck(new LocalDate(2012,7,31),new LocalDate(2012,8,31),InvoiceItemType.RECURRING,new BigDecimal("249.95")),new ExpectedInvoiceItemCheck(new LocalDate(2012,7,10),new LocalDate(2012,7,31),InvoiceItemType.REPAIR_ADJ,new BigDecimal("-169.32")));
