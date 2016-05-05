@@ -9,7 +9,7 @@ case PURCHASE:
       final UUID invoiceId=getInvoiceId(pluginProperties);
     existingInvoicePayment=invoiceApi.getInvoicePaymentForAttempt(paymentControlContext.getPaymentId(),internalContext);
   if (existingInvoicePayment != null && existingInvoicePayment.isSuccess()) {
-    log.info("onSuccessCall was already completed for payment purchase: " + paymentControlContext.getPaymentId());
+    log.info("onSuccessCall was already completed for purchase paymentId='{}'",paymentControlContext.getPaymentId());
   }
  else {
     final BigDecimal invoicePaymentAmount;
@@ -17,23 +17,23 @@ case PURCHASE:
       invoicePaymentAmount=paymentControlContext.getProcessedAmount();
     }
  else {
-      log.warn("Currency {} of invoice payment {} doesn't match invoice currency {}, assuming it is a full payment",paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCurrency());
+      log.warn("processedCurrency='{}' of invoice paymentId='{}' doesn't match invoice currency='{}', assuming it is a full payment",paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCurrency());
       invoicePaymentAmount=paymentControlContext.getAmount();
     }
-    log.debug("Notifying invoice of successful payment: id={}, amount={}, currency={}, invoiceId={}",paymentControlContext.getPaymentId(),invoicePaymentAmount,paymentControlContext.getCurrency(),invoiceId);
-    invoiceApi.notifyOfPayment(invoiceId,invoicePaymentAmount,paymentControlContext.getCurrency(),paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getCreatedDate(),true,internalContext);
+    log.debug("Notifying invoice of successful paymentId='{}', amount='{}', currency='{}', invoiceId='{}'",paymentControlContext.getPaymentId(),invoicePaymentAmount,paymentControlContext.getCurrency(),invoiceId);
+    invoiceApi.recordPaymentAttemptCompletion(invoiceId,invoicePaymentAmount,paymentControlContext.getCurrency(),paymentControlContext.getProcessedCurrency(),paymentControlContext.getPaymentId(),paymentControlContext.getTransactionExternalKey(),paymentControlContext.getCreatedDate(),true,internalContext);
   }
 break;
 case REFUND:
 final Map<UUID,BigDecimal> idWithAmount=extractIdsWithAmountFromProperties(pluginProperties);
 final PluginProperty prop=getPluginProperty(pluginProperties,PROP_IPCD_REFUND_WITH_ADJUSTMENTS);
 final boolean isAdjusted=prop != null ? Boolean.valueOf((String)prop.getValue()) : false;
-invoiceApi.createRefund(paymentControlContext.getPaymentId(),paymentControlContext.getAmount(),isAdjusted,idWithAmount,paymentControlContext.getTransactionExternalKey(),internalContext);
+invoiceApi.recordRefund(paymentControlContext.getPaymentId(),paymentControlContext.getAmount(),isAdjusted,idWithAmount,paymentControlContext.getTransactionExternalKey(),internalContext);
 break;
 case CHARGEBACK:
 existingInvoicePayment=invoiceApi.getInvoicePaymentForChargeback(paymentControlContext.getPaymentId(),internalContext);
 if (existingInvoicePayment != null) {
-log.info("onSuccessCall was already completed for payment chargeback: " + paymentControlContext.getPaymentId());
+log.info("onSuccessCall was already completed for chargeback paymentId='{}'",paymentControlContext.getPaymentId());
 }
  else {
 final InvoicePayment linkedInvoicePayment=invoiceApi.getInvoicePaymentForAttempt(paymentControlContext.getPaymentId(),internalContext);
@@ -51,7 +51,7 @@ currency=paymentControlContext.getCurrency();
 amount=linkedInvoicePayment.getAmount();
 currency=linkedInvoicePayment.getCurrency();
 }
-invoiceApi.createChargeback(paymentControlContext.getPaymentId(),amount,currency,internalContext);
+invoiceApi.recordChargeback(paymentControlContext.getPaymentId(),amount,currency,internalContext);
 }
 break;
 default :
@@ -59,7 +59,7 @@ throw new IllegalStateException("Unexpected transactionType " + transactionType)
 }
 }
  catch (final InvoiceApiException e) {
-log.error("InvoicePaymentControlPluginApi onSuccessCall failed for attemptId = " + paymentControlContext.getAttemptPaymentId() + ", transactionType  = "+ transactionType,e);
+log.warn("onSuccessCall failed for attemptId='{}', transactionType='{}'",paymentControlContext.getAttemptPaymentId(),transactionType,e);
 }
 return new DefaultOnSuccessPaymentControlResult();
 }

@@ -1,0 +1,15 @@
+{
+  UUID userToken;
+  if (Request.getPerThreadRequestData().getRequestId() != null) {
+    try {
+      userToken=UUID.fromString(Request.getPerThreadRequestData().getRequestId());
+    }
+ catch (    final IllegalArgumentException ignored) {
+      userToken=UUIDs.randomUUID();
+    }
+  }
+ else {
+    userToken=UUIDs.randomUUID();
+  }
+  return userToken;
+}

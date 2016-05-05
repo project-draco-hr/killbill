@@ -1,0 +1,13 @@
+{
+  final MigrationVersion version=appliedMigration.getVersion();
+  final String versionStr=version == null ? null : version.toString();
+  final int calculateInstalledRank;
+  try {
+    calculateInstalledRank=calculateInstalledRank();
+  }
+ catch (  final SQLException e) {
+    throw new RuntimeException(e);
+  }
+  final String sql=new StringBuilder().append("INSERT INTO ").append(table).append(" (").append(dbSupport.quote("installed_rank")).append(",").append(dbSupport.quote("version")).append(",").append(dbSupport.quote("description")).append(",").append(dbSupport.quote("type")).append(",").append(dbSupport.quote("script")).append(",").append(dbSupport.quote("checksum")).append(",").append(dbSupport.quote("installed_by")).append(",").append(dbSupport.quote("execution_time")).append(",").append(dbSupport.quote("success")).append(")").append(" VALUES (").append(calculateInstalledRank + appliedMigration.getInstalledRank()).append(",").append("'").append(versionStr).append("',").append("'").append(appliedMigration.getDescription()).append("',").append("'").append(appliedMigration.getType().name()).append("',").append("'").append(appliedMigration.getScript()).append("',").append(appliedMigration.getChecksum()).append(",").append(dbSupport.getCurrentUserFunction()).append(",").append(appliedMigration.getExecutionTime()).append(",").append(appliedMigration.isSuccess()).append(")").toString();
+  sqlStatements.add(new SqlStatement(0,sql,false));
+}

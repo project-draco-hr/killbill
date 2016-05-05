@@ -4,7 +4,7 @@
   final DefaultSubscriptionBaseBundle bundleData=bundleTransferData.getData();
   final List<SubscriptionBundleModelDao> existingBundleModels=transBundleDao.getBundlesFromAccountAndKey(bundleData.getAccountId().toString(),bundleData.getExternalKey(),context);
   if (existingBundleModels.size() != 0) {
-    log.error(String.format("Attempted to create a bundle for account %s and key %s that already existed, skip...",bundleData.getAccountId().toString(),bundleData.getExternalKey()));
+    log.warn("Bundle already exists for accountId='{}', bundleExternalKey='{}'",bundleData.getAccountId(),bundleData.getExternalKey());
     return;
   }
   for (  final SubscriptionMigrationData curSubscription : bundleTransferData.getSubscriptions()) {

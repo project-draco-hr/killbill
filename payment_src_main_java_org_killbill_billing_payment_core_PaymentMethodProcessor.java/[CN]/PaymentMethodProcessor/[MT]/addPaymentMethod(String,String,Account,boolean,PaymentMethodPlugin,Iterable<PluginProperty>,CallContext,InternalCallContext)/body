@@ -15,7 +15,6 @@
         }
       }
  catch (      final PaymentPluginApiException e) {
-        log.warn("Error adding payment method " + pm.getId() + " for plugin "+ paymentPluginServiceName,e);
         throw new PaymentApiException(ErrorCode.PAYMENT_ADD_PAYMENT_METHOD,account.getId(),e.getErrorMessage());
       }
 catch (      final AccountApiException e) {
@@ -25,7 +24,7 @@ catch (      final AccountApiException e) {
     }
     private void validateUniqueExternalPaymentMethod(    final UUID accountId,    final String pluginName) throws PaymentApiException {
       if (ExternalPaymentProviderPlugin.PLUGIN_NAME.equals(pluginName)) {
-        final List<PaymentMethodModelDao> accountPaymentMethods=paymentDao.getPaymentMethods(accountId,context);
+        final List<PaymentMethodModelDao> accountPaymentMethods=paymentDao.getPaymentMethods(context);
         if (Iterables.any(accountPaymentMethods,new Predicate<PaymentMethodModelDao>(){
           @Override public boolean apply(          final PaymentMethodModelDao input){
             return ExternalPaymentProviderPlugin.PLUGIN_NAME.equals(input.getPluginName());

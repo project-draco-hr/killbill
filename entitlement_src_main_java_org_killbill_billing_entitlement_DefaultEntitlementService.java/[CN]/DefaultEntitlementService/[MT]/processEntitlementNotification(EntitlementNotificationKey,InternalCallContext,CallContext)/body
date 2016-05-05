@@ -4,11 +4,11 @@
     entitlement=entitlementInternalApi.getEntitlementForId(key.getEntitlementId(),internalCallContext);
   }
  catch (  final EntitlementApiException e) {
-    log.error("Error retrieving entitlement for id " + key.getEntitlementId(),e);
+    log.error("Error retrieving entitlementId='{}'",key.getEntitlementId(),e);
     return;
   }
   if (!(entitlement instanceof DefaultEntitlement)) {
-    log.error("Entitlement service received an unexpected entitlement class type {}" + entitlement.getClass().getName());
+    log.error("Error retrieving entitlementId='{}', unexpected entitlement className='{}'",key.getEntitlementId(),entitlement.getClass().getName());
     return;
   }
   final EntitlementNotificationKeyAction entitlementNotificationKeyAction=key.getEntitlementNotificationKeyAction();
@@ -24,6 +24,6 @@
     }
   }
  catch (  final EntitlementApiException e) {
-    log.error("Error processing event for entitlement {}" + entitlement.getId(),e);
+    log.error("Error processing event for entitlementId='{}'",entitlement.getId(),e);
   }
 }

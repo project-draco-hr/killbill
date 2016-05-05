@@ -9,13 +9,13 @@
   final InvoiceModelDao retrievedInvoice=invoiceDao.getById(invoice.getId(),context);
   assertEquals(retrievedInvoice.getInvoicePayments().size(),0);
   final UUID paymentId=UUID.randomUUID();
-  final DefaultInvoicePayment defaultInvoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice.getId(),clock.getUTCNow().plusDays(12),BigDecimal.TEN,Currency.USD,Currency.USD,false);
-  invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment),context);
+  final DefaultInvoicePayment defaultInvoicePayment=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice.getId(),clock.getUTCNow().plusDays(12),BigDecimal.TEN,Currency.USD,Currency.USD,"cookie",false);
+  invoiceDao.notifyOfPaymentCompletion(new InvoicePaymentModelDao(defaultInvoicePayment),context);
   final InvoiceModelDao retrievedInvoice1=invoiceDao.getById(invoice.getId(),context);
   assertEquals(retrievedInvoice1.getInvoicePayments().size(),1);
   assertEquals(retrievedInvoice1.getInvoicePayments().get(0).getSuccess(),Boolean.FALSE);
-  final DefaultInvoicePayment defaultInvoicePayment2=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice.getId(),clock.getUTCNow().plusDays(12),BigDecimal.TEN,Currency.USD,Currency.USD,true);
-  invoiceDao.notifyOfPayment(new InvoicePaymentModelDao(defaultInvoicePayment2),context);
+  final DefaultInvoicePayment defaultInvoicePayment2=new DefaultInvoicePayment(InvoicePaymentType.ATTEMPT,paymentId,invoice.getId(),clock.getUTCNow().plusDays(12),BigDecimal.TEN,Currency.USD,Currency.USD,"cookie",true);
+  invoiceDao.notifyOfPaymentCompletion(new InvoicePaymentModelDao(defaultInvoicePayment2),context);
   final InvoiceModelDao retrievedInvoice2=invoiceDao.getById(invoice.getId(),context);
   assertEquals(retrievedInvoice2.getInvoicePayments().size(),1);
   assertEquals(retrievedInvoice2.getInvoicePayments().get(0).getSuccess(),Boolean.TRUE);

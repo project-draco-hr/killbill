@@ -3,13 +3,13 @@
     final NotificationQueueHandler queueHandler=new NotificationQueueHandler(){
       @Override public void handleReadyNotification(      final NotificationEvent inputKey,      final DateTime eventDateTime,      final UUID fromNotificationQueueUserToken,      final Long accountRecordId,      final Long tenantRecordId){
         if (!(inputKey instanceof SubscriptionNotificationKey)) {
-          log.error("SubscriptionBase service received an unexpected event type {}" + inputKey.getClass().getName());
+          log.error("SubscriptionBase service received an unexpected event className='{}'",inputKey.getClass().getName());
           return;
         }
         final SubscriptionNotificationKey key=(SubscriptionNotificationKey)inputKey;
         final SubscriptionBaseEvent event=dao.getEventById(key.getEventId(),internalCallContextFactory.createInternalTenantContext(tenantRecordId,accountRecordId));
         if (event == null) {
-          log.info("Failed to extract event for notification key {}",inputKey);
+          log.debug("Failed to extract event for notification key {}",inputKey);
           return;
         }
         final InternalCallContext context=internalCallContextFactory.createInternalCallContext(tenantRecordId,accountRecordId,"SubscriptionEventQueue",CallOrigin.INTERNAL,UserType.SYSTEM,fromNotificationQueueUserToken);

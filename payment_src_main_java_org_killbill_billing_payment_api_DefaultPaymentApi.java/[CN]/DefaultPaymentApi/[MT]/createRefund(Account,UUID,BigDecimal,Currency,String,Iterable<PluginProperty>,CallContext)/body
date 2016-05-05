@@ -5,10 +5,11 @@
   }
   checkNotNullParameter(paymentId,"paymentId");
   checkNotNullParameter(properties,"plugin properties");
-  if (amount != null) {
-    checkPositiveAmount(amount);
-  }
-  logAPICall(TransactionType.REFUND.name(),account,null,paymentId,null,amount,currency,null,paymentTransactionExternalKey);
+  final String transactionType=TransactionType.REFUND.name();
+  logAPICall(transactionType,account,null,paymentId,null,amount,currency,null,paymentTransactionExternalKey,null,null);
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
-  return paymentProcessor.createRefund(IS_API_PAYMENT,NULL_ATTEMPT_ID,account,paymentId,amount,currency,paymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
+  final Payment payment=paymentProcessor.createRefund(IS_API_PAYMENT,NULL_ATTEMPT_ID,account,paymentId,amount,currency,paymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
+  final PaymentTransaction paymentTransaction=payment.getTransactions().get(payment.getTransactions().size() - 1);
+  logAPICall(transactionType,account,payment.getPaymentMethodId(),payment.getId(),paymentTransaction.getId(),paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),payment.getExternalKey(),paymentTransaction.getExternalKey(),paymentTransaction.getTransactionStatus(),null);
+  return payment;
 }

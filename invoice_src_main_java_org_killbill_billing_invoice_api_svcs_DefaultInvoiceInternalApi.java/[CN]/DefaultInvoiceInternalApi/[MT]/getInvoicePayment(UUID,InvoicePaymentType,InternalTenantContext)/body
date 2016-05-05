@@ -1,17 +1,10 @@
 {
-  final Collection<InvoicePayment> invoicePayments=Collections2.transform(dao.getInvoicePayments(paymentId,context),new Function<InvoicePaymentModelDao,InvoicePayment>(){
-    @Override public InvoicePayment apply(    final InvoicePaymentModelDao input){
-      return new DefaultInvoicePayment(input);
-    }
-  }
-);
-  if (invoicePayments.isEmpty()) {
-    return null;
-  }
-  return Iterables.tryFind(invoicePayments,new Predicate<InvoicePayment>(){
-    @Override public boolean apply(    final InvoicePayment input){
-      return input.getType() == type;
+  final List<InvoicePaymentModelDao> invoicePayments=dao.getInvoicePaymentsByPaymentId(paymentId,context);
+  final InvoicePaymentModelDao resultOrNull=Iterables.tryFind(invoicePayments,new Predicate<InvoicePaymentModelDao>(){
+    @Override public boolean apply(    final InvoicePaymentModelDao input){
+      return input.getType() == type && input.getSuccess();
     }
   }
 ).orNull();
+  return resultOrNull != null ? new DefaultInvoicePayment(resultOrNull) : null;
 }

@@ -4,6 +4,7 @@
     UUIDs.setRandom(random);
     ThreadContext.bind(securityManager);
     ThreadContext.bind(subject);
+    MDC.setContextMap(mdcContextMap);
     return delegate.call();
   }
   finally {
@@ -11,5 +12,6 @@
     UUIDs.setRandom(null);
     ThreadContext.unbindSecurityManager();
     ThreadContext.unbindSubject();
+    MDC.clear();
   }
 }

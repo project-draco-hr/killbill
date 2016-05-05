@@ -1,0 +1,23 @@
+{
+  String jarDirs=properties.getProperty(PROPERTY_JAR_DIRS);
+  if (!StringUtils.hasLength(jarDirs)) {
+    return;
+  }
+  jarDirs=jarDirs.replace(File.pathSeparator,",");
+  final String[] dirs=StringUtils.tokenizeToStringArray(jarDirs,",");
+  for (  final String dirName : dirs) {
+    final File dir=new File(dirName);
+    final File[] files=dir.listFiles(new FilenameFilter(){
+      public boolean accept(      final File dir,      final String name){
+        return name.endsWith(".jar");
+      }
+    }
+);
+    if (files == null) {
+      continue;
+    }
+    for (    final File file : files) {
+      addJarOrDirectoryToClasspath(file.getPath());
+    }
+  }
+}

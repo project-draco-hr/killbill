@@ -14,13 +14,13 @@
     final FutureAccountNotifications futureAccountNotifications=createNextFutureNotificationDate(invoiceWithMetadata,billingEvents.getAccountDateAndTimeZoneContext(),context);
     if (invoice == null) {
       if (isDryRun) {
-        log.info("Generated null dryRun invoice for accountId {} and targetDate {} (targetDateTime {})",new Object[]{accountId,targetDate,targetDateTime});
+        log.info("Generated null dryRun invoice for accountId='{}', targetDate='{}', targetDateTime='{}'",accountId,targetDate,targetDateTime);
       }
  else {
-        log.info("Generated null invoice for accountId {} and targetDate {} (targetDateTime {})",new Object[]{accountId,targetDate,targetDateTime});
+        log.info("Generated null invoice for accountId='{}', targetDate='{}', targetDateTime='{}'",accountId,targetDate,targetDateTime);
         final BusInternalEvent event=new DefaultNullInvoiceEvent(accountId,clock.getUTCToday(),context.getAccountRecordId(),context.getTenantRecordId(),context.getUserToken());
         commitInvoiceAndSetFutureNotifications(account,null,ImmutableList.<InvoiceItemModelDao>of(),futureAccountNotifications,false,context);
-        postEvent(event,accountId,context);
+        postEvent(event);
       }
       return null;
     }

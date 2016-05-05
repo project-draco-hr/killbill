@@ -1,0 +1,43 @@
+{
+  final Level logLevel=getLogLevel(args);
+  initLogging(logLevel);
+  try {
+    if (isPrintVersionAndExit(args)) {
+      printVersion();
+      System.exit(0);
+    }
+    final List<String> operations=determineOperations(args);
+    if (operations.isEmpty()) {
+      printUsage();
+      return;
+    }
+    final Properties properties=new Properties();
+    initializeDefaults(properties);
+    loadConfiguration(properties,args);
+    overrideConfiguration(properties,args);
+    dumpConfiguration(properties);
+    loadJdbcDrivers();
+    loadJavaMigrationsFromJarDirs(properties);
+    final List<SqlStatement> sqlStatements=new LinkedList<SqlStatement>();
+    final FlywayWithDryRun flyway=new FlywayWithDryRun(sqlStatements);
+    filterProperties(properties);
+    flyway.configure(properties);
+    for (    final String operation : operations) {
+      executeOperation(flyway,operation,sqlStatements);
+    }
+  }
+ catch (  final Exception e) {
+    if (logLevel == Level.DEBUG) {
+      LOG.error("Unexpected error",e);
+    }
+ else {
+      if (e instanceof FlywayException) {
+        LOG.error(e.getMessage());
+      }
+ else {
+        LOG.error(e.toString());
+      }
+    }
+    System.exit(1);
+  }
+}

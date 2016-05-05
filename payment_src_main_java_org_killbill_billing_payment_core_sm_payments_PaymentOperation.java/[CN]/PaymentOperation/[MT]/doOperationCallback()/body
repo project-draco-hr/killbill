@@ -1,15 +1,21 @@
 {
+  final String pluginName;
   try {
-    final String pluginName=daoHelper.getPaymentProviderPluginName();
+    pluginName=daoHelper.getPaymentProviderPluginName();
     this.plugin=daoHelper.getPaymentPluginApi(pluginName);
-    if (paymentStateContext.shouldLockAccountAndDispatch()) {
-      return doOperationCallbackWithDispatchAndAccountLock(pluginName);
-    }
+  }
+ catch (  final PaymentApiException e) {
+    throw convertToUnknownTransactionStatusAndErroredPaymentState(e);
+  }
+  if (paymentStateContext.shouldLockAccountAndDispatch()) {
+    return doOperationCallbackWithDispatchAndAccountLock(pluginName);
+  }
  else {
+    try {
       return doSimpleOperationCallback();
     }
-  }
- catch (  final Exception e) {
-    throw convertToUnknownTransactionStatusAndErroredPaymentState(e);
+ catch (    final Exception e) {
+      throw unwrapExceptionFromDispatchedTask(e);
+    }
   }
 }

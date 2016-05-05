@@ -1,0 +1,25 @@
+{
+  final List<InvoicePayment> invoicePayments=invoice.getPayments();
+  final InvoicePayment incompleteInvoicePayment=Iterables.tryFind(invoicePayments,new Predicate<InvoicePayment>(){
+    @Override public boolean apply(    final InvoicePayment input){
+      return input.getType() == InvoicePaymentType.ATTEMPT && !input.isSuccess();
+    }
+  }
+).orNull();
+  if (incompleteInvoicePayment != null) {
+    final String transactionExternalKey=incompleteInvoicePayment.getPaymentCookieId();
+    final List<PaymentTransactionModelDao> transactions=paymentDao.getPaymentTransactionsByExternalKey(transactionExternalKey,internalContext);
+    final PaymentTransactionModelDao successfulTransaction=Iterables.tryFind(transactions,new Predicate<PaymentTransactionModelDao>(){
+      @Override public boolean apply(      final PaymentTransactionModelDao input){
+        return input.getTransactionStatus() == TransactionStatus.SUCCESS;
+      }
+    }
+).orNull();
+    if (successfulTransaction != null) {
+      log.info(String.format("Detected an incomplete invoicePayment row for invoiceId='%s' and transactionExternalKey='%s', will correct status",invoice.getId(),successfulTransaction.getTransactionExternalKey()));
+      invoiceApi.recordPaymentAttemptCompletion(invoice.getId(),successfulTransaction.getAmount(),successfulTransaction.getCurrency(),successfulTransaction.getProcessedCurrency(),successfulTransaction.getPaymentId(),successfulTransaction.getTransactionExternalKey(),successfulTransaction.getCreatedDate(),true,internalContext);
+      return true;
+    }
+  }
+  return false;
+}

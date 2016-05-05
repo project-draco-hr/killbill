@@ -2,9 +2,17 @@
   verifyNonNullOrEmpty(json,"PaymentTransactionJson body should be specified");
   verifyNonNullOrEmpty(json.getTransactionType(),"PaymentTransactionJson transactionType needs to be set",json.getAmount(),"PaymentTransactionJson amount needs to be set");
   final Iterable<PluginProperty> pluginProperties=extractPluginProperties(pluginPropertiesString);
-  final UUID paymentMethodId=paymentMethodIdStr == null ? account.getPaymentMethodId() : UUID.fromString(paymentMethodIdStr);
   final Currency currency=json.getCurrency() == null ? account.getCurrency() : Currency.valueOf(json.getCurrency());
   final UUID paymentId=json.getPaymentId() == null ? null : UUID.fromString(json.getPaymentId());
+  final UUID paymentMethodId;
+  if (paymentId != null) {
+    final Payment initialPayment=paymentApi.getPayment(paymentId,false,pluginProperties,callContext);
+    final PaymentTransaction pendingTransaction=lookupPendingTransaction(initialPayment,json != null ? json.getTransactionId() : null,json != null ? json.getTransactionExternalKey() : null,json != null ? json.getTransactionType() : null);
+    paymentMethodId=initialPayment.getPaymentMethodId();
+  }
+ else {
+    paymentMethodId=paymentMethodIdStr == null ? account.getPaymentMethodId() : UUID.fromString(paymentMethodIdStr);
+  }
   validatePaymentMethodForAccount(account.getId(),paymentMethodId,callContext);
   final TransactionType transactionType=TransactionType.valueOf(json.getTransactionType());
   final PaymentOptions paymentOptions=createControlPluginApiPaymentOptions(paymentControlPluginNames);
