@@ -1,13 +1,13 @@
 {
+  mockPaymentProviderPlugin.makeNextPaymentFailWithException();
   final BigDecimal requestedAmount=BigDecimal.TEN;
-  final String paymentExternalKey="ohhhh";
-  final String transactionExternalKey="naaahhh";
-  mockPaymentProviderPlugin.makePluginWaitSomeMilliseconds((int)(paymentConfig.getPaymentPluginTimeout().getMillis() + 100));
+  final String paymentExternalKey="pay external key";
+  final String transactionExternalKey="txn external key";
   try {
     paymentApi.createPurchase(account,account.getPaymentMethodId(),null,requestedAmount,Currency.AED,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
     fail();
   }
  catch (  PaymentApiException e) {
-    assertEquals(e.getCode(),ErrorCode.PAYMENT_PLUGIN_TIMEOUT.getCode());
+    assertTrue(e.getCause() instanceof PaymentPluginApiException);
   }
 }

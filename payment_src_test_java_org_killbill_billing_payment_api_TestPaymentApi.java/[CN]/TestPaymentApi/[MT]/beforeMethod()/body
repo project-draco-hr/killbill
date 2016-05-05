@@ -2,4 +2,18 @@
   super.beforeMethod();
   mockPaymentProviderPlugin.clear();
   account=testHelper.createTestAccount("bobo@gmail.com",true);
+  mockPaymentControlProviderPlugin=new MockPaymentControlProviderPlugin();
+  ;
+  controlPluginRegistry.registerService(new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getPluginName(){
+      return MockPaymentControlProviderPlugin.PLUGIN_NAME;
+    }
+    @Override public String getRegistrationName(){
+      return MockPaymentControlProviderPlugin.PLUGIN_NAME;
+    }
+  }
+,mockPaymentControlProviderPlugin);
 }
