@@ -1,6 +1,6 @@
 {
   final Account account=createAccountWithDefaultPaymentMethod();
-  mockPaymentProviderPlugin.makeNextPaymentFailWithError();
+  mockPaymentProviderPlugin.makeNextPaymentFailWithCancellation();
   final PaymentTransaction authTransaction=new PaymentTransaction();
   authTransaction.setAmount(BigDecimal.ONE);
   authTransaction.setCurrency(account.getCurrency());
@@ -10,6 +10,6 @@
     fail();
   }
  catch (  KillBillClientException e) {
-    assertEquals(402,e.getResponse().getStatusCode());
+    assertEquals(502,e.getResponse().getStatusCode());
   }
 }
