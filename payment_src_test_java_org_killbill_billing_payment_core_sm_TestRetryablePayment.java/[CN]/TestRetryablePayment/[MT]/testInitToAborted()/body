@@ -2,7 +2,15 @@
   mockRetryProviderPlugin.setAborted(true).setNextRetryDate(null);
   mockRetryAuthorizeOperationCallback.setResult(OperationResult.SUCCESS).setException(null);
   runner.setOperationCallback(mockRetryAuthorizeOperationCallback).setContext(paymentStateContext);
-  runner.run(true,TransactionType.AUTHORIZE,account,paymentMethodId,null,paymentExternalKey,paymentTransactionExternalKey,amount,currency,emptyProperties,null,callContext,internalCallContext);
+  try {
+    runner.run(true,TransactionType.AUTHORIZE,account,paymentMethodId,null,paymentExternalKey,paymentTransactionExternalKey,amount,currency,emptyProperties,null,callContext,internalCallContext);
+    fail();
+  }
+ catch (  PaymentApiException e) {
+    assertEquals(e.getCode(),ErrorCode.PAYMENT_PLUGIN_API_ABORTED.getCode());
+  }
+  assertFalse(mockRetryProviderPlugin.isOnSuccessCallExecuted(),"OnSuccessCall method should not be called when payment is aborted");
+  assertFalse(mockRetryProviderPlugin.isOnFailureCallExecuted(),"onFailureCall method should not be called when payment is aborted");
   final PaymentAttemptModelDao pa=paymentDao.getPaymentAttemptByTransactionExternalKey(paymentTransactionExternalKey,internalCallContext).get(0);
   assertEquals(pa.getTransactionExternalKey(),paymentTransactionExternalKey);
   assertEquals(pa.getStateName(),"ABORTED");

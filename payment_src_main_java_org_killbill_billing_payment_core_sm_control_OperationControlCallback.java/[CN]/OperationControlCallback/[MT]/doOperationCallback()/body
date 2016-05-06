@@ -7,12 +7,12 @@
       final PriorPaymentControlResult pluginResult;
       try {
         pluginResult=executePluginPriorCalls(paymentStateControlContext.getPaymentControlPluginNames(),paymentControlContext);
-        if (pluginResult != null && pluginResult.isAborted()) {
-          return PluginDispatcher.createPluginDispatcherReturnType(OperationResult.EXCEPTION);
-        }
       }
  catch (      final PaymentControlApiException e) {
         throw new OperationException(e,OperationResult.EXCEPTION);
+      }
+catch (      final PaymentApiException paymentAbortedException) {
+        throw new OperationException(paymentAbortedException,OperationResult.EXCEPTION);
       }
       final boolean success;
       try {
