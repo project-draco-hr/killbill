@@ -4,9 +4,8 @@
   return dispatchWithAccountLockAndTimeout(pluginNames,new DispatcherCallback<PluginDispatcherReturnType<OperationResult>,OperationException>(){
     @Override public PluginDispatcherReturnType<OperationResult> doOperation() throws OperationException {
       final PaymentControlContext paymentControlContext=new DefaultPaymentControlContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),PaymentApiType.PAYMENT_TRANSACTION,paymentStateContext.getTransactionType(),null,paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateControlContext.isApiPayment(),paymentStateContext.getCallContext());
-      final PriorPaymentControlResult pluginResult;
       try {
-        pluginResult=executePluginPriorCalls(paymentStateControlContext.getPaymentControlPluginNames(),paymentControlContext);
+        executePluginPriorCalls(paymentStateControlContext.getPaymentControlPluginNames(),paymentControlContext);
       }
  catch (      final PaymentControlApiException e) {
         throw new OperationException(e,OperationResult.EXCEPTION);
