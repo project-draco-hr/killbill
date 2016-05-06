@@ -1,0 +1,17 @@
+{
+  final List<PaymentTransaction> reversedTransactions=Lists.reverse(payment.getTransactions());
+  final Iterable<PaymentTransaction> matchingTransactions=Iterables.filter(reversedTransactions,new Predicate<PaymentTransaction>(){
+    @Override public boolean apply(    final PaymentTransaction input){
+      return input.getTransactionType() == transactionType;
+    }
+  }
+);
+  if (transactionExternalKey != null) {
+    for (    final PaymentTransaction transaction : matchingTransactions) {
+      if (transactionExternalKey.equals(transaction.getExternalKey())) {
+        return transaction;
+      }
+    }
+  }
+  return Iterables.getFirst(matchingTransactions,null);
+}

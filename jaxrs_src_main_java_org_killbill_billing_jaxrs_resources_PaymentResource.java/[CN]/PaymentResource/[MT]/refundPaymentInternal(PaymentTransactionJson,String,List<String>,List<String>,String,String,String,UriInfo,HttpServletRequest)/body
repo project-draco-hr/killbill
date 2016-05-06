@@ -8,5 +8,5 @@
   final Currency currency=json.getCurrency() == null ? account.getCurrency() : Currency.valueOf(json.getCurrency());
   final PaymentOptions paymentOptions=createControlPluginApiPaymentOptions(paymentControlPluginNames);
   final Payment payment=paymentApi.createRefundWithPaymentControl(account,initialPayment.getId(),json.getAmount(),currency,json.getTransactionExternalKey(),pluginProperties,paymentOptions,callContext);
-  return uriBuilder.buildResponse(uriInfo,PaymentResource.class,"getPayment",payment.getId());
+  return createPaymentResponse(uriInfo,payment,TransactionType.REFUND,json.getTransactionExternalKey());
 }

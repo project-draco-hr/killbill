@@ -2,25 +2,12 @@
   final BigDecimal requestedAmount=BigDecimal.TEN;
   final String paymentExternalKey="ohhhh";
   final String transactionExternalKey="naaahhh";
-  final String pluginName=mockPaymentProviderPlugin.PLUGIN_NAME;
   mockPaymentProviderPlugin.makePluginWaitSomeMilliseconds((int)(paymentConfig.getPaymentPluginTimeout().getMillis() + 100));
-  SpyLogger spyLogger=withSpyLogger(OperationCallbackBase.class,new Callable<Void>(){
-    @Override public Void call() throws Exception {
-      PaymentApiException thrownException=null;
-      try {
-        final Payment payment=paymentApi.createPurchase(account,account.getPaymentMethodId(),null,requestedAmount,Currency.AED,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
-      }
- catch (      PaymentApiException e) {
-        thrownException=e;
-      }
-      assertNotNull(thrownException);
-      Throwable timeoutException=thrownException.getCause();
-      assertNotNull(timeoutException);
-      assertTrue(timeoutException instanceof TimeoutException);
-      return null;
-    }
+  try {
+    paymentApi.createPurchase(account,account.getPaymentMethodId(),null,requestedAmount,Currency.AED,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
+    fail();
   }
-);
-  assertTrue(spyLogger.contains("Calling plugin.*" + pluginName,Optional.of(SpyLogger.LOG_LEVEL_DEBUG)));
-  assertTrue(spyLogger.contains("TimeoutException.*" + pluginName,Optional.of(SpyLogger.LOG_LEVEL_WARN)));
+ catch (  PaymentApiException e) {
+    assertEquals(e.getCode(),ErrorCode.PAYMENT_PLUGIN_TIMEOUT.getCode());
+  }
 }
