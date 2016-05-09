@@ -7,11 +7,12 @@
       try {
         executePluginPriorCalls(paymentStateControlContext.getPaymentControlPluginNames(),paymentControlContext);
       }
- catch (      final PaymentControlApiException e) {
-        throw new OperationException(e,OperationResult.EXCEPTION);
-      }
-catch (      final PaymentApiException paymentAbortedException) {
+ catch (      final PaymentControlApiAbortException e) {
+        final PaymentApiException paymentAbortedException=new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_API_ABORTED,e.getPluginName());
         throw new OperationException(paymentAbortedException,OperationResult.EXCEPTION);
+      }
+catch (      final PaymentControlApiException e) {
+        throw new OperationException(e,OperationResult.EXCEPTION);
       }
       final boolean success;
       try {
