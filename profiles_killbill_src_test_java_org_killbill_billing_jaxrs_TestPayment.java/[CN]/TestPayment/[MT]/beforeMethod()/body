@@ -2,4 +2,17 @@
   super.beforeMethod();
   mockPaymentProviderPlugin=(MockPaymentProviderPlugin)registry.getServiceForName(PLUGIN_NAME);
   mockPaymentProviderPlugin.clear();
+  mockPaymentControlProviderPlugin=new MockPaymentControlProviderPlugin();
+  controlPluginRegistry.registerService(new OSGIServiceDescriptor(){
+    @Override public String getPluginSymbolicName(){
+      return null;
+    }
+    @Override public String getPluginName(){
+      return MockPaymentControlProviderPlugin.PLUGIN_NAME;
+    }
+    @Override public String getRegistrationName(){
+      return MockPaymentControlProviderPlugin.PLUGIN_NAME;
+    }
+  }
+,mockPaymentControlProviderPlugin);
 }

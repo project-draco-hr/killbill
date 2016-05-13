@@ -1,0 +1,3 @@
+{
+  return (Long)handle.select("select count(distinct record_id) count from bus_events").get(0).get("count") + (Long)handle.select("select count(distinct record_id) count from notifications where effective_date < ?",clock.getUTCNow().toDate()).get(0).get("count") + (Long)handle.select("select count(distinct record_id) count from notifications where processing_state = 'IN_PROCESSING'").get(0).get("count");
+}

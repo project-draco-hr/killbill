@@ -4,14 +4,14 @@
   return dispatchWithAccountLockAndTimeout(pluginNames,new DispatcherCallback<PluginDispatcherReturnType<OperationResult>,OperationException>(){
     @Override public PluginDispatcherReturnType<OperationResult> doOperation() throws OperationException {
       final PaymentControlContext paymentControlContext=new DefaultPaymentControlContext(paymentStateContext.getAccount(),paymentStateContext.getPaymentMethodId(),paymentStateControlContext.getAttemptId(),paymentStateContext.getPaymentId(),paymentStateContext.getPaymentExternalKey(),paymentStateContext.getPaymentTransactionExternalKey(),PaymentApiType.PAYMENT_TRANSACTION,paymentStateContext.getTransactionType(),null,paymentStateContext.getAmount(),paymentStateContext.getCurrency(),paymentStateControlContext.isApiPayment(),paymentStateContext.getCallContext());
-      final PriorPaymentControlResult pluginResult;
       try {
-        pluginResult=executePluginPriorCalls(paymentStateControlContext.getPaymentControlPluginNames(),paymentControlContext);
-        if (pluginResult != null && pluginResult.isAborted()) {
-          return PluginDispatcher.createPluginDispatcherReturnType(OperationResult.EXCEPTION);
-        }
+        executePluginPriorCalls(paymentStateControlContext.getPaymentControlPluginNames(),paymentControlContext);
       }
- catch (      final PaymentControlApiException e) {
+ catch (      final PaymentControlApiAbortException e) {
+        final PaymentApiException paymentAbortedException=new PaymentApiException(ErrorCode.PAYMENT_PLUGIN_API_ABORTED,e.getPluginName());
+        throw new OperationException(paymentAbortedException,OperationResult.EXCEPTION);
+      }
+catch (      final PaymentControlApiException e) {
         throw new OperationException(e,OperationResult.EXCEPTION);
       }
       final boolean success;
@@ -33,8 +33,7 @@
         throw new OperationException(e,executePluginOnFailureCallsAndSetRetryDate(paymentControlContext));
       }
 catch (      final RuntimeException e) {
-        executePluginOnFailureCallsAndSetRetryDate(paymentControlContext);
-        throw new OperationException(e,OperationResult.EXCEPTION);
+        throw new OperationException(e,executePluginOnFailureCallsAndSetRetryDate(paymentControlContext));
       }
     }
   }

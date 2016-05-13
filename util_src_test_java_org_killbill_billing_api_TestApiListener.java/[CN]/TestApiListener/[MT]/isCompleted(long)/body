@@ -1,2 +1,35 @@
 {
+synchronized (this) {
+    long waitTimeMs=timeout;
+    do {
+      try {
+        final long before=System.currentTimeMillis();
+        wait(100);
+        if (completed) {
+          await().atMost(timeout,TimeUnit.MILLISECONDS).until(new Callable<Boolean>(){
+            @Override public Boolean call() throws Exception {
+              final long pending=idbi.withHandle(new PendingBusOrNotificationCallback(clock));
+              log.debug("Events still in processing: {}",pending);
+              return pending == 0;
+            }
+          }
+);
+          return completed;
+        }
+        final long after=System.currentTimeMillis();
+        waitTimeMs-=(after - before);
+      }
+ catch (      final Exception ignore) {
+        final long pending=idbi.withHandle(new PendingBusOrNotificationCallback(clock));
+        log.error("isCompleted : Received all events but found remaining unprocessed bus events/notifications =  {}",pending);
+        return false;
+      }
+    }
+ while (waitTimeMs > 0 && !completed);
+  }
+  if (!completed) {
+    final Joiner joiner=Joiner.on(" ");
+    log.error("TestApiListener did not complete in " + timeout + " ms, remaining events are "+ joiner.join(nextExpectedEvent));
+  }
+  return completed;
 }

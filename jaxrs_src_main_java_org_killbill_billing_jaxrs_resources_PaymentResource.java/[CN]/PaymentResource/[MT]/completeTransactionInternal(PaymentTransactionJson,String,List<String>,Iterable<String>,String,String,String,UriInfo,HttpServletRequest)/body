@@ -7,24 +7,25 @@
   final Currency currency=json == null || json.getCurrency() == null ? null : Currency.valueOf(json.getCurrency());
   final PaymentTransaction pendingTransaction=lookupPendingTransaction(initialPayment,json != null ? json.getTransactionId() : null,json != null ? json.getTransactionExternalKey() : null,json != null ? json.getTransactionType() : null);
   final PaymentOptions paymentOptions=createControlPluginApiPaymentOptions(paymentControlPluginNames);
+  final Payment result;
 switch (pendingTransaction.getTransactionType()) {
 case AUTHORIZE:
-    paymentApi.createAuthorizationWithPaymentControl(account,initialPayment.getPaymentMethodId(),initialPayment.getId(),amount,currency,initialPayment.getExternalKey(),pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
+    result=paymentApi.createAuthorizationWithPaymentControl(account,initialPayment.getPaymentMethodId(),initialPayment.getId(),amount,currency,initialPayment.getExternalKey(),pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
   break;
 case CAPTURE:
-paymentApi.createCaptureWithPaymentControl(account,initialPayment.getId(),amount,currency,pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
+result=paymentApi.createCaptureWithPaymentControl(account,initialPayment.getId(),amount,currency,pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
 break;
 case PURCHASE:
-paymentApi.createPurchaseWithPaymentControl(account,initialPayment.getPaymentMethodId(),initialPayment.getId(),amount,currency,initialPayment.getExternalKey(),pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
+result=paymentApi.createPurchaseWithPaymentControl(account,initialPayment.getPaymentMethodId(),initialPayment.getId(),amount,currency,initialPayment.getExternalKey(),pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
 break;
 case CREDIT:
-paymentApi.createCreditWithPaymentControl(account,initialPayment.getPaymentMethodId(),initialPayment.getId(),amount,currency,initialPayment.getExternalKey(),pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
+result=paymentApi.createCreditWithPaymentControl(account,initialPayment.getPaymentMethodId(),initialPayment.getId(),amount,currency,initialPayment.getExternalKey(),pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
 break;
 case REFUND:
-paymentApi.createRefundWithPaymentControl(account,initialPayment.getId(),amount,currency,pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
+result=paymentApi.createRefundWithPaymentControl(account,initialPayment.getId(),amount,currency,pendingTransaction.getExternalKey(),pluginProperties,paymentOptions,callContext);
 break;
 default :
 return Response.status(Status.PRECONDITION_FAILED).entity("TransactionType " + pendingTransaction.getTransactionType() + " cannot be completed").build();
 }
-return uriBuilder.buildResponse(uriInfo,PaymentResource.class,"getPayment",initialPayment.getId());
+return createPaymentResponse(uriInfo,result,pendingTransaction.getTransactionType(),pendingTransaction.getExternalKey());
 }

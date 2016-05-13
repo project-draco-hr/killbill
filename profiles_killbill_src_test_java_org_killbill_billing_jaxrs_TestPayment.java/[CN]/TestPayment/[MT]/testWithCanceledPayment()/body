@@ -1,0 +1,15 @@
+{
+  final Account account=createAccountWithDefaultPaymentMethod();
+  mockPaymentProviderPlugin.makeNextPaymentFailWithCancellation();
+  final PaymentTransaction authTransaction=new PaymentTransaction();
+  authTransaction.setAmount(BigDecimal.ONE);
+  authTransaction.setCurrency(account.getCurrency());
+  authTransaction.setTransactionType(TransactionType.AUTHORIZE.name());
+  try {
+    killBillClient.createPayment(account.getAccountId(),account.getPaymentMethodId(),authTransaction,ImmutableMap.<String,String>of(),createdBy,reason,comment);
+    fail();
+  }
+ catch (  KillBillClientException e) {
+    assertEquals(502,e.getResponse().getStatusCode());
+  }
+}

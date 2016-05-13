@@ -1,0 +1,16 @@
+{
+  final Account accountJson=getAccount();
+  accountJson.setAccountId(null);
+  final String paymentExternalKey=UUID.randomUUID().toString();
+  final ComboPaymentTransaction comboPaymentTransaction=createComboPaymentTransaction(accountJson,paymentExternalKey);
+  mockPaymentControlProviderPlugin.setAborted(true);
+  try {
+    killBillClient.createPayment(comboPaymentTransaction,Arrays.asList(MockPaymentControlProviderPlugin.PLUGIN_NAME),ImmutableMap.<String,String>of(),createdBy,reason,comment);
+    fail();
+  }
+ catch (  KillBillClientException e) {
+    assertEquals(e.getResponse().getStatusCode(),422);
+  }
+  assertFalse(mockPaymentControlProviderPlugin.isOnFailureCallExecuted());
+  assertFalse(mockPaymentControlProviderPlugin.isOnSuccessCallExecuted());
+}

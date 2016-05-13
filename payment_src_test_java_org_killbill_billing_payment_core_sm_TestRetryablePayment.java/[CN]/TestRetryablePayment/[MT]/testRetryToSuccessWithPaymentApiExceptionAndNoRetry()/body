@@ -7,7 +7,7 @@
   paymentDao.insertPaymentAttemptWithProperties(new PaymentAttemptModelDao(account.getId(),paymentMethodId,utcNow,utcNow,paymentExternalKey,transactionId,paymentTransactionExternalKey,TransactionType.AUTHORIZE,state.getName(),amount,currency,null,EMPTY_PROPERTIES),internalCallContext);
   try {
     runner.run(state,false,TransactionType.AUTHORIZE,account,paymentMethodId,null,paymentExternalKey,paymentTransactionExternalKey,amount,currency,emptyProperties,null,callContext,internalCallContext);
-    Assert.fail("Expecting paymentApiException...");
+    fail("Expecting paymentApiException...");
   }
  catch (  final PaymentApiException e) {
     final List<PaymentAttemptModelDao> pas=paymentDao.getPaymentAttemptByTransactionExternalKey(paymentTransactionExternalKey,internalCallContext);

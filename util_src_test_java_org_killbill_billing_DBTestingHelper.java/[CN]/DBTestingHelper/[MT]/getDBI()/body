@@ -1,7 +1,9 @@
 {
   final DBI dbi=(DBI)super.getDBI();
-  dbi.registerMapper(new AuditLogModelDaoMapper());
-  dbi.registerMapper(new RecordIdIdMappingsMapper());
-  dbi.registerMapper(new LowerToCamelBeanMapperFactory(SessionModelDao.class));
+  if (initialized.compareAndSet(false,true)) {
+    dbi.registerMapper(new AuditLogModelDaoMapper());
+    dbi.registerMapper(new RecordIdIdMappingsMapper());
+    dbi.registerMapper(new LowerToCamelBeanMapperFactory(SessionModelDao.class));
+  }
   return dbi;
 }
