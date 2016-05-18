@@ -5,10 +5,16 @@
   checkNotNullParameter(currency,"currency");
   checkNotNullParameter(properties,"plugin properties");
   final String transactionType=TransactionType.CAPTURE.name();
-  logAPICall(transactionType,account,null,paymentId,null,amount,currency,null,paymentTransactionExternalKey,null,null);
-  final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
-  final Payment payment=paymentProcessor.createCapture(IS_API_PAYMENT,NULL_ATTEMPT_ID,account,paymentId,amount,currency,paymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
-  final PaymentTransaction paymentTransaction=payment.getTransactions().get(payment.getTransactions().size() - 1);
-  logAPICall(transactionType,account,payment.getPaymentMethodId(),payment.getId(),paymentTransaction.getId(),paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),payment.getExternalKey(),paymentTransaction.getExternalKey(),paymentTransaction.getTransactionStatus(),null);
-  return payment;
+  Payment payment=null;
+  PaymentTransaction paymentTransaction=null;
+  try {
+    logEnterAPICall(transactionType,account,null,paymentId,null,amount,currency,null,paymentTransactionExternalKey,null,null);
+    final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
+    payment=paymentProcessor.createCapture(IS_API_PAYMENT,NULL_ATTEMPT_ID,account,paymentId,amount,currency,paymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
+    paymentTransaction=payment.getTransactions().get(payment.getTransactions().size() - 1);
+    return payment;
+  }
+  finally {
+    logExitAPICall(transactionType,account,payment != null ? payment.getPaymentMethodId() : null,payment != null ? payment.getId() : null,paymentTransaction != null ? paymentTransaction.getId() : null,paymentTransaction != null ? paymentTransaction.getProcessedAmount() : null,paymentTransaction != null ? paymentTransaction.getProcessedCurrency() : null,payment != null ? payment.getExternalKey() : null,paymentTransaction != null ? paymentTransaction.getExternalKey() : null,paymentTransaction != null ? paymentTransaction.getTransactionStatus() : null,null);
+  }
 }
