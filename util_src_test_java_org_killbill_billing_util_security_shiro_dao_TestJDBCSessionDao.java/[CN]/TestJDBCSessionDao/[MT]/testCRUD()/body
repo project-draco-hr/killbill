@@ -5,11 +5,11 @@
   final Serializable sessionId=jdbcSessionDao.doCreate(session);
   final Session retrievedSession=jdbcSessionDao.doReadSession(sessionId);
   Assert.assertEquals(retrievedSession,session);
-  final Date lastAccessTime=DateTime.now().withTimeAtStartOfDay().toDate();
-  Assert.assertNotEquals(retrievedSession.getLastAccessTime(),lastAccessTime);
-  session.setLastAccessTime(lastAccessTime);
+  final String newHost=UUID.randomUUID().toString();
+  Assert.assertNotEquals(retrievedSession.getHost(),newHost);
+  session.setHost(newHost);
   jdbcSessionDao.doUpdate(session);
-  Assert.assertEquals(jdbcSessionDao.doReadSession(sessionId).getLastAccessTime().compareTo(lastAccessTime),0);
+  Assert.assertEquals(jdbcSessionDao.doReadSession(sessionId).getHost(),newHost);
   jdbcSessionDao.doDelete(session);
   Assert.assertNull(jdbcSessionDao.doReadSession(session.getId()));
 }
