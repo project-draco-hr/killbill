@@ -1,8 +1,9 @@
 {
   return transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<List<PaymentMethodModelDao>>(){
     @Override public List<PaymentMethodModelDao> inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
+      final InternalCallContext contextWithUpdatedDate=contextWithUpdatedDate(context);
       final PaymentMethodSqlDao transactional=entitySqlDaoWrapperFactory.become(PaymentMethodSqlDao.class);
-      final List<PaymentMethodModelDao> allPaymentMethodsForAccount=transactional.getForAccountIncludedDelete(context);
+      final List<PaymentMethodModelDao> allPaymentMethodsForAccount=transactional.getForAccountIncludedDelete(contextWithUpdatedDate);
       final Collection<PaymentMethodModelDao> existingPaymentMethods=Collections2.filter(allPaymentMethodsForAccount,new Predicate<PaymentMethodModelDao>(){
         @Override public boolean apply(        final PaymentMethodModelDao paymentMethod){
           return pluginName.equals(paymentMethod.getPluginName());
@@ -17,13 +18,13 @@
             break;
           }
  else           if (existingPaymentMethod.equalsButActive(finalPaymentMethod)) {
-            undeletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),context);
+            undeletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),contextWithUpdatedDate);
             foundExistingPaymentMethod=existingPaymentMethod;
             break;
           }
         }
         if (foundExistingPaymentMethod == null) {
-          insertPaymentMethodInTransaction(entitySqlDaoWrapperFactory,finalPaymentMethod,context);
+          insertPaymentMethodInTransaction(entitySqlDaoWrapperFactory,finalPaymentMethod,contextWithUpdatedDate);
         }
  else {
           existingPaymentMethods.remove(foundExistingPaymentMethod);
@@ -31,10 +32,10 @@
       }
       for (      final PaymentMethodModelDao existingPaymentMethod : existingPaymentMethods) {
         if (existingPaymentMethod.isActive()) {
-          deletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),context);
+          deletedPaymentMethodInTransaction(entitySqlDaoWrapperFactory,existingPaymentMethod.getId(),contextWithUpdatedDate);
         }
       }
-      return transactional.getForAccount(context);
+      return transactional.getForAccount(contextWithUpdatedDate);
     }
   }
 );

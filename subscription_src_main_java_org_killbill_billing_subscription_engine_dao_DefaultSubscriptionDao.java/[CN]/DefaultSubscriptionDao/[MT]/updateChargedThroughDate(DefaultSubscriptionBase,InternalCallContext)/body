@@ -1,12 +1,13 @@
 {
   final Date ctd=(subscription.getChargedThroughDate() != null) ? subscription.getChargedThroughDate().toDate() : null;
+  final InternalCallContext contextWithUpdatedDate=contextWithUpdatedDate(context);
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final SubscriptionSqlDao transactionalDao=entitySqlDaoWrapperFactory.become(SubscriptionSqlDao.class);
-      transactionalDao.updateChargedThroughDate(subscription.getId().toString(),ctd,context);
+      transactionalDao.updateChargedThroughDate(subscription.getId().toString(),ctd,contextWithUpdatedDate);
       final BundleSqlDao bundleSqlDao=entitySqlDaoWrapperFactory.become(BundleSqlDao.class);
       final String bundleId=subscription.getBundleId().toString();
-      bundleSqlDao.updateBundleLastSysTime(bundleId,clock.getUTCNow().toDate(),context);
+      bundleSqlDao.updateBundleLastSysTime(bundleId,clock.getUTCNow().toDate(),contextWithUpdatedDate);
       return null;
     }
   }

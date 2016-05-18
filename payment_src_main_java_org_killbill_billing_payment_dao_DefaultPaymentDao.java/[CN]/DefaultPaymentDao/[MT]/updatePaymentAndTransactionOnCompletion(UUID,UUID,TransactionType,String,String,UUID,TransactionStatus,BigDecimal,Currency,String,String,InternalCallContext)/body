@@ -1,12 +1,13 @@
 {
   transactionalSqlDao.execute(new EntitySqlDaoTransactionWrapper<Void>(){
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
-      entitySqlDaoWrapperFactory.become(TransactionSqlDao.class).updateTransactionStatus(transactionId.toString(),processedAmount,processedCurrency == null ? null : processedCurrency.toString(),transactionStatus == null ? null : transactionStatus.toString(),gatewayErrorCode,gatewayErrorMsg,context);
+      final InternalCallContext contextWithUpdatedDate=contextWithUpdatedDate(context);
+      entitySqlDaoWrapperFactory.become(TransactionSqlDao.class).updateTransactionStatus(transactionId.toString(),processedAmount,processedCurrency == null ? null : processedCurrency.toString(),transactionStatus == null ? null : transactionStatus.toString(),gatewayErrorCode,gatewayErrorMsg,contextWithUpdatedDate);
       if (lastPaymentSuccessStateName != null) {
-        entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).updateLastSuccessPaymentStateName(paymentId.toString(),currentPaymentStateName,lastPaymentSuccessStateName,context);
+        entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).updateLastSuccessPaymentStateName(paymentId.toString(),currentPaymentStateName,lastPaymentSuccessStateName,contextWithUpdatedDate);
       }
  else {
-        entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).updatePaymentStateName(paymentId.toString(),currentPaymentStateName,context);
+        entitySqlDaoWrapperFactory.become(PaymentSqlDao.class).updatePaymentStateName(paymentId.toString(),currentPaymentStateName,contextWithUpdatedDate);
       }
       postPaymentEventFromTransaction(accountId,transactionStatus,transactionType,paymentId,transactionId,processedAmount,processedCurrency,clock.getUTCNow(),gatewayErrorCode,entitySqlDaoWrapperFactory,context);
       return null;
