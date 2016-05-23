@@ -24,9 +24,10 @@
       }
     }
   }
+  final BigDecimal chargebackAmount=getChargebackAmount(transactions);
   this.authAmount=getAmountForType(nonVoidedTransactions,TransactionType.AUTHORIZE);
-  this.captureAmount=getAmountForType(nonVoidedTransactions,TransactionType.CAPTURE);
-  this.purchasedAmount=getAmountForType(nonVoidedTransactions,TransactionType.PURCHASE);
+  this.captureAmount=getAmountForType(nonVoidedTransactions,TransactionType.CAPTURE).add(chargebackAmount.negate()).max(BigDecimal.ZERO);
+  this.purchasedAmount=getAmountForType(nonVoidedTransactions,TransactionType.PURCHASE).add(chargebackAmount.negate()).max(BigDecimal.ZERO);
   this.creditAmount=getAmountForType(nonVoidedTransactions,TransactionType.CREDIT);
   this.refundAmount=getAmountForType(nonVoidedTransactions,TransactionType.REFUND);
   this.isAuthVoided=Iterables.<PaymentTransaction>tryFind(voidedTransactions,new Predicate<PaymentTransaction>(){
