@@ -1,0 +1,10 @@
+{
+  plugin.setAborted(true);
+  try {
+    paymentGatewayApi.buildFormDescriptorWithPaymentControl(account,UUID.randomUUID(),ImmutableList.<PluginProperty>of(),ImmutableList.<PluginProperty>of(),paymentOptions,callContext);
+    Assert.fail();
+  }
+ catch (  PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_PLUGIN_API_ABORTED.getCode());
+  }
+}
