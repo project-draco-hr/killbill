@@ -1,10 +1,15 @@
 {
   try {
+    final InputStream stream=new ByteArrayInputStream(catalogXML.getBytes());
+    XMLLoader.getObjectFromStream(new URI("dummy"),stream,StandaloneCatalog.class);
     final InternalTenantContext internalTenantContext=createInternalTenantContext(callContext);
     catalogCache.clearCatalog(internalTenantContext);
     tenantApi.addTenantKeyValue(TenantKey.CATALOG.toString(),catalogXML,callContext);
   }
  catch (  TenantApiException e) {
     throw new CatalogApiException(e);
+  }
+catch (  final Exception e) {
+    throw new IllegalStateException(e);
   }
 }
