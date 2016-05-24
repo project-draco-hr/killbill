@@ -6,6 +6,13 @@
   final BillingPeriod term=BillingPeriod.MONTHLY;
   final Subscription entitlementJson=createEntitlement(accountJson.getAccountId(),"99999",productName,ProductCategory.BASE,term,true);
   Subscription objFromJson=killBillClient.getSubscription(entitlementJson.getSubscriptionId());
+  Assert.assertEquals(objFromJson.getPriceOverrides().size(),2);
+  Assert.assertEquals(objFromJson.getPriceOverrides().get(0).getFixedPrice(),BigDecimal.ZERO);
+  Assert.assertNull(objFromJson.getPriceOverrides().get(0).getRecurringPrice());
+  Assert.assertNull(objFromJson.getPriceOverrides().get(1).getFixedPrice());
+  Assert.assertEquals(objFromJson.getPriceOverrides().get(1).getRecurringPrice(),new BigDecimal("249.95"));
+  objFromJson.setPriceOverrides(null);
+  entitlementJson.setPriceOverrides(null);
   Assert.assertTrue(objFromJson.equals(entitlementJson));
   final String newProductName="Assault-Rifle";
   final Subscription newInput=new Subscription();

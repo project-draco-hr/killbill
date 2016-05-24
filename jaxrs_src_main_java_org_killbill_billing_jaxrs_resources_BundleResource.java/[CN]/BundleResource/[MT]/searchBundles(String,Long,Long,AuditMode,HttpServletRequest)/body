@@ -8,7 +8,12 @@
       if (accountsAuditLogs.get().get(bundle.getAccountId()) == null) {
         accountsAuditLogs.get().put(bundle.getAccountId(),auditUserApi.getAccountAuditLogs(bundle.getAccountId(),auditMode.getLevel(),tenantContext));
       }
-      return new BundleJson(bundle,accountsAuditLogs.get().get(bundle.getAccountId()));
+      try {
+        return new BundleJson(bundle,null,accountsAuditLogs.get().get(bundle.getAccountId()));
+      }
+ catch (      final CatalogApiException unused) {
+        throw new RuntimeException(unused);
+      }
     }
   }
 ,nextPageUri);

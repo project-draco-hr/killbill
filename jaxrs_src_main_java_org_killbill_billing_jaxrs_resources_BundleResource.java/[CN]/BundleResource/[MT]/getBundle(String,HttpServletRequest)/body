@@ -1,6 +1,8 @@
 {
   final UUID id=UUID.fromString(bundleId);
-  final SubscriptionBundle bundle=subscriptionApi.getSubscriptionBundle(id,context.createContext(request));
-  final BundleJson json=new BundleJson(bundle,null);
+  final TenantContext tenantContext=this.context.createContext(request);
+  final SubscriptionBundle bundle=subscriptionApi.getSubscriptionBundle(id,tenantContext);
+  final Account account=accountUserApi.getAccountById(bundle.getAccountId(),tenantContext);
+  final BundleJson json=new BundleJson(bundle,account.getCurrency(),null);
   return Response.status(Status.OK).entity(json).build();
 }

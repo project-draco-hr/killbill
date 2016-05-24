@@ -1,6 +1,8 @@
 {
   final UUID uuid=UUID.fromString(subscriptionId);
-  final Subscription subscription=subscriptionApi.getSubscriptionForEntitlementId(uuid,context.createContext(request));
-  final SubscriptionJson json=new SubscriptionJson(subscription,null);
+  final TenantContext tenantContext=this.context.createContext(request);
+  final Subscription subscription=subscriptionApi.getSubscriptionForEntitlementId(uuid,tenantContext);
+  final Account account=accountUserApi.getAccountById(subscription.getAccountId(),tenantContext);
+  final SubscriptionJson json=new SubscriptionJson(subscription,account.getCurrency(),null);
   return Response.status(Status.OK).entity(json).build();
 }

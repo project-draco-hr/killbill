@@ -46,5 +46,16 @@
   for (  final SubscriptionEvent subscriptionEvent : subscription.getSubscriptionEvents()) {
     this.events.add(new EventSubscriptionJson(subscriptionEvent,accountAuditLogs));
   }
-  this.priceOverrides=new LinkedList<PhasePriceOverrideJson>();
+  this.priceOverrides=new ArrayList<PhasePriceOverrideJson>();
+  if (currency != null) {
+    final Plan plan=subscription.getLastActivePlan();
+    if (plan != null) {
+      for (      final PlanPhase cur : plan.getAllPhases()) {
+        final BigDecimal fixedPrice=cur.getFixed() != null ? cur.getFixed().getPrice().getPrice(currency) : null;
+        final BigDecimal recurringPrice=cur.getRecurring() != null ? cur.getRecurring().getRecurringPrice().getPrice(currency) : null;
+        final PhasePriceOverrideJson phase=new PhasePriceOverrideJson(cur.getName(),cur.getPhaseType().toString(),fixedPrice,recurringPrice);
+        priceOverrides.add(phase);
+      }
+    }
+  }
 }
