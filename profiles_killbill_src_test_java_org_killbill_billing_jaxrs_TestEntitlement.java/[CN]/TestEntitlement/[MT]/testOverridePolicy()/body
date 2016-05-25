@@ -6,6 +6,8 @@
   final BillingPeriod term=BillingPeriod.ANNUAL;
   final Subscription subscriptionJson=createEntitlement(accountJson.getAccountId(),"99999",productName,ProductCategory.BASE,term,true);
   Subscription objFromJson=killBillClient.getSubscription(subscriptionJson.getSubscriptionId());
+  objFromJson.setPriceOverrides(null);
+  subscriptionJson.setPriceOverrides(null);
   Assert.assertTrue(objFromJson.equals(subscriptionJson));
   assertEquals(objFromJson.getBillingPeriod(),BillingPeriod.ANNUAL);
   final Subscription newInput=new Subscription();

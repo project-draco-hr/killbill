@@ -6,6 +6,8 @@
   final BillingPeriod term=BillingPeriod.MONTHLY;
   final Subscription entitlementJson=createEntitlement(accountJson.getAccountId(),"99999",productName,ProductCategory.BASE,term,true);
   Subscription objFromJson=killBillClient.getSubscription(entitlementJson.getSubscriptionId());
+  objFromJson.setPriceOverrides(null);
+  entitlementJson.setPriceOverrides(null);
   Assert.assertTrue(objFromJson.equals(entitlementJson));
   final Interval it=new Interval(clock.getUTCNow(),clock.getUTCNow().plusDays(31));
   clock.addDeltaFromReality(it.toDurationMillis());
