@@ -1,0 +1,17 @@
+{
+  final Collection<String> successfulChargebackExternalKeys=new HashSet<String>();
+  for (  final PaymentTransaction transaction : transactions) {
+    if (TransactionType.CHARGEBACK.equals(transaction.getTransactionType()) && TransactionStatus.SUCCESS.equals(transaction.getTransactionStatus())) {
+      successfulChargebackExternalKeys.add(transaction.getExternalKey());
+    }
+ else     if (TransactionType.CHARGEBACK.equals(transaction.getTransactionType()) && TransactionStatus.PAYMENT_FAILURE.equals(transaction.getTransactionStatus())) {
+      successfulChargebackExternalKeys.remove(transaction.getExternalKey());
+    }
+  }
+  return getAmountForType(Iterables.<PaymentTransaction>filter(transactions,new Predicate<PaymentTransaction>(){
+    @Override public boolean apply(    final PaymentTransaction input){
+      return successfulChargebackExternalKeys.contains(input.getExternalKey());
+    }
+  }
+),TransactionType.CHARGEBACK);
+}
