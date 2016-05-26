@@ -1,0 +1,14 @@
+{
+  final List<PaymentTransactionInfoPlugin> existingTransactions=paymentTransactions.remove(kbPaymentId.toString());
+  final List<PaymentTransactionInfoPlugin> newTransactions=new LinkedList<PaymentTransactionInfoPlugin>();
+  paymentTransactions.put(kbPaymentId.toString(),newTransactions);
+  for (  final PaymentTransactionInfoPlugin existingTransaction : existingTransactions) {
+    if (existingTransaction.getKbTransactionPaymentId().equals(kbTransactionId)) {
+      final PaymentTransactionInfoPlugin newTransaction=new DefaultNoOpPaymentInfoPlugin(existingTransaction.getKbPaymentId(),existingTransaction.getKbTransactionPaymentId(),existingTransaction.getTransactionType(),existingTransaction.getAmount(),existingTransaction.getCurrency(),existingTransaction.getEffectiveDate(),existingTransaction.getCreatedDate(),status,existingTransaction.getGatewayErrorCode(),existingTransaction.getGatewayError());
+      newTransactions.add(newTransaction);
+    }
+ else {
+      newTransactions.add(existingTransaction);
+    }
+  }
+}

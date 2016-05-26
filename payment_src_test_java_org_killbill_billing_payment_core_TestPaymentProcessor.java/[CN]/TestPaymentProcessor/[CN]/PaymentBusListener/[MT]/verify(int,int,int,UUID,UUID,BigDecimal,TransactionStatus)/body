@@ -1,0 +1,17 @@
+{
+  Awaitility.await().until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      return paymentInfoEvents.size() == nbInfoEvents && paymentErrorEvents.size() == nbErrorEvents && paymentPluginErrorEvents.size() == nbPluginErrorEvents;
+    }
+  }
+);
+  if (transactionStatus == TransactionStatus.SUCCESS || transactionStatus == TransactionStatus.PENDING) {
+    verify(paymentInfoEvents.get(paymentInfoEvents.size() - 1),accountId,paymentId,amount,transactionStatus);
+  }
+ else   if (transactionStatus == TransactionStatus.PAYMENT_FAILURE) {
+    verify(paymentErrorEvents.get(paymentErrorEvents.size() - 1),accountId,paymentId,amount,transactionStatus);
+  }
+ else {
+    verify(paymentPluginErrorEvents.get(paymentPluginErrorEvents.size() - 1),accountId,paymentId,amount,transactionStatus);
+  }
+}

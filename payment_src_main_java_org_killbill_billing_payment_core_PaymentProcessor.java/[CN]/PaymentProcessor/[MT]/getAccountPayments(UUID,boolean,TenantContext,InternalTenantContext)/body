@@ -3,7 +3,7 @@
   final List<PaymentTransactionModelDao> transactionsModelDao=paymentDao.getTransactionsForAccount(accountId,tenantContext);
   final Map<UUID,PaymentPluginApi> paymentPluginByPaymentMethodId=new HashMap<UUID,PaymentPluginApi>();
   final Collection<UUID> absentPlugins=new HashSet<UUID>();
-  return Lists.<PaymentModelDao,Payment>transform(paymentsModelDao,new Function<PaymentModelDao,Payment>(){
+  final List<Payment> transformedPayments=Lists.<PaymentModelDao,Payment>transform(paymentsModelDao,new Function<PaymentModelDao,Payment>(){
     @Override public Payment apply(    final PaymentModelDao paymentModelDao){
       List<PaymentTransactionInfoPlugin> pluginInfo=null;
       if (withPluginInfo) {
@@ -24,4 +24,5 @@
     }
   }
 );
+  return ImmutableList.<Payment>copyOf(transformedPayments);
 }
