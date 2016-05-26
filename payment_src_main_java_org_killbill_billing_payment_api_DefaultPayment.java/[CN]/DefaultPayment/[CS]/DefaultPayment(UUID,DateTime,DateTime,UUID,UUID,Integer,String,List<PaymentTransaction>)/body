@@ -24,17 +24,35 @@
       }
     }
   }
-  final BigDecimal chargebackAmount=getChargebackAmount(transactions);
-  this.authAmount=getAmountForType(nonVoidedTransactions,TransactionType.AUTHORIZE);
-  this.captureAmount=getAmountForType(nonVoidedTransactions,TransactionType.CAPTURE).add(chargebackAmount.negate()).max(BigDecimal.ZERO);
-  this.purchasedAmount=getAmountForType(nonVoidedTransactions,TransactionType.PURCHASE).add(chargebackAmount.negate()).max(BigDecimal.ZERO);
-  this.creditAmount=getAmountForType(nonVoidedTransactions,TransactionType.CREDIT);
-  this.refundAmount=getAmountForType(nonVoidedTransactions,TransactionType.REFUND);
+  final Collection<PaymentTransaction> chargebackTransactions=getChargebackTransactions(transactions);
+  final Currency chargebackProcessedCurrency=getCurrencyForTransactions(chargebackTransactions,true);
+  final BigDecimal chargebackProcessedAmount=chargebackProcessedCurrency == null ? BigDecimal.ZERO : getAmountForTransactions(chargebackTransactions,true);
+  final Currency chargebackCurrency=getCurrencyForTransactions(chargebackTransactions,false);
+  final BigDecimal chargebackAmount=chargebackCurrency == null ? BigDecimal.ZERO : getAmountForTransactions(chargebackTransactions,false);
+  PaymentTransaction transactionToUseForCurrency=Iterables.<PaymentTransaction>getFirst(Iterables.<PaymentTransaction>filter(transactions,new Predicate<PaymentTransaction>(){
+    @Override public boolean apply(    final PaymentTransaction transaction){
+      return (transaction.getTransactionType() == TransactionType.AUTHORIZE || transaction.getTransactionType() == TransactionType.PURCHASE || transaction.getTransactionType() == TransactionType.CREDIT) && (TransactionStatus.SUCCESS.equals(transaction.getTransactionStatus()) || TransactionStatus.PENDING.equals(transaction.getTransactionStatus()));
+    }
+  }
+),null);
+  if (transactionToUseForCurrency == null) {
+    transactionToUseForCurrency=Iterables.<PaymentTransaction>getLast(Iterables.<PaymentTransaction>filter(transactions,new Predicate<PaymentTransaction>(){
+      @Override public boolean apply(      final PaymentTransaction transaction){
+        return transaction.getTransactionType() == TransactionType.AUTHORIZE || transaction.getTransactionType() == TransactionType.PURCHASE || transaction.getTransactionType() == TransactionType.CREDIT;
+      }
+    }
+),null);
+  }
+  this.currency=transactionToUseForCurrency == null ? null : transactionToUseForCurrency.getCurrency();
+  this.authAmount=getAmountForTransactions(this.currency,nonVoidedTransactions,TransactionType.AUTHORIZE,chargebackTransactions,chargebackProcessedAmount,chargebackProcessedCurrency,chargebackAmount,chargebackCurrency);
+  this.captureAmount=getAmountForTransactions(this.currency,nonVoidedTransactions,TransactionType.CAPTURE,chargebackTransactions,chargebackProcessedAmount,chargebackProcessedCurrency,chargebackAmount,chargebackCurrency);
+  this.purchasedAmount=getAmountForTransactions(this.currency,nonVoidedTransactions,TransactionType.PURCHASE,chargebackTransactions,chargebackProcessedAmount,chargebackProcessedCurrency,chargebackAmount,chargebackCurrency);
+  this.creditAmount=getAmountForTransactions(this.currency,nonVoidedTransactions,TransactionType.CREDIT,chargebackTransactions,chargebackProcessedAmount,chargebackProcessedCurrency,chargebackAmount,chargebackCurrency);
+  this.refundAmount=getAmountForTransactions(this.currency,nonVoidedTransactions,TransactionType.REFUND,chargebackTransactions,chargebackProcessedAmount,chargebackProcessedCurrency,chargebackAmount,chargebackCurrency);
   this.isAuthVoided=Iterables.<PaymentTransaction>tryFind(voidedTransactions,new Predicate<PaymentTransaction>(){
     @Override public boolean apply(    final PaymentTransaction input){
       return input.getTransactionType() == TransactionType.AUTHORIZE && TransactionStatus.SUCCESS.equals(input.getTransactionStatus());
     }
   }
 ).isPresent();
-  this.currency=!transactions.isEmpty() ? transactions.get(0).getCurrency() : null;
 }

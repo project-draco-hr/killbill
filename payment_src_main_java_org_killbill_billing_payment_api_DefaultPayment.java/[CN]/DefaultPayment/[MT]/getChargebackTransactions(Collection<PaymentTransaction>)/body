@@ -8,10 +8,10 @@
       successfulChargebackExternalKeys.remove(transaction.getExternalKey());
     }
   }
-  return getAmountForType(Iterables.<PaymentTransaction>filter(transactions,new Predicate<PaymentTransaction>(){
+  return Collections2.<PaymentTransaction>filter(transactions,new Predicate<PaymentTransaction>(){
     @Override public boolean apply(    final PaymentTransaction input){
       return successfulChargebackExternalKeys.contains(input.getExternalKey());
     }
   }
-),TransactionType.CHARGEBACK);
+);
 }

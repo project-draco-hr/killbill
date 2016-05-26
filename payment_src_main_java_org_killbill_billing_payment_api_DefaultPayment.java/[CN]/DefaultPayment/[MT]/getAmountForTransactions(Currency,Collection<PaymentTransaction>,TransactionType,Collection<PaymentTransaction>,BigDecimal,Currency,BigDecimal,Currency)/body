@@ -1,0 +1,27 @@
+{
+  final Collection<PaymentTransaction> candidateTransactions=Collections2.<PaymentTransaction>filter(transactions,new Predicate<PaymentTransaction>(){
+    @Override public boolean apply(    final PaymentTransaction transaction){
+      return transaction.getTransactionType() == transactiontype && TransactionStatus.SUCCESS.equals(transaction.getTransactionStatus());
+    }
+  }
+);
+  final boolean takeChargebacksIntoAccount=ImmutableList.<TransactionType>of(TransactionType.CAPTURE,TransactionType.PURCHASE).contains(transactiontype);
+  Currency currencyForTransactions=getCurrencyForTransactions(candidateTransactions,true);
+  if (currencyForTransactions == null || currencyForTransactions != paymentCurrency) {
+    currencyForTransactions=getCurrencyForTransactions(candidateTransactions,false);
+    if (currencyForTransactions == null) {
+      return BigDecimal.ZERO;
+    }
+ else     if (currencyForTransactions != paymentCurrency) {
+      return BigDecimal.ZERO;
+    }
+ else {
+      final BigDecimal amountForTransactions=getAmountForTransactions(candidateTransactions,false);
+      return getAmountForTransactions(amountForTransactions,takeChargebacksIntoAccount,currencyForTransactions,chargebackTransactions,chargebackProcessedAmount,chargebackProcessedCurrency,chargebackAmount,chargebackCurrency);
+    }
+  }
+ else {
+    final BigDecimal amountForTransactions=getAmountForTransactions(candidateTransactions,true);
+    return getAmountForTransactions(amountForTransactions,takeChargebacksIntoAccount,currencyForTransactions,chargebackTransactions,chargebackProcessedAmount,chargebackProcessedCurrency,chargebackAmount,chargebackCurrency);
+  }
+}

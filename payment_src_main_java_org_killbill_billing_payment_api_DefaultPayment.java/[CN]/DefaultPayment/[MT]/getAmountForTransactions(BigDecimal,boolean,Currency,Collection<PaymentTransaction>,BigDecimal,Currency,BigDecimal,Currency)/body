@@ -1,0 +1,19 @@
+{
+  if (!takeChargebacksIntoAccount) {
+    return amountForTransactions;
+  }
+  final BigDecimal chargebackAmountInCorrectCurrency;
+  if (currencyForTransactions == chargebackProcessedCurrency) {
+    chargebackAmountInCorrectCurrency=chargebackProcessedAmount;
+  }
+ else   if (currencyForTransactions == chargebackCurrency) {
+    chargebackAmountInCorrectCurrency=chargebackAmount;
+  }
+ else   if (!chargebackTransactions.isEmpty()) {
+    chargebackAmountInCorrectCurrency=amountForTransactions;
+  }
+ else {
+    chargebackAmountInCorrectCurrency=BigDecimal.ZERO;
+  }
+  return amountForTransactions.add(chargebackAmountInCorrectCurrency.negate()).max(BigDecimal.ZERO);
+}

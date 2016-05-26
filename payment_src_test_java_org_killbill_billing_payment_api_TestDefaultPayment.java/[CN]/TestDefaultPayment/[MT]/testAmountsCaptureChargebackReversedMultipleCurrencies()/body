@@ -1,0 +1,11 @@
+{
+  final UUID paymentId=UUID.randomUUID();
+  final String chargebackExternalKey=UUID.randomUUID().toString();
+  final List<PaymentTransaction> transactions=ImmutableList.<PaymentTransaction>of(buildPaymentTransaction(paymentId,UUID.randomUUID().toString(),TransactionType.AUTHORIZE,TransactionStatus.SUCCESS,BigDecimal.TEN,Currency.EUR),buildPaymentTransaction(paymentId,UUID.randomUUID().toString(),TransactionType.CAPTURE,TransactionStatus.SUCCESS,BigDecimal.TEN,Currency.USD),buildPaymentTransaction(paymentId,chargebackExternalKey,TransactionType.CHARGEBACK,TransactionStatus.SUCCESS,BigDecimal.ONE,Currency.EUR),buildPaymentTransaction(paymentId,chargebackExternalKey,TransactionType.CHARGEBACK,TransactionStatus.PAYMENT_FAILURE,BigDecimal.ONE,Currency.EUR));
+  final Payment payment=buildPayment(paymentId,transactions);
+  Assert.assertEquals(payment.getCurrency(),Currency.EUR);
+  Assert.assertEquals(payment.getAuthAmount().compareTo(BigDecimal.TEN),0);
+  Assert.assertEquals(payment.getCapturedAmount().compareTo(BigDecimal.ZERO),0);
+  Assert.assertEquals(payment.getPurchasedAmount().compareTo(BigDecimal.ZERO),0);
+  Assert.assertEquals(payment.getRefundedAmount().compareTo(BigDecimal.ZERO),0);
+}

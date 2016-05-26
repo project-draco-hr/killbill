@@ -1,0 +1,9 @@
+{
+  final Collection<Currency> currencies=new HashSet<Currency>(Collections2.<PaymentTransaction,Currency>transform(candidateTransactions,new Function<PaymentTransaction,Currency>(){
+    @Override public Currency apply(    final PaymentTransaction transaction){
+      return useProcessedValues ? transaction.getProcessedCurrency() : transaction.getCurrency();
+    }
+  }
+));
+  return currencies.size() > 1 ? null : Iterables.<Currency>getFirst(currencies,null);
+}
