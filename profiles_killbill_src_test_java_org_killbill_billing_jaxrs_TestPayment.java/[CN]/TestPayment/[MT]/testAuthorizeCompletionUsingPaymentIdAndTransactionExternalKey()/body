@@ -13,7 +13,7 @@
   completeTransactionByPaymentIdAndInvalidTransactionExternalKey.setPaymentId(initialPayment.getPaymentId());
   completeTransactionByPaymentIdAndInvalidTransactionExternalKey.setTransactionExternalKey("bozo");
   try {
-    killBillClient.completePayment(completeTransactionByPaymentIdAndInvalidTransactionExternalKey,pluginProperties,createdBy,reason,comment);
+    killBillClient.completePayment(completeTransactionByPaymentIdAndInvalidTransactionExternalKey,pluginProperties,basicRequestOptions());
     fail("Payment completion should fail when invalid transaction externalKey has been provided");
   }
  catch (  final KillBillClientException expected) {
@@ -21,6 +21,6 @@
   final PaymentTransaction completeTransactionByPaymentIdAndTransactionExternalKey=new PaymentTransaction();
   completeTransactionByPaymentIdAndTransactionExternalKey.setPaymentId(initialPayment.getPaymentId());
   completeTransactionByPaymentIdAndTransactionExternalKey.setTransactionExternalKey(authTransactionExternalKey);
-  final Payment completedPaymentByPaymentId=killBillClient.completePayment(completeTransactionByPaymentIdAndTransactionExternalKey,pluginProperties,createdBy,reason,comment);
+  final Payment completedPaymentByPaymentId=killBillClient.completePayment(completeTransactionByPaymentIdAndTransactionExternalKey,pluginProperties,basicRequestOptions());
   verifyPayment(account,paymentMethodId,completedPaymentByPaymentId,paymentExternalKey,authTransactionExternalKey,transactionType.toString(),TransactionStatus.SUCCESS.name(),amount,amount,BigDecimal.ZERO,BigDecimal.ZERO,1,1);
 }
