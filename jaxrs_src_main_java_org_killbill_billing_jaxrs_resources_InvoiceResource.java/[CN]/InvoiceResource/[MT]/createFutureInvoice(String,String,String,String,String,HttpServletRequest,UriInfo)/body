@@ -3,7 +3,7 @@
   final LocalDate inputDate=toLocalDate(UUID.fromString(accountId),targetDate,callContext);
   try {
     final Invoice generatedInvoice=invoiceApi.triggerInvoiceGeneration(UUID.fromString(accountId),inputDate,null,callContext);
-    return uriBuilder.buildResponse(uriInfo,InvoiceResource.class,"getInvoice",generatedInvoice.getId());
+    return uriBuilder.buildResponse(uriInfo,InvoiceResource.class,"getInvoice",generatedInvoice.getId(),jaxrsConfig.getJaxrsReturnPathLikeUrl());
   }
  catch (  InvoiceApiException e) {
     if (e.getCode() == ErrorCode.INVOICE_NOTHING_TO_DO.getCode()) {

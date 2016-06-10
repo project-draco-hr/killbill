@@ -1,0 +1,10 @@
+{
+  final LinkedList<CustomField> input=new LinkedList<CustomField>();
+  for (  final CustomFieldJson cur : customFields) {
+    verifyNonNullOrEmpty(cur.getName(),"CustomFieldJson name needs to be set");
+    verifyNonNullOrEmpty(cur.getValue(),"CustomFieldJson value needs to be set");
+    input.add(new StringCustomField(cur.getName(),cur.getValue(),getObjectType(),id,context.getCreatedDate()));
+  }
+  customFieldUserApi.addCustomFields(input,context);
+  return uriBuilder.buildResponse(uriInfo,this.getClass(),"getCustomFields",id,jaxrsPathLikeUrl);
+}

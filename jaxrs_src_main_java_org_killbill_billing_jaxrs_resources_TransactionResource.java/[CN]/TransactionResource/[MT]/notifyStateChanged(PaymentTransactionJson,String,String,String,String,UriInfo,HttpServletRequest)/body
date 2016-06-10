@@ -7,5 +7,5 @@
   final Account account=accountUserApi.getAccountById(payment.getAccountId(),callContext);
   final boolean success=TransactionStatus.SUCCESS.name().equals(json.getStatus());
   final Payment result=paymentApi.notifyPendingTransactionOfStateChanged(account,UUID.fromString(transactionIdStr),success,callContext);
-  return uriBuilder.buildResponse(uriInfo,PaymentResource.class,"getPayment",result.getId());
+  return uriBuilder.buildResponse(uriInfo,PaymentResource.class,"getPayment",result.getId(),jaxrsConfig.getJaxrsReturnPathLikeUrl());
 }
