@@ -13,8 +13,8 @@
         if (existingAttempt == null) {
           transactional.create(invoicePayment,context);
         }
- else         if (!existingAttempt.getSuccess() && invoicePayment.getSuccess()) {
-          transactional.updateAttempt(existingAttempt.getRecordId(),invoicePayment.getPaymentId().toString(),invoicePayment.getPaymentDate().toDate(),invoicePayment.getAmount(),invoicePayment.getCurrency(),invoicePayment.getProcessedCurrency(),invoicePayment.getPaymentCookieId(),null,context);
+ else         if (!existingAttempt.getSuccess()) {
+          transactional.updateAttempt(existingAttempt.getRecordId(),invoicePayment.getPaymentId().toString(),invoicePayment.getPaymentDate().toDate(),invoicePayment.getAmount(),invoicePayment.getCurrency(),invoicePayment.getProcessedCurrency(),invoicePayment.getPaymentCookieId(),null,invoicePayment.getSuccess(),context);
         }
       }
       if (completion) {
