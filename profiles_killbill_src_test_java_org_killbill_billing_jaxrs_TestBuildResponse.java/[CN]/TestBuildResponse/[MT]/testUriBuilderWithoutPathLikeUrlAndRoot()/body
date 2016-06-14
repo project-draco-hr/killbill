@@ -8,5 +8,6 @@
   when(jaxrsConfig.isJaxrsLocationFullUrl()).thenReturn(true);
   JaxrsUriBuilder uriBuilder=new JaxrsUriBuilder(jaxrsConfig);
   Response response=uriBuilder.buildResponse(uriInfo,AccountResource.class,"getAccount",objectId);
+  assertEquals(response.getStatus(),Status.CREATED.getStatusCode());
   assertEquals(response.getMetadata().get("Location").get(0).toString(),uri.toString() + "/1.0/kb/accounts/" + objectId.toString());
 }
