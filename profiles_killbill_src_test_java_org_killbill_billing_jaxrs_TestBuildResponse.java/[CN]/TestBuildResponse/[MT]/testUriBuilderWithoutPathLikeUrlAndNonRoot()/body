@@ -4,7 +4,9 @@
   URI uri=URI.create("http://localhost:8080/killbill");
   when(uriInfo.getBaseUri()).thenReturn(uri);
   when(uriInfo.getAbsolutePath()).thenReturn(uri);
-  JaxrsUriBuilder uriBuilder=new JaxrsUriBuilder();
-  Response response=uriBuilder.buildResponse(uriInfo,AccountResource.class,"getAccount",objectId,false);
+  JaxrsConfig jaxrsConfig=mock(JaxrsConfig.class);
+  when(jaxrsConfig.isJaxrsLocationFullUrl()).thenReturn(true);
+  JaxrsUriBuilder uriBuilder=new JaxrsUriBuilder(jaxrsConfig);
+  Response response=uriBuilder.buildResponse(uriInfo,AccountResource.class,"getAccount",objectId);
   assertEquals(response.getMetadata().get("Location").get(0).toString(),uri.toString() + "/1.0/kb/accounts/" + objectId.toString());
 }
