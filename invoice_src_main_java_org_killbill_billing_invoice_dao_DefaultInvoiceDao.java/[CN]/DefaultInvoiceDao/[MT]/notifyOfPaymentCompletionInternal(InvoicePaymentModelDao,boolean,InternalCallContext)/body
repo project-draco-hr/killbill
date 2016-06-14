@@ -3,7 +3,7 @@
     @Override public Void inTransaction(    final EntitySqlDaoWrapperFactory entitySqlDaoWrapperFactory) throws Exception {
       final InvoicePaymentSqlDao transactional=entitySqlDaoWrapperFactory.become(InvoicePaymentSqlDao.class);
       if (!completion || invoicePayment.getPaymentId() != null) {
-        final List<InvoicePaymentModelDao> invoicePayments=transactional.getPaymentsForInvoice(invoicePayment.getInvoiceId().toString(),context);
+        final List<InvoicePaymentModelDao> invoicePayments=transactional.getAllPaymentsForInvoiceIncludedInit(invoicePayment.getInvoiceId().toString(),context);
         final InvoicePaymentModelDao existingAttempt=Iterables.tryFind(invoicePayments,new Predicate<InvoicePaymentModelDao>(){
           @Override public boolean apply(          final InvoicePaymentModelDao input){
             return input.getType() == InvoicePaymentType.ATTEMPT && input.getPaymentCookieId().equals(invoicePayment.getPaymentCookieId());
