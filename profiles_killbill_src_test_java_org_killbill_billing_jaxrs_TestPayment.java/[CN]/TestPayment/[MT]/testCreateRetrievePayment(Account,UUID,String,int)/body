@@ -8,13 +8,13 @@
   captureTransaction.setCurrency(account.getCurrency());
   captureTransaction.setPaymentExternalKey(paymentExternalKey);
   captureTransaction.setTransactionExternalKey(capture1TransactionExternalKey);
-  final Payment capturedPayment1=killBillClient.captureAuthorization(captureTransaction,createdBy,reason,comment);
+  final Payment capturedPayment1=killBillClient.captureAuthorization(captureTransaction,basicRequestOptions());
   verifyPayment(account,paymentMethodId,capturedPayment1,paymentExternalKey,authTransactionExternalKey,"AUTHORIZE","SUCCESS",BigDecimal.TEN,BigDecimal.TEN,BigDecimal.ONE,BigDecimal.ZERO,2,paymentNb);
   verifyPaymentTransaction(account,authPayment.getPaymentId(),paymentExternalKey,capturedPayment1.getTransactions().get(1),capture1TransactionExternalKey,captureTransaction.getAmount(),"CAPTURE","SUCCESS");
   final String capture2TransactionExternalKey=UUID.randomUUID().toString();
   captureTransaction.setTransactionExternalKey(capture2TransactionExternalKey);
   captureTransaction.setPaymentId(null);
-  final Payment capturedPayment2=killBillClient.captureAuthorization(captureTransaction,createdBy,reason,comment);
+  final Payment capturedPayment2=killBillClient.captureAuthorization(captureTransaction,basicRequestOptions());
   verifyPayment(account,paymentMethodId,capturedPayment2,paymentExternalKey,authTransactionExternalKey,"AUTHORIZE","SUCCESS",BigDecimal.TEN,BigDecimal.TEN,new BigDecimal("2"),BigDecimal.ZERO,3,paymentNb);
   verifyPaymentTransaction(account,authPayment.getPaymentId(),paymentExternalKey,capturedPayment2.getTransactions().get(2),capture2TransactionExternalKey,captureTransaction.getAmount(),"CAPTURE","SUCCESS");
   final String refundTransactionExternalKey=UUID.randomUUID().toString();
@@ -24,7 +24,7 @@
   refundTransaction.setCurrency(account.getCurrency());
   refundTransaction.setPaymentExternalKey(paymentExternalKey);
   refundTransaction.setTransactionExternalKey(refundTransactionExternalKey);
-  final Payment refundPayment=killBillClient.refundPayment(refundTransaction,createdBy,reason,comment);
+  final Payment refundPayment=killBillClient.refundPayment(refundTransaction,basicRequestOptions());
   verifyPayment(account,paymentMethodId,refundPayment,paymentExternalKey,authTransactionExternalKey,"AUTHORIZE","SUCCESS",BigDecimal.TEN,BigDecimal.TEN,new BigDecimal("2"),new BigDecimal("2"),4,paymentNb);
   verifyPaymentTransaction(account,authPayment.getPaymentId(),paymentExternalKey,refundPayment.getTransactions().get(3),refundTransactionExternalKey,refundTransaction.getAmount(),"REFUND","SUCCESS");
   return authPayment.getPaymentId();

@@ -13,16 +13,16 @@
   refundTransaction.setTransactionExternalKey(refundTransactionExternalKey);
   refundTransaction.setAmount(purchaseAmount);
   refundTransaction.setCurrency(authPayment.getCurrency());
-  final Payment refundPayment=killBillClient.refundPayment(refundTransaction,null,pluginProperties,createdBy,reason,comment);
+  final Payment refundPayment=killBillClient.refundPayment(refundTransaction,null,pluginProperties,basicRequestOptions());
   verifyPaymentWithPendingRefund(account,paymentMethodId,paymentExternalKey,purchaseTransactionExternalKey,purchaseAmount,refundTransactionExternalKey,refundPayment);
   final PaymentTransaction completeTransactionWithTypeAndKey=new PaymentTransaction();
   completeTransactionWithTypeAndKey.setPaymentId(refundPayment.getPaymentId());
   completeTransactionWithTypeAndKey.setTransactionExternalKey(refundTransactionExternalKey);
-  final Payment completedPaymentByTypeAndKey=killBillClient.completePayment(completeTransactionWithTypeAndKey,pluginProperties,createdBy,reason,comment);
+  final Payment completedPaymentByTypeAndKey=killBillClient.completePayment(completeTransactionWithTypeAndKey,pluginProperties,basicRequestOptions());
   verifyPaymentWithPendingRefund(account,paymentMethodId,paymentExternalKey,purchaseTransactionExternalKey,purchaseAmount,refundTransactionExternalKey,completedPaymentByTypeAndKey);
   final PaymentTransaction completeTransactionWithTypeAndId=new PaymentTransaction();
   completeTransactionWithTypeAndId.setPaymentId(refundPayment.getPaymentId());
   completeTransactionWithTypeAndId.setTransactionId(refundPayment.getTransactions().get(1).getTransactionId());
-  final Payment completedPaymentByTypeAndId=killBillClient.completePayment(completeTransactionWithTypeAndId,pluginProperties,createdBy,reason,comment);
+  final Payment completedPaymentByTypeAndId=killBillClient.completePayment(completeTransactionWithTypeAndId,pluginProperties,basicRequestOptions());
   verifyPaymentWithPendingRefund(account,paymentMethodId,paymentExternalKey,purchaseTransactionExternalKey,purchaseAmount,refundTransactionExternalKey,completedPaymentByTypeAndId);
 }
