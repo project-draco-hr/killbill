@@ -1,0 +1,13 @@
+{
+  UUID objectId=UUID.randomUUID();
+  final UriInfo uriInfo=mock(UriInfo.class);
+  URI uri=URI.create("http://localhost:8080");
+  when(uriInfo.getBaseUri()).thenReturn(uri);
+  when(uriInfo.getAbsolutePath()).thenReturn(uri);
+  JaxrsConfig jaxrsConfig=mock(JaxrsConfig.class);
+  when(jaxrsConfig.isJaxrsLocationFullUrl()).thenReturn(true);
+  JaxrsUriBuilder uriBuilder=new JaxrsUriBuilder(jaxrsConfig);
+  Response response=uriBuilder.buildResponse(uriInfo,AccountResource.class,"getAccount",objectId);
+  assertEquals(response.getStatus(),Status.CREATED.getStatusCode());
+  assertEquals(response.getMetadata().get("Location").get(0).toString(),uri.toString() + "/1.0/kb/accounts/" + objectId.toString());
+}

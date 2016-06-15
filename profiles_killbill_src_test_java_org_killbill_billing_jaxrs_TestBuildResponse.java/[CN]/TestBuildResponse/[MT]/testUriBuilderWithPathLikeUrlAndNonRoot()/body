@@ -1,0 +1,12 @@
+{
+  UUID objectId=UUID.randomUUID();
+  final UriInfo uriInfo=mock(UriInfo.class);
+  URI uri=URI.create("http://localhost:8080/killbill");
+  when(uriInfo.getBaseUri()).thenReturn(uri);
+  JaxrsConfig jaxrsConfig=mock(JaxrsConfig.class);
+  when(jaxrsConfig.isJaxrsLocationFullUrl()).thenReturn(false);
+  JaxrsUriBuilder uriBuilder=new JaxrsUriBuilder(jaxrsConfig);
+  Response response=uriBuilder.buildResponse(uriInfo,AccountResource.class,"getAccount",objectId);
+  assertEquals(response.getStatus(),Status.CREATED.getStatusCode());
+  assertEquals(response.getMetadata().get("Location").get(0),"/killbill/1.0/kb/accounts/" + objectId.toString());
+}

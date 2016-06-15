@@ -1,4 +1,4 @@
 {
   final URI location=buildLocation(uriInfo,theClass,getMethodName,objectId);
-  return Response.created(location).build();
+  return !jaxrsConfig.isJaxrsLocationFullUrl() ? Response.status(Response.Status.CREATED).header("Location",location.getPath()).build() : Response.created(location).build();
 }
