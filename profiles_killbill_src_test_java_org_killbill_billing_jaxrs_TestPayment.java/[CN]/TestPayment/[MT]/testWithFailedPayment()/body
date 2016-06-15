@@ -5,11 +5,9 @@
   authTransaction.setAmount(BigDecimal.ONE);
   authTransaction.setCurrency(account.getCurrency());
   authTransaction.setTransactionType(TransactionType.AUTHORIZE.name());
-  try {
-    killBillClient.createPayment(account.getAccountId(),account.getPaymentMethodId(),authTransaction,ImmutableMap.<String,String>of(),createdBy,reason,comment);
-    fail();
-  }
- catch (  KillBillClientException e) {
-    assertEquals(402,e.getResponse().getStatusCode());
-  }
+  final Payment payment=killBillClient.createPayment(account.getAccountId(),account.getPaymentMethodId(),authTransaction,ImmutableMap.<String,String>of(),basicRequestOptions());
+  final PaymentTransaction paymentTransaction=payment.getTransactions().get(0);
+  assertEquals(paymentTransaction.getStatus(),TransactionStatus.PAYMENT_FAILURE.toString());
+  assertEquals(paymentTransaction.getGatewayErrorCode(),MockPaymentProviderPlugin.GATEWAY_ERROR_CODE);
+  assertEquals(paymentTransaction.getGatewayErrorMsg(),MockPaymentProviderPlugin.GATEWAY_ERROR);
 }

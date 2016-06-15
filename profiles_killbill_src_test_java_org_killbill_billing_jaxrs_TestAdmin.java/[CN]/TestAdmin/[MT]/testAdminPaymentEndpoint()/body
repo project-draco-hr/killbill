@@ -8,7 +8,7 @@
   authTransaction.setPaymentExternalKey(paymentExternalKey);
   authTransaction.setTransactionExternalKey(authTransactionExternalKey);
   authTransaction.setTransactionType("AUTHORIZE");
-  final Payment authPayment=killBillClient.createPayment(account.getAccountId(),account.getPaymentMethodId(),authTransaction,createdBy,reason,comment);
+  final Payment authPayment=killBillClient.createPayment(account.getAccountId(),account.getPaymentMethodId(),authTransaction,basicRequestOptions());
   fixPaymentState(authPayment,null,"AUTH_FAILED",TransactionStatus.PAYMENT_FAILURE);
   final Payment updatedPayment1=killBillClient.getPayment(authPayment.getPaymentId());
   Assert.assertEquals(updatedPayment1.getTransactions().size(),1);
