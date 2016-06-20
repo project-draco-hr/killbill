@@ -3,7 +3,7 @@
   final String paymentExternalKey="krapo";
   final String transactionExternalKey="grenouye";
   final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,requestedAmount,Currency.EUR,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
-  paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,"AUTH_ERRORED",null,payment.getTransactions().get(0).getId(),TransactionStatus.PLUGIN_FAILURE,null,null,null,null,internalCallContext);
+  paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),null,payment.getId(),TransactionType.AUTHORIZE,"AUTH_ERRORED",null,payment.getTransactions().get(0).getId(),TransactionStatus.PLUGIN_FAILURE,null,null,null,null,internalCallContext);
   final PaymentSqlDao paymentSqlDao=dbi.onDemand(PaymentSqlDao.class);
   paymentSqlDao.updateLastSuccessPaymentStateName(payment.getId().toString(),"AUTH_ERRORED",null,internalCallContext);
   try {

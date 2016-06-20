@@ -51,7 +51,7 @@
   assertEquals(savedTransactionModelDao2.getCurrency(),Currency.AED);
   final List<PaymentTransactionModelDao> transactions=paymentDao.getTransactionsForPayment(savedPayment.getId(),internalCallContext);
   assertEquals(transactions.size(),2);
-  paymentDao.updatePaymentAndTransactionOnCompletion(accountId,savedPayment.getId(),savedTransactionModelDao2.getTransactionType(),"AUTH_ABORTED","AUTH_SUCCESS",transactionModelDao2.getId(),TransactionStatus.SUCCESS,BigDecimal.ONE,Currency.USD,null,"nothing",internalCallContext);
+  paymentDao.updatePaymentAndTransactionOnCompletion(accountId,savedTransactionModelDao2.getAttemptId(),savedPayment.getId(),savedTransactionModelDao2.getTransactionType(),"AUTH_ABORTED","AUTH_SUCCESS",transactionModelDao2.getId(),TransactionStatus.SUCCESS,BigDecimal.ONE,Currency.USD,null,"nothing",internalCallContext);
   final PaymentModelDao savedPayment4=paymentDao.getPayment(savedPayment.getId(),internalCallContext);
   assertEquals(savedPayment4.getId(),paymentModelDao.getId());
   assertEquals(savedPayment4.getAccountId(),paymentModelDao.getAccountId());
@@ -70,12 +70,12 @@
   assertEquals(savedTransactionModelDao4.getProcessedCurrency(),Currency.USD);
   assertNull(savedTransactionModelDao4.getGatewayErrorCode());
   assertEquals(savedTransactionModelDao4.getGatewayErrorMsg(),"nothing");
-  paymentDao.updatePaymentAndTransactionOnCompletion(accountId,savedPayment.getId(),savedTransactionModelDao2.getTransactionType(),"AUTH_ABORTED",null,transactionModelDao2.getId(),TransactionStatus.SUCCESS,BigDecimal.ONE,Currency.USD,null,"nothing",internalCallContext);
+  paymentDao.updatePaymentAndTransactionOnCompletion(accountId,savedTransactionModelDao2.getAttemptId(),savedPayment.getId(),savedTransactionModelDao2.getTransactionType(),"AUTH_ABORTED",null,transactionModelDao2.getId(),TransactionStatus.SUCCESS,BigDecimal.ONE,Currency.USD,null,"nothing",internalCallContext);
   final PaymentModelDao savedPayment4Again=paymentDao.getPayment(savedPayment.getId(),internalCallContext);
   assertEquals(savedPayment4Again.getId(),paymentModelDao.getId());
   assertEquals(savedPayment4Again.getStateName(),"AUTH_ABORTED");
   assertEquals(savedPayment4Again.getLastSuccessStateName(),"AUTH_SUCCESS");
-  paymentDao.updatePaymentAndTransactionOnCompletion(accountId,savedPayment.getId(),savedTransactionModelDao2.getTransactionType(),"AUTH_ABORTED","AUTH_SUCCESS",transactionModelDao2.getId(),TransactionStatus.SUCCESS,BigDecimal.ONE,Currency.USD,null,"nothing",internalCallContext);
+  paymentDao.updatePaymentAndTransactionOnCompletion(accountId,savedTransactionModelDao2.getAttemptId(),savedPayment.getId(),savedTransactionModelDao2.getTransactionType(),"AUTH_ABORTED","AUTH_SUCCESS",transactionModelDao2.getId(),TransactionStatus.SUCCESS,BigDecimal.ONE,Currency.USD,null,"nothing",internalCallContext);
   final PaymentModelDao savedPayment4Final=paymentDao.getPayment(savedPayment.getId(),internalCallContext);
   assertEquals(savedPayment4Final.getId(),paymentModelDao.getId());
   assertEquals(savedPayment4Final.getStateName(),"AUTH_ABORTED");

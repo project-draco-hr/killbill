@@ -13,7 +13,7 @@
   final Payment payment=paymentApi.getPaymentByExternalKey(paymentExternalKey,false,ImmutableList.<PluginProperty>of(),callContext);
   final String paymentStateName=paymentSMHelper.getErroredStateForTransaction(TransactionType.AUTHORIZE).toString();
   testListener.pushExpectedEvent(NextEvent.PAYMENT_PLUGIN_ERROR);
-  paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),payment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,payment.getTransactions().get(0).getId(),TransactionStatus.UNKNOWN,requestedAmount,account.getCurrency(),"foo","bar",internalCallContext);
+  paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),null,payment.getId(),TransactionType.AUTHORIZE,paymentStateName,paymentStateName,payment.getTransactions().get(0).getId(),TransactionStatus.UNKNOWN,requestedAmount,account.getCurrency(),"foo","bar",internalCallContext);
   testListener.assertListenerStatus();
   clock.addDeltaFromReality(5 * 60 * 1000);
   final List<PaymentTransactionModelDao> paymentTransactionHistoryBeforeJanitor=getPaymentTransactionHistory(transactionExternalKey);

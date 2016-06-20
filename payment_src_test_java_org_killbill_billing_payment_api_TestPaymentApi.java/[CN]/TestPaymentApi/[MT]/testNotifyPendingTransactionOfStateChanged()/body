@@ -4,7 +4,7 @@
   final String transactionExternalKey="vert";
   final Payment initialPayment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,authAmount,Currency.AED,paymentExternalKey,transactionExternalKey,ImmutableList.<PluginProperty>of(),callContext);
   final PaymentTransaction paymentTransaction=initialPayment.getTransactions().get(0);
-  paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),initialPayment.getId(),TransactionType.AUTHORIZE,"AUTH_PENDING","AUTH_PENDING",paymentTransaction.getId(),TransactionStatus.PENDING,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),null,null,internalCallContext);
+  paymentDao.updatePaymentAndTransactionOnCompletion(account.getId(),null,initialPayment.getId(),TransactionType.AUTHORIZE,"AUTH_PENDING","AUTH_PENDING",paymentTransaction.getId(),TransactionStatus.PENDING,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),null,null,internalCallContext);
   final Payment payment=paymentApi.notifyPendingTransactionOfStateChanged(account,paymentTransaction.getId(),true,callContext);
   assertEquals(payment.getExternalKey(),paymentExternalKey);
   assertEquals(payment.getPaymentMethodId(),account.getPaymentMethodId());

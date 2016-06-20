@@ -25,7 +25,7 @@
   final Iterable<PaymentTransactionModelDao> transactions1=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.PENDING),newTime,initialTime,0L,3L);
   for (  PaymentTransactionModelDao paymentTransaction : transactions1) {
     final String newPaymentState="XXX_FAILED";
-    paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),payment.getId(),paymentTransaction.getTransactionType(),newPaymentState,payment.getLastSuccessStateName(),paymentTransaction.getId(),TransactionStatus.PAYMENT_FAILURE,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),paymentTransaction.getGatewayErrorCode(),paymentTransaction.getGatewayErrorMsg(),internalCallContext);
+    paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),paymentTransaction.getAttemptId(),payment.getId(),paymentTransaction.getTransactionType(),newPaymentState,payment.getLastSuccessStateName(),paymentTransaction.getId(),TransactionStatus.PAYMENT_FAILURE,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),paymentTransaction.getGatewayErrorCode(),paymentTransaction.getGatewayErrorMsg(),internalCallContext);
   }
   final List<PaymentTransactionModelDao> result2=getPendingTransactions(paymentModelDao.getId());
   Assert.assertEquals(result2.size(),1);
@@ -38,7 +38,7 @@
   final Iterable<PaymentTransactionModelDao> transactions2=paymentDao.getByTransactionStatusAcrossTenants(ImmutableList.of(TransactionStatus.PENDING),clock.getUTCNow(),initialTime,0L,1L);
   for (  PaymentTransactionModelDao paymentTransaction : transactions2) {
     final String newPaymentState="XXX_FAILED";
-    paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),payment.getId(),paymentTransaction.getTransactionType(),newPaymentState,payment.getLastSuccessStateName(),paymentTransaction.getId(),TransactionStatus.PAYMENT_FAILURE,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),paymentTransaction.getGatewayErrorCode(),paymentTransaction.getGatewayErrorMsg(),internalCallContext);
+    paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),paymentTransaction.getAttemptId(),payment.getId(),paymentTransaction.getTransactionType(),newPaymentState,payment.getLastSuccessStateName(),paymentTransaction.getId(),TransactionStatus.PAYMENT_FAILURE,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),paymentTransaction.getGatewayErrorCode(),paymentTransaction.getGatewayErrorMsg(),internalCallContext);
   }
   final List<PaymentTransactionModelDao> result3=getPendingTransactions(paymentModelDao.getId());
   Assert.assertEquals(result3.size(),0);
