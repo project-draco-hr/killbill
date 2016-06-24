@@ -4,7 +4,7 @@
   String currentStateName=null;
   if (paymentStateContext.getPaymentId() != null) {
     if (paymentStateContext.getTransactionId() != null || paymentStateContext.getPaymentTransactionExternalKey() != null) {
-      PaymentTransactionModelDao transactionToComplete=findTransactionToComplete(paymentStateContext,daoHelper);
+      PaymentTransactionModelDao transactionToComplete=findTransactionToCompleteAndRunSanityChecks(paymentStateContext,daoHelper);
       if (transactionToComplete != null) {
         getPayment(paymentStateContext.getPaymentId(),true,properties,callContext,internalCallContext);
         transactionToComplete=daoHelper.getPaymentDao().getPaymentTransaction(transactionToComplete.getId(),paymentStateContext.getInternalCallContext());
