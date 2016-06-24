@@ -1,23 +1,11 @@
 {
   logger.debug("Leaving state {}",oldState.getName());
   try {
-    if (paymentStateContext.getPaymentMethodId() == null) {
-      throw new PaymentApiException(ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD,paymentStateContext.getAccount().getId());
+    if (paymentStateContext.getPaymentTransactionModelDao() == null || paymentStateContext.getPaymentTransactionModelDao().getTransactionStatus() != TransactionStatus.PENDING) {
+      daoHelper.createNewPaymentTransaction();
     }
-    final List<PaymentTransactionModelDao> paymentTransactionsForCurrentPayment=paymentStateContext.getPaymentId() != null ? daoHelper.getPaymentDao().getTransactionsForPayment(paymentStateContext.getPaymentId(),paymentStateContext.getInternalCallContext()) : ImmutableList.<PaymentTransactionModelDao>of();
-    final Iterable<PaymentTransactionModelDao> existingPaymentTransactionsForTransactionIdOrKey=filterExistingPaymentTransactionsForTransactionIdOrKey(paymentTransactionsForCurrentPayment,paymentStateContext.getTransactionId(),paymentStateContext.getPaymentTransactionExternalKey());
-    validatePaymentIdAndTransactionType(existingPaymentTransactionsForTransactionIdOrKey);
-    validateUniqueTransactionExternalKey(existingPaymentTransactionsForTransactionIdOrKey);
-    final Iterable<PaymentTransactionModelDao> pendingTransactionsForPaymentAndTransactionType=filterPendingTransactionsForPaymentAndTransactionType(paymentTransactionsForCurrentPayment,paymentStateContext.getTransactionType());
-    validateUniqueInitialPendingTransaction(pendingTransactionsForPaymentAndTransactionType,paymentStateContext.getTransactionType(),paymentStateContext.getPaymentTransactionExternalKey());
-    final PaymentTransactionModelDao pendingPaymentTransaction=filterPendingTransactionsForTransactionKey(pendingTransactionsForPaymentAndTransactionType,paymentStateContext.getPaymentTransactionExternalKey());
-    if (pendingPaymentTransaction != null) {
-      paymentStateContext.setPaymentTransactionModelDao(pendingPaymentTransaction);
-      return;
-    }
-    daoHelper.createNewPaymentTransaction();
   }
- catch (  PaymentApiException e) {
+ catch (  final PaymentApiException e) {
     throw new OperationException(e);
   }
 }

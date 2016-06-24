@@ -10,13 +10,13 @@
   }
 catch (  final OperationException e) {
     if (e.getCause() == null) {
-      throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
+      throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,MoreObjects.firstNonNull(e.getMessage(),""));
     }
  else     if (e.getCause() instanceof PaymentApiException) {
       throw (PaymentApiException)e.getCause();
     }
  else {
-      throw new PaymentApiException(e.getCause(),ErrorCode.PAYMENT_INTERNAL_ERROR,Objects.firstNonNull(e.getMessage(),""));
+      throw new PaymentApiException(e.getCause(),ErrorCode.PAYMENT_INTERNAL_ERROR,MoreObjects.firstNonNull(e.getMessage(),""));
     }
   }
 }

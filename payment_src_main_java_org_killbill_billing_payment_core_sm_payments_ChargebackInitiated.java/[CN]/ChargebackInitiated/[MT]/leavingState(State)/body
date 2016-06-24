@@ -1,0 +1,10 @@
+{
+  if (OperationResult.FAILURE.equals(paymentStateContext.getOverridePluginOperationResult())) {
+    final List<PaymentTransactionModelDao> paymentTransactionsForCurrentPayment=paymentStateContext.getPaymentId() != null ? daoHelper.getPaymentDao().getTransactionsForPayment(paymentStateContext.getPaymentId(),paymentStateContext.getInternalCallContext()) : ImmutableList.<PaymentTransactionModelDao>of();
+    final Iterable<PaymentTransactionModelDao> existingPaymentTransactionsForTransactionIdOrKey=filterExistingPaymentTransactionsForTransactionIdOrKey(paymentTransactionsForCurrentPayment,paymentStateContext.getTransactionId(),paymentStateContext.getPaymentTransactionExternalKey());
+    if (Iterables.<PaymentTransactionModelDao>isEmpty(existingPaymentTransactionsForTransactionIdOrKey)) {
+      throw new OperationException(new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_SUCCESS_PAYMENT,paymentStateContext.getPaymentId()));
+    }
+  }
+  super.leavingState(oldState);
+}

@@ -1,4 +1,26 @@
 {
-  final UUID nonNullPaymentId=paymentAutomatonRunner.run(isApiPayment,transactionType,account,attemptId,paymentMethodId,paymentId,transactionId,paymentExternalKey,paymentTransactionExternalKey,amount,currency,shouldLockAccountAndDispatch,overridePluginOperationResult,properties,callContext,internalCallContext);
+  final PaymentStateContext paymentStateContext=paymentAutomatonRunner.buildPaymentStateContext(isApiPayment,transactionType,account,attemptId,paymentMethodId != null ? paymentMethodId : account.getPaymentMethodId(),paymentId,transactionId,paymentExternalKey,paymentTransactionExternalKey,amount,currency,shouldLockAccountAndDispatch,overridePluginOperationResult,properties,callContext,internalCallContext);
+  final PaymentAutomatonDAOHelper daoHelper=paymentAutomatonRunner.buildDaoHelper(paymentStateContext,internalCallContext);
+  String currentStateName=null;
+  if (paymentStateContext.getPaymentId() != null) {
+    if (paymentStateContext.getTransactionId() != null || paymentStateContext.getPaymentTransactionExternalKey() != null) {
+      PaymentTransactionModelDao transactionToComplete=findTransactionToComplete(paymentStateContext,daoHelper);
+      if (transactionToComplete != null) {
+        getPayment(paymentStateContext.getPaymentId(),true,properties,callContext,internalCallContext);
+        transactionToComplete=daoHelper.getPaymentDao().getPaymentTransaction(transactionToComplete.getId(),paymentStateContext.getInternalCallContext());
+        if (transactionToComplete.getTransactionStatus() == TransactionStatus.UNKNOWN) {
+          throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_OPERATION,paymentStateContext.getTransactionType(),transactionToComplete.getTransactionStatus());
+        }
+        paymentStateContext.setPaymentTransactionModelDao(transactionToComplete);
+      }
+    }
+    final PaymentModelDao paymentModelDao=daoHelper.getPayment();
+    paymentStateContext.setPaymentMethodId(paymentModelDao.getPaymentMethodId());
+    currentStateName=paymentModelDao.getLastSuccessStateName();
+  }
+  if (paymentStateContext.getPaymentMethodId() == null) {
+    throw new PaymentApiException(ErrorCode.PAYMENT_NO_DEFAULT_PAYMENT_METHOD,paymentStateContext.getAccount().getId());
+  }
+  final UUID nonNullPaymentId=paymentAutomatonRunner.run(paymentStateContext,daoHelper,currentStateName,transactionType);
   return getPayment(nonNullPaymentId,true,properties,callContext,internalCallContext);
 }

@@ -1,22 +1,5 @@
 {
-  final DateTime utcNow=clock.getUTCNow();
-  final UUID effectivePaymentId=paymentId != null ? paymentId : retrievePaymentId(paymentExternalKey,internalCallContext);
-  final PaymentStateContext paymentStateContext=new PaymentStateContext(isApiPayment,effectivePaymentId,transactionId,attemptId,paymentExternalKey,paymentTransactionExternalKey,transactionType,account,paymentMethodId,amount,currency,shouldLockAccount,overridePluginOperationResult,properties,internalCallContext,callContext);
-  final PaymentAutomatonDAOHelper daoHelper=new PaymentAutomatonDAOHelper(paymentStateContext,utcNow,paymentDao,pluginRegistry,internalCallContext,eventBus,paymentSMHelper);
-  final UUID effectivePaymentMethodId;
-  final String currentStateName;
-  if (effectivePaymentId != null) {
-    final PaymentModelDao paymentModelDao=daoHelper.getPayment();
-    effectivePaymentMethodId=paymentModelDao.getPaymentMethodId();
-    currentStateName=paymentModelDao.getLastSuccessStateName() != null ? paymentModelDao.getLastSuccessStateName() : paymentSMHelper.getInitStateNameForTransaction();
-    Preconditions.checkState(currentStateName != null,"State name cannot be null for payment " + effectivePaymentId);
-    Preconditions.checkState(paymentMethodId == null || effectivePaymentMethodId.equals(paymentMethodId),"Specified payment method id " + paymentMethodId + " doesn't match the one on the payment "+ effectivePaymentMethodId);
-  }
- else {
-    effectivePaymentMethodId=paymentMethodId != null ? paymentMethodId : account.getPaymentMethodId();
-    currentStateName=paymentSMHelper.getInitStateNameForTransaction();
-  }
-  paymentStateContext.setPaymentMethodId(effectivePaymentMethodId);
+  final String currentStateName=MoreObjects.firstNonNull(currentStateNameOrNull,paymentSMHelper.getInitStateNameForTransaction());
   final OperationCallback operationCallback;
   final LeavingStateCallback leavingStateCallback;
   final EnteringStateCallback enteringStateCallback;
