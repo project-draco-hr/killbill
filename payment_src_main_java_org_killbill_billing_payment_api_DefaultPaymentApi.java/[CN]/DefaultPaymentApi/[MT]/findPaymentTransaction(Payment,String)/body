@@ -1,0 +1,13 @@
+{
+  if (paymentTransactionExternalKey == null) {
+    return Iterables.getLast(payment.getTransactions());
+  }
+ else {
+    return Iterables.<PaymentTransaction>find(Lists.<PaymentTransaction>reverse(payment.getTransactions()),new Predicate<PaymentTransaction>(){
+      @Override public boolean apply(      final PaymentTransaction input){
+        return paymentTransactionExternalKey.equals(input.getExternalKey());
+      }
+    }
+);
+  }
+}

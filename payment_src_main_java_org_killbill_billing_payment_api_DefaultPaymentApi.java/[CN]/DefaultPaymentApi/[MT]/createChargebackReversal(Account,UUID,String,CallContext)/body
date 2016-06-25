@@ -9,12 +9,7 @@
     logEnterAPICall(transactionType,account,null,paymentId,null,null,null,null,paymentTransactionExternalKey,null,null);
     final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
     payment=paymentProcessor.createChargebackReversal(IS_API_PAYMENT,NULL_ATTEMPT_ID,account,paymentId,paymentTransactionExternalKey,null,null,true,callContext,internalCallContext);
-    paymentTransaction=Iterables.<PaymentTransaction>find(Lists.<PaymentTransaction>reverse(payment.getTransactions()),new Predicate<PaymentTransaction>(){
-      @Override public boolean apply(      final PaymentTransaction input){
-        return paymentTransactionExternalKey.equals(input.getExternalKey());
-      }
-    }
-);
+    paymentTransaction=findPaymentTransaction(payment,paymentTransactionExternalKey);
     return payment;
   }
   finally {

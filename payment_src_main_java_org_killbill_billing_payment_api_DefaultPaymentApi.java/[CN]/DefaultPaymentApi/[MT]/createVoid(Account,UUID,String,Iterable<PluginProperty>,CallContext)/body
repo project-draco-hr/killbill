@@ -9,7 +9,7 @@
     logEnterAPICall(transactionType,account,null,paymentId,null,null,null,null,paymentTransactionExternalKey,null,null);
     final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(account.getId(),callContext);
     payment=paymentProcessor.createVoid(IS_API_PAYMENT,NULL_ATTEMPT_ID,account,paymentId,paymentTransactionExternalKey,SHOULD_LOCK_ACCOUNT,properties,callContext,internalCallContext);
-    paymentTransaction=payment.getTransactions().get(payment.getTransactions().size() - 1);
+    paymentTransaction=findPaymentTransaction(payment,paymentTransactionExternalKey);
     return payment;
   }
   finally {
