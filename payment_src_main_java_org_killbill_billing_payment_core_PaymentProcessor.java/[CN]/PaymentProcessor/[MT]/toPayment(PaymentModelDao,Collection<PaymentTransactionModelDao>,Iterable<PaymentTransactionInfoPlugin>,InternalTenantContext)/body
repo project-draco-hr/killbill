@@ -1,0 +1,18 @@
+{
+  final Collection<PaymentTransactionModelDao> transactionsModelDao=new LinkedList<PaymentTransactionModelDao>(curTransactionsModelDao);
+  final PaymentModelDao newPaymentModelDao=invokeJanitor(curPaymentModelDao,transactionsModelDao,pluginTransactions,internalTenantContext);
+  final Collection<PaymentTransaction> transactions=new LinkedList<PaymentTransaction>();
+  for (  final PaymentTransactionModelDao newPaymentTransactionModelDao : transactionsModelDao) {
+    final PaymentTransactionInfoPlugin paymentTransactionInfoPlugin=findPaymentTransactionInfoPlugin(newPaymentTransactionModelDao,pluginTransactions);
+    final PaymentTransaction transaction=new DefaultPaymentTransaction(newPaymentTransactionModelDao.getId(),newPaymentTransactionModelDao.getAttemptId(),newPaymentTransactionModelDao.getTransactionExternalKey(),newPaymentTransactionModelDao.getCreatedDate(),newPaymentTransactionModelDao.getUpdatedDate(),newPaymentTransactionModelDao.getPaymentId(),newPaymentTransactionModelDao.getTransactionType(),newPaymentTransactionModelDao.getEffectiveDate(),newPaymentTransactionModelDao.getTransactionStatus(),newPaymentTransactionModelDao.getAmount(),newPaymentTransactionModelDao.getCurrency(),newPaymentTransactionModelDao.getProcessedAmount(),newPaymentTransactionModelDao.getProcessedCurrency(),newPaymentTransactionModelDao.getGatewayErrorCode(),newPaymentTransactionModelDao.getGatewayErrorMsg(),paymentTransactionInfoPlugin);
+    transactions.add(transaction);
+  }
+  final Ordering<PaymentTransaction> perPaymentTransactionOrdering=Ordering.<PaymentTransaction>from(new Comparator<PaymentTransaction>(){
+    @Override public int compare(    final PaymentTransaction o1,    final PaymentTransaction o2){
+      return o1.getEffectiveDate().compareTo(o2.getEffectiveDate());
+    }
+  }
+);
+  final List<PaymentTransaction> sortedTransactions=perPaymentTransactionOrdering.immutableSortedCopy(transactions);
+  return new DefaultPayment(newPaymentModelDao.getId(),newPaymentModelDao.getCreatedDate(),newPaymentModelDao.getUpdatedDate(),newPaymentModelDao.getAccountId(),newPaymentModelDao.getPaymentMethodId(),newPaymentModelDao.getPaymentNumber(),newPaymentModelDao.getExternalKey(),sortedTransactions);
+}

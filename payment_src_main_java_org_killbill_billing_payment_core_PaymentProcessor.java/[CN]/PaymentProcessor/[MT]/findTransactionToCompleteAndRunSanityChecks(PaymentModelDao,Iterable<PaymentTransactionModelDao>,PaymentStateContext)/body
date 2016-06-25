@@ -1,10 +1,8 @@
 {
-  final List<PaymentTransactionModelDao> paymentTransactionsForCurrentPayment=daoHelper.getPaymentDao().getTransactionsForPayment(paymentStateContext.getPaymentId(),paymentStateContext.getInternalCallContext());
   final Collection<PaymentTransactionModelDao> completionCandidates=new LinkedList<PaymentTransactionModelDao>();
   for (  final PaymentTransactionModelDao paymentTransactionModelDao : paymentTransactionsForCurrentPayment) {
     if (!(paymentStateContext.getTransactionId() != null && paymentTransactionModelDao.getId().equals(paymentStateContext.getTransactionId())) && !(paymentStateContext.getPaymentTransactionExternalKey() != null && paymentTransactionModelDao.getTransactionExternalKey().equals(paymentStateContext.getPaymentTransactionExternalKey()))) {
       if ((paymentTransactionModelDao.getTransactionType() == TransactionType.AUTHORIZE || paymentTransactionModelDao.getTransactionType() == TransactionType.PURCHASE || paymentTransactionModelDao.getTransactionType() == TransactionType.CREDIT) && paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.PENDING) {
-        final PaymentModelDao paymentModelDao=daoHelper.getPayment();
         throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_OPERATION,paymentTransactionModelDao.getTransactionType(),paymentModelDao.getStateName());
       }
  else {
@@ -12,7 +10,6 @@
       }
     }
     if (paymentTransactionModelDao.getTransactionType() != paymentStateContext.getTransactionType()) {
-      final PaymentModelDao paymentModelDao=daoHelper.getPayment();
       throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_OPERATION,paymentStateContext.getTransactionType(),paymentModelDao.getStateName());
     }
     if (paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.PENDING || paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.UNKNOWN) {

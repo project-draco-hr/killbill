@@ -1,0 +1,13 @@
+{
+  final List<PaymentTransactionInfoPlugin> existingTransactions=paymentTransactions.get(kbPaymentId.toString());
+  PaymentTransactionInfoPlugin paymentTransactionInfoPlugin=null;
+  for (  final PaymentTransactionInfoPlugin existingTransaction : existingTransactions) {
+    if (existingTransaction.getKbTransactionPaymentId().equals(kbTransactionId)) {
+      paymentTransactionInfoPlugin=existingTransaction;
+      break;
+    }
+  }
+  Preconditions.checkNotNull(paymentTransactionInfoPlugin);
+  final Iterable<PluginProperty> pluginProperties=ImmutableList.<PluginProperty>of(new PluginProperty(MockPaymentProviderPlugin.PLUGIN_PROPERTY_PAYMENT_PLUGIN_STATUS_OVERRIDE,paymentPluginStatus.toString(),false));
+  getPaymentTransactionInfoPluginResult(kbPaymentId,kbTransactionId,TransactionType.AUTHORIZE,paymentTransactionInfoPlugin.getAmount(),paymentTransactionInfoPlugin.getCurrency(),pluginProperties);
+}

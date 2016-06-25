@@ -3,18 +3,27 @@
   final PaymentAutomatonDAOHelper daoHelper=paymentAutomatonRunner.buildDaoHelper(paymentStateContext,internalCallContext);
   String currentStateName=null;
   if (paymentStateContext.getPaymentId() != null) {
+    PaymentModelDao paymentModelDao=daoHelper.getPayment();
     if (paymentStateContext.getTransactionId() != null || paymentStateContext.getPaymentTransactionExternalKey() != null) {
-      PaymentTransactionModelDao transactionToComplete=findTransactionToCompleteAndRunSanityChecks(paymentStateContext,daoHelper);
+      final List<PaymentTransactionModelDao> paymentTransactionsForCurrentPayment=daoHelper.getPaymentDao().getTransactionsForPayment(paymentStateContext.getPaymentId(),paymentStateContext.getInternalCallContext());
+      PaymentTransactionModelDao transactionToComplete=findTransactionToCompleteAndRunSanityChecks(paymentModelDao,paymentTransactionsForCurrentPayment,paymentStateContext);
       if (transactionToComplete != null) {
-        getPayment(paymentStateContext.getPaymentId(),true,properties,callContext,internalCallContext);
-        transactionToComplete=daoHelper.getPaymentDao().getPaymentTransaction(transactionToComplete.getId(),paymentStateContext.getInternalCallContext());
+        final PaymentPluginApi plugin=getPaymentProviderPlugin(paymentModelDao.getPaymentMethodId(),internalCallContext);
+        final List<PaymentTransactionInfoPlugin> pluginTransactions=getPaymentTransactionInfoPlugins(plugin,paymentModelDao,properties,callContext);
+        paymentModelDao=invokeJanitor(paymentModelDao,paymentTransactionsForCurrentPayment,pluginTransactions,internalCallContext);
+        final UUID transactionToCompleteId=transactionToComplete.getId();
+        transactionToComplete=Iterables.<PaymentTransactionModelDao>find(paymentTransactionsForCurrentPayment,new Predicate<PaymentTransactionModelDao>(){
+          @Override public boolean apply(          final PaymentTransactionModelDao input){
+            return transactionToCompleteId.equals(input.getId());
+          }
+        }
+);
         if (transactionToComplete.getTransactionStatus() == TransactionStatus.UNKNOWN) {
           throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_OPERATION,paymentStateContext.getTransactionType(),transactionToComplete.getTransactionStatus());
         }
         paymentStateContext.setPaymentTransactionModelDao(transactionToComplete);
       }
     }
-    final PaymentModelDao paymentModelDao=daoHelper.getPayment();
     paymentStateContext.setPaymentMethodId(paymentModelDao.getPaymentMethodId());
     currentStateName=paymentModelDao.getLastSuccessStateName();
   }

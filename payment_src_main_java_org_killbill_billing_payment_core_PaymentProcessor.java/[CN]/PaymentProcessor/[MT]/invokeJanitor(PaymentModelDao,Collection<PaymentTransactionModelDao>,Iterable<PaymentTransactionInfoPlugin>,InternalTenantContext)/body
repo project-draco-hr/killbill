@@ -1,0 +1,25 @@
+{
+  final Iterable<PaymentTransactionModelDao> filteredTransactions=Iterables.filter(curTransactionsModelDao,new Predicate<PaymentTransactionModelDao>(){
+    @Override public boolean apply(    final PaymentTransactionModelDao curPaymentTransactionModelDao){
+      return curPaymentTransactionModelDao.getPaymentId().equals(curPaymentModelDao.getId());
+    }
+  }
+);
+  PaymentModelDao newPaymentModelDao=curPaymentModelDao;
+  final Collection<PaymentTransactionModelDao> transactionsModelDao=new LinkedList<PaymentTransactionModelDao>();
+  for (  final PaymentTransactionModelDao curPaymentTransactionModelDao : filteredTransactions) {
+    PaymentTransactionModelDao newPaymentTransactionModelDao=curPaymentTransactionModelDao;
+    final PaymentTransactionInfoPlugin paymentTransactionInfoPlugin=findPaymentTransactionInfoPlugin(newPaymentTransactionModelDao,pluginTransactions);
+    if (paymentTransactionInfoPlugin != null) {
+      final boolean hasChanged=incompletePaymentTransactionTask.updatePaymentAndTransactionIfNeededWithAccountLock(newPaymentModelDao,newPaymentTransactionModelDao,paymentTransactionInfoPlugin,internalTenantContext);
+      if (hasChanged) {
+        newPaymentModelDao=paymentDao.getPayment(newPaymentModelDao.getId(),internalTenantContext);
+        newPaymentTransactionModelDao=paymentDao.getPaymentTransaction(newPaymentTransactionModelDao.getId(),internalTenantContext);
+      }
+    }
+    transactionsModelDao.add(newPaymentTransactionModelDao);
+  }
+  curTransactionsModelDao.clear();
+  curTransactionsModelDao.addAll(transactionsModelDao);
+  return newPaymentModelDao;
+}
