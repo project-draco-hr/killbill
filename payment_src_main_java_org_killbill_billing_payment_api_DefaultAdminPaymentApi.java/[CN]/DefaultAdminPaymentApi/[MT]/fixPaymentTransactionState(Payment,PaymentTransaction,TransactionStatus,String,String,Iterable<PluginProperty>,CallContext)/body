@@ -1,4 +1,12 @@
 {
   final InternalCallContext internalCallContext=internalCallContextFactory.createInternalCallContext(payment.getAccountId(),callContext);
+  final TransactionStatus transactionStatus;
+  if (transactionStatusMaybeNull == null) {
+    checkNotNullParameter(paymentTransaction.getPaymentInfoPlugin(),"PaymentTransactionInfoPlugin");
+    transactionStatus=PaymentTransactionInfoPluginConverter.toTransactionStatus(paymentTransaction.getPaymentInfoPlugin());
+  }
+ else {
+    transactionStatus=transactionStatusMaybeNull;
+  }
   paymentDao.updatePaymentAndTransactionOnCompletion(payment.getAccountId(),null,payment.getId(),paymentTransaction.getTransactionType(),currentPaymentStateName,lastSuccessPaymentState,paymentTransaction.getId(),transactionStatus,paymentTransaction.getProcessedAmount(),paymentTransaction.getProcessedCurrency(),paymentTransaction.getGatewayErrorCode(),paymentTransaction.getGatewayErrorMsg(),internalCallContext);
 }

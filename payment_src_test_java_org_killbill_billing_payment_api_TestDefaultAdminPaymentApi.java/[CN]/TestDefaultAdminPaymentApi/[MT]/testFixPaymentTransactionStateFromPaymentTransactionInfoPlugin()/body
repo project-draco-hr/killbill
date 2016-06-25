@@ -1,0 +1,24 @@
+{
+  final Payment payment=paymentApi.createAuthorization(account,account.getPaymentMethodId(),null,BigDecimal.TEN,Currency.EUR,UUID.randomUUID().toString(),UUID.randomUUID().toString(),ImmutableList.<PluginProperty>of(),callContext);
+  final PaymentModelDao paymentModelDao=paymentDao.getPayment(payment.getId(),internalCallContext);
+  final PaymentTransactionModelDao paymentTransactionModelDao=paymentDao.getPaymentTransaction(payment.getTransactions().get(0).getId(),internalCallContext);
+  Assert.assertEquals(paymentModelDao.getStateName(),"AUTH_SUCCESS");
+  Assert.assertEquals(paymentModelDao.getLastSuccessStateName(),"AUTH_SUCCESS");
+  Assert.assertEquals(paymentTransactionModelDao.getTransactionStatus(),TransactionStatus.SUCCESS);
+  Assert.assertEquals(paymentTransactionModelDao.getProcessedAmount().compareTo(BigDecimal.TEN),0);
+  Assert.assertEquals(paymentTransactionModelDao.getProcessedCurrency(),Currency.EUR);
+  Assert.assertEquals(paymentTransactionModelDao.getGatewayErrorCode(),"");
+  Assert.assertEquals(paymentTransactionModelDao.getGatewayErrorMsg(),"");
+  final PaymentTransactionInfoPlugin infoPlugin=new DefaultNoOpPaymentInfoPlugin(paymentTransactionModelDao.getPaymentId(),paymentTransactionModelDao.getId(),paymentTransactionModelDao.getTransactionType(),paymentTransactionModelDao.getAmount(),paymentTransactionModelDao.getCurrency(),paymentTransactionModelDao.getEffectiveDate(),paymentTransactionModelDao.getCreatedDate(),PaymentPluginStatus.ERROR,"error-code","error-msg");
+  final PaymentTransaction newPaymentTransaction=new DefaultPaymentTransaction(paymentTransactionModelDao.getId(),paymentTransactionModelDao.getAttemptId(),paymentTransactionModelDao.getTransactionExternalKey(),paymentTransactionModelDao.getCreatedDate(),paymentTransactionModelDao.getUpdatedDate(),paymentTransactionModelDao.getPaymentId(),paymentTransactionModelDao.getTransactionType(),paymentTransactionModelDao.getEffectiveDate(),TransactionStatus.PAYMENT_FAILURE,paymentTransactionModelDao.getAmount(),paymentTransactionModelDao.getCurrency(),paymentTransactionModelDao.getProcessedAmount(),paymentTransactionModelDao.getProcessedCurrency(),infoPlugin.getGatewayErrorCode(),infoPlugin.getGatewayError(),infoPlugin);
+  adminPaymentApi.fixPaymentTransactionState(payment,newPaymentTransaction,null,null,"AUTH_ERRORED",ImmutableList.<PluginProperty>of(),callContext);
+  final PaymentModelDao refreshedPaymentModelDao=paymentDao.getPayment(payment.getId(),internalCallContext);
+  final PaymentTransactionModelDao refreshedPaymentTransactionModelDao=paymentDao.getPaymentTransaction(payment.getTransactions().get(0).getId(),internalCallContext);
+  Assert.assertEquals(refreshedPaymentModelDao.getStateName(),"AUTH_ERRORED");
+  Assert.assertEquals(refreshedPaymentModelDao.getLastSuccessStateName(),"AUTH_SUCCESS");
+  Assert.assertEquals(refreshedPaymentTransactionModelDao.getTransactionStatus(),TransactionStatus.PAYMENT_FAILURE);
+  Assert.assertEquals(refreshedPaymentTransactionModelDao.getProcessedAmount().compareTo(BigDecimal.TEN),0);
+  Assert.assertEquals(refreshedPaymentTransactionModelDao.getProcessedCurrency(),Currency.EUR);
+  Assert.assertEquals(refreshedPaymentTransactionModelDao.getGatewayErrorCode(),"error-code");
+  Assert.assertEquals(refreshedPaymentTransactionModelDao.getGatewayErrorMsg(),"error-msg");
+}
