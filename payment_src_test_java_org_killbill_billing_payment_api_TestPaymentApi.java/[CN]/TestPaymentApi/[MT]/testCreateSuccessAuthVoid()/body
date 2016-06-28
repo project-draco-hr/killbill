@@ -45,4 +45,11 @@
   assertEquals(payment2.getTransactions().get(1).getTransactionType(),TransactionType.VOID);
   assertNotNull(payment2.getTransactions().get(1).getGatewayErrorMsg());
   assertNotNull(payment2.getTransactions().get(1).getGatewayErrorCode());
+  try {
+    paymentApi.createVoid(account,payment.getId(),UUID.randomUUID().toString(),ImmutableList.<PluginProperty>of(),callContext);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
 }
