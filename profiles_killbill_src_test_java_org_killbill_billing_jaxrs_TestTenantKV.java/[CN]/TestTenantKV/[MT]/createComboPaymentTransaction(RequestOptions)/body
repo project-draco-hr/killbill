@@ -1,0 +1,19 @@
+{
+  final Account accountJson=getAccount();
+  accountJson.setAccountId(null);
+  final PaymentMethodPluginDetail info=new PaymentMethodPluginDetail();
+  info.setProperties(null);
+  final String paymentMethodExternalKey=UUID.randomUUID().toString();
+  final PaymentMethod paymentMethodJson=new PaymentMethod(null,paymentMethodExternalKey,null,true,PLUGIN_NAME,info);
+  final String authTransactionExternalKey=UUID.randomUUID().toString();
+  final PaymentTransaction authTransactionJson=new PaymentTransaction();
+  authTransactionJson.setAmount(BigDecimal.TEN);
+  authTransactionJson.setCurrency(accountJson.getCurrency());
+  authTransactionJson.setPaymentExternalKey(UUID.randomUUID().toString());
+  authTransactionJson.setTransactionExternalKey(authTransactionExternalKey);
+  authTransactionJson.setTransactionType("AUTHORIZE");
+  final ComboPaymentTransaction comboAuthorization=new ComboPaymentTransaction(accountJson,paymentMethodJson,authTransactionJson,ImmutableList.<PluginProperty>of(),ImmutableList.<PluginProperty>of());
+  final Payment payment=killBillClient.createPayment(comboAuthorization,ImmutableMap.<String,String>of(),requestOptions);
+  Assert.assertEquals(payment.getTransactions().get(0).getStatus(),TransactionStatus.SUCCESS.toString());
+  return payment;
+}

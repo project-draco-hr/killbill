@@ -1,0 +1,31 @@
+{
+  checkCacheLoaderStatus();
+  if (!(key instanceof String)) {
+    throw new IllegalArgumentException("Unexpected key type of " + key.getClass().getName());
+  }
+  if (!(argument instanceof CacheLoaderArgument)) {
+    throw new IllegalArgumentException("Unexpected key type of " + argument.getClass().getName());
+  }
+  final String[] parts=((String)key).split(CacheControllerDispatcher.CACHE_KEY_SEPARATOR);
+  final String rawKey=parts[0];
+  final Matcher matcher=PATTERN.matcher(rawKey);
+  if (!matcher.matches()) {
+    throw new IllegalArgumentException("Unexpected key " + rawKey);
+  }
+  final String pluginName=matcher.group(1);
+  final String tenantRecordId=parts[1];
+  final CacheLoaderArgument cacheLoaderArgument=(CacheLoaderArgument)argument;
+  final LoaderCallback callback=(LoaderCallback)cacheLoaderArgument.getArgs()[0];
+  final InternalTenantContext internalTenantContext=new InternalTenantContext(Long.valueOf(tenantRecordId));
+  final String stateMachineConfigXML=tenantApi.getPluginPaymentStateMachineConfig(pluginName,internalTenantContext);
+  if (stateMachineConfigXML == null) {
+    return null;
+  }
+  try {
+    log.info("Loading config state machine cache for pluginName='{}', tenantRecordId='{}'",pluginName,internalTenantContext.getTenantRecordId());
+    return callback.loadStateMachineConfig(stateMachineConfigXML);
+  }
+ catch (  final PaymentApiException e) {
+    throw new IllegalStateException(String.format("Failed to de-serialize state machine config for tenantRecordId='%s'",internalTenantContext.getTenantRecordId()),e);
+  }
+}

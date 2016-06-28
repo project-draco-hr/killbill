@@ -1,0 +1,51 @@
+{
+  final Tenant otherTenantWithDifferentStateMachine=new Tenant();
+  otherTenantWithDifferentStateMachine.setApiKey(UUID.randomUUID().toString());
+  otherTenantWithDifferentStateMachine.setApiSecret(UUID.randomUUID().toString());
+  killBillClient.createTenant(otherTenantWithDifferentStateMachine,requestOptions);
+  final RequestOptions requestOptionsOtherTenant=requestOptions.extend().withTenantApiKey(otherTenantWithDifferentStateMachine.getApiKey()).withTenantApiSecret(otherTenantWithDifferentStateMachine.getApiSecret()).build();
+  final TenantKey emptyTenantKey=killBillClient.getPluginPaymentStateMachineConfigurationForTenant(PLUGIN_NAME,requestOptions);
+  Assert.assertEquals(emptyTenantKey.getValues().size(),0);
+  final TenantKey emptyTenantKeyOtherTenant=killBillClient.getPluginPaymentStateMachineConfigurationForTenant(PLUGIN_NAME,requestOptionsOtherTenant);
+  Assert.assertEquals(emptyTenantKeyOtherTenant.getValues().size(),0);
+  final String stateMachineConfigPath=Resources.getResource("SimplePaymentStates.xml").getPath();
+  final TenantKey tenantKey0=killBillClient.registerPluginPaymentStateMachineConfigurationForTenant(PLUGIN_NAME,stateMachineConfigPath,requestOptionsOtherTenant);
+  Assert.assertEquals(tenantKey0.getKey(),TenantKV.TenantKey.PLUGIN_PAYMENT_STATE_MACHINE_.toString() + PLUGIN_NAME);
+  final TenantKey emptyTenantKey1=killBillClient.getPluginPaymentStateMachineConfigurationForTenant(PLUGIN_NAME,requestOptions);
+  Assert.assertEquals(emptyTenantKey1.getValues().size(),0);
+  final TenantKey tenantKey1OtherTenant=killBillClient.getPluginPaymentStateMachineConfigurationForTenant(PLUGIN_NAME,requestOptionsOtherTenant);
+  Assert.assertEquals(tenantKey1OtherTenant.getKey(),TenantKV.TenantKey.PLUGIN_PAYMENT_STATE_MACHINE_.toString() + PLUGIN_NAME);
+  Assert.assertEquals(tenantKey1OtherTenant.getValues().size(),1);
+  final Payment payment=createComboPaymentTransaction(requestOptions);
+  final Payment paymentOtherTenant=createComboPaymentTransaction(requestOptionsOtherTenant);
+  final Payment voidPayment=killBillClient.voidPayment(payment.getPaymentId(),payment.getPaymentExternalKey(),UUID.randomUUID().toString(),ImmutableList.<String>of(),ImmutableMap.<String,String>of(),requestOptions);
+  Assert.assertEquals(voidPayment.getTransactions().get(0).getStatus(),TransactionStatus.SUCCESS.toString());
+  Assert.assertEquals(voidPayment.getTransactions().get(1).getStatus(),TransactionStatus.SUCCESS.toString());
+  try {
+    killBillClient.voidPayment(paymentOtherTenant.getPaymentId(),paymentOtherTenant.getPaymentExternalKey(),UUID.randomUUID().toString(),ImmutableList.<String>of(),ImmutableMap.<String,String>of(),requestOptionsOtherTenant);
+    Assert.fail();
+  }
+ catch (  final KillBillClientException e) {
+    Assert.assertEquals((int)e.getBillingException().getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
+  killBillClient.unregisterPluginPaymentStateMachineConfigurationForTenant(PLUGIN_NAME,requestOptionsOtherTenant);
+  final TenantKey tenantKey2=killBillClient.getPluginPaymentStateMachineConfigurationForTenant(PLUGIN_NAME,requestOptionsOtherTenant);
+  Assert.assertEquals(tenantKey2.getKey(),TenantKV.TenantKey.PLUGIN_PAYMENT_STATE_MACHINE_.toString() + PLUGIN_NAME);
+  Assert.assertEquals(tenantKey2.getValues().size(),0);
+  final AtomicReference<Payment> voidPaymentOtherTenant2Ref=new AtomicReference<Payment>();
+  Awaitility.await().atMost(6,TimeUnit.SECONDS).pollInterval(Duration.TWO_SECONDS).until(new Callable<Boolean>(){
+    @Override public Boolean call() throws Exception {
+      try {
+        final Payment voidPaymentOtherTenant2=killBillClient.voidPayment(paymentOtherTenant.getPaymentId(),paymentOtherTenant.getPaymentExternalKey(),UUID.randomUUID().toString(),ImmutableList.<String>of(),ImmutableMap.<String,String>of(),requestOptionsOtherTenant);
+        voidPaymentOtherTenant2Ref.set(voidPaymentOtherTenant2);
+        return voidPaymentOtherTenant2 != null;
+      }
+ catch (      final KillBillClientException e) {
+        return false;
+      }
+    }
+  }
+);
+  Assert.assertEquals(voidPaymentOtherTenant2Ref.get().getTransactions().get(0).getStatus(),TransactionStatus.SUCCESS.toString());
+  Assert.assertEquals(voidPaymentOtherTenant2Ref.get().getTransactions().get(1).getStatus(),TransactionStatus.SUCCESS.toString());
+}

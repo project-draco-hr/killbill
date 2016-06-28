@@ -2,8 +2,8 @@
   bind(StateMachineProvider.class).annotatedWith(Names.named(STATE_MACHINE_RETRY)).toInstance(new StateMachineProvider(DEFAULT_STATE_MACHINE_RETRY_XML));
   bind(StateMachineConfig.class).annotatedWith(Names.named(STATE_MACHINE_RETRY)).toProvider(Key.get(StateMachineProvider.class,Names.named(STATE_MACHINE_RETRY)));
   bind(PaymentControlStateMachineHelper.class).asEagerSingleton();
-  bind(StateMachineProvider.class).annotatedWith(Names.named(STATE_MACHINE_PAYMENT)).toInstance(new StateMachineProvider(DEFAULT_STATE_MACHINE_PAYMENT_XML));
-  bind(StateMachineConfig.class).annotatedWith(Names.named(STATE_MACHINE_PAYMENT)).toProvider(Key.get(StateMachineProvider.class,Names.named(STATE_MACHINE_PAYMENT)));
+  bind(StateMachineConfigCache.class).to(EhCacheStateMachineConfigCache.class).asEagerSingleton();
+  bind(CacheInvalidationCallback.class).annotatedWith(Names.named(STATE_MACHINE_CONFIG_INVALIDATION_CALLBACK)).to(StateMachineConfigCacheInvalidationCallback.class).asEagerSingleton();
   bind(PaymentStateMachineHelper.class).asEagerSingleton();
   bind(ControlPluginRunner.class).asEagerSingleton();
 }

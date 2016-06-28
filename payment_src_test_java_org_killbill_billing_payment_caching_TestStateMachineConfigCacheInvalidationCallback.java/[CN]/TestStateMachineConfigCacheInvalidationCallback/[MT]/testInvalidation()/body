@@ -1,0 +1,28 @@
+{
+  final String pluginName=UUID.randomUUID().toString();
+  final StateMachineConfig defaultPaymentStateMachineConfig=stateMachineConfigCache.getPaymentStateMachineConfig(UUID.randomUUID().toString(),internalCallContext);
+  Assert.assertNotNull(defaultPaymentStateMachineConfig);
+  final AtomicBoolean shouldThrow=new AtomicBoolean(false);
+  Mockito.when(tenantInternalApi.getPluginPaymentStateMachineConfig(Mockito.eq(pluginName),Mockito.any(InternalTenantContext.class))).thenAnswer(new Answer<String>(){
+    @Override public String answer(    final InvocationOnMock invocation) throws Throwable {
+      if (shouldThrow.get()) {
+        throw new RuntimeException();
+      }
+      return null;
+    }
+  }
+);
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,internalCallContext),defaultPaymentStateMachineConfig);
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,otherMultiTenantContext),defaultPaymentStateMachineConfig);
+  shouldThrow.set(true);
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,internalCallContext),defaultPaymentStateMachineConfig);
+  cacheInvalidationCallback.invalidateCache(TenantKey.PLUGIN_PAYMENT_STATE_MACHINE_,pluginName,multiTenantContext);
+  try {
+    stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,multiTenantContext);
+    Assert.fail();
+  }
+ catch (  final CacheException exception) {
+    Assert.assertTrue(exception.getCause() instanceof RuntimeException);
+  }
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,otherMultiTenantContext),defaultPaymentStateMachineConfig);
+}

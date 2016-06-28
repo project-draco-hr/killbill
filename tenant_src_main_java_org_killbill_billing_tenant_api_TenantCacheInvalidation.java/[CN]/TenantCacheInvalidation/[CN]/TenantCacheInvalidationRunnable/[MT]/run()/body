@@ -10,10 +10,12 @@
     try {
       final TenantKeyAndCookie tenantKeyAndCookie=extractTenantKeyAndCookie(cur.getType());
       if (tenantKeyAndCookie != null) {
-        final CacheInvalidationCallback callback=parent.getCacheInvalidation(tenantKeyAndCookie.getTenantKey());
-        if (callback != null) {
+        final Collection<CacheInvalidationCallback> callbacks=parent.getCacheInvalidations(tenantKeyAndCookie.getTenantKey());
+        if (!callbacks.isEmpty()) {
           final InternalTenantContext tenantContext=new InternalTenantContext(cur.getTenantRecordId());
-          callback.invalidateCache(tenantKeyAndCookie.getTenantKey(),tenantKeyAndCookie.getCookie(),tenantContext);
+          for (          final CacheInvalidationCallback callback : callbacks) {
+            callback.invalidateCache(tenantKeyAndCookie.getTenantKey(),tenantKeyAndCookie.getCookie(),tenantContext);
+          }
           final Long tenantKvsTargetRecordId=cur.getTargetRecordId();
           final BusInternalEvent event;
           if (tenantKvsTargetRecordId != null) {

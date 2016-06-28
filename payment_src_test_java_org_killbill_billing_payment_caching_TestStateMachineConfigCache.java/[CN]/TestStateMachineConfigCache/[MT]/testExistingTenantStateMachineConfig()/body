@@ -1,0 +1,58 @@
+{
+  final String pluginName=UUID.randomUUID().toString();
+  final InternalCallContext differentMultiTenantContext=Mockito.mock(InternalCallContext.class);
+  Mockito.when(differentMultiTenantContext.getTenantRecordId()).thenReturn(55667788L);
+  final AtomicBoolean shouldThrow=new AtomicBoolean(false);
+  final Long multiTenantRecordId=multiTenantContext.getTenantRecordId();
+  final Long otherMultiTenantRecordId=otherMultiTenantContext.getTenantRecordId();
+  Mockito.when(tenantInternalApi.getPluginPaymentStateMachineConfig(Mockito.eq(pluginName),Mockito.any(InternalTenantContext.class))).thenAnswer(new Answer<String>(){
+    @Override public String answer(    final InvocationOnMock invocation) throws Throwable {
+      if (shouldThrow.get()) {
+        throw new RuntimeException();
+      }
+      final InternalTenantContext internalContext=(InternalTenantContext)invocation.getArguments()[1];
+      if (multiTenantRecordId.equals(internalContext.getTenantRecordId())) {
+        return new String(ByteStreams.toByteArray(UriAccessor.accessUri(Resources.getResource(PaymentModule.DEFAULT_STATE_MACHINE_PAYMENT_XML).toExternalForm())));
+      }
+ else       if (otherMultiTenantRecordId.equals(internalContext.getTenantRecordId())) {
+        return new String(ByteStreams.toByteArray(UriAccessor.accessUri(Resources.getResource(PaymentModule.DEFAULT_STATE_MACHINE_RETRY_XML).toExternalForm())));
+      }
+ else {
+        return null;
+      }
+    }
+  }
+);
+  final StateMachineConfig defaultStateMachineConfig=stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,differentMultiTenantContext);
+  Assert.assertNotNull(defaultStateMachineConfig);
+  shouldThrow.set(true);
+  final StateMachineConfig defaultStateMachineConfig2=stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,differentMultiTenantContext);
+  Assert.assertNotNull(defaultStateMachineConfig2);
+  Assert.assertEquals(defaultStateMachineConfig2,defaultStateMachineConfig);
+  shouldThrow.set(false);
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(UUID.randomUUID().toString(),multiTenantContext),defaultStateMachineConfig);
+  final StateMachineConfig result=stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,multiTenantContext);
+  Assert.assertNotNull(result);
+  Assert.assertNotEquals(result,defaultStateMachineConfig);
+  Assert.assertEquals(result.getStateMachines().length,8);
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(UUID.randomUUID().toString(),otherMultiTenantContext),defaultStateMachineConfig);
+  final StateMachineConfig otherResult=stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,otherMultiTenantContext);
+  Assert.assertNotNull(otherResult);
+  Assert.assertEquals(otherResult.getStateMachines().length,1);
+  shouldThrow.set(true);
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,multiTenantContext),result);
+  final InternalCallContext sameMultiTenantContext=Mockito.mock(InternalCallContext.class);
+  Mockito.when(sameMultiTenantContext.getAccountRecordId()).thenReturn(9102L);
+  Mockito.when(sameMultiTenantContext.getTenantRecordId()).thenReturn(multiTenantRecordId);
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,sameMultiTenantContext),result);
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,otherMultiTenantContext),otherResult);
+  stateMachineConfigCache.clearPaymentStateMachineConfig(pluginName,multiTenantContext);
+  Assert.assertEquals(stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,otherMultiTenantContext),otherResult);
+  try {
+    stateMachineConfigCache.getPaymentStateMachineConfig(pluginName,multiTenantContext);
+    Assert.fail();
+  }
+ catch (  final CacheException exception) {
+    Assert.assertTrue(exception.getCause() instanceof RuntimeException);
+  }
+}

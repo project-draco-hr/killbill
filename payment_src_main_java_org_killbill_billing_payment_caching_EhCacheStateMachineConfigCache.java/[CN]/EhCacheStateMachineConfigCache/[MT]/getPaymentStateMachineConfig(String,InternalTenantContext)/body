@@ -1,0 +1,18 @@
+{
+  if (tenantContext.getTenantRecordId() == InternalCallContextFactory.INTERNAL_TENANT_RECORD_ID || cacheController == null) {
+    return defaultPaymentStateMachineConfig;
+  }
+  final String pluginConfigKey=getCacheKeyName(pluginName,tenantContext);
+  final CacheLoaderArgument cacheLoaderArgument=createCacheLoaderArgument(pluginName);
+  try {
+    StateMachineConfig pluginPaymentStateMachineConfig=(StateMachineConfig)cacheController.get(pluginConfigKey,cacheLoaderArgument);
+    if (pluginPaymentStateMachineConfig == null) {
+      pluginPaymentStateMachineConfig=defaultPaymentStateMachineConfig;
+      cacheController.add(pluginConfigKey,pluginPaymentStateMachineConfig);
+    }
+    return pluginPaymentStateMachineConfig;
+  }
+ catch (  final IllegalStateException e) {
+    throw new PaymentApiException(e,ErrorCode.PAYMENT_INTERNAL_ERROR,"Invalid payment state machine");
+  }
+}

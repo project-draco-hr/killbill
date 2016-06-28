@@ -1,7 +1,10 @@
 {
-  final PaymentPluginApi pluginApi=pluginRegistry.getServiceForName(pluginName);
-  if (pluginApi == null) {
+  if (paymentPluginApi != null) {
+    return paymentPluginApi;
+  }
+  paymentPluginApi=pluginRegistry.getServiceForName(pluginName);
+  if (paymentPluginApi == null) {
     throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_PLUGIN,pluginName);
   }
-  return pluginApi;
+  return paymentPluginApi;
 }

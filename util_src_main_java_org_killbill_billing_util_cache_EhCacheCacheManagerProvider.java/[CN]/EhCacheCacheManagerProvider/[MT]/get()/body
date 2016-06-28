@@ -13,6 +13,10 @@ catch (  final URISyntaxException e) {
   for (  final BaseCacheLoader cacheLoader : cacheLoaders) {
     cacheLoader.init();
     final Ehcache cache=cacheManager.getEhcache(cacheLoader.getCacheType().getCacheName());
+    if (cache == null) {
+      logger.warn("Cache for cacheName='{}' not configured - check your ehcache.xml",cacheLoader.getCacheType().getCacheName());
+      continue;
+    }
     for (    final CacheLoader existingCacheLoader : cache.getRegisteredCacheLoaders()) {
       cache.unregisterCacheLoader(existingCacheLoader);
     }

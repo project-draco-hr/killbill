@@ -1,8 +1,12 @@
 {
+  if (pluginName != null) {
+    return pluginName;
+  }
   final UUID paymentMethodId=paymentStateContext.getPaymentMethodId();
   final PaymentMethodModelDao methodDao=paymentDao.getPaymentMethodIncludedDeleted(paymentMethodId,internalCallContext);
   if (methodDao == null) {
     throw new PaymentApiException(ErrorCode.PAYMENT_NO_SUCH_PAYMENT_METHOD,paymentMethodId);
   }
-  return methodDao.getPluginName();
+  pluginName=methodDao.getPluginName();
+  return pluginName;
 }
