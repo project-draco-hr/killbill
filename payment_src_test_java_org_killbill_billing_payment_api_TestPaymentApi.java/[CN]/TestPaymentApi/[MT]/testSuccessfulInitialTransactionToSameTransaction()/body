@@ -13,12 +13,14 @@
       Assert.fail("Retrying initial successful transaction (AUTHORIZE, PURCHASE, CREDIT) with same different key should fail");
     }
  catch (    final PaymentApiException e) {
+      Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
     }
     try {
       createPayment(transactionType,processedPayment.getId(),paymentExternalKey,keyA,requestedAmount,PaymentPluginStatus.PROCESSED);
       Assert.fail("Retrying initial successful transaction (AUTHORIZE, PURCHASE, CREDIT) with same transaction key should fail");
     }
  catch (    final PaymentApiException e) {
+      Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
     }
   }
 }
