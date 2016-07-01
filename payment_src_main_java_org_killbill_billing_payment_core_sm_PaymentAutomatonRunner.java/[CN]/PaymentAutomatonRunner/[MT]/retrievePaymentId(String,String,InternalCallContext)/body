@@ -1,0 +1,29 @@
+{
+  if (paymentExternalKey != null) {
+    final PaymentModelDao payment=paymentDao.getPaymentByExternalKey(paymentExternalKey,internalCallContext);
+    if (payment != null) {
+      return payment.getId();
+    }
+  }
+  if (paymentTransactionExternalKey == null) {
+    return null;
+  }
+  final List<PaymentTransactionModelDao> paymentTransactionModelDaos=paymentDao.getPaymentTransactionsByExternalKey(paymentTransactionExternalKey,internalCallContext);
+  for (  final PaymentTransactionModelDao paymentTransactionModelDao : paymentTransactionModelDaos) {
+    if (paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.SUCCESS || paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.PENDING || paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.UNKNOWN) {
+      return paymentTransactionModelDao.getPaymentId();
+    }
+  }
+  UUID paymentIdCandidate=null;
+  for (  final PaymentTransactionModelDao paymentTransactionModelDao : paymentTransactionModelDaos) {
+    if (paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.PAYMENT_FAILURE || paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.PLUGIN_FAILURE) {
+      if (paymentIdCandidate == null) {
+        paymentIdCandidate=paymentTransactionModelDao.getPaymentId();
+      }
+ else       if (!paymentIdCandidate.equals(paymentTransactionModelDao.getPaymentId())) {
+        return null;
+      }
+    }
+  }
+  return paymentIdCandidate;
+}

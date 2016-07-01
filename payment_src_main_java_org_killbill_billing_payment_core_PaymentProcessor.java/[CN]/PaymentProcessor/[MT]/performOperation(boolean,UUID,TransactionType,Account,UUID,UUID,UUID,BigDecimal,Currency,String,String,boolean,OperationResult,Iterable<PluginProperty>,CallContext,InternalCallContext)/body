@@ -6,7 +6,7 @@
     PaymentModelDao paymentModelDao=daoHelper.getPayment();
     if (paymentStateContext.getTransactionId() != null || paymentStateContext.getPaymentTransactionExternalKey() != null) {
       final List<PaymentTransactionModelDao> paymentTransactionsForCurrentPayment=daoHelper.getPaymentDao().getTransactionsForPayment(paymentStateContext.getPaymentId(),paymentStateContext.getInternalCallContext());
-      PaymentTransactionModelDao transactionToComplete=findTransactionToCompleteAndRunSanityChecks(paymentModelDao,paymentTransactionsForCurrentPayment,paymentStateContext);
+      PaymentTransactionModelDao transactionToComplete=findTransactionToCompleteAndRunSanityChecks(paymentModelDao,paymentTransactionsForCurrentPayment,paymentStateContext,internalCallContext);
       if (transactionToComplete != null) {
         final PaymentPluginApi plugin=getPaymentProviderPlugin(paymentModelDao.getPaymentMethodId(),internalCallContext);
         final List<PaymentTransactionInfoPlugin> pluginTransactions=getPaymentTransactionInfoPlugins(plugin,paymentModelDao,properties,callContext);

@@ -1,16 +1,3 @@
 {
-  final Iterable<PluginProperty> pluginProperties=ImmutableList.<PluginProperty>of(new PluginProperty(MockPaymentProviderPlugin.PLUGIN_PROPERTY_PAYMENT_PLUGIN_STATUS_OVERRIDE,paymentPluginStatus.toString(),false));
-switch (transactionType) {
-case AUTHORIZE:
-    return paymentApi.createAuthorization(account,account.getPaymentMethodId(),paymentId,amount,amount == null ? null : account.getCurrency(),paymentExternalKey,paymentTransactionExternalKey,pluginProperties,callContext);
-case PURCHASE:
-  return paymentApi.createPurchase(account,account.getPaymentMethodId(),paymentId,amount,amount == null ? null : account.getCurrency(),paymentExternalKey,paymentTransactionExternalKey,pluginProperties,callContext);
-case CREDIT:
-return paymentApi.createCredit(account,account.getPaymentMethodId(),paymentId,amount,amount == null ? null : account.getCurrency(),paymentExternalKey,paymentTransactionExternalKey,pluginProperties,callContext);
-case CAPTURE:
-return paymentApi.createCapture(account,paymentId,amount,amount == null ? null : account.getCurrency(),paymentTransactionExternalKey,pluginProperties,callContext);
-default :
-Assert.fail();
-return null;
-}
+  return createPayment(account,transactionType,paymentId,paymentExternalKey,paymentTransactionExternalKey,amount,paymentPluginStatus);
 }
