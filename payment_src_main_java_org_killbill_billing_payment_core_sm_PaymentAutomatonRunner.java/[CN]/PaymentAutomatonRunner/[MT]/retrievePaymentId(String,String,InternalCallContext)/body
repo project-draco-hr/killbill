@@ -21,7 +21,7 @@
         paymentIdCandidate=paymentTransactionModelDao.getPaymentId();
       }
  else       if (!paymentIdCandidate.equals(paymentTransactionModelDao.getPaymentId())) {
-        return null;
+        throw new PaymentApiException(ErrorCode.PAYMENT_INTERNAL_ERROR,"Multiple failed payments sharing the same transaction external key - this should never happen");
       }
     }
   }
