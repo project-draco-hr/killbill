@@ -12,6 +12,20 @@
     Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_PARAMETER.getCode());
   }
   try {
+    createPayment(TransactionType.AUTHORIZE,null,authorization.getExternalKey(),null,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
+  try {
+    createPayment(TransactionType.AUTHORIZE,null,authorization.getExternalKey(),UUID.randomUUID().toString(),BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
+  try {
     createPayment(TransactionType.AUTHORIZE,null,null,authKey,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
     Assert.fail();
   }
@@ -19,6 +33,20 @@
     Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS.getCode());
   }
   final Account account1=testHelper.createTestAccount("bobo2@gmail.com",true);
+  try {
+    createPayment(account1,TransactionType.AUTHORIZE,null,authorization.getExternalKey(),UUID.randomUUID().toString(),BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
+  try {
+    createPayment(account1,TransactionType.AUTHORIZE,null,authorization.getExternalKey(),UUID.randomUUID().toString(),BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
   try {
     createPayment(account1,TransactionType.AUTHORIZE,null,null,authKey,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
     Assert.fail();

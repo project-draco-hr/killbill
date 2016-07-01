@@ -13,16 +13,48 @@
   }
   final Account account1=testHelper.createTestAccount("bobo2@gmail.com",true);
   try {
+    createPayment(account1,TransactionType.AUTHORIZE,null,pendingAuthorization.getExternalKey(),UUID.randomUUID().toString(),BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
+  try {
     createPayment(account1,TransactionType.AUTHORIZE,null,null,authKey,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
     Assert.fail();
   }
  catch (  final PaymentApiException e) {
     Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS.getCode());
   }
+  try {
+    createPayment(TransactionType.AUTHORIZE,null,pendingAuthorization.getExternalKey(),UUID.randomUUID().toString(),BigDecimal.TEN,PaymentPluginStatus.PENDING);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
+  final Payment pendingAuthorization2=createPayment(TransactionType.AUTHORIZE,null,pendingAuthorization.getExternalKey(),authKey,BigDecimal.TEN,PaymentPluginStatus.PENDING);
+  assertNotNull(pendingAuthorization2);
+  Assert.assertEquals(pendingAuthorization2.getTransactions().size(),1);
+  Assert.assertEquals(pendingAuthorization2.getTransactions().get(0).getTransactionStatus(),TransactionStatus.PENDING);
   final Payment authorization=createPayment(TransactionType.AUTHORIZE,null,null,authKey,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
   assertNotNull(authorization);
   Assert.assertEquals(authorization.getTransactions().size(),1);
   Assert.assertEquals(authorization.getTransactions().get(0).getTransactionStatus(),TransactionStatus.SUCCESS);
+  try {
+    createPayment(account1,TransactionType.AUTHORIZE,null,pendingAuthorization.getExternalKey(),null,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
+  try {
+    createPayment(account1,TransactionType.AUTHORIZE,null,pendingAuthorization.getExternalKey(),UUID.randomUUID().toString(),BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+  }
   try {
     createPayment(account1,TransactionType.AUTHORIZE,null,null,authKey,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
     Assert.fail();
