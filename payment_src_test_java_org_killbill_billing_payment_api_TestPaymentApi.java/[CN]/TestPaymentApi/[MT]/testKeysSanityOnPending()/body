@@ -13,11 +13,18 @@
   }
   final Account account1=testHelper.createTestAccount("bobo2@gmail.com",true);
   try {
+    createPayment(account1,TransactionType.AUTHORIZE,null,pendingAuthorization.getExternalKey(),null,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
+    Assert.fail();
+  }
+ catch (  final PaymentApiException e) {
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS.getCode());
+  }
+  try {
     createPayment(account1,TransactionType.AUTHORIZE,null,pendingAuthorization.getExternalKey(),UUID.randomUUID().toString(),BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
     Assert.fail();
   }
  catch (  final PaymentApiException e) {
-    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS.getCode());
   }
   try {
     createPayment(account1,TransactionType.AUTHORIZE,null,null,authKey,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
@@ -46,14 +53,14 @@
     Assert.fail();
   }
  catch (  final PaymentApiException e) {
-    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS.getCode());
   }
   try {
     createPayment(account1,TransactionType.AUTHORIZE,null,pendingAuthorization.getExternalKey(),UUID.randomUUID().toString(),BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
     Assert.fail();
   }
  catch (  final PaymentApiException e) {
-    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_OPERATION.getCode());
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS.getCode());
   }
   try {
     createPayment(account1,TransactionType.AUTHORIZE,null,null,authKey,BigDecimal.TEN,PaymentPluginStatus.PROCESSED);
@@ -79,7 +86,7 @@
     Assert.fail();
   }
  catch (  final PaymentApiException e) {
-    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_INVALID_PARAMETER.getCode());
+    Assert.assertEquals(e.getCode(),ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS.getCode());
   }
   final Payment capturedPayment=createPayment(TransactionType.CAPTURE,authorization.getId(),null,captureKey,BigDecimal.ONE,PaymentPluginStatus.PROCESSED);
   Assert.assertEquals(capturedPayment.getTransactions().size(),2);
