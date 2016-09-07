@@ -7,6 +7,10 @@
     if (!paymentModelDao.getAccountRecordId().equals(internalCallContext.getAccountRecordId())) {
       throw new PaymentApiException(ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS,paymentStateContext.getPaymentTransactionExternalKey());
     }
+    if (paymentStateContext.getPaymentTransactionExternalKey() != null) {
+      final List<PaymentTransactionModelDao> allPaymentTransactionsForKey=daoHelper.getPaymentDao().getPaymentTransactionsByExternalKey(paymentStateContext.getPaymentTransactionExternalKey(),internalCallContext);
+      runSanityOnTransactionExternalKey(allPaymentTransactionsForKey,paymentStateContext,internalCallContext);
+    }
     if (paymentStateContext.getTransactionId() != null || paymentStateContext.getPaymentTransactionExternalKey() != null) {
       final List<PaymentTransactionModelDao> paymentTransactionsForCurrentPayment=daoHelper.getPaymentDao().getTransactionsForPayment(paymentStateContext.getPaymentId(),paymentStateContext.getInternalCallContext());
       PaymentTransactionModelDao transactionToComplete=findTransactionToCompleteAndRunSanityChecks(paymentModelDao,paymentTransactionsForCurrentPayment,paymentStateContext,internalCallContext);

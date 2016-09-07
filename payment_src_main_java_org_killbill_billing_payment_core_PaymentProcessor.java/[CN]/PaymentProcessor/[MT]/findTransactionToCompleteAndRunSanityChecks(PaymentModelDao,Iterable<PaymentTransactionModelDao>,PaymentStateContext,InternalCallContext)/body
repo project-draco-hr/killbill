@@ -12,12 +12,6 @@
     if (paymentTransactionModelDao.getTransactionType() != paymentStateContext.getTransactionType()) {
       throw new PaymentApiException(ErrorCode.PAYMENT_INVALID_PARAMETER,"transactionType",String.format("%s doesn't match existing transaction type %s",paymentStateContext.getTransactionType(),paymentTransactionModelDao.getTransactionType()));
     }
-    if (paymentTransactionModelDao.getTransactionExternalKey().equals(paymentStateContext.getPaymentTransactionExternalKey()) && paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.SUCCESS && paymentTransactionModelDao.getTransactionType() != TransactionType.CHARGEBACK) {
-      throw new PaymentApiException(ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS,paymentStateContext.getPaymentTransactionExternalKey());
-    }
-    if (paymentTransactionModelDao.getTransactionExternalKey().equals(paymentStateContext.getPaymentTransactionExternalKey()) && !paymentTransactionModelDao.getAccountRecordId().equals(internalCallContext.getAccountRecordId())) {
-      throw new PaymentApiException(ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS,paymentStateContext.getPaymentTransactionExternalKey());
-    }
     if (paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.PENDING || paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.UNKNOWN) {
       completionCandidates.add(paymentTransactionModelDao);
     }
