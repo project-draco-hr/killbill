@@ -3,7 +3,7 @@
     if (paymentTransactionModelDao.getTransactionExternalKey().equals(paymentStateContext.getPaymentTransactionExternalKey()) && paymentTransactionModelDao.getTransactionStatus() == TransactionStatus.SUCCESS && paymentTransactionModelDao.getTransactionType() != TransactionType.CHARGEBACK) {
       throw new PaymentApiException(ErrorCode.PAYMENT_ACTIVE_TRANSACTION_KEY_EXISTS,paymentStateContext.getPaymentTransactionExternalKey());
     }
-    if (paymentTransactionModelDao.getTransactionExternalKey().equals(paymentStateContext.getPaymentTransactionExternalKey()) && !paymentTransactionModelDao.getAccountRecordId().equals(internalCallContext.getAccountRecordId())) {
+    if (!paymentTransactionModelDao.getAccountRecordId().equals(internalCallContext.getAccountRecordId())) {
       UUID accountId;
       try {
         accountId=accountInternalApi.getAccountByRecordId(paymentTransactionModelDao.getAccountRecordId(),internalCallContext).getId();
