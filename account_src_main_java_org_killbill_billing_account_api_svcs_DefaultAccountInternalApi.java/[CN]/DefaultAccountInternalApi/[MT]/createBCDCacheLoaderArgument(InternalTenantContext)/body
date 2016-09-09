@@ -1,8 +1,11 @@
 {
   final AccountBCDCacheLoader.LoaderCallback loaderCallback=new AccountBCDCacheLoader.LoaderCallback(){
     @Override public Object loadAccountBCD(    final UUID accountId,    final InternalTenantContext context){
-      int bcd=getBCDInternal(accountId,context);
-      return new Integer(bcd);
+      Object result=accountDao.getAccountBCD(accountId,context);
+      if (result != null) {
+        result=result.equals(DefaultMutableAccountData.DEFAULT_BILLING_CYCLE_DAY_LOCAL) ? null : result;
+      }
+      return result;
     }
   }
 ;
